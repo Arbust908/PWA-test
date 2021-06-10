@@ -1,33 +1,34 @@
-import { createApp, h, markRaw } from "vue";
+import { Component, createApp, defineComponent, h, ref, markRaw } from 'vue'
+
 import page from "page";
 import routes from "./routes";
 import "./index.css";
 
 // createApp(App).mount('#app')
-const DefaultComponent = markRaw({
+const defaultComponent = markRaw({
   render: () => h("div", "Loading…"),
 });
 
-const SimpleRouterApp = {
-  data: () => ({
-    ViewComponent: null,
-  }),
+
+const Router: Component = defineComponent({
+  setup() {
+    const viewComponent: Component = ref(null);
+    return { viewComponent }
+  },
 
   render() {
-    return h(this.ViewComponent || DefaultComponent);
+    return h(this.viewComponent || defaultComponent);
   },
 
   created() {
-    for (let route in routes) {
-      page(route, () => {
-        this.ViewComponent = markRaw(
-          require("./pages/" + routes[route] + ".vue").default
-        );
-      });
+    for (const path in routes) {
+      if (Object.prototype.hasOwnProperty.call(routes, path)) {
+        const route = routes[path];
+        page(path, () => this.viewComponent = route);
+      }
     }
-
     page();
   },
-};
+});
 
-createApp(SimpleRouterApp).mount("#app");
+createApp(Router).mount("#app");
