@@ -6,10 +6,66 @@ import {
   createLogger
 } from "vuex";
 
-import {Actions, actions} from '@/store/index.action.ts';
-import {Getters, getters} from '@/store/index.getter.ts';
-import {Mutations, mutations} from '@/store/index.mutation.ts';
-import {State, state} from '@/store/index.state.ts';
+import User from '@/interfaces/User';
+//declare state
+export type State = { counter: number, current_user: User | null};
+//set state
+export const state: State = { counter: 0, current_user: null };
+
+// Getters types
+export type Getters = {
+  doubleCounter(state: State): number;
+};
+
+//getters
+export const getters: GetterTree<State, State> & Getters = {
+  doubleCounter: state => {
+    console.log("state", state.counter);
+    return state.counter * 2;
+  }
+};
+
+export enum MutationTypes {
+  INC_COUNTER = "SET_COUNTER"
+}
+
+//Mutation Types
+export type Mutations<S = State> = {
+  [MutationTypes.INC_COUNTER](state: S, payload: number): void;
+};
+
+//define mutations
+export const mutations: MutationTree<State> & Mutations = {
+  [MutationTypes.INC_COUNTER](state: State, payload: number) {
+    state.counter += payload;
+  }
+};
+
+
+export enum ActionTypes {
+  INC_COUNTER = "SET_COUNTER"
+}
+//actions
+type AugmentedActionContext = {
+  commit<K extends keyof Mutations>(
+    key: K,
+    payload: Parameters<Mutations[K]>[1]
+  ): ReturnType<Mutations[K]>;
+} & Omit<ActionContext<State, State>, "commit">;
+
+// actions interface
+export interface Actions {
+  [ActionTypes.INC_COUNTER](
+    { commit }: AugmentedActionContext,
+    payload: number
+  ): void;
+}
+
+export const actions: ActionTree<State, State> & Actions = {
+  [ActionTypes.INC_COUNTER]({ commit }, payload: number) {
+    commit(MutationTypes.INC_COUNTER, payload);
+  }
+};
 
 //setup store type
 export type Store = Omit<
