@@ -1,19 +1,12 @@
 <template>
-  <div class="card">
-    <div class="card-body text-center">
-      <h4>Welcome to the cat facts page</h4>
-      <div>🐾</div>
-      <span> Use the nav menu above to find new facts! </span>
-    </div>
-  </div>
+  <Layout> Hola </Layout>
 </template>
 
 <script lang="ts">
-import { computed, ComputedRef, defineComponent } from "vue";
-export default defineComponent({
-  components: {},
-  setup() {
-    const router = useRouter();
+import Layout from "@/layouts/Main.vue";
+export default {
+  components: {
+    Layout,
   },
-});
+};
 </script>

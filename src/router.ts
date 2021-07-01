@@ -1,7 +1,12 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from './pages/Home.vue';
 
-const routes: Array<RouterRecordRaw> = [
+const routes: Array<RouteRecordRaw> = [
+    {
+    path: '',
+    name: 'Home',
+    component: Home
+  },
     {
     path: '/',
     name: 'Home',
@@ -41,8 +46,13 @@ const routes: Array<RouterRecordRaw> = [
   },
   {
     path: '/orden-de-trabajo',
-    name: 'WorkOrder',
-    component: () => import('./pages/WorkOrder.vue')
+    name: 'WorkOrders',
+    component: () => import('./pages/WorkOrder/Index.vue')
+  },
+  {
+    path: '/orden-de-trabajo/nueva',
+    name: 'NewWorkOrder',
+    component: () => import('./pages/WorkOrder/New.vue')
   },
   {
     path: '/:catchAll(.*)',

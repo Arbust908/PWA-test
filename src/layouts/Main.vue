@@ -1,10 +1,21 @@
+<!--
+  This example requires Tailwind CSS v2.0+ 
+  
+  This example requires some changes to your config:
+  
+  ```
+  // tailwind.config.js
+  module.exports = {
+    // ...
+    plugins: [
+      // ...
+      require('@tailwindcss/forms'),
+    ]
+  }
+  ```
+-->
 <template>
-  <div
-    :class="isDark ? 'dark' : null"
-    class="h-screen flex overflow-hidden bg-second-100 font-body"
-  >
-    <NotificationInfo v-if="false" />
-    <ModalGeneral v-if="false" />
+  <div class="h-screen flex overflow-hidden bg-gray-100">
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog
         as="div"
@@ -22,7 +33,7 @@
           leave-from="opacity-100"
           leave-to="opacity-0"
         >
-          <DialogOverlay class="fixed inset-0 bg-second-600 bg-opacity-75" />
+          <DialogOverlay class="fixed inset-0 bg-gray-600 bg-opacity-75" />
         </TransitionChild>
         <TransitionChild
           as="template"
@@ -34,7 +45,15 @@
           leave-to="-translate-x-full"
         >
           <div
-            class="relative flex-1 flex flex-col max-w-xs w-full bg-second-800"
+            class="
+              relative
+              flex-1 flex flex-col
+              max-w-xs
+              w-full
+              pt-5
+              pb-4
+              bg-white
+            "
           >
             <TransitionChild
               as="template"
@@ -67,23 +86,19 @@
                 </button>
               </div>
             </TransitionChild>
-            <div class="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
-              <div class="flex-shrink-0 flex items-center px-4">
-                <img
-                  class="h-8 w-auto"
-                  src="@/assets/logo.png"
-                  alt="Workflow"
-                />
-              </div>
-              <nav class="mt-5 px-2 space-y-1">
+            <div class="flex-shrink-0 flex items-center px-4">
+              <Logo class="h-8 w-auto" />
+            </div>
+            <div class="mt-5 flex-1 h-0 overflow-y-auto">
+              <nav class="px-2 space-y-1">
                 <a
                   v-for="item in navigation"
                   :key="item.name"
                   :href="item.href"
                   :class="[
                     item.current
-                      ? 'bg-second-900 text-white'
-                      : 'text-second-300 hover:bg-second-700 hover:text-white',
+                      ? 'bg-gray-100 text-gray-900'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                     'group flex items-center px-2 py-2 text-base font-medium rounded-md',
                   ]"
                 >
@@ -91,8 +106,8 @@
                     :is="item.icon"
                     :class="[
                       item.current
-                        ? 'text-second-300'
-                        : 'text-second-400 group-hover:text-second-300',
+                        ? 'text-gray-500'
+                        : 'text-gray-400 group-hover:text-gray-500',
                       'mr-4 flex-shrink-0 h-6 w-6',
                     ]"
                     aria-hidden="true"
@@ -101,39 +116,10 @@
                 </a>
               </nav>
             </div>
-            <div class="flex-shrink-0 flex bg-second-700 p-4">
-              <a href="#" class="flex-shrink-0 group block">
-                <div class="flex items-center">
-                  <div>
-                    <img
-                      class="inline-block h-10 w-10 rounded-full"
-                      src="https://cdn.bitpatagonia.com/profile/6a76b287-e237-4010-8033-409f03a278d4.jpg"
-                      alt=""
-                    />
-                  </div>
-                  <div class="ml-3">
-                    <p class="text-base font-medium text-white">
-                      <strong>Kin Comida</strong>
-                      <span>- Rol</span>
-                    </p>
-                    <p
-                      class="
-                        text-sm
-                        font-medium
-                        text-second-400
-                        group-hover:text-second-300
-                      "
-                    >
-                      Perfil
-                    </p>
-                  </div>
-                </div>
-              </a>
-            </div>
           </div>
         </TransitionChild>
-        <div class="flex-shrink-0 w-14">
-          <!-- Force sidebar to shrink to fit close icon -->
+        <div class="flex-shrink-0 w-14" aria-hidden="true">
+          <!-- Dummy element to force sidebar to shrink to fit close icon -->
         </div>
       </Dialog>
     </TransitionRoot>
@@ -142,20 +128,29 @@
     <div class="hidden md:flex md:flex-shrink-0">
       <div class="flex flex-col w-64">
         <!-- Sidebar component, swap this element with another sidebar if you like -->
-        <div class="flex flex-col h-0 flex-1 bg-second-800">
-          <div class="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-            <div class="flex items-center flex-shrink-0 px-4">
-              <img class="h-8 w-auto" src="@/assets/logo.png" alt="Workflow" />
-            </div>
-            <nav class="mt-5 flex-1 px-2 bg-second-800 space-y-1">
+        <div
+          class="
+            flex flex-col flex-grow
+            border-r border-gray-200
+            pt-5
+            pb-4
+            bg-white
+            overflow-y-auto
+          "
+        >
+          <div class="flex items-center flex-shrink-0 px-4">
+            <Logo class="h-8 w-auto" />
+          </div>
+          <div class="mt-5 flex-grow flex flex-col">
+            <nav class="flex-1 px-2 bg-white space-y-1">
               <a
                 v-for="item in navigation"
                 :key="item.name"
                 :href="item.href"
                 :class="[
                   item.current
-                    ? 'bg-second-900 text-white'
-                    : 'text-second-300 hover:bg-second-700 hover:text-white',
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
                   'group flex items-center px-2 py-2 text-sm font-medium rounded-md',
                 ]"
               >
@@ -163,8 +158,8 @@
                   :is="item.icon"
                   :class="[
                     item.current
-                      ? 'text-second-300'
-                      : 'text-second-400 group-hover:text-second-300',
+                      ? 'text-gray-500'
+                      : 'text-gray-400 group-hover:text-gray-500',
                     'mr-3 flex-shrink-0 h-6 w-6',
                   ]"
                   aria-hidden="true"
@@ -173,72 +168,165 @@
               </a>
             </nav>
           </div>
-          <div class="flex-shrink-0 flex bg-second-700 p-4">
-            <a href="#" class="flex-shrink-0 w-full group block">
-              <div class="flex items-center">
-                <div>
-                  <img
-                    class="inline-block h-9 w-9 rounded-full"
-                    src="https://cdn.bitpatagonia.com/profile/6a76b287-e237-4010-8033-409f03a278d4.jpg"
-                    alt=""
-                  />
-                </div>
-                <div class="ml-3">
-                  <p class="text-sm font-medium text-white">
-                    <strong>Kin Comida</strong> <span>- Rol</span>
-                  </p>
-                  <p
-                    class="
-                      text-xs
-                      font-medium
-                      text-second-300
-                      group-hover:text-second-200
-                    "
-                  >
-                    Perfil
-                  </p>
-                </div>
-              </div>
-            </a>
-          </div>
         </div>
       </div>
     </div>
     <div class="flex flex-col w-0 flex-1 overflow-hidden">
-      <div class="md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3">
+      <div class="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
         <button
           class="
-            -ml-0.5
-            -mt-0.5
-            h-12
-            w-12
-            inline-flex
-            items-center
-            justify-center
-            rounded-md
-            text-second-500
-            hover:text-second-900
+            px-4
+            border-r border-gray-200
+            text-gray-500
             focus:outline-none
             focus:ring-2
             focus:ring-inset
             focus:ring-indigo-500
+            md:hidden
           "
           @click="sidebarOpen = true"
         >
           <span class="sr-only">Open sidebar</span>
-          <MenuIcon class="h-6 w-6" aria-hidden="true" />
+          <MenuAlt2Icon class="h-6 w-6" aria-hidden="true" />
         </button>
-      </div>
-      <main class="flex-1 relative z-0 overflow-y-auto focus:outline-none">
-        <div class="py-6">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 class="text-2xl font-semibold text-second-900">Dashboard</h1>
+        <div class="flex-1 px-4 flex justify-between">
+          <div class="flex-1 flex">
+            <form class="w-full flex md:ml-0" action="#" method="GET">
+              <label for="search_field" class="sr-only">Search</label>
+              <div
+                class="relative w-full text-gray-400 focus-within:text-gray-600"
+              >
+                <div
+                  class="
+                    absolute
+                    inset-y-0
+                    left-0
+                    flex
+                    items-center
+                    pointer-events-none
+                  "
+                >
+                  <SearchIcon class="h-5 w-5" aria-hidden="true" />
+                </div>
+                <input
+                  id="search_field"
+                  class="
+                    block
+                    w-full
+                    h-full
+                    pl-8
+                    pr-3
+                    py-2
+                    border-transparent
+                    text-gray-900
+                    placeholder-gray-500
+                    focus:outline-none
+                    focus:placeholder-gray-400
+                    focus:ring-0
+                    focus:border-transparent
+                    sm:text-sm
+                  "
+                  placeholder="Search"
+                  type="search"
+                  name="search"
+                />
+              </div>
+            </form>
           </div>
+          <div class="ml-4 flex items-center md:ml-6">
+            <button
+              class="
+                bg-white
+                p-1
+                rounded-full
+                text-gray-400
+                hover:text-gray-500
+                focus:outline-none
+                focus:ring-2
+                focus:ring-offset-2
+                focus:ring-indigo-500
+              "
+            >
+              <span class="sr-only">View notifications</span>
+              <BellIcon class="h-6 w-6" aria-hidden="true" />
+            </button>
+
+            <!-- Profile dropdown -->
+            <Menu as="div" class="ml-3 relative">
+              <div>
+                <MenuButton
+                  class="
+                    max-w-xs
+                    bg-white
+                    flex
+                    items-center
+                    text-sm
+                    rounded-full
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-offset-2
+                    focus:ring-indigo-500
+                  "
+                >
+                  <span class="sr-only">Open user menu</span>
+                  <img
+                    class="h-8 w-8 rounded-full"
+                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    alt=""
+                  />
+                </MenuButton>
+              </div>
+              <transition
+                enter-active-class="transition ease-out duration-100"
+                enter-from-class="transform opacity-0 scale-95"
+                enter-to-class="transform opacity-100 scale-100"
+                leave-active-class="transition ease-in duration-75"
+                leave-from-class="transform opacity-100 scale-100"
+                leave-to-class="transform opacity-0 scale-95"
+              >
+                <MenuItems
+                  class="
+                    origin-top-right
+                    absolute
+                    right-0
+                    mt-2
+                    w-48
+                    rounded-md
+                    shadow-lg
+                    py-1
+                    bg-white
+                    ring-1 ring-black ring-opacity-5
+                    focus:outline-none
+                  "
+                >
+                  <MenuItem
+                    v-for="item in userNavigation"
+                    :key="item.name"
+                    v-slot="{ active }"
+                  >
+                    <a
+                      :href="item.href"
+                      :class="[
+                        active ? 'bg-gray-100' : '',
+                        'block px-4 py-2 text-sm text-gray-700',
+                      ]"
+                      >{{ item.name }}</a
+                    >
+                  </MenuItem>
+                </MenuItems>
+              </transition>
+            </Menu>
+          </div>
+        </div>
+      </div>
+
+      <main class="flex-1 relative overflow-y-auto focus:outline-none py-6">
+        <div class="py-6">
+          <!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+            <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
+          </div> -->
           <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <div class="py-4">
-              <ModeToggle @click="toggleMode" />
-              <router-view></router-view>
-            </div>
+            <slot></slot>
           </div>
         </div>
       </main>
@@ -246,62 +334,69 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { ref } from "vue";
 import {
   Dialog,
   DialogOverlay,
+  Menu,
+  MenuButton,
+  MenuItem,
+  MenuItems,
   TransitionChild,
   TransitionRoot,
 } from "@headlessui/vue";
 import {
+  BellIcon,
   CalendarIcon,
   ChartBarIcon,
   FolderIcon,
   HomeIcon,
   InboxIcon,
-  MenuIcon,
+  MenuAlt2Icon,
   UsersIcon,
   XIcon,
 } from "@heroicons/vue/outline";
-import ModeToggle from "@/components/ModeToggle.vue";
-import NotificationInfo from "@/components/notifications/Info.vue";
-import ModalGeneral from "@/components/modal/General.vue";
-// TO-DO: Desarmar el Layout en componentes
-// TO-DO: pasar a VUEX
+import { SearchIcon } from "@heroicons/vue/solid";
+import Logo from "@/components/Logo.vue";
+
 const navigation = [
-  { name: "Dashboard", href: "/", icon: HomeIcon, current: true },
-  { name: "Team", href: "/team", icon: UsersIcon, current: false },
-  { name: "About", href: "/about", icon: FolderIcon, current: false },
-  { name: "Calendar", href: "/calendar", icon: CalendarIcon, current: false },
-  { name: "Documents", href: "/documents", icon: InboxIcon, current: false },
-  { name: "Reports", href: "/reports", icon: ChartBarIcon, current: false },
+  { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
+  { name: "Team", href: "#", icon: UsersIcon, current: false },
+  { name: "Projects", href: "#", icon: FolderIcon, current: false },
+  { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
+  { name: "Documents", href: "#", icon: InboxIcon, current: false },
+  { name: "Reports", href: "#", icon: ChartBarIcon, current: false },
 ];
-// TO-DO: Armar sistema de notificacion y modales global via Vuex
+const userNavigation = [
+  { name: "Your Profile", href: "#" },
+  { name: "Settings", href: "#" },
+  { name: "Sign out", href: "#" },
+];
+
 export default {
   components: {
     Dialog,
     DialogOverlay,
+    Menu,
+    MenuButton,
+    MenuItem,
+    MenuItems,
     TransitionChild,
     TransitionRoot,
-    ModeToggle,
-    NotificationInfo,
-    ModalGeneral,
-    MenuIcon,
+    BellIcon,
+    MenuAlt2Icon,
+    SearchIcon,
     XIcon,
+    Logo,
   },
   setup() {
     const sidebarOpen = ref(false);
-    let isDark = false;
-    const toggleMode = () => {
-      isDark = !isDark;
-    };
 
     return {
       navigation,
+      userNavigation,
       sidebarOpen,
-      toggleMode,
-      isDark,
     };
   },
 };
