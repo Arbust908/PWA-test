@@ -1,6 +1,10 @@
-<!-- This example requires Tailwind CSS v2.0+ -->
 <template>
-  <div class="h-screen flex overflow-hidden bg-second-100 font-body">
+  <div
+    :class="isDark ? 'dark' : null"
+    class="h-screen flex overflow-hidden bg-second-100 font-body"
+  >
+    <NotificationInfo v-if="false" />
+    <ModalGeneral v-if="false" />
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog
         as="div"
@@ -52,7 +56,9 @@
                     w-10
                     rounded-full
                     focus:outline-none
-                    focus:ring-2 focus:ring-inset focus:ring-white
+                    focus:ring-2
+                    focus:ring-inset
+                    focus:ring-white
                   "
                   @click="sidebarOpen = false"
                 >
@@ -101,12 +107,15 @@
                   <div>
                     <img
                       class="inline-block h-10 w-10 rounded-full"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                      src="https://cdn.bitpatagonia.com/profile/6a76b287-e237-4010-8033-409f03a278d4.jpg"
                       alt=""
                     />
                   </div>
                   <div class="ml-3">
-                    <p class="text-base font-medium text-white">Tom Cook</p>
+                    <p class="text-base font-medium text-white">
+                      <strong>Kin Comida</strong>
+                      <span>- Rol</span>
+                    </p>
                     <p
                       class="
                         text-sm
@@ -115,7 +124,7 @@
                         group-hover:text-second-300
                       "
                     >
-                      View profile
+                      Perfil
                     </p>
                   </div>
                 </div>
@@ -170,12 +179,14 @@
                 <div>
                   <img
                     class="inline-block h-9 w-9 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                    src="https://cdn.bitpatagonia.com/profile/6a76b287-e237-4010-8033-409f03a278d4.jpg"
                     alt=""
                   />
                 </div>
                 <div class="ml-3">
-                  <p class="text-sm font-medium text-white">Tom Cook</p>
+                  <p class="text-sm font-medium text-white">
+                    <strong>Kin Comida</strong> <span>- Rol</span>
+                  </p>
                   <p
                     class="
                       text-xs
@@ -184,7 +195,7 @@
                       group-hover:text-second-200
                     "
                   >
-                    View profile
+                    Perfil
                   </p>
                 </div>
               </div>
@@ -208,7 +219,9 @@
             text-second-500
             hover:text-second-900
             focus:outline-none
-            focus:ring-2 focus:ring-inset focus:ring-indigo-500
+            focus:ring-2
+            focus:ring-inset
+            focus:ring-indigo-500
           "
           @click="sidebarOpen = true"
         >
@@ -222,12 +235,10 @@
             <h1 class="text-2xl font-semibold text-second-900">Dashboard</h1>
           </div>
           <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <!-- Replace with your content -->
             <div class="py-4">
-              <ModeToggle />
-              <slot></slot>
+              <ModeToggle @click="toggleMode" />
+              <router-view></router-view>
             </div>
-            <!-- /End replace -->
           </div>
         </div>
       </main>
@@ -235,7 +246,7 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import { ref } from "vue";
 import {
   Dialog,
@@ -254,7 +265,10 @@ import {
   XIcon,
 } from "@heroicons/vue/outline";
 import ModeToggle from "@/components/ModeToggle.vue";
-
+import NotificationInfo from "@/components/notifications/Info.vue";
+import ModalGeneral from "@/components/modal/General.vue";
+// TO-DO: Desarmar el Layout en componentes
+// TO-DO: pasar a VUEX
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon, current: true },
   { name: "Team", href: "/team", icon: UsersIcon, current: false },
@@ -263,7 +277,7 @@ const navigation = [
   { name: "Documents", href: "/documents", icon: InboxIcon, current: false },
   { name: "Reports", href: "/reports", icon: ChartBarIcon, current: false },
 ];
-
+// TO-DO: Armar sistema de notificacion y modales global via Vuex
 export default {
   components: {
     Dialog,
@@ -271,13 +285,23 @@ export default {
     TransitionChild,
     TransitionRoot,
     ModeToggle,
+    NotificationInfo,
+    ModalGeneral,
+    MenuIcon,
+    XIcon,
   },
   setup() {
     const sidebarOpen = ref(false);
+    let isDark = false;
+    const toggleMode = () => {
+      isDark = !isDark;
+    };
 
     return {
       navigation,
       sidebarOpen,
+      toggleMode,
+      isDark,
     };
   },
 };

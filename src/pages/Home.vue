@@ -1,14 +1,19 @@
 <template>
-  <main-layout>
-    <p>Welcome home!</p>
-  </main-layout>
+  <div class="card">
+    <div class="card-body text-center">
+      <h4>Welcome to the cat facts page</h4>
+      <div>🐾</div>
+      <span> Use the nav menu above to find new facts! </span>
+    </div>
+  </div>
 </template>
 
-<script>
-import MainLayout from "@/layouts/Main.vue";
-export default {
-  components: {
-    MainLayout,
+<script lang="ts">
+import { computed, ComputedRef, defineComponent } from "vue";
+export default defineComponent({
+  components: {},
+  setup() {
+    const router = useRouter();
   },
-};
+});
 </script>

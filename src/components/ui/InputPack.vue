@@ -1,0 +1,28 @@
+<template>
+  <div class="input-pack">
+    <label :for="naming"> {{ title }} </label>
+    <div class="mt-1">
+      <input
+        :id="naming"
+        :name="naming"
+        type="password"
+        autocomplete="new-password"
+        required
+      />
+      <p v-if="error.password">
+        {{ error_msg }}
+      </p>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.input-pack {
+  & > label {
+    @apply block text-sm font-medium text-gray-700;
+  }
+  & input {
+    @apply appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm;
+  }
+}
+</style>

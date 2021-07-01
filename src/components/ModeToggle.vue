@@ -2,39 +2,81 @@
 <template>
   <Switch
     v-model="enabled"
-    :class="[
-      enabled ? 'bg-indigo-600' : 'bg-gray-200',
-      'relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent rounded-full cursor-pointer transition-colors ease-in-out duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500',
-    ]"
+    :class="[enabled ? 'bg-main-600' : 'bg-second-200']"
+    class="
+      relative
+      inline-flex
+      flex-shrink-0
+      h-6
+      w-11
+      border-2 border-transparent
+      rounded-full
+      cursor-pointer
+      transition-colors
+      ease-in-out
+      duration-200
+      focus:outline-none
+      focus:ring-2 focus:ring-offset-2 focus:ring-main-500
+    "
   >
     <span class="sr-only">Use setting</span>
     <span
-      :class="[
-        enabled ? 'translate-x-5' : 'translate-x-0',
-        'pointer-events-none relative inline-block h-5 w-5 rounded-full bg-white shadow transform ring-0 transition ease-in-out duration-200',
-      ]"
+      :class="[enabled ? 'translate-x-5' : 'translate-x-0']"
+      class="
+        pointer-events-none
+        relative
+        inline-block
+        h-5
+        w-5
+        rounded-full
+        bg-white
+        shadow
+        transform
+        ring-0
+        transition
+        ease-in-out
+        duration-200
+      "
     >
       <span
         :class="[
           enabled
             ? 'opacity-0 ease-out duration-100'
             : 'opacity-100 ease-in duration-200',
-          'absolute inset-0 h-full w-full flex items-center justify-center transition-opacity',
         ]"
+        class="
+          absolute
+          inset-0
+          h-full
+          w-full
+          flex
+          items-center
+          justify-center
+          transition-opacity
+        "
         aria-hidden="true"
       >
-        <UserIcon />
+        <MoonIcon />
       </span>
       <span
         :class="[
           enabled
             ? 'opacity-100 ease-in duration-200'
             : 'opacity-0 ease-out duration-100',
-          'absolute inset-0 h-full w-full flex items-center justify-center transition-opacity',
         ]"
+        class="
+          absolute
+          inset-0
+          h-full
+          w-full
+          flex
+          items-center
+          justify-center
+          transition-opacity
+        "
         aria-hidden="true"
       >
-        <XIcon />
+        <SunIcon />
       </span>
     </span>
   </Switch>
@@ -43,13 +85,13 @@
 <script>
 import { ref } from "vue";
 import { Switch } from "@headlessui/vue";
-import { UsersIcon, XIcon } from "@heroicons/vue/outline";
+import { MoonIcon, SunIcon } from "@heroicons/vue/outline";
 
 export default {
   components: {
     Switch,
-    UsersIcon,
-    XIcon,
+    MoonIcon,
+    SunIcon,
   },
   setup() {
     const enabled = ref(false);
