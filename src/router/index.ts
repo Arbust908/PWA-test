@@ -1,58 +1,31 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
-import Home from './pages/Home.vue';
+import Home from '@/pages/Home.vue';
 
 const routes: Array<RouteRecordRaw> = [
-    {
-    path: '',
-    name: 'Home',
-    component: Home
-  },
     {
     path: '/',
     name: 'Home',
     component: Home
   },
-//   {
-//     path: '/fact/:id',
-//     name: 'Fact',
-//     component: () => import('../views/Fact.vue'),
-//     beforeEnter: (to, _, next) => {
-//       const { id } = to.params
-
-//       if (Array.isArray(id)) {
-//         next({ path: '/error' })
-//         return
-//       }
-
-//       // Is a valid index number
-//       const index = parseInt(id)
-//       if (index < 0 || index >= facts.length) {
-//         next({ path: '/error' })
-//         return
-//       }
-
-//       next()
-//     }
-//   },
   {
     path: '/login',
     name: 'Login',
-    component: () => import('./pages/Login.vue')
+    component: () => import('@/pages/Login.vue')
   },
   {
     path: '/about',
     name: 'About',
-    component: () => import('./pages/About.vue')
+    component: () => import('@/pages/About.vue')
   },
   {
     path: '/orden-de-trabajo',
     name: 'WorkOrders',
-    component: () => import('./pages/WorkOrder/Index.vue')
+    component: () => import('@/pages/WorkOrder/Index.vue')
   },
   {
     path: '/orden-de-trabajo/:id',
     name: 'WorkOrderNum',
-    component: () => import('./pages/WorkOrder/_id.vue'),
+    component: () => import('@/pages/WorkOrder/_id.vue'),
     beforeEnter: (to, _, next) => {
       const { id } = to.params
       if (Array.isArray(id)) {
@@ -77,12 +50,17 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/orden-de-trabajo/nueva',
     name: 'NewWorkOrder',
-    component: () => import('./pages/WorkOrder/New.vue')
+    component: () => import('@/pages/WorkOrder/New.vue')
+  },
+  {
+    path: '/componentes',
+    name: 'Components',
+    component: () => import('@/pages/Components.vue')
   },
   {
     path: '/:catchAll(.*)',
     name: 'PageNotFound',
-    component: () => import('./pages/404.vue')
+    component: () => import('@/pages/404.vue')
   }
 ];
 

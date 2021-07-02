@@ -1,9 +1,9 @@
 <template>
-  <main>
+  <Layout>
     <nav>
-      <a href="">Orden</a>
-      <a href="">Equipamento</a>
-      <a href="">RRHH</a>
+      <button>Orden</button>
+      <button>Equipamento</button>
+      <button>RRHH</button>
     </nav>
     <form action="">
       <div class="recover-form__input-block">
@@ -13,5 +13,18 @@
         </div>
       </div>
     </form>
-  </main>
+  </Layout>
 </template>
+
+<script>
+import Layout from '@/layouts/Main.vue';
+
+export default {
+  components: {
+    Layout,
+  },
+  setup() {
+    return {};
+  },
+};
+</script>

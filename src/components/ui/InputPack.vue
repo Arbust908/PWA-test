@@ -1,6 +1,6 @@
 <template>
   <div class="input-pack">
-    <label :for="naming"> {{ title }} </label>
+    <!-- <label :for="naming"> {{ title }} </label>
     <div class="mt-1">
       <input
         :id="naming"
@@ -12,9 +12,11 @@
       <p v-if="error.password">
         {{ error_msg }}
       </p>
-    </div>
+    </div> -->
   </div>
 </template>
+
+<script></script>
 
 <style lang="scss" scoped>
 .input-pack {

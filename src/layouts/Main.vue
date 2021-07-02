@@ -1,19 +1,3 @@
-<!--
-  This example requires Tailwind CSS v2.0+ 
-  
-  This example requires some changes to your config:
-  
-  ```
-  // tailwind.config.js
-  module.exports = {
-    // ...
-    plugins: [
-      // ...
-      require('@tailwindcss/forms'),
-    ]
-  }
-  ```
--->
 <template>
   <div class="h-screen flex overflow-hidden bg-gray-100">
     <TransitionRoot as="template" :show="sidebarOpen">
@@ -44,17 +28,7 @@
           leave-from="translate-x-0"
           leave-to="-translate-x-full"
         >
-          <div
-            class="
-              relative
-              flex-1 flex flex-col
-              max-w-xs
-              w-full
-              pt-5
-              pb-4
-              bg-white
-            "
-          >
+          <div class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white">
             <TransitionChild
               as="template"
               enter="ease-in-out duration-300"
@@ -74,10 +48,7 @@
                     h-10
                     w-10
                     rounded-full
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-inset
-                    focus:ring-white
+                    focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white
                   "
                   @click="sidebarOpen = false"
                 >
@@ -91,29 +62,25 @@
             </div>
             <div class="mt-5 flex-1 h-0 overflow-y-auto">
               <nav class="px-2 space-y-1">
-                <a
+                <router-link
                   v-for="item in navigation"
-                  :key="item.name"
-                  :href="item.href"
+                  :key="item.to"
+                  :to="item.href"
                   :class="[
-                    item.current
-                      ? 'bg-gray-100 text-gray-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    'group flex items-center px-2 py-2 text-base font-medium rounded-md',
+                    item.current ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                    'group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer',
                   ]"
                 >
                   <component
                     :is="item.icon"
                     :class="[
-                      item.current
-                        ? 'text-gray-500'
-                        : 'text-gray-400 group-hover:text-gray-500',
+                      item.current ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500',
                       'mr-4 flex-shrink-0 h-6 w-6',
                     ]"
                     aria-hidden="true"
                   />
                   {{ item.name }}
-                </a>
+                </router-link>
               </nav>
             </div>
           </div>
@@ -128,44 +95,31 @@
     <div class="hidden md:flex md:flex-shrink-0">
       <div class="flex flex-col w-64">
         <!-- Sidebar component, swap this element with another sidebar if you like -->
-        <div
-          class="
-            flex flex-col flex-grow
-            border-r border-gray-200
-            pt-5
-            pb-4
-            bg-white
-            overflow-y-auto
-          "
-        >
+        <div class="flex flex-col flex-grow border-r border-gray-200 pt-5 pb-4 bg-white overflow-y-auto">
           <div class="flex items-center flex-shrink-0 px-4">
             <Logo class="h-8 w-auto" />
           </div>
           <div class="mt-5 flex-grow flex flex-col">
             <nav class="flex-1 px-2 bg-white space-y-1">
-              <a
+              <router-link
                 v-for="item in navigation"
                 :key="item.name"
-                :href="item.href"
+                :to="item.to"
                 :class="[
-                  item.current
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md',
+                  item.current ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
+                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer',
                 ]"
               >
                 <component
                   :is="item.icon"
                   :class="[
-                    item.current
-                      ? 'text-gray-500'
-                      : 'text-gray-400 group-hover:text-gray-500',
+                    item.current ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500',
                     'mr-3 flex-shrink-0 h-6 w-6',
                   ]"
                   aria-hidden="true"
                 />
                 {{ item.name }}
-              </a>
+              </router-link>
             </nav>
           </div>
         </div>
@@ -178,10 +132,7 @@
             px-4
             border-r border-gray-200
             text-gray-500
-            focus:outline-none
-            focus:ring-2
-            focus:ring-inset
-            focus:ring-indigo-500
+            focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500
             md:hidden
           "
           @click="sidebarOpen = true"
@@ -193,19 +144,8 @@
           <div class="flex-1 flex">
             <form class="w-full flex md:ml-0" action="#" method="GET">
               <label for="search_field" class="sr-only">Search</label>
-              <div
-                class="relative w-full text-gray-400 focus-within:text-gray-600"
-              >
-                <div
-                  class="
-                    absolute
-                    inset-y-0
-                    left-0
-                    flex
-                    items-center
-                    pointer-events-none
-                  "
-                >
+              <div class="relative w-full text-gray-400 focus-within:text-gray-600">
+                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
                   <SearchIcon class="h-5 w-5" aria-hidden="true" />
                 </div>
                 <input
@@ -220,10 +160,7 @@
                     border-transparent
                     text-gray-900
                     placeholder-gray-500
-                    focus:outline-none
-                    focus:placeholder-gray-400
-                    focus:ring-0
-                    focus:border-transparent
+                    focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent
                     sm:text-sm
                   "
                   placeholder="Search"
@@ -241,10 +178,7 @@
                 rounded-full
                 text-gray-400
                 hover:text-gray-500
-                focus:outline-none
-                focus:ring-2
-                focus:ring-offset-2
-                focus:ring-indigo-500
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
               "
             >
               <span class="sr-only">View notifications</span>
@@ -262,10 +196,7 @@
                     items-center
                     text-sm
                     rounded-full
-                    focus:outline-none
-                    focus:ring-2
-                    focus:ring-offset-2
-                    focus:ring-indigo-500
+                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
                   "
                 >
                   <span class="sr-only">Open user menu</span>
@@ -299,19 +230,15 @@
                     focus:outline-none
                   "
                 >
-                  <MenuItem
-                    v-for="item in userNavigation"
-                    :key="item.name"
-                    v-slot="{ active }"
-                  >
-                    <a
-                      :href="item.href"
-                      :class="[
-                        active ? 'bg-gray-100' : '',
-                        'block px-4 py-2 text-sm text-gray-700',
-                      ]"
-                      >{{ item.name }}</a
+                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
+                    <router-link
+                      :to="item.to"
+                      :class="active ? 'bg-gray-100' : ''"
+                      class="flex px-4 py-2 text-sm text-gray-700 items-center"
                     >
+                      <component :is="item.icon" class="mr-3 flex-shrink-0 h-6 w-6 text-gray-500" aria-hidden="true" />
+                      {{ item.name }}
+                    </router-link>
                   </MenuItem>
                 </MenuItems>
               </transition>
@@ -322,9 +249,6 @@
 
       <main class="flex-1 relative overflow-y-auto focus:outline-none py-6">
         <div class="py-6">
-          <!-- <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <h1 class="text-2xl font-semibold text-gray-900">Dashboard</h1>
-          </div> -->
           <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
             <slot></slot>
           </div>
@@ -335,7 +259,7 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from 'vue';
 import {
   Dialog,
   DialogOverlay,
@@ -345,34 +269,23 @@ import {
   MenuItems,
   TransitionChild,
   TransitionRoot,
-} from "@headlessui/vue";
+} from '@headlessui/vue';
 import {
   BellIcon,
-  CalendarIcon,
-  ChartBarIcon,
-  FolderIcon,
   HomeIcon,
-  InboxIcon,
   MenuAlt2Icon,
   UsersIcon,
   XIcon,
-} from "@heroicons/vue/outline";
-import { SearchIcon } from "@heroicons/vue/solid";
-import Logo from "@/components/Logo.vue";
+  AtSymbolIcon,
+  ClipboardListIcon,
+  AdjustmentsIcon,
+  LogoutIcon,
+  ChipIcon,
+} from '@heroicons/vue/outline';
+import { SearchIcon } from '@heroicons/vue/solid';
+import Logo from '@/components/Logo.vue';
 
-const navigation = [
-  { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
-  { name: "Team", href: "#", icon: UsersIcon, current: false },
-  { name: "Projects", href: "#", icon: FolderIcon, current: false },
-  { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
-  { name: "Documents", href: "#", icon: InboxIcon, current: false },
-  { name: "Reports", href: "#", icon: ChartBarIcon, current: false },
-];
-const userNavigation = [
-  { name: "Your Profile", href: "#" },
-  { name: "Settings", href: "#" },
-  { name: "Sign out", href: "#" },
-];
+import { useStore } from 'vuex';
 
 export default {
   components: {
@@ -384,14 +297,28 @@ export default {
     MenuItems,
     TransitionChild,
     TransitionRoot,
+    HomeIcon,
     BellIcon,
     MenuAlt2Icon,
     SearchIcon,
     XIcon,
     Logo,
+    AtSymbolIcon,
+    ClipboardListIcon,
+    AdjustmentsIcon,
+    UsersIcon,
+    LogoutIcon,
+    ChipIcon,
   },
   setup() {
+    const store = useStore();
     const sidebarOpen = ref(false);
+    const navigation = computed(() => {
+      return store.state.global.navigation;
+    });
+    const userNavigation = computed(() => {
+      return store.state.global.user_navigation;
+    });
 
     return {
       navigation,
