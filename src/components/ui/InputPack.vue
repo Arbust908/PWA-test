@@ -1,22 +1,62 @@
 <template>
   <div class="input-pack">
-    <!-- <label :for="naming"> {{ title }} </label>
+    <label :for="naming"> {{ title }} </label>
     <div class="mt-1">
       <input
         :id="naming"
         :name="naming"
-        type="password"
+        :type="type"
+        :inputmode="inputmode"
         autocomplete="new-password"
-        required
+        :required="required"
       />
       <p v-if="error.password">
         {{ error_msg }}
       </p>
-    </div> -->
+    </div>
   </div>
 </template>
 
-<script></script>
+<script lang="ts">
+import { reactive, computed } from 'vue';
+// Input Mode
+// https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
+export default {
+  props: {
+    naming: {
+      type: String,
+      default: 'input',
+    },
+    type: {
+      type: String,
+      default: 'text',
+    },
+    inputmode: {
+      type: String,
+      default: 'text',
+    },
+    required: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
+    const state = reactive({
+      input_errors: [],
+      inputType: props.type,
+    });
+
+    const things = computed(() => {
+      return state.input_errors[0];
+    });
+
+    return {
+      state,
+      things,
+    };
+  },
+};
+</script>
 
 <style lang="scss" scoped>
 .input-pack {

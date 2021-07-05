@@ -1,7 +1,7 @@
 <!-- This example requires Tailwind CSS v2.0+ -->
 <template>
   <button :type="type" :size="size">
-    <slot class="icon"></slot>
+    <slot></slot>
   </button>
 </template>
 

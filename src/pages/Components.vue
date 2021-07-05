@@ -1,5 +1,6 @@
 <template>
   <Layout>
+    <Title1></Title1>
     <Title2></Title2>
     <section class="space-y-4">
       <Title3></Title3>
