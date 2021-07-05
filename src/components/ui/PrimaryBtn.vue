@@ -20,8 +20,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+// border-transparent text-white bg-main-600 hover:bg-main-700
 button {
-  @apply inline-flex items-center border border-transparent shadow-sm font-medium  text-white bg-main-600 hover:bg-main-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 space-x-2;
+  @apply inline-flex items-center border-transparent text-white bg-main-600 hover:bg-main-700 border shadow-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 space-x-2;
 }
 button[size='xs'] {
   @apply px-2.5 py-1.5 text-xs rounded;

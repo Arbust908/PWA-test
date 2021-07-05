@@ -25,5 +25,6 @@ export interface HumanResource {
 export interface Crew {
     id: number,
     time: number,
+    title: string,
     resources: Array<HumanResource>,
 }

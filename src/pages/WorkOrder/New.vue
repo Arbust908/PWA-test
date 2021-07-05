@@ -2,7 +2,7 @@
   <Layout>
     <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de Trabjao - #1234</h1>
-      <GhostBtn class="self-end mb-3 md:mb-0" @click="save()">
+      <GhostBtn class="btn__draft" @click="save()">
         <BookmarkIcon class="w-5 h-5" />
         <span> Guardar Provisorio </span>
       </GhostBtn>
@@ -51,20 +51,20 @@
           <section class="input-block_multi">
             <label for="pit" class=""> Pozo </label>
             <div v-for="pit in pits" :key="pit.id" class="pit-block">
-              <input name="pit" type="text" :value="pit.name" />
-              <CircularBtn class="mx-2 shrink-0 p-2" size="sm" @click="removePit(pit.id)">
+              <input name="pit" type="text" :value="pit.name" placeholder="nombre del Pozo" />
+              <CircularBtn class="btn__delete" size="sm" @click="removePit(pit.id)">
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
             <div class="pit-block mt-1">
-              <input name="pit" type="text" placeholder="nombre del Pozo" />
-              <CircularBtn class="mx-2 shrink-0 p-2 invisible">
+              <input name="pit" type="text" placeholder="nombre del Pozo" v-model="new_pit_name" />
+              <CircularBtn class="btn__delete invisible">
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
             <button class="mt-1 flex items-center" @click.prevent="addPit">
-              <CircularBtn class="mr-2" size="xs">
-                <PlusIcon class="w-4 h-4" />
+              <CircularBtn class="btn__add" size="xs">
+                <PlusIcon class="w-5 h-5" />
               </CircularBtn>
               <span class="font-bold text-lg"> Agregar pozo </span>
             </button>
@@ -72,73 +72,76 @@
         </fieldset>
       </form>
       <form v-else-if="WO_section === 'equipamento'" method="POST" action="/" class="p-4">
-        <fieldset>
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Cradle</legend>
-          <section>
-            <div class="input-block">
-              <label for="client" class=""> Operativo </label>
-              <div class="mt-1">
-                <select name="client">
-                  <option value="aplt">Aplt</option>
-                  <option value="rotum">Rotum</option>
-                  <option value="xacje">Xacje</option>
-                </select>
+        <section class="md:flex md:justify-between max-w-4xl gap-4">
+          <fieldset class="w-full max-w-sm">
+            <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Cradle</legend>
+            <section>
+              <div class="input-block">
+                <label for="client" class=""> Operativo </label>
+                <div class="mt-1">
+                  <select name="client">
+                    <option value="aplt">Aplt</option>
+                    <option value="rotum">Rotum</option>
+                    <option value="xacje">Xacje</option>
+                  </select>
+                </div>
               </div>
-            </div>
-            <div class="input-block">
-              <label for="client" class=""> Backup </label>
-              <div class="mt-1">
-                <select name="client">
-                  <option value="aplt">Aplt</option>
-                  <option value="rotum">Rotum</option>
-                  <option value="xacje">Xacje</option>
-                </select>
+              <div class="input-block">
+                <label for="client" class=""> Backup </label>
+                <div class="mt-1">
+                  <select name="client">
+                    <option value="aplt">Aplt</option>
+                    <option value="rotum">Rotum</option>
+                    <option value="xacje">Xacje</option>
+                  </select>
+                </div>
               </div>
-            </div>
-          </section>
-        </fieldset>
-        <fieldset>
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Forklift</legend>
-          <section>
-            <div class="input-block">
-              <label for="client" class=""> Operativo </label>
-              <div class="mt-1">
-                <select name="client">
-                  <option value="roklim">Roklim</option>
-                  <option value="salmin">Salmin</option>
-                  <option value="eroba">Eroba</option>
-                </select>
+            </section>
+          </fieldset>
+          <fieldset class="w-full max-w-sm">
+            <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Forklift</legend>
+            <section>
+              <div class="input-block">
+                <label for="client" class=""> Operativo </label>
+                <div class="mt-1">
+                  <select name="client">
+                    <option value="roklim">Roklim</option>
+                    <option value="salmin">Salmin</option>
+                    <option value="eroba">Eroba</option>
+                  </select>
+                </div>
               </div>
-            </div>
-            <div class="input-block">
-              <label for="client" class=""> Backup </label>
-              <div class="mt-1">
-                <select name="client">
-                  <option value="aplt">Aplt</option>
-                  <option value="rotum">Rotum</option>
-                  <option value="xacje">Xacje</option>
-                </select>
+              <div class="input-block">
+                <label for="client" class=""> Backup </label>
+                <div class="mt-1">
+                  <select name="client">
+                    <option value="aplt">Aplt</option>
+                    <option value="rotum">Rotum</option>
+                    <option value="xacje">Xacje</option>
+                  </select>
+                </div>
               </div>
-            </div>
-          </section>
-        </fieldset>
+            </section>
+          </fieldset>
+        </section>
         <fieldset>
           <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Tractor / Chasis</legend>
           <section class="divide-y">
-            <article v-for="traktor in traktors" :key="traktor.id" class="py-5">
+            <article v-for="traktor in traktors" :key="traktor.id" class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center">
               <div class="">
                 <label for="client" class=""> ID Tractor / Chasis </label>
                 <div class="pit-block">
-                  <input name="pit" type="text" />
-                  <CircularBtn class="mx-2 shrink-0 p-2" size="sm" @click="removeTraktor(traktor.id)">
+                  <input name="pit" type="text" placeholder="#47AGH" />
+                  <CircularBtn class="btn__delete btn__mobile-only" size="sm" @click="removeTraktor(traktor.id)">
                     <TrashIcon class="w-5 h-5" />
                   </CircularBtn>
                 </div>
               </div>
-              <div class="input-block">
+              <div class="input-block lg:w-5/12">
                 <label for="client" class=""> Proveedor </label>
                 <div class="mt-1">
                   <select name="client">
+                    <option selected disabled>Proveedor</option>
                     <option value="10223">Transportes Zaraza SRL</option>
                     <option value="10224">Montoto Logistica SRL</option>
                     <option value="10225">E Inc</option>
@@ -148,41 +151,51 @@
               <div class="input-block">
                 <label for="client" class=""> Descripción </label>
                 <div class="mt-1">
-                  <textarea class="tractor-desc" name="" rows="2"></textarea>
+                  <input name="" type="text" placeholder="Tractor rojo" />
                 </div>
+              </div>
+              <div class="mt-8 mb-5">
+                <CircularBtn class="btn__delete btn__desktop-only" size="sm" @click="removeTraktor(traktor.id)">
+                  <TrashIcon class="w-5 h-5" />
+                </CircularBtn>
               </div>
             </article>
           </section>
           <button class="mt-1 flex items-center" @click.prevent="addTraktor">
-            <CircularBtn class="mr-2" size="xs">
+            <CircularBtn class="btn__add" size="xs">
               <PlusIcon class="w-4 h-4" />
             </CircularBtn>
             <span class="font-bold text-lg"> Agregar tractor / chasis </span>
           </button>
         </fieldset>
-        <fieldset>
+        <fieldset class="max-w-2xl">
           <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">ID Pickup</legend>
           <section class="divide-y">
-            <article v-for="pickup in pickups" :key="pickup.id" class="py-5">
-              <div class="">
+            <article v-for="pickup in pickups" :key="pickup.id" class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center">
+              <div class="lg:w-5/12">
                 <label for="client" class=""> ID Pickup </label>
                 <div class="pit-block">
                   <input name="pit" type="text" />
-                  <CircularBtn class="mx-2 shrink-0 p-2" size="sm" @click="removePickup(pickup.id)">
+                  <CircularBtn class="btn__delete btn__mobile-only" size="sm" @click="removePickup(pickup.id)">
                     <TrashIcon class="w-5 h-5" />
                   </CircularBtn>
                 </div>
               </div>
-              <div class="input-block">
+              <div class="input-block lg:w-8/12">
                 <label for="client" class=""> Descripción </label>
                 <div class="mt-1">
-                  <textarea class="tractor-desc" name="" rows="2"></textarea>
+                  <input name="" type="text" />
                 </div>
+              </div>
+              <div class="mt-8 mb-5">
+                <CircularBtn class="btn__delete btn__desktop-only" size="sm" @click="removePickup(pickup.id)">
+                  <TrashIcon class="w-5 h-5" />
+                </CircularBtn>
               </div>
             </article>
           </section>
           <button class="mt-1 flex items-center" @click.prevent="addPickup">
-            <CircularBtn class="mr-2" size="xs">
+            <CircularBtn class="btn__add" size="xs">
               <PlusIcon class="w-4 h-4" />
             </CircularBtn>
             <span class="font-bold text-lg"> Agregar pickup </span>
@@ -224,10 +237,10 @@
           </section>
         </fieldset>
       </form>
-      <form v-else-if="WO_section === 'rrhh'" method="POST" action="/" class="p-4">
-        <fieldset v-for="crew in crews" :key="crew.id">
+      <form v-else-if="WO_section === 'rrhh'" method="POST" action="/" class="p-4 md:flex md:flex-wrap md:gap-4">
+        <fieldset v-for="crew in crews" :key="crew.id" class="max-w-sm w-full">
           <legend class="flex justify-between items-center font-bold text-2xl pb-4 border-b mb-3 w-full">
-            <span> Crew A </span>
+            <span>{{ crew.title }}</span>
             <select class="rounded" name="client" :time="crew.time">
               <option value="7">7:00 PM</option>
               <option value="8">8:00 PM</option>
@@ -235,7 +248,7 @@
             </select>
           </legend>
           <section class="divide-y">
-            <article v-for="people in crew.resources" :key="people.id" class="py-5">
+            <article v-for="people in crew.resources" :key="people.id" class="pt-2 pb-3">
               <div class="">
                 <label for="client" class=""> Rol </label>
                 <div class="pit-block">
@@ -245,7 +258,7 @@
                     <option value="8">8:00 PM</option>
                     <option value="9">9:00 PM</option>
                   </select>
-                  <CircularBtn class="mx-2 shrink-0 p-2" size="sm" @click="removeResource(people.id)">
+                  <CircularBtn class="btn__delete" size="sm" @click="removeResource(crew.id, people.id)">
                     <TrashIcon class="w-5 h-5" />
                   </CircularBtn>
                 </div>
@@ -262,17 +275,28 @@
               </div>
             </article>
           </section>
-          <button class="mt-1 flex items-center" @click.prevent="addResource">
-            <CircularBtn class="mr-2" size="xs">
+          <button class="mt-1 flex items-center" @click.prevent="addResource(crew.id)">
+            <CircularBtn class="btn__add" size="xs">
               <PlusIcon class="w-4 h-4" />
             </CircularBtn>
             <span class="font-bold text-lg"> Agregar otro </span>
           </button>
         </fieldset>
+        <button
+          class="max-w-sm w-full bg-gray-200 border-2 border-transparent rounded group hover:border-gray-400 p-4"
+          @click.prevent="addCrew"
+        >
+          <div class="text-gray-500 font-bold text-2xl w-full flex justify-center items-center flex-col gap-4">
+            <span class="group-hover:text-gray-600">Agregar Crew</span>
+            <CircularBtn class="btn__add--special" size="sm">
+              <PlusIcon class="w-6 h-6" />
+            </CircularBtn>
+          </div>
+        </button>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
-        <button>Cancelar</button>
-        <PrimaryBtn v-if="!isLastSection()" @click="nextSection()"> Siguiente </PrimaryBtn>
+        <button @click.prevent="goToShowAll">Cancelar</button>
+        <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
         <PrimaryBtn v-else @click="save(true)"> Finalizar </PrimaryBtn>
       </footer>
     </section>
@@ -280,15 +304,15 @@
 </template>
 
 <script lang="ts">
-import { computed, ref, Ref } from 'vue';
-import { BookmarkIcon, TrashIcon, PlusIcon } from '@heroicons/vue/outline';
+import { ref, Ref } from 'vue';
+import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
+import { PlusIcon } from '@heroicons/vue/solid';
 import Layout from '@/layouts/Main.vue';
 import GhostBtn from '@/components/ui/GhostBtn.vue';
 import CircularBtn from '@/components/ui/CircularBtn.vue';
 import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
 import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/WorkOrder';
-import { HumanResource } from '../../interfaces/WorkOrder';
 
 export default {
   components: {
@@ -303,22 +327,31 @@ export default {
   setup() {
     // Pozos
     const pits: Ref<Array<Pit>> = ref([]);
+    const new_pit_name: Ref<string> = ref('');
     const removePit = (pitId: number) => {
       pits.value = pits.value.filter((pit) => pit.id !== pitId);
     };
     const addPit = () => {
       const lastPitId = pits.value.length;
+      console.log(new_pit_name.value);
       pits.value.push({
         id: lastPitId,
-        name: '',
+        name: new_pit_name.value,
       });
     };
     // Tractor
-    const traktors: Ref<Array<Traktor>> = ref([]);
+    const traktors: Ref<Array<Traktor>> = ref([
+      {
+        id: 0,
+        chassis: '',
+        supplier: '',
+        description: '',
+      },
+    ]);
     const removeTraktor = (traktorId: number) => {
       traktors.value = traktors.value.filter((traktor) => traktor.id !== traktorId);
     };
-    const addTraktor = () => {
+    const addTraktor = (): void => {
       const lastTraktorId = traktors.value.length;
       traktors.value.push({
         id: lastTraktorId,
@@ -328,60 +361,84 @@ export default {
       });
     };
     // Pickup
-    const pickups: Ref<Array<Pickup>> = ref([]);
+    const pickups: Ref<Array<Pickup>> = ref([
+      {
+        id: 0,
+        pickup_id: '',
+        description: '',
+      },
+    ]);
     const removePickup = (pickupId: number) => {
       pickups.value = pickups.value.filter((pickup) => pickup.id !== pickupId);
     };
-    const addPickup = () => {
+    const addPickup = (): void => {
       const lastTraktorId = pickups.value.length;
       pickups.value.push({
         id: lastTraktorId,
-        chassis: '',
-        supplier: '',
+        pickup_id: '',
         description: '',
       });
     };
     // Recursos Humanos
-    const resource: Ref<Array<HumanResource>> = ref([]);
-    const crews: Ref<Array<Crew>> = ref([{ id: 1, time: '7', resources: resource }]);
-    const removeResource = (peopleId: number) => {
-      resource.value = resource.value.filter((people) => people.id !== peopleId);
+    const resource: Ref<Array<HumanResource>> = ref([
+      {
+        id: 0,
+        rol: '',
+        name: '',
+      },
+    ]);
+    const crews: Ref<Array<Crew>> = ref([{ id: 1, time: '7', title: 'Crew A', resources: resource }]);
+    const removeResource = (crewId: number, peopleId: number) => {
+      const selectedCrew = crews.value.find((crew) => crew.id === crewId);
+      selectedCrew.resources.value = selectedCrew.resources.value.filter((people) => people.id !== peopleId);
     };
-    const addResource = () => {
-      const lastId = resource.value.length;
-      resource.value.push({
+    const addResource = (crewId: number): void => {
+      const selectedCrew = crews.value.find((crew) => crew.id === crewId);
+      const lastId = selectedCrew.resources.length;
+      selectedCrew.resources.push({
         id: lastId,
         rol: '',
         name: '',
       } as HumanResource);
     };
+    const addCrew = (): void => {
+      const lastId = crews.value.length + 1;
+      const crewLetter = String.fromCharCode(lastId + 64);
+      crews.value.push({ id: lastId, time: '', title: `Crew ${crewLetter}`, resources: [] });
+      addResource(lastId);
+    };
     // Sections
     const WO_section = ref('orden');
     const section_order = ['orden', 'equipamento', 'rrhh'];
-    const changeSection = (new_section: string) => {
+    const changeSection = (new_section: string): void => {
       WO_section.value = new_section;
     };
-    const currentSectionIndex = () => {
+    const currentSectionIndex = (): number => {
       return section_order.indexOf(WO_section.value);
     };
-    const isLastSection = () => {
+    const isLastSection = (): boolean => {
       return currentSectionIndex() >= section_order.length - 1;
     };
-    const nextSection = () => {
+    const nextSection = (): void => {
       if (isLastSection()) {
         WO_section.value = section_order[section_order.length - 1];
       }
       WO_section.value = section_order[currentSectionIndex() + 1];
     };
 
+    const goToShowAll = () => {
+      console.log('Go to show all Work Orders page');
+    };
+
     const save = (isFull = false) => {};
 
     return {
-      pits,
       WO_section,
       changeSection,
       nextSection,
       isLastSection,
+      pits,
+      new_pit_name,
       save,
       removePit,
       addPit,
@@ -395,12 +452,35 @@ export default {
       removeResource,
       addResource,
       crews,
+      addCrew,
+      goToShowAll,
     };
   },
 };
 </script>
 
 <style lang="scss" scoped>
+.btn {
+  &__draft {
+    @apply self-end mb-3 md:mb-0 border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+  }
+  &__delete {
+    @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2;
+  }
+  &__add {
+    @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+  }
+  &__add--special {
+    @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+  }
+  &__mobile-only {
+    @apply lg:hidden;
+  }
+  &__desktop-only {
+    @apply hidden lg:inline-flex;
+  }
+}
+
 .section-tab {
   @apply py-2 border-b-4 w-full font-bold text-gray-400;
 }
@@ -422,10 +502,6 @@ export default {
 
 fieldset {
   @apply mb-6;
-}
-
-.tractor-desc {
-  @apply rounded p-2 max-w-md inline-block w-full;
 }
 
 .equip-grid {
