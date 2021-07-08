@@ -77,9 +77,9 @@
             <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Cradle</legend>
             <section>
               <div class="input-block">
-                <label for="client" class=""> Operativo </label>
+                <label for="cradle_main" class=""> Operativo </label>
                 <div class="mt-1">
-                  <select name="client">
+                  <select name="cradle_main">
                     <option value="aplt">Aplt</option>
                     <option value="rotum">Rotum</option>
                     <option value="xacje">Xacje</option>
@@ -87,9 +87,9 @@
                 </div>
               </div>
               <div class="input-block">
-                <label for="client" class=""> Backup </label>
+                <label for="cradle_backup" class=""> Backup </label>
                 <div class="mt-1">
-                  <select name="client">
+                  <select name="cradle_backup">
                     <option value="aplt">Aplt</option>
                     <option value="rotum">Rotum</option>
                     <option value="xacje">Xacje</option>
@@ -304,13 +304,18 @@
 </template>
 
 <script lang="ts">
+// import { ref, Ref, computed } from 'vue';
+import { useStore } from 'vuex';
 import { ref, Ref } from 'vue';
+import { useState, useGetters, useActions } from '@/store/helpers';
+
 import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
 import { PlusIcon } from '@heroicons/vue/solid';
 import Layout from '@/layouts/Main.vue';
 import GhostBtn from '@/components/ui/GhostBtn.vue';
 import CircularBtn from '@/components/ui/CircularBtn.vue';
 import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+import WOOrder from '@/components/workOrder/Order.vue';
 
 import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/WorkOrder';
 
@@ -323,8 +328,24 @@ export default {
     PlusIcon,
     CircularBtn,
     PrimaryBtn,
+    WOOrder,
   },
   setup() {
+    const store = useStore();
+    console.log('VUEX', store);
+    console.log('Actions', store.state);
+    // const nombreDeEstado = computed(() => store.state.estado)
+    // const nombreDeGetter = computed(() => store.getters.getter)
+
+    // Con Helpers
+    const { all: workOrders, pepe: person } = useState(['workOrders/all', 'pepe']);
+    const {} = useGetters(['']);
+    // const { addNewWorkOrder } = useActions(['workOrders/addNewWorkOrder']);
+    const { testAction: accion } = useActions(['testAction']);
+    accion({ name: 'Pancho' });
+
+    console.log('WO', workOrders);
+    console.log('WO', person.value);
     // Pozos
     const pits: Ref<Array<Pit>> = ref([]);
     const new_pit_name: Ref<string> = ref('');

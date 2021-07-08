@@ -1,5 +1,7 @@
 # Sandflow
 
+<img src="./src/assets/logo.png">
+
 ```bash
 npm install
 npm run dev
@@ -8,8 +10,9 @@ npm run dev
 ## Stack
 
 - Vite
-- Vue 3
-- Page.js
-- Tailwind 2.0
+- Vue v3
+- Vuex v4
+- Vue Router v4
+- Tailwind 2
 - Heroicon
 - HeadlessUI

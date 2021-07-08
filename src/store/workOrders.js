@@ -1,17 +1,28 @@
 export default {
   state: () => ({
-    workOrders: [
+    all: [
       {
-        name: 'About',
-        to: '/about',
-        icon: 'AtSymbolIcon',
-        current: false,
+        id: '000000',
+        client: 'client',
+        service_co: 'pipele',
+        pad: 'pad 01',
+        pits: ['Pozo 1', 'Pozo2'],
+        cradle: {
+          main: 'efjne',
+          buckup: 'sakdjb',
+        },
       },
     ],
   }),
   getters: {},
   mutations: {
-    addNewWorkOrder({ commit }, workOrder) {},
+    ADD_WORKORDER(state, payload) {
+      state.workOrders.push(payload);
+    },
   },
-  actions: {},
+  actions: {
+    addNewWorkOrder({ commit }, workOrder) {
+      commit('ADD_WORKORDER', workOrder);
+    },
+  },
 };

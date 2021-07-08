@@ -20,10 +20,7 @@
               text-white
               bg-indigo-600
               hover:bg-indigo-700
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-indigo-500
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
             "
             to="/login"
             >Ingreso</router-link
@@ -45,10 +42,7 @@
               text-indigo-700
               bg-indigo-100
               hover:bg-indigo-200
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-indigo-500
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
             "
             to="/about"
             >About*</router-link
@@ -71,10 +65,7 @@
               text-gray-700
               bg-white
               hover:bg-gray-50
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-indigo-500
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
             "
             to="/orden-de-trabajo"
             >Orden de Trabajo</router-link
@@ -98,13 +89,10 @@
               text-gray-700
               bg-transparent
               hover:bg-gray-50
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-indigo-500
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
             "
             to="/orden-de-trabajo/nueva"
-            >Nueba OT</router-link
+            >Nueva OT</router-link
           >
         </li>
       </ul>
@@ -113,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import Layout from "@/layouts/Main.vue";
+import Layout from '@/layouts/Main.vue';
 export default {
   components: {
     Layout,
