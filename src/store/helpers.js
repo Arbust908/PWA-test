@@ -1,6 +1,6 @@
 /*** DEPRECO POR QUE VAMOS A USAR vuex-composition-helpers
  * Tambien hay que quedar atentos al issue en el repo de VUEX https://github.com/vuejs/vuex/issues/1725
- */
+
 import { computed } from 'vue';
 import { useStore } from 'vuex';
 
@@ -24,3 +24,4 @@ export function useActions(arr) {
   const keypair = arr.map((a) => [a, (input) => store.dispatch(a, input)]);
   return Object.fromEntries(keypair);
 }
+ */

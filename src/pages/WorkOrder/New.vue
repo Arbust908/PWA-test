@@ -307,7 +307,8 @@
 // import { ref, Ref, computed } from 'vue';
 import { useStore } from 'vuex';
 import { ref, Ref } from 'vue';
-import { useState, useGetters, useActions } from '@/store/helpers';
+// import { useState, useGetters, useActions } from '@/store/helpers';
+import { useState, useGetters, useActions } from 'vuex-composition-helpers';
 
 import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
 import { PlusIcon } from '@heroicons/vue/solid';
@@ -331,21 +332,15 @@ export default {
     WOOrder,
   },
   setup() {
-    const store = useStore();
-    console.log('VUEX', store);
-    console.log('Actions', store.state);
     // const nombreDeEstado = computed(() => store.state.estado)
     // const nombreDeGetter = computed(() => store.getters.getter)
 
     // Con Helpers
-    const { all: workOrders, pepe: person } = useState(['workOrders/all', 'pepe']);
-    const {} = useGetters(['']);
+    // const { pepe: person } = useState(['pepe']);
     // const { addNewWorkOrder } = useActions(['workOrders/addNewWorkOrder']);
-    const { testAction: accion } = useActions(['testAction']);
-    accion({ name: 'Pancho' });
+    // const { testAction: accion } = useActions(['testAction']);
+    // accion({ name: 'Pancho' });
 
-    console.log('WO', workOrders);
-    console.log('WO', person.value);
     // Pozos
     const pits: Ref<Array<Pit>> = ref([]);
     const new_pit_name: Ref<string> = ref('');
@@ -354,7 +349,6 @@ export default {
     };
     const addPit = () => {
       const lastPitId = pits.value.length;
-      console.log(new_pit_name.value);
       pits.value.push({
         id: lastPitId,
         name: new_pit_name.value,

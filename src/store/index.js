@@ -1,24 +1,35 @@
 import { createStore } from 'vuex';
 
-import user from '@/store/user';
+// import user from '@/store/user';
 import global from '@/store/global';
 import workOrders from '@/store/workOrders';
 
 const store = createStore({
   state: {
-    pepe: 'Pelepe',
+    user: { name: '', role: 0 },
   },
-  getter: {},
-  mutations: {},
+  getters: {
+    isAdmin(state) {
+      return state.user.role == 99;
+    },
+    isLogged(state) {
+      return state.user.role > 0;
+    },
+    isGuest(state) {
+      return state.user.role === 0;
+    },
+  },
   actions: {
-    testAction(context, payload) {
-      console.log('Entre al Action');
-      console.log('El payload', payload);
-      console.log('Contexto', context);
+    setUser({ commit }, user) {
+      commit('SET_USER', user);
+    },
+  },
+  mutations: {
+    SET_USER(state, payload) {
+      state.user = payload;
     },
   },
   modules: {
-    user,
     global,
     workOrders,
   },
