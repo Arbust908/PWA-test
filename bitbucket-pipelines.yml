@@ -1,18 +1,17 @@
-image: node:lts-alpine
+image: node:latest
 
 definitions:
   steps:
     - step: &build
         name: 'Dependencies & build project'
         artifacts:
-          - release.zip
+          - dist/**
           - ci/**
           - deploy.yml
         script:
           - npm install
           - npm run build --verbose
           - rm -rf node_modules
-          - zip -r release.zip .
           - mv .ci ci
           - env
     - step: &deploy-qa
