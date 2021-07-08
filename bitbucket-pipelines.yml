@@ -9,8 +9,8 @@ definitions:
           - ci/**
           - deploy.yml
         script:
-          - yarn install
-          - yarn build
+          - npm install
+          - npm run build
           - rm -rf node_modules
           - zip -r release.zip .
           - mv .ci ci
