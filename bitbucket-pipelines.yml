@@ -1,0 +1,69 @@
+image: atlassian/default-image:2
+
+definitions:
+  steps:
+    - step: &build
+        name: 'Dependencies & build project'
+        artifacts:
+          - release.zip
+          - ci/**
+          - deploy.yml
+        script:
+          - npm install
+          - npm run build
+          - rm -rf node_modules
+          - zip -r release.zip .
+          - mv .ci ci
+          - env
+    - step: &deploy-qa
+        image: python:3.9
+        name: 'Deployment to QA'
+        trigger: manual
+        deployment: test
+        script:
+          - ls -l
+          - pip3 install paramiko pyyaml scp
+          - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
+          - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
+          - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
+          - python3 ./ci/deploy.py
+    - step: &deploy-staging
+        image: python:3.9
+        name: 'Deployment to STAGING'
+        trigger: manual
+        deployment: staging
+        script:
+          - ls -l
+          - pip3 install paramiko pyyaml scp
+          - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
+          - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
+          - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
+          - python3 ./ci/deploy.py
+    - step: &deploy-prod
+        image: python:3.9
+        name: 'Deployment to PROD'
+        trigger: manual
+        deployment: production
+        script:
+          - ls -l
+          - pip3 install paramiko pyyaml scp
+          - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
+          - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
+          - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
+          - python3 ./ci/deploy.py
+pipelines:
+  branches:
+    main:
+      - step: *build
+      - step: *deploy-staging
+      - step: *deploy-prod
+  pull-requests:
+    feature/*:
+      - step: *build
+      - step: *deploy-qa
+    fix/*:
+      - step: *build
+      - step: *deploy-qa
+    release/*:
+      - step: *build
+      - step: *deploy-staging
