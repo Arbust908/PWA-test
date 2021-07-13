@@ -485,7 +485,6 @@ export default {
       traktors.value.push({
         id: lastTraktorId,
         chassis: '',
-        supplier: '',
         description: '',
       });
     };
