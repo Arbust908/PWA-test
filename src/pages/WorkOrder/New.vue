@@ -271,6 +271,7 @@
               </div>
             </div>
           </section>
+          {{ isEquipmentFull }}
         </fieldset>
       </form>
       <form
@@ -485,6 +486,7 @@ export default {
       traktors.value.push({
         id: lastTraktorId,
         chassis: '',
+        supplier: '',
         description: '',
       });
     };
