@@ -68,7 +68,7 @@
 import { ref, Ref, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
 import { useActions } from 'vuex-composition-helpers';
-import { User, Role } from '@/interfaces/User';
+import { Role } from '@/interfaces/User';
 
 const Logo = defineAsyncComponent(() => import('@/components/Logo.vue'));
 const Button = defineAsyncComponent(() => import('@/components/ui/Button.vue'));
