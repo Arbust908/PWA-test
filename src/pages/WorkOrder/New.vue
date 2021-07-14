@@ -550,6 +550,7 @@ export default {
         name: '',
       } as HumanResource);
     };
+
     const addCrew = (): void => {
       const lastId = crews.value.length + 1;
       const crewLetter = String.fromCharCode(lastId + 64);
@@ -623,7 +624,6 @@ export default {
     });
     // Is all sections full
     const isAllFull = computed(() => {
-      console.log(isOrderFull.value + ' && ' + isEquipmentFull.value + ' && ' + isRRHHFull.value);
       return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
     });
     // method go to index that goes to the index page
