@@ -5,6 +5,7 @@ definitions:
     - step: &build
         name: 'Dependencies & build project'
         artifacts:
+          - release.zip
           - dist/**
           - ci/**
           - deploy.yml
@@ -12,6 +13,7 @@ definitions:
           - npm install
           - npm run build
           - rm -rf node_modules
+          - npx bestzip release.zip dist/*
           - mv .ci ci
           - env
     - step: &deploy-qa

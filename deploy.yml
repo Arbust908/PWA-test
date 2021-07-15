@@ -1,8 +1,8 @@
 target_dir: /var/www/front
 artifacts:
-  - release
+  - release.zip
 tasks:
-  - mv {cfg.artifacts_dir}/release -d {cfg.target_dir}/{rel.release_name}
+  - unzip {cfg.artifacts_dir}/release.zip -d {cfg.target_dir}/{rel.release_name}
   - yarn install
   - cp {cfg.target_dir}/environment ./.env
   - sudo /usr/sbin/service nginx stop
