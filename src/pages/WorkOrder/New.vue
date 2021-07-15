@@ -406,9 +406,9 @@ import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
 import { PlusIcon } from '@heroicons/vue/solid';
-import Layout from '@/layouts/Main.vue';
-import GhostBtn from '@/components/ui/GhostBtn.vue';
 import CircularBtn from '@/components/ui/CircularBtn.vue';
+import GhostBtn from '@/components/ui/GhostBtn.vue';
+import Layout from '@/layouts/Main.vue';
 import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
 import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
@@ -418,14 +418,14 @@ const api = 'https://sandflow-qa.bitpatagonia.com/api';
 
 export default {
   components: {
-    Layout,
-    GhostBtn,
     BookmarkIcon,
-    TrashIcon,
-    PlusIcon,
     CheckCircleIcon,
     CircularBtn,
+    GhostBtn,
+    Layout,
+    PlusIcon,
     PrimaryBtn,
+    TrashIcon,
   },
   setup() {
     // Init
@@ -448,6 +448,7 @@ export default {
         name: '',
       },
     ]);
+
     const removePit = (pitId: number) => {
       pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
     };
@@ -462,13 +463,19 @@ export default {
     const removeEmptyPits = () => {
       pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
     };
+    // ::
     // Cradle
+    // ::
     const operativeCradle: Ref<string> = ref('');
     const backupCradle: Ref<string> = ref('');
+    // ::
     // Forklift
+    // ::
     const operativeForklift: Ref<string> = ref('');
     const backupForklift: Ref<string> = ref('');
+    // ::
     // Tractor
+    // ::
     const traktors: Ref<Array<Traktor>> = ref([
       {
         id: 0,
@@ -495,7 +502,9 @@ export default {
         (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
       );
     };
+    // ::
     // Pickup
+    // ::
     const pickups: Ref<Array<Pickup>> = ref([
       {
         id: 0,
@@ -518,14 +527,20 @@ export default {
     const removeEmptyPickups = (): void => {
       pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
     };
+    // ::
     // Equipment
+    // ::
+
     // rigmats, conex, generators, tower, cabin
     const rigmats: Ref<number> = ref(0);
     const conex: Ref<number> = ref(0);
     const generators: Ref<number> = ref(0);
     const tower: Ref<number> = ref(0);
     const cabin: Ref<number> = ref(0);
-    // Crew y Recursos Humanos
+
+    // ::
+    // Crew
+    // ::
     const resource: Ref<Array<HumanResource>> = ref([
       {
         id: 0,
@@ -578,6 +593,8 @@ export default {
       );
       return selectedCrew;
     };
+
+    // ::
     // Sections
     const WO_section = ref('orden');
     const section_order = ['orden', 'equipamento', 'rrhh'];
@@ -622,14 +639,12 @@ export default {
     });
     // Is all sections full
     const isAllFull = computed(() => {
-      console.log(isOrderFull.value + ' && ' + isEquipmentFull.value + ' && ' + isRRHHFull.value);
       return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
     });
     // method go to index that goes to the index page
     const goToIndex = (): void => {
       router.push('/ordenes-de-trabajo');
     };
-
     const removeAllEmptys = (): void => {
       removeEmptyPits();
       removeEmptyTraktors();
@@ -637,6 +652,7 @@ export default {
       removeEmptyCrews();
     };
 
+    // :: SAVE
     const save = async (isFull = false) => {
       removeAllEmptys();
       const newWO = {
@@ -667,7 +683,6 @@ export default {
         })
         .then((res) => {
           console.log(res);
-          return res.data;
         })
         .finally(() => {
           loading.value = false;
