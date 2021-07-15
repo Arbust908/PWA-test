@@ -376,6 +376,7 @@
       </form>
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section>
+          {{ isAllFull.value }}
           <GhostBtn v-if="isLastSection()" class="btn__draft" @click.prevent="addCrew"> Agregar Crew </GhostBtn>
         </section>
         <section class="space-x-6 flex items-center justify-end">
