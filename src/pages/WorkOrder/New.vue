@@ -548,7 +548,6 @@ export default {
         name: '',
       } as HumanResource);
     };
-
     const addCrew = (): void => {
       const lastId = crews.value.length + 1;
       const crewLetter = String.fromCharCode(lastId + 64);
