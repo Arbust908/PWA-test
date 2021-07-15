@@ -1,6 +1,6 @@
 # Sandflow
 
-<img src="./src/assets/logo.png">
+![Sandflow](./src/assets/logo.png)
 
 ```bash
 npm install

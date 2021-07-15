@@ -1,13 +1,13 @@
 <template>
   <main class="relative">
-    <aside class="space-x-4 absolute top-0 right-0 m-8">
+    <aside v-if="false" class="space-x-4 absolute top-0 right-0 m-8">
       <button class="px-4 py-1 rounded bg-second-500 text-second-100" @click="selectedCard('login')">login</button>
       <button class="px-4 py-1 rounded bg-second-500 text-second-100" @click="selectedCard('recover')">recover</button>
       <button class="px-4 py-1 rounded bg-second-500 text-second-100" @click="selectedCard('success')">success</button>
       <button class="px-4 py-1 rounded bg-second-500 text-second-100" @click="selectedCard('error')">error</button>
     </aside>
-    <LoginCard v-if="selected_card === 'login'" />
-    <PassRecover v-else-if="selected_card === 'recover'" />
+    <LoginCard v-if="selected_card === 'login'" @recover="selectedCard('recover')" />
+    <PassRecover v-else-if="selected_card === 'recover'" @logback="selectedCard('login')" />
     <Success v-else-if="selected_card === 'success'" />
     <Error v-else-if="selected_card === 'error'" />
   </main>

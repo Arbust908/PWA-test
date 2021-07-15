@@ -1,6 +1,22 @@
 export interface WorkOrder {
     id: number,
-    order_number: string
+    client: string,
+    service_co: string,
+    pad: string,
+    pits: Array<Pit>,
+    operativeCradle: string,
+    backupCradle: string,
+    operativeForklift: string,
+    backupForklift: string,
+    traktors: Array<Traktor>,
+    pickups: Array<Pickup>,
+    crews: Array<Crew>,
+    rigmats: number,
+    conex: number,
+    generators: number,
+    tower: number,
+    cabin: number,
+    isFull: boolean,
 }
 export interface Pit {
     id: number,

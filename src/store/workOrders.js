@@ -1,28 +1,21 @@
 export default {
   state: () => ({
-    all: [
-      {
-        id: '000000',
-        client: 'client',
-        service_co: 'pipele',
-        pad: 'pad 01',
-        pits: ['Pozo 1', 'Pozo2'],
-        cradle: {
-          main: 'efjne',
-          buckup: 'sakdjb',
-        },
-      },
-    ],
+    all: [],
   }),
   getters: {},
   mutations: {
     ADD_WORKORDER(state, payload) {
-      state.workOrders.push(payload);
+      state.all.push(payload);
     },
   },
   actions: {
-    addNewWorkOrder({ commit }, workOrder) {
+    saveWorkOrder({ commit }, workOrder) {
       commit('ADD_WORKORDER', workOrder);
+      if (workOrder.isFull) {
+        // Axios POST to api to create work order
+      } else {
+        // Axios POST to incomplete work order
+      }
     },
   },
 };

@@ -6,7 +6,7 @@ import workOrders from '@/store/workOrders';
 
 const store = createStore({
   state: {
-    user: { name: '', role: 0 },
+    user: { username: '', role: 0 },
   },
   getters: {
     isAdmin(state) {
@@ -22,6 +22,9 @@ const store = createStore({
   actions: {
     setUser({ commit }, user) {
       commit('SET_USER', user);
+    },
+    logOutUser({ commit }) {
+      commit('SET_USER', { username: '', role: 0 });
     },
   },
   mutations: {

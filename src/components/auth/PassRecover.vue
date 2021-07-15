@@ -3,19 +3,13 @@
     <article class="recover-box">
       <header class="recover-box__header">
         <Logo class="recover-logo" />
-        <h2>Cambiar contraseña</h2>
+        <!-- <h2>Cambiar contraseña</h2> -->
       </header>
       <form class="recover-box__form" action="#" method="POST">
         <div class="recover-form__input-block">
           <label for="password" class=""> Nueva Contraseña </label>
           <div class="mt-1">
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autocomplete="new-password"
-              required
-            />
+            <input id="password" name="password" type="password" autocomplete="new-password" required />
             <p v-if="error.password"></p>
           </div>
         </div>
@@ -23,13 +17,7 @@
         <div class="recover-form__input-block">
           <label for="new-password"> Confirmar Nueva Contraseña </label>
           <div class="mt-1">
-            <input
-              id="new-password"
-              name="new-password"
-              type="password"
-              autocomplete="new-password"
-              required
-            />
+            <input id="new-password" name="new-password" type="password" autocomplete="new-password" required />
             <p v-if="error.new_password"></p>
           </div>
         </div>
@@ -39,9 +27,7 @@
         </div>
 
         <div class="recover-back">
-          <a href="#" class="recover-form__forgeti text-sm">
-            Volver al Login
-          </a>
+          <button @click.prevent="$emit('logback')">Volver al Login</button>
         </div>
       </form>
     </article>
@@ -49,8 +35,8 @@
 </template>
 
 <script>
-import Logo from "@/components/Logo.vue";
-import Button from "@/components/ui/Button.vue";
+import Logo from '@/components/Logo.vue';
+import Button from '@/components/ui/Button.vue';
 export default {
   components: {
     Logo,
@@ -74,7 +60,7 @@ export default {
     &__image {
       @apply hidden md:block relative;
       &:after {
-        content: "";
+        content: '';
         @apply absolute inset-0 bg-gradient-to-t from-main-600 to-transparent;
       }
     }
@@ -106,7 +92,7 @@ export default {
   }
   &-back {
     @apply text-center;
-    & a {
+    & button {
       @apply text-main-500 hover:text-main-300 hover:underline;
     }
   }
