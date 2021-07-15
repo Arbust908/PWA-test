@@ -1,0 +1,14 @@
+target_dir: /var/www/front
+artifacts:
+  - release.zip
+tasks:
+  - unzip {cfg.artifacts_dir}/release.zip -d {cfg.target_dir}/{rel.release_name}
+  - yarn install
+  - cp {cfg.target_dir}/environment ./.env
+  - sudo /usr/sbin/service nginx stop
+  - rm -f {cfg.target_dir}/live
+  - ln -s {cfg.target_dir}/{rel.release_name} {cfg.target_dir}/live
+  - sudo /usr/sbin/service nginx start
+required_vars:
+  - AWS_HOST
+  - AWS_USER
