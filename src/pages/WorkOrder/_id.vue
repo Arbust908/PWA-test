@@ -1,7 +1,7 @@
 <template>
   <Layout>
     <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de Trabjao - {{ woID }}</h1>
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de trabajo - {{ woID }}</h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <nav class="flex justify-between">
@@ -23,23 +23,25 @@
           <div class="input-block">
             <label for="client" class=""> Cliente </label>
             <div class="mt-1">
-              <select v-model="client" name="client">
+              <input v-model="client" name="client" type="text" placeholder="Nombre de cliente" />
+              <!-- <select v-model="client" name="client">
                 <option selected disabled value="">ej: Nasta</option>
                 <option value="ypf">YPF</option>
                 <option value="ypf2">YPF2</option>
                 <option value="ypf3">YPF3</option>
-              </select>
+              </select> -->
             </div>
           </div>
           <div class="input-block">
             <label for="service_co" class=""> Operadora / Empresa de Servicios </label>
             <div class="mt-1">
-              <select v-model="service_co" name="service_co">
+              <input v-model="service_co" name="service_co" type="text" placeholder="Nombre de Operadora" />
+              <!-- <select v-model="service_co" name="service_co">
                 <option selected disabled value="">ej: Pipele</option>
                 <option value="ypf">YPF</option>
                 <option value="ypf2">YPF2</option>
                 <option value="ypf3">YPF3</option>
-              </select>
+              </select> -->
             </div>
           </div>
           <div class="input-block">
@@ -79,23 +81,25 @@
               <div class="input-block">
                 <label for="cradle_main" class=""> Operativo </label>
                 <div class="mt-1">
-                  <select v-model="operativeCradle" name="cradle_main">
+                  <input v-model="operativeCradle" name="cradle_main" type="text" placeholder="Cradle 1" />
+                  <!-- <select v-model="operativeCradle" name="cradle_main">
                     <option selected disabled value="">Cradle Operativo</option>
                     <option value="aplt">Aplt</option>
                     <option value="rotum">Rotum</option>
                     <option value="xacje">Xacje</option>
-                  </select>
+                  </select> -->
                 </div>
               </div>
               <div class="input-block">
                 <label for="cradle_backup" class=""> Backup </label>
                 <div class="mt-1">
-                  <select v-model="backupCradle" name="cradle_backup">
+                  <input v-model="backupCradle" name="cradle_backup" type="text" placeholder="Cradle 25" />
+                  <!-- <select v-model="backupCradle" name="cradle_backup">
                     <option selected disabled value="">Backup Cradle</option>
                     <option value="aplt">Aplt</option>
                     <option value="rotum">Rotum</option>
                     <option value="xacje">Xacje</option>
-                  </select>
+                  </select> -->
                 </div>
               </div>
             </section>
@@ -104,25 +108,27 @@
             <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Forklift</legend>
             <section>
               <div class="input-block">
-                <label for="client" class=""> Operativo </label>
+                <label for="operative_forklift" class=""> Operativo </label>
                 <div class="mt-1">
-                  <select v-model="operativeForklift" name="client">
+                  <input v-model="operativeForklift" name="operative_forklift" type="text" placeholder="Forklift 1" />
+                  <!-- <select v-model="operativeForklift" name="client">
                     <option selected disabled value="">Forklift Operativo</option>
                     <option value="roklim">Roklim</option>
                     <option value="salmin">Salmin</option>
                     <option value="eroba">Eroba</option>
-                  </select>
+                  </select> -->
                 </div>
               </div>
               <div class="input-block">
-                <label for="client" class=""> Backup </label>
+                <label for="backup_forklift" class=""> Backup </label>
                 <div class="mt-1">
-                  <select v-model="backupForklift" name="client">
+                  <input v-model="backupForklift" name="backup_forklift" type="text" placeholder="forklift 7" />
+                  <!-- <select v-model="backupForklift" name="client">
                     <option selected disabled value="">Backup Forklift</option>
                     <option value="aplt">Aplt</option>
                     <option value="rotum">Rotum</option>
                     <option value="xacje">Xacje</option>
-                  </select>
+                  </select> -->
                 </div>
               </div>
             </section>
@@ -149,12 +155,18 @@
               <div class="input-block lg:w-5/12">
                 <label :for="`tractor-${traktor.id}-proveedor`"> Proveedor </label>
                 <div class="mt-1">
-                  <select v-model="traktor.supplier" :name="`tractor-${traktor.id}-proveedor`">
+                  <input
+                    v-model="traktor.supplier"
+                    :name="`tractor-${traktor.id}-proveedor`"
+                    type="text"
+                    placeholder="Nombre de proveedor"
+                  />
+                  <!-- <select v-model="traktor.supplier" :name="`tractor-${traktor.id}-proveedor`">
                     <option selected disabled value="">Proveedor</option>
                     <option value="10223">Transportes Zaraza SRL</option>
                     <option value="10224">Montoto Logistica SRL</option>
                     <option value="10225">E Inc</option>
-                  </select>
+                  </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -190,7 +202,7 @@
                 <label :for="`pickup-${pickup.id}-chassis`"> ID Pickup </label>
                 <div class="pit-block">
                   <input
-                    v-model="pickup.chassis"
+                    v-model="pickup.pickup_id"
                     :name="`pickup-${pickup.id}-chassis`"
                     type="text"
                     placeholder="#456"
@@ -261,29 +273,51 @@
           </section>
         </fieldset>
       </form>
-      <form v-else-if="WO_section === 'rrhh'" method="POST" action="/" class="p-4 md:flex md:flex-wrap md:gap-32">
-        <fieldset v-for="crew in crews" :key="crew.id" class="max-w-sm w-full">
+      <form
+        v-else-if="WO_section === 'rrhh'"
+        method="POST"
+        action="/"
+        class="p-4 md:flex md:flex-wrap md:gap-24 2xl:gap-32"
+      >
+        <fieldset v-for="(crew, key) in crews" :key="crew.id" class="max-w-sm w-full">
           <legend class="flex justify-between items-center font-bold text-2xl pb-4 border-b mb-3 w-full">
             <span>{{ crew.title }}</span>
+            <CircularBtn v-if="key !== 0" class="btn__delete" size="xs" @click="removeCrew(crew.id)">
+              <TrashIcon class="w-5 h-5" />
+            </CircularBtn>
           </legend>
-          <section class="flex gap-3">
-            <div class="flex flex-col w-full">
+          <section class="flex gap-6">
+            <div class="flex flex-col">
               <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
-              <select class="rounded" :name="`crew-${crew.id}-start-time`" v-model="crew.start_time">
+              <input
+                class="rounded max-w-[8rem]"
+                :name="`crew-${crew.id}-start-time`"
+                v-model="crew.start_time"
+                type="text"
+                placeholder="00:00"
+              />
+              <!-- <select class="rounded" :name="`crew-${crew.id}-start-time`" v-model="crew.start_time">
                 <option selected disabled value="">ej 5:30 AM</option>
                 <option value="7">7:00 PM</option>
                 <option value="8">8:00 PM</option>
                 <option value="9">9:00 PM</option>
-              </select>
+              </select> -->
             </div>
-            <div class="flex flex-col w-full">
+            <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
-              <select class="rounded" :name="`crew-${crew.id}-end-time`" v-model="crew.end_time">
+              <input
+                class="rounded max-w-[8rem]"
+                :name="`crew-${crew.id}-end-time`"
+                v-model="crew.end_time"
+                type="text"
+                placeholder="00:00"
+              />
+              <!-- <select class="rounded" :name="`crew-${crew.id}-end-time`" v-model="crew.end_time">
                 <option selected disabled value="">ej 5:30 AM</option>
                 <option value="7">7:00 PM</option>
                 <option value="8">8:00 PM</option>
                 <option value="9">9:00 PM</option>
-              </select>
+              </select> -->
             </div>
           </section>
           <section class="divide-y">
@@ -291,12 +325,18 @@
               <div class="">
                 <label :for="`crew-${crew.id}-${people.id}-rol`" class=""> Rol </label>
                 <div class="pit-block relative">
-                  <select v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`">
+                  <input
+                    v-model="people.rol"
+                    :name="`crew-${crew.id}-${people.id}-rol`"
+                    type="text"
+                    placeholder="Rol"
+                  />
+                  <!-- <select v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`">
                     <option selected disabled value="">Lead Operator</option>
                     <option value="7">7:00 PM</option>
                     <option value="8">8:00 PM</option>
                     <option value="9">9:00 PM</option>
-                  </select>
+                  </select> -->
                   <CircularBtn
                     class="btn__delete md:absolute md:right-[-3rem]"
                     size="sm"
@@ -309,12 +349,18 @@
               <div class="input-block">
                 <div class="mt-1">
                   <label :for="`crew-${crew.id}-${people.id}-name`">
-                    <select v-model="people.name" :name="`crew-${crew.id}-${people.id}-name`">
+                    <input
+                      v-model="people.name"
+                      :name="`crew-${crew.id}-${people.id}-name`"
+                      type="text"
+                      placeholder="Empleado"
+                    />
+                    <!-- <select v-model="people.name" :name="`crew-${crew.id}-${people.id}-name`">
                       <option selected disabled value="">Selecciona Empleado</option>
                       <option value="7">7:00 PM</option>
                       <option value="8">8:00 PM</option>
                       <option value="9">9:00 PM</option>
-                    </select>
+                    </select> -->
                   </label>
                 </div>
               </div>
@@ -328,18 +374,25 @@
           </button>
         </fieldset>
       </form>
-      <footer class="p-4 flex justify-between">
-        <section class="space-x-8">
+      <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
+        <section>
           <GhostBtn v-if="isLastSection()" class="btn__draft" @click.prevent="addCrew"> Agregar Crew </GhostBtn>
         </section>
-        <section class="space-x-6 flex items-center">
+        <section class="space-x-6 flex items-center justify-end">
           <button @click.prevent="goToIndex">Cancelar</button>
           <GhostBtn class="btn__draft" @click="save()">
-            <BookmarkIcon class="w-5 h-5" />
+            <BookmarkIcon class="w-4 h-4" />
             <span> Guardar Provisorio </span>
           </GhostBtn>
           <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
-          <PrimaryBtn v-else @click="save(true)"> Finalizar </PrimaryBtn>
+          <PrimaryBtn
+            v-else
+            :class="isAllFull.value ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isAllFull.value && save(true)"
+            :disabled="!isAllFull.value"
+          >
+            Finalizar
+          </PrimaryBtn>
         </section>
       </footer>
     </section>
@@ -347,7 +400,7 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, computed } from 'vue';
+import { ref, Ref, computed, toRefs } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router';
 import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
@@ -358,7 +411,9 @@ import CircularBtn from '@/components/ui/CircularBtn.vue';
 import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
 import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
-import { log } from 'console';
+
+import axios from 'axios';
+const api = 'https://sandflow-qa.bitpatagonia.com/api';
 
 export default {
   components: {
@@ -376,15 +431,15 @@ export default {
     const store = useStore();
     const router = useRouter();
     const route = useRoute();
-    const workOrders: Array<WorkOrder> = store.state.workOrders.all;
-    console.log(route.params.id);
-    console.log(workOrders);
+    const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
+    console.log('Route Params ID:_' + route.params.id);
+    console.log('WOs ', workOrders);
     const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
-      console.log(wo.id);
-      console.log(route.params.id);
+      console.log('WO ID:_' + wo.id);
+      console.log('Route Params ID:_' + route.params.id);
       return wo.id == route.params.id;
     });
-    console.log(currentWorkOrder);
+    console.log('Current WO ', currentWorkOrder);
     const {
       id: woID,
       client,
@@ -403,8 +458,8 @@ export default {
       generators,
       tower,
       cabin,
-    } = currentWorkOrder;
-
+    } = toRefs(currentWorkOrder);
+    console.table(currentWorkOrder);
     //Pit
     const removePit = (pitId: number) => {
       pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
@@ -416,6 +471,9 @@ export default {
         name: '',
       });
     };
+    if (pits.value.length === 0) {
+      addPit();
+    }
     //Traktor
     const removeTraktor = (traktorId: number) => {
       traktors.value = traktors.value.filter((traktor: Traktor) => traktor.id !== traktorId);
@@ -428,6 +486,9 @@ export default {
         description: '',
       });
     };
+    if (traktors.value.length === 0) {
+      addTraktor();
+    }
     // Pickup
     const removePickup = (pickupId: number) => {
       pickups.value = pickups.value.filter((pickup: Pickup) => pickup.id !== pickupId);
@@ -440,6 +501,9 @@ export default {
         description: '',
       });
     };
+    if (pickups.value.length === 0) {
+      addPickup();
+    }
     // Crew
     const removeResource = (crewId: number, peopleId: number) => {
       const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
@@ -459,9 +523,21 @@ export default {
     const addCrew = (): void => {
       const lastId = crews.value.length + 1;
       const crewLetter = String.fromCharCode(lastId + 64);
-      crews.value.push({ id: lastId, start_time: '7', end_time: '9', title: `Crew ${crewLetter}`, resources: [] });
+      crews.value.push({
+        id: lastId,
+        start_time: '',
+        end_time: '',
+        title: `Crew ${crewLetter}`,
+        resources: [],
+      });
       addResource(lastId);
     };
+    const removeCrew = (crewId: number): void => {
+      crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
+    };
+    if (crews.value.length === 0) {
+      addCrew();
+    }
     // Sections
     const WO_section = ref('orden');
     const section_order = ['orden', 'equipamento', 'rrhh'];
@@ -482,15 +558,15 @@ export default {
     };
     // Is the Order section is full
     const isOrderFull = computed(() => {
-      return client.value && service_co.value && pad.value && pits.value.length > 0;
+      return !!(client.value && service_co.value && pad.value && pits.value.length > 0 && pits.value[0].name);
     });
     // Is the Equipment section is full
     const isEquipmentFull = computed(() => {
-      return (
+      return !!(
         operativeCradle.value &&
-        backupCradle.value &&
+        // backupCradle.value &&
         operativeForklift.value &&
-        backupForklift.value &&
+        // backupForklift.value &&
         traktors.value.length > 0 &&
         traktors.value[0].chassis &&
         traktors.value[0].description &&
@@ -502,16 +578,55 @@ export default {
     });
     // Is the RRHH section is full
     const isRRHHFull = computed(() => {
-      return crews.value[0].start_time && crews.value[0].end_time && crews.value.length > 0;
+      return !!(crews.value.length > 0 && crews.value[0].start_time && crews.value[0].end_time);
+    });
+    // Is all sections full
+    const isAllFull = computed(() => {
+      return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
     });
     // method go to index that goes to the index page
     const goToIndex = (): void => {
       router.push('/ordenes-de-trabajo');
     };
+    // Remove Empty pits
+    const removeEmptyPits = () => {
+      pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
+    };
+    // Remove empty traktors
+    const removeEmptyTraktors = (): void => {
+      traktors.value = traktors.value.filter(
+        (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
+      );
+    };
+    // Remove Empty Pickups
+    const removeEmptyPickups = (): void => {
+      pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
+    };
+    // Remove empty Crews
+    const removeEmptyCrews = (): void => {
+      crews.value = crews.value
+        .map((crew: Crew) => removeEmptyResource(crew.id))
+        .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
+    };
+    // Remove Empty Resource
+    const removeEmptyResource = (crewId: number): void => {
+      const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+      selectedCrew.resources = selectedCrew.resources.filter(
+        (resource: HumanResource) => resource.rol !== '' && resource.name !== ''
+      );
+      return selectedCrew;
+    };
+    const removeAllEmptys = (): void => {
+      removeEmptyPits();
+      removeEmptyTraktors();
+      removeEmptyPickups();
+      removeEmptyCrews();
+    };
 
-    const save = (isFull = false) => {
-      store.dispatch('updateWorkOrder', {
-        id: woID,
+    const save = async (isFull = false) => {
+      removeAllEmptys();
+      const newWO = {
+        id: woID.value,
         client: client.value,
         service_co: service_co.value,
         pad: pad.value,
@@ -529,7 +644,28 @@ export default {
         tower: tower.value,
         cabin: cabin.value,
         isFull: isFull,
-      });
+      };
+      const loading = ref(true);
+      // Update Work Order
+      let woDB = await axios
+        .post(`${api}/workOrder/${newWO.id}`, newWO)
+        .catch((err) => {
+          console.log(err);
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            return res.data;
+          }
+          return {};
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+      console.log(woDB);
+      // Update Work Order
+      store.dispatch('updateWorkOrder', newWO);
+      router.push('/orden-de-trabajo');
     };
 
     return {
@@ -565,9 +701,11 @@ export default {
       removeResource,
       addResource,
       crews,
+      removeCrew,
       addCrew,
       goToIndex,
       save,
+      isAllFull,
     };
   },
 };

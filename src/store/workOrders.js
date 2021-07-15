@@ -7,6 +7,13 @@ export default {
     ADD_WORKORDER(state, payload) {
       state.all.push(payload);
     },
+    UPDATE_WORKORDER(state, payload) {
+      state.all.map((workOrder, index) => {
+        if (workOrder.id === payload.id) {
+          state.all[index] = payload;
+        }
+      });
+    },
   },
   actions: {
     saveWorkOrder({ commit }, workOrder) {
@@ -16,6 +23,9 @@ export default {
       } else {
         // Axios POST to incomplete work order
       }
+    },
+    updateWorkOrder({ commit }, workOrder) {
+      commit('UPDATE_WORKORDER', workOrder);
     },
   },
 };
