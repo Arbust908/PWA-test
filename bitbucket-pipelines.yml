@@ -10,7 +10,7 @@ definitions:
           - deploy.yml
         script:
           - npm install
-          - npm run build --verbose
+          - npm run build
           - rm -rf node_modules
           - mv .ci ci
           - env
