@@ -376,7 +376,6 @@
       </form>
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section>
-          {{ isAllFull.value }}
           <GhostBtn v-if="isLastSection()" class="btn__draft" @click.prevent="addCrew"> Agregar Crew </GhostBtn>
         </section>
         <section class="space-x-6 flex items-center justify-end">
@@ -388,9 +387,9 @@
           <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
           <PrimaryBtn
             v-else
-            :class="isAllFull.value ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isAllFull.value && save(true)"
-            :disabled="!isAllFull.value"
+            :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isAllFull && save(true)"
+            :disabled="!isAllFull"
           >
             Finalizar
           </PrimaryBtn>
@@ -643,7 +642,7 @@ export default {
     });
     // method go to index that goes to the index page
     const goToIndex = (): void => {
-      router.push('/ordenes-de-trabajo');
+      router.push('/orden-de-trabajo');
     };
     const removeAllEmptys = (): void => {
       removeEmptyPits();
@@ -683,6 +682,10 @@ export default {
         })
         .then((res) => {
           console.log(res);
+          if (res.status === 200) {
+            return res.data;
+          }
+          return {};
         })
         .finally(() => {
           loading.value = false;

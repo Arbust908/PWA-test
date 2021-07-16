@@ -44,7 +44,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(wo, woKey) in workOrders"
+                  v-for="(wo, woKey) in woDB"
                   :key="wo.id"
                   :class="woKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                   class="hover:bg-gray-100"
@@ -76,7 +76,7 @@
                     </router-link>
                   </td>
                 </tr>
-                <tr v-if="workOrders.length <= 0">
+                <tr v-if="woDB.length <= 0">
                   <td colspan="5" class="text-center text-xs text-gray-500 px-6 py-4">
                     <p>No hay Ordenes de Trabajo</p>
                   </td>
@@ -104,39 +104,50 @@ export default {
     UiBtn,
   },
   setup() {
-    let woDB = [];
+    const woDB = ref([]);
+    const store = useStore();
+    const workOrders = JSON.parse(JSON.stringify(store.state.workOrders.all));
     onMounted(async () => {
       const loading = ref(true);
-      woDB = await axios
+      woDB.value = await axios
         .get(`${api}/workOrder`)
         .catch((err) => {
           console.log(err);
         })
-        .then(({ data }) => {
-          return data;
+        .then((res) => {
+          if (res.status === 200) {
+            return res.data.data.workOrders || res.data.workOrders;
+          }
+          return [];
         })
         .finally(() => {
           loading.value = false;
         });
-      console.log(woDB);
-    });
-    const store = useStore();
-    const workOrders = store.state.workOrders.all;
-    if (woDB && woDB.lenth > 0) {
-      if (woDB.length > workOrders.length) {
-        // Set woDB to workOrders
-        const newWoDB = woDB.filter((wo, key) => {
-          return wo.id && wo.id !== workOrders[key].id;
-        });
-        newWoDB.forEach((wo, woKey) => {
-          store.dispatch('saveWorkOrder', wo);
-        });
-      } else if (woDB.length < workOrders.length) {
-        // Set workOrders to woDB
+      console.log('API DB', woDB.value);
+      console.log('State', workOrders);
+      console.log('API DB', woDB.value.length);
+      if (woDB.value && woDB.value.length > 0) {
+        console.log(woDB.value.length);
+        if (woDB.value.length > workOrders.length) {
+          console.log(woDB.value.length, workOrders.length);
+          if (workOrders.length === 0) {
+            woDB.value.forEach((wo, woKey) => {
+              store.dispatch('saveWorkOrder', wo);
+            });
+          } else {
+            const newWoDB = woDB.value.filter((woFromApi, key) => {
+              return woFromApi.id && workOrders[key] && woFromApi.id !== workOrders[key].id;
+            });
+            console.log(newWoDB);
+            newWoDB.forEach((wo, woKey) => {
+              store.dispatch('saveWorkOrder', wo);
+            });
+          }
+        }
       }
-    }
+    });
     return {
-      workOrders,
+      woDB,
     };
   },
 };

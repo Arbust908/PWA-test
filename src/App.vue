@@ -11,7 +11,7 @@ import { ref } from 'vue';
 import NotificationInfo from '@/components/notifications/Info.vue';
 import ModalGeneral from '@/components/modal/General.vue';
 import { useActions } from 'vuex-composition-helpers';
-// import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router';
 
 export default {
   components: {
@@ -20,11 +20,12 @@ export default {
   },
   setup() {
     let isDark = ref(false);
-    // const router = useRouter();
+    const router = useRouter();
     if (localStorage.getItem('user')) {
       const user = JSON.parse(localStorage.getItem('user'));
       const { setUser } = useActions(['setUser']);
       setUser(user);
+      router.push('/orden-de-trabajo');
     }
 
     return {
