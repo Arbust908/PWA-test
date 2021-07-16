@@ -647,7 +647,7 @@ export default {
       const loading = ref(true);
       // Update Work Order
       let woDB = await axios
-        .post(`${api}/workOrder/${newWO.id}`, newWO)
+        .put(`${api}/workOrder/${newWO.id}`, newWO)
         .catch((err) => {
           console.log(err);
         })
@@ -663,7 +663,7 @@ export default {
         });
       console.log(woDB);
       // Update Work Order
-      store.dispatch('updateWorkOrder', newWO);
+      store.dispatch('updateWorkOrder', woDB);
       router.push('/orden-de-trabajo');
     };
 
