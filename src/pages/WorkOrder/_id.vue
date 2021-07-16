@@ -459,7 +459,6 @@ export default {
       tower,
       cabin,
     } = toRefs(currentWorkOrder);
-    console.table(currentWorkOrder);
     //Pit
     const removePit = (pitId: number) => {
       pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
