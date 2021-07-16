@@ -104,7 +104,9 @@ export default {
     UiBtn,
   },
   setup() {
-    let woDB = ref([]);
+    const woDB = ref([]);
+    const store = useStore();
+    const workOrders = JSON.parse(JSON.stringify(store.state.workOrders.all));
     onMounted(async () => {
       const loading = ref(true);
       woDB.value = await axios
@@ -113,37 +115,37 @@ export default {
           console.log(err);
         })
         .then((res) => {
-          // console.log(res);
           if (res.status === 200) {
-            return res.data.data || res.data;
+            return res.data.data.workOrders || res.data.workOrders;
           }
           return [];
         })
         .finally(() => {
           loading.value = false;
         });
-      console.log(woDB.value);
+      console.log('API DB', woDB.value);
+      console.log('State', workOrders);
+      console.log('API DB', woDB.value.length);
+      if (woDB.value && woDB.value.length > 0) {
+        console.log(woDB.value.length);
+        if (woDB.value.length > workOrders.length) {
+          console.log(woDB.value.length, workOrders.length);
+          if (workOrders.length === 0) {
+            woDB.value.forEach((wo, woKey) => {
+              store.dispatch('saveWorkOrder', wo);
+            });
+          } else {
+            const newWoDB = woDB.value.filter((woFromApi, key) => {
+              return woFromApi.id && workOrders[key] && woFromApi.id !== workOrders[key].id;
+            });
+            console.log(newWoDB);
+            newWoDB.forEach((wo, woKey) => {
+              store.dispatch('saveWorkOrder', wo);
+            });
+          }
+        }
+      }
     });
-    console.log('WODB', woDB.value);
-    let allTheWO = [];
-    const store = useStore();
-    const workOrders = store.state.workOrders.all;
-    if (woDB && woDB.value.lenth > 0) {
-      allTheWO = woDB.value.length > workOrders.length ? woDB : workOrders;
-      // if (woDB.length > workOrders.length) {
-      //   // Set woDB to workOrders
-      //   const newWoDB = woDB.filter((wo, key) => {
-      //     return wo.id && wo.id !== workOrders[key].id;
-      //   });
-      //   newWoDB.forEach((wo, woKey) => {
-      //     store.dispatch('saveWorkOrder', wo);
-      //   });
-      // } else if (woDB.length < workOrders.length) {
-      //   // Set workOrders to woDB
-      // }
-    } else {
-      allTheWO = workOrders;
-    }
     return {
       woDB,
     };

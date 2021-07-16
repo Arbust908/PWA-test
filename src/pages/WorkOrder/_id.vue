@@ -586,7 +586,7 @@ export default {
     });
     // method go to index that goes to the index page
     const goToIndex = (): void => {
-      router.push('/ordenes-de-trabajo');
+      router.push('/orden-de-trabajo');
     };
     // Remove Empty pits
     const removeEmptyPits = () => {

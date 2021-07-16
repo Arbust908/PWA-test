@@ -117,21 +117,28 @@ export default {
       const email = username.value.indexOf('@') > -1 ? username.value : `${username.value}@testmail.com`;
       // const loggedUser: User = { id: 99, username: username.value, role: Role.Logged };
       const loggedUser = { email, password: password.value };
-      let fullUser = {};
-      // let fullUser = await axios
-      //   .post(`${api}/auth/login`, loggedUser)
-      //   .catch((err) => {
-      //     console.log(err);
-      //   })
-      //   .then(({ data }) => {
-      //     return data;
-      //   })
-      //   .finally(() => {
-      //     loading.value = false;
-      //   });
-      fullUser.role = Role.Logged;
-      fullUser = { id: 99, username: username.value, role: Role.Logged };
-      localStorage.setItem('user', JSON.stringify(fullUser));
+      // let fullUser = {};
+      let fullUser = await axios
+        .post(`${api}/auth/login`, loggedUser)
+        .catch((err) => {
+          console.log(err);
+          alert('Error al iniciar sesión');
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            return res.data.data.token || res.data.token;
+          }
+          return {};
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+      console.log(fullUser);
+      fullUser = { id: 99, username: username.value, role: Role.Logged, token: fullUser };
+      if (shouldRemember.value) {
+        localStorage.setItem('user', JSON.stringify(fullUser));
+      }
       setUser(fullUser);
       router.push('/orden-de-trabajo');
     };
