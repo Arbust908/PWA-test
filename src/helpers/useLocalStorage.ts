@@ -2,7 +2,6 @@ import { ref, Ref } from "vue";
 
 export function useLocalStorage(keys: Array<string>) {
   const storage = keys.reduce((storage: {[key: string]: any}, key: string) => {
-    console.log(key);
     storage[key] = {
       key,
       value: JSON.parse(localStorage.getItem(key)),

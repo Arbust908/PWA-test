@@ -1,7 +1,7 @@
 export interface WorkOrder {
     id: number,
     client: string,
-    service_co: string,
+    serviceCompany: string,
     pad: string,
     pits: Array<Pit>,
     operativeCradle: string,
@@ -16,7 +16,7 @@ export interface WorkOrder {
     generators: number,
     tower: number,
     cabin: number,
-    isFull: boolean,
+    draft: boolean,
 }
 export interface Pit {
     id: number,
