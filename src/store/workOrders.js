@@ -8,7 +8,9 @@ export default {
       state.all.push(payload);
     },
     UPDATE_WORKORDER(state, payload) {
+      // Que no sea map
       state.all.map((workOrder, index) => {
+        console.log(workOrder, payload);
         if (workOrder.id === payload.id) {
           state.all[index] = payload;
         }
@@ -17,12 +19,10 @@ export default {
   },
   actions: {
     saveWorkOrder({ commit }, workOrder) {
-      console.log('>>Adding Work Order', workOrder);
-      console.table(workOrder);
       const baseWO = {
         id: 0,
         client: '',
-        service_co: '',
+        serviceCompany: '',
         pad: '',
         pits: [],
         operativeCradle: '',

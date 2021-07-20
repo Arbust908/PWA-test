@@ -59,10 +59,10 @@
                     {{ wo.client || 'Sin cliente' }}
                   </td>
                   <td
-                    :class="wo.service_co ? 'text-gray-500' : 'text-gray-400 italic'"
+                    :class="wo.serviceCompany ? 'text-gray-500' : 'text-gray-400 italic'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ wo.service_co || 'Sin empresa de servicio' }}
+                    {{ wo.serviceCompany || 'Sin empresa de servicio' }}
                   </td>
                   <td
                     :class="wo.isFull ? 'text-green-500' : 'text-blue-500'"
@@ -116,6 +116,7 @@ export default {
         })
         .then((res) => {
           if (res.status === 200) {
+            console.log(res);
             return res.data.data.workOrders || res.data.workOrders;
           }
           return [];
@@ -123,13 +124,10 @@ export default {
         .finally(() => {
           loading.value = false;
         });
-      console.log('API DB', woDB.value);
-      console.log('State', workOrders);
-      console.log('API DB', woDB.value.length);
+      console.log(woDB.value);
+      console.log(workOrders);
       if (woDB.value && woDB.value.length > 0) {
-        console.log(woDB.value.length);
         if (woDB.value.length > workOrders.length) {
-          console.log(woDB.value.length, workOrders.length);
           if (workOrders.length === 0) {
             woDB.value.forEach((wo, woKey) => {
               store.dispatch('saveWorkOrder', wo);
@@ -138,7 +136,6 @@ export default {
             const newWoDB = woDB.value.filter((woFromApi, key) => {
               return woFromApi.id && workOrders[key] && woFromApi.id !== workOrders[key].id;
             });
-            console.log(newWoDB);
             newWoDB.forEach((wo, woKey) => {
               store.dispatch('saveWorkOrder', wo);
             });

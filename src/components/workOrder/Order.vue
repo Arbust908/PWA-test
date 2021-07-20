@@ -14,10 +14,10 @@
         </div>
       </div>
       <div class="input-block">
-        <label for="service_co" class=""> Operadora / Empresa de Servicios </label>
+        <label for="serviceCompany" class=""> Operadora / Empresa de Servicios </label>
         <div class="mt-1">
-          <input v-model="service_co" name="service_co" type="text" placeholder="Nombre de Operadora" />
-          <!-- <select v-model="service_co" name="service_co">
+          <input v-model="serviceCompany" name="serviceCompany" type="text" placeholder="Nombre de Operadora" />
+          <!-- <select v-model="serviceCompany" name="serviceCompany">
             <option selected disabled value="">ej: Pipele</option>
             <option value="ypf">YPF</option>
             <option value="ypf2">YPF2</option>
@@ -81,7 +81,7 @@ export default {
     // Cliente
     const client: Ref<String> = ref('');
     // Service Company
-    const service_co: Ref<String> = ref('');
+    const serviceCompany: Ref<String> = ref('');
     // PAD
     const pad: Ref<String> = ref('');
     // Pozos
@@ -108,13 +108,13 @@ export default {
     };
     // Is the Order section is full
     const isOrderFull = computed(() => {
-      return !!(client.value && service_co.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+      return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
     });
 
     return {
       isOrderFull,
       client,
-      service_co,
+      serviceCompany,
       pad,
       pits,
       removePit,
