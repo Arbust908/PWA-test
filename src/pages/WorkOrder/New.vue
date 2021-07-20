@@ -388,12 +388,11 @@
           <PrimaryBtn
             v-else
             :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="save(true)"
+            @click="isAllFull && save(true)"
             :disabled="!isAllFull"
           >
             Finalizar
           </PrimaryBtn>
-          {{ isAllFull }}
         </section>
       </footer>
     </section>
