@@ -1,49 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/pages/Home.vue';
-import store from '@/store';
+import { isLogged, isAdmin, isGuest } from '@/router/guards';
 
-const wokrOrdersID = store.state.workOrders.all.reduce((woIds, workOrder) => {
-  woIds.push(workOrder.id);
-  return woIds;
-}, []);
-
-const isLogged = (to, from, next) => {
-  const isLogged = store.getters.isLogged
-  if (!isLogged) {
-    next({ path: '/login' })
-    return
-  } else {
-    next()
-  }
-}
-const isAdmin = (to, from, next) => {
-  const isAdmin = store.getters.isAdmin
-  if (!isAdmin) {
-    next({ path: '/login' })
-    return
-  } else {
-    next()
-  }
-}
-const isGuest = (to, from, next) => {
-  const isGuest = store.getters.isGuest
-  if (!isGuest) {
-    next({ path: '/login' })
-    return
-  } else {
-    next()
-  }
-}
-// Route Guard to check if id param is on workOrdersID array
-const isValidWO = (to, from, next) => {
-  const id = to.params.id;
-  if (wokrOrdersID.indexOf(id) === -1) {
-    next({ path: '/error' })
-    return
-  } else {
-    next()
-  }
-}
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -87,6 +45,12 @@ const routes: Array<RouteRecordRaw> = [
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),
     beforeEnter: isLogged,
+  },
+  {
+    path: '/usuario/admin',
+    name: 'UserAdmin',
+    component: () => import('@/pages/User/Admin.vue'),
+    beforeEnter: isAdmin,
   },
   {
     path: '/:catchAll(.*)',

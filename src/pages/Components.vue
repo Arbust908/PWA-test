@@ -1,40 +1,5 @@
 <template>
-  <Layout>
-    <Title1></Title1>
-    <Title2></Title2>
-    <section class="space-y-4">
-      <Title3></Title3>
-      <article>
-        <BaseBtn></BaseBtn>
-      </article>
-      <article>
-        <Button></Button>
-      </article>
-      <article class="space-x-4 flex items-end">
-        <CircularBtn size="xs"><MailIcon class="w-5 h-5" aria-hidden="true" /></CircularBtn>
-        <CircularBtn size="sm"><MailIcon class="w-5 h-5" aria-hidden="true" /></CircularBtn>
-        <CircularBtn><MailIcon class="w-5 h-5" aria-hidden="true" /></CircularBtn>
-        <CircularBtn size="lg"><MailIcon class="w-6 h-6" aria-hidden="true" /></CircularBtn>
-        <CircularBtn size="xl"><MailIcon class="w-6 h-6" aria-hidden="true" /></CircularBtn>
-      </article>
-      <article>
-        <PrimaryBtn></PrimaryBtn>
-      </article>
-      <article>
-        <SecondaryBtn></SecondaryBtn>
-      </article>
-      <article>
-        <GhostBtn></GhostBtn>
-      </article>
-      <article>
-        <IconBtn></IconBtn>
-      </article>
-    </section>
-    <section>
-      <Title3></Title3>
-      <InputPack></InputPack>
-    </section>
-  </Layout>
+  <div class="mt-4 text-red-500"></div>
 </template>
 
 <script>

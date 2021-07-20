@@ -1,4 +1,4 @@
-import apiClient from "@/http-common";
+import apiClient from "@/http-commons";
 
 class WorkOrderService {
   getAll(): Promise<any> {

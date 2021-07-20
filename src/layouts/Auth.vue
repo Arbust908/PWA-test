@@ -1,8 +1,5 @@
 <template>
-  <div
-    :class="isDark ? 'dark' : null"
-    class="h-screen flex overflow-hidden bg-second-100 font-body"
-  >
+  <div :class="isDark ? 'dark' : null">
     <ModeToggle @click="toggleMode" />
     <router-view></router-view>
   </div>
@@ -23,3 +20,9 @@ export default {
   },
 };
 </script>
+
+<style lang="scss" scoped>
+div {
+  @apply h-screen flex overflow-hidden bg-second-100 font-body;
+}
+</style>

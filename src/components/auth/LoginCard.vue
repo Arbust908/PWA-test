@@ -50,7 +50,6 @@
             <input v-model="shouldRemember" id="remember_me" name="remember_me" type="checkbox" />
             <label for="remember_me" class="ml-2 block text-sm text-gray-900"> Recordarme </label>
           </div>
-
           <!-- <div class="text-sm">
             <button class="login-form__fogeti" @click.prevent="$emit('recover')">Olvidaste tu contraseña</button>
           </div> -->
