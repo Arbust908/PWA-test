@@ -22,10 +22,6 @@ export default class PurchaseOrderAPIService {
     }
   }
 
-  async getAll() {
-    return await this.getAllPurchaseOrders();
-  }
-
   async getAllPurchaseOrders() {
     return this.axiosCall<Array<PurchaseOrder>>({ method: "GET" });
   }

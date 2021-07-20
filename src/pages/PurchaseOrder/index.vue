@@ -76,6 +76,7 @@
 <script>
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
+import PurchaseOrderAPIService from '@/services/PurchaseOrder.service';
 
 export default {
   components: {
@@ -83,6 +84,8 @@ export default {
     UiBtn,
   },
   setup() {
+    const pOAS = PurchaseOrderAPIService.getAllPurchaseOrders();
+    console.log(pOAS);
     return {
       people,
     };

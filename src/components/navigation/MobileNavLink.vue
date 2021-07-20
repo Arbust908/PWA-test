@@ -7,16 +7,17 @@
 
 <script lang="ts">
 import {
+  AdjustmentsIcon,
+  ArchiveIcon,
+  AtSymbolIcon,
   BellIcon,
+  ChipIcon,
+  ClipboardListIcon,
   HomeIcon,
+  LogoutIcon,
   MenuAlt2Icon,
   UsersIcon,
   XIcon,
-  AtSymbolIcon,
-  ClipboardListIcon,
-  AdjustmentsIcon,
-  LogoutIcon,
-  ChipIcon,
 } from '@heroicons/vue/outline';
 import { defineComponent } from 'vue';
 
@@ -36,16 +37,17 @@ export default defineComponent({
     },
   },
   components: {
+    AdjustmentsIcon,
+    ArchiveIcon,
+    AtSymbolIcon,
     BellIcon,
+    ChipIcon,
+    ClipboardListIcon,
     HomeIcon,
+    LogoutIcon,
     MenuAlt2Icon,
     UsersIcon,
     XIcon,
-    AtSymbolIcon,
-    ClipboardListIcon,
-    AdjustmentsIcon,
-    LogoutIcon,
-    ChipIcon,
   },
 });
 </script>

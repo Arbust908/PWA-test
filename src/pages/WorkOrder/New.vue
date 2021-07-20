@@ -426,7 +426,7 @@ export default {
     PrimaryBtn,
     TrashIcon,
   },
-  setup() {
+  async setup() {
     // Init
     const store = useStore();
     const router = useRouter();

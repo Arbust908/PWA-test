@@ -139,6 +139,8 @@ const api = import.meta.env.VITE_API_URL;
 export default {
   components: {
     Layout,
+    PencilAltIcon,
+    TrashIcon,
     UiBtn,
     TrashIcon,
     PencilAltIcon,
@@ -164,7 +166,6 @@ export default {
         woDB.value = currentData.data;
       }
     });
-
     debouncedWatch(
       isFinished,
       () => {
