@@ -17,7 +17,7 @@ export interface SandOrder {
 export interface TransportProvider {
     id: number,
     name: string,
-    transportId: number,
+    transportId: string,
     boxQuantity: number,
     observation: string,
 }

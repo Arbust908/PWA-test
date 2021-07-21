@@ -138,15 +138,13 @@ const api = import.meta.env.VITE_API_URL;
 
 export default {
   components: {
-    Layout,
-    PencilAltIcon,
-    TrashIcon,
+    ExclamationCircleIcon,
+    CheckCircleIcon,
     UiBtn,
     TrashIcon,
     PencilAltIcon,
+    Layout,
     InformationCircleIcon,
-    ExclamationCircleIcon,
-    CheckCircleIcon,
   },
   setup() {
     const instance = axios.create({
