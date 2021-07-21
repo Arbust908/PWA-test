@@ -59,6 +59,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/proveedores-de-arena',
+    name: 'SandProvider',
+    component: () => import('@/pages/SandProvider/index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/proveedores-de-arena/:id',
+    name: 'SandProviderById',
+    component: () => import('@/pages/SandProvider/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/proveedores-de-arena/nuevo',
+    name: 'NewSandProvider',
+    component: () => import('@/pages/SandProvider/new.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/usuario/salir',
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),

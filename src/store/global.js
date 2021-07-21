@@ -12,6 +12,11 @@ export default {
         to: '/orden-de-trabajo',
         icon: 'ClipboardListIcon',
       },
+      {
+        name: 'Proveedores de arena',
+        to: '/proveedores-de-arena',
+        icon: 'ClipboardListIcon',
+      },
       // {
       //   name: 'Componentes',
       //   to: '/componentes',
