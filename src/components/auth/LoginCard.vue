@@ -124,7 +124,6 @@ export default {
           alert('Error al iniciar sesión');
         })
         .then((res) => {
-          console.log(res);
           if (res.status === 200) {
             return res.data.data.token || res.data.token;
           }
@@ -133,7 +132,6 @@ export default {
         .finally(() => {
           loading.value = false;
         });
-      console.log(fullUser);
       fullUser = { id: 99, username: username.value, role: Role.Logged, token: fullUser };
       if (shouldRemember.value) {
         localStorage.setItem('user', JSON.stringify(fullUser));

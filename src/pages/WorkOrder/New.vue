@@ -1,7 +1,7 @@
 <template>
   <Layout>
     <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de trabajo - {{ woID }}</h1>
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Nueva orden de trabajo</h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <nav class="flex justify-between">
@@ -33,10 +33,10 @@
             </div>
           </div>
           <div class="input-block">
-            <label for="service_co" class=""> Operadora / Empresa de Servicios </label>
+            <label for="serviceCompany" class=""> Operadora / Empresa de Servicios </label>
             <div class="mt-1">
-              <input v-model="service_co" name="service_co" type="text" placeholder="Nombre de Operadora" />
-              <!-- <select v-model="service_co" name="service_co">
+              <input v-model="serviceCompany" name="serviceCompany" type="text" placeholder="Nombre de Operadora" />
+              <!-- <select v-model="serviceCompany" name="serviceCompany">
                 <option selected disabled value="">ej: Pipele</option>
                 <option value="ypf">YPF</option>
                 <option value="ypf2">YPF2</option>
@@ -418,10 +418,10 @@ const api = 'https://sandflow-qa.bitpatagonia.com/api';
 export default {
   components: {
     BookmarkIcon,
-    CheckCircleIcon,
     CircularBtn,
     GhostBtn,
     Layout,
+    CheckCircleIcon,
     PlusIcon,
     PrimaryBtn,
     TrashIcon,
@@ -430,24 +430,34 @@ export default {
     // Init
     const store = useStore();
     const router = useRouter();
-    // Work Order ID
-    const workOrders: Array<WorkOrder> = store.state.workOrders.all;
-    // Work Order ID if WorkOrder is not empty the last id plus one or 0
-    const woID: number = workOrders && workOrders.length > 0 ? workOrders[workOrders.length - 1].id + 1 : 0;
+
+    // :: >>>
+    // ::
+    // Order
+    // ::
+    // :: >>>
+
+    // ::
     // Cliente
+    // ::
     const client: Ref<String> = ref('');
+    // ::
     // Service Company
-    const service_co: Ref<String> = ref('');
+    // ::
+    const serviceCompany: Ref<String> = ref('');
+    // ::
     // PAD
+    // ::
     const pad: Ref<String> = ref('');
+    // ::
     // Pozos
+    // ::
     const pits: Ref<Array<Pit>> = ref([
       {
         id: 0,
         name: '',
       },
     ]);
-
     const removePit = (pitId: number) => {
       pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
     };
@@ -458,10 +468,15 @@ export default {
         name: '',
       });
     };
-    // Remove Empty pits
     const removeEmptyPits = () => {
       pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
     };
+    // :: >>>
+    // ::
+    // Equipment
+    // ::
+    // :: >>>
+
     // ::
     // Cradle
     // ::
@@ -495,7 +510,6 @@ export default {
         description: '',
       });
     };
-    // Remove empty traktors
     const removeEmptyTraktors = (): void => {
       traktors.value = traktors.value.filter(
         (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
@@ -522,23 +536,26 @@ export default {
         description: '',
       });
     };
-    // Remove Empty Pickups
     const removeEmptyPickups = (): void => {
       pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
     };
     // ::
-    // Equipment
+    // Rigmats, Conex, Generators, Tower & Cabin
     // ::
-
-    // rigmats, conex, generators, tower, cabin
     const rigmats: Ref<number> = ref(0);
     const conex: Ref<number> = ref(0);
     const generators: Ref<number> = ref(0);
     const tower: Ref<number> = ref(0);
     const cabin: Ref<number> = ref(0);
 
+    // :: >>>
     // ::
     // Crew
+    // ::
+    // :: >>>
+
+    // ::
+    // Human Resource
     // ::
     const resource: Ref<Array<HumanResource>> = ref([
       {
@@ -546,9 +563,6 @@ export default {
         rol: '',
         name: '',
       },
-    ]);
-    const crews: Ref<Array<Crew>> = ref([
-      { id: 1, start_time: '', end_time: '', title: 'Crew A', resources: resource },
     ]);
     const removeResource = (crewId: number, peopleId: number) => {
       const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
@@ -563,6 +577,17 @@ export default {
         name: '',
       } as HumanResource);
     };
+    const removeEmptyCrews = (): void => {
+      crews.value = crews.value
+        .map((crew: Crew) => removeEmptyResource(crew.id))
+        .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
+    };
+    // ::
+    // Crew
+    // ::
+    const crews: Ref<Array<Crew>> = ref([
+      { id: 1, start_time: '', end_time: '', title: 'Crew A', resources: resource },
+    ]);
     const addCrew = (): void => {
       const lastId = crews.value.length + 1;
       const crewLetter = String.fromCharCode(lastId + 64);
@@ -578,13 +603,6 @@ export default {
     const removeCrew = (crewId: number): void => {
       crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
     };
-    // Remove empty Crews
-    const removeEmptyCrews = (): void => {
-      crews.value = crews.value
-        .map((crew: Crew) => removeEmptyResource(crew.id))
-        .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
-    };
-    // Remove Empty Resource
     const removeEmptyResource = (crewId: number): void => {
       const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
       selectedCrew.resources = selectedCrew.resources.filter(
@@ -593,6 +611,7 @@ export default {
       return selectedCrew;
     };
 
+    // :: >>>
     // ::
     // Sections
     const WO_section = ref('orden');
@@ -614,7 +633,7 @@ export default {
     };
     // Is the Order section is full
     const isOrderFull = computed(() => {
-      return !!(client.value && service_co.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+      return !!(client.value && serviceCompany.value.value && pad.value && pits.value.length > 0 && pits.value[0].name);
     });
     // Is the Equipment section is full
     const isEquipmentFull = computed(() => {
@@ -655,9 +674,8 @@ export default {
     const save = async (isFull = false) => {
       removeAllEmptys();
       const newWO = {
-        id: woID,
         client: client.value,
-        service_co: service_co.value,
+        serviceCompany: serviceCompany.value,
         pad: pad.value,
         pits: pits.value,
         operativeCradle: operativeCradle.value,
@@ -672,7 +690,7 @@ export default {
         generators: generators.value,
         tower: tower.value,
         cabin: cabin.value,
-        isFull: isFull,
+        draft: isFull,
       };
       const loading = ref(true);
       let woDB = await axios
@@ -681,22 +699,19 @@ export default {
           console.log(err);
         })
         .then((res) => {
-          console.log(res);
           if (res.status === 200) {
-            return res.data;
+            return res.data.data.workOrder;
           }
           return {};
         })
         .finally(() => {
           loading.value = false;
         });
-      console.log(woDB);
-      store.dispatch('saveWorkOrder', newWO);
+      store.dispatch('saveWorkOrder', woDB);
       router.push('/orden-de-trabajo');
     };
 
     return {
-      woID,
       WO_section,
       changeSection,
       nextSection,
@@ -705,7 +720,7 @@ export default {
       isEquipmentFull,
       isRRHHFull,
       client,
-      service_co,
+      serviceCompany,
       pad,
       pits,
       removePit,

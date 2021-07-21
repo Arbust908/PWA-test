@@ -33,10 +33,10 @@
             </div>
           </div>
           <div class="input-block">
-            <label for="service_co" class=""> Operadora / Empresa de Servicios </label>
+            <label for="serviceCompany" class=""> Operadora / Empresa de Servicios </label>
             <div class="mt-1">
-              <input v-model="service_co" name="service_co" type="text" placeholder="Nombre de Operadora" />
-              <!-- <select v-model="service_co" name="service_co">
+              <input v-model="serviceCompany" name="serviceCompany" type="text" placeholder="Nombre de Operadora" />
+              <!-- <select v-model="serviceCompany" name="serviceCompany">
                 <option selected disabled value="">ej: Pipele</option>
                 <option value="ypf">YPF</option>
                 <option value="ypf2">YPF2</option>
@@ -387,9 +387,9 @@
           <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
           <PrimaryBtn
             v-else
-            :class="isAllFull.value ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isAllFull.value && save(true)"
-            :disabled="!isAllFull.value"
+            :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isAllFull && save(true)"
+            :disabled="!isAllFull"
           >
             Finalizar
           </PrimaryBtn>
@@ -400,7 +400,7 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, computed, toRefs } from 'vue';
+import { ref, Ref, computed, toRefs, reactive } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router';
 import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
@@ -432,18 +432,14 @@ export default {
     const router = useRouter();
     const route = useRoute();
     const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
-    console.log('Route Params ID:_' + route.params.id);
-    console.log('WOs ', workOrders);
     const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
-      console.log('WO ID:_' + wo.id);
-      console.log('Route Params ID:_' + route.params.id);
       return wo.id == route.params.id;
     });
-    console.log('Current WO ', currentWorkOrder);
+    console.log('currentWorkOrder', currentWorkOrder);
     const {
       id: woID,
       client,
-      service_co,
+      serviceCompany,
       pad,
       pits,
       operativeCradle,
@@ -458,7 +454,7 @@ export default {
       generators,
       tower,
       cabin,
-    } = toRefs(currentWorkOrder);
+    } = toRefs(reactive({ ...currentWorkOrder }));
     //Pit
     const removePit = (pitId: number) => {
       pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
@@ -470,7 +466,7 @@ export default {
         name: '',
       });
     };
-    if (pits.value.length === 0) {
+    if (pits.value && pits.value.length === 0) {
       addPit();
     }
     //Traktor
@@ -557,7 +553,7 @@ export default {
     };
     // Is the Order section is full
     const isOrderFull = computed(() => {
-      return !!(client.value && service_co.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+      return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
     });
     // Is the Equipment section is full
     const isEquipmentFull = computed(() => {
@@ -627,7 +623,7 @@ export default {
       const newWO = {
         id: woID.value,
         client: client.value,
-        service_co: service_co.value,
+        serviceCompany: serviceCompany.value,
         pad: pad.value,
         pits: pits.value,
         operativeCradle: operativeCradle.value,
@@ -652,16 +648,14 @@ export default {
           console.log(err);
         })
         .then((res) => {
-          console.log(res);
           if (res.status === 200) {
-            return res.data;
+            return res.data.data.workOrder;
           }
           return {};
         })
         .finally(() => {
           loading.value = false;
         });
-      console.log(woDB);
       // Update Work Order
       store.dispatch('updateWorkOrder', woDB);
       router.push('/orden-de-trabajo');
@@ -677,7 +671,7 @@ export default {
       isEquipmentFull,
       isRRHHFull,
       client,
-      service_co,
+      serviceCompany,
       pad,
       pits,
       removePit,
