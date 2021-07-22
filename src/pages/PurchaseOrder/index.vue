@@ -1,9 +1,9 @@
 <template>
   <Layout>
-    <header class="flex justify-between items-center mb-4 px-3">
+    <header class="flex justify-between items-center mb-4">
       <h2 class="text-2xl font-semibold text-gray-900">Ordenes de Pedido</h2>
       <router-link to="/orden-de-pedido/nueva">
-        <UiBtn>Crear Nueva</UiBtn>
+        <UiBtn>Crear nueva</UiBtn>
       </router-link>
     </header>
     <div class="flex flex-col">
@@ -16,8 +16,9 @@
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    title="Numero de Pedido"
                   >
-                    Numero de Pedido
+                    N°
                   </th>
                   <th
                     scope="col"
@@ -111,13 +112,14 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, Ref } from 'vue';
 import { useStore } from 'vuex';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
 import { TrashIcon, PencilAltIcon, InformationCircleIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/vue/solid';
 import { PurchaseOrder, SandOrder } from '@/interfaces/PurchaseOrder.ts';
+import { PurchaseOrder, PurchaseOrder } from '../../interfaces/PurchaseOrder';
 const api = 'https://sandflow-qa.bitpatagonia.com/api';
 export default {
   components: {
@@ -130,12 +132,11 @@ export default {
     InformationCircleIcon,
   },
   setup() {
-    const poDB = ref([]);
+    const poDB: Ref<Array<PurchaseOrder>> = ref([] as Array<PurchaseOrder>);
     const store = useStore();
     const purchaseOrder: Array<PurchaseOrder> = JSON.parse(JSON.stringify(store.state.purchaseOrder.all));
-      console.log(purchaseOrder)
     onMounted(async () => {
-      const loading = ref(true);
+      const loading: Ref<boolean> = ref(true);
       // poDB.value = await axios
       //   .get(`${api}/purchaseOrder`)
       //   .catch((err) => {
@@ -150,33 +151,26 @@ export default {
       //   .finally(() => {
       //     loading.value = false;
       //   });
-      console.log('PO PO PO PO');
-      console.log('API DB', poDB.value);
-      console.log('State', purchaseOrder);
-      console.log('API DB', poDB.value.length);
       if (poDB.value && poDB.value.length > 0) {
-        console.log(poDB.value.length);
         if (poDB.value.length > purchaseOrder.length) {
-          console.log(poDB.value.length, purchaseOrder.length);
           if (purchaseOrder.length === 0) {
-            poDB.value.forEach((wo, woKey) => {
+            poDB.value.forEach((wo) => {
               store.dispatch('savePurchaseOrder', wo);
             });
           } else {
-            const newWoDB = poDB.value.filter((woFromApi, key) => {
+            const newWoDB = poDB.value.filter((woFromApi: PurchaseOrder, key: number) => {
               return woFromApi.id && purchaseOrder[key] && woFromApi.id !== purchaseOrder[key].id;
             });
-            console.log(newWoDB);
-            newWoDB.forEach((wo, woKey) => {
+            newWoDB.forEach((wo) => {
               store.dispatch('savePurchaseOrder', wo);
             });
           }
         } else {
           poDB.value = purchaseOrder;
         }
-      } else {
-          poDB.value = purchaseOrder;
-        }
+      } else if(purchaseOrder.length > 0) {
+        poDB.value = purchaseOrder;
+      }
     });
     const sumTotalSand = (sandOrders: Array<SandOrder>) => {
       return sandOrders.reduce((totalSand, order) => {

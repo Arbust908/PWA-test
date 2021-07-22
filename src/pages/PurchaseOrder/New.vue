@@ -111,7 +111,7 @@
           </template>
           <button class="col-span-full mt-1 flex items-center" @click.prevent="addOrder">
             <CircularBtn class="btn__add" size="xs">
-              <PlusIcon class="w-4 h-4" />
+              <PlusIcon class="w-5 h-5" />
             </CircularBtn>
             <span class="font-bold text"> Agregar </span>
           </button>
@@ -241,14 +241,14 @@ export default {
 
     // ::
     // SandProvider
-    const sandProvider: SandProvider = reactive({
-      id: 1,
+    const sandProvider: ComputedRef<SandProvider> = reactive({
+      id: 0,
       name: '',
       sandOrder: [
         {
           id: 0,
           type: '',
-          quantity: null,
+          quantity: 0,
           boxId: '',
         },
       ],
@@ -262,7 +262,7 @@ export default {
       sandProvider.sandOrder.push({
         id: newId,
         type: '',
-        quantity: null,
+        quantity: 0,
         boxId: '',
       });
     };
@@ -276,10 +276,10 @@ export default {
     // ::
     // TransportProvider
     const transportProvider: TransportProvider = reactive({
-      id: 1,
+      id: 0,
       name: '',
       transportId: '',
-      boxQuantity: null,
+      boxQuantity: 0,
       observation: '',
     });
 
@@ -288,9 +288,10 @@ export default {
         sandProvider.id &&
         sandProvider.name &&
         sandProvider.sandOrder.length &&
-        sandProvider.sandOrder.every((sandOrder: SandOrder) => sandOrder.type !== '') &&
-        sandProvider.sandOrder.every((sandOrder: SandOrder) => sandOrder.quantity > 0) &&
-        sandProvider.sandOrder.every((sandOrder: SandOrder) => sandOrder.boxId !== '')
+        sandProvider.sandOrder
+          .every((sandOrder: SandOrder) => sandOrder.type !== '')
+          .every((sandOrder: SandOrder) => sandOrder.quantity > 0)
+          .every((sandOrder: SandOrder) => sandOrder.boxId !== '')
       );
     });
     const isTransportProviderFull: ComputedRef<boolean> = computed(() => {
@@ -304,18 +305,11 @@ export default {
     const isFull: ComputedRef<boolean> = computed(() => {
       return isSandProviderFull.value && isTransportProviderFull.value;
     });
-    const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
     const save = (): void => {
       removeEmptySandOrders();
-      if (isFull.value) {
-        sandProvider.sandOrder = toRaw(sandProvider.sandOrder);
-        const purchaseOrder = {
-          sandProvider: { ...sandProvider },
-          transportProvider: { ...transportProvider },
-        } as PurchaseOrder;
-        savePurchaseOrder(purchaseOrder);
-        router.push('/orden-de-pedido');
+      if (!isFull.value) {
       }
+      console.log('>>> Save');
     };
     return {
       sandProvider,

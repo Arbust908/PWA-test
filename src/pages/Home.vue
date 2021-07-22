@@ -1,7 +1,7 @@
 <template>
   <Layout>
     <h2 class="text-2xl font-semibold text-gray-900 mb-4">Panel de Control</h2>
-    <section class="grid grid-cols-4 gap-4">
+    <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
       <router-link to="/orden-de-trabajo" class="nav__card">
         <h3>Orden de Trabajo</h3>
         <BookmarkIcon class="nav__pic" />

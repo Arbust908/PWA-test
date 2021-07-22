@@ -22,6 +22,9 @@ const store = createStore({
     isGuest(state) {
       return state.user.role === 0;
     },
+    getUserToken(state) {
+      return state.user.token || null;
+    },
   },
   actions: {
     setUser({ commit }, user) {

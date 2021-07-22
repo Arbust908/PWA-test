@@ -9,7 +9,7 @@
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">Ordenes de Trabajo</h2>
       <router-link to="/orden-de-trabajo/nueva">
-        <UiBtn>Nuevo</UiBtn>
+        <UiBtn>Crear nueva</UiBtn>
       </router-link>
     </header>
     <div class="flex flex-col">

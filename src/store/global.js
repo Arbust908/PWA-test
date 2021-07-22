@@ -1,7 +1,7 @@
 export default {
   state: () => ({
     navigation: [
-      // { name: 'Ingreso', to: '/login', icon: 'HomeIcon' },
+      { name: 'Panel', to: '/', icon: 'HomeIcon' },
       // {
       //   name: 'About',
       //   to: '/about',
