@@ -17,51 +17,68 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Name
+                    Numero de Orden
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Title
+                    Cliente
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Email
+                    Empresa de Servicio
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Role
+                    Estado
                   </th>
                   <th scope="col" class="relative px-6 py-3">
-                    <span class="sr-only">Edit</span>
+                    <span class="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="(person, personIdx) in people"
-                  :key="person.email"
-                  :class="personIdx % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
+                  v-for="(wo, woKey) in woDB"
+                  :key="wo.id"
+                  :class="woKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
+                  class="hover:bg-gray-100"
                 >
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {{ person.name }}
+                    {{ wo.id }}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ person.title }}
+                  <td
+                    :class="wo.client ? 'text-gray-500' : 'text-gray-400 italic'"
+                    class="px-6 py-4 whitespace-nowrap text-sm"
+                  >
+                    {{ wo.client || 'Sin cliente' }}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ person.email }}
+                  <td
+                    :class="wo.serviceCompany ? 'text-gray-500' : 'text-gray-400 italic'"
+                    class="px-6 py-4 whitespace-nowrap text-sm"
+                  >
+                    {{ wo.serviceCompany || 'Sin empresa de servicio' }}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {{ person.role }}
+                  <td
+                    :class="wo.isFull ? 'text-green-500' : 'text-blue-500'"
+                    class="px-6 py-4 whitespace-nowrap text-sm"
+                  >
+                    {{ wo.isFull ? 'Completado' : 'Pendiente' }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <a href="#" class="text-indigo-600 hover:text-indigo-900">Edit</a>
+                    <router-link :to="`/orden-de-trabajo/${wo.id}`" class="text-indigo-600 hover:text-indigo-900">
+                      Editar
+                    </router-link>
+                  </td>
+                </tr>
+                <tr v-if="woDB.length <= 0">
+                  <td colspan="5" class="text-center text-xs text-gray-500 px-6 py-4">
+                    <p>No hay Ordenes de Trabajo</p>
                   </td>
                 </tr>
               </tbody>
@@ -74,22 +91,60 @@
 </template>
 
 <script>
+import { onMounted, ref } from 'vue';
+import { useStore } from 'vuex';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
-const people = [
-  { name: 'Jane Cooper', title: 'Regional Paradigm Technician', role: 'Admin', email: 'jane.cooper@example.com' },
-  { name: 'Cody Fisher', title: 'Product Directives Officer', role: 'Owner', email: 'cody.fisher@example.com' },
-  // More people...
-];
-
+import axios from 'axios';
+// import { WorkOrder } from '@/interfaces/WorkOrder';
+const api = 'https://sandflow-qa.bitpatagonia.com/api';
 export default {
   components: {
     Layout,
     UiBtn,
   },
   setup() {
+    const woDB = ref([]);
+    const store = useStore();
+    const workOrders = JSON.parse(JSON.stringify(store.state.workOrders.all));
+    onMounted(async () => {
+      const loading = ref(true);
+      woDB.value = await axios
+        .get(`${api}/workOrder`)
+        .catch((err) => {
+          console.log(err);
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            console.log(res);
+            return res.data.data.workOrders || res.data.workOrders;
+          }
+          return [];
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+      console.log(woDB.value);
+      console.log(workOrders);
+      if (woDB.value && woDB.value.length > 0) {
+        if (woDB.value.length > workOrders.length) {
+          if (workOrders.length === 0) {
+            woDB.value.forEach((wo, woKey) => {
+              store.dispatch('saveWorkOrder', wo);
+            });
+          } else {
+            const newWoDB = woDB.value.filter((woFromApi, key) => {
+              return woFromApi.id && workOrders[key] && woFromApi.id !== workOrders[key].id;
+            });
+            newWoDB.forEach((wo, woKey) => {
+              store.dispatch('saveWorkOrder', wo);
+            });
+          }
+        }
+      }
+    });
     return {
-      people,
+      woDB,
     };
   },
 };

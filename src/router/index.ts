@@ -1,34 +1,7 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/pages/Home.vue';
-import store from '@/store';
+import { isLogged, isAdmin, isGuest } from '@/router/guards';
 
-const isLogged = (to, from, next) => {
-  const isLogged = store.getters.isLogged
-  if (!isLogged) {
-    next({ path: '/login' })
-    return
-  } else {
-    next()
-  }
-}
-const isAdmin = (to, from, next) => {
-  const isAdmin = store.getters.isAdmin
-  if (!isAdmin) {
-    next({ path: '/login' })
-    return
-  } else {
-    next()
-  }
-}
-const isGuest = (to, from, next) => {
-  const isGuest = store.getters.isGuest
-  if (!isGuest) {
-    next({ path: '/login' })
-    return
-  } else {
-    next()
-  }
-}
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -57,28 +30,9 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/orden-de-trabajo/:id',
-    name: 'WorkOrderNum',
+    name: 'WorkOrderById',
     component: () => import('@/pages/WorkOrder/_id.vue'),
-    beforeEnter: [isLogged, (to, _, next) => {
-      const { id } = to.params
-      if (Array.isArray(id)) {
-        next({ path: '/error' })
-        return
-      }
-      // *** Ordenes de Trabajo Dummy
-        const workOrders: Array<WorkOrder> = [
-            {id: 1, order_number: 'ac123'},
-            {id: 2, order_number: 'ab123'},
-            {id: 3, order_number: 'ac321'},
-            {id: 4, order_number: 'ax567'},
-        ];
-      const index = parseInt(id)
-      if (index < 0 || index >= workOrders.length) {
-        next({ path: '/error' })
-        return
-      }
-      next()
-    }]
+    beforeEnter: isLogged
   },
   {
     path: '/orden-de-trabajo/nueva',
@@ -87,14 +41,21 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
-    path: '/componentes',
-    name: 'Components',
-    component: () => import('@/pages/Components.vue')
+    path: '/usuario/salir',
+    name: 'UserLogout',
+    component: () => import('@/pages/User/Logout.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/usuario/admin',
+    name: 'UserAdmin',
+    component: () => import('@/pages/User/Admin.vue'),
+    beforeEnter: isAdmin,
   },
   {
     path: '/:catchAll(.*)',
     name: 'PageNotFound',
-    component: () => import('@/pages/404.vue')
+    component: () => import('@/pages/404.vue'),
   }
 ];
 

@@ -9,7 +9,7 @@
         <h2>Inicia sesión</h2>
       </header>
       <form class="login-box__form" action="#" method="POST">
-        <div :class="{ hasError: formWithError }" class="login-form__input-block">
+        <div :class="{ hasError: formWithError || usernameError }" class="login-form__input-block">
           <label for="username" class=""> Usuario </label>
           <div class="mt-1">
             <input
@@ -19,13 +19,15 @@
               type="text"
               autocomplete="username"
               required
+              placeholder="Nombre de Usuario"
               @blur="validate"
             />
             <p v-if="formWithError"></p>
+            <p v-else-if="usernameError">El usuario tiene que tener mas de 3 caracteres</p>
           </div>
         </div>
 
-        <div :class="{ hasError: formWithError }" class="login-form__input-block">
+        <div :class="{ hasError: formWithError || passwordError }" class="login-form__input-block">
           <label for="password"> Contraseña </label>
           <div class="mt-1">
             <input
@@ -35,9 +37,11 @@
               type="password"
               autocomplete="current-password"
               required
+              placeholder="Contraseña"
               @blur="validate"
             />
             <p v-if="formWithError">Los datos no coinciden</p>
+            <p v-else-if="passwordError">La contraseña deber tener mas de 5 caracteres</p>
           </div>
         </div>
 
@@ -46,10 +50,9 @@
             <input v-model="shouldRemember" id="remember_me" name="remember_me" type="checkbox" />
             <label for="remember_me" class="ml-2 block text-sm text-gray-900"> Recordarme </label>
           </div>
-
-          <div class="text-sm">
-            <a href="#" class="login-form__forgeti"> Olvidaste tu contraseña </a>
-          </div>
+          <!-- <div class="text-sm">
+            <button class="login-form__fogeti" @click.prevent="$emit('recover')">Olvidaste tu contraseña</button>
+          </div> -->
         </div>
 
         <div>
@@ -63,14 +66,14 @@
 <script lang="ts">
 import { ref, Ref, defineAsyncComponent } from 'vue';
 import { useRouter } from 'vue-router';
-import { useState, useGetters, useActions } from 'vuex-composition-helpers';
-import { User, Role } from '@/interfaces/User';
-
-// import Logo from '@/components/Logo.vue';
-// import Button from '@/components/ui/Button.vue';
+import { useActions } from 'vuex-composition-helpers';
+import { Role } from '@/interfaces/User';
 
 const Logo = defineAsyncComponent(() => import('@/components/Logo.vue'));
 const Button = defineAsyncComponent(() => import('@/components/ui/Button.vue'));
+
+import axios from 'axios';
+const api = 'https://sandflow-qa.bitpatagonia.com/api';
 
 export default {
   components: {
@@ -104,11 +107,37 @@ export default {
       passwordError.value = password.value.length <= 3;
       formWithError.value = usernameError.value || passwordError.value;
       if (!formWithError.value) {
-        const loggedUser: User = { id: 99, username: username.value, role: Role.Logged };
-        console.log(loggedUser);
-        setUser(loggedUser);
-        router.push('/');
+        login();
       }
+    };
+
+    const login = async () => {
+      const loading = ref(true);
+      const email = username.value.indexOf('@') > -1 ? username.value : `${username.value}@testmail.com`;
+      // const loggedUser: User = { id: 99, username: username.value, role: Role.Logged };
+      const loggedUser = { email, password: password.value };
+      // let fullUser = {};
+      let fullUser = await axios
+        .post(`${api}/auth/login`, loggedUser)
+        .catch((err) => {
+          console.log(err);
+          alert('Error al iniciar sesión');
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            return res.data.data.token || res.data.token;
+          }
+          return {};
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+      fullUser = { id: 99, username: username.value, role: Role.Logged, token: fullUser };
+      if (shouldRemember.value) {
+        localStorage.setItem('user', JSON.stringify(fullUser));
+      }
+      setUser(fullUser);
+      router.push('/orden-de-trabajo');
     };
 
     return {
@@ -118,6 +147,8 @@ export default {
       shouldRemember,
       validate,
       formValidation,
+      usernameError,
+      passwordError,
     };
   },
 };

@@ -62,25 +62,7 @@
             </div>
             <div class="mt-5 flex-1 h-0 overflow-y-auto">
               <nav class="px-2 space-y-1">
-                <router-link
-                  v-for="item in navigation"
-                  :key="item.to"
-                  :to="item.href"
-                  :class="[
-                    item.current ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    'group flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer',
-                  ]"
-                >
-                  <component
-                    :is="item.icon"
-                    :class="[
-                      item.current ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500',
-                      'mr-4 flex-shrink-0 h-6 w-6',
-                    ]"
-                    aria-hidden="true"
-                  />
-                  {{ item.name }}
-                </router-link>
+                <MobileNavLink v-for="item in navigation" :key="item.to" v-bind="item" />
               </nav>
             </div>
           </div>
@@ -101,25 +83,28 @@
           </div>
           <div class="mt-5 flex-grow flex flex-col">
             <nav class="flex-1 px-2 bg-white space-y-1">
-              <router-link
+              <MobileNavLink v-for="item in navigation" :key="item.to" v-bind="item" />
+              <!-- <router-link
                 v-for="item in navigation"
                 :key="item.name"
                 :to="item.to"
-                :class="[
-                  item.current ? 'bg-gray-100 text-gray-900' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                  'group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer',
-                ]"
+                :class="
+                  item.to === $route.fullPath
+                    ? 'bg-gray-100 text-gray-900'
+                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                "
+                class="group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer"
               >
                 <component
                   :is="item.icon"
-                  :class="[
-                    item.current ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500',
-                    'mr-3 flex-shrink-0 h-6 w-6',
-                  ]"
+                  :class="item.to === $route.fullPath ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500'"
+                  class="mr-3 flex-shrink-0 h-6 w-6"
                   aria-hidden="true"
                 />
-                {{ item.name }}
-              </router-link>
+                <span>
+                  {{ item.name }}
+                </span>
+              </router-link> -->
             </nav>
           </div>
         </div>
@@ -146,9 +131,9 @@
               <label for="search_field" class="sr-only">Search</label>
               <div class="relative w-full text-gray-400 focus-within:text-gray-600">
                 <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
-                  <SearchIcon class="h-5 w-5" aria-hidden="true" />
+                  <!-- <SearchIcon class="h-5 w-5" aria-hidden="true" /> -->
                 </div>
-                <input
+                <!-- <input
                   id="search_field"
                   class="
                     block
@@ -166,12 +151,12 @@
                   placeholder="Search"
                   type="search"
                   name="search"
-                />
+                /> -->
               </div>
             </form>
           </div>
           <div class="ml-4 flex items-center md:ml-6">
-            <button
+            <!-- <button
               class="
                 bg-white
                 p-1
@@ -183,7 +168,7 @@
             >
               <span class="sr-only">View notifications</span>
               <BellIcon class="h-6 w-6" aria-hidden="true" />
-            </button>
+            </button> -->
 
             <!-- Profile dropdown -->
             <Menu as="div" class="ml-3 relative">
@@ -200,11 +185,27 @@
                   "
                 >
                   <span class="sr-only">Open user menu</span>
-                  <img
+                  <!-- <img
                     class="h-8 w-8 rounded-full"
                     src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
                     alt=""
-                  />
+                  /> -->
+                  <span
+                    class="
+                      flex
+                      justify-center
+                      items-center
+                      h-8
+                      w-8
+                      rounded-full
+                      bg-main-600
+                      uppercase
+                      text-white
+                      font-bold
+                      hover:bg-gradient-br hover:from-main-400 hover:to-main-700 hover:shadow-lg
+                    "
+                    >{{ user.username.split('')[0] }}</span
+                  >
                 </MenuButton>
               </div>
               <transition
@@ -258,8 +259,9 @@
   </div>
 </template>
 
-<script>
-import { ref, computed } from 'vue';
+<script lang="ts">
+import { ref, Ref, computed, ComputedRef, defineComponent } from 'vue';
+import { useStore } from 'vuex';
 import {
   Dialog,
   DialogOverlay,
@@ -284,10 +286,9 @@ import {
 } from '@heroicons/vue/outline';
 import { SearchIcon } from '@heroicons/vue/solid';
 import Logo from '@/components/Logo.vue';
+import MobileNavLink from '@/components/navigation/MobileNavLink.vue';
 
-import { useStore } from 'vuex';
-
-export default {
+export default defineComponent({
   components: {
     Dialog,
     DialogOverlay,
@@ -297,12 +298,13 @@ export default {
     MenuItems,
     TransitionChild,
     TransitionRoot,
+    Logo,
+    MobileNavLink,
     HomeIcon,
     BellIcon,
     MenuAlt2Icon,
     SearchIcon,
     XIcon,
-    Logo,
     AtSymbolIcon,
     ClipboardListIcon,
     AdjustmentsIcon,
@@ -319,12 +321,16 @@ export default {
     const userNavigation = computed(() => {
       return store.state.global.user_navigation;
     });
+    const user = computed(() => {
+      return store.state.user;
+    });
 
     return {
       navigation,
       userNavigation,
       sidebarOpen,
+      user,
     };
   },
-};
+});
 </script>

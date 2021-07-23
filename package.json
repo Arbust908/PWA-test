@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite",
-    "build": "vuedx-typecheck . && vite build",
+    "build": "vite build",
     "serve": "vite preview"
   },
   "dependencies": {
@@ -11,6 +11,7 @@
     "@heroicons/vue": "^1.0.1",
     "axios": "^0.21.1",
     "vue": "^3.0.5",
+    "vue-axios": "^3.2.4",
     "vue-router": "^4.0.10",
     "vuex": "^4.0.2",
     "vuex-composition-helpers": "^2.0.0"
@@ -21,7 +22,7 @@
     "@tailwindcss/typography": "^0.4.1",
     "@types/node": "^15.12.2",
     "@types/page": "^1.11.2",
-    "@vitejs/plugin-vue": "^1.1.4",
+    "@vitejs/plugin-vue": "^1.2.5",
     "@vue/compiler-sfc": "^3.0.5",
     "@vuedx/typecheck": "^0.6.0",
     "@vuedx/typescript-plugin-vue": "^0.6.3",

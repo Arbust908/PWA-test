@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, computed } from 'vue';
+import { reactive, computed, ComputedRef } from 'vue';
 // Input Mode
 // https://developer.mozilla.org/en-US/docs/Web/HTML/Global_attributes/inputmode
 export default {
@@ -46,7 +46,7 @@ export default {
       inputType: props.type,
     });
 
-    const things = computed(() => {
+    const things: ComputedRef<String> = computed(() => {
       return state.input_errors[0];
     });
 
