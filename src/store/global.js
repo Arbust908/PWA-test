@@ -30,6 +30,11 @@ export default {
       {
         name: 'Proveedores de arena',
         to: '/proveedores-de-arena',
+        icon: 'Clipboard'
+      },
+      {
+        name: 'Centro de Carga',
+        to: '/centro-de-carga-de-arena',
         icon: 'ClipboardListIcon',
       },
       {
