@@ -68,12 +68,32 @@
                     :class="wo.isFull ? 'text-green-500' : 'text-blue-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ wo.isFull ? 'Completado' : 'Pendiente' }}
+                  <div class="flex space-x-2">
+                      <ExclamationCircleIcon v-if="wo.isFull === 'error'" class="w-5 h-5" />
+                      <CheckCircleIcon v-if="wo.isFull" class="w-5 h-5" />
+                      <InformationCircleIcon v-else class="w-5 h-5" />
+                      <span>
+                        {{ wo.isFull ? 'Completado' : 'Pendiente' }}
+                      </span>
+                    </div>
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <router-link :to="`/orden-de-trabajo/${wo.id}`" class="text-indigo-600 hover:text-indigo-900">
-                      Editar
-                    </router-link>
+                    <div class="flex justify-end space-x-4">
+                      <router-link
+                        :to="`/orden-de-trabajo/${wo.id}`"
+                        class="flex justify-between items-center text-indigo-600 hover:text-indigo-900"
+                      >
+                        <PencilAltIcon class="w-5 h-5" />
+                        <span> Editar </span>
+                      </router-link>
+                      <button
+                        @click="deleteWO(wo.id)"
+                        class="flex justify-between items-center text-red-600 hover:text-red-900"
+                      >
+                        <TrashIcon class="w-5 h-5" />
+                        <span> Eliminar </span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 <tr v-if="woDB.length <= 0">
@@ -93,6 +113,7 @@
 <script>
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+import { TrashIcon, PencilAltIcon, InformationCircleIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/vue/solid';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
@@ -102,8 +123,14 @@ export default {
   components: {
     Layout,
     UiBtn,
+    TrashIcon,
+    PencilAltIcon,
+    InformationCircleIcon,
+    ExclamationCircleIcon,
+    CheckCircleIcon,
   },
   setup() {
+    const loading = ref(false);
     const woDB = ref([]);
     const store = useStore();
     const workOrders = JSON.parse(JSON.stringify(store.state.workOrders.all));
@@ -141,8 +168,31 @@ export default {
         }
       }
     });
+
+    const deleteWO = async (woId) => {
+      const deletedWO = await axios
+        .delete(`${api}/workOrder/${woId}`)
+        .catch((err) => {
+          console.log(err);
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            console.log(res);
+            return res;
+          }
+          return [];
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+        console.log(deletedWO);
+        woDB.value = woDB.value.filter((woFromApi) => {
+          return woFromApi.id !== woId;
+        });
+    };
     return {
       woDB,
+      deleteWO
     };
   },
 };
