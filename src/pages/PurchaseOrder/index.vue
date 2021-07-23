@@ -177,22 +177,24 @@ export default {
     };
 
     const deletePO = async (poId: number) => {
-      const deleted = await axios
-        .delete(`${api}/purchaseOrder/${poId}`)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            console.log(res);
-            return res;
-          }
-          return [];
-        })
-        .finally(() => {
-          loading.value = false;
-        });
-      console.log(deleted);
+      // const deleted = await axios
+      //   .delete(`${api}/purchaseOrder/${poId}`)
+      //   .catch((err) => {
+      //     console.log(err);
+      //   })
+      //   .then((res) => {
+      //     if (res.status === 200) {
+      //       console.log(res);
+      //       return res;
+      //     }
+      //     return [];
+      //   })
+      //   .finally(() => {
+      //     loading.value = false;
+      //   });
+      poDB.value = poDB.value.filter((wo) => {
+        return wo.id !== poId;
+      });
     };
     return {
       poDB,
