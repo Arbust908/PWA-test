@@ -103,7 +103,7 @@ export default {
     UiBtn,
   },
   setup() {
-    const sandPlans = ref([]);
+    const sandCenter = ref([]);
     const store = useStore();
     const allSandPlans = JSON.parse(JSON.stringify(store.state.sandPlan.all));
     // onMounted(async () => {
