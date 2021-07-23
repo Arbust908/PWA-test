@@ -22,6 +22,11 @@ export default {
         to: '/proveedores-de-transporte',
         icon: 'ClipboardListIcon',
       },
+      {
+        name: 'Centro de Carga',
+        to: '/centro-de-carga-de-arena',
+        icon: 'ClipboardListIcon',
+      },
       // {
       //   name: 'Componentes',
       //   to: '/componentes',
