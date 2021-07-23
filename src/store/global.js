@@ -27,6 +27,11 @@ export default {
         to: '/centro-de-carga-de-arena',
         icon: 'ClipboardListIcon',
       },
+      {
+        name: 'Notificaciones a Proveedores',
+        to: '/notificaciones-a-proveedores',
+        icon: 'ClipboardListIcon',
+      },
       // {
       //   name: 'Componentes',
       //   to: '/componentes',

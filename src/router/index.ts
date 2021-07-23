@@ -133,6 +133,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/notificaciones-a-proveedores',
+    name: 'ProviderNotifications',
+    component: () => import('@/pages/ProviderNotification/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/notificaciones-a-proveedores/:id',
+    name: 'ProviderNotificationById',
+    component: () => import('@/pages/ProviderNotification/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/notificaciones-a-proveedores/nueva',
+    name: 'NewProviderNotification',
+    component: () => import('@/pages/ProviderNotification/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/usuario/salir',
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),
