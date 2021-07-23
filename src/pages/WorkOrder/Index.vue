@@ -65,15 +65,15 @@
                     {{ wo.serviceCompany || 'Sin empresa de servicio' }}
                   </td>
                   <td
-                    :class="wo.isFull ? 'text-green-500' : 'text-blue-500'"
+                    :class="!wo.draft ? 'text-green-500' : 'text-blue-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
                   <div class="flex space-x-2">
-                      <ExclamationCircleIcon v-if="wo.isFull === 'error'" class="w-5 h-5" />
-                      <CheckCircleIcon v-if="wo.isFull" class="w-5 h-5" />
+                      <ExclamationCircleIcon v-if="wo.draft === 'error'" class="w-5 h-5" />
+                      <CheckCircleIcon v-if="!wo.draft" class="w-5 h-5" />
                       <InformationCircleIcon v-else class="w-5 h-5" />
                       <span>
-                        {{ wo.isFull ? 'Completado' : 'Pendiente' }}
+                        {{ !wo.draft ? 'Completado' : 'Pendiente' }}
                       </span>
                     </div>
                   </td>
