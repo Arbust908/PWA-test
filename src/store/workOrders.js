@@ -10,7 +10,6 @@ export default {
     UPDATE_WORKORDER(state, payload) {
       // Que no sea map
       state.all.map((workOrder, index) => {
-        console.log(workOrder, payload);
         if (workOrder.id === payload.id) {
           state.all[index] = payload;
         }
