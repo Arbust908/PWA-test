@@ -41,6 +41,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/tipos-de-arena',
+    name: 'Sand',
+    component: () => import('@/pages/Sand/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/tipos-de-arena/:id',
+    name: 'SandById',
+    component: () => import('@/pages/Sand/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/tipos-de-arena/nueva',
+    name: 'NewSand',
+    component: () => import('@/pages/Sand/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/usuario/salir',
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),
