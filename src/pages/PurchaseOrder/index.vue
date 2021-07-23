@@ -63,7 +63,11 @@
                     :class="po.sandProvider.sandOrders ? 'text-gray-500' : 'text-gray-400 italic'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ po.sandProvider.sandOrders.length > 0 ? sumTotalSand(po.sandProvider.sandOrders) + 't' : 'Sin orden de arena' }}
+                    {{
+                      po.sandProvider.sandOrders.length > 0
+                        ? sumTotalSand(po.sandProvider.sandOrders) + 't'
+                        : 'Sin orden de arena'
+                    }}
                   </td>
                   <td
                     :class="po.draft ? 'text-blue-500' : 'text-green-500'"
@@ -81,7 +85,7 @@
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-4">
                       <router-link
-                        :to="`/orden-de-trabajo/${po.id}`"
+                        :to="`/orden-de-pedido/${po.id}`"
                         class="flex justify-between items-center text-indigo-600 hover:text-indigo-900"
                       >
                         <PencilAltIcon class="w-5 h-5" />
@@ -113,11 +117,18 @@
 
 <script lang="ts">
 import { onMounted, ref, Ref } from 'vue';
-import { useStore } from 'vuex';
+import { createNamespacedHelpers } from 'vuex-composition-helpers';
+const { useState, useActions } = createNamespacedHelpers('purchaseOrder');
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
-import { TrashIcon, PencilAltIcon, InformationCircleIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/vue/solid';
+import {
+  TrashIcon,
+  PencilAltIcon,
+  InformationCircleIcon,
+  ExclamationCircleIcon,
+  CheckCircleIcon,
+} from '@heroicons/vue/solid';
 import { PurchaseOrder, SandOrder } from '@/interfaces/PurchaseOrder.ts';
 import { PurchaseOrder, PurchaseOrder } from '../../interfaces/PurchaseOrder';
 const api = 'https://sandflow-qa.bitpatagonia.com/api';
@@ -133,42 +144,29 @@ export default {
   },
   setup() {
     const poDB: Ref<Array<PurchaseOrder>> = ref([] as Array<PurchaseOrder>);
-    const store = useStore();
-    const purchaseOrder: Array<PurchaseOrder> = JSON.parse(JSON.stringify(store.state.purchaseOrder.all));
+    const { all } = useState(['all']);
+    const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
+    const purchaseOrder: Array<PurchaseOrder> = all.value;
     onMounted(async () => {
       const loading: Ref<boolean> = ref(true);
-      // poDB.value = await axios
-      //   .get(`${api}/purchaseOrder`)
-      //   .catch((err) => {
-      //     console.log(err);
-      //   })
-      //   .then((res) => {
-      //     if (res.status === 200) {
-      //       return res.data.data.purchaseOrder || res.data.purchaseOrder;
-      //     }
-      //     return [];
-      //   })
-      //   .finally(() => {
-      //     loading.value = false;
-      //   });
       if (poDB.value && poDB.value.length > 0) {
         if (poDB.value.length > purchaseOrder.length) {
           if (purchaseOrder.length === 0) {
             poDB.value.forEach((wo) => {
-              store.dispatch('savePurchaseOrder', wo);
+              savePurchaseOrder(wo);
             });
           } else {
             const newWoDB = poDB.value.filter((woFromApi: PurchaseOrder, key: number) => {
               return woFromApi.id && purchaseOrder[key] && woFromApi.id !== purchaseOrder[key].id;
             });
             newWoDB.forEach((wo) => {
-              store.dispatch('savePurchaseOrder', wo);
+              savePurchaseOrder(wo);
             });
           }
         } else {
           poDB.value = purchaseOrder;
         }
-      } else if(purchaseOrder.length > 0) {
+      } else if (purchaseOrder.length > 0) {
         poDB.value = purchaseOrder;
       }
     });
@@ -178,7 +176,7 @@ export default {
       }, 0);
     };
 
-    const deletePO = async (poId) => {
+    const deletePO = async (poId: number) => {
       const deleted = await axios
         .delete(`${api}/purchaseOrder/${poId}`)
         .catch((err) => {
