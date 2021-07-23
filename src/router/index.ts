@@ -94,6 +94,24 @@ const routes: Array<RouteRecordRaw> = [
     path: '/proveedores-de-arena/nuevo',
     name: 'NewSandProvider',
     component: () => import('@/pages/SandProvider/new.vue'),
+     beforeEnter: isLogged,
+  },
+  {
+    path: '/planificacion-de-arena',
+    name: 'SandPlans',
+    component: () => import('@/pages/SandPlan/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/planificacion-de-arena/:id',
+    name: 'SandPlanById',
+    component: () => import('@/pages/SandPlan/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/planificacion-de-arena/nueva',
+    name: 'NewSandPlan',
+    component: () => import('@/pages/SandPlan/New.vue'),
     beforeEnter: isLogged,
   },
   {
