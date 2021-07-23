@@ -435,7 +435,6 @@ export default {
     const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
       return wo.id == route.params.id;
     });
-    console.log('currentWorkOrder', currentWorkOrder);
     const {
       id: woID,
       client,
@@ -649,7 +648,7 @@ export default {
         })
         .then((res) => {
           if (res.status === 200) {
-            return res.data.data.workOrder;
+            return res.data.data;
           }
           return {};
         })
