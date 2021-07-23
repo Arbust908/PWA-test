@@ -8,6 +8,7 @@ import sandProviders from '@/store/sandProviders';
 import transportProviders from '@/store/transportProviders';
 import purchaseOrder from '@/store/purchaseOrder';
 import providerNotification from '@/store/providerNotification';
+import sandPlan from '@/store/sandPlan';
 
 const store = createStore({
   state: {
@@ -49,6 +50,7 @@ const store = createStore({
     sandProviders,
     transportProviders,
     purchaseOrder,
+    sandPlan,
   },
   strict: true,
 });

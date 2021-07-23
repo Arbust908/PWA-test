@@ -17,19 +17,19 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Numero de Orden
+                    Pozo
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Cliente
+                    Etapas 
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Empresa de Servicio
+                    Cantidad
                   </th>
                   <th
                     scope="col"
@@ -44,41 +44,40 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(wo, woKey) in woDB"
-                  :key="wo.id"
-                  :class="woKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
+                  v-for="(sp, Key) in sandPlans"
+                  :key="Key"
+                  :class="Key % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                   class="hover:bg-gray-100"
                 >
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {{ wo.id }}
+                    {{ sp.pit }}
+                  </td>
+                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm" >
+                    {{ sp.stages }}
+                  </td>
+                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm" >
+                    {{ sumQty(sp.sandStage) }}t
                   </td>
                   <td
-                    :class="wo.client ? 'text-gray-500' : 'text-gray-400 italic'"
+                    :class="sp.draft ?  'text-blue-500' : 'text-green-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ wo.client || 'Sin cliente' }}
-                  </td>
-                  <td
-                    :class="wo.serviceCompany ? 'text-gray-500' : 'text-gray-400 italic'"
-                    class="px-6 py-4 whitespace-nowrap text-sm"
-                  >
-                    {{ wo.serviceCompany || 'Sin empresa de servicio' }}
-                  </td>
-                  <td
-                    :class="wo.isFull ? 'text-green-500' : 'text-blue-500'"
-                    class="px-6 py-4 whitespace-nowrap text-sm"
-                  >
-                    {{ wo.isFull ? 'Completado' : 'Pendiente' }}
+                    {{ sp.draft ? 'Pendiente' : 'Completado' }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <router-link :to="`/orden-de-trabajo/${wo.id}`" class="text-indigo-600 hover:text-indigo-900">
-                      Editar
-                    </router-link>
+                    <div>
+                      <router-link :to="`/orden-de-trabajo/${sp.id}`" class="text-indigo-600 hover:text-indigo-900">
+                        Editar
+                      </router-link>
+                      <button @click="deleteSP(sp.id)" class="text-red-600 hover:text-red-900">
+                        Borrar
+                      </button>
+                    </div>
                   </td>
                 </tr>
-                <tr v-if="woDB.length <= 0">
+                <tr v-if="sandPlans.length <= 0">
                   <td colspan="5" class="text-center text-xs text-gray-500 px-6 py-4">
-                    <p>No hay Ordenes de Trabajo</p>
+                    <p>No hay Planificacion de Arena</p>
                   </td>
                 </tr>
               </tbody>
@@ -104,47 +103,58 @@ export default {
     UiBtn,
   },
   setup() {
-    const woDB = ref([]);
+    const sandPlans = ref([]);
     const store = useStore();
-    const workOrders = JSON.parse(JSON.stringify(store.state.workOrders.all));
-    onMounted(async () => {
+    const allSandPlans = JSON.parse(JSON.stringify(store.state.sandPlan.all));
+    // onMounted(async () => {
+    //   const loading = ref(true);
+    //   sandPlans.value = await axios
+    //     .get(`${api}/sandPlan`)
+    //     .catch((err) => {
+    //       console.log(err);
+    //     })
+    //     .then((res) => {
+    //       if (res.status === 200) {
+    //         console.log(res);
+    //         // return res.data.data.workOrders || res.data.workOrders;
+    //       }
+    //       return [];
+    //     })
+    //     .finally(() => {
+    //       loading.value = false;
+    //     });
+    //   if (sandPlans.value && sandPlans.value.length > 0) {
+    //     if (sandPlans.value.length > allSandPlans.length) {
+    //       if (allSandPlans.length === 0) {
+    //         sandPlans.value.forEach((sp) => {
+    //           store.dispatch('saveSandPlan', sp);
+    //         });
+    //       } else {
+    //         const newSpDB = sandPlans.value.filter((spFromApi, key) => {
+    //           return spFromApi.id && allSandPlans[key] && spFromApi.id !== allSandPlans[key].id;
+    //         });
+    //         newSpDB.forEach((sp) => {
+    //           store.dispatch('saveSandPlan', sp);
+    //         });
+    //       }
+    //     }
+    //   }
+    // });
+    sandPlans.value = allSandPlans;
+
+    const sumQty = (sandStage) => {
+      return sandStage.reduce((totalSum, ss) => {
+        return totalSum + ss.quantity;
+      }, 0);
+    }
+    const deleteSP = (id) => {
       const loading = ref(true);
-      woDB.value = await axios
-        .get(`${api}/workOrder`)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            console.log(res);
-            return res.data.data.workOrders || res.data.workOrders;
-          }
-          return [];
-        })
-        .finally(() => {
-          loading.value = false;
-        });
-      console.log(woDB.value);
-      console.log(workOrders);
-      if (woDB.value && woDB.value.length > 0) {
-        if (woDB.value.length > workOrders.length) {
-          if (workOrders.length === 0) {
-            woDB.value.forEach((wo, woKey) => {
-              store.dispatch('saveWorkOrder', wo);
-            });
-          } else {
-            const newWoDB = woDB.value.filter((woFromApi, key) => {
-              return woFromApi.id && workOrders[key] && woFromApi.id !== workOrders[key].id;
-            });
-            newWoDB.forEach((wo, woKey) => {
-              store.dispatch('saveWorkOrder', wo);
-            });
-          }
-        }
-      }
-    });
+      // delete from DB
+    }
     return {
-      woDB,
+      sandPlans,
+      deleteSP,
+      sumQty,
     };
   },
 };

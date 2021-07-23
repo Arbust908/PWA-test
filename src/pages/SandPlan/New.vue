@@ -1,23 +1,9 @@
 <template>
   <Layout>
     <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Nueva orden de trabajo</h1>
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Cargar planificacón de arenas</h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
-      <nav class="flex justify-between">
-        <button class="section-tab" :selected="WO_section === 'orden'" @click="changeSection('orden')">
-          <span> Orden </span>
-          <CheckCircleIcon v-if="isOrderFull" class="w-5 h-5" />
-        </button>
-        <button class="section-tab" :selected="WO_section === 'equipamento'" @click="changeSection('equipamento')">
-          <span> Equipamento </span>
-          <CheckCircleIcon v-if="isEquipmentFull" class="w-5 h-5" />
-        </button>
-        <button class="section-tab" :selected="WO_section === 'rrhh'" @click="changeSection('rrhh')">
-          <span> RRHH </span>
-          <CheckCircleIcon v-if="isRRHHFull" class="w-5 h-5" />
-        </button>
-      </nav>
       <form v-if="WO_section === 'orden'" method="POST" action="/" class="p-4 max-w-lg">
         <fieldset>
           <div class="input-block">
