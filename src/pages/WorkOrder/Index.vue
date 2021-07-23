@@ -124,19 +124,17 @@ export default {
         .finally(() => {
           loading.value = false;
         });
-      console.log(woDB.value);
-      console.log(workOrders);
       if (woDB.value && woDB.value.length > 0) {
         if (woDB.value.length > workOrders.length) {
           if (workOrders.length === 0) {
-            woDB.value.forEach((wo, woKey) => {
+            woDB.value.forEach((wo) => {
               store.dispatch('saveWorkOrder', wo);
             });
           } else {
             const newWoDB = woDB.value.filter((woFromApi, key) => {
               return woFromApi.id && workOrders[key] && woFromApi.id !== workOrders[key].id;
             });
-            newWoDB.forEach((wo, woKey) => {
+            newWoDB.forEach((wo) => {
               store.dispatch('saveWorkOrder', wo);
             });
           }
