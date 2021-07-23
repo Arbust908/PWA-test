@@ -2,9 +2,10 @@ export default {
     state: () => ({
       all: [
         {
+          id: 0,
           pit: 'VC1',
           stages: 3,
-          sandStage: [
+          sandStages: [
             {
               number: 1,
               sandType: '30/40',
@@ -23,9 +24,10 @@ export default {
           ]
         },
         {
+          id: 1,
           pit: 'VC2',
           stages: 1,
-          sandStage: [
+          sandStages: [
             {
               number: 1,
               sandType: '130/240',
@@ -34,9 +36,10 @@ export default {
           ]
         },
         {
+          id: 2,
           pit: 'VC3',
           stages: 2,
-          sandStage: [
+          sandStages: [
             {
               number: 1,
               sandType: '30/40',
@@ -66,8 +69,6 @@ export default {
     },
     actions: {
       saveSandPlan({ commit }, sandPlan) {
-        console.log('>>Adding SandPlan', sandPlan);
-        console.table(sandPlan);
         commit('ADD_SANDPLAN', sandPlan);
       },
       updateSandPlan({ commit }, sandPlan) {

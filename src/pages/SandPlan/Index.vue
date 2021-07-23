@@ -1,8 +1,8 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Ordenes de Trabajo</h2>
-      <router-link to="/orden-de-trabajo/nueva">
+      <h2 class="text-2xl font-semibold text-gray-900">Planificacónes de arenas</h2>
+      <router-link to="/planificacion-de-arena/nueva">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
     </header>
@@ -56,7 +56,7 @@
                     {{ sp.stages }}
                   </td>
                   <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm" >
-                    {{ sumQty(sp.sandStage) }}t
+                    {{ sumQty(sp.sandStages) }}t
                   </td>
                   <td
                     :class="sp.draft ?  'text-blue-500' : 'text-green-500'"
@@ -66,7 +66,7 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div>
-                      <router-link :to="`/orden-de-trabajo/${sp.id}`" class="text-indigo-600 hover:text-indigo-900">
+                      <router-link :to="`/planificacion-de-arena/${sp.id}`" class="text-indigo-600 hover:text-indigo-900">
                         Editar
                       </router-link>
                       <button @click="deleteSP(sp.id)" class="text-red-600 hover:text-red-900">
@@ -141,15 +141,17 @@ export default {
     //   }
     // });
     sandPlans.value = allSandPlans;
-
-    const sumQty = (sandStage) => {
-      return sandStage.reduce((totalSum, ss) => {
+    const sumQty = (sandStages) => {
+      return sandStages.reduce((totalSum, ss) => {
         return totalSum + ss.quantity;
       }, 0);
     }
     const deleteSP = (id) => {
       const loading = ref(true);
-      // delete from DB
+      sandPlans.value = sandPlans.value.filter((sp) => {
+        return sp.id !== id;
+      });
+      loading.value = false;
     }
     return {
       sandPlans,
