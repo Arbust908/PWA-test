@@ -17,7 +17,6 @@ export default {
   },
   actions: {
     saveSandProvider({ commit }, sandProvider) {
-      console.log('>>Adding Sand provider', sandProvider);
       console.table(sandProvider);
       const baseSP = {
         id: 0,
@@ -38,6 +37,8 @@ export default {
       }
     },
     updateSandProvider({ commit }, sandProvider) {
+      console.log("update!!!", sandProvider)
+
       commit('UPDATE_SANDPROVIDER', sandProvider);
     },
   },

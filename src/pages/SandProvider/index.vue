@@ -2,7 +2,7 @@
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">Proovedores de arena</h2>
-      <router-link to="/orden-de-trabajo/nueva">
+      <router-link to="/proveedores-de-arena/nuevo">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
     </header>
@@ -112,48 +112,24 @@ export default {
     const sandProviders = JSON.parse(JSON.stringify(store.state.sandProviders.all));
     onMounted(async () => {
       const loading = ref(true);
-      // spDB.value = await axios
-      //   .get(`${api}/sandProvider`)
-      //   .catch((err) => {
-      //     console.log(err);
-      //   })
-      //   .then((res) => {
-      //     if (res.status === 200) {
-      //       return res.data.data.sandProviders || res.data.sandProviders;
-      //     }
-      //     return [];
-      //   })
-      //   .finally(() => {
-      //     loading.value = false;
-      //   });
-      spDB.value = [
-        {
-          "id": 1,
-          "name": "Cliente copado",
-          "legalName": "CLIENTE SRL",
-          "meshType": "Malla numero 1",
-          "grains": "grains xER2"
-        },
-        {
-          "id": 2,
-          "name": "Cliente de prueba",
-          "legalName": "TESTING SA",
-          "meshType": "Malla protegida",
-          "grains": "grains 235253"
-        },
-        {
-          "id": 2,
-          "name": "Cliente de prueba",
-          "legalName": "TESTING SA",
-          "meshType": "Malla protegida",
-          "grains": "grains 235253"
-        },
-      ]
-      console.log('API DB', spDB.value);
-      console.log('State', sandProviders);
-      console.log('API DB', spDB.value.length);
+      spDB.value = await axios
+        .get(`${api}/sandProvider`)
+        .catch((err) => {
+          console.log(err);
+        })
+        .then((res) => {
+          if (res.status === 200) {
+            return res.data.data
+          }
+          return [];
+        })
+        .finally(() => {
+          loading.value = false;
+        });
+      
+      console.log(spDB.value)
+
       if (spDB.value && spDB.value.length > 0) {
-        console.log(spDB.value.length);
         if (spDB.value.length > sandProviders.length) {
           if (sandProviders.length === 0) {
             spDB.value.forEach((sp, spKey) => {
@@ -163,7 +139,6 @@ export default {
             const newspDB = spDB.value.filter((spFromApi, key) => {
               return spFromApi.id && sandProviders[key] && spFromApi.id !== sandProviders[key].id;
             });
-            console.log(newspDB);
             newspDB.forEach((sp, spKey) => {
               store.dispatch('saveSandProvider', sp);
             });
