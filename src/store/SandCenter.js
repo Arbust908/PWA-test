@@ -1,6 +1,12 @@
 export default {
     state: () => ({
-      all: [],
+      all: [
+        {
+          id: 0,
+          provider: 'Arena san luis',
+          
+        }
+      ],
     }),
     getters: {},
     mutations: {
