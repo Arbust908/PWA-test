@@ -117,7 +117,7 @@ export default {
         .then((res) => {
           if (res.status === 200) {
             console.log(res);
-            return res.data.data.workOrders || res.data.workOrders;
+            return res.data.data;
           }
           return [];
         })
