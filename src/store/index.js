@@ -9,6 +9,7 @@ import sandProviders from '@/store/sandProviders';
 import transportProviders from '@/store/transportProviders';
 import workOrders from '@/store/workOrders';
 import forklifts from '@/store/forklifts';
+import sandCenter from '@/store/sandCenter';
 
 const store = createStore({
   state: {
@@ -51,9 +52,8 @@ const store = createStore({
     sandProviders,
     transportProviders,
     workOrders,
-    forklifts
+    sandCenter,
   },
   strict: true,
 });
-
 export default store;

@@ -1,8 +1,8 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Planificacónes de arenas</h2>
-      <router-link to="/planificacion-de-arena/nueva">
+      <h2 class="text-2xl font-semibold text-gray-900">Centros de arena</h2>
+      <router-link to="/centro-de-carga-de-arena/nueva">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
     </header>
@@ -17,13 +17,13 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Pozo
+                    Proveedor
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Etapas 
+                    Cantidad de Cajas 
                   </th>
                   <th
                     scope="col"
@@ -44,38 +44,40 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(sp, Key) in sandPlans"
+                  v-for="(sc, Key) in sandCenter"
                   :key="Key"
                   :class="Key % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                   class="hover:bg-gray-100"
                 >
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {{ sp.pit }}
+                    {{ sc.provider }}
                   </td>
                   <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm" >
-                    {{ sp.stages }}
+                    {{ sc.sandCarge.length }}
                   </td>
                   <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm" >
-                    {{ sumQty(sp.sandStages) }}t
+                    {{ sumQty(sc.sandCarge) }}t
                   </td>
                   <td
-                    :class="sp.draft ?  'text-blue-500' : 'text-green-500'"
+                    :class="sc.loaded ? 'text-green-500' : 'text-blue-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ sp.draft ? 'Pendiente' : 'Completado' }}
+                    {{ sc.loaded ? 'Cargado' : 'No cargado' }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div>
-                      <router-link :to="`/planificacion-de-arena/${sp.id}`" class="text-indigo-600 hover:text-indigo-900">
-                        Editar
+                    <div class="flex justify-end space-x-4">
+                      <router-link :to="`/centro-de-carga-de-arena/${sc.id}`" class="flex text-indigo-600 hover:text-indigo-900">
+                        <PencilAltIcon class="w-5 h-5" />
+                        <span> Editar </span>
                       </router-link>
-                      <button @click="deleteSP(sp.id)" class="text-red-600 hover:text-red-900">
-                        Borrar
+                      <button @click="deleteSP(sc.id)" class="flex text-red-600 hover:text-red-900">
+                        <TrashIcon class="w-5 h-5" />
+                        <span> Eliminar </span>
                       </button>
                     </div>
                   </td>
                 </tr>
-                <tr v-if="sandPlans.length <= 0">
+                <tr v-if="sandCenter.length <= 0">
                   <td colspan="5" class="text-center text-xs text-gray-500 px-6 py-4">
                     <p>No hay Planificacion de Arena</p>
                   </td>
@@ -92,6 +94,7 @@
 <script>
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
+import { TrashIcon, PencilAltIcon, InformationCircleIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/vue/solid';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
@@ -101,11 +104,13 @@ export default {
   components: {
     Layout,
     UiBtn,
+  TrashIcon,
+    PencilAltIcon,
   },
   setup() {
     const sandCenter = ref([]);
     const store = useStore();
-    const allSandPlans = JSON.parse(JSON.stringify(store.state.sandPlan.all));
+    const allSandCenters = JSON.parse(JSON.stringify(store.state.sandCenter.all));
     // onMounted(async () => {
     //   const loading = ref(true);
     //   sandPlans.value = await axios
@@ -140,7 +145,7 @@ export default {
     //     }
     //   }
     // });
-    sandPlans.value = allSandPlans;
+    sandCenter.value = allSandCenters;
     const sumQty = (sandStages) => {
       return sandStages.reduce((totalSum, ss) => {
         return totalSum + ss.quantity;
@@ -148,13 +153,13 @@ export default {
     }
     const deleteSP = (id) => {
       const loading = ref(true);
-      sandPlans.value = sandPlans.value.filter((sp) => {
+      sandCenter.value = sandCenter.value.filter((sp) => {
         return sp.id !== id;
       });
       loading.value = false;
     }
     return {
-      sandPlans,
+      sandCenter,
       deleteSP,
       sumQty,
     };
