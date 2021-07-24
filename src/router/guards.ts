@@ -1,10 +1,18 @@
 import store from '@/store';
 
+const recoverLocalUser = () => {
+  if (localStorage.getItem('user')) {
+    const user = JSON.parse(localStorage.getItem('user'));
+    store.dispatch('setUser', user);
+  }
+}
+
 export const wokrOrdersID = store.state.workOrders.all.reduce((woIds, workOrder) => {
   woIds.push(workOrder.id);
   return woIds;
 }, []);
 export const isLogged = (to, from, next) => {
+  recoverLocalUser()
   const isLogged = store.getters.isLogged
   if (!isLogged) {
     next({ path: '/login' })
@@ -14,6 +22,7 @@ export const isLogged = (to, from, next) => {
   }
 }
 export const isAdmin = (to, from, next) => {
+  recoverLocalUser()
   const isAdmin = store.getters.isAdmin
   if (!isAdmin) {
     next({ path: '/login' })
@@ -23,10 +32,13 @@ export const isAdmin = (to, from, next) => {
   }
 }
 export const isGuest = (to, from, next) => {
+  recoverLocalUser()
   const isGuest = store.getters.isGuest
-  if (!isGuest) {
+  if (isGuest) {
     next({ path: '/login' })
     return
+  } else if (to.path === '/login') {
+    next({ path: '/' })
   } else {
     next()
   }

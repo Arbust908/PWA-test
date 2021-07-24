@@ -25,7 +25,6 @@ export default {
       const user = JSON.parse(localStorage.getItem('user'));
       const { setUser } = useActions(['setUser']);
       setUser(user);
-      router.push('/orden-de-trabajo');
     }
 
     return {

@@ -15,9 +15,13 @@ export default {
         }
       });
     },
+    DELETE_WORKORDER(state, payload) {
+      state.all = state.all.filter((workOrder) => workOrder.id !== payload);
+    },
   },
   actions: {
     saveWorkOrder({ commit }, workOrder) {
+      console.log('saveWorkOrder', workOrder);
       const baseWO = {
         id: 0,
         client: '',
@@ -46,6 +50,9 @@ export default {
     },
     updateWorkOrder({ commit }, workOrder) {
       commit('UPDATE_WORKORDER', workOrder);
+    },
+    deleteWorkOrder({ commit }, workOrderId) {
+      commit('DELETE_WORKORDER', workOrderId);
     },
   },
 };

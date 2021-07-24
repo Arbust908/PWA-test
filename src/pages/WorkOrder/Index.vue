@@ -1,5 +1,11 @@
 <template>
   <Layout>
+    <progress
+      v-if="loading"
+      class="fixed inset-x-0 top-0 z-50 w-full h-2 shadow"
+      :value="(progress * 100).toFixed(0)"
+      max="100"
+    ></progress>
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">Ordenes de Trabajo</h2>
       <router-link to="/orden-de-trabajo/nueva">
@@ -16,8 +22,9 @@
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    title="Numero de Orden"
                   >
-                    Numero de Orden
+                    N°
                   </th>
                   <th
                     scope="col"
@@ -68,7 +75,7 @@
                     :class="!wo.draft ? 'text-green-500' : 'text-blue-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                  <div class="flex space-x-2">
+                    <div class="flex space-x-2">
                       <ExclamationCircleIcon v-if="wo.draft === 'error'" class="w-5 h-5" />
                       <CheckCircleIcon v-if="!wo.draft" class="w-5 h-5" />
                       <InformationCircleIcon v-else class="w-5 h-5" />
@@ -110,15 +117,24 @@
   </Layout>
 </template>
 
-<script>
-import { onMounted, ref } from 'vue';
+<script lang="ts">
+import { onMounted, ref, watch } from 'vue';
 import { useStore } from 'vuex';
-import { TrashIcon, PencilAltIcon, InformationCircleIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/vue/solid';
+import {
+  TrashIcon,
+  PencilAltIcon,
+  InformationCircleIcon,
+  ExclamationCircleIcon,
+  CheckCircleIcon,
+} from '@heroicons/vue/solid';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
-// import { WorkOrder } from '@/interfaces/WorkOrder';
-const api = 'https://sandflow-qa.bitpatagonia.com/api';
+import { useAxios } from '@vueuse/integrations/useAxios';
+import { useNProgress } from '@vueuse/integrations/useNProgress';
+import { debouncedWatch } from '@vueuse/core';
+import { WorkOrder } from '@/interfaces/WorkOrder';
+
 export default {
   components: {
     Layout,
@@ -130,69 +146,78 @@ export default {
     CheckCircleIcon,
   },
   setup() {
-    const loading = ref(false);
-    const woDB = ref([]);
+    const instance = axios.create({
+      baseURL: 'https://sandflow-qa.bitpatagonia.com/api/workOrder',
+    });
     const store = useStore();
-    const workOrders = JSON.parse(JSON.stringify(store.state.workOrders.all));
-    onMounted(async () => {
-      const loading = ref(true);
-      woDB.value = await axios
-        .get(`${api}/workOrder`)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            console.log(res);
-            return res.data.data;
-          }
-          return [];
-        })
-        .finally(() => {
-          loading.value = false;
-        });
-      if (woDB.value && woDB.value.length > 0) {
-        if (woDB.value.length > workOrders.length) {
-          if (workOrders.length === 0) {
-            woDB.value.forEach((wo) => {
-              store.dispatch('saveWorkOrder', wo);
-            });
-          } else {
-            const newWoDB = woDB.value.filter((woFromApi, key) => {
-              return woFromApi.id && workOrders[key] && woFromApi.id !== workOrders[key].id;
-            });
-            newWoDB.forEach((wo) => {
-              store.dispatch('saveWorkOrder', wo);
-            });
-          }
-        }
+    const workOrders = store.state.workOrders.all;
+
+    const { data, isFinished, isLoading, error } = useAxios('/', instance);
+    const { progress, isLoading: loading, start, done } = useNProgress();
+    watch(isLoading, (load, prevLoad) => {
+      start();
+    });
+    const woDB: Ref<Array<WorkOrder>> = ref([] as Array<WorkOrder>);
+    watch(data, (currentData, prevData) => {
+      if (currentData) {
+        woDB.value = currentData.data;
       }
     });
 
-    const deleteWO = async (woId) => {
-      const deletedWO = await axios
-        .delete(`${api}/workOrder/${woId}`)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            console.log(res);
-            return res;
-          }
-          return [];
-        })
-        .finally(() => {
-          loading.value = false;
-        });
-        console.log(deletedWO);
+    debouncedWatch(
+      isFinished,
+      () => {
+        if (isFinished.value) {
+          const left = 1 - (progress.value || 0);
+          const loading = setInterval(() => {
+            progress.value += left / 10;
+            if (progress.value >= 1) {
+              clearInterval(loading);
+            }
+          }, 100);
+        }
+      },
+      { debounce: 500 }
+    );
+    if (woDB.value && woDB.value.length > 0) {
+      if (woDB.value.length > workOrders.value.length) {
+        if (workOrders.value.length === 0) {
+          woDB.value.forEach((wo) => {
+            store.dispatch('saveWorkOrder', wo);
+          });
+        } else {
+          const newWoDB = woDB.value.filter((woFromApi, key) => {
+            return woFromApi.id && workOrders.value[key] && woFromApi.id !== workOrders.value[key].id;
+          });
+          newWoDB.forEach((wo) => {
+            store.dispatch('saveWorkOrder', wo);
+          });
+        }
+      }
+    }
+    const deleteWO = (woId) => {
+      start();
+      const { data, isFinished } = useAxios(`/${woId}`, { method: 'DELETE' }, instance);
+      watch(isFinished, (load, prevLoad) => {
+        store.dispatch('deleteWorkOrder', woId);
         woDB.value = woDB.value.filter((woFromApi) => {
           return woFromApi.id !== woId;
         });
+        done();
+      });
+      return isFinished;
     };
+
     return {
       woDB,
-      deleteWO
+      deleteWO,
+      isFinished,
+      progress,
+      isLoading,
+      start,
+      done,
+      error,
+      loading,
     };
   },
 };
