@@ -73,51 +73,53 @@
         </div>
 
         <div>
-          <Button class="mx-auto px-6" @click.prevent="formValidation">
+          <Button
+            class="mx-auto px-6 bg-main-500"
+            @click.prevent="formValidation"
+          >
             Iniciar Sesión
           </Button>
         </div>
       </form>
     </article>
-    <Modal
-      title="Error de inicio"
-      type="error"
-      :open="showModal"
-      @close="toggleModal"
-    >
-      <template #body>
-        <p>Hubo un error al intentar iniciar sesión.</p>
-      </template>
-      <template #btn>
-        <button
-          type="button"
-          class="
-            inline-flex
-            justify-center
-            w-full
-            rounded-md
-            border border-transparent
-            shadow-sm
-            px-4
-            py-2
-            bg-red-200
-            sm:bg-transparent
-            text-base
-            font-medium
-            text-second-400
-            hover:bg-gray-100
-            focus:outline-none
-            focus:ring-2
-            focus:ring-offset-2
-            focus:ring-red-500
-            sm:text-sm
-          "
-          @click.prevent="toggleModal"
-        >
-          Volver
-        </button>
-      </template>
-    </Modal>
+    <teleport to="body">
+      <Modal v-if="showModal" title="Hubo un error" type="error">
+        <template v-slot:body>
+          <div>
+            Alguno de los datos no coinciden con los datos que tenemos
+            registrados. Volve a ingresar los datos correctos.
+          </div>
+        </template>
+        <template v-slot:btn>
+          <button
+            type="button"
+            class="
+              inline-flex
+              justify-center
+              w-full
+              rounded-md
+              border border-transparent
+              shadow-sm
+              px-4
+              py-2
+              bg-indigo-600
+              text-base
+              font-medium
+              text-white
+              hover:bg-indigo-700
+              focus:outline-none
+              focus:ring-2
+              focus:ring-offset-2
+              focus:ring-indigo-500
+              sm:text-sm
+            "
+            @click.prevent="closeModal"
+          >
+            Ok
+          </button>
+        </template>
+      </Modal>
+    </teleport>
   </section>
 </template>
 

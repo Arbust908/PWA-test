@@ -23,7 +23,7 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Cantidad de Cajas 
+                    Cajas
                   </th>
                   <th
                     scope="col"
@@ -52,12 +52,10 @@
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     {{ sc.provider }}
                   </td>
-                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm" >
+                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
                     {{ sc.sandCarge.length }}
                   </td>
-                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm" >
-                    {{ sumQty(sc.sandCarge) }}t
-                  </td>
+                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">{{ sumQty(sc.sandCarge) }}t</td>
                   <td
                     :class="sc.loaded ? 'text-green-500' : 'text-blue-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
@@ -66,7 +64,10 @@
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-4">
-                      <router-link :to="`/centro-de-carga-de-arena/${sc.id}`" class="flex text-indigo-600 hover:text-indigo-900">
+                      <router-link
+                        :to="`/centro-de-carga-de-arena/${sc.id}`"
+                        class="flex text-indigo-600 hover:text-indigo-900"
+                      >
                         <PencilAltIcon class="w-5 h-5" />
                         <span> Editar </span>
                       </router-link>
@@ -94,7 +95,13 @@
 <script>
 import { onMounted, ref } from 'vue';
 import { useStore } from 'vuex';
-import { TrashIcon, PencilAltIcon, InformationCircleIcon, ExclamationCircleIcon, CheckCircleIcon } from '@heroicons/vue/solid';
+import {
+  TrashIcon,
+  PencilAltIcon,
+  InformationCircleIcon,
+  ExclamationCircleIcon,
+  CheckCircleIcon,
+} from '@heroicons/vue/solid';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
@@ -104,7 +111,7 @@ export default {
   components: {
     Layout,
     UiBtn,
-  TrashIcon,
+    TrashIcon,
     PencilAltIcon,
   },
   setup() {
@@ -150,14 +157,14 @@ export default {
       return sandStages.reduce((totalSum, ss) => {
         return totalSum + ss.quantity;
       }, 0);
-    }
+    };
     const deleteSP = (id) => {
       const loading = ref(true);
       sandCenter.value = sandCenter.value.filter((sp) => {
         return sp.id !== id;
       });
       loading.value = false;
-    }
+    };
     return {
       sandCenter,
       deleteSP,
