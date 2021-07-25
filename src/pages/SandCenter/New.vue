@@ -122,8 +122,8 @@
             </button>
           </div>
           <label class="col-span-full toggle" for="sandBoxId">
-            <span>Camion Patente {{ transportId }} - Cargado</span>
-            <SlimToggle :on="loaded" />
+            <span>Camion Patente {{ transportId }} - {{ loaded ? 'Cargado' : 'No Cargado' }}</span>
+            <SlimToggle :on="loaded" @click="toggleLoaded" />
           </label>
         </fieldset>
       </form>
@@ -202,6 +202,10 @@ export default defineComponent({
     };
     addSandCarge();
 
+    const toggleLoaded = () => {
+      loaded.value = !loaded.value;
+    };
+
     const isFull = computed(() => {
       return (
         provider.value &&
@@ -231,6 +235,7 @@ export default defineComponent({
       loaded,
       addSandCarge,
       removeSandCarge,
+      toggleLoaded,
       save,
       isFull,
     };
@@ -255,7 +260,7 @@ label:not(.toggle) {
   }
 }
 .toggle {
-  @apply flex space-x-3;
+  @apply flex space-x-3 items-center;
 }
 .btn {
   &__draft {

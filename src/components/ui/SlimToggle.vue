@@ -1,5 +1,27 @@
 <template>
-  <Switch
+  <button
+    @click.prevent="toggle"
+    class="
+      flex-shrink-0
+      relative
+      rounded-full
+      inline-flex
+      items-center
+      justify-center
+      h-5
+      w-10
+      cursor-pointer
+      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+      switch
+      group
+    "
+  >
+    <span class="sr-only">Use setting</span>
+    <span aria-hidden="true" class="switch__bg" />
+    <span aria-hidden="true" :class="enabled ? 'on' : 'off'" class="switch__pipe" />
+    <span aria-hidden="true" :class="enabled ? 'on' : 'off'" class="switch__dot" />
+  </button>
+  <!-- <Switch
     v-model="enabled"
     class="
       flex-shrink-0
@@ -20,7 +42,7 @@
     <span aria-hidden="true" class="switch__bg" />
     <span aria-hidden="true" :class="enabled ? 'on' : 'off'" class="switch__pipe" />
     <span aria-hidden="true" :class="enabled ? 'on' : 'off'" class="switch__dot" />
-  </Switch>
+  </Switch> -->
 </template>
 
 <script lang="ts">
@@ -31,11 +53,20 @@ export default defineComponent({
   components: {
     Switch,
   },
+  props: {
+    enabled: {
+      type: Boolean,
+      default: false,
+    },
+  },
   setup(props) {
-    const enabled: Ref<boolean> = ref(props.on);
-
+    const enabled: Ref<boolean> = ref(props.enabled);
+    const toggle = () => {
+      enabled.value = !enabled.value;
+    };
     return {
       enabled,
+      toggle,
     };
   },
 });
