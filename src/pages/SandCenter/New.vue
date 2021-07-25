@@ -1,9 +1,9 @@
 <template>
   <Layout>
     <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Centro de carga de arenas</h1>
+      <h1 class="font-bold text-second-900 text-xl self-start mb-3 md:mb-0">Centro de carga de arenas</h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm">
+    <section class="bg-second-50 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 grid-r gap-3 md:gap-4">
           <legend class="col-span-12 text-xl">Orden de Pedido</legend>
@@ -61,7 +61,7 @@
                     border-r-0
                     rounded-l
                     focus:ring-indigo-500 focus:border-indigo-500
-                    border-gray-300
+                    border-second-300
                     sm:text-sm
                   "
                   placeholder="22"
@@ -79,9 +79,9 @@
                     items-center
                     px-3
                     rounded-r
-                    border border-gray-300
-                    bg-gray-50
-                    text-gray-500
+                    border border-second-300
+                    bg-second-50
+                    text-second-500
                     sm:text-sm
                   "
                   title="Peso en Toneladas"
@@ -240,10 +240,10 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .input {
-  @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 mt-1 flex shadow-sm;
+  @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
 }
 input:read-only {
-  @apply bg-gray-200 border cursor-not-allowed;
+  @apply bg-second-200 border cursor-not-allowed;
 }
 fieldset:not(:last-of-type) {
   @apply border-b pb-6;
@@ -262,16 +262,16 @@ label:not(.toggle) {
     @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
   }
   &__delete {
-    @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
+    @apply border-transparent text-second-800 bg-transparent hover:bg-red-600 hover:text-second-50 mx-2 p-2 transition duration-150 ease-out;
   }
   &__options {
-    @apply border-transparent text-gray-800 bg-transparent hover:bg-gray-300 hover:text-indigo-800 mx-2 p-2 transition duration-150 ease-out;
+    @apply border-transparent text-second-800 bg-transparent hover:bg-second-300 hover:text-indigo-800 mx-2 p-2 transition duration-150 ease-out;
   }
   &__add {
-    @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+    @apply border-transparent text-second-50 bg-green-500 hover:bg-green-600 mr-2;
   }
   &__add--special {
-    @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+    @apply border-2 border-second-400 text-second-400 bg-transparent group-hover:bg-second-200 group-hover:text-second-600 group-hover:border-second-600;
   }
   &__mobile-only {
     @apply lg:hidden;

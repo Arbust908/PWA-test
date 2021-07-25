@@ -7,7 +7,7 @@
       max="100"
     ></progress>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Ordenes de Trabajo</h2>
+      <h2 class="text-2xl font-semibold text-second-900">Ordenes de Trabajo</h2>
       <router-link to="/orden-de-trabajo/nueva">
         <UiBtn>Crear nueva</UiBtn>
       </router-link>
@@ -60,30 +60,14 @@
                     class="
                       px-6
                       py-3
-                      text-left text-xs
                       font-medium
                       text-gray-500
                       uppercase
                       tracking-wider
                     "
                   >
-                    Empresa de Servicio
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-gray-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Estado
-                  </th>
-                  <th scope="col" class="relative px-6 py-3">
+                    scope="col" class=" px-6 py-3 font-medium text-gray-500
+                    uppercase tracking-wider " >
                     <span class="sr-only">Actions</span>
                   </th>
                 </tr>
@@ -92,8 +76,8 @@
                 <tr
                   v-for="(wo, woKey) in woDB"
                   :key="wo.id"
-                  :class="woKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
-                  class="hover:bg-gray-100"
+                  :class="woKey % 2 === 0 ? 'bg-second-100' : 'bg-second-50'"
+                  class="hover:bg-second-100"
                 >
                   <td
                     class="

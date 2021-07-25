@@ -1,7 +1,7 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Centros de arena</h2>
+      <h2 class="text-2xl font-semibold text-second-900">Centros de arena</h2>
       <router-link to="/centro-de-carga-de-arena/nueva">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
@@ -9,31 +9,31 @@
     <div class="flex flex-col">
       <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
+          <div class="shadow overflow-hidden border-b border-second-200 sm:rounded-lg">
+            <table class="min-w-full divide-y divide-second-200">
+              <thead class="bg-second-50">
                 <tr>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider"
                   >
                     Proveedor
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider"
                   >
                     Cajas
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider"
                   >
                     Cantidad
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider"
                   >
                     Estado
                   </th>
@@ -46,16 +46,16 @@
                 <tr
                   v-for="(sc, Key) in sandCenter"
                   :key="Key"
-                  :class="Key % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
-                  class="hover:bg-gray-100"
+                  :class="Key % 2 === 0 ? 'bg-second-100' : 'bg-second-50'"
+                  class="hover:bg-second-100"
                 >
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-second-900">
                     {{ sc.provider }}
                   </td>
-                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
+                  <td class="text-second-500 px-6 py-4 whitespace-nowrap text-sm">
                     {{ sc.sandCarge.length }}
                   </td>
-                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">{{ sumQty(sc.sandCarge) }}t</td>
+                  <td class="text-second-500 px-6 py-4 whitespace-nowrap text-sm">{{ sumQty(sc.sandCarge) }}t</td>
                   <td
                     :class="sc.loaded ? 'text-green-500' : 'text-blue-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
@@ -79,7 +79,7 @@
                   </td>
                 </tr>
                 <tr v-if="sandCenter.length <= 0">
-                  <td colspan="5" class="text-center text-xs text-gray-500 px-6 py-4">
+                  <td colspan="5" class="text-center text-xs text-second-500 px-6 py-4">
                     <p>No hay Planificacion de Arena</p>
                   </td>
                 </tr>

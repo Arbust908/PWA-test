@@ -18,8 +18,8 @@
         z-20
       "
     >
-      <StatusOnlineIcon v-if="isOnline" class="h-5 w-5 text-white" />
-      <StatusOfflineIcon v-else class="h-5 w-5 text-white" />
+      <StatusOnlineIcon v-if="isOnline" class="h-5 w-5 text-second-50" />
+      <StatusOfflineIcon v-else class="h-5 w-5 text-second-50" />
     </aside> -->
     <NotificationInfo v-if="false" />
     <ModalGeneral v-if="false" />

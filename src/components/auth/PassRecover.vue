@@ -9,7 +9,13 @@
         <div class="recover-form__input-block">
           <label for="password" class=""> Nueva Contraseña </label>
           <div class="mt-1">
-            <input id="password" name="password" type="password" autocomplete="new-password" required />
+            <input
+              id="password"
+              name="password"
+              type="password"
+              autocomplete="new-password"
+              required
+            />
             <p v-if="error.password"></p>
           </div>
         </div>
@@ -17,7 +23,13 @@
         <div class="recover-form__input-block">
           <label for="new-password"> Confirmar Nueva Contraseña </label>
           <div class="mt-1">
-            <input id="new-password" name="new-password" type="password" autocomplete="new-password" required />
+            <input
+              id="new-password"
+              name="new-password"
+              type="password"
+              autocomplete="new-password"
+              required
+            />
             <p v-if="error.new_password"></p>
           </div>
         </div>

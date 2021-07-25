@@ -1,5 +1,5 @@
 <template>
-  <div class="h-screen flex overflow-hidden bg-gray-100">
+  <div class="h-screen flex overflow-hidden bg-second-100">
     <TransitionRoot as="template" :show="sidebarOpen">
       <Dialog
         as="div"
@@ -17,7 +17,7 @@
           leave-from="opacity-100"
           leave-to="opacity-0"
         >
-          <DialogOverlay class="fixed inset-0 bg-gray-600 bg-opacity-75" />
+          <DialogOverlay class="fixed inset-0 bg-second-600 bg-opacity-75" />
         </TransitionChild>
         <TransitionChild
           as="template"
@@ -28,7 +28,7 @@
           leave-from="translate-x-0"
           leave-to="-translate-x-full"
         >
-          <div class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white">
+          <div class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-second-50">
             <TransitionChild
               as="template"
               enter="ease-in-out duration-300"
@@ -53,7 +53,7 @@
                   @click="sidebarOpen = false"
                 >
                   <span class="sr-only">Close sidebar</span>
-                  <XIcon class="h-6 w-6 text-white" aria-hidden="true" />
+                  <XIcon class="h-6 w-6 text-second-50" aria-hidden="true" />
                 </button>
               </div>
             </TransitionChild>
@@ -77,12 +77,12 @@
     <div class="hidden md:flex md:flex-shrink-0">
       <div class="flex flex-col w-64">
         <!-- Sidebar component, swap this element with another sidebar if you like -->
-        <div class="flex flex-col flex-grow border-r border-gray-200 pt-5 pb-4 bg-white overflow-y-auto">
+        <div class="flex flex-col flex-grow border-r border-second-200 pt-5 pb-4 bg-second-50 overflow-y-auto">
           <div class="flex items-center flex-shrink-0 px-4">
             <Logo class="h-8 w-auto" />
           </div>
           <div class="mt-5 flex-grow flex flex-col">
-            <nav class="flex-1 px-2 bg-white space-y-1">
+            <nav class="flex-1 px-2 bg-second-50 space-y-1">
               <MobileNavLink v-for="item in navigation" :key="item.to" v-bind="item" />
               <!-- <router-link
                 v-for="item in navigation"
@@ -90,14 +90,14 @@
                 :to="item.to"
                 :class="
                   item.to === $route.fullPath
-                    ? 'bg-gray-100 text-gray-900'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    ? 'bg-second-100 text-second-900'
+                    : 'text-second-600 hover:bg-second-50 hover:text-second-900'
                 "
                 class="group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer"
               >
                 <component
                   :is="item.icon"
-                  :class="item.to === $route.fullPath ? 'text-gray-500' : 'text-gray-400 group-hover:text-gray-500'"
+                  :class="item.to === $route.fullPath ? 'text-second-500' : 'text-second-400 group-hover:text-second-500'"
                   class="mr-3 flex-shrink-0 h-6 w-6"
                   aria-hidden="true"
                 />
@@ -111,12 +111,12 @@
       </div>
     </div>
     <div class="flex flex-col w-0 flex-1 overflow-hidden">
-      <div class="relative z-10 flex-shrink-0 flex h-16 bg-white shadow">
+      <div class="relative z-10 flex-shrink-0 flex h-16 bg-second-50 shadow">
         <button
           class="
             px-4
-            border-r border-gray-200
-            text-gray-500
+            border-r border-second-200
+            text-second-500
             focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500
             md:hidden
           "
@@ -129,7 +129,7 @@
           <div class="flex-1 flex">
             <form class="w-full flex md:ml-0" action="#" method="GET">
               <label for="search_field" class="sr-only">Search</label>
-              <div class="relative w-full text-gray-400 focus-within:text-gray-600">
+              <div class="relative w-full text-second-400 focus-within:text-second-600">
                 <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
                   <!-- <SearchIcon class="h-5 w-5" aria-hidden="true" /> -->
                 </div>
@@ -143,9 +143,9 @@
                     pr-3
                     py-2
                     border-transparent
-                    text-gray-900
-                    placeholder-gray-500
-                    focus:outline-none focus:placeholder-gray-400 focus:ring-0 focus:border-transparent
+                    text-second-900
+                    placeholder-second-500
+                    focus:outline-none focus:placeholder-second-400 focus:ring-0 focus:border-transparent
                     sm:text-sm
                   "
                   placeholder="Search"
@@ -158,11 +158,11 @@
           <div class="ml-4 flex items-center md:ml-6">
             <!-- <button
               class="
-                bg-white
+                bg-second-50
                 p-1
                 rounded-full
-                text-gray-400
-                hover:text-gray-500
+                text-second-400
+                hover:text-second-500
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
               "
             >
@@ -176,7 +176,7 @@
                 <MenuButton
                   class="
                     max-w-xs
-                    bg-white
+                    bg-second-50
                     flex
                     items-center
                     text-sm
@@ -200,7 +200,7 @@
                       rounded-full
                       bg-main-600
                       uppercase
-                      text-white
+                      text-second-50
                       font-bold
                       hover:bg-gradient-br hover:from-main-400 hover:to-main-700 hover:shadow-lg
                     "
@@ -226,7 +226,7 @@
                     rounded-md
                     shadow-lg
                     py-1
-                    bg-white
+                    bg-second-50
                     ring-1 ring-black ring-opacity-5
                     focus:outline-none
                   "
@@ -234,10 +234,10 @@
                   <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
                     <router-link
                       :to="item.to"
-                      :class="active ? 'bg-gray-100' : ''"
-                      class="flex px-4 py-2 text-sm text-gray-700 items-center"
+                      :class="active ? 'bg-second-100' : ''"
+                      class="flex px-4 py-2 text-sm text-second-700 items-center"
                     >
-                      <component :is="item.icon" class="mr-3 flex-shrink-0 h-6 w-6 text-gray-500" aria-hidden="true" />
+                      <component :is="item.icon" class="mr-3 flex-shrink-0 h-6 w-6 text-second-500" aria-hidden="true" />
                       {{ item.name }}
                     </router-link>
                   </MenuItem>

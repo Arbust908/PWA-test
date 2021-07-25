@@ -45,7 +45,7 @@ export default defineComponent({
 .switch {
   @apply flex-shrink-0 relative rounded-full inline-flex items-center justify-center h-5 w-10 cursor-pointer focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
   &__bg {
-    @apply pointer-events-none absolute bg-white w-full h-full rounded-md;
+    @apply pointer-events-none absolute bg-second-50 w-full h-full rounded-md;
   }
   &__pipe {
     @apply pointer-events-none absolute h-4 w-9 mx-auto rounded-full transition-colors ease-in-out duration-200;
@@ -53,11 +53,11 @@ export default defineComponent({
       @apply bg-indigo-600;
     }
     &.off {
-      @apply bg-gray-200;
+      @apply bg-second-200;
     }
   }
   &__dot {
-    @apply pointer-events-none absolute left-0 inline-block h-5 w-5 border border-gray-200 rounded-full bg-white shadow transform ring-0 transition-transform ease-in-out duration-200;
+    @apply pointer-events-none absolute left-0 inline-block h-5 w-5 border border-second-200 rounded-full bg-second-50 shadow transform ring-0 transition-transform ease-in-out duration-200;
     &.on {
       @apply translate-x-5;
     }

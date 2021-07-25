@@ -28,7 +28,7 @@
         h-5
         w-5
         rounded-full
-        bg-white
+        bg-second-50
         shadow
         transform
         ring-0

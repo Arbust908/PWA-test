@@ -77,13 +77,10 @@
             class="mx-auto px-6 bg-main-500"
             @click.prevent="formValidation"
           >
-            Iniciar Sesión
           </Button>
         </div>
       </form>
-    </article>
-    <teleport to="body">
-      <Modal v-if="showModal" title="Hubo un error" type="error">
+      <Modal>
         <template v-slot:body>
           <div>
             Alguno de los datos no coinciden con los datos que tenemos
@@ -94,7 +91,7 @@
           <button
             type="button"
             class="
-              inline-flex
+              inline-flex 
               justify-center
               w-full
               rounded-md
@@ -105,7 +102,7 @@
               bg-indigo-600
               text-base
               font-medium
-              text-white
+              text-second-50
               hover:bg-indigo-700
               focus:outline-none
               focus:ring-2
@@ -119,7 +116,6 @@
           </button>
         </template>
       </Modal>
-    </teleport>
   </section>
 </template>
 

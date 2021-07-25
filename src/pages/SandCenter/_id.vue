@@ -1,9 +1,9 @@
 <template>
     <Layout>
       <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-        <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de trabajo - {{ woID }}</h1>
+        <h1 class="font-bold text-second-900 text-xl self-start mb-3 md:mb-0">Orden de trabajo - {{ woID }}</h1>
       </header>
-      <section class="bg-white rounded-md shadow-sm">
+      <section class="bg-second-50 rounded-md shadow-sm">
         <nav class="flex justify-between">
           <button class="section-tab" :selected="WO_section === 'orden'" @click="changeSection('orden')">
             <span> Orden </span>
@@ -716,14 +716,14 @@
       @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
     }
     &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+      @apply border-transparent text-second-800 bg-transparent hover:bg-red-600 hover:text-second-50 mx-2 p-2 transition duration-150 ease-out;
+      /* @apply border-transparent text-second-50 bg-red-500 hover:bg-red-600 mx-2 p-2; */
     }
     &__add {
-      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+      @apply border-transparent text-second-50 bg-green-500 hover:bg-green-600 mr-2;
     }
     &__add--special {
-      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+      @apply border-2 border-second-400 text-second-400 bg-transparent group-hover:bg-second-200 group-hover:text-second-600 group-hover:border-second-600;
     }
     &__mobile-only {
       @apply lg:hidden;
@@ -733,7 +733,7 @@
     }
   }
   .section-tab {
-    @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
+    @apply py-2 border-b-4 w-full font-bold text-second-400 flex justify-center items-center gap-2;
   }
   .section-tab[selected='true'] {
     @apply border-main-500 text-main-500;

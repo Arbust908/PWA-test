@@ -15,21 +15,50 @@
       >
         50%
       </progress>
-      <b v-if="isLoading" class="ml-2 col-span-full">{{ (progress * 100).toFixed(0) }}%</b>
+      <b v-if="isLoading" class="ml-2 col-span-full"
+        >{{ (progress * 100).toFixed(0) }}%</b
+      >
       <button
-        class="px-3 py-1 rounded bg-green-500 text-green-100 hover:bg-green-700 hover:shadow mb-1 col-span-2"
+        class="
+          px-3
+          py-1
+          rounded
+          bg-green-500
+          text-green-100
+          hover:bg-green-700 hover:shadow
+          mb-1
+          col-span-2
+        "
         @click="initProgrss"
       >
         Load
       </button>
       <button
-        class="px-3 py-1 rounded bg-green-500 text-green-100 hover:bg-green-700 hover:shadow mb-1 col-span-2"
+        class="
+          px-3
+          py-1
+          rounded
+          bg-green-500
+          text-green-100
+          hover:bg-green-700 hover:shadow
+          mb-1
+          col-span-2
+        "
         @click="done"
       >
         Finish
       </button>
       <button
-        class="px-3 py-1 rounded bg-green-500 text-green-100 hover:bg-green-700 hover:shadow mb-1 col-span-2"
+        class="
+          px-3
+          py-1
+          rounded
+          bg-green-500
+          text-green-100
+          hover:bg-green-700 hover:shadow
+          mb-1
+          col-span-2
+        "
         @click="start"
       >
         Start
