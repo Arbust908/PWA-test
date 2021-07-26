@@ -5,8 +5,8 @@
     </header>
     <section class="bg-second-50 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 grid-r gap-3 md:gap-4">
-          <legend class="col-span-12 text-xl">Orden de Pedido</legend>
+        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
+          <h2 class="col-span-12 text-xl">Orden de Pedido</h2>
           <label class="col-span-12" for="provider">
             <span>Proveedor</span>
             <input
@@ -24,7 +24,7 @@
           </label>
         </fieldset>
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <legend class="col-span-full text-xl">Arena</legend>
+          <h2 class="col-span-full text-xl">Arena</h2>
           <template v-for="(sandCarge, scKey) in sandCarges" :key="scKey">
             <hr v-if="scKey !== 0" class="mt-4 mb-2 col-span-full" />
             <label class="col-span-full" for="sandType">

@@ -28,26 +28,30 @@
 </template>
 
 <script lang="ts">
-  import { ref, defineComponent } from 'vue';
   import NotificationInfo from '@/components/notifications/Info.vue';
   import ModalGeneral from '@/components/modal/General.vue';
   import { useActions } from 'vuex-composition-helpers';
-  export default defineComponent({
+  // import { useRouter } from 'vue-router';
+  import { useDark, useToggle, useOnline } from '@vueuse/core';
+  // import { StatusOnlineIcon, StatusOfflineIcon } from '@heroicons/vue/outline';
+
+  export default {
     components: {
       NotificationInfo,
       ModalGeneral,
-      StatusOnlineIcon,
-      StatusOfflineIcon,
+      // StatusOnlineIcon,
+      // StatusOfflineIcon,
     },
     setup() {
       console.log(import.meta.env);
       const isDark = useDark();
       const isOnline = useOnline();
       const toggleDark = useToggle(isDark);
-      const router = useRouter();
-      console.log(localStorage.getItem('user'));
+      if (isDark.value) {
+        toggleDark();
+      }
+      // const router = useRouter();
       if (localStorage.getItem('user')) {
-        console.log('Guardo el Usuario');
         const user = JSON.parse(localStorage.getItem('user'));
         const { setUser } = useActions(['setUser']);
         setUser(user);
@@ -59,5 +63,5 @@
         toggleDark,
       };
     },
-  });
+  };
 </script>
