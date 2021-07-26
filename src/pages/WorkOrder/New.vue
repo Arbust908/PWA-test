@@ -388,7 +388,7 @@
           <PrimaryBtn
             v-else
             :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isAllFull && save(true)"
+            @click="isAllFull && save(false)"
             :disabled="!isAllFull"
           >
             Finalizar
@@ -671,7 +671,7 @@ export default {
     };
 
     // :: SAVE
-    const save = async (isFull = false) => {
+    const save = async (draft = true) => {
       removeAllEmptys();
       const newWO = {
         client: client.value,
@@ -690,7 +690,7 @@ export default {
         generators: generators.value,
         tower: tower.value,
         cabin: cabin.value,
-        draft: isFull,
+        draft,
       };
       const loading = ref(true);
       let woDB = await axios
