@@ -42,7 +42,7 @@
             <label for="companyRepresentativeId" class=""> CUIT Compañía representante </label>
             <div class="mt-1">
               <select name="companyRepresentativeId" v-model="newSandProvider.companyRepresentativeId" class="w-full rounded-md shadow">
-                <option v-for="company in companyRepresentatives" :key="company.id" :value="company.legalId">{{company.legalId}} ({{company.name}})</option>
+                <option v-for="company in companyRepresentatives" :key="company.id" :value="company.id">{{company.legalId}} ({{company.name}})</option>
               </select>
             </div>
           </div>
@@ -121,6 +121,7 @@ export default {
     })
    
     const newSandProvider: SandProvider = reactive({
+      id: 0,
       name: "",
       legalName: "",
       legalId: 0,
@@ -130,7 +131,6 @@ export default {
       companyRepresentativeId: 0   
     })     
 
-    // method go to index that goes to the index page
     const goToIndex = (): void => {
       router.push('/proveedores-de-arena');
     };
@@ -155,15 +155,16 @@ export default {
         })
         .then((res) => {
           if (res.status === 200) {
+            newSandProvider.id = res.data.data.id
             return res.data;
           }
           return {};
         })
         .finally(() => {
-        });
+      });
 
       // Update Sand Provider
-      store.dispatch('updateSandProvider', newSandProvider);
+      store.dispatch('saveSandProvider', newSandProvider);
       router.push('/proveedores-de-arena');
     };
 

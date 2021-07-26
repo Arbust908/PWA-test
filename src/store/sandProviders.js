@@ -4,6 +4,9 @@ export default {
   }),
   getters: {},
   mutations: {
+    SET_SANDPROVIDERS(state,payload) {
+      state.all = payload
+    },
     ADD_SANDPROVIDER(state, payload) {
       state.all.push(payload);
     },
@@ -14,10 +17,22 @@ export default {
         }
       });
     },
+    DELETE_SANDPROVIDER(state, payload) {
+      state.all.map((sandProvider, index) => {
+        if (sandProvider.id === payload.id) {
+          state.all[index] = payload;
+        }
+      });
+      state.all.splice(state.all.findIndex(function(i){
+        return i.id === payload;
+      }), 1);
+    },
   },
   actions: {
+    setSandProviders({commit}, sandProviders) {
+      commit('SET_SANDPROVIDERS', sandProviders)
+    },
     saveSandProvider({ commit }, sandProvider) {
-      console.table(sandProvider);
       const baseSP = {
         id: 0,
         name: "",
@@ -26,8 +41,7 @@ export default {
         meshType: "",
         grains: "",
         observations: "",
-        companyRepresentativeId: 0,
-        // CompanyRepresentative?: CompanyRepresentative,
+        companyRepresentativeId: 0
       };
       commit('ADD_SANDPROVIDER', { ...baseSP, ...sandProvider });
       if (sandProvider.isFull) {
@@ -37,9 +51,10 @@ export default {
       }
     },
     updateSandProvider({ commit }, sandProvider) {
-      console.log("update!!!", sandProvider)
-
       commit('UPDATE_SANDPROVIDER', sandProvider);
+    },
+    deleteSandProvider({ commit }, sandProviderId) {
+      commit('DELETE_SANDPROVIDER', sandProviderId);
     },
   },
 };

@@ -41,7 +41,9 @@
           <div class="input-block p-4">
             <label for="companyRepresentativeId" class=""> CUIT Compañía representante </label>
             <div class="mt-1">
-              <input v-model="companyRepresentativeId" class="w-full rounded-md shadow" name="companyRepresentativeId" type="text" placeholder="CUIT Compañía representante" />
+              <select name="companyRepresentativeId" :v-model="companyRepresentativeId" class="w-full rounded-md shadow">
+                <option v-for="company in companyRepresentatives" :key="company.id" :value="company.id">{{company.legalId}} ({{company.name}})</option>
+              </select>
             </div>
           </div>
           <div class="input-block p-4">
@@ -69,7 +71,7 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, computed, toRefs } from 'vue';
+import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter, useRoute } from 'vue-router';
 import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
@@ -105,27 +107,46 @@ export default {
       return sp.id == route.params.id;
     });
 
-    console.log(currentSandProvider)
+    let id = ref(0)
+    let name = ref("")
+    let legalName = ref("")
+    let legalId = ref(0)
+    let meshType = ref("")
+    let grains = ref("")
+    let observations = ref("")
+    let companyRepresentativeId = ref(0)
+    let companyRepresentatives = ref([])
 
-    const {
-      id,
-      name,
-      legalName,
-      legalId,
-      meshType,
-      grains,
-      observations,
-      companyRepresentativeId
-    } = toRefs(currentSandProvider);
+    onMounted(async () => {
+      id.value = currentSandProvider.id
+      name.value = currentSandProvider.name
+      legalName.value = currentSandProvider.legalName
+      legalId.value = currentSandProvider.legalId
+      meshType.value = currentSandProvider.meshType
+      grains.value = currentSandProvider.grains
+      observations.value = currentSandProvider.observations
+      companyRepresentativeId.value = currentSandProvider.companyRepresentativeId
+
+      companyRepresentatives.value = await axios
+      .get(`${api}/companyRepresentative`)
+      .catch((err) => {
+        console.log(err);
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          return res.data.data;
+        }
+        return {};
+      })
+    })
 
     const goToIndex = (): void => {
       router.push('/proveedores-de-arena');
     };
    
-    // Update Sand Provider
     const update = async () => {
       const updatedSP = {
-        id,
+        id: id.value,
         name: name.value,
         legalName: legalName.value,
         legalId: legalId.value,
@@ -141,17 +162,11 @@ export default {
           console.log(err);
         })
         .then((res) => {
-          console.log(res);
           if (res.status === 200) {
             return res.data;
           }
           return {};
         })
-        .finally(() => {
-          // loading.value = false;
-          console.log("DONE")
-        });
-      console.log(spDB);
       // Update Work Order
       store.dispatch('updateSandProvider', updatedSP);
       router.push('/proveedores-de-arena');
@@ -167,7 +182,8 @@ export default {
       observations,
       companyRepresentativeId,
       goToIndex,
-      update
+      update,
+      companyRepresentatives
     };
   },
 };

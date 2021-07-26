@@ -1,3 +1,11 @@
+export interface companyRepresentative {
+  id?: number;
+  name: string;
+  legalId: number;
+  email: string;
+  phone: string;
+}
+
 export interface SandProvider {
   id?: number;
   name: string;
@@ -6,8 +14,8 @@ export interface SandProvider {
   meshType: string;
   grains: string;
   observations: string;
+  companyRepresentative?: companyRepresentative;
   companyRepresentativeId: number;
-  // CompanyRepresentative?: CompanyRepresentative;
 }
 export interface Driver {
   id?: number;
@@ -47,8 +55,8 @@ export interface Company {
   legalName: string;
   legalId: number;
   isOperator: boolean;
-  childrenId: number;
+  childId: number;
   observations: string;
-  Company?: Company;
-  // CompanyRepresentative?: CompanyRepresentative;
+  child?: Company;
+  companyRepresentative?: companyRepresentative;
 }

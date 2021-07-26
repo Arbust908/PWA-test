@@ -2,6 +2,7 @@
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">Proovedores de arena</h2>
+      <h3>{{loading}}</h3>
       <router-link to="/proveedores-de-arena/nuevo">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
@@ -37,8 +38,8 @@
                   >
                     grains
                   </th>
-                  <th scope="col" class="relative px-6 py-3">
-                    <span class="sr-only">Actions</span>
+                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <span >Actions</span>
                   </th>
                 </tr>
               </thead>
@@ -74,7 +75,10 @@
                     {{ sp.grains || 'Sin empresa de servicio' }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <router-link :to="`/proveedores-de-arena/${sp.id}`" class="text-indigo-600 hover:text-indigo-900">
+                    <span @click="deleteSP(sp.id)" class="text-red-600 hover:text-red-900 cursor-pointer">
+                      Borrar
+                    </span>
+                    <router-link :to="`/proveedores-de-arena/${sp.id}`" class="ml-4 text-indigo-600 hover:text-indigo-900">
                       Editar
                     </router-link>
                   </td>
@@ -110,8 +114,10 @@ export default {
     const spDB = ref([]);
     const store = useStore();
     const sandProviders = JSON.parse(JSON.stringify(store.state.sandProviders.all));
-    onMounted(async () => {
-      const loading = ref(true);
+    const loading = ref(false)
+
+    const getSP = async() => {
+      loading.value = true;
       spDB.value = await axios
         .get(`${api}/sandProvider`)
         .catch((err) => {
@@ -123,31 +129,43 @@ export default {
           }
           return [];
         })
-        .finally(() => {
-          loading.value = false;
-        });
       
-      console.log(spDB.value)
+      store.dispatch('setSandProviders', spDB.value)
+    }
 
-      if (spDB.value && spDB.value.length > 0) {
-        if (spDB.value.length > sandProviders.length) {
-          if (sandProviders.length === 0) {
-            spDB.value.forEach((sp, spKey) => {
-              store.dispatch('saveSandProvider', spDB);
-            });
-          } else {
-            const newspDB = spDB.value.filter((spFromApi, key) => {
-              return spFromApi.id && sandProviders[key] && spFromApi.id !== sandProviders[key].id;
-            });
-            newspDB.forEach((sp, spKey) => {
-              store.dispatch('saveSandProvider', sp);
-            });
-          }
+    const deleteSP = async(spID) => {
+      let response = await axios
+      .delete(`${api}/sandProvider/${spID}`)
+      .catch((err) => {
+        console.log(err);
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          console.log(res)
+          return res.data.data
         }
+        return [];
+      })
+      .finally(() => {
+        store.dispatch('deleteSandProvider', spID);
+        getSP()
+      });
+
+
+      return {
+        response
       }
+    }
+
+    onMounted(async () => {
+      loading.value = true
+      await getSP()
+      loading.value = false
     });
     return {
       spDB,
+      deleteSP,
+      loading
     };
   },
 };
