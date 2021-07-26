@@ -17,11 +17,11 @@ export default {
       //   to: '/componentes',
       //   icon: 'ChipIcon',
       // },
-      {
-        name: 'Tipos de Arena',
-        to: '/tipos-de-arena',
-        icon: 'ClipboardListIcon',
-      }
+      // {
+      //   name: 'Tipos de Arena',
+      //   to: '/tipos-de-arena',
+      //   icon: 'ClipboardListIcon',
+      // }
     ],
     user_navigation: [
       // { name: 'Perfil', to: '/usuario', icon: 'AdjustmentsIcon' },
