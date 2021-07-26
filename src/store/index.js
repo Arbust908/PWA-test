@@ -7,6 +7,7 @@ import sand from '@/store/sand';
 import sandProviders from '@/store/sandProviders';
 import transportProviders from '@/store/transportProviders';
 import purchaseOrder from '@/store/purchaseOrder';
+import providerNotification from '@/store/providerNotification';
 
 const store = createStore({
   state: {
@@ -41,6 +42,8 @@ const store = createStore({
   },
   modules: {
     global,
+    providerNotification,
+    sand,
     workOrders,
     sand,
     sandProviders,
