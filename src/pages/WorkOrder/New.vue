@@ -633,7 +633,7 @@ export default {
     };
     // Is the Order section is full
     const isOrderFull = computed(() => {
-      return !!(client.value && serviceCompany.value.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+      return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
     });
     // Is the Equipment section is full
     const isEquipmentFull = computed(() => {
