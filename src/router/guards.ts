@@ -35,7 +35,6 @@ export const isGuest = (to, from, next) => {
   recoverLocalUser();
   const isGuest = store.getters.isGuest;
   if (isGuest) {
-    console.log(to, 'Soy guest voy a Login')
     if (to.path !== '/login') {
       next({ path: '/login' });
       return;
