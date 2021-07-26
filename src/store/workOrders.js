@@ -42,11 +42,6 @@ export default {
         cabin: 0,
       };
       commit('ADD_WORKORDER', { ...baseWO, ...workOrder });
-      if (workOrder.isFull) {
-        // Axios POST to api to create work order
-      } else {
-        // Axios POST to incomplete work order
-      }
     },
     updateWorkOrder({ commit }, workOrder) {
       commit('UPDATE_WORKORDER', workOrder);
