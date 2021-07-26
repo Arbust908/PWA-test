@@ -53,9 +53,9 @@
                     {{ sc.provider }}
                   </td>
                   <td class="text-second-500 px-6 py-4 whitespace-nowrap text-sm">
-                    {{ sc.sandCarge.length }}
+                    {{ sc.sandCarges.length }}
                   </td>
-                  <td class="text-second-500 px-6 py-4 whitespace-nowrap text-sm">{{ sumQty(sc.sandCarge) }}t</td>
+                  <td class="text-second-500 px-6 py-4 whitespace-nowrap text-sm">{{ sumQty(sc.sandCarges) }}t</td>
                   <td
                     :class="sc.loaded ? 'text-green-500' : 'text-blue-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"

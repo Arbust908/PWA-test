@@ -4,7 +4,7 @@ export default {
         {
           id: 0,
           provider: 'Arena san luis',
-          sandCarge: [
+          sandCarges: [
             {
               id: 0,
               sandType: '30/50',
@@ -30,7 +30,7 @@ export default {
         {
           id: 1,
           provider: 'Arena Orange',
-          sandCarge: [
+          sandCarges: [
             {
               id: 0,
               sandType: '30/50',

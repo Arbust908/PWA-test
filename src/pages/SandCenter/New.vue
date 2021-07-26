@@ -186,7 +186,7 @@ export default defineComponent({
 
     const provider: Ref<string> = ref(null);
     const sandCarges: Ref<Array<SandCarge>> = ref([]);
-    const transportId: Ref<string> = ref(null);
+    const transportId: Ref<string> = ref('AC 276 WS');
     const loaded: Ref<boolean> = ref(false);
 
     const addSandCarge = () => {
@@ -207,10 +207,9 @@ export default defineComponent({
     };
 
     const isFull = computed(() => {
-      return (
+      return !!(
         provider.value &&
         sandCarges.value.length > 0 &&
-        transportId.value &&
         sandCarges.value.every((c) => c.boxId) &&
         sandCarges.value.every((c) => c.quantity > 0) &&
         sandCarges.value.every((c) => c.sandType)

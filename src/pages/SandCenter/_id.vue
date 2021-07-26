@@ -147,7 +147,7 @@
 <script lang="ts">
 import { ref, Ref, reactive, computed, ComputedRef, toRaw, defineComponent } from 'vue';
 import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import { useState, useActions } from 'vuex-composition-helpers';
 
 import { BookmarkIcon, TrashIcon, DotsVerticalIcon } from '@heroicons/vue/outline';
@@ -183,11 +183,16 @@ export default defineComponent({
     // Init
     const store = useStore();
     const router = useRouter();
+    const route = useRoute();
 
-    const provider: Ref<string> = ref(null);
-    const sandCarges: Ref<Array<SandCarge>> = ref([]);
-    const transportId: Ref<string> = ref(null);
-    const loaded: Ref<boolean> = ref(false);
+    const currentSandCenter = store.state.sandCenter.all.filter((sC) => {
+      return sC.id === route.params.id;
+    });
+
+    const provider: Ref<string> = ref(currentSandCenter.provider);
+    const sandCarges: Ref<Array<SandCarge>> = ref(currentSandCenter.sandCarges);
+    const transportId: Ref<string> = ref(currentSandCenter.transportId);
+    const loaded: Ref<boolean> = ref(currentSandCenter.loaded);
 
     const addSandCarge = () => {
       sandCarges.value.push({
@@ -200,32 +205,34 @@ export default defineComponent({
     const removeSandCarge = (id: number) => {
       sandCarges.value = sandCarges.value.filter((c) => c.id !== id);
     };
-    addSandCarge();
+    if (sandCarges.value.length <= 0) {
+      addSandCarge();
+    }
 
     const toggleLoaded = () => {
       loaded.value = !loaded.value;
     };
 
     const isFull = computed(() => {
-      return (
+      return !!(
         provider.value &&
         sandCarges.value.length > 0 &&
-        transportId.value &&
         sandCarges.value.every((c) => c.boxId) &&
         sandCarges.value.every((c) => c.quantity > 0) &&
         sandCarges.value.every((c) => c.sandType)
       );
     });
 
-    const { saveSandCenter } = useActions(['saveSandCenter']);
+    const { updateSandCenter } = useActions(['updateSandCenter']);
     const save = (): void => {
       const sandCenter = {
+        id: currentSandCenter.id,
         provider: provider.value,
         sandCarges: sandCarges.value,
         transportId: transportId.value,
         loaded: loaded.value,
       };
-      saveSandCenter(sandCenter);
+      updateSandCenter(sandCenter);
       router.push('/centro-de-carga-de-arena');
     };
     return {
