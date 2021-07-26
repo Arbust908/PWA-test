@@ -3,6 +3,7 @@ import { createStore } from 'vuex';
 // import user from '@/store/user';
 import global from '@/store/global';
 import workOrders from '@/store/workOrders';
+import sand from '@/store/sand';
 
 const store = createStore({
   state: {
@@ -35,6 +36,7 @@ const store = createStore({
   modules: {
     global,
     workOrders,
+    sand
   },
   strict: true,
 });
