@@ -121,10 +121,6 @@
               <span class="font-bold text"> Agregar Etapa </span>
             </button>
           </div>
-          <label class="col-span-full toggle" for="sandBoxId">
-            <span>Camion Patente {{ transportId }} - {{ loaded ? 'Cargado' : 'No Cargado' }}</span>
-            <SlimToggle :on="loaded" @click="toggleLoaded" />
-          </label>
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
@@ -158,7 +154,6 @@ import GhostBtn from '@/components/ui/GhostBtn.vue';
 import CircularBtn from '@/components/ui/CircularBtn.vue';
 import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 import { PurchaseOrder, SandProvider, SandOrder, TransportProvider } from '@/interfaces/PurchaseOrder.ts';
-import SlimToggle from '@/components/ui/SlimToggle.vue';
 
 interface SandCarge {
   id: number;
@@ -177,7 +172,6 @@ export default defineComponent({
     CircularBtn,
     PrimaryBtn,
     DotsVerticalIcon,
-    SlimToggle,
   },
   setup() {
     // Init
