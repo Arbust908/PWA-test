@@ -237,7 +237,11 @@
                       :class="active ? 'bg-second-100' : ''"
                       class="flex px-4 py-2 text-sm text-second-700 items-center"
                     >
-                      <component :is="item.icon" class="mr-3 flex-shrink-0 h-6 w-6 text-second-500" aria-hidden="true" />
+                      <component
+                        :is="item.icon"
+                        class="mr-3 flex-shrink-0 h-6 w-6 text-second-500"
+                        aria-hidden="true"
+                      />
                       {{ item.name }}
                     </router-link>
                   </MenuItem>

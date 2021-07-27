@@ -6,10 +6,11 @@
     <section class="bg-second-50 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-12 text-xl">Orden de Pedido</h2>
+          <h2 class="col-span-full text-xl">Orden de Pedido</h2>
           <label class="col-span-12" for="provider">
             <span>Proveedor</span>
             <input
+              id="provider"
               v-model="provider"
               class="input"
               type="text"
@@ -19,6 +20,8 @@
             />
             <datalist id="provider">
               <option value="San Luis">San Luis</option>
+              <option value="Orange">Orange</option>
+              <option value="Pancho">Pancho</option>
               <option value="Orange">Orange</option>
             </datalist>
           </label>
@@ -38,7 +41,7 @@
                 placeholder="Tipo de Arena"
               />
               <datalist id="sandType">
-                <option value="30/40">Arena #30/40</option>
+                <option value="30/40"></option>
                 <option value="50/100">Arena #30/40</option>
               </datalist>
             </label>
@@ -90,7 +93,6 @@
                 </span>
               </div>
             </label>
-
             <label class="col-span-5" for="sandType">
               <span>ID Caja</span>
               <input

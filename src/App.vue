@@ -21,35 +21,31 @@
       <StatusOnlineIcon v-if="isOnline" class="h-5 w-5 text-second-50" />
       <StatusOfflineIcon v-else class="h-5 w-5 text-second-50" />
     </aside> -->
-    <NotificationInfo v-if="false" />
-    <ModalGeneral v-if="false" />
     <router-view class="w-full"></router-view>
   </div>
 </template>
 
 <script lang="ts">
-  import NotificationInfo from '@/components/notifications/Info.vue';
-  import ModalGeneral from '@/components/modal/General.vue';
+  import { ref, defineComponent, defineAsyncComponent } from 'vue';
   import { useActions } from 'vuex-composition-helpers';
   // import { useRouter } from 'vue-router';
   import { useDark, useToggle, useOnline } from '@vueuse/core';
   // import { StatusOnlineIcon, StatusOfflineIcon } from '@heroicons/vue/outline';
 
-  export default {
+  export default defineComponent({
     components: {
-      NotificationInfo,
-      ModalGeneral,
       // StatusOnlineIcon,
       // StatusOfflineIcon,
     },
     setup() {
       console.log(import.meta.env);
       const isDark = useDark();
-      const isOnline = useOnline();
       const toggleDark = useToggle(isDark);
       if (isDark.value) {
         toggleDark();
       }
+
+      const isOnline = useOnline();
       // const router = useRouter();
       if (localStorage.getItem('user')) {
         const user = JSON.parse(localStorage.getItem('user'));
@@ -63,5 +59,5 @@
         toggleDark,
       };
     },
-  };
+  });
 </script>

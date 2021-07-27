@@ -80,134 +80,199 @@
           </Button>
         </div>
       </form>
-      <Modal>
-        <template v-slot:body>
-          <div>
-            Alguno de los datos no coinciden con los datos que tenemos
-            registrados. Volve a ingresar los datos correctos.
-          </div>
-        </template>
-        <template v-slot:btn>
-          <button
-            type="button"
-            class="
-              inline-flex 
-              justify-center
-              w-full
-              rounded-md
-              border border-transparent
-              shadow-sm
-              px-4
-              py-2
-              bg-red-600
-              text-base
-              font-medium
-              text-second-50
-              hover:bg-red-700
-              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
-              sm:text-sm
-            "
-            @click.prevent="closeModal"
-          >
-            Ok
-          </button>
-        </template>
-      </Modal>
+    </article>
+    <Modal
+      title="Hubo un error"
+      type="error"
+      :open="showModal"
+      @close="closeModal"
+    >
+      <template v-slot:body>
+        <div>
+          Alguno de los datos no coinciden con los datos que tenemos
+          registrados. Volve a ingresar los datos correctos.
+        </div>
+      </template>
+      <template v-slot:btn>
+        <button
+          type="button"
+          class="
+            inline-flex
+            justify-center
+            w-full
+            rounded-md
+            border border-transparent
+            shadow-sm
+            px-4
+            py-2
+            bg-red-600
+            text-base
+            font-medium
+            text-second-50
+            hover:bg-red-700
+            focus:outline-none
+            focus:ring-2
+            focus:ring-offset-2
+            focus:ring-red-500
+            sm:text-sm
+          "
+          @click.prevent="closeModal"
+        >
+          Ok
+        </button>
+      </template>
+    </Modal>
   </section>
 </template>
 
 <script lang="ts">
-  import { ref, Ref, defineAsyncComponent } from 'vue';
+  <<<<<<< HEAD
+    import { ref, Ref, defineAsyncComponent } from 'vue';
+    import { useRouter } from 'vue-router';
+    import { useActions } from 'vuex-composition-helpers';
+    import { Role } from '@/interfaces/User';
+  =======
+  import { ref, Ref, defineAsyncComponent, defineComponent } from 'vue';
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
   import { Role } from '@/interfaces/User';
+  >>>>>>> Fix::SFC-9 Full app Update
 
-  const Logo = defineAsyncComponent(() => import('@/components/Logo.vue'));
-  const Button = defineAsyncComponent(
-    () => import('@/components/ui/Button.vue')
-  );
-  const Modal = defineAsyncComponent(
-    () => import('@/components/modal/General.vue')
-  );
-  import { useToggle } from '@vueuse/core';
-  import axios from 'axios';
-  const api = import.meta.env.VITE_API_URL || '/api';
-  export default {
+    const Logo = defineAsyncComponent(() => import('@/components/Logo.vue'));
+    const Button = defineAsyncComponent(
+      () => import('@/components/ui/Button.vue')
+    );
+    const Modal = defineAsyncComponent(
+      () => import('@/components/modal/General.vue')
+    );
+    import { useToggle } from '@vueuse/core';
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+    export default {
+      components: {
+        Logo,
+        Button,
+        Modal,
+      },
+      setup() {
+        const usernameError: Ref<boolean> = ref(false);
+        const passwordError: Ref<boolean> = ref(false);
+        const formWithError: Ref<boolean | null> = ref(null);
+
+        const username: Ref<string> = ref('');
+        const password: Ref<string> = ref('');
+        const shouldRemember: Ref<boolean> = ref(true);
+
+  <<<<<<< HEAD
+        const showModal = ref(false);
+        const toggleModal = useToggle(showModal);
+  =======
+  export default defineComponent({
     components: {
       Logo,
       Button,
       Modal,
     },
     setup() {
+      const showModal = ref(false);
       const usernameError: Ref<boolean> = ref(false);
       const passwordError: Ref<boolean> = ref(false);
       const formWithError: Ref<boolean | null> = ref(null);
+  >>>>>>> Fix::SFC-9 Full app Update
 
-      const username: Ref<string> = ref('');
-      const password: Ref<string> = ref('');
-      const shouldRemember: Ref<boolean> = ref(true);
-
-      const showModal = ref(false);
-      const toggleModal = useToggle(showModal);
-
-      const validate = (event: any) => {
-        const name: string = event.target.name;
-        const isLong: boolean = event.target.value.length >= 3;
-        if (!isLong) {
-          if (name === 'username') {
-            usernameError.value = true;
-          } else if (name === 'password') {
-            passwordError.value = true;
+        const validate = (event: any) => {
+          const name: string = event.target.name;
+          const isLong: boolean = event.target.value.length >= 3;
+          if (!isLong) {
+            if (name === 'username') {
+              usernameError.value = true;
+            } else if (name === 'password') {
+              passwordError.value = true;
+            }
           }
-        }
-      };
-      const router = useRouter();
-      const { setUser } = useActions(['setUser']);
-      const formValidation = () => {
-        usernameError.value = username.value.length <= 3;
-        passwordError.value = password.value.length <= 3;
-        formWithError.value = usernameError.value || passwordError.value;
-        if (!formWithError.value) {
-          login();
-        }
-      };
+        };
+        const router = useRouter();
+        const { setUser } = useActions(['setUser']);
+        const formValidation = () => {
+          usernameError.value = username.value.length <= 3;
+          passwordError.value = password.value.length <= 3;
+          formWithError.value = usernameError.value || passwordError.value;
+          if (!formWithError.value) {
+            login();
+          }
+        };
 
+  <<<<<<< HEAD
+        const login = async () => {
+          const loading = ref(true);
+          const email = username.value;
+          const loggedUser = { email, password: password.value };
+          let fullUser = await axios
+            .post(`${api}/auth/login`, loggedUser)
+            .catch((err) => {
+              console.log(err);
+              return false;
+            })
+            .then((res) => {
+              if (res.status === 200) {
+                return res.data.data.token || res.data.token;
+              }
+              return false;
+            })
+            .finally(() => {
+              loading.value = false;
+            });
+          if (fullUser) {
+            fullUser = {
+              id: 99,
+              username: username.value,
+              role: Role.Logged,
+              token: fullUser,
+            };
+            if (shouldRemember.value) {
+              localStorage.setItem('user', JSON.stringify(fullUser));
+  =======
       const login = async () => {
         const loading = ref(true);
-        const email = username.value;
+        const email = username.value.indexOf('@') > -1 ? username.value : `${username.value}@testmail.com`;
+        // const loggedUser: User = { id: 99, username: username.value, role: Role.Logged };
         const loggedUser = { email, password: password.value };
+        // let fullUser = {};
         let fullUser = await axios
           .post(`${api}/auth/login`, loggedUser)
           .catch((err) => {
             console.log(err);
+            showModal.value = true;
             return false;
           })
           .then((res) => {
             if (res.status === 200) {
               return res.data.data.token || res.data.token;
+  >>>>>>> Fix::SFC-9 Full app Update
             }
-            return false;
-          })
-          .finally(() => {
-            loading.value = false;
-          });
-        if (fullUser) {
-          fullUser = {
-            id: 99,
-            username: username.value,
-            role: Role.Logged,
-            token: fullUser,
-          };
-          if (shouldRemember.value) {
-            localStorage.setItem('user', JSON.stringify(fullUser));
+            setUser(fullUser);
+            router.push('/');
+          } else {
+            toggleModal(true);
           }
-          setUser(fullUser);
-          router.push('/');
-        } else {
-          toggleModal(true);
-        }
-      };
+        };
 
+  <<<<<<< HEAD
+        return {
+          formWithError,
+          username,
+          password,
+          shouldRemember,
+          validate,
+          formValidation,
+          usernameError,
+          passwordError,
+          showModal,
+          toggleModal,
+        };
+      },
+    };
+  =======
       return {
         formWithError,
         username,
@@ -218,10 +283,11 @@
         usernameError,
         passwordError,
         showModal,
-        toggleModal,
+        closeModal,
       };
     },
-  };
+  });
+  >>>>>>> Fix::SFC-9 Full app Update
 </script>
 
 <style lang="scss" scoped>
