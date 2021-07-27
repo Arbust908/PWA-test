@@ -86,7 +86,7 @@ import CircularBtn from '@/components/ui/CircularBtn.vue';
 import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
 import axios from 'axios'
-import { SandProvider } from '../../interfaces/SandProvider';
+import { SandProvider } from '@/interfaces/SandProvider';
 const api = 'https://sandflow-qa.bitpatagonia.com/api';
 
 export default {
