@@ -30,7 +30,7 @@ export default {
       {
         name: 'Notificaciones a Proveedores',
         to: '/notificaciones-a-proveedores',
-        icon: 'ClipboardListIcon',
+        icon: 'AnnotationIcon',
       },
       // {
       //   name: 'Componentes',

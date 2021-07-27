@@ -1,5 +1,9 @@
 <template>
-  <router-link :to="to" :class="to === $route.fullPath ? 'selected' : null" class="nav-link group">
+  <router-link
+    :to="to"
+    :class="to === $route.fullPath ? 'selected' : null"
+    class="nav-link group"
+  >
     <component :is="icon" class="icon" aria-hidden="true" />
     {{ name }}
   </router-link>
@@ -8,6 +12,7 @@
 <script lang="ts">
 import {
   AdjustmentsIcon,
+  AnnotationIcon,
   ArchiveIcon,
   AtSymbolIcon,
   BellIcon,
@@ -19,7 +24,7 @@ import {
   UsersIcon,
   XIcon,
 } from '@heroicons/vue/outline';
-import { defineComponent } from 'vue';
+import { defineComponent, defineAsyncComponent } from 'vue';
 
 export default defineComponent({
   props: {

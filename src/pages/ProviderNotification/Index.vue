@@ -56,7 +56,7 @@
                     {{ pn.sandOrder.length }}
                   </td>
                   <td class="text-second-500 px-6 py-4 whitespace-nowrap text-sm">{{ sumQty(pn.sandOrder) }}t</td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm" >
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
                     {{ pn.transportProviders.length }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -92,10 +92,7 @@
 <script>
 import { ref } from 'vue';
 import { useStore } from 'vuex';
-import {
-  TrashIcon,
-  PencilAltIcon,
-} from '@heroicons/vue/solid';
+import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 
@@ -110,7 +107,7 @@ export default {
     const pNs = ref([]);
     const store = useStore();
     const allproviderNotifications = JSON.parse(JSON.stringify(store.state.providerNotification.all));
-    pNs.value.value = allproviderNotifications;
+    pNs.value = allproviderNotifications;
     const sumQty = (sandOrder) => {
       return sandOrder.reduce((totalSum, sO) => {
         return totalSum + sO.amount;
