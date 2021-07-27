@@ -28,14 +28,21 @@
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider"
+                    title="Cantidad de Arena"
                   >
-                    Cantidad
+                    C° Arena
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider"
                   >
                     Transportes
+                  </th>
+                  <th
+                    scope="col"
+                    class="px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider"
+                  >
+                    C° de Camiones
                   </th>
                   <th scope="col" class="relative px-6 py-3">
                     <span class="sr-only">Actions</span>
@@ -58,6 +65,9 @@
                   <td class="text-second-500 px-6 py-4 whitespace-nowrap text-sm">{{ sumQty(pn.sandOrder) }}t</td>
                   <td class="px-6 py-4 whitespace-nowrap text-sm">
                     {{ pn.transportProviders.length }}
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    {{ sumTransport(pn.transportProviders) }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div class="flex justify-end space-x-4">
@@ -113,6 +123,11 @@ export default {
         return totalSum + sO.amount;
       }, 0);
     };
+    const sumTransport = (transportProviders) => {
+      return transportProviders.reduce((totalSum, tP) => {
+        return totalSum + tP.amount;
+      }, 0);
+    };
     const deletePN = (id) => {
       const loading = ref(true);
       pNs.value = pNs.value.filter((pn) => {
@@ -120,10 +135,13 @@ export default {
       });
       loading.value = false;
     };
+    console.log(pNs.value);
+
     return {
       pNs,
       deletePN,
       sumQty,
+      sumTransport,
     };
   },
 };
