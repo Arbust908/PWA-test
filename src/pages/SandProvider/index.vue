@@ -2,7 +2,6 @@
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">Proovedores de arena</h2>
-      <h3>{{loading}}</h3>
       <router-link to="/proveedores-de-arena/nuevo">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
@@ -24,7 +23,7 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Raz—n social
+                    Razï¿½n social
                   </th>
                   <th
                     scope="col"
