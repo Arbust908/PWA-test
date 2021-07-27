@@ -24,7 +24,7 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Raz√≥n social
+                    Razón social
                   </th>
                   <th
                     scope="col"
@@ -103,7 +103,6 @@ import { useStore } from 'vuex';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
-// import { SandProvider } from '@/interfaces/SandProvider';
 const api = 'https://sandflow-qa.bitpatagonia.com/api';
 export default {
   components: {
