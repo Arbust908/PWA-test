@@ -4,7 +4,7 @@ import { isLogged, isAdmin, isGuest } from '@/router/guards';
 
 
 const routes: Array<RouteRecordRaw> = [
-    {
+  {
     path: '/',
     name: 'Home',
     component: Home,
