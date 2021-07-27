@@ -4,6 +4,7 @@ import { createStore } from 'vuex';
 import global from '@/store/global';
 import workOrders from '@/store/workOrders';
 import sand from '@/store/sand';
+import sandProviders from '@/store/sandProviders';
 
 const store = createStore({
   state: {
@@ -36,7 +37,8 @@ const store = createStore({
   modules: {
     global,
     workOrders,
-    sand
+    sand,
+    sandProviders,
   },
   strict: true,
 });

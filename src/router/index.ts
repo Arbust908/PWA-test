@@ -4,7 +4,7 @@ import { isLogged, isAdmin, isGuest } from '@/router/guards';
 
 
 const routes: Array<RouteRecordRaw> = [
-    {
+  {
     path: '/',
     name: 'Home',
     component: Home,
@@ -56,6 +56,24 @@ const routes: Array<RouteRecordRaw> = [
     path: '/tipos-de-arena/nueva',
     name: 'NewSand',
     component: () => import('@/pages/Sand/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/proveedores-de-arena',
+    name: 'SandProvider',
+    component: () => import('@/pages/SandProvider/index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/proveedores-de-arena/:id',
+    name: 'SandProviderById',
+    component: () => import('@/pages/SandProvider/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/proveedores-de-arena/nuevo',
+    name: 'NewSandProvider',
+    component: () => import('@/pages/SandProvider/new.vue'),
     beforeEnter: isLogged,
   },
   {
