@@ -134,6 +134,7 @@ import { useAxios } from '@vueuse/integrations/useAxios';
 import { useNProgress } from '@vueuse/integrations/useNProgress';
 import { debouncedWatch } from '@vueuse/core';
 import { WorkOrder } from '@/interfaces/WorkOrder';
+const api = import.meta.env.VITE_API_URL;
 
 export default {
   components: {
@@ -147,7 +148,7 @@ export default {
   },
   setup() {
     const instance = axios.create({
-      baseURL: 'https://sandflow-qa.bitpatagonia.com/api/workOrder',
+      baseURL: api + '/workOrder',
     });
     const store = useStore();
     const workOrders = store.state.workOrders.all;

@@ -102,7 +102,7 @@ import { useStore } from 'vuex';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
-const api = 'https://sandflow-qa.bitpatagonia.com/api';
+const api = import.meta.env.VITE_API_URL;
 export default {
   components: {
     Layout,

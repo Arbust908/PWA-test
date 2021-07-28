@@ -20,6 +20,7 @@ export default {
   },
   setup() {
     let isDark = ref(false);
+    console.log(import.meta.env);
     const router = useRouter();
     if (localStorage.getItem('user')) {
       const user = JSON.parse(localStorage.getItem('user'));

@@ -115,7 +115,7 @@ import UiBtn from '@/components/ui/Button.vue';
 import { TrashIcon } from '@heroicons/vue/outline';
 import axios from 'axios';
 
-const api = 'https://sandflow-qa.bitpatagonia.com/api';
+const api = import.meta.env.VITE_API_URL;
 
 export default {
  components: {

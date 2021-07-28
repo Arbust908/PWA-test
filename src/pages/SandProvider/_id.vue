@@ -84,7 +84,7 @@ import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 import { SandProvider, Driver, Vehicle, Sand, Cradle, Forklift, Company } from '@/interfaces/SandProvider';
 
 import axios from 'axios';
-const api = 'https://sandflow-qa.bitpatagonia.com/api';
+const api = import.meta.env.VITE_API_URL;
 
 export default {
   components: {

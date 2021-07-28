@@ -73,7 +73,7 @@ const Logo = defineAsyncComponent(() => import('@/components/Logo.vue'));
 const Button = defineAsyncComponent(() => import('@/components/ui/Button.vue'));
 
 import axios from 'axios';
-const api = 'https://sandflow-qa.bitpatagonia.com/api';
+const api = import.meta.env.VITE_API_URL;
 
 export default {
   components: {
