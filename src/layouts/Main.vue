@@ -5,8 +5,8 @@
         as="div"
         static
         class="fixed inset-0 flex z-40 md:hidden"
-        @close="sidebarOpen = false"
         :open="sidebarOpen"
+        @close="sidebarOpen = false"
       >
         <TransitionChild
           as="template"
@@ -260,36 +260,9 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, computed, ComputedRef, defineComponent } from 'vue';
-import { useStore } from 'vuex';
-import {
-  Dialog,
-  DialogOverlay,
-  Menu,
-  MenuButton,
-  MenuItem,
-  MenuItems,
-  TransitionChild,
-  TransitionRoot,
-} from '@headlessui/vue';
-import {
-  BellIcon,
-  HomeIcon,
-  MenuAlt2Icon,
-  UsersIcon,
-  XIcon,
-  AtSymbolIcon,
-  ClipboardListIcon,
-  AdjustmentsIcon,
-  LogoutIcon,
-  ChipIcon,
-} from '@heroicons/vue/outline';
-import { SearchIcon } from '@heroicons/vue/solid';
-import Logo from '@/components/Logo.vue';
-import MobileNavLink from '@/components/navigation/MobileNavLink.vue';
-
-export default defineComponent({
-  components: {
+  import { ref, Ref, computed, ComputedRef, defineComponent } from 'vue';
+  import { useStore } from 'vuex';
+  import {
     Dialog,
     DialogOverlay,
     Menu,
@@ -298,39 +271,66 @@ export default defineComponent({
     MenuItems,
     TransitionChild,
     TransitionRoot,
-    Logo,
-    MobileNavLink,
-    HomeIcon,
+  } from '@headlessui/vue';
+  import {
     BellIcon,
+    HomeIcon,
     MenuAlt2Icon,
-    SearchIcon,
+    UsersIcon,
     XIcon,
     AtSymbolIcon,
     ClipboardListIcon,
     AdjustmentsIcon,
-    UsersIcon,
     LogoutIcon,
     ChipIcon,
-  },
-  setup() {
-    const store = useStore();
-    const sidebarOpen = ref(false);
-    const navigation = computed(() => {
-      return store.state.global.navigation;
-    });
-    const userNavigation = computed(() => {
-      return store.state.global.user_navigation;
-    });
-    const user = computed(() => {
-      return store.state.user;
-    });
+  } from '@heroicons/vue/outline';
+  import { SearchIcon } from '@heroicons/vue/solid';
+  import Logo from '@/components/Logo.vue';
+  import MobileNavLink from '@/components/navigation/MobileNavLink.vue';
 
-    return {
-      navigation,
-      userNavigation,
-      sidebarOpen,
-      user,
-    };
-  },
-});
+  export default defineComponent({
+    components: {
+      Dialog,
+      DialogOverlay,
+      Menu,
+      MenuButton,
+      MenuItem,
+      MenuItems,
+      TransitionChild,
+      TransitionRoot,
+      Logo,
+      MobileNavLink,
+      HomeIcon,
+      BellIcon,
+      MenuAlt2Icon,
+      SearchIcon,
+      XIcon,
+      AtSymbolIcon,
+      ClipboardListIcon,
+      AdjustmentsIcon,
+      UsersIcon,
+      LogoutIcon,
+      ChipIcon,
+    },
+    setup() {
+      const store = useStore();
+      const sidebarOpen = ref(false);
+      const navigation = computed(() => {
+        return store.state.global.navigation;
+      });
+      const userNavigation = computed(() => {
+        return store.state.global.user_navigation;
+      });
+      const user = computed(() => {
+        return store.state.user;
+      });
+
+      return {
+        navigation,
+        userNavigation,
+        sidebarOpen,
+        user,
+      };
+    },
+  });
 </script>

@@ -1,6 +1,6 @@
 <template>
   <TransitionRoot as="template" :show="open">
-    <Dialog as="div" static class="fixed z-10 inset-0 overflow-y-auto" @close="$emit('close')" :open="open">
+    <Dialog as="div" static class="fixed z-10 inset-0 overflow-y-auto" :open="open" @close="$emit('close')">
       <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
         <TransitionChild
           as="template"
@@ -114,34 +114,34 @@
 </template>
 
 <script lang="ts">
-import { ref, toRefs } from 'vue';
-import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-import { CheckIcon, QuestionMarkCircleIcon, ExclamationIcon } from '@heroicons/vue/outline';
+  import { ref, toRefs } from 'vue';
+  import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
+  import { CheckIcon, QuestionMarkCircleIcon, ExclamationIcon } from '@heroicons/vue/outline';
 
-export default {
-  components: {
-    Dialog,
-    DialogOverlay,
-    DialogTitle,
-    TransitionChild,
-    TransitionRoot,
-    CheckIcon,
-    QuestionMarkCircleIcon,
-    ExclamationIcon,
-  },
-  props: {
-    title: String,
-    type: {
-      type: String,
-      default: 'info',
-      validate: (value) => ['error', 'success', 'info', 'off'].includes(value),
+  export default {
+    components: {
+      Dialog,
+      DialogOverlay,
+      DialogTitle,
+      TransitionChild,
+      TransitionRoot,
+      CheckIcon,
+      QuestionMarkCircleIcon,
+      ExclamationIcon,
     },
-    open: Boolean,
-  },
-  setup(props) {
-    return {
-      ...toRefs(props),
-    };
-  },
-};
+    props: {
+      title: String,
+      type: {
+        type: String,
+        default: 'info',
+        validate: (value) => ['error', 'success', 'info', 'off'].includes(value),
+      },
+      open: Boolean,
+    },
+    setup(props) {
+      return {
+        ...toRefs(props),
+      };
+    },
+  };
 </script>

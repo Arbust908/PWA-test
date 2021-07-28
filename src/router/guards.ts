@@ -5,56 +5,56 @@ const recoverLocalUser = () => {
     const user = JSON.parse(localStorage.getItem('user'));
     store.dispatch('setUser', user);
   }
-}
+};
 
 export const wokrOrdersID = store.state.workOrders.all.reduce((woIds, workOrder) => {
   woIds.push(workOrder.id);
   return woIds;
 }, []);
 export const isLogged = (to, from, next) => {
-  console.log('In is Logged')
-  recoverLocalUser()
-  const isLogged = store.getters.isLogged
+  console.log('In is Logged');
+  recoverLocalUser();
+  const isLogged = store.getters.isLogged;
   if (!isLogged) {
-    next({ path: '/login' })
-    return
+    next({ path: '/login' });
+    return;
   } else {
-    next()
+    next();
   }
-}
+};
 export const isAdmin = (to, from, next) => {
-  recoverLocalUser()
-  const isAdmin = store.getters.isAdmin
+  recoverLocalUser();
+  const isAdmin = store.getters.isAdmin;
   if (!isAdmin) {
-    next({ path: '/login' })
-    return
+    next({ path: '/login' });
+    return;
   } else {
-    next()
+    next();
   }
-}
+};
 export const isGuest = (to, from, next) => {
-  recoverLocalUser()
-  const isGuest = store.getters.isGuest
+  recoverLocalUser();
+  const isGuest = store.getters.isGuest;
   if (isGuest) {
     if (to.path !== '/login') {
-      next({ path: '/login' })
-      return
+      next({ path: '/login' });
+      return;
     } else {
-      next()
+      next();
     }
   } else if (to.path === '/login') {
-    next({ path: '/' })
-    return
+    next({ path: '/' });
+    return;
   } else {
-    next()
+    next();
   }
-}
+};
 export const isValidWO = (to, from, next) => {
   const id = to.params.id;
   if (wokrOrdersID.indexOf(id) === -1) {
-    next({ path: '/error' })
-    return
+    next({ path: '/error' });
+    return;
   } else {
-    next()
+    next();
   }
-}
+};

@@ -37,7 +37,7 @@
       <section class="input-block_multi">
         <label for="pit" class=""> Pozo </label>
         <div v-for="(pit, key) in pits" :key="pit.id" class="pit-block">
-          <input :name="`pit-${pit.id}`" type="text" v-model="pits[key].name" placeholder="Nuevo Pozo" />
+          <input v-model="pits[key].name" :name="`pit-${pit.id}`" type="text" placeholder="Nuevo Pozo" />
           <CircularBtn v-if="key !== pits.length - 1" class="btn__delete" size="sm" @click="removePit(pit.id)">
             <TrashIcon class="w-5 h-5" />
           </CircularBtn>
@@ -57,112 +57,112 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, computed } from 'vue';
-import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-import { PlusIcon } from '@heroicons/vue/solid';
-import CircularBtn from '@/components/ui/CircularBtn.vue';
-import GhostBtn from '@/components/ui/GhostBtn.vue';
-import Layout from '@/layouts/Main.vue';
-import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-import { Pit } from '@/interfaces/WorkOrder';
+  import { ref, Ref, computed } from 'vue';
+  import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+  import { PlusIcon } from '@heroicons/vue/solid';
+  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import Layout from '@/layouts/Main.vue';
+  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import { Pit } from '@/interfaces/WorkOrder';
 
-export default {
-  components: {
-    BookmarkIcon,
-    CheckCircleIcon,
-    CircularBtn,
-    GhostBtn,
-    Layout,
-    PlusIcon,
-    PrimaryBtn,
-    TrashIcon,
-  },
-  setup() {
-    // Cliente
-    const client: Ref<String> = ref('');
-    // Service Company
-    const serviceCompany: Ref<String> = ref('');
-    // PAD
-    const pad: Ref<String> = ref('');
-    // Pozos
-    const pits: Ref<Array<Pit>> = ref([
-      {
-        id: 0,
-        name: '',
-      },
-    ]);
+  export default {
+    components: {
+      BookmarkIcon,
+      CheckCircleIcon,
+      CircularBtn,
+      GhostBtn,
+      Layout,
+      PlusIcon,
+      PrimaryBtn,
+      TrashIcon,
+    },
+    setup() {
+      // Cliente
+      const client: Ref<string> = ref('');
+      // Service Company
+      const serviceCompany: Ref<string> = ref('');
+      // PAD
+      const pad: Ref<string> = ref('');
+      // Pozos
+      const pits: Ref<Array<Pit>> = ref([
+        {
+          id: 0,
+          name: '',
+        },
+      ]);
 
-    const removePit = (pitId: number) => {
-      pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
-    };
-    const addPit = () => {
-      const lastPitId = pits.value.length;
-      pits.value.push({
-        id: lastPitId,
-        name: '',
+      const removePit = (pitId: number) => {
+        pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
+      };
+      const addPit = () => {
+        const lastPitId = pits.value.length;
+        pits.value.push({
+          id: lastPitId,
+          name: '',
+        });
+      };
+      // Remove Empty pits
+      const removeEmptyPits = () => {
+        pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
+      };
+      // Is the Order section is full
+      const isOrderFull = computed(() => {
+        return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
       });
-    };
-    // Remove Empty pits
-    const removeEmptyPits = () => {
-      pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
-    };
-    // Is the Order section is full
-    const isOrderFull = computed(() => {
-      return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
-    });
 
-    return {
-      isOrderFull,
-      client,
-      serviceCompany,
-      pad,
-      pits,
-      removePit,
-      addPit,
-    };
-  },
-};
+      return {
+        isOrderFull,
+        client,
+        serviceCompany,
+        pad,
+        pits,
+        removePit,
+        addPit,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.btn {
-  &__draft {
-    @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+  .btn {
+    &__draft {
+      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+    }
+    &__delete {
+      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
+      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+    }
+    &__add {
+      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+    }
+    &__add--special {
+      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+    }
+    &__mobile-only {
+      @apply lg:hidden;
+    }
+    &__desktop-only {
+      @apply hidden lg:inline-flex;
+    }
   }
-  &__delete {
-    @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-    /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+  .input-block select,
+  .input-block input {
+    @apply w-full rounded mb-3 p-2;
   }
-  &__add {
-    @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-  }
-  &__add--special {
-    @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-  }
-  &__mobile-only {
-    @apply lg:hidden;
-  }
-  &__desktop-only {
-    @apply hidden lg:inline-flex;
-  }
-}
-.input-block select,
-.input-block input {
-  @apply w-full rounded mb-3 p-2;
-}
 
-.pit-block {
-  @apply flex mt-1 items-center w-full mb-3;
-  & select,
-  & input {
-    @apply rounded p-2 max-w-md inline-block w-full;
+  .pit-block {
+    @apply flex mt-1 items-center w-full mb-3;
+    & select,
+    & input {
+      @apply rounded p-2 max-w-md inline-block w-full;
+    }
   }
-}
 
-fieldset {
-  @apply mb-6;
-}
-label {
-  @apply text-sm;
-}
+  fieldset {
+    @apply mb-6;
+  }
+  label {
+    @apply text-sm;
+  }
 </style>

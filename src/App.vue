@@ -8,25 +8,27 @@
 </template>
 
 <script lang="ts">
-import { ref } from 'vue';
-import { useActions, useGetters } from 'vuex-composition-helpers';
-import { useRouter } from 'vue-router';
-
-export default {
-  setup() {
-    let isDark = ref(false);
-    const router = useRouter();
-    const { getUserToken: loggedUser } = useGetters(['getUserToken']);
-    if (localStorage.getItem('user') && !loggedUser.value) {
-      const user = JSON.parse(localStorage.getItem('user'));
-      const { setUser } = useActions(['setUser']);
-      setUser(user);
-      router.push('/');
-    }
-
-    return {
-      isDark,
-    };
-  },
-};
+  import { ref, defineComponent } from 'vue';
+  import NotificationInfo from '@/components/notifications/Info.vue';
+  import ModalGeneral from '@/components/modal/General.vue';
+  import { useActions } from 'vuex-composition-helpers';
+  export default defineComponent({
+    components: {
+      NotificationInfo,
+      ModalGeneral,
+    },
+    setup() {
+      console.log(import.meta.env);
+      let isDark = ref(false);
+      // const router = useRouter();
+      if (localStorage.getItem('user') !== null) {
+        const user = JSON.parse(localStorage.getItem('user'));
+        const { setUser } = useActions(['setUser']);
+        setUser(user);
+      }
+      return {
+        isDark,
+      };
+    },
+  });
 </script>

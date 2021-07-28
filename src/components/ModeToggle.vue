@@ -15,8 +15,7 @@
       transition-colors
       ease-in-out
       duration-200
-      focus:outline-none
-      focus:ring-2 focus:ring-offset-2 focus:ring-main-500
+      focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500
     "
   >
     <span class="sr-only">Use setting</span>
@@ -39,41 +38,15 @@
       "
     >
       <span
-        :class="[
-          enabled
-            ? 'opacity-0 ease-out duration-100'
-            : 'opacity-100 ease-in duration-200',
-        ]"
-        class="
-          absolute
-          inset-0
-          h-full
-          w-full
-          flex
-          items-center
-          justify-center
-          transition-opacity
-        "
+        :class="[enabled ? 'opacity-0 ease-out duration-100' : 'opacity-100 ease-in duration-200']"
+        class="absolute inset-0 h-full w-full flex items-center justify-center transition-opacity"
         aria-hidden="true"
       >
         <MoonIcon />
       </span>
       <span
-        :class="[
-          enabled
-            ? 'opacity-100 ease-in duration-200'
-            : 'opacity-0 ease-out duration-100',
-        ]"
-        class="
-          absolute
-          inset-0
-          h-full
-          w-full
-          flex
-          items-center
-          justify-center
-          transition-opacity
-        "
+        :class="[enabled ? 'opacity-100 ease-in duration-200' : 'opacity-0 ease-out duration-100']"
+        class="absolute inset-0 h-full w-full flex items-center justify-center transition-opacity"
         aria-hidden="true"
       >
         <SunIcon />
@@ -83,22 +56,22 @@
 </template>
 
 <script>
-import { ref } from "vue";
-import { Switch } from "@headlessui/vue";
-import { MoonIcon, SunIcon } from "@heroicons/vue/outline";
+  import { ref } from 'vue';
+  import { Switch } from '@headlessui/vue';
+  import { MoonIcon, SunIcon } from '@heroicons/vue/outline';
 
-export default {
-  components: {
-    Switch,
-    MoonIcon,
-    SunIcon,
-  },
-  setup() {
-    const enabled = ref(false);
+  export default {
+    components: {
+      Switch,
+      MoonIcon,
+      SunIcon,
+    },
+    setup() {
+      const enabled = ref(false);
 
-    return {
-      enabled,
-    };
-  },
-};
+      return {
+        enabled,
+      };
+    },
+  };
 </script>

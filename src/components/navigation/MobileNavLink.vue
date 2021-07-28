@@ -10,41 +10,7 @@
 </template>
 
 <script lang="ts">
-import {
-  AdjustmentsIcon,
-  AnnotationIcon,
-  ArchiveIcon,
-  AtSymbolIcon,
-  BellIcon,
-  ChipIcon,
-  ClipboardListIcon,
-  HomeIcon,
-  LogoutIcon,
-  MenuAlt2Icon,
-  UsersIcon,
-  XIcon,
-} from '@heroicons/vue/outline';
-import { defineComponent, defineAsyncComponent } from 'vue';
-
-export default defineComponent({
-  props: {
-    to: {
-      type: String,
-      required: true,
-    },
-    icon: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-  },
-  components: {
-    AdjustmentsIcon,
-    ArchiveIcon,
-    AtSymbolIcon,
+  import {
     BellIcon,
     ChipIcon,
     ClipboardListIcon,
@@ -53,27 +19,63 @@ export default defineComponent({
     MenuAlt2Icon,
     UsersIcon,
     XIcon,
-  },
-});
+    AtSymbolIcon,
+    ClipboardListIcon,
+    AdjustmentsIcon,
+    LogoutIcon,
+    ChipIcon,
+    AnnotationIcon,
+  } from '@heroicons/vue/outline';
+  import { defineComponent, defineAsyncComponent } from 'vue';
+
+  export default defineComponent({
+    components: {
+      BellIcon,
+      HomeIcon,
+      MenuAlt2Icon,
+      UsersIcon,
+      XIcon,
+      AtSymbolIcon,
+      ClipboardListIcon,
+      AdjustmentsIcon,
+      LogoutIcon,
+      ChipIcon,
+      AnnotationIcon,
+    },
+    props: {
+      to: {
+        type: String,
+        required: true,
+      },
+      icon: {
+        type: String,
+        required: true,
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+    },
+  });
 </script>
 
 <style lang="scss" scoped>
-.nav-link {
-  @apply flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer;
-  &.selected {
-    @apply bg-gray-100 text-gray-900;
+  .nav-link {
+    @apply flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer;
+    &.selected {
+      @apply bg-gray-100 text-gray-900;
+      & > .icon {
+        @apply text-gray-500;
+      }
+    }
+    &:not(.selected) {
+      @apply text-gray-600 hover:bg-gray-50 hover:text-gray-900;
+      & > .icon {
+        @apply text-gray-400 group-hover:text-gray-500;
+      }
+    }
     & > .icon {
-      @apply text-gray-500;
+      @apply mr-4 flex-shrink-0 h-6 w-6;
     }
   }
-  &:not(.selected) {
-    @apply text-gray-600 hover:bg-gray-50 hover:text-gray-900;
-    & > .icon {
-      @apply text-gray-400 group-hover:text-gray-500;
-    }
-  }
-  & > .icon {
-    @apply mr-4 flex-shrink-0 h-6 w-6;
-  }
-}
 </style>

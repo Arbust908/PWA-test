@@ -14,7 +14,6 @@
       </p>
       <div class="mt-6">
         <button
-          @click="$router.back()"
           class="
             inline-flex
             items-center
@@ -28,6 +27,7 @@
             bg-white bg-opacity-75
             sm:bg-opacity-25 sm:hover:bg-opacity-50
           "
+          @click="$router.back()"
         >
           Volver
         </button>

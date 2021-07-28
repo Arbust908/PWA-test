@@ -56,7 +56,7 @@
           <section class="input-block_multi">
             <label for="pit" class=""> Pozo </label>
             <div v-for="(pit, key) in pits" :key="pit.id" class="pit-block">
-              <input :name="`pit-${pit.id}`" type="text" v-model="pits[key].name" placeholder="Nuevo Pozo" />
+              <input v-model="pits[key].name" :name="`pit-${pit.id}`" type="text" placeholder="Nuevo Pozo" />
               <CircularBtn v-if="key !== pits.length - 1" class="btn__delete" size="sm" @click="removePit(pit.id)">
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
@@ -290,9 +290,9 @@
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
               <input
+                v-model="crew.start_time"
                 class="rounded max-w-[8rem]"
                 :name="`crew-${crew.id}-start-time`"
-                v-model="crew.start_time"
                 type="text"
                 placeholder="00:00"
               />
@@ -306,9 +306,9 @@
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
               <input
+                v-model="crew.end_time"
                 class="rounded max-w-[8rem]"
                 :name="`crew-${crew.id}-end-time`"
-                v-model="crew.end_time"
                 type="text"
                 placeholder="00:00"
               />
@@ -388,8 +388,8 @@
           <PrimaryBtn
             v-else
             :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isAllFull && save(false)"
             :disabled="!isAllFull"
+            @click="isAllFull && save(false)"
           >
             Finalizar
           </PrimaryBtn>
@@ -400,357 +400,357 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, computed, toRefs, reactive } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter, useRoute } from 'vue-router';
-import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-import { PlusIcon } from '@heroicons/vue/solid';
-import Layout from '@/layouts/Main.vue';
-import GhostBtn from '@/components/ui/GhostBtn.vue';
-import CircularBtn from '@/components/ui/CircularBtn.vue';
-import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import { ref, Ref, computed, toRefs, reactive } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRouter, useRoute } from 'vue-router';
+  import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+  import { PlusIcon } from '@heroicons/vue/solid';
+  import Layout from '@/layouts/Main.vue';
+  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
-import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
+  import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
 
 import axios from 'axios';
 const api = import.meta.env.VITE_API_URL;
 
-export default {
-  components: {
-    Layout,
-    GhostBtn,
-    BookmarkIcon,
-    TrashIcon,
-    PlusIcon,
-    CheckCircleIcon,
-    CircularBtn,
-    PrimaryBtn,
-  },
-  setup() {
-    // Init
-    const store = useStore();
-    const router = useRouter();
-    const route = useRoute();
-    const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
-    const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
-      return wo.id == route.params.id;
-    });
-    const {
-      id: woID,
-      client,
-      serviceCompany,
-      pad,
-      pits,
-      operativeCradle,
-      backupCradle,
-      operativeForklift,
-      backupForklift,
-      traktors,
-      pickups,
-      crews,
-      rigmats,
-      conex,
-      generators,
-      tower,
-      cabin,
-    } = toRefs(reactive({ ...currentWorkOrder }));
-    //Pit
-    const removePit = (pitId: number) => {
-      pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
-    };
-    const addPit = () => {
-      const lastPitId = pits.value.length;
-      pits.value.push({
-        id: lastPitId,
-        name: '',
+  export default {
+    components: {
+      Layout,
+      GhostBtn,
+      BookmarkIcon,
+      TrashIcon,
+      PlusIcon,
+      CheckCircleIcon,
+      CircularBtn,
+      PrimaryBtn,
+    },
+    setup() {
+      // Init
+      const store = useStore();
+      const router = useRouter();
+      const route = useRoute();
+      const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
+      const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
+        return wo.id == route.params.id;
       });
-    };
-    if (pits.value && pits.value.length === 0) {
-      addPit();
-    }
-    //Traktor
-    const removeTraktor = (traktorId: number) => {
-      traktors.value = traktors.value.filter((traktor: Traktor) => traktor.id !== traktorId);
-    };
-    const addTraktor = (): void => {
-      const lastTraktorId = traktors.value.length;
-      traktors.value.push({
-        id: lastTraktorId,
-        chassis: '',
-        description: '',
-      });
-    };
-    if (traktors.value.length === 0) {
-      addTraktor();
-    }
-    // Pickup
-    const removePickup = (pickupId: number) => {
-      pickups.value = pickups.value.filter((pickup: Pickup) => pickup.id !== pickupId);
-    };
-    const addPickup = (): void => {
-      const lastTraktorId = pickups.value.length;
-      pickups.value.push({
-        id: lastTraktorId,
-        pickup_id: '',
-        description: '',
-      });
-    };
-    if (pickups.value.length === 0) {
-      addPickup();
-    }
-    // Crew
-    const removeResource = (crewId: number, peopleId: number) => {
-      const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-      selectedCrew.resources.value = selectedCrew.resources.value.filter(
-        (resource: HumanResource) => resource.id !== peopleId
-      );
-    };
-    const addResource = (crewId: number): void => {
-      const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-      const lastId = selectedCrew.resources.length;
-      selectedCrew.resources.push({
-        id: lastId,
-        rol: '',
-        name: '',
-      } as HumanResource);
-    };
-    const addCrew = (): void => {
-      const lastId = crews.value.length + 1;
-      const crewLetter = String.fromCharCode(lastId + 64);
-      crews.value.push({
-        id: lastId,
-        start_time: '',
-        end_time: '',
-        title: `Crew ${crewLetter}`,
-        resources: [],
-      });
-      addResource(lastId);
-    };
-    const removeCrew = (crewId: number): void => {
-      crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
-    };
-    if (crews.value.length === 0) {
-      addCrew();
-    }
-    // Sections
-    const WO_section = ref('orden');
-    const section_order = ['orden', 'equipamento', 'rrhh'];
-    const changeSection = (new_section: string): void => {
-      WO_section.value = new_section;
-    };
-    const currentSectionIndex = (): number => {
-      return section_order.indexOf(WO_section.value);
-    };
-    const isLastSection = (): boolean => {
-      return currentSectionIndex() >= section_order.length - 1;
-    };
-    const nextSection = (): void => {
-      if (isLastSection()) {
-        WO_section.value = section_order[section_order.length - 1];
-      }
-      WO_section.value = section_order[currentSectionIndex() + 1];
-    };
-    // Is the Order section is full
-    const isOrderFull = computed(() => {
-      return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
-    });
-    // Is the Equipment section is full
-    const isEquipmentFull = computed(() => {
-      return !!(
-        operativeCradle.value &&
-        // backupCradle.value &&
-        operativeForklift.value &&
-        // backupForklift.value &&
-        traktors.value.length > 0 &&
-        traktors.value[0].chassis &&
-        traktors.value[0].description &&
-        traktors.value[0].supplier &&
-        pickups.value.length > 0 &&
-        pickups.value[0].pickup_id &&
-        pickups.value[0].description
-      );
-    });
-    // Is the RRHH section is full
-    const isRRHHFull = computed(() => {
-      return !!(crews.value.length > 0 && crews.value[0].start_time && crews.value[0].end_time);
-    });
-    // Is all sections full
-    const isAllFull = computed(() => {
-      return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
-    });
-    // method go to index that goes to the index page
-    const goToIndex = (): void => {
-      router.push('/orden-de-trabajo');
-    };
-    // Remove Empty pits
-    const removeEmptyPits = () => {
-      pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
-    };
-    // Remove empty traktors
-    const removeEmptyTraktors = (): void => {
-      traktors.value = traktors.value.filter(
-        (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
-      );
-    };
-    // Remove Empty Pickups
-    const removeEmptyPickups = (): void => {
-      pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
-    };
-    // Remove empty Crews
-    const removeEmptyCrews = (): void => {
-      crews.value = crews.value
-        .map((crew: Crew) => removeEmptyResource(crew.id))
-        .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
-    };
-    // Remove Empty Resource
-    const removeEmptyResource = (crewId: number): void => {
-      const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-      selectedCrew.resources = selectedCrew.resources.filter(
-        (resource: HumanResource) => resource.rol !== '' && resource.name !== ''
-      );
-      return selectedCrew;
-    };
-    const removeAllEmptys = (): void => {
-      removeEmptyPits();
-      removeEmptyTraktors();
-      removeEmptyPickups();
-      removeEmptyCrews();
-    };
-
-    const save = async (draft = true) => {
-      removeAllEmptys();
-      const newWO = {
-        id: woID.value,
-        client: client.value,
-        serviceCompany: serviceCompany.value,
-        pad: pad.value,
-        pits: pits.value,
-        operativeCradle: operativeCradle.value,
-        backupCradle: backupCradle.value,
-        operativeForklift: operativeForklift.value,
-        backupForklift: backupForklift.value,
-        traktors: traktors.value,
-        pickups: pickups.value,
-        crews: crews.value,
-        rigmats: rigmats.value,
-        conex: conex.value,
-        generators: generators.value,
-        tower: tower.value,
-        cabin: cabin.value,
-        draft,
+      const {
+        id: woID,
+        client,
+        serviceCompany,
+        pad,
+        pits,
+        operativeCradle,
+        backupCradle,
+        operativeForklift,
+        backupForklift,
+        traktors,
+        pickups,
+        crews,
+        rigmats,
+        conex,
+        generators,
+        tower,
+        cabin,
+      } = toRefs(reactive({ ...currentWorkOrder }));
+      //Pit
+      const removePit = (pitId: number) => {
+        pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
       };
-      const loading = ref(true);
-      // Update Work Order
-      let woDB = await axios
-        .put(`${api}/workOrder/${newWO.id}`, newWO)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            return res.data.data;
-          }
-          return {};
-        })
-        .finally(() => {
-          loading.value = false;
+      const addPit = () => {
+        const lastPitId = pits.value.length;
+        pits.value.push({
+          id: lastPitId,
+          name: '',
         });
-      // Update Work Order
-      store.dispatch('updateWorkOrder', woDB);
-      router.push('/orden-de-trabajo');
-    };
+      };
+      if (pits.value && pits.value.length === 0) {
+        addPit();
+      }
+      //Traktor
+      const removeTraktor = (traktorId: number) => {
+        traktors.value = traktors.value.filter((traktor: Traktor) => traktor.id !== traktorId);
+      };
+      const addTraktor = (): void => {
+        const lastTraktorId = traktors.value.length;
+        traktors.value.push({
+          id: lastTraktorId,
+          chassis: '',
+          description: '',
+        });
+      };
+      if (traktors.value.length === 0) {
+        addTraktor();
+      }
+      // Pickup
+      const removePickup = (pickupId: number) => {
+        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.id !== pickupId);
+      };
+      const addPickup = (): void => {
+        const lastTraktorId = pickups.value.length;
+        pickups.value.push({
+          id: lastTraktorId,
+          pickup_id: '',
+          description: '',
+        });
+      };
+      if (pickups.value.length === 0) {
+        addPickup();
+      }
+      // Crew
+      const removeResource = (crewId: number, peopleId: number) => {
+        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        selectedCrew.resources.value = selectedCrew.resources.value.filter(
+          (resource: HumanResource) => resource.id !== peopleId
+        );
+      };
+      const addResource = (crewId: number): void => {
+        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        const lastId = selectedCrew.resources.length;
+        selectedCrew.resources.push({
+          id: lastId,
+          rol: '',
+          name: '',
+        } as HumanResource);
+      };
+      const addCrew = (): void => {
+        const lastId = crews.value.length + 1;
+        const crewLetter = String.fromCharCode(lastId + 64);
+        crews.value.push({
+          id: lastId,
+          start_time: '',
+          end_time: '',
+          title: `Crew ${crewLetter}`,
+          resources: [],
+        });
+        addResource(lastId);
+      };
+      const removeCrew = (crewId: number): void => {
+        crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
+      };
+      if (crews.value.length === 0) {
+        addCrew();
+      }
+      // Sections
+      const WO_section = ref('orden');
+      const section_order = ['orden', 'equipamento', 'rrhh'];
+      const changeSection = (new_section: string): void => {
+        WO_section.value = new_section;
+      };
+      const currentSectionIndex = (): number => {
+        return section_order.indexOf(WO_section.value);
+      };
+      const isLastSection = (): boolean => {
+        return currentSectionIndex() >= section_order.length - 1;
+      };
+      const nextSection = (): void => {
+        if (isLastSection()) {
+          WO_section.value = section_order[section_order.length - 1];
+        }
+        WO_section.value = section_order[currentSectionIndex() + 1];
+      };
+      // Is the Order section is full
+      const isOrderFull = computed(() => {
+        return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+      });
+      // Is the Equipment section is full
+      const isEquipmentFull = computed(() => {
+        return !!(
+          operativeCradle.value &&
+          // backupCradle.value &&
+          operativeForklift.value &&
+          // backupForklift.value &&
+          traktors.value.length > 0 &&
+          traktors.value[0].chassis &&
+          traktors.value[0].description &&
+          traktors.value[0].supplier &&
+          pickups.value.length > 0 &&
+          pickups.value[0].pickup_id &&
+          pickups.value[0].description
+        );
+      });
+      // Is the RRHH section is full
+      const isRRHHFull = computed(() => {
+        return !!(crews.value.length > 0 && crews.value[0].start_time && crews.value[0].end_time);
+      });
+      // Is all sections full
+      const isAllFull = computed(() => {
+        return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
+      });
+      // method go to index that goes to the index page
+      const goToIndex = (): void => {
+        router.push('/orden-de-trabajo');
+      };
+      // Remove Empty pits
+      const removeEmptyPits = () => {
+        pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
+      };
+      // Remove empty traktors
+      const removeEmptyTraktors = (): void => {
+        traktors.value = traktors.value.filter(
+          (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
+        );
+      };
+      // Remove Empty Pickups
+      const removeEmptyPickups = (): void => {
+        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
+      };
+      // Remove empty Crews
+      const removeEmptyCrews = (): void => {
+        crews.value = crews.value
+          .map((crew: Crew) => removeEmptyResource(crew.id))
+          .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
+      };
+      // Remove Empty Resource
+      const removeEmptyResource = (crewId: number): void => {
+        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        selectedCrew.resources = selectedCrew.resources.filter(
+          (resource: HumanResource) => resource.rol !== '' && resource.name !== ''
+        );
+        return selectedCrew;
+      };
+      const removeAllEmptys = (): void => {
+        removeEmptyPits();
+        removeEmptyTraktors();
+        removeEmptyPickups();
+        removeEmptyCrews();
+      };
 
-    return {
-      woID,
-      WO_section,
-      changeSection,
-      nextSection,
-      isLastSection,
-      isOrderFull,
-      isEquipmentFull,
-      isRRHHFull,
-      client,
-      serviceCompany,
-      pad,
-      pits,
-      removePit,
-      addPit,
-      operativeCradle,
-      backupCradle,
-      operativeForklift,
-      backupForklift,
-      traktors,
-      removeTraktor,
-      addTraktor,
-      pickups,
-      removePickup,
-      addPickup,
-      rigmats,
-      conex,
-      generators,
-      tower,
-      cabin,
-      removeResource,
-      addResource,
-      crews,
-      removeCrew,
-      addCrew,
-      goToIndex,
-      save,
-      isAllFull,
-    };
-  },
-};
+      const save = async (draft = true) => {
+        removeAllEmptys();
+        const newWO = {
+          id: woID.value,
+          client: client.value,
+          serviceCompany: serviceCompany.value,
+          pad: pad.value,
+          pits: pits.value,
+          operativeCradle: operativeCradle.value,
+          backupCradle: backupCradle.value,
+          operativeForklift: operativeForklift.value,
+          backupForklift: backupForklift.value,
+          traktors: traktors.value,
+          pickups: pickups.value,
+          crews: crews.value,
+          rigmats: rigmats.value,
+          conex: conex.value,
+          generators: generators.value,
+          tower: tower.value,
+          cabin: cabin.value,
+          draft,
+        };
+        const loading = ref(true);
+        // Update Work Order
+        let woDB = await axios
+          .put(`${api}/workOrder/${newWO.id}`, newWO)
+          .catch((err) => {
+            console.log(err);
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              return res.data.data;
+            }
+            return {};
+          })
+          .finally(() => {
+            loading.value = false;
+          });
+        // Update Work Order
+        store.dispatch('updateWorkOrder', woDB);
+        router.push('/orden-de-trabajo');
+      };
+
+      return {
+        woID,
+        WO_section,
+        changeSection,
+        nextSection,
+        isLastSection,
+        isOrderFull,
+        isEquipmentFull,
+        isRRHHFull,
+        client,
+        serviceCompany,
+        pad,
+        pits,
+        removePit,
+        addPit,
+        operativeCradle,
+        backupCradle,
+        operativeForklift,
+        backupForklift,
+        traktors,
+        removeTraktor,
+        addTraktor,
+        pickups,
+        removePickup,
+        addPickup,
+        rigmats,
+        conex,
+        generators,
+        tower,
+        cabin,
+        removeResource,
+        addResource,
+        crews,
+        removeCrew,
+        addCrew,
+        goToIndex,
+        save,
+        isAllFull,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.btn {
-  &__draft {
-    @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+  .btn {
+    &__draft {
+      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+    }
+    &__delete {
+      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
+      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+    }
+    &__add {
+      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+    }
+    &__add--special {
+      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+    }
+    &__mobile-only {
+      @apply lg:hidden;
+    }
+    &__desktop-only {
+      @apply hidden lg:inline-flex;
+    }
   }
-  &__delete {
-    @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-    /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+  .section-tab {
+    @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
   }
-  &__add {
-    @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+  .section-tab[selected='true'] {
+    @apply border-main-500 text-main-500;
   }
-  &__add--special {
-    @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+  .input-block select,
+  .input-block input {
+    @apply w-full rounded mb-3 p-2;
   }
-  &__mobile-only {
-    @apply lg:hidden;
-  }
-  &__desktop-only {
-    @apply hidden lg:inline-flex;
-  }
-}
-.section-tab {
-  @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
-}
-.section-tab[selected='true'] {
-  @apply border-main-500 text-main-500;
-}
-.input-block select,
-.input-block input {
-  @apply w-full rounded mb-3 p-2;
-}
 
-.pit-block {
-  @apply flex mt-1 items-center w-full mb-3;
-  & select,
-  & input {
-    @apply rounded p-2 max-w-md inline-block w-full;
+  .pit-block {
+    @apply flex mt-1 items-center w-full mb-3;
+    & select,
+    & input {
+      @apply rounded p-2 max-w-md inline-block w-full;
+    }
   }
-}
 
-fieldset {
-  @apply mb-6;
-}
-label {
-  @apply text-sm;
-}
-.equip-grid {
-  @apply grid gap-4 grid-cols-2 md:grid-cols-3;
-}
+  fieldset {
+    @apply mb-6;
+  }
+  label {
+    @apply text-sm;
+  }
+  .equip-grid {
+    @apply grid gap-4 grid-cols-2 md:grid-cols-3;
+  }
 </style>

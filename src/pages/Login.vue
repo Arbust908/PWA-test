@@ -14,32 +14,32 @@
 </template>
 
 <script>
-import LoginCard from '@/components/auth/LoginCard.vue';
-import PassRecover from '@/components/auth/PassRecover.vue';
-import Success from '@/components/auth/Success.vue';
-import Error from '@/components/auth/Error.vue';
-export default {
-  components: {
-    LoginCard,
-    PassRecover,
-    Success,
-    Error,
-  },
-  data() {
-    return {
-      selected_card: 'login',
-    };
-  },
-  methods: {
-    selectedCard(card) {
-      this.selected_card = card;
+  import LoginCard from '@/components/auth/LoginCard.vue';
+  import PassRecover from '@/components/auth/PassRecover.vue';
+  import Success from '@/components/auth/Success.vue';
+  import Error from '@/components/auth/Error.vue';
+  export default {
+    components: {
+      LoginCard,
+      PassRecover,
+      Success,
+      Error,
     },
-  },
-};
+    data() {
+      return {
+        selected_card: 'login',
+      };
+    },
+    methods: {
+      selectedCard(card) {
+        this.selected_card = card;
+      },
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-main {
-  @apply min-h-screen bg-white flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8;
-}
+  main {
+    @apply min-h-screen bg-white flex flex-col justify-center items-center py-12 sm:px-6 lg:px-8;
+  }
 </style>

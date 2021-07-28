@@ -197,190 +197,190 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, computed } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
-import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-import { PlusIcon } from '@heroicons/vue/solid';
-import CircularBtn from '@/components/ui/CircularBtn.vue';
-import GhostBtn from '@/components/ui/GhostBtn.vue';
-import Layout from '@/layouts/Main.vue';
-import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import { ref, Ref, computed } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRouter } from 'vue-router';
+  import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+  import { PlusIcon } from '@heroicons/vue/solid';
+  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import Layout from '@/layouts/Main.vue';
+  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
-import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
+  import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
 
 import axios from 'axios';
 const api = import.meta.env.VITE_API_URL;
 
-export default {
-  components: {
-    BookmarkIcon,
-    CheckCircleIcon,
-    CircularBtn,
-    GhostBtn,
-    Layout,
-    PlusIcon,
-    PrimaryBtn,
-    TrashIcon,
-  },
-  setup() {
-    // ::
-    // Cradle
-    // ::
-    const operativeCradle: Ref<string> = ref('');
-    const backupCradle: Ref<string> = ref('');
-    // ::
-    // Forklift
-    // ::
-    const operativeForklift: Ref<string> = ref('');
-    const backupForklift: Ref<string> = ref('');
-    // ::
-    // Tractor
-    // ::
-    const traktors: Ref<Array<Traktor>> = ref([
-      {
-        id: 0,
-        chassis: '',
-        supplier: '',
-        description: '',
-      },
-    ]);
-    const removeTraktor = (traktorId: number) => {
-      traktors.value = traktors.value.filter((traktor: Traktor) => traktor.id !== traktorId);
-    };
-    const addTraktor = (): void => {
-      const lastTraktorId = traktors.value.length;
-      traktors.value.push({
-        id: lastTraktorId,
-        chassis: '',
-        supplier: '',
-        description: '',
+  export default {
+    components: {
+      BookmarkIcon,
+      CheckCircleIcon,
+      CircularBtn,
+      GhostBtn,
+      Layout,
+      PlusIcon,
+      PrimaryBtn,
+      TrashIcon,
+    },
+    setup() {
+      // ::
+      // Cradle
+      // ::
+      const operativeCradle: Ref<string> = ref('');
+      const backupCradle: Ref<string> = ref('');
+      // ::
+      // Forklift
+      // ::
+      const operativeForklift: Ref<string> = ref('');
+      const backupForklift: Ref<string> = ref('');
+      // ::
+      // Tractor
+      // ::
+      const traktors: Ref<Array<Traktor>> = ref([
+        {
+          id: 0,
+          chassis: '',
+          supplier: '',
+          description: '',
+        },
+      ]);
+      const removeTraktor = (traktorId: number) => {
+        traktors.value = traktors.value.filter((traktor: Traktor) => traktor.id !== traktorId);
+      };
+      const addTraktor = (): void => {
+        const lastTraktorId = traktors.value.length;
+        traktors.value.push({
+          id: lastTraktorId,
+          chassis: '',
+          supplier: '',
+          description: '',
+        });
+      };
+      // Remove empty traktors
+      const removeEmptyTraktors = (): void => {
+        traktors.value = traktors.value.filter(
+          (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
+        );
+      };
+      // ::
+      // Pickup
+      // ::
+      const pickups: Ref<Array<Pickup>> = ref([
+        {
+          id: 0,
+          pickup_id: '',
+          description: '',
+        },
+      ]);
+      const removePickup = (pickupId: number) => {
+        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.id !== pickupId);
+      };
+      const addPickup = (): void => {
+        const lastTraktorId = pickups.value.length;
+        pickups.value.push({
+          id: lastTraktorId,
+          pickup_id: '',
+          description: '',
+        });
+      };
+      // Remove Empty Pickups
+      const removeEmptyPickups = (): void => {
+        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
+      };
+      // ::
+      // Equipment
+      // ::
+
+      // rigmats, conex, generators, tower, cabin
+      const rigmats: Ref<number> = ref(0);
+      const conex: Ref<number> = ref(0);
+      const generators: Ref<number> = ref(0);
+      const tower: Ref<number> = ref(0);
+      const cabin: Ref<number> = ref(0);
+
+      // Is the Equipment section is full
+      const isEquipmentFull = computed(() => {
+        return !!(
+          operativeCradle.value &&
+          // backupCradle.value &&
+          operativeForklift.value &&
+          // backupForklift.value &&
+          traktors.value.length > 0 &&
+          traktors.value[0].chassis &&
+          traktors.value[0].description &&
+          traktors.value[0].supplier &&
+          pickups.value.length > 0 &&
+          pickups.value[0].pickup_id &&
+          pickups.value[0].description
+        );
       });
-    };
-    // Remove empty traktors
-    const removeEmptyTraktors = (): void => {
-      traktors.value = traktors.value.filter(
-        (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
-      );
-    };
-    // ::
-    // Pickup
-    // ::
-    const pickups: Ref<Array<Pickup>> = ref([
-      {
-        id: 0,
-        pickup_id: '',
-        description: '',
-      },
-    ]);
-    const removePickup = (pickupId: number) => {
-      pickups.value = pickups.value.filter((pickup: Pickup) => pickup.id !== pickupId);
-    };
-    const addPickup = (): void => {
-      const lastTraktorId = pickups.value.length;
-      pickups.value.push({
-        id: lastTraktorId,
-        pickup_id: '',
-        description: '',
-      });
-    };
-    // Remove Empty Pickups
-    const removeEmptyPickups = (): void => {
-      pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
-    };
-    // ::
-    // Equipment
-    // ::
 
-    // rigmats, conex, generators, tower, cabin
-    const rigmats: Ref<number> = ref(0);
-    const conex: Ref<number> = ref(0);
-    const generators: Ref<number> = ref(0);
-    const tower: Ref<number> = ref(0);
-    const cabin: Ref<number> = ref(0);
-
-    // Is the Equipment section is full
-    const isEquipmentFull = computed(() => {
-      return !!(
-        operativeCradle.value &&
-        // backupCradle.value &&
-        operativeForklift.value &&
-        // backupForklift.value &&
-        traktors.value.length > 0 &&
-        traktors.value[0].chassis &&
-        traktors.value[0].description &&
-        traktors.value[0].supplier &&
-        pickups.value.length > 0 &&
-        pickups.value[0].pickup_id &&
-        pickups.value[0].description
-      );
-    });
-
-    return {
-      isEquipmentFull,
-      operativeCradle,
-      backupCradle,
-      operativeForklift,
-      backupForklift,
-      traktors,
-      removeTraktor,
-      addTraktor,
-      pickups,
-      removePickup,
-      addPickup,
-      rigmats,
-      conex,
-      generators,
-      tower,
-      cabin,
-    };
-  },
-};
+      return {
+        isEquipmentFull,
+        operativeCradle,
+        backupCradle,
+        operativeForklift,
+        backupForklift,
+        traktors,
+        removeTraktor,
+        addTraktor,
+        pickups,
+        removePickup,
+        addPickup,
+        rigmats,
+        conex,
+        generators,
+        tower,
+        cabin,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.btn {
-  &__draft {
-    @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+  .btn {
+    &__draft {
+      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+    }
+    &__delete {
+      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
+      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+    }
+    &__add {
+      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+    }
+    &__add--special {
+      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+    }
+    &__mobile-only {
+      @apply lg:hidden;
+    }
+    &__desktop-only {
+      @apply hidden lg:inline-flex;
+    }
   }
-  &__delete {
-    @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-    /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-  }
-  &__add {
-    @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-  }
-  &__add--special {
-    @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-  }
-  &__mobile-only {
-    @apply lg:hidden;
-  }
-  &__desktop-only {
-    @apply hidden lg:inline-flex;
-  }
-}
 
-.input-block select,
-.input-block input {
-  @apply w-full rounded mb-3 p-2;
-}
-
-.pit-block {
-  @apply flex mt-1 items-center w-full mb-3;
-  & select,
-  & input {
-    @apply rounded p-2 max-w-md inline-block w-full;
+  .input-block select,
+  .input-block input {
+    @apply w-full rounded mb-3 p-2;
   }
-}
 
-fieldset {
-  @apply mb-6;
-}
-label {
-  @apply text-sm;
-}
-.equip-grid {
-  @apply grid gap-4 grid-cols-2 md:grid-cols-3;
-}
+  .pit-block {
+    @apply flex mt-1 items-center w-full mb-3;
+    & select,
+    & input {
+      @apply rounded p-2 max-w-md inline-block w-full;
+    }
+  }
+
+  fieldset {
+    @apply mb-6;
+  }
+  label {
+    @apply text-sm;
+  }
+  .equip-grid {
+    @apply grid gap-4 grid-cols-2 md:grid-cols-3;
+  }
 </style>

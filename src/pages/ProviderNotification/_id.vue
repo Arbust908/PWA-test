@@ -196,7 +196,7 @@
       </footer>
     </section>
     <Modal title="Notificación a Proveedores" type="off" :open="showModal" @close="toggleModal">
-      <template v-slot:body>
+      <template #body>
         <div class="divide-y text-left">
           <section class="py-2 space-y-2">
             <h3 class="text-xl">Arena</h3>
@@ -223,7 +223,7 @@
           </section>
         </div>
       </template>
-      <template v-slot:btn>
+      <template #btn>
         <div class="flex gap-4">
           <button
             type="button"
@@ -278,196 +278,192 @@
 </template>
 
 <script lang="ts">
-import { ref, Ref, reactive, computed, ComputedRef, toRaw, defineComponent, defineAsyncComponent } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter, useRoute } from 'vue-router';
-import { useState, useActions } from 'vuex-composition-helpers';
+  import { ref, Ref, reactive, computed, ComputedRef, toRaw, defineComponent, defineAsyncComponent } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRouter, useRoute } from 'vue-router';
+  import { useState, useActions } from 'vuex-composition-helpers';
 
-import { BookmarkIcon, TrashIcon, DotsVerticalIcon } from '@heroicons/vue/outline';
-import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
-import Layout from '@/layouts/Main.vue';
-import GhostBtn from '@/components/ui/GhostBtn.vue';
-import CircularBtn from '@/components/ui/CircularBtn.vue';
-import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-import { ProviderNotification, SandOrder, TransportProvider } from '@/interfaces/ProviderNotification.ts';
-import { useToggle } from '@vueuse/core';
+  import { BookmarkIcon, TrashIcon, DotsVerticalIcon } from '@heroicons/vue/outline';
+  import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
+  import Layout from '@/layouts/Main.vue';
+  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import { ProviderNotification, SandOrder, TransportProvider } from '@/interfaces/ProviderNotification.ts';
+  import { useToggle } from '@vueuse/core';
 
-const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+  const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
-import axios from 'axios';
-const api = 'https://sandflow-qa.bitpatagonia.com/api';
+  import axios from 'axios';
+  const api = 'https://sandflow-qa.bitpatagonia.com/api';
 
-export default defineComponent({
-  components: {
-    BellIcon,
-    BookmarkIcon,
-    CircularBtn,
-    DotsVerticalIcon,
-    GhostBtn,
-    Layout,
-    Modal,
-    PlusIcon,
-    PrimaryBtn,
-    TrashIcon,
-  },
-  setup() {
-    const router = useRouter();
-    const route = useRoute();
-    const store = useStore();
+  export default defineComponent({
+    components: {
+      BellIcon,
+      BookmarkIcon,
+      CircularBtn,
+      DotsVerticalIcon,
+      GhostBtn,
+      Layout,
+      Modal,
+      PlusIcon,
+      PrimaryBtn,
+      TrashIcon,
+    },
+    setup() {
+      const router = useRouter();
+      const route = useRoute();
+      const store = useStore();
 
-    const allPNs = JSON.parse(JSON.stringify(store.state.providerNotifications.all));
-    const currentProviderNotification = allPNs.find(pn => pn.id === route.params.id);
+      const allPNs = JSON.parse(JSON.stringify(store.state.providerNotifications.all));
+      const currentProviderNotification = allPNs.find((pn) => pn.id === route.params.id);
 
-    const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
-    
-      const {
+      const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
+
+      const { sandProvider, sandOrder, transportProviders } = currentProviderNotification;
+      // const sandProvider: Ref<string> = ref('');
+      // const sandOrder: Ref<Array<SandOrder>> = ref([]);
+      // const transportProviders: Ref<Array<TransportProvider>> = ref([]);
+
+      const defaultSandOrder: SandOrder = {
+        id: 0,
+        sandType: null,
+        amount: 0,
+      };
+      const addSandOrder = () => {
+        const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
+        const lastSandOrderId = lastSandOrder ? lastSandOrder.id : 0;
+        const newSandOrder = { ...defaultSandOrder };
+        newSandOrder.id = lastSandOrderId + 1;
+        sandOrder.value.push(newSandOrder);
+      };
+      const removeSandOrder = (soId: number) => {
+        sandOrder.value = sandOrder.value.filter((so) => so.id !== soId);
+      };
+      if (sandOrder.value.length === 0) {
+        addSandOrder();
+      }
+
+      const defaultTransportProvider: TransportProvider = {
+        id: 0,
+        name: '',
+        amount: 0,
+        observation: '',
+      };
+      const addTransportProvider = () => {
+        const lastTransportProvider = transportProviders.value[transportProviders.value.length - 1];
+        const lastTransportProviderId = lastTransportProvider ? lastTransportProvider.id : 0;
+        const newTransportProvider = { ...defaultTransportProvider };
+        newTransportProvider.id = lastTransportProviderId + 1;
+        transportProviders.value.push(newTransportProvider);
+      };
+      const removeTransportProvider = (tpId: number) => {
+        transportProviders.value = transportProviders.value.filter((tp) => tp.id !== tpId);
+      };
+      if (transportProviders.value.length === 0) {
+        addTransportProvider();
+      }
+
+      const isFull = computed(() => {
+        return !!(
+          sandProvider.value &&
+          sandOrder.value &&
+          sandOrder.value.every((so) => so.amount >= 0) &&
+          sandOrder.value.every((so) => so.sandType) &&
+          transportProviders.value &&
+          transportProviders.value.every((tp) => tp.amount >= 0) &&
+          transportProviders.value.every((tp) => tp.name)
+        );
+      });
+
+      const showModal = ref(false);
+      const toggleModal = useToggle(showModal);
+      const save = async () => {
+        toggleModal(true);
+      };
+      const confirm = async () => {
+        pN.value = {
+          sandProvider: sandProvider.value,
+          sandOrder: sandOrder.value,
+          transportProviders: transportProviders.value,
+        };
+        const newPN = await axios
+          .put(`${api}/sand`, pN.value)
+          .catch((err) => {
+            console.log(err);
+            return false;
+          })
+          .then((res) => {
+            console.log(res);
+            if (res.status === 200) {
+              return res.data;
+            }
+            return {};
+          })
+          .finally(() => {});
+        toggleModal(false);
+        store.dispatch('updateProviderNotification', pN.value);
+        router.push('/notificaciones-a-proveedores');
+      };
+
+      return {
         sandProvider,
         sandOrder,
         transportProviders,
-      } = currentProviderNotification;
-    // const sandProvider: Ref<string> = ref('');
-    // const sandOrder: Ref<Array<SandOrder>> = ref([]);
-    // const transportProviders: Ref<Array<TransportProvider>> = ref([]);
-
-    const defaultSandOrder: SandOrder = {
-      id: 0,
-      sandType: null,
-      amount: 0,
-    };
-    const addSandOrder = () => {
-      const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
-      const lastSandOrderId = lastSandOrder ? lastSandOrder.id : 0;
-      const newSandOrder = { ...defaultSandOrder };
-      newSandOrder.id = lastSandOrderId + 1;
-      sandOrder.value.push(newSandOrder);
-    };
-    const removeSandOrder = (soId: number) => {
-      sandOrder.value = sandOrder.value.filter((so) => so.id !== soId);
-    };
-    if (sandOrder.value.length === 0) {
-      addSandOrder();
-    }
-
-    const defaultTransportProvider: TransportProvider = {
-      id: 0,
-      name: '',
-      amount: 0,
-      observation: '',
-    };
-    const addTransportProvider = () => {
-      const lastTransportProvider = transportProviders.value[transportProviders.value.length - 1];
-      const lastTransportProviderId = lastTransportProvider ? lastTransportProvider.id : 0;
-      const newTransportProvider = { ...defaultTransportProvider };
-      newTransportProvider.id = lastTransportProviderId + 1;
-      transportProviders.value.push(newTransportProvider);
-    };
-    const removeTransportProvider = (tpId: number) => {
-      transportProviders.value = transportProviders.value.filter((tp) => tp.id !== tpId);
-    };
-    if (transportProviders.value.length === 0) {
-      addTransportProvider();
-    }
-
-    const isFull = computed(() => {
-      return !!(
-        sandProvider.value &&
-        sandOrder.value &&
-        sandOrder.value.every((so) => so.amount >= 0) &&
-        sandOrder.value.every((so) => so.sandType) &&
-        transportProviders.value &&
-        transportProviders.value.every((tp) => tp.amount >= 0) &&
-        transportProviders.value.every((tp) => tp.name)
-      );
-    });
-
-    const showModal = ref(false);
-    const toggleModal = useToggle(showModal);
-    const save = async () => {
-      toggleModal(true);
-    };
-    const confirm = async () => {
-      pN.value = {
-        sandProvider: sandProvider.value,
-        sandOrder: sandOrder.value,
-        transportProviders: transportProviders.value,
+        addSandOrder,
+        removeSandOrder,
+        addTransportProvider,
+        removeTransportProvider,
+        save,
+        showModal,
+        toggleModal,
+        isFull,
+        confirm,
       };
-      const newPN = await axios
-        .put(`${api}/sand`, pN.value)
-        .catch((err) => {
-          console.log(err);
-          return false;
-        })
-        .then((res) => {
-          console.log(res);
-          if (res.status === 200) {
-            return res.data;
-          }
-          return {};
-        })
-        .finally(() => {});
-      toggleModal(false);
-      store.dispatch('updateProviderNotification', pN.value);
-      router.push('/notificaciones-a-proveedores');
-    };
-
-    return {
-      sandProvider,
-      sandOrder,
-      transportProviders,
-      addSandOrder,
-      removeSandOrder,
-      addTransportProvider,
-      removeTransportProvider,
-      save,
-      showModal,
-      toggleModal,
-      isFull,
-      confirm,
-    };
-  },
-});
+    },
+  });
 </script>
 
 <style lang="scss" scoped>
-.input {
-  @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
-}
-input:read-only {
-  @apply bg-second-200 border cursor-not-allowed;
-}
-fieldset:not(:last-of-type) {
-  @apply border-b pb-6;
-}
-label:not(.toggle) {
-  @apply flex flex-col;
-  span {
-    @apply text-sm;
+  .input {
+    @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
   }
-}
-.toggle {
-  @apply flex space-x-3 items-center;
-}
-.btn {
-  &__draft {
-    @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+  input:read-only {
+    @apply bg-second-200 border cursor-not-allowed;
   }
-  &__delete {
-    @apply border-transparent text-second-800 bg-transparent hover:bg-red-600 hover:text-second-50 mx-2 p-2 transition duration-150 ease-out;
+  fieldset:not(:last-of-type) {
+    @apply border-b pb-6;
   }
-  &__options {
-    @apply border-transparent text-second-800 bg-transparent hover:bg-second-300 hover:text-indigo-800 mx-2 p-2 transition duration-150 ease-out;
+  label:not(.toggle) {
+    @apply flex flex-col;
+    span {
+      @apply text-sm;
+    }
   }
-  &__add {
-    @apply border-transparent text-second-50 bg-green-500 hover:bg-green-600 mr-2;
+  .toggle {
+    @apply flex space-x-3 items-center;
   }
-  &__add--special {
-    @apply border-2 border-second-400 text-second-400 bg-transparent group-hover:bg-second-200 group-hover:text-second-600 group-hover:border-second-600;
+  .btn {
+    &__draft {
+      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+    }
+    &__delete {
+      @apply border-transparent text-second-800 bg-transparent hover:bg-red-600 hover:text-second-50 mx-2 p-2 transition duration-150 ease-out;
+    }
+    &__options {
+      @apply border-transparent text-second-800 bg-transparent hover:bg-second-300 hover:text-indigo-800 mx-2 p-2 transition duration-150 ease-out;
+    }
+    &__add {
+      @apply border-transparent text-second-50 bg-green-500 hover:bg-green-600 mr-2;
+    }
+    &__add--special {
+      @apply border-2 border-second-400 text-second-400 bg-transparent group-hover:bg-second-200 group-hover:text-second-600 group-hover:border-second-600;
+    }
+    &__mobile-only {
+      @apply lg:hidden;
+    }
+    &__desktop-only {
+      @apply hidden lg:inline-flex;
+    }
   }
-  &__mobile-only {
-    @apply lg:hidden;
-  }
-  &__desktop-only {
-    @apply hidden lg:inline-flex;
-  }
-}
 </style>

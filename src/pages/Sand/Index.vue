@@ -68,7 +68,7 @@
                     :class="st.description ? 'text-gray-500' : 'text-gray-400 italic'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ st.description || "Sin definir" }}
+                    {{ st.description || 'Sin definir' }}
                   </td>
                   <td
                     :class="st.meshType ? 'text-green-500' : 'text-blue-500'"
@@ -108,86 +108,85 @@
 </template>
 
 <script>
-import { onMounted, ref } from 'vue';
-import { useStore } from 'vuex';
-import Layout from '@/layouts/Main.vue';
-import UiBtn from '@/components/ui/Button.vue';
-import { TrashIcon } from '@heroicons/vue/outline';
-import axios from 'axios';
-
+  import { onMounted, ref } from 'vue';
+  import { useStore } from 'vuex';
+  import Layout from '@/layouts/Main.vue';
+  import UiBtn from '@/components/ui/Button.vue';
+  import { TrashIcon } from '@heroicons/vue/outline';
+  import axios from 'axios';
 const api = import.meta.env.VITE_API_URL;
 
-export default {
- components: {
-   Layout,
-   UiBtn,
-   TrashIcon: TrashIcon,
- },
-setup() {
-    const store = useStore();
-    const stDB = ref([]);
-    const sandDB = JSON.parse(JSON.stringify(store.state.sand.all));
-    
-    onMounted(async () => {
-      const loading = ref(true);
-      stDB.value = await axios
-        .get(`${api}/sand`)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            // console.log('data', res.data.data)
-            return res.data.data;
-          }
-          return [];
-        })
-        .finally(() => {
-          loading.value = false;
-        });
+  export default {
+    components: {
+      Layout,
+      UiBtn,
+      TrashIcon: TrashIcon,
+    },
+    setup() {
+      const store = useStore();
+      const stDB = ref([]);
+      const sandDB = JSON.parse(JSON.stringify(store.state.sand.all));
 
-      if (stDB.value && stDB.value.length > 0) {
-        if (stDB.value.length > sandDB.length) {
-          if (sandDB.length === 0) {
-            stDB.value.forEach((st, sKey) => {
-              store.dispatch('saveSand', st);
-            });
-          } else {
-            const newsDB = stDB.value.filter((stFromApi, key) => {
-              return stFromApi.id && sandDB[key] && stFromApi.id !== sandDB[key].id;
-            });
-            newsDB.forEach((st, stKey) => {
-              store.dispatch('saveSand', st);
-            });
+      onMounted(async () => {
+        const loading = ref(true);
+        stDB.value = await axios
+          .get(`${api}/sand`)
+          .catch((err) => {
+            console.log(err);
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              // console.log('data', res.data.data)
+              return res.data.data;
+            }
+            return [];
+          })
+          .finally(() => {
+            loading.value = false;
+          });
+
+        if (stDB.value && stDB.value.length > 0) {
+          if (stDB.value.length > sandDB.length) {
+            if (sandDB.length === 0) {
+              stDB.value.forEach((st, sKey) => {
+                store.dispatch('saveSand', st);
+              });
+            } else {
+              const newsDB = stDB.value.filter((stFromApi, key) => {
+                return stFromApi.id && sandDB[key] && stFromApi.id !== sandDB[key].id;
+              });
+              newsDB.forEach((st, stKey) => {
+                store.dispatch('saveSand', st);
+              });
+            }
           }
         }
-      }
-    });
+      });
 
-    const deleteFrom = async(id) => {
-      const loading = ref(true);
-      let sandDB = await axios
-        .delete(`${api}/sand/${id}`)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            console.log('OK', id)
-            return res.data;
-          }
-          return {};
-        })
-        .finally(() => {
-          loading.value = false;
-          stDB.value = stDB.value.filter(st => st.id !== id)
-        });
-    }
+      const deleteFrom = async (id) => {
+        const loading = ref(true);
+        let sandDB = await axios
+          .delete(`${api}/sand/${id}`)
+          .catch((err) => {
+            console.log(err);
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              console.log('OK', id);
+              return res.data;
+            }
+            return {};
+          })
+          .finally(() => {
+            loading.value = false;
+            stDB.value = stDB.value.filter((st) => st.id !== id);
+          });
+      };
 
-    return {
-      stDB,
-      deleteFrom
-    };
-  },
-};
+      return {
+        stDB,
+        deleteFrom,
+      };
+    },
+  };
 </script>

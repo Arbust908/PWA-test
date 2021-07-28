@@ -78,7 +78,7 @@
                         <PencilAltIcon class="w-5 h-5" />
                         <span> Editar </span>
                       </router-link>
-                      <button @click="deleteSP(pn.id)" class="flex text-red-600 hover:text-red-900">
+                      <button class="flex text-red-600 hover:text-red-900" @click="deleteSP(pn.id)">
                         <TrashIcon class="w-5 h-5" />
                         <span> Eliminar </span>
                       </button>
@@ -100,49 +100,49 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { useStore } from 'vuex';
-import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
-import Layout from '@/layouts/Main.vue';
-import UiBtn from '@/components/ui/Button.vue';
+  import { ref } from 'vue';
+  import { useStore } from 'vuex';
+  import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
+  import Layout from '@/layouts/Main.vue';
+  import UiBtn from '@/components/ui/Button.vue';
 
-export default {
-  components: {
-    Layout,
-    PencilAltIcon,
-    TrashIcon,
-    UiBtn,
-  },
-  setup() {
-    const pNs = ref([]);
-    const store = useStore();
-    const allproviderNotifications = JSON.parse(JSON.stringify(store.state.providerNotification.all));
-    pNs.value = allproviderNotifications;
-    const sumQty = (sandOrder) => {
-      return sandOrder.reduce((totalSum, sO) => {
-        return totalSum + sO.amount;
-      }, 0);
-    };
-    const sumTransport = (transportProviders) => {
-      return transportProviders.reduce((totalSum, tP) => {
-        return totalSum + tP.amount;
-      }, 0);
-    };
-    const deletePN = (id) => {
-      const loading = ref(true);
-      pNs.value = pNs.value.filter((pn) => {
-        return pn.id !== id;
-      });
-      loading.value = false;
-    };
-    console.log(pNs.value);
+  export default {
+    components: {
+      Layout,
+      PencilAltIcon,
+      TrashIcon,
+      UiBtn,
+    },
+    setup() {
+      const pNs = ref([]);
+      const store = useStore();
+      const allproviderNotifications = JSON.parse(JSON.stringify(store.state.providerNotification.all));
+      pNs.value = allproviderNotifications;
+      const sumQty = (sandOrder) => {
+        return sandOrder.reduce((totalSum, sO) => {
+          return totalSum + sO.amount;
+        }, 0);
+      };
+      const sumTransport = (transportProviders) => {
+        return transportProviders.reduce((totalSum, tP) => {
+          return totalSum + tP.amount;
+        }, 0);
+      };
+      const deletePN = (id) => {
+        const loading = ref(true);
+        pNs.value = pNs.value.filter((pn) => {
+          return pn.id !== id;
+        });
+        loading.value = false;
+      };
+      console.log(pNs.value);
 
-    return {
-      pNs,
-      deletePN,
-      sumQty,
-      sumTransport,
-    };
-  },
-};
+      return {
+        pNs,
+        deletePN,
+        sumQty,
+        sumTransport,
+      };
+    },
+  };
 </script>
