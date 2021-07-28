@@ -18,9 +18,7 @@
       ModalGeneral,
     },
     setup() {
-      console.log(import.meta.env);
       let isDark = ref(false);
-      // const router = useRouter();
       if (localStorage.getItem('user') !== null) {
         const user = JSON.parse(localStorage.getItem('user'));
         const { setUser } = useActions(['setUser']);
