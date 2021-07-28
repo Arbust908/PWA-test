@@ -33,7 +33,7 @@ export default {
       commit('SET_TRANSPORTPROVIDERS', transportProviders)
     },
     saveTransportProvider({ commit }, transportProvider) {
-      const baseSP = {
+      const baseTP = {
         id: 0,
         name: "",
         legalName: "",
@@ -43,7 +43,7 @@ export default {
         observations: "",
         companyRepresentativeId: 0
       };
-      commit('ADD_TRANSPORTPROVIDER', { ...baseSP, ...transportProvider });
+      commit('ADD_TRANSPORTPROVIDER', { ...baseTP, ...transportProvider });
       // if (transportProvider.isFull) {
       //   // Axios POST to api to create transport provider
       // } else {

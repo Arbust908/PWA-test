@@ -5,6 +5,7 @@ import global from '@/store/global';
 import workOrders from '@/store/workOrders';
 import sand from '@/store/sand';
 import sandProviders from '@/store/sandProviders';
+import transportProviders from '@/store/transportProviders';
 
 const store = createStore({
   state: {
@@ -39,6 +40,7 @@ const store = createStore({
     workOrders,
     sand,
     sandProviders,
+    transportProviders
   },
   strict: true,
 });
