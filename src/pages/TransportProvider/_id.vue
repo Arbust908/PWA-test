@@ -68,7 +68,7 @@ import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 import { TransportProvider } from '@/interfaces/TransportProvider';
 
 import axios from 'axios';
-const api = 'https://sandflow-staging.bitpatagonia.com/api';
+const api = import.meta.env.VITE_API_URL;
 
 export default {
   components: {
