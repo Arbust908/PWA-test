@@ -1,46 +1,64 @@
 <template>
   <Layout>
-    <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de Pedido - {{ id }}</h1>
+    <header
+      class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
+    >
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+        Orden de Pedido
+      </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <legend class="col-span-12 text-xl">Arena</legend>
+          <h2 class="col-span-12 text-xl">Arena</h2>
           <label class="col-span-12" for="sandProvider">
             <span>Proveedor</span>
-            <input
-              v-model="sandProvider.name"
+            <select
+              id="sandProvider"
+              v-model="sandProviderId"
               class="input"
-              type="text"
               name="sandProvider"
-              list="sandProvider"
-              placeholder="Proveedor de Arena"
-            />
-            <datalist id="sandProvider">
-              <option value="San Luis">San Luis</option>
-              <option value="Orange">Orange</option>
-            </datalist>
+            >
+              <option selected disabled value="">
+                Seleccciona Proveedor de Arena
+              </option>
+              <option
+                v-for="sP in sandProviders.data"
+                :key="sP.id + sP.name"
+                :value="sP.id"
+              >
+                {{ sP.name }}
+              </option>
+            </select>
           </label>
-          <template v-for="(order, orderKey) in sandProvider.sandOrders" :key="orderKey">
+          <template v-for="(order, orderKey) in sandOrder" :key="orderKey">
             <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
             <label class="col-span-10" for="sandType">
               <span>Tipo</span>
-              <input
-                v-model="order.type"
+              <select
+                id="sandType"
+                v-model="order.sandTypeId"
                 class="input"
-                type="text"
                 name="sandType"
-                list="sandType"
-                placeholder="arena-#30/40"
-              />
-              <datalist id="sandType">
-                <option value="30/40">Arena #30/40</option>
-                <option value="50/100">Arena #30/40</option>
-              </datalist>
+              >
+                <option selected disabled value="">
+                  Seleccciona Tipo de Arena
+                </option>
+                <option
+                  v-for="sT in sandTypes.data"
+                  :key="sT.id + sT.type"
+                  :value="sT.id"
+                >
+                  {{ sT.type }}
+                </option>
+              </select>
             </label>
             <div class="col-span-2 flex justify-end items-end">
-              <CircularBtn class="btn__delete" size="sm" @click="removeOrder(order.id)">
+              <CircularBtn
+                class="btn__delete"
+                size="sm"
+                @click="removeOrder(order.id)"
+              >
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
@@ -66,7 +84,7 @@
                     border-gray-300
                     sm:text-sm
                   "
-                  placeholder="22"
+                  placeholder="Cantidad de Arena"
                   list="sandQuantity"
                 />
                 <datalist id="sandQuantity">
@@ -101,7 +119,7 @@
                 type="text"
                 name="sandBoxId"
                 list="sandBoxId"
-                placeholder="Ingrear ID"
+                placeholder="Ingrear ID de caja"
               />
               <datalist id="sandBoxId">
                 <option value="#123">#123</option>
@@ -109,7 +127,10 @@
               </datalist>
             </label>
           </template>
-          <button class="col-span-full mt-1 flex items-center" @click.prevent="addOrder">
+          <button
+            class="col-span-full mt-1 flex items-center"
+            @click.prevent="addOrder"
+          >
             <CircularBtn class="btn__add" size="xs">
               <PlusIcon class="w-4 h-4" />
             </CircularBtn>
@@ -117,21 +138,26 @@
           </button>
         </fieldset>
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <legend class="col-span-full text-xl">Transporte</legend>
+          <h2 class="col-span-full text-xl">Transporte</h2>
           <label class="col-span-full" for="transportProvider">
             <span>Proveedor</span>
-            <input
-              v-model="transportProvider.name"
+            <select
+              id="transportProvider"
+              v-model="transportProviderId"
               class="input"
-              type="text"
               name="transportProvider"
-              list="transportProvider"
-              placeholder="Proveedor de Transporte"
-            />
-            <datalist id="transportProvider">
-              <option value="Logistica Rapida">Logistica Rapida</option>
-              <option value="Orange">Orange</option>
-            </datalist>
+            >
+              <option selected disabled value="-1">
+                Proveedor de Transporte
+              </option>
+              <option
+                v-for="tP in transportProviders.data"
+                :key="tP.id + tP.name"
+                :value="tP.id"
+              >
+                {{ tP.name }}
+              </option>
+            </select>
           </label>
 
           <label class="col-span-6" for="transportId">
@@ -142,7 +168,7 @@
               type="text"
               name="transportId"
               list="transportId"
-              placeholder="AC 245 XX"
+              placeholder="Patente del Transporte"
             />
             <datalist id="transportId">
               <option value="AC 245 WC">AC 245 WC</option>
@@ -158,7 +184,7 @@
               type="number"
               name="quantityBoxes"
               list="quantityBoxes"
-              placeholder="0"
+              placeholder="Cantidad de cajas"
             />
             <datalist id="quantityBoxes">
               <option value="1">1</option>
@@ -186,7 +212,9 @@
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
-        <button @click.prevent="$router.push('/orden-de-pedido')">Cancelar</button>
+        <button @click.prevent="$router.push('/orden-de-pedido')">
+          Cancelar
+        </button>
         <PrimaryBtn
           type="submit"
           size="sm"
@@ -197,6 +225,9 @@
         >
           Crear Orden
         </PrimaryBtn>
+        <PrimaryBtn type="submit" size="sm" class="p-4" @click.prevent="save()">
+          Crear r
+        </PrimaryBtn>
       </footer>
     </section>
   </Layout>
@@ -204,9 +235,9 @@
 
 <script lang="ts">
 import { ref, Ref, reactive, computed, ComputedRef, toRaw } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { createNamespacedHelpers } from 'vuex-composition-helpers';
-const { useState, useActions, useGetters } = createNamespacedHelpers('purchaseOrder');
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import { useState, useActions } from 'vuex-composition-helpers';
 
 import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
 import { PlusIcon } from '@heroicons/vue/solid';
@@ -215,8 +246,15 @@ import PurchaseOrderForm from '@/components/purchaseOrder/Form.vue';
 import GhostBtn from '@/components/ui/GhostBtn.vue';
 import CircularBtn from '@/components/ui/CircularBtn.vue';
 import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-import { PurchaseOrder, SandProvider, SandOrder, TransportProvider } from '@/interfaces/PurchaseOrder.ts';
-import { useStore } from 'vuex';
+import {
+  PurchaseOrder,
+  SandProvider,
+  SandOrder,
+  TransportProvider,
+} from '@/interfaces/PurchaseOrder.ts';
+import axios from 'axios';
+import { useAxios } from '@vueuse/integrations/useAxios';
+const api = import.meta.env.VITE_API_URL;
 
 export default {
   components: {
@@ -231,83 +269,134 @@ export default {
   setup() {
     // Init
     const store = useStore();
-    const route = useRoute();
     const router = useRouter();
-    const id = route.params.id;
-    // ::
-    // PurchaseOrder
-    const purchaseOrder: PurchaseOrder = store.getters.getPurchaseOrder(id);
-    console.log(purchaseOrder);
-    // ::
-    // SandProvider
-    const { sandProvider }: SandProvider = purchaseOrder;
-    console.log(sandProvider);
+    const instance = axios.create({
+      baseURL: api,
+    });
+
+    const {
+      data: sandProviders,
+      isFinished: sPs_end,
+      isLoading: sPs_load,
+      error: sPs_error,
+    } = useAxios('/sandProvider', instance);
+    const sandProviderId: Ref<number> = ref('');
+    const sandOrder: Ref<Array<any>> = ref([
+      {
+        id: 0,
+        sandType: {},
+        sandTypeId: '',
+        quantity: null,
+        boxId: '',
+      },
+    ]);
+
+    const { data, isFinished, isLoading, error } = useAxios(
+      '/sandOrder',
+      instance
+    );
+    const {
+      data: sandTypes,
+      isFinished: sTs_end,
+      isLoading: sTs_load,
+      error: sTs_error,
+    } = useAxios('/sand', instance);
+
     const removeOrder = (id: number): void => {
-      sandProvider.sandOrder = sandProvider.sandOrder.filter((sandOrder: SandOrder) => sandOrder.id !== id);
+      sandOrder.value = sandOrder.value.filter(
+        (sandOrder: SandOrder) => sandOrder.id !== id
+      );
     };
     const addOrder = (): void => {
-      const lastSandOrder = sandProvider.sandOrder[sandProvider.sandOrder.length - 1];
+      const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
       const newId = lastSandOrder.id + 1;
-      sandProvider.sandOrder.push({
+      sandOrder.value.push({
         id: newId,
-        type: '',
+        type: {},
+        sandTypeId: '',
         quantity: null,
         boxId: '',
       });
     };
     const removeEmptySandOrders = (): void => {
-      sandProvider.sandOrder = sandProvider.sandOrder
+      sandOrder.value = sandOrder.value
         .filter((sandOrder: SandOrder) => sandOrder.quantity > 0)
         .filter((sandOrder: SandOrder) => sandOrder.type !== '')
         .filter((sandOrder: SandOrder) => sandOrder.boxId !== '');
     };
-
     // ::
     // TransportProvider
-    const { transportProvider }: TransportProvider = purchaseOrder;
+    const {
+      data: transportProviders,
+      isFinished: tPs_end,
+      isLoading: tPs_load,
+      error: tPs_error,
+    } = useAxios('/transportProvider', instance);
+    const transportProviderId: Ref<number> = ref(-1);
+    const transportProvider: TransportProvider = reactive({
+      id: 1,
+      name: '',
+      transportId: '',
+      boxQuantity: null,
+      observation: '',
+    });
 
-    const isSandProviderFull: ComputedRef<boolean> = computed(() => {
-      return !!(
-        sandProvider.id &&
-        sandProvider.name &&
-        sandProvider.sandOrder.length &&
-        sandProvider.sandOrder.every((sandOrder: SandOrder) => sandOrder.type !== '') &&
-        sandProvider.sandOrder.every((sandOrder: SandOrder) => sandOrder.quantity > 0) &&
-        sandProvider.sandOrder.every((sandOrder: SandOrder) => sandOrder.boxId !== '')
-      );
-    });
-    const isTransportProviderFull: ComputedRef<boolean> = computed(() => {
-      return !!(
-        transportProvider.id &&
-        transportProvider.name &&
-        transportProvider.transportId &&
-        transportProvider.boxQuantity
-      );
-    });
     const isFull: ComputedRef<boolean> = computed(() => {
-      return isSandProviderFull.value && isTransportProviderFull.value;
+      return false;
     });
+    const getTPbyId = (id: number): TransportProvider => {
+      return transportProviders.value.data.find((tp) => tp.id === id);
+    };
+    const getSPbyId = (id: number): SandProvider => {
+      return sandProviders.value.data.find((sp) => sp.id === id);
+    };
+
     const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
     const save = (): void => {
       removeEmptySandOrders();
       if (isFull.value) {
-        sandProvider.sandOrder = toRaw(sandProvider.sandOrder);
+        const newTP = getTPbyId(transportProviderId.value);
+        const trueTP = {
+          ...transportProvider,
+          id: newTP.id,
+          name: newTP.name,
+        };
         const purchaseOrder = {
-          sandProvider: { ...sandProvider },
-          transportProvider: { ...transportProvider },
+          sandProviderId: sandProviderId.value,
+          sandProvider: getSPbyId(sandProviderId.value),
+          sandOrders: [...sandOrder.value],
+          transportProviderId: transportProviderId.value,
+          transportProvider: trueTP,
         } as PurchaseOrder;
         savePurchaseOrder(purchaseOrder);
         router.push('/orden-de-pedido');
       }
     };
     return {
-      id,
-      sandProvider,
+      sandProviderId,
+      sandOrder,
       removeOrder,
       addOrder,
       transportProvider,
       isFull,
       save,
+      data,
+      isFinished,
+      isLoading,
+      error,
+      sandProviders,
+      sPs_end,
+      sPs_load,
+      sPs_error,
+      sandTypes,
+      sTs_end,
+      sTs_load,
+      sTs_error,
+      transportProviders,
+      tPs_end,
+      tPs_load,
+      tPs_error,
+      transportProviderId,
     };
   },
 };

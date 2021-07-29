@@ -1,5 +1,8 @@
 <template>
-  <div :class="isDark ? 'dark' : null" class="h-screen w-full flex overflow-hidden font-body">
+  <div
+    :class="isDark ? 'dark' : null"
+    class="h-screen w-full flex overflow-hidden font-body"
+  >
     <router-view class="w-full"></router-view>
   </div>
 </template>
@@ -12,7 +15,6 @@ import { useRouter } from 'vue-router';
 export default {
   setup() {
     let isDark = ref(false);
-    console.log(import.meta.env);
     const router = useRouter();
     const { getUserToken: loggedUser } = useGetters(['getUserToken']);
     if (localStorage.getItem('user') && !loggedUser.value) {

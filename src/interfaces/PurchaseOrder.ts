@@ -1,6 +1,7 @@
 export interface PurchaseOrder {
     id: number,
     sandProvider: SandProvider,
+    sandOrders: Array<SandOrder>,
     transportProvider: TransportProvider,
 }
 export interface SandProvider {

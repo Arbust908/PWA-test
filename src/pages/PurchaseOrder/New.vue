@@ -84,7 +84,7 @@
                     border-gray-300
                     sm:text-sm
                   "
-                  placeholder="22"
+                  placeholder="Cantidad de Arena"
                   list="sandQuantity"
                 />
                 <datalist id="sandQuantity">
@@ -119,7 +119,7 @@
                 type="text"
                 name="sandBoxId"
                 list="sandBoxId"
-                placeholder="Ingrear ID"
+                placeholder="Ingrear ID de caja"
               />
               <datalist id="sandBoxId">
                 <option value="#123">#123</option>
@@ -168,7 +168,7 @@
               type="text"
               name="transportId"
               list="transportId"
-              placeholder="AC 245 XX"
+              placeholder="Patente del Transporte"
             />
             <datalist id="transportId">
               <option value="AC 245 WC">AC 245 WC</option>
@@ -184,7 +184,7 @@
               type="number"
               name="quantityBoxes"
               list="quantityBoxes"
-              placeholder="0"
+              placeholder="Cantidad de cajas"
             />
             <datalist id="quantityBoxes">
               <option value="1">1</option>
@@ -224,6 +224,9 @@
           @click.prevent="isFull && save()"
         >
           Crear Orden
+        </PrimaryBtn>
+        <PrimaryBtn type="submit" size="sm" class="p-4" @click.prevent="save()">
+          Crear r
         </PrimaryBtn>
       </footer>
     </section>
@@ -338,38 +341,32 @@ export default {
       observation: '',
     });
 
-    const isSandProviderFull: ComputedRef<boolean> = computed(() => {
-      return !!(
-        sandProviderId.value &&
-        sandOrder.value.length &&
-        sandOrder.value.every(
-          (sandOrder: SandOrder) => sandOrder.type !== ''
-        ) &&
-        sandOrder.value.every(
-          (sandOrder: SandOrder) => sandOrder.quantity > 0
-        ) &&
-        sandOrder.value.every((sandOrder: SandOrder) => sandOrder.boxId !== '')
-      );
-    });
-    const isTransportProviderFull: ComputedRef<boolean> = computed(() => {
-      return !!(
-        transportProvider.id &&
-        transportProvider.name &&
-        transportProvider.transportId &&
-        transportProvider.boxQuantity
-      );
-    });
     const isFull: ComputedRef<boolean> = computed(() => {
-      return isSandProviderFull.value && isTransportProviderFull.value;
+      return false;
     });
+    const getTPbyId = (id: number): TransportProvider => {
+      return transportProviders.value.data.find((tp) => tp.id === id);
+    };
+    const getSPbyId = (id: number): SandProvider => {
+      return sandProviders.value.data.find((sp) => sp.id === id);
+    };
+
     const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
     const save = (): void => {
       removeEmptySandOrders();
       if (isFull.value) {
-        sandOrder = toRaw(sandOrder);
+        const newTP = getTPbyId(transportProviderId.value);
+        const trueTP = {
+          ...transportProvider,
+          id: newTP.id,
+          name: newTP.name,
+        };
         const purchaseOrder = {
-          sandProvider: { ...sandProvider },
-          transportProvider: { ...transportProvider },
+          sandProviderId: sandProviderId.value,
+          sandProvider: getSPbyId(sandProviderId.value),
+          sandOrders: [...sandOrder.value],
+          transportProviderId: transportProviderId.value,
+          transportProvider: trueTP,
         } as PurchaseOrder;
         savePurchaseOrder(purchaseOrder);
         router.push('/orden-de-pedido');
