@@ -5,14 +5,13 @@
     </header>
     <section class="bg-second-50 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <!-- {{ sandTypes }} -->
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Arena</h2>
           <label class="col-span-full" for="sandProvider">
             <span>Proveedor</span>
             <select
               id="sandProvider"
-              v-model="sandProvider"
+              v-model="sandProviderId"
               :class="sP_end ? null : 'loading'"
               class="input"
               name="sandProvider"
@@ -101,44 +100,45 @@
         </fieldset>
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Transporte</h2>
-          <template v-for="(tP, tPKey) in transportProviders" :key="tPKey">
-            <hr v-if="tPKey !== 0" class="mt-4 mb-2 col-span-full" />
+          <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
+            <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
             <label
-              :class="transportProviders.length > 1 ? 'col-span-10' : 'col-span-full'"
-              :for="'transportProvider' + tP.id"
+              :class="transportProviders && transportProviders.length > 1 ? 'col-span-10' : 'col-span-full'"
+              :for="'transportProvider' + tO.id"
             >
               <span>Proveedor</span>
-              <input
-                :id="'transportProvider' + tP.id"
-                v-model="tP.name"
+              <select
+                :id="'transportProvider' + tO.id"
+                v-model="tO.id"
                 class="input"
-                type="text"
-                :name="'transportProvider' + tP.id"
-                :list="'transportProvider' + tP.id + '-list'"
-                placeholder="Proveedor de Transpore"
-              />
-              <datalist :id="'transportProvider' + tP.id + '-list'">
-                <option value="San Luis">San Luis</option>
-                <option value="Orange">Orange</option>
-              </datalist>
+                :name="'transportProvider' + tO.id"
+              >
+                <option selected disabled value="-1">Proveedor de Transpore</option>
+                <option v-for="(tP, tPKey) in transportProviders.data" :key="tPKey" :value="tP.id">
+                  {{ tP.name }}
+                </option>
+              </select>
             </label>
-            <div v-if="transportProviders.length > 1" class="col-span-2 flex justify-end items-end">
-              <CircularBtn class="btn__delete" size="sm" @click="removeTransportProvider(tP.id)">
+            <div
+              v-if="transportProviders && transportProviders.length > 1"
+              class="col-span-2 flex justify-end items-end"
+            >
+              <CircularBtn class="btn__delete" size="sm" @click="removeTransportProvider(tO.id)">
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
-            <label class="col-span-full" :for="'transportAmount' + tP.id">
+            <label class="col-span-full" :for="'transportAmount' + tO.id">
               <span>Cantidad de camiones</span>
               <input
-                :id="'transportAmount' + tP.id"
-                v-model="tP.amount"
+                :id="'transportAmount' + tO.id"
+                v-model.number="tO.amount"
                 class="input"
                 type="text"
-                :name="'transportAmount' + tP.id"
-                :list="'transportAmount' + tP.id + '-list'"
+                :name="'transportAmount' + tO.id"
+                :list="'transportAmount' + tO.id + '-list'"
                 placeholder="Cantidad de camiones"
               />
-              <datalist :id="'transportAmount' + tP.id + '-list'">
+              <datalist :id="'transportAmount' + tO.id + '-list'">
                 <option value="1">1 Camion</option>
                 <option value="2">2 Camiones</option>
                 <option value="4">4 Camiones</option>
@@ -147,18 +147,18 @@
               </datalist>
             </label>
 
-            <label class="col-span-full" :for="'transportObservations' + tP.id">
+            <label class="col-span-full" :for="'transportObservations' + tO.id">
               <span>Observaciones</span>
               <input
-                :id="'transportObservations' + tP.id"
-                v-model.number="tP.observation"
+                :id="'transportObservations' + tO.id"
+                v-model="tO.observation"
                 class="input"
                 type="text"
-                :name="'transportObservations' + tP.id"
-                :list="'transportObservations' + tP.id + '-list'"
+                :name="'transportObservations' + tO.id"
+                :list="'transportObservations' + tO.id + '-list'"
                 placeholder="Observaciones"
               />
-              <datalist :id="'transportObservations' + tP.id + '-list'">
+              <datalist :id="'transportObservations' + tO.id + '-list'">
                 <option value="Chasis Grande">Chasis Grande</option>
                 <option value="Chasis Chico">Chasis Chico</option>
                 <option value="Doble Carga">Doble Carga</option>
@@ -188,6 +188,7 @@
         >
           Cargar Planificacíon
         </PrimaryBtn>
+        <PrimaryBtn type="submit" size="sm" class="p-4" @click.prevent="save()"> nificacíon </PrimaryBtn>
       </footer>
     </section>
     <Modal title="Notificación a Proveedores" type="off" :open="showModal" @close="toggleModal">
@@ -291,6 +292,7 @@
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   import { SandProvider } from '@/interfaces/SandProvider';
+  import { Sand } from '@/interfaces/SandType';
   import SelectList from '@/components/ui/SelectList.vue';
   const apiUrl = import.meta.env.VITE_API_URL;
 
@@ -319,12 +321,12 @@
       const sandProviders: Ref<Array<SandProvider> | null> = ref(sPData);
 
       const { data: sData, isFinished: s_end } = useAxios('/sand', api);
-      const sandTypes: Ref<Array<SandType> | null> = ref(sData);
+      const sandTypes: Ref<Array<Sand> | null> = ref(sData);
 
       const { data: tPData, isFinished: tP_end } = useAxios('/transportProvider', api);
       const transportProviders: Ref<Array<TransportProvider> | null> = ref(tPData);
 
-      const sandProvider: Ref<string> = ref('');
+      const sandProviderId: Ref<string> = ref('');
       const sandOrder: Ref<Array<SandOrder>> = ref([]);
       const transportOrder: Ref<Array<TransportProvider>> = ref([]);
 
@@ -336,7 +338,7 @@
       };
       const addSandOrder = () => {
         const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
-        const lastSandOrderId = lastSandOrder ? lastSandOrder.id : 0;
+        const lastSandOrderId = lastSandOrder ? lastSandOrder.id : -1;
         const newSandOrder = { ...defaultSandOrder };
         newSandOrder.id = lastSandOrderId + 1;
         sandOrder.value.push(newSandOrder);
@@ -357,7 +359,7 @@
       };
       const addTransportProvider = () => {
         const lastTransportProvider = transportOrder.value[transportOrder.value.length - 1];
-        const lastTransportProviderId = lastTransportProvider ? lastTransportProvider.id : 0;
+        const lastTransportProviderId = lastTransportProvider ? lastTransportProvider.id : -2;
         const newTransportProvider = { ...defaultTransportProvider };
         newTransportProvider.id = lastTransportProviderId + 1;
         transportOrder.value.push(newTransportProvider);
@@ -371,52 +373,44 @@
 
       const isFull = computed(() => {
         return !!(
-          sandProvider.value &&
+          sandProviderId.value &&
           sandOrder.value &&
           sandOrder.value.every((so) => so.amount >= 0) &&
           sandOrder.value.every((so) => so.sandType) &&
           transportProviders.value &&
-          transportProviders.value.every((tp) => tp.amount >= 0) &&
-          transportProviders.value.every((tp) => tp.name)
+          transportProviders.value?.data.every((tp) => tp.amount >= 0) &&
+          transportProviders.value?.data.every((tp) => tp.name)
         );
       });
 
       const showModal = ref(false);
       const toggleModal = useToggle(showModal);
       const save = async () => {
-        toggleModal(true);
-      };
-      const confirm = async () => {
-        pN.value = {
-          sandProvider: sandProvider.value,
+        console.log(sandProviderId.value, sandOrder.value, transportProviders.value.data);
+        console.log({
+          sandProviderId: sandProviderId.value,
           sandOrder: sandOrder.value,
-          transportProviders: transportProviders.value,
-        };
-        const newPN = await axios
-          .post(`${api}/sand`, pN.value)
-          .catch((err) => {
-            console.log(err);
-            return false;
-          })
-          .then((res) => {
-            console.log(res);
-            if (res.status === 200) {
-              return res.data;
-            }
-            return {};
-          })
-          .finally(() => {});
-        toggleModal(false);
-        store.dispatch('saveProviderNotification', pN.value);
-        router.push('/notificaciones-a-proveedores');
+        });
+        // toggleModal(true);
       };
+      // const confirm = async () => {
+      //   pN.value = {
+      //     sandProvider: sandProvider.value,
+      //     sandOrder: sandOrder.value,
+      //     transportProviders: transportProviders.value,
+      //   };
+
+      //   toggleModal(false);
+      //   store.dispatch('saveProviderNotification', pN.value);
+      //   router.push('/notificaciones-a-proveedores');
+      // };
 
       const toCapitalize = (str: string) => {
         return str.charAt(0).toUpperCase() + str.slice(1);
       };
 
       return {
-        sandProvider,
+        sandProviderId,
         sandOrder,
         transportProviders,
         addSandOrder,
@@ -434,6 +428,7 @@
         s_end,
         sandTypes,
         tP_end,
+        transportOrder,
       };
     },
   });
