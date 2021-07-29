@@ -198,125 +198,154 @@
 </template>
 
 <script lang="ts">
-  import { onMounted, ref, watch } from 'vue';
-  import { useStore } from 'vuex';
-  import {
-    TrashIcon,
-    PencilAltIcon,
-    InformationCircleIcon,
-    ExclamationCircleIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/solid';
-  import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/Button.vue';
-  import axios from 'axios';
-  import { useAxios } from '@vueuse/integrations/useAxios';
-  import { useNProgress } from '@vueuse/integrations/useNProgress';
-  import { debouncedWatch } from '@vueuse/core';
-  import { WorkOrder } from '@/interfaces/WorkOrder';
-  const api = import.meta.env.VITE_API_URL;
-
-  export default {
-    components: {
-      ExclamationCircleIcon,
-      CheckCircleIcon,
-      UiBtn,
+    import { onMounted, ref, watch } from 'vue';
+    import { useStore } from 'vuex';
+    import {
       TrashIcon,
       PencilAltIcon,
-      Layout,
       InformationCircleIcon,
-    },
-    setup() {
-      const instance = axios.create({
-        baseURL: api + '/workOrder',
-      });
-      const store = useStore();
-      const workOrders = store.state.workOrders.all;
+      ExclamationCircleIcon,
+      CheckCircleIcon,
+    } from '@heroicons/vue/solid';
+    import Layout from '@/layouts/Main.vue';
+    import UiBtn from '@/components/ui/Button.vue';
+    import axios from 'axios';
+    import { useAxios } from '@vueuse/integrations/useAxios';
+    import { useNProgress } from '@vueuse/integrations/useNProgress';
+    import { debouncedWatch } from '@vueuse/core';
+    import { WorkOrder } from '@/interfaces/WorkOrder';
+    const api = import.meta.env.VITE_API_URL;
 
     export default {
       components: {
-        Layout,
+        ExclamationCircleIcon,
+        CheckCircleIcon,
         UiBtn,
         TrashIcon,
         PencilAltIcon,
+        Layout,
         InformationCircleIcon,
-        ExclamationCircleIcon,
-        CheckCircleIcon,
       },
       setup() {
         const instance = axios.create({
-          baseURL: 'https://sandflow-qa.bitpatagonia.com/api/workOrder',
+          baseURL: api + '/workOrder',
         });
         const store = useStore();
         const workOrders = store.state.workOrders.all;
 
-        const { data, isFinished, isLoading, error } = useAxios('/', instance);
-        const { progress, isLoading: loading, start, done } = useNProgress();
-        watch(isLoading, (load, prevLoad) => {
-          start();
-        });
-        const woDB: Ref<Array<WorkOrder>> = ref([] as Array<WorkOrder>);
-        watch(data, (currentData, prevData) => {
-          if (currentData) {
-            woDB.value = currentData.data;
-          }
-        });
+      export default {
+        components: {
+          Layout,
+          UiBtn,
+          TrashIcon,
+          PencilAltIcon,
+          InformationCircleIcon,
+          ExclamationCircleIcon,
+          CheckCircleIcon,
+        },
+        setup() {
+          const instance = axios.create({
+            baseURL: 'https://sandflow-qa.bitpatagonia.com/api/workOrder',
+          });
+          const store = useStore();
+          const workOrders = store.state.workOrders.all;
 
-        debouncedWatch(
-          isFinished,
-          () => {
-            if (isFinished.value) {
-              const left = 1 - (progress.value || 0);
-              const loading = setInterval(() => {
-                progress.value += left / 10;
-                if (progress.value >= 1) {
-                  clearInterval(loading);
-                }
-              }, 100);
+          const { data, isFinished, isLoading, error } = useAxios('/', instance);
+          const { progress, isLoading: loading, start, done } = useNProgress();
+          watch(isLoading, (load, prevLoad) => {
+            start();
+          });
+          const woDB: Ref<Array<WorkOrder>> = ref([] as Array<WorkOrder>);
+          watch(data, (currentData, prevData) => {
+            if (currentData) {
+              woDB.value = currentData.data;
             }
+  <<<<<<< HEAD
+          });
+
+          debouncedWatch(
+            isFinished,
+            () => {
+              if (isFinished.value) {
+                const left = 1 - (progress.value || 0);
+                const loading = setInterval(() => {
+                  progress.value += left / 10;
+                  if (progress.value >= 1) {
+                    clearInterval(loading);
+                  }
+                }, 100);
+              }
+            },
+            { debounce: 500 }
+          );
+          if (woDB.value && woDB.value.length > 0) {
+            if (woDB.value.length > workOrders.value.length) {
+              if (workOrders.value.length === 0) {
+                woDB.value.forEach((wo) => {
+                  store.dispatch('saveWorkOrder', wo);
+                });
+              } else {
+                const newWoDB = woDB.value.filter((woFromApi, key) => {
+                  return woFromApi.id && workOrders.value[key] && woFromApi.id !== workOrders.value[key].id;
+                });
+                newWoDB.forEach((wo) => {
+                  store.dispatch('saveWorkOrder', wo);
+                });
+              }
+            }
+          }
+          const deleteWO = (woId) => {
+            start();
+            const { data, isFinished } = useAxios(`/${woId}`, { method: 'DELETE' }, instance);
+            watch(isFinished, (load, prevLoad) => {
+              store.dispatch('deleteWorkOrder', woId);
+              woDB.value = woDB.value.filter((woFromApi) => {
+                return woFromApi.id !== woId;
+              });
+              done();
+  =======
           },
           { debounce: 500 }
         );
         if (woDB.value && woDB.value.length > 0) {
           if (woDB.value.length > workOrders.value.length) {
             if (workOrders.value.length === 0) {
-              woDB.value.forEach((wo) => {
+              woDB.value.forEach((wo: WorkOrder) => {
                 store.dispatch('saveWorkOrder', wo);
               });
             } else {
-              const newWoDB = woDB.value.filter((woFromApi, key) => {
+              const newWoDB = woDB.value.filter((woFromApi: WorkOrder, key: number) => {
                 return woFromApi.id && workOrders.value[key] && woFromApi.id !== workOrders.value[key].id;
               });
-              newWoDB.forEach((wo) => {
+              newWoDB.forEach((wo: WorkOrder) => {
                 store.dispatch('saveWorkOrder', wo);
               });
             }
           }
         }
-        const deleteWO = (woId) => {
+        const deleteWO = (woId: number) => {
           start();
           const { data, isFinished } = useAxios(`/${woId}`, { method: 'DELETE' }, instance);
           watch(isFinished, (load, prevLoad) => {
             store.dispatch('deleteWorkOrder', woId);
-            woDB.value = woDB.value.filter((woFromApi) => {
+            woDB.value = woDB.value.filter((woFromApi: WorkOrder) => {
               return woFromApi.id !== woId;
+  >>>>>>> Feat::SFC-7 API bind
             });
-            done();
-          });
-          return isFinished;
-        };
+            return isFinished;
+          };
 
-        return {
-          woDB,
-          deleteWO,
-          isFinished,
-          progress,
-          isLoading,
-          start,
-          done,
-          error,
-          loading,
-        };
-      },
-    };
+          return {
+            woDB,
+            deleteWO,
+            isFinished,
+            progress,
+            isLoading,
+            start,
+            done,
+            error,
+            loading,
+          };
+        },
+      };
 </script>

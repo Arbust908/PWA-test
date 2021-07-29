@@ -5,43 +5,38 @@
     </header>
     <section class="bg-second-50 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
+        <!-- {{ sandTypes }} -->
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Arena</h2>
           <label class="col-span-full" for="sandProvider">
             <span>Proveedor</span>
-            <input
+            <select
               id="sandProvider"
               v-model="sandProvider"
+              :class="sP_end ? null : 'loading'"
               class="input"
-              type="text"
               name="sandProvider"
-              list="sandProvider-list"
-              placeholder="Proveedor de Arena"
-            />
-            <datalist id="sandProvider-list">
-              <option value="San Luis">San Luis</option>
-              <option value="San Lucio">San Lucio</option>
-              <option value="Orange">Orange</option>
-            </datalist>
+            >
+              <option selected disabled value="">Seleccionar Proveedor de Arena</option>
+              <option v-for="sP in sandProviders.data" :key="sP.id" :value="sP.id">{{ toCapitalize(sP.name) }}</option>
+            </select>
           </label>
+
           <template v-for="(sO, Key) in sandOrder" :key="Key">
             <hr v-if="Key !== 0" class="mt-4 mb-2 col-span-full" />
             <label :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'" for="sandType">
               <span>Tipo</span>
-              <input
-                v-model="sO.sandType"
+              <select
+                id="sandProvider"
+                v-model="sO.sandType.id"
+                :class="s_end ? null : 'loading'"
                 class="input"
-                type="text"
-                name="sandType"
-                list="sandType-list"
-                placeholder="Tipo de Arena"
-              />
-              <datalist id="sandType-list">
-                <option value="30/40"></option>
-                <option value="50/100"></option>
-              </datalist>
+                name="sandProvider"
+              >
+                <option selected disabled value="">Seleccionar Tipo de Arena</option>
+                <option v-for="sT in sandTypes.data" :key="sT.id" :value="sT.id">{{ toCapitalize(sT.type) }}</option>
+              </select>
             </label>
-
             <label :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'" for="sandQuantity">
               <span>Cantidad</span>
               <div class="mt-1 flex rounded shadow-sm">
@@ -293,9 +288,11 @@
 
   const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
-  import axios from 'axios'
-  import { useAxios } from '@vueuse/integrations/useAxios'
-  const api = 'https://sandflow-qa.bitpatagonia.com/api';
+  import axios from 'axios';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  import { SandProvider } from '@/interfaces/SandProvider';
+  import SelectList from '@/components/ui/SelectList.vue';
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   export default defineComponent({
     components: {
@@ -307,6 +304,7 @@
       PlusIcon,
       PrimaryBtn,
       TrashIcon,
+      SelectList,
     },
     setup() {
       const router = useRouter();
@@ -314,13 +312,26 @@
 
       const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
 
+      const api = axios.create({
+        baseURL: apiUrl,
+      });
+      const { data: sPData, isFinished: sP_end } = useAxios('/sandProvider', api);
+      const sandProviders: Ref<Array<SandProvider> | null> = ref(sPData);
+
+      const { data: sData, isFinished: s_end } = useAxios('/sand', api);
+      const sandTypes: Ref<Array<SandType> | null> = ref(sData);
+
+      const { data: tPData, isFinished: tP_end } = useAxios('/transportProvider', api);
+      const transportProviders: Ref<Array<TransportProvider> | null> = ref(tPData);
+
       const sandProvider: Ref<string> = ref('');
       const sandOrder: Ref<Array<SandOrder>> = ref([]);
-      const transportProviders: Ref<Array<TransportProvider>> = ref([]);
+      const transportOrder: Ref<Array<TransportProvider>> = ref([]);
 
       const defaultSandOrder: SandOrder = {
         id: 0,
-        sandType: null,
+        sandTypeId: 0,
+        sandType: { id: '', type: '', description: '', meshType: '', grainType: '', observations: '' },
         amount: 0,
       };
       const addSandOrder = () => {
@@ -336,24 +347,25 @@
       if (sandOrder.value.length === 0) {
         addSandOrder();
       }
-
       const defaultTransportProvider: TransportProvider = {
         id: 0,
         name: '',
         amount: 0,
         observation: '',
+        providerNotificationId: 0,
+        providerNotification: { id: 0, sandProviderId: 0, sandOrderId: 0 },
       };
       const addTransportProvider = () => {
-        const lastTransportProvider = transportProviders.value[transportProviders.value.length - 1];
+        const lastTransportProvider = transportOrder.value[transportOrder.value.length - 1];
         const lastTransportProviderId = lastTransportProvider ? lastTransportProvider.id : 0;
         const newTransportProvider = { ...defaultTransportProvider };
         newTransportProvider.id = lastTransportProviderId + 1;
-        transportProviders.value.push(newTransportProvider);
+        transportOrder.value.push(newTransportProvider);
       };
       const removeTransportProvider = (tpId: number) => {
-        transportProviders.value = transportProviders.value.filter((tp) => tp.id !== tpId);
+        transportOrder.value = transportOrder.value.filter((tp) => tp.id !== tpId);
       };
-      if (transportProviders.value.length === 0) {
+      if (transportOrder.value.length === 0) {
         addTransportProvider();
       }
 
@@ -399,6 +411,10 @@
         router.push('/notificaciones-a-proveedores');
       };
 
+      const toCapitalize = (str: string) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      };
+
       return {
         sandProvider,
         sandOrder,
@@ -412,6 +428,12 @@
         toggleModal,
         isFull,
         confirm,
+        sandProviders,
+        sP_end,
+        toCapitalize,
+        s_end,
+        sandTypes,
+        tP_end,
       };
     },
   });
