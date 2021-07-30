@@ -53,7 +53,7 @@
                 </option>
               </select>
             </label>
-            <div class="col-span-2 flex justify-end items-end">
+            <div v-if="sandOrder.length > 1" class="col-span-2 flex justify-end items-end">
               <CircularBtn
                 class="btn__delete"
                 size="sm"
