@@ -80,7 +80,7 @@
       </form>
     </article>
     <Modal
-      title="Notificación a Proveedores"
+      title="Error de inicio"
       type="error"
       :open="showModal"
       @close="toggleModal"
