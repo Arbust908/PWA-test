@@ -79,6 +79,45 @@
         </div>
       </form>
     </article>
+    <Modal
+      title="Notificación a Proveedores"
+      type="error"
+      :open="showModal"
+      @close="toggleModal"
+    >
+      <template #body>
+        <p>Hubo un error al intentar iniciar sesión.</p>
+      </template>
+      <template #btn>
+        <button
+          type="button"
+          class="
+            inline-flex
+            justify-center
+            w-full
+            rounded-md
+            border border-transparent
+            shadow-sm
+            px-4
+            py-2
+            bg-red-200
+            sm:bg-transparent
+            text-base
+            font-medium
+            text-second-400
+            hover:bg-gray-100
+            focus:outline-none
+            focus:ring-2
+            focus:ring-offset-2
+            focus:ring-red-500
+            sm:text-sm
+          "
+          @click.prevent="toggleModal"
+        >
+          Volver
+        </button>
+      </template>
+    </Modal>
   </section>
 </template>
 
@@ -92,13 +131,17 @@
   const Button = defineAsyncComponent(
     () => import('@/components/ui/Button.vue')
   );
-
+  const Modal = defineAsyncComponent(
+    () => import('@/components/modal/General.vue')
+  );
+  import { useToggle } from '@vueuse/core';
   import axios from 'axios';
   const api = import.meta.env.VITE_API_URL;
   export default {
     components: {
       Logo,
       Button,
+      Modal,
     },
     setup() {
       const usernameError: Ref<boolean> = ref(false);
@@ -108,6 +151,9 @@
       const username: Ref<string> = ref('');
       const password: Ref<string> = ref('');
       const shouldRemember: Ref<boolean> = ref(true);
+
+      const showModal = ref(false);
+      const toggleModal = useToggle(showModal);
 
       const validate = (event: any) => {
         const name: string = event.target.name;
@@ -133,39 +179,38 @@
 
       const login = async () => {
         const loading = ref(true);
-        const email =
-          username.value.indexOf('@') > -1
-            ? username.value
-            : `${username.value}@testmail.com`;
-        // const loggedUser: User = { id: 99, username: username.value, role: Role.Logged };
+        const email = username.value;
         const loggedUser = { email, password: password.value };
-        // let fullUser = {};
         let fullUser = await axios
           .post(`${api}/auth/login`, loggedUser)
           .catch((err) => {
             console.log(err);
-            alert('Error al iniciar sesión');
+            return false;
           })
           .then((res) => {
             if (res.status === 200) {
               return res.data.data.token || res.data.token;
             }
-            return {};
+            return false;
           })
           .finally(() => {
             loading.value = false;
           });
-        fullUser = {
-          id: 99,
-          username: username.value,
-          role: Role.Logged,
-          token: fullUser,
-        };
-        if (shouldRemember.value) {
-          localStorage.setItem('user', JSON.stringify(fullUser));
+        if (fullUser) {
+          fullUser = {
+            id: 99,
+            username: username.value,
+            role: Role.Logged,
+            token: fullUser,
+          };
+          if (shouldRemember.value) {
+            localStorage.setItem('user', JSON.stringify(fullUser));
+          }
+          setUser(fullUser);
+          router.push('/');
+        } else {
+          toggleModal(true);
         }
-        setUser(fullUser);
-        router.push('/');
       };
 
       return {
@@ -177,6 +222,8 @@
         formValidation,
         usernameError,
         passwordError,
+        showModal,
+        toggleModal,
       };
     },
   };

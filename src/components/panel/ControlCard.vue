@@ -3,7 +3,7 @@
     <h3>{{ name }}</h3>
     <component :is="icon" class="nav__pic" aria-hidden="true" />
     <component :is="icon" class="nav__pic--bg" aria-hidden="true" />
-    <!-- <button>ir {{ name }}</button> -->
+    <button>ir</button>
   </router-link>
 </template>
 
@@ -69,7 +69,7 @@
     &__card {
       @apply p-2 rounded-lg bg-gray-200 shadow-sm hover:bg-white hover:shadow-lg transition duration-150 ease-out space-y-2 relative overflow-hidden h-32;
       button {
-        @apply ml-auto mr-1 px-2 rounded bg-main-300 text-white hover:bg-main-500 hover:shadow transition duration-150 ease-out;
+        @apply ml-auto mr-1 px-2 rounded bg-main-300 text-white hover:bg-main-500 hover:shadow transition duration-150 ease-out absolute bottom-2 right-2 capitalize;
       }
       h3 {
         @apply text-xl font-bold;
