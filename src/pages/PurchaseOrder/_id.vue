@@ -233,7 +233,7 @@
 <script lang="ts">
   import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
   import { useStore } from 'vuex';
-  import { useRouter } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
   import { useState, useActions } from 'vuex-composition-helpers';
 
   import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
@@ -269,9 +269,25 @@
       // :: Init
       const store = useStore();
       const router = useRouter();
+      const route = useRoute();
       const instance = axios.create({
         baseURL: api,
       });
+
+      const allPurchaseOrders = store.state.purchaseOrder.all;
+      console.log(allPurchaseOrders);
+      const currentPurchaseOrder = allPurchaseOrders.find((pO) => {
+        console.log(pO.id);
+        console.log(route.params.id);
+        return pO.id == route.params.id;
+      });
+      console.log(currentPurchaseOrder);
+      const {
+        sandProviderId,
+        sandOrders: sandOrder,
+        transportProviderId,
+        transportProvider,
+      } = currentPurchaseOrder;
       // >> Init
       // :: Proveedores de Sand
       const sandProviders = ref([] as Array<SandProvider>);
@@ -281,19 +297,19 @@
           sandProviders.value = sPData.data;
         }
       });
-      const sandProviderId: Ref<number> = ref(-1);
+      // const sandProviderId: Ref<number> = ref(-1);
       // >> Proveedores de Sand
 
       // :: Ordenes de Sand
-      const sandOrder: Ref<Array<any>> = ref([
-        {
-          id: 0,
-          sandType: {},
-          sandTypeId: '',
-          quantity: null,
-          boxId: '',
-        },
-      ]);
+      // const sandOrder: Ref<Array<any>> = ref([
+      //   {
+      //     id: 0,
+      //     sandType: {},
+      //     sandTypeId: '',
+      //     quantity: null,
+      //     boxId: '',
+      //   },
+      // ]);
 
       // :: Ordenes de Sand
       const sandOrders = ref([] as Array<SandOrder>);
@@ -342,14 +358,14 @@
         }
       });
 
-      const transportProviderId: Ref<number> = ref(-1);
-      const transportProvider: TransportProvider = reactive({
-        id: 1,
-        name: '',
-        transportId: '',
-        boxQuantity: null,
-        observation: '',
-      });
+      // const transportProviderId: Ref<number> = ref(-1);
+      // const transportProvider: TransportProvider = reactive({
+      //   id: 1,
+      //   name: '',
+      //   transportId: '',
+      //   boxQuantity: null,
+      //   observation: '',
+      // });
       // >> TransportProvider
 
       const isFull: ComputedRef<boolean> = computed(() => {
