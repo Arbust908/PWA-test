@@ -100,7 +100,8 @@
             shadow-sm
             px-4
             py-2
-            bg-transparent
+            bg-red-200
+            sm:bg-transparent
             text-base
             font-medium
             text-second-400
