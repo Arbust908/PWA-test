@@ -53,7 +53,10 @@
                 </option>
               </select>
             </label>
-            <div v-if="sandOrder.length > 1" class="col-span-2 flex justify-end items-end">
+            <div
+              v-if="sandOrder.length > 1"
+              class="col-span-2 flex justify-end items-end"
+            >
               <CircularBtn
                 class="btn__delete"
                 size="sm"
@@ -253,7 +256,7 @@
   import { useAxios } from '@vueuse/integrations/useAxios';
   import { SandProvider } from '@/interfaces/SandProvider';
   import { Sand, SandOrder } from '@/interfaces/sandflow.Types';
-  const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {

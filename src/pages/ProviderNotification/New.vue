@@ -364,7 +364,7 @@
   import { SandProvider } from '@/interfaces/SandProvider';
   import { Sand } from '@/interfaces/SandType';
   import SelectList from '@/components/ui/SelectList.vue';
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
     components: {

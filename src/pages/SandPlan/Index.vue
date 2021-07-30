@@ -200,7 +200,7 @@
   import axios from 'axios';
   // import { Sand } from '@/interfaces/sandflow.Types.ts';
 
-  const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
   export default {
     components: {
       Layout,

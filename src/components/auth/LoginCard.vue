@@ -136,7 +136,7 @@
   );
   import { useToggle } from '@vueuse/core';
   import axios from 'axios';
-  const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
   export default {
     components: {
       Logo,

@@ -253,7 +253,7 @@
   import { useAxios } from '@vueuse/integrations/useAxios';
   import { SandProvider } from '@/interfaces/SandProvider';
   import { Sand, SandOrder } from '@/interfaces/sandflow.Types';
-  const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {

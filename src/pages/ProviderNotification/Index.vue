@@ -188,7 +188,7 @@
   import UiBtn from '@/components/ui/Button.vue';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  const apiUrl = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
