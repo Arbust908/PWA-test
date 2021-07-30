@@ -137,7 +137,7 @@ export default {
         localStorage.setItem('user', JSON.stringify(fullUser));
       }
       setUser(fullUser);
-      router.push('/orden-de-trabajo');
+      router.push('/');
     };
 
     return {

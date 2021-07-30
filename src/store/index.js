@@ -6,6 +6,7 @@ import workOrders from '@/store/workOrders';
 import sand from '@/store/sand';
 import sandProviders from '@/store/sandProviders';
 import transportProviders from '@/store/transportProviders';
+import purchaseOrder from '@/store/purchaseOrder';
 
 const store = createStore({
   state: {
@@ -20,6 +21,9 @@ const store = createStore({
     },
     isGuest(state) {
       return state.user.role === 0;
+    },
+    getUserToken(state) {
+      return state.user.token || null;
     },
   },
   actions: {
@@ -40,7 +44,8 @@ const store = createStore({
     workOrders,
     sand,
     sandProviders,
-    transportProviders
+    transportProviders,
+    purchaseOrder,
   },
   strict: true,
 });

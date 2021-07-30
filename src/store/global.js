@@ -1,7 +1,7 @@
 export default {
   state: () => ({
     navigation: [
-      // { name: 'Ingreso', to: '/login', icon: 'HomeIcon' },
+      { name: 'Panel', to: '/', icon: 'HomeIcon' },
       // {
       //   name: 'About',
       //   to: '/about',
@@ -32,6 +32,11 @@ export default {
       //   to: '/tipos-de-arena',
       //   icon: 'ClipboardListIcon',
       // }
+      {
+        name: 'Orden de Pedido',
+        to: '/orden-de-pedido',
+        icon: 'ArchiveIcon',
+      },
     ],
     user_navigation: [
       // { name: 'Perfil', to: '/usuario', icon: 'AdjustmentsIcon' },

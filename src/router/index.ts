@@ -39,6 +39,27 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/pages/WorkOrder/New.vue'),
     beforeEnter: isLogged,
   },
+  // > :: 
+  // PurchaseOrder
+  // > ::
+  {
+    path: '/orden-de-pedido',
+    name: 'PurchaseOrders',
+    component: () => import('@/pages/PurchaseOrder/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/orden-de-pedido/:id',
+    name: 'PurchaseOrderById',
+    component: () => import('@/pages/PurchaseOrder/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/orden-de-pedido/nueva',
+    name: 'NewPurchaseOrder',
+    component: () => import('@/pages/PurchaseOrder/New.vue'),
+    beforeEnter: isLogged,
+  },
   {
     path: '/tipos-de-arena',
     name: 'Sand',
