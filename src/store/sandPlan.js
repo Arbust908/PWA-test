@@ -24,6 +24,7 @@ export default {
             },
             quantity: 200,
             sandPlanId: 0,
+            status: 0,
           },
           {
             id: 1,
@@ -39,6 +40,7 @@ export default {
             },
             quantity: 100,
             sandPlanId: 0,
+            status: 0,
           },
         ],
       },

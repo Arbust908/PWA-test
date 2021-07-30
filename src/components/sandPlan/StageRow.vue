@@ -7,6 +7,7 @@
     <td
       v-if="editing === stage.id"
       class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm"
+      :id="`sandType${stage.id}`"
     >
       <select id="pit" v-model="stage.sandId" class="input" name="pit">
         <option disabled selected value="-1">Seleccionar</option>
@@ -16,7 +17,7 @@
       </select>
       <div class="amountWrapper">
         <input
-          v-model="stage.quantity"
+          v-model.number="stage.quantity"
           type="number"
           name="sandQuantity"
           class="amountInput"
@@ -27,8 +28,8 @@
       </div>
     </td>
     <td v-else class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length < 0 && stage.sandId > 0">
-        {{ sands.find((sand) => sand.id === stage.sandId).type || '-' }}
+      <p v-if="sands.length > 0 && stage.sandId >= 0">
+        {{ getSand(stage.sandId).type }}
       </p>
       <p v-else>-</p>
       <p>{{ stage.quantity }}t</p>
@@ -39,7 +40,7 @@
       v-if="editing === stage.id"
       class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm"
     >
-      <select id="pit" v-model="stage.sandId" class="input" name="pit">
+      <select id="pit" v-model="stageB.sandId" class="input" name="pit">
         <option disabled selected value="-1">Seleccionar</option>
         <option v-for="sand in sands" :key="sand.id" :value="sand.id">
           {{ sand.type }}
@@ -47,7 +48,7 @@
       </select>
       <div class="amountWrapper">
         <input
-          v-model="stage.quantity"
+          v-model.number="stageB.quantity"
           type="number"
           name="sandQuantity"
           class="amountInput"
@@ -58,11 +59,11 @@
       </div>
     </td>
     <td v-else class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length < 0 && stage.sandId > 0">
-        {{ sands.find((sand) => sand.id === stage.sandId).type || '-' }}
+      <p v-if="sands.length > 0 && stageB.sandId > 0">
+        {{ getSand(stageB.sandId).type }}
       </p>
       <p v-else>-</p>
-      <p>{{ stage.quantity }}t</p>
+      <p>{{ stageB.quantity }}t</p>
     </td>
     <!-- /Tipos -->
     <!-- Tipos -->
@@ -70,7 +71,7 @@
       v-if="editing === stage.id"
       class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm"
     >
-      <select id="pit" v-model="stage.sandId" class="input" name="pit">
+      <select id="pit" v-model="stageC.sandId" class="input" name="pit">
         <option disabled selected value="-1">Seleccionar</option>
         <option v-for="sand in sands" :key="sand.id" :value="sand.id">
           {{ sand.type }}
@@ -78,7 +79,7 @@
       </select>
       <div class="amountWrapper">
         <input
-          v-model="stage.quantity"
+          v-model.number="stageC.quantity"
           type="number"
           name="sandQuantity"
           class="amountInput"
@@ -89,11 +90,11 @@
       </div>
     </td>
     <td v-else class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length < 0 && stage.sandId > 0">
-        {{ sands.find((sand) => sand.id === stage.sandId).type || '-' }}
+      <p v-if="sands.length > 0 && stageC.sandId > 0">
+        {{ getSand(stageC.sandId).type }}
       </p>
       <p v-else>-</p>
-      <p>{{ stage.quantity }}t</p>
+      <p>{{ stageC.quantity }}t</p>
     </td>
     <!-- /Tipos -->
     <td class="text-gray-500 px-6 py-4 whitespace-nowrap font-bold">
@@ -145,13 +146,17 @@
     </td>
     <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
       <div>
-        <button @click="duplicateStage" class="action duplicate">
+        <button @click.prevent="upgrade" class="action duplicate">
+          <ReceiptRefundIcon class="w-6 h-6" />
+          <span class="sr-only">Actualizar</span>
+        </button>
+        <button @click.prevent="duplicateStage" class="action duplicate">
           <DocumentDuplicateIcon class="w-6 h-6" />
           <span class="sr-only">Duplicar</span>
         </button>
         <button
-          v-if="editing === stage.id"
-          @click="editStage"
+          v-if="editing !== stage.id"
+          @click.prevent="editStage"
           :disabled="stage.status > 0"
           class="action edit text-gray-600 hover:text-blue-800 p-2"
         >
@@ -160,15 +165,15 @@
         </button>
         <button
           v-else
-          @click="saveStage"
+          @click.prevent="saveStage"
           :disabled="stage.status > 0"
           class="action edit text-gray-600 hover:text-blue-800 p-2"
         >
-          <PencilAltIcon class="w-6 h-6" />
+          <SaveIcon class="w-6 h-6" />
           <span class="sr-only">Guardar</span>
         </button>
         <button
-          @click="deleteStage"
+          @click.prevent="deleteStage"
           :disabled="stage.status > 0"
           class="action delete text-gray-600 hover:text-red-800 p-2"
         >
@@ -181,11 +186,13 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, toRefs } from 'vue';
+  import { defineComponent, toRefs, ref, computed } from 'vue';
   import {
     DocumentDuplicateIcon,
     PencilAltIcon,
     TrashIcon,
+    SaveIcon,
+    ReceiptRefundIcon,
   } from '@heroicons/vue/solid';
   import { useVModel } from '@vueuse/core';
 
@@ -208,14 +215,30 @@
       DocumentDuplicateIcon,
       PencilAltIcon,
       TrashIcon,
+      SaveIcon,
+      ReceiptRefundIcon,
     },
     setup(props, { emit }) {
       const { stage, editing, sands } = toRefs(props);
 
-      const totalWheight = sands.value.reduce(
-        (acc, sand) => acc + sand.weight,
-        0
-      );
+      const totalWheight = computed(() => {
+        return [stage.value, stageB.value, stageC.value].reduce((acc, sand) => {
+          return acc + sand.quantity;
+        }, 0);
+      });
+      const getSand = (sandId: number) => {
+        return sands.value.find((sand) => sand.id === sandId);
+      };
+
+      // dummy sands
+      const stageB = ref({
+        sandId: -1,
+        quantity: 0,
+      });
+      const stageC = ref({
+        sandId: -1,
+        quantity: 0,
+      });
 
       const editStage = () => {
         emit('editStage', stage.value);
@@ -229,16 +252,23 @@
       const deleteStage = () => {
         emit('deleteStage', stage.value);
       };
+      const upgrade = () => {
+        emit('upgrade', stage.value);
+      };
 
       return {
         stage,
+        stageB,
+        stageC,
         editing,
         sands,
         totalWheight,
+        getSand,
         duplicateStage,
         deleteStage,
         editStage,
         saveStage,
+        upgrade,
       };
     },
   });
