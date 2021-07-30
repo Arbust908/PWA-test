@@ -25,23 +25,23 @@
             <div class="mt-1">
               <input v-model="client" name="client" type="text" placeholder="Nombre de cliente" />
               <!-- <select v-model="client" name="client">
-                <option selected disabled value="">ej: Nasta</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
+                  <option selected disabled value="">ej: Nasta</option>
+                  <option value="ypf">YPF</option>
+                  <option value="ypf2">YPF2</option>
+                  <option value="ypf3">YPF3</option>
+                </select> -->
             </div>
           </div>
           <div class="input-block">
-            <label for="serviceCompany" class=""> Operadora / Empresa de Servicios </label>
+            <label for="service_co" class=""> Operadora / Empresa de Servicios </label>
             <div class="mt-1">
-              <input v-model="serviceCompany" name="serviceCompany" type="text" placeholder="Nombre de Operadora" />
-              <!-- <select v-model="serviceCompany" name="serviceCompany">
-                <option selected disabled value="">ej: Pipele</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
+              <input v-model="service_co" name="service_co" type="text" placeholder="Nombre de Operadora" />
+              <!-- <select v-model="service_co" name="service_co">
+                  <option selected disabled value="">ej: Pipele</option>
+                  <option value="ypf">YPF</option>
+                  <option value="ypf2">YPF2</option>
+                  <option value="ypf3">YPF3</option>
+                </select> -->
             </div>
           </div>
           <div class="input-block">
@@ -83,11 +83,11 @@
                 <div class="mt-1">
                   <input v-model="operativeCradle" name="cradle_main" type="text" placeholder="Cradle 1" />
                   <!-- <select v-model="operativeCradle" name="cradle_main">
-                    <option selected disabled value="">Cradle Operativo</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
+                      <option selected disabled value="">Cradle Operativo</option>
+                      <option value="aplt">Aplt</option>
+                      <option value="rotum">Rotum</option>
+                      <option value="xacje">Xacje</option>
+                    </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -95,11 +95,11 @@
                 <div class="mt-1">
                   <input v-model="backupCradle" name="cradle_backup" type="text" placeholder="Cradle 25" />
                   <!-- <select v-model="backupCradle" name="cradle_backup">
-                    <option selected disabled value="">Backup Cradle</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
+                      <option selected disabled value="">Backup Cradle</option>
+                      <option value="aplt">Aplt</option>
+                      <option value="rotum">Rotum</option>
+                      <option value="xacje">Xacje</option>
+                    </select> -->
                 </div>
               </div>
             </section>
@@ -112,11 +112,11 @@
                 <div class="mt-1">
                   <input v-model="operativeForklift" name="operative_forklift" type="text" placeholder="Forklift 1" />
                   <!-- <select v-model="operativeForklift" name="client">
-                    <option selected disabled value="">Forklift Operativo</option>
-                    <option value="roklim">Roklim</option>
-                    <option value="salmin">Salmin</option>
-                    <option value="eroba">Eroba</option>
-                  </select> -->
+                      <option selected disabled value="">Forklift Operativo</option>
+                      <option value="roklim">Roklim</option>
+                      <option value="salmin">Salmin</option>
+                      <option value="eroba">Eroba</option>
+                    </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -124,11 +124,11 @@
                 <div class="mt-1">
                   <input v-model="backupForklift" name="backup_forklift" type="text" placeholder="forklift 7" />
                   <!-- <select v-model="backupForklift" name="client">
-                    <option selected disabled value="">Backup Forklift</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
+                      <option selected disabled value="">Backup Forklift</option>
+                      <option value="aplt">Aplt</option>
+                      <option value="rotum">Rotum</option>
+                      <option value="xacje">Xacje</option>
+                    </select> -->
                 </div>
               </div>
             </section>
@@ -162,11 +162,11 @@
                     placeholder="Nombre de proveedor"
                   />
                   <!-- <select v-model="traktor.supplier" :name="`tractor-${traktor.id}-proveedor`">
-                    <option selected disabled value="">Proveedor</option>
-                    <option value="10223">Transportes Zaraza SRL</option>
-                    <option value="10224">Montoto Logistica SRL</option>
-                    <option value="10225">E Inc</option>
-                  </select> -->
+                      <option selected disabled value="">Proveedor</option>
+                      <option value="10223">Transportes Zaraza SRL</option>
+                      <option value="10224">Montoto Logistica SRL</option>
+                      <option value="10225">E Inc</option>
+                    </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -297,11 +297,11 @@
                 placeholder="00:00"
               />
               <!-- <select class="rounded" :name="`crew-${crew.id}-start-time`" v-model="crew.start_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
+                  <option selected disabled value="">ej 5:30 AM</option>
+                  <option value="7">7:00 PM</option>
+                  <option value="8">8:00 PM</option>
+                  <option value="9">9:00 PM</option>
+                </select> -->
             </div>
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
@@ -313,11 +313,11 @@
                 placeholder="00:00"
               />
               <!-- <select class="rounded" :name="`crew-${crew.id}-end-time`" v-model="crew.end_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
+                  <option selected disabled value="">ej 5:30 AM</option>
+                  <option value="7">7:00 PM</option>
+                  <option value="8">8:00 PM</option>
+                  <option value="9">9:00 PM</option>
+                </select> -->
             </div>
           </section>
           <section class="divide-y">
@@ -332,11 +332,11 @@
                     placeholder="Rol"
                   />
                   <!-- <select v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`">
-                    <option selected disabled value="">Lead Operator</option>
-                    <option value="7">7:00 PM</option>
-                    <option value="8">8:00 PM</option>
-                    <option value="9">9:00 PM</option>
-                  </select> -->
+                      <option selected disabled value="">Lead Operator</option>
+                      <option value="7">7:00 PM</option>
+                      <option value="8">8:00 PM</option>
+                      <option value="9">9:00 PM</option>
+                    </select> -->
                   <CircularBtn
                     class="btn__delete md:absolute md:right-[-3rem]"
                     size="sm"
@@ -356,11 +356,11 @@
                       placeholder="Empleado"
                     />
                     <!-- <select v-model="people.name" :name="`crew-${crew.id}-${people.id}-name`">
-                      <option selected disabled value="">Selecciona Empleado</option>
-                      <option value="7">7:00 PM</option>
-                      <option value="8">8:00 PM</option>
-                      <option value="9">9:00 PM</option>
-                    </select> -->
+                        <option selected disabled value="">Selecciona Empleado</option>
+                        <option value="7">7:00 PM</option>
+                        <option value="8">8:00 PM</option>
+                        <option value="9">9:00 PM</option>
+                      </select> -->
                   </label>
                 </div>
               </div>
@@ -389,7 +389,7 @@
             v-else
             :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
             :disabled="!isAllFull"
-            @click="isAllFull && save(false)"
+            @click="isAllFull && save(true)"
           >
             Finalizar
           </PrimaryBtn>
@@ -400,61 +400,54 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, toRefs, reactive } from 'vue';
+  import { ref, Ref, computed } from 'vue';
   import { useStore } from 'vuex';
-  import { useRouter, useRoute } from 'vue-router';
+  import { useRouter } from 'vue-router';
   import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
-  import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
   import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
 
-import axios from 'axios';
-const api = import.meta.env.VITE_API_URL;
+  import axios from 'axios';
+  const api = 'https://sandflow-qa.bitpatagonia.com/api';
 
   export default {
     components: {
-      Layout,
-      GhostBtn,
       BookmarkIcon,
-      TrashIcon,
-      PlusIcon,
       CheckCircleIcon,
       CircularBtn,
+      GhostBtn,
+      Layout,
+      PlusIcon,
       PrimaryBtn,
+      TrashIcon,
     },
     setup() {
       // Init
       const store = useStore();
       const router = useRouter();
-      const route = useRoute();
-      const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
-      const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
-        return wo.id == route.params.id;
-      });
-      const {
-        id: woID,
-        client,
-        serviceCompany,
-        pad,
-        pits,
-        operativeCradle,
-        backupCradle,
-        operativeForklift,
-        backupForklift,
-        traktors,
-        pickups,
-        crews,
-        rigmats,
-        conex,
-        generators,
-        tower,
-        cabin,
-      } = toRefs(reactive({ ...currentWorkOrder }));
-      //Pit
+      // Work Order ID
+      const workOrders: Array<WorkOrder> = store.state.workOrders.all;
+      // Work Order ID if WorkOrder is not empty the last id plus one or 0
+      const woID: number = workOrders && workOrders.length > 0 ? workOrders[workOrders.length - 1].id + 1 : 0;
+      // Cliente
+      const client: Ref<string> = ref('');
+      // Service Company
+      const service_co: Ref<string> = ref('');
+      // PAD
+      const pad: Ref<string> = ref('');
+      // Pozos
+      const pits: Ref<Array<Pit>> = ref([
+        {
+          id: 0,
+          name: '',
+        },
+      ]);
+
       const removePit = (pitId: number) => {
         pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
       };
@@ -465,10 +458,31 @@ const api = import.meta.env.VITE_API_URL;
           name: '',
         });
       };
-      if (pits.value && pits.value.length === 0) {
-        addPit();
-      }
-      //Traktor
+      // Remove Empty pits
+      const removeEmptyPits = () => {
+        pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
+      };
+      // ::
+      // Cradle
+      // ::
+      const operativeCradle: Ref<string> = ref('');
+      const backupCradle: Ref<string> = ref('');
+      // ::
+      // Forklift
+      // ::
+      const operativeForklift: Ref<string> = ref('');
+      const backupForklift: Ref<string> = ref('');
+      // ::
+      // Tractor
+      // ::
+      const traktors: Ref<Array<Traktor>> = ref([
+        {
+          id: 0,
+          chassis: '',
+          supplier: '',
+          description: '',
+        },
+      ]);
       const removeTraktor = (traktorId: number) => {
         traktors.value = traktors.value.filter((traktor: Traktor) => traktor.id !== traktorId);
       };
@@ -477,13 +491,26 @@ const api = import.meta.env.VITE_API_URL;
         traktors.value.push({
           id: lastTraktorId,
           chassis: '',
+          supplier: '',
           description: '',
         });
       };
-      if (traktors.value.length === 0) {
-        addTraktor();
-      }
+      // Remove empty traktors
+      const removeEmptyTraktors = (): void => {
+        traktors.value = traktors.value.filter(
+          (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
+        );
+      };
+      // ::
       // Pickup
+      // ::
+      const pickups: Ref<Array<Pickup>> = ref([
+        {
+          id: 0,
+          pickup_id: '',
+          description: '',
+        },
+      ]);
       const removePickup = (pickupId: number) => {
         pickups.value = pickups.value.filter((pickup: Pickup) => pickup.id !== pickupId);
       };
@@ -495,15 +522,37 @@ const api = import.meta.env.VITE_API_URL;
           description: '',
         });
       };
-      if (pickups.value.length === 0) {
-        addPickup();
-      }
+      // Remove Empty Pickups
+      const removeEmptyPickups = (): void => {
+        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
+      };
+      // ::
+      // Equipment
+      // ::
+
+      // rigmats, conex, generators, tower, cabin
+      const rigmats: Ref<number> = ref(0);
+      const conex: Ref<number> = ref(0);
+      const generators: Ref<number> = ref(0);
+      const tower: Ref<number> = ref(0);
+      const cabin: Ref<number> = ref(0);
+
+      // ::
       // Crew
+      // ::
+      const resource: Ref<Array<HumanResource>> = ref([
+        {
+          id: 0,
+          rol: '',
+          name: '',
+        },
+      ]);
+      const crews: Ref<Array<Crew>> = ref([
+        { id: 1, start_time: '', end_time: '', title: 'Crew A', resources: resource },
+      ]);
       const removeResource = (crewId: number, peopleId: number) => {
         const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-        selectedCrew.resources.value = selectedCrew.resources.value.filter(
-          (resource: HumanResource) => resource.id !== peopleId
-        );
+        selectedCrew.resources = selectedCrew.resources.filter((resource: HumanResource) => resource.id !== peopleId);
       };
       const addResource = (crewId: number): void => {
         const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
@@ -529,9 +578,22 @@ const api = import.meta.env.VITE_API_URL;
       const removeCrew = (crewId: number): void => {
         crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
       };
-      if (crews.value.length === 0) {
-        addCrew();
-      }
+      // Remove empty Crews
+      const removeEmptyCrews = (): void => {
+        crews.value = crews.value
+          .map((crew: Crew) => removeEmptyResource(crew.id))
+          .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
+      };
+      // Remove Empty Resource
+      const removeEmptyResource = (crewId: number): void => {
+        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        selectedCrew.resources = selectedCrew.resources.filter(
+          (resource: HumanResource) => resource.rol !== '' && resource.name !== ''
+        );
+        return selectedCrew;
+      };
+
+      // ::
       // Sections
       const WO_section = ref('orden');
       const section_order = ['orden', 'equipamento', 'rrhh'];
@@ -552,7 +614,7 @@ const api = import.meta.env.VITE_API_URL;
       };
       // Is the Order section is full
       const isOrderFull = computed(() => {
-        return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+        return !!(client.value && service_co.value && pad.value && pits.value.length > 0 && pits.value[0].name);
       });
       // Is the Equipment section is full
       const isEquipmentFull = computed(() => {
@@ -582,34 +644,6 @@ const api = import.meta.env.VITE_API_URL;
       const goToIndex = (): void => {
         router.push('/orden-de-trabajo');
       };
-      // Remove Empty pits
-      const removeEmptyPits = () => {
-        pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
-      };
-      // Remove empty traktors
-      const removeEmptyTraktors = (): void => {
-        traktors.value = traktors.value.filter(
-          (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
-        );
-      };
-      // Remove Empty Pickups
-      const removeEmptyPickups = (): void => {
-        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
-      };
-      // Remove empty Crews
-      const removeEmptyCrews = (): void => {
-        crews.value = crews.value
-          .map((crew: Crew) => removeEmptyResource(crew.id))
-          .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
-      };
-      // Remove Empty Resource
-      const removeEmptyResource = (crewId: number): void => {
-        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-        selectedCrew.resources = selectedCrew.resources.filter(
-          (resource: HumanResource) => resource.rol !== '' && resource.name !== ''
-        );
-        return selectedCrew;
-      };
       const removeAllEmptys = (): void => {
         removeEmptyPits();
         removeEmptyTraktors();
@@ -617,12 +651,13 @@ const api = import.meta.env.VITE_API_URL;
         removeEmptyCrews();
       };
 
-      const save = async (draft = true) => {
+      // :: SAVE
+      const save = async (isFull = false) => {
         removeAllEmptys();
         const newWO = {
-          id: woID.value,
+          id: woID,
           client: client.value,
-          serviceCompany: serviceCompany.value,
+          service_co: service_co.value,
           pad: pad.value,
           pits: pits.value,
           operativeCradle: operativeCradle.value,
@@ -637,26 +672,26 @@ const api = import.meta.env.VITE_API_URL;
           generators: generators.value,
           tower: tower.value,
           cabin: cabin.value,
-          draft,
+          isFull: isFull,
         };
         const loading = ref(true);
-        // Update Work Order
         let woDB = await axios
-          .put(`${api}/workOrder/${newWO.id}`, newWO)
+          .post(`${api}/workOrder`, newWO)
           .catch((err) => {
             console.log(err);
           })
           .then((res) => {
+            console.log(res);
             if (res.status === 200) {
-              return res.data.data;
+              return res.data;
             }
             return {};
           })
           .finally(() => {
             loading.value = false;
           });
-        // Update Work Order
-        store.dispatch('updateWorkOrder', woDB);
+        console.log(woDB);
+        store.dispatch('saveWorkOrder', newWO);
         router.push('/orden-de-trabajo');
       };
 
@@ -670,7 +705,7 @@ const api = import.meta.env.VITE_API_URL;
         isEquipmentFull,
         isRRHHFull,
         client,
-        serviceCompany,
+        service_co,
         pad,
         pits,
         removePit,

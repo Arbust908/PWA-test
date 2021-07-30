@@ -25,23 +25,23 @@
             <div class="mt-1">
               <input v-model="client" name="client" type="text" placeholder="Nombre de cliente" />
               <!-- <select v-model="client" name="client">
-                <option selected disabled value="">ej: Nasta</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
+                  <option selected disabled value="">ej: Nasta</option>
+                  <option value="ypf">YPF</option>
+                  <option value="ypf2">YPF2</option>
+                  <option value="ypf3">YPF3</option>
+                </select> -->
             </div>
           </div>
           <div class="input-block">
-            <label for="serviceCompany" class=""> Operadora / Empresa de Servicios </label>
+            <label for="service_co" class=""> Operadora / Empresa de Servicios </label>
             <div class="mt-1">
-              <input v-model="serviceCompany" name="serviceCompany" type="text" placeholder="Nombre de Operadora" />
-              <!-- <select v-model="serviceCompany" name="serviceCompany">
-                <option selected disabled value="">ej: Pipele</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
+              <input v-model="service_co" name="service_co" type="text" placeholder="Nombre de Operadora" />
+              <!-- <select v-model="service_co" name="service_co">
+                  <option selected disabled value="">ej: Pipele</option>
+                  <option value="ypf">YPF</option>
+                  <option value="ypf2">YPF2</option>
+                  <option value="ypf3">YPF3</option>
+                </select> -->
             </div>
           </div>
           <div class="input-block">
@@ -83,11 +83,11 @@
                 <div class="mt-1">
                   <input v-model="operativeCradle" name="cradle_main" type="text" placeholder="Cradle 1" />
                   <!-- <select v-model="operativeCradle" name="cradle_main">
-                    <option selected disabled value="">Cradle Operativo</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
+                      <option selected disabled value="">Cradle Operativo</option>
+                      <option value="aplt">Aplt</option>
+                      <option value="rotum">Rotum</option>
+                      <option value="xacje">Xacje</option>
+                    </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -95,11 +95,11 @@
                 <div class="mt-1">
                   <input v-model="backupCradle" name="cradle_backup" type="text" placeholder="Cradle 25" />
                   <!-- <select v-model="backupCradle" name="cradle_backup">
-                    <option selected disabled value="">Backup Cradle</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
+                      <option selected disabled value="">Backup Cradle</option>
+                      <option value="aplt">Aplt</option>
+                      <option value="rotum">Rotum</option>
+                      <option value="xacje">Xacje</option>
+                    </select> -->
                 </div>
               </div>
             </section>
@@ -112,11 +112,11 @@
                 <div class="mt-1">
                   <input v-model="operativeForklift" name="operative_forklift" type="text" placeholder="Forklift 1" />
                   <!-- <select v-model="operativeForklift" name="client">
-                    <option selected disabled value="">Forklift Operativo</option>
-                    <option value="roklim">Roklim</option>
-                    <option value="salmin">Salmin</option>
-                    <option value="eroba">Eroba</option>
-                  </select> -->
+                      <option selected disabled value="">Forklift Operativo</option>
+                      <option value="roklim">Roklim</option>
+                      <option value="salmin">Salmin</option>
+                      <option value="eroba">Eroba</option>
+                    </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -124,11 +124,11 @@
                 <div class="mt-1">
                   <input v-model="backupForklift" name="backup_forklift" type="text" placeholder="forklift 7" />
                   <!-- <select v-model="backupForklift" name="client">
-                    <option selected disabled value="">Backup Forklift</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
+                      <option selected disabled value="">Backup Forklift</option>
+                      <option value="aplt">Aplt</option>
+                      <option value="rotum">Rotum</option>
+                      <option value="xacje">Xacje</option>
+                    </select> -->
                 </div>
               </div>
             </section>
@@ -162,11 +162,11 @@
                     placeholder="Nombre de proveedor"
                   />
                   <!-- <select v-model="traktor.supplier" :name="`tractor-${traktor.id}-proveedor`">
-                    <option selected disabled value="">Proveedor</option>
-                    <option value="10223">Transportes Zaraza SRL</option>
-                    <option value="10224">Montoto Logistica SRL</option>
-                    <option value="10225">E Inc</option>
-                  </select> -->
+                      <option selected disabled value="">Proveedor</option>
+                      <option value="10223">Transportes Zaraza SRL</option>
+                      <option value="10224">Montoto Logistica SRL</option>
+                      <option value="10225">E Inc</option>
+                    </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -297,11 +297,11 @@
                 placeholder="00:00"
               />
               <!-- <select class="rounded" :name="`crew-${crew.id}-start-time`" v-model="crew.start_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
+                  <option selected disabled value="">ej 5:30 AM</option>
+                  <option value="7">7:00 PM</option>
+                  <option value="8">8:00 PM</option>
+                  <option value="9">9:00 PM</option>
+                </select> -->
             </div>
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
@@ -313,11 +313,11 @@
                 placeholder="00:00"
               />
               <!-- <select class="rounded" :name="`crew-${crew.id}-end-time`" v-model="crew.end_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
+                  <option selected disabled value="">ej 5:30 AM</option>
+                  <option value="7">7:00 PM</option>
+                  <option value="8">8:00 PM</option>
+                  <option value="9">9:00 PM</option>
+                </select> -->
             </div>
           </section>
           <section class="divide-y">
@@ -332,11 +332,11 @@
                     placeholder="Rol"
                   />
                   <!-- <select v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`">
-                    <option selected disabled value="">Lead Operator</option>
-                    <option value="7">7:00 PM</option>
-                    <option value="8">8:00 PM</option>
-                    <option value="9">9:00 PM</option>
-                  </select> -->
+                      <option selected disabled value="">Lead Operator</option>
+                      <option value="7">7:00 PM</option>
+                      <option value="8">8:00 PM</option>
+                      <option value="9">9:00 PM</option>
+                    </select> -->
                   <CircularBtn
                     class="btn__delete md:absolute md:right-[-3rem]"
                     size="sm"
@@ -356,11 +356,11 @@
                       placeholder="Empleado"
                     />
                     <!-- <select v-model="people.name" :name="`crew-${crew.id}-${people.id}-name`">
-                      <option selected disabled value="">Selecciona Empleado</option>
-                      <option value="7">7:00 PM</option>
-                      <option value="8">8:00 PM</option>
-                      <option value="9">9:00 PM</option>
-                    </select> -->
+                        <option selected disabled value="">Selecciona Empleado</option>
+                        <option value="7">7:00 PM</option>
+                        <option value="8">8:00 PM</option>
+                        <option value="9">9:00 PM</option>
+                      </select> -->
                   </label>
                 </div>
               </div>
@@ -387,9 +387,9 @@
           <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
           <PrimaryBtn
             v-else
-            :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
-            :disabled="!isAllFull"
-            @click="isAllFull && save(false)"
+            :class="isAllFull.value ? null : 'opacity-50 cursor-not-allowed'"
+            :disabled="!isAllFull.value"
+            @click="isAllFull.value && save(true)"
           >
             Finalizar
           </PrimaryBtn>
@@ -400,7 +400,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, toRefs, reactive } from 'vue';
+  import { ref, Ref, computed, toRefs } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
@@ -412,8 +412,8 @@
 
   import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
 
-import axios from 'axios';
-const api = import.meta.env.VITE_API_URL;
+  import axios from 'axios';
+  const api = 'https://sandflow-qa.bitpatagonia.com/api';
 
   export default {
     components: {
@@ -432,13 +432,18 @@ const api = import.meta.env.VITE_API_URL;
       const router = useRouter();
       const route = useRoute();
       const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
+      console.log('Route Params ID:_' + route.params.id);
+      console.log('WOs ', workOrders);
       const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
+        console.log('WO ID:_' + wo.id);
+        console.log('Route Params ID:_' + route.params.id);
         return wo.id == route.params.id;
       });
+      console.log('Current WO ', currentWorkOrder);
       const {
         id: woID,
         client,
-        serviceCompany,
+        service_co,
         pad,
         pits,
         operativeCradle,
@@ -453,7 +458,7 @@ const api = import.meta.env.VITE_API_URL;
         generators,
         tower,
         cabin,
-      } = toRefs(reactive({ ...currentWorkOrder }));
+      } = toRefs(currentWorkOrder);
       //Pit
       const removePit = (pitId: number) => {
         pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
@@ -465,7 +470,7 @@ const api = import.meta.env.VITE_API_URL;
           name: '',
         });
       };
-      if (pits.value && pits.value.length === 0) {
+      if (pits.value.length === 0) {
         addPit();
       }
       //Traktor
@@ -552,7 +557,7 @@ const api = import.meta.env.VITE_API_URL;
       };
       // Is the Order section is full
       const isOrderFull = computed(() => {
-        return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+        return !!(client.value && service_co.value && pad.value && pits.value.length > 0 && pits.value[0].name);
       });
       // Is the Equipment section is full
       const isEquipmentFull = computed(() => {
@@ -617,12 +622,12 @@ const api = import.meta.env.VITE_API_URL;
         removeEmptyCrews();
       };
 
-      const save = async (draft = true) => {
+      const save = async (isFull = false) => {
         removeAllEmptys();
         const newWO = {
           id: woID.value,
           client: client.value,
-          serviceCompany: serviceCompany.value,
+          service_co: service_co.value,
           pad: pad.value,
           pits: pits.value,
           operativeCradle: operativeCradle.value,
@@ -637,7 +642,7 @@ const api = import.meta.env.VITE_API_URL;
           generators: generators.value,
           tower: tower.value,
           cabin: cabin.value,
-          draft,
+          isFull: isFull,
         };
         const loading = ref(true);
         // Update Work Order
@@ -647,14 +652,16 @@ const api = import.meta.env.VITE_API_URL;
             console.log(err);
           })
           .then((res) => {
+            console.log(res);
             if (res.status === 200) {
-              return res.data.data;
+              return res.data;
             }
             return {};
           })
           .finally(() => {
             loading.value = false;
           });
+        console.log(woDB);
         // Update Work Order
         store.dispatch('updateWorkOrder', woDB);
         router.push('/orden-de-trabajo');
@@ -670,7 +677,7 @@ const api = import.meta.env.VITE_API_URL;
         isEquipmentFull,
         isRRHHFull,
         client,
-        serviceCompany,
+        service_co,
         pad,
         pits,
         removePit,

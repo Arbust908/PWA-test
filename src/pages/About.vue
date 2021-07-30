@@ -39,58 +39,58 @@
 </template>
 
 <script lang="ts">
-import Layout from '@/layouts/Main.vue';
-import { useLocalStorage } from '@/helpers/useLocalStorage';
-import { useNProgress } from '@vueuse/integrations/useNProgress';
+  import Layout from '@/layouts/Main.vue';
+  import { useLocalStorage } from '@/helpers/useLocalStorage';
+  import { useNProgress } from '@vueuse/integrations/useNProgress';
 
-export default {
-  components: {
-    Layout,
-  },
-  setup() {
-    const { storage, keys } = useLocalStorage(['user', 'gipi']);
-    const { gipi } = storage;
+  export default {
+    components: {
+      Layout,
+    },
+    setup() {
+      const { storage, keys } = useLocalStorage(['user', 'gipi']);
+      const { gipi } = storage;
 
-    const { progress, isLoading, start, done } = useNProgress();
+      const { progress, isLoading, start, done } = useNProgress();
 
-    const initProgrss = () => {
-      if (progress.value === null) {
-        progress.value = 0.0;
-      }
-      const loading = setInterval(() => {
-        progress.value += 0.01;
-        if (progress.value >= 1.0) {
-          clearInterval(loading);
+      const initProgrss = () => {
+        if (progress.value === null) {
+          progress.value = 0.0;
         }
-      }, 100);
-    };
+        const loading = setInterval(() => {
+          progress.value += 0.01;
+          if (progress.value >= 1.0) {
+            clearInterval(loading);
+          }
+        }, 100);
+      };
 
-    storage.gipi.set('Mintiti');
+      storage.gipi.set('Mintiti');
 
-    return {
-      storage,
-      keys,
-      progress,
-      isLoading,
-      initProgrss,
-      start,
-      done,
-    };
-  },
-};
+      return {
+        storage,
+        keys,
+        progress,
+        isLoading,
+        initProgrss,
+        start,
+        done,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-progress {
-  @apply bg-green-500;
-}
-progress::-webkit-progress-bar {
-  @apply bg-gray-500;
-}
-progress::-webkit-progress-value {
-  @apply bg-green-500;
-}
-progress::-moz-progress-bar {
-  @apply bg-green-500;
-}
+  progress {
+    @apply bg-green-500;
+  }
+  progress::-webkit-progress-bar {
+    @apply bg-gray-500;
+  }
+  progress::-webkit-progress-value {
+    @apply bg-green-500;
+  }
+  progress::-moz-progress-bar {
+    @apply bg-green-500;
+  }
 </style>

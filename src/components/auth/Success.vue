@@ -8,26 +8,26 @@
 </template>
 
 <script>
-import { CheckCircleIcon } from "@heroicons/vue/solid";
-import Button from "@/components/ui/Button.vue";
-export default {
-  components: {
-    CheckCircleIcon,
-    Button,
-  },
-};
+  import { CheckCircleIcon } from '@heroicons/vue/solid';
+  import Button from '@/components/ui/Button.vue';
+  export default {
+    components: {
+      CheckCircleIcon,
+      Button,
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.success {
-  &-box {
-    @apply py-8 px-4 sm:px-8 flex-1 flex flex-col justify-center max-w-xs mx-auto text-center space-y-8;
-    & > h2 {
-      @apply text-center text-3xl font-extrabold text-gray-900;
+  .success {
+    &-box {
+      @apply py-8 px-4 sm:px-8 flex-1 flex flex-col justify-center max-w-xs mx-auto text-center space-y-8;
+      & > h2 {
+        @apply text-center text-3xl font-extrabold text-gray-900;
+      }
+    }
+    &-logo {
+      @apply mx-auto h-28 w-auto text-green-600;
     }
   }
-  &-logo {
-    @apply mx-auto h-28 w-auto text-green-600;
-  }
-}
 </style>

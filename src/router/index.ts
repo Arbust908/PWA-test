@@ -31,7 +31,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/orden-de-trabajo/:id',
     name: 'WorkOrderById',
     component: () => import('@/pages/WorkOrder/_id.vue'),
-    beforeEnter: isLogged
+    beforeEnter: isLogged,
   },
   {
     path: '/orden-de-trabajo/nueva',
@@ -70,7 +70,7 @@ const routes: Array<RouteRecordRaw> = [
     path: '/tipos-de-arena/:id',
     name: 'SandById',
     component: () => import('@/pages/Sand/_id.vue'),
-    beforeEnter: isLogged
+    beforeEnter: isLogged,
   },
   {
     path: '/tipos-de-arena/nueva',
@@ -115,6 +115,42 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/centro-de-carga-de-arena',
+    name: 'SandCenters',
+    component: () => import('@/pages/SandCenter/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/centro-de-carga-de-arena/:id',
+    name: 'SandCenterById',
+    component: () => import('@/pages/SandCenter/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/centro-de-carga-de-arena/nueva',
+    name: 'NewSandCenter',
+    component: () => import('@/pages/SandCenter/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/notificaciones-a-proveedores',
+    name: 'ProviderNotifications',
+    component: () => import('@/pages/ProviderNotification/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/notificaciones-a-proveedores/:id',
+    name: 'ProviderNotificationById',
+    component: () => import('@/pages/ProviderNotification/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/notificaciones-a-proveedores/nueva',
+    name: 'NewProviderNotification',
+    component: () => import('@/pages/ProviderNotification/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/usuario/salir',
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),
@@ -130,12 +166,12 @@ const routes: Array<RouteRecordRaw> = [
     path: '/:catchAll(.*)',
     name: 'PageNotFound',
     component: () => import('@/pages/404.vue'),
-  }
+  },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
   routes,
-})
+});
 
 export default router;

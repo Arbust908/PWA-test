@@ -1,8 +1,8 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Tipos de Arena</h2>
-      <router-link to="/tipos-de-arena/nueva">
+      <h2 class="text-2xl font-semibold text-gray-900">Ordenes de Trabajo</h2>
+      <router-link to="/orden-de-trabajo/nueva">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
     </header>
@@ -17,85 +17,68 @@
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    ID
+                    Numero de Orden
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Tipo
+                    Cliente
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Descripción
+                    Empresa de Servicio
                   </th>
                   <th
                     scope="col"
                     class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
                   >
-                    Malla
+                    Estado
                   </th>
-                  <th
-                    scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                  >
-                    Granaje
-                  </th>
-                  <th scope="col" colspan="2" class="relative px-6 py-3">
+                  <th scope="col" class="relative px-6 py-3">
                     <span class="sr-only">Actions</span>
                   </th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="(st, sKey) in stDB"
-                  :key="st.id"
-                  :class="sKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
+                  v-for="(wo, woKey) in woDB"
+                  :key="wo.id"
+                  :class="woKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                   class="hover:bg-gray-100"
                 >
                   <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    {{ st.id }}
+                    {{ wo.id }}
                   </td>
                   <td
-                    :class="st.type ? 'text-gray-500' : 'text-gray-400 italic'"
+                    :class="wo.client ? 'text-gray-500' : 'text-gray-400 italic'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ st.type || 'Sin definir' }}
+                    {{ wo.client || 'Sin cliente' }}
                   </td>
                   <td
-                    :class="st.description ? 'text-gray-500' : 'text-gray-400 italic'"
+                    :class="wo.service_co ? 'text-gray-500' : 'text-gray-400 italic'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ st.description || 'Sin definir' }}
+                    {{ wo.service_co || 'Sin empresa de servicio' }}
                   </td>
                   <td
-                    :class="st.meshType ? 'text-green-500' : 'text-blue-500'"
+                    :class="wo.isFull ? 'text-green-500' : 'text-blue-500'"
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ st.meshType || 'Sin definir' }}
-                  </td>
-                  <td
-                    :class="st.grainType ? 'text-green-500' : 'text-blue-500'"
-                    class="px-6 py-4 whitespace-nowrap text-sm"
-                  >
-                    {{ st.grainType || 'Sin definir' }}
+                    {{ wo.isFull ? 'Completado' : 'Pendiente' }}
                   </td>
                   <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <span class="text-red-600 hover:text-red-900 cursor-pointer" @click="deleteFrom(st.id)">
-                      Delete
-                    </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <router-link :to="`/tipos-de-arena/${st.id}`" class="text-indigo-600 hover:text-indigo-900">
+                    <router-link :to="`/orden-de-trabajo/${wo.id}`" class="text-indigo-600 hover:text-indigo-900">
                       Editar
                     </router-link>
                   </td>
                 </tr>
-                <tr v-if="stDB.length <= 0">
+                <tr v-if="woDB.length <= 0">
                   <td colspan="5" class="text-center text-xs text-gray-500 px-6 py-4">
-                    <p>No hay arenas cargadas</p>
+                    <p>No hay Ordenes de Trabajo</p>
                   </td>
                 </tr>
               </tbody>
@@ -112,80 +95,59 @@
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
-  import { TrashIcon } from '@heroicons/vue/outline';
   import axios from 'axios';
-const api = import.meta.env.VITE_API_URL;
-
+  // import { WorkOrder } from '@/interfaces/WorkOrder';
+  const api = 'https://sandflow-qa.bitpatagonia.com/api';
   export default {
     components: {
       Layout,
       UiBtn,
-      TrashIcon: TrashIcon,
     },
     setup() {
+      const woDB = ref([]);
       const store = useStore();
-      const stDB = ref([]);
-      const sandDB = JSON.parse(JSON.stringify(store.state.sand.all));
-
+      const workOrders = JSON.parse(JSON.stringify(store.state.workOrders.all));
       onMounted(async () => {
         const loading = ref(true);
-        stDB.value = await axios
-          .get(`${api}/sand`)
+        woDB.value = await axios
+          .get(`${api}/workOrder`)
           .catch((err) => {
             console.log(err);
           })
           .then((res) => {
             if (res.status === 200) {
-              // console.log('data', res.data.data)
-              return res.data.data;
+              return res.data.data.workOrders || res.data.workOrders;
             }
             return [];
           })
           .finally(() => {
             loading.value = false;
           });
-
-        if (stDB.value && stDB.value.length > 0) {
-          if (stDB.value.length > sandDB.length) {
-            if (sandDB.length === 0) {
-              stDB.value.forEach((st, sKey) => {
-                store.dispatch('saveSand', st);
+        console.log('API DB', woDB.value);
+        console.log('State', workOrders);
+        console.log('API DB', woDB.value.length);
+        if (woDB.value && woDB.value.length > 0) {
+          console.log(woDB.value.length);
+          if (woDB.value.length > workOrders.length) {
+            console.log(woDB.value.length, workOrders.length);
+            if (workOrders.length === 0) {
+              woDB.value.forEach((wo, woKey) => {
+                store.dispatch('saveWorkOrder', wo);
               });
             } else {
-              const newsDB = stDB.value.filter((stFromApi, key) => {
-                return stFromApi.id && sandDB[key] && stFromApi.id !== sandDB[key].id;
+              const newWoDB = woDB.value.filter((woFromApi, key) => {
+                return woFromApi.id && workOrders[key] && woFromApi.id !== workOrders[key].id;
               });
-              newsDB.forEach((st, stKey) => {
-                store.dispatch('saveSand', st);
+              console.log(newWoDB);
+              newWoDB.forEach((wo, woKey) => {
+                store.dispatch('saveWorkOrder', wo);
               });
             }
           }
         }
       });
-
-      const deleteFrom = async (id) => {
-        const loading = ref(true);
-        let sandDB = await axios
-          .delete(`${api}/sand/${id}`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              console.log('OK', id);
-              return res.data;
-            }
-            return {};
-          })
-          .finally(() => {
-            loading.value = false;
-            stDB.value = stDB.value.filter((st) => st.id !== id);
-          });
-      };
-
       return {
-        stDB,
-        deleteFrom,
+        woDB,
       };
     },
   };

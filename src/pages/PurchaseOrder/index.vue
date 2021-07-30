@@ -9,32 +9,71 @@
     <div class="flex flex-col">
       <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+          <div
+            class="
+              shadow
+              overflow-hidden
+              border-b border-gray-200
+              sm:rounded-lg
+            "
+          >
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                     title="Numero de Pedido"
                   >
                     N°
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                   >
                     Proveedor de arena
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                   >
                     Cantidad
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                   >
                     Estado
                   </th>
@@ -50,17 +89,34 @@
                   :class="poKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                   class="hover:bg-gray-100"
                 >
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td
+                    class="
+                      px-6
+                      py-4
+                      whitespace-nowrap
+                      text-sm
+                      font-medium
+                      text-gray-900
+                    "
+                  >
                     {{ po.id }}
                   </td>
                   <td
-                    :class="po.sandProvider?.name ? 'text-gray-500' : 'text-gray-400 italic'"
+                    :class="
+                      po.sandProvider?.name
+                        ? 'text-gray-500'
+                        : 'text-gray-400 italic'
+                    "
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
                     {{ po.sandProvider.name || 'Sin proveedor' }}
                   </td>
                   <td
-                    :class="po.sandProvider.sandOrders ? 'text-gray-500' : 'text-gray-400 italic'"
+                    :class="
+                      po.sandProvider.sandOrders
+                        ? 'text-gray-500'
+                        : 'text-gray-400 italic'
+                    "
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
                     {{
@@ -74,7 +130,10 @@
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
                     <div class="flex space-x-2">
-                      <ExclamationCircleIcon v-if="po.draft === 'error'" class="w-5 h-5" />
+                      <ExclamationCircleIcon
+                        v-if="po.draft === 'error'"
+                        class="w-5 h-5"
+                      />
                       <InformationCircleIcon v-if="po.draft" class="w-5 h-5" />
                       <CheckCircleIcon v-else class="w-5 h-5" />
                       <span>
@@ -82,18 +141,38 @@
                       </span>
                     </div>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td
+                    class="
+                      px-6
+                      py-4
+                      whitespace-nowrap
+                      text-right text-sm
+                      font-medium
+                    "
+                  >
                     <div class="flex justify-end space-x-4">
                       <router-link
                         :to="`/orden-de-pedido/${po.id}`"
-                        class="flex justify-between items-center text-indigo-600 hover:text-indigo-900"
+                        class="
+                          flex
+                          justify-between
+                          items-center
+                          text-indigo-600
+                          hover:text-indigo-900
+                        "
                       >
                         <PencilAltIcon class="w-5 h-5" />
                         <span> Editar </span>
                       </router-link>
                       <button
                         @click="deletePO(po.id)"
-                        class="flex justify-between items-center text-red-600 hover:text-red-900"
+                        class="
+                          flex
+                          justify-between
+                          items-center
+                          text-red-600
+                          hover:text-red-900
+                        "
                       >
                         <TrashIcon class="w-5 h-5" />
                         <span> Eliminar </span>
@@ -102,7 +181,10 @@
                   </td>
                 </tr>
                 <tr v-if="poDB.length <= 0">
-                  <td colspan="5" class="text-center text-xs text-gray-500 px-6 py-4">
+                  <td
+                    colspan="5"
+                    class="text-center text-xs text-gray-500 px-6 py-4"
+                  >
                     <p>No hay Ordenes de Trabajo</p>
                   </td>
                 </tr>
@@ -116,91 +198,97 @@
 </template>
 
 <script lang="ts">
-import { onMounted, ref, Ref } from 'vue';
-import { createNamespacedHelpers } from 'vuex-composition-helpers';
-const { useState, useActions } = createNamespacedHelpers('purchaseOrder');
-import Layout from '@/layouts/Main.vue';
-import UiBtn from '@/components/ui/Button.vue';
-import axios from 'axios';
-import {
-  TrashIcon,
-  PencilAltIcon,
-  InformationCircleIcon,
-  ExclamationCircleIcon,
-  CheckCircleIcon,
-} from '@heroicons/vue/solid';
-import { PurchaseOrder, SandOrder } from '@/interfaces/PurchaseOrder.ts';
-import { PurchaseOrder, PurchaseOrder } from '../../interfaces/PurchaseOrder';
-const api = 'https://sandflow-qa.bitpatagonia.com/api';
-export default {
-  components: {
-    ExclamationCircleIcon,
-    CheckCircleIcon,
-    UiBtn,
+  import { onMounted, ref, Ref } from 'vue';
+  import { createNamespacedHelpers } from 'vuex-composition-helpers';
+  const { useState, useActions } = createNamespacedHelpers('purchaseOrder');
+  import Layout from '@/layouts/Main.vue';
+  import UiBtn from '@/components/ui/Button.vue';
+  import axios from 'axios';
+  import {
     TrashIcon,
     PencilAltIcon,
-    Layout,
     InformationCircleIcon,
-  },
-  setup() {
-    const poDB: Ref<Array<PurchaseOrder>> = ref([] as Array<PurchaseOrder>);
-    const { all } = useState(['all']);
-    const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
-    const purchaseOrder: Array<PurchaseOrder> = all.value;
-    onMounted(async () => {
-      const loading: Ref<boolean> = ref(true);
-      if (poDB.value && poDB.value.length > 0) {
-        if (poDB.value.length > purchaseOrder.length) {
-          if (purchaseOrder.length === 0) {
-            poDB.value.forEach((wo) => {
-              savePurchaseOrder(wo);
-            });
+    ExclamationCircleIcon,
+    CheckCircleIcon,
+  } from '@heroicons/vue/solid';
+  import { PurchaseOrder, SandOrder } from '@/interfaces/PurchaseOrder.ts';
+  import { PurchaseOrder, PurchaseOrder } from '../../interfaces/PurchaseOrder';
+  const api = 'https://sandflow-qa.bitpatagonia.com/api';
+  export default {
+    components: {
+      ExclamationCircleIcon,
+      CheckCircleIcon,
+      UiBtn,
+      TrashIcon,
+      PencilAltIcon,
+      Layout,
+      InformationCircleIcon,
+    },
+    setup() {
+      const poDB: Ref<Array<PurchaseOrder>> = ref([] as Array<PurchaseOrder>);
+      const { all } = useState(['all']);
+      const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
+      const purchaseOrder: Array<PurchaseOrder> = all.value;
+      onMounted(async () => {
+        const loading: Ref<boolean> = ref(true);
+        if (poDB.value && poDB.value.length > 0) {
+          if (poDB.value.length > purchaseOrder.length) {
+            if (purchaseOrder.length === 0) {
+              poDB.value.forEach((wo) => {
+                savePurchaseOrder(wo);
+              });
+            } else {
+              const newWoDB = poDB.value.filter(
+                (woFromApi: PurchaseOrder, key: number) => {
+                  return (
+                    woFromApi.id &&
+                    purchaseOrder[key] &&
+                    woFromApi.id !== purchaseOrder[key].id
+                  );
+                }
+              );
+              newWoDB.forEach((wo) => {
+                savePurchaseOrder(wo);
+              });
+            }
           } else {
-            const newWoDB = poDB.value.filter((woFromApi: PurchaseOrder, key: number) => {
-              return woFromApi.id && purchaseOrder[key] && woFromApi.id !== purchaseOrder[key].id;
-            });
-            newWoDB.forEach((wo) => {
-              savePurchaseOrder(wo);
-            });
+            poDB.value = purchaseOrder;
           }
-        } else {
+        } else if (purchaseOrder.length > 0) {
           poDB.value = purchaseOrder;
         }
-      } else if (purchaseOrder.length > 0) {
-        poDB.value = purchaseOrder;
-      }
-    });
-    const sumTotalSand = (sandOrders: Array<SandOrder>) => {
-      return sandOrders.reduce((totalSand, order) => {
-        return totalSand + order.quantity;
-      }, 0);
-    };
-
-    const deletePO = async (poId: number) => {
-      // const deleted = await axios
-      //   .delete(`${api}/purchaseOrder/${poId}`)
-      //   .catch((err) => {
-      //     console.log(err);
-      //   })
-      //   .then((res) => {
-      //     if (res.status === 200) {
-      //       console.log(res);
-      //       return res;
-      //     }
-      //     return [];
-      //   })
-      //   .finally(() => {
-      //     loading.value = false;
-      //   });
-      poDB.value = poDB.value.filter((wo) => {
-        return wo.id !== poId;
       });
-    };
-    return {
-      poDB,
-      deletePO,
-      sumTotalSand,
-    };
-  },
-};
+      const sumTotalSand = (sandOrders: Array<SandOrder>) => {
+        return sandOrders.reduce((totalSand, order) => {
+          return totalSand + order.quantity;
+        }, 0);
+      };
+
+      const deletePO = async (poId: number) => {
+        // const deleted = await axios
+        //   .delete(`${api}/purchaseOrder/${poId}`)
+        //   .catch((err) => {
+        //     console.log(err);
+        //   })
+        //   .then((res) => {
+        //     if (res.status === 200) {
+        //       console.log(res);
+        //       return res;
+        //     }
+        //     return [];
+        //   })
+        //   .finally(() => {
+        //     loading.value = false;
+        //   });
+        poDB.value = poDB.value.filter((wo) => {
+          return wo.id !== poId;
+        });
+      };
+      return {
+        poDB,
+        deletePO,
+        sumTotalSand,
+      };
+    },
+  };
 </script>

@@ -42,3 +42,4 @@ export default class WorkOrderAPIService {
     return this.axiosCall<WorkOrder>({ method: "DELETE", url: `/${WorkOrderId}` });
   }
 }
+export default new WorkOrderService();
