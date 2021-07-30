@@ -171,7 +171,7 @@
                     colspan="5"
                     class="text-center text-xs text-gray-500 px-6 py-4"
                   >
-                    <p>No hay Ordenes de Trabajo</p>
+                    <p>No hay Ordenes de Pedidos</p>
                   </td>
                 </tr>
               </tbody>
