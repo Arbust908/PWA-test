@@ -14,7 +14,7 @@ export default {
   mutations: {
     ADD_PURCHASEORDER(state, payload) {
       const lastId =
-        state.all.length > 0 ? state.all[state.all.length - 1].id : 0;
+        state.all.length > 0 ? state.all[state.all.length - 1].id : -1;
       payload.id = lastId + 1;
       state.all.push(payload);
     },

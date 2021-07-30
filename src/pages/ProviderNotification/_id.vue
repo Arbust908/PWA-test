@@ -1,7 +1,11 @@
 <template>
   <Layout>
-    <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-second-900 text-xl self-start mb-3 md:mb-0">Notificación a proveedores</h1>
+    <header
+      class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
+    >
+      <h1 class="font-bold text-second-900 text-xl self-start mb-3 md:mb-0">
+        Notificación a proveedores
+      </h1>
     </header>
     <section class="bg-second-50 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
@@ -9,40 +13,46 @@
           <h2 class="col-span-full text-xl">Arena</h2>
           <label class="col-span-full" for="sandProvider">
             <span>Proveedor</span>
-            <input
+            <select
               id="sandProvider"
-              v-model="sandProvider"
+              v-model="sandProviderId"
               class="input"
-              type="text"
               name="sandProvider"
-              list="sandProvider-list"
-              placeholder="Proveedor de Arena"
-            />
-            <datalist id="sandProvider-list">
-              <option value="San Luis">San Luis</option>
-              <option value="San Lucio">San Lucio</option>
-              <option value="Orange">Orange</option>
-            </datalist>
+            >
+              <option selected disabled value="">
+                Seleccionar Proveedor de Arena
+              </option>
+              <option v-for="sP in sandProviders" :key="sP.id" :value="sP.id">
+                {{ toCapitalize(sP.name) }}
+              </option>
+            </select>
           </label>
-          <template v-for="(sO, Key) in sandOrder" :key="Key">
+          {{ sandOrder }}
+          <!-- <template v-for="(sO, Key) in sandOrder" :key="Key">
             <hr v-if="Key !== 0" class="mt-4 mb-2 col-span-full" />
-            <label :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'" for="sandType">
+            <label
+              :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'"
+              for="sandType"
+            >
               <span>Tipo</span>
-              <input
-                v-model="sO.sandType"
+              <select
+                id="sandProvider"
+                v-model="sO.sandType.id"
                 class="input"
-                type="text"
-                name="sandType"
-                list="sandType-list"
-                placeholder="Tipo de Arena"
-              />
-              <datalist id="sandType-list">
-                <option value="30/40"></option>
-                <option value="50/100"></option>
-              </datalist>
+                name="sandProvider"
+              >
+                <option selected disabled value="">
+                  Seleccionar Tipo de Arena
+                </option>
+                <option v-for="sT in sandTypes" :key="sT.id" :value="sT.id">
+                  {{ toCapitalize(sT.type) }}
+                </option>
+              </select>
             </label>
-
-            <label :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'" for="sandQuantity">
+            <label
+              :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'"
+              for="sandQuantity"
+            >
               <span>Cantidad</span>
               <div class="mt-1 flex rounded shadow-sm">
                 <input
@@ -89,12 +99,19 @@
                 </span>
               </div>
             </label>
-            <div v-if="sandOrder.length > 1" class="col-span-2 flex justify-end items-end">
-              <CircularBtn class="btn__delete" size="sm" @click="removeSandOrder(sO.id)">
+            <div
+              v-if="sandOrder.length > 1"
+              class="col-span-2 flex justify-end items-end"
+            >
+              <CircularBtn
+                class="btn__delete"
+                size="sm"
+                @click="removeSandOrder(sO.id)"
+              >
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
-          </template>
+          </template> -->
           <div class="col-span-full mt-1 pb-4 mb-4">
             <button class="flex items-center p-1" @click.prevent="addSandOrder">
               <CircularBtn class="btn__add" size="xs">
@@ -106,44 +123,59 @@
         </fieldset>
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Transporte</h2>
-          <template v-for="(tP, tPKey) in transportProviders" :key="tPKey">
-            <hr v-if="tPKey !== 0" class="mt-4 mb-2 col-span-full" />
+          <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
+            <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
             <label
-              :class="transportProviders.length > 1 ? 'col-span-10' : 'col-span-full'"
-              :for="'transportProvider' + tP.id"
+              :class="
+                transportProviders && transportProviders.length > 1
+                  ? 'col-span-10'
+                  : 'col-span-full'
+              "
+              :for="'transportProvider' + tO.id"
             >
               <span>Proveedor</span>
-              <input
-                :id="'transportProvider' + tP.id"
-                v-model="tP.name"
+              <select
+                :id="'transportProvider' + tO.id"
+                v-model="tO.id"
                 class="input"
-                type="text"
-                :name="'transportProvider' + tP.id"
-                :list="'transportProvider' + tP.id + '-list'"
-                placeholder="Proveedor de Transpore"
-              />
-              <datalist :id="'transportProvider' + tP.id + '-list'">
-                <option value="San Luis">San Luis</option>
-                <option value="Orange">Orange</option>
-              </datalist>
+                :name="'transportProvider' + tO.id"
+              >
+                <option selected disabled value="-1">
+                  Proveedor de Transpore
+                </option>
+                <option
+                  v-for="(tP, tPKey) in transportProviders"
+                  :key="tPKey"
+                  :value="tP.id"
+                >
+                  {{ tP.name }}
+                </option>
+              </select>
             </label>
-            <div v-if="transportProviders.length > 1" class="col-span-2 flex justify-end items-end">
-              <CircularBtn class="btn__delete" size="sm" @click="removeTransportProvider(tP.id)">
+            <div
+              v-if="transportProviders && transportProviders.length > 1"
+              class="col-span-2 flex justify-end items-end"
+            >
+              <CircularBtn
+                class="btn__delete"
+                size="sm"
+                @click="removeTransportProvider(tO.id)"
+              >
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
-            <label class="col-span-full" :for="'transportAmount' + tP.id">
+            <label class="col-span-full" :for="'transportAmount' + tO.id">
               <span>Cantidad de camiones</span>
               <input
-                :id="'transportAmount' + tP.id"
-                v-model="tP.amount"
+                :id="'transportAmount' + tO.id"
+                v-model.number="tO.amount"
                 class="input"
                 type="text"
-                :name="'transportAmount' + tP.id"
-                :list="'transportAmount' + tP.id + '-list'"
+                :name="'transportAmount' + tO.id"
+                :list="'transportAmount' + tO.id + '-list'"
                 placeholder="Cantidad de camiones"
               />
-              <datalist :id="'transportAmount' + tP.id + '-list'">
+              <datalist :id="'transportAmount' + tO.id + '-list'">
                 <option value="1">1 Camion</option>
                 <option value="2">2 Camiones</option>
                 <option value="4">4 Camiones</option>
@@ -152,18 +184,18 @@
               </datalist>
             </label>
 
-            <label class="col-span-full" :for="'transportObservations' + tP.id">
+            <label class="col-span-full" :for="'transportObservations' + tO.id">
               <span>Observaciones</span>
               <input
-                :id="'transportObservations' + tP.id"
-                v-model.number="tP.observation"
+                :id="'transportObservations' + tO.id"
+                v-model="tO.observation"
                 class="input"
                 type="text"
-                :name="'transportObservations' + tP.id"
-                :list="'transportObservations' + tP.id + '-list'"
+                :name="'transportObservations' + tO.id"
+                :list="'transportObservations' + tO.id + '-list'"
                 placeholder="Observaciones"
               />
-              <datalist :id="'transportObservations' + tP.id + '-list'">
+              <datalist :id="'transportObservations' + tO.id + '-list'">
                 <option value="Chasis Grande">Chasis Grande</option>
                 <option value="Chasis Chico">Chasis Chico</option>
                 <option value="Doble Carga">Doble Carga</option>
@@ -172,7 +204,10 @@
             </label>
           </template>
           <div class="col-span-full mt-1 pb-4 mb-4">
-            <button class="flex items-center p-1" @click.prevent="addTransportProvider">
+            <button
+              class="flex items-center p-1"
+              @click.prevent="addTransportProvider"
+            >
               <CircularBtn class="btn__add" size="xs">
                 <PlusIcon class="w-4 h-4" />
               </CircularBtn>
@@ -182,7 +217,9 @@
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
-        <button @click.prevent="$router.push('/notificaciones-a-proveedores')">Cancelar</button>
+        <GhostBtn @click.prevent="$router.push('/notificaciones-a-proveedores')"
+          >Cancelar</GhostBtn
+        >
         <PrimaryBtn
           type="submit"
           size="sm"
@@ -195,7 +232,12 @@
         </PrimaryBtn>
       </footer>
     </section>
-    <Modal title="Notificación a Proveedores" type="off" :open="showModal" @close="toggleModal">
+    <Modal
+      title="Notificación a Proveedores"
+      type="off"
+      :open="showModal"
+      @close="toggleModal"
+    >
       <template #body>
         <div class="divide-y text-left">
           <section class="py-2 space-y-2">
@@ -203,20 +245,25 @@
             <article class="text-sm text-indigo-500">
               <header class="flex items-center gap-2">
                 <BellIcon class="w-4 h-4" />
-                <span>Notificación para {{ sandProvider }}</span>
+                <span>Notificación para {{ sandProvider.name }}</span>
               </header>
               <ul class="list-disc pl-6 ml-2">
-                <li v-for="sOli in sandOrder" :key="sOli.id">Tipo {{ sOli.sandType }}, {{ sOli.amount }}</li>
+                <li v-for="sOli in sandOrder" :key="sOli.id">
+                  Tipo {{ sOli.sandType.name }}, {{ sOli.amount }}
+                </li>
               </ul>
             </article>
           </section>
           <section class="py-2 space-y-2">
             <h3 class="text-xl">Transporte</h3>
-            <template v-for="tPNot in transportProviders" :key="tPNot.id">
+            <template v-for="tPNot in transportOrder" :key="tPNot.id">
               <article class="text-sm text-indigo-500">
                 <header class="flex items-center gap-2">
                   <BellIcon class="w-4 h-4" />
-                  <span> Notificación para {{ tPNot.name }}, {{ tPNot.amount }}U, {{ tPNot.observation }} </span>
+                  <span>
+                    Notificación para {{ tPNot.name }}, {{ tPNot.amount }}U,
+                    {{ tPNot.observation }}
+                  </span>
                 </header>
               </article>
             </template>
@@ -241,7 +288,10 @@
               font-medium
               text-second-400
               hover:bg-gray-100
-              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
+              focus:outline-none
+              focus:ring-2
+              focus:ring-offset-2
+              focus:ring-red-500
               sm:text-sm
             "
             @click.prevent="toggleModal"
@@ -264,7 +314,10 @@
               font-medium
               text-second-50
               hover:bg-main-700
-              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500
+              focus:outline-none
+              focus:ring-2
+              focus:ring-offset-2
+              focus:ring-main-500
               sm:text-sm
             "
             @click.prevent="confirm"
@@ -278,61 +331,133 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, reactive, computed, ComputedRef, toRaw, defineComponent, defineAsyncComponent } from 'vue';
+  import {
+    ref,
+    Ref,
+    computed,
+    defineComponent,
+    defineAsyncComponent,
+    watch,
+    toRefs,
+  } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
-  import { useState, useActions } from 'vuex-composition-helpers';
 
-  import { BookmarkIcon, TrashIcon, DotsVerticalIcon } from '@heroicons/vue/outline';
+  import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import { ProviderNotification, SandOrder, TransportProvider } from '@/interfaces/ProviderNotification.ts';
+  import {
+    ProviderNotification,
+    SandOrder,
+    TransportProvider,
+  } from '@/interfaces/ProviderNotification.ts';
   import { useToggle } from '@vueuse/core';
 
-  const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+  const Modal = defineAsyncComponent(
+    () => import('@/components/modal/General.vue')
+  );
 
   import axios from 'axios';
-  const api = 'https://sandflow-qa.bitpatagonia.com/api';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  import { SandProvider } from '@/interfaces/SandProvider';
+  import { Sand } from '@/interfaces/SandType';
+  import SelectList from '@/components/ui/SelectList.vue';
+  const apiUrl = import.meta.env.VITE_API_URL;
 
   export default defineComponent({
     components: {
       BellIcon,
-      BookmarkIcon,
       CircularBtn,
-      DotsVerticalIcon,
       GhostBtn,
       Layout,
       Modal,
       PlusIcon,
       PrimaryBtn,
       TrashIcon,
+      SelectList,
     },
     setup() {
       const router = useRouter();
       const route = useRoute();
       const store = useStore();
 
-      const allPNs = JSON.parse(JSON.stringify(store.state.providerNotifications.all));
-      const currentProviderNotification = allPNs.find((pn) => pn.id === route.params.id);
+      const instance = axios.create({
+        baseURL: apiUrl,
+      });
 
-      const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
+      const id = route.params.id;
+      const stateNotifications = store.state.providerNotification.all;
+      const stateNot = stateNotifications.find(
+        (notification: ProviderNotification) => notification.id == id
+      );
+      const currentProviderNotification = ref({});
+      console.log(stateNot);
+      if (!stateNot) {
+        console.log('Api');
+        const { data: pNData } = useAxios('/ProviderNotification', instance);
+        watch(pNData, (pNData, prevCount) => {
+          if (pNData && pNData.data) {
+            currentProviderNotification.value = pNData.data;
+          }
+        });
+      } else {
+        currentProviderNotification.value = stateNot;
+      }
 
-      const { sandProvider, sandOrder, transportProviders } = currentProviderNotification;
-      // const sandProvider: Ref<string> = ref('');
+      const { sandProviderId, sandOrder } = currentProviderNotification.value;
+      console.log(sandProviderId, sandOrder);
+
+      const sandProviders = ref([] as Array<Sand>);
+      const { data: sPData } = useAxios('/sandProvider', instance);
+      watch(sPData, (sPData, prevCount) => {
+        if (sPData && sPData.data) {
+          sandProviders.value = sPData.data;
+        }
+      });
+
+      const sandTypes = ref([] as Array<Sand>);
+      const { data: sData } = useAxios('/sand', instance);
+      watch(sData, (sData, prevCount) => {
+        if (sData && sData.data) {
+          sandTypes.value = sData.data;
+        }
+      });
+
+      const transportProviders = ref([] as Array<Sand>);
+      const { data: tPData } = useAxios('/transportProvider', instance);
+      watch(tPData, (tPData, prevCount) => {
+        if (tPData && tPData.data) {
+          transportProviders.value = tPData.data;
+        }
+      });
+
+      // const sandProviderId: Ref<string> = ref('');
+      const sandProvider: ComputedRef<SandProvider> = computed(() =>
+        sandProviders.value.find((sp) => sp.id === sandProviderId.value)
+      );
+
       // const sandOrder: Ref<Array<SandOrder>> = ref([]);
-      // const transportProviders: Ref<Array<TransportProvider>> = ref([]);
+      const transportOrder: Ref<Array<TransportProvider>> = ref([]);
 
       const defaultSandOrder: SandOrder = {
         id: 0,
-        sandType: null,
-        amount: 0,
+        sandTypeId: 0,
+        sandType: {
+          id: '',
+          type: '',
+          description: '',
+          meshType: '',
+          grainType: '',
+          observations: '',
+        },
+        amount: null,
       };
       const addSandOrder = () => {
         const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
-        const lastSandOrderId = lastSandOrder ? lastSandOrder.id : 0;
+        const lastSandOrderId = lastSandOrder ? lastSandOrder.id : -1;
         const newSandOrder = { ...defaultSandOrder };
         newSandOrder.id = lastSandOrderId + 1;
         sandOrder.value.push(newSandOrder);
@@ -343,30 +468,36 @@
       if (sandOrder.value.length === 0) {
         addSandOrder();
       }
-
       const defaultTransportProvider: TransportProvider = {
         id: 0,
         name: '',
         amount: 0,
         observation: '',
+        providerNotificationId: 0,
+        providerNotification: { id: 0, sandProviderId: 0, sandOrderId: 0 },
       };
       const addTransportProvider = () => {
-        const lastTransportProvider = transportProviders.value[transportProviders.value.length - 1];
-        const lastTransportProviderId = lastTransportProvider ? lastTransportProvider.id : 0;
+        const lastTransportProvider =
+          transportOrder.value[transportOrder.value.length - 1];
+        const lastTransportProviderId = lastTransportProvider
+          ? lastTransportProvider.id
+          : -2;
         const newTransportProvider = { ...defaultTransportProvider };
         newTransportProvider.id = lastTransportProviderId + 1;
-        transportProviders.value.push(newTransportProvider);
+        transportOrder.value.push(newTransportProvider);
       };
       const removeTransportProvider = (tpId: number) => {
-        transportProviders.value = transportProviders.value.filter((tp) => tp.id !== tpId);
+        transportOrder.value = transportOrder.value.filter(
+          (tp) => tp.id !== tpId
+        );
       };
-      if (transportProviders.value.length === 0) {
+      if (transportOrder.value.length === 0) {
         addTransportProvider();
       }
 
       const isFull = computed(() => {
         return !!(
-          sandProvider.value &&
+          sandProviderId.value &&
           sandOrder.value &&
           sandOrder.value.every((so) => so.amount >= 0) &&
           sandOrder.value.every((so) => so.sandType) &&
@@ -379,35 +510,35 @@
       const showModal = ref(false);
       const toggleModal = useToggle(showModal);
       const save = async () => {
+        console.log(
+          sandProviderId.value,
+          sandOrder.value,
+          transportProviders.value
+        );
+        console.log({
+          sandProviderId: sandProviderId.value,
+          sandOrder: sandOrder.value,
+        });
         toggleModal(true);
       };
       const confirm = async () => {
         pN.value = {
-          sandProvider: sandProvider.value,
+          sandProvider: sandProvider,
           sandOrder: sandOrder.value,
           transportProviders: transportProviders.value,
         };
-        const newPN = await axios
-          .put(`${api}/sand`, pN.value)
-          .catch((err) => {
-            console.log(err);
-            return false;
-          })
-          .then((res) => {
-            console.log(res);
-            if (res.status === 200) {
-              return res.data;
-            }
-            return {};
-          })
-          .finally(() => {});
+
         toggleModal(false);
-        store.dispatch('updateProviderNotification', pN.value);
+        store.dispatch('saveProviderNotification', pN.value);
         router.push('/notificaciones-a-proveedores');
       };
 
+      const toCapitalize = (str: string) => {
+        return str.charAt(0).toUpperCase() + str.slice(1);
+      };
+
       return {
-        sandProvider,
+        sandProviderId,
         sandOrder,
         transportProviders,
         addSandOrder,
@@ -419,6 +550,11 @@
         toggleModal,
         isFull,
         confirm,
+        sandProviders,
+        toCapitalize,
+        sandTypes,
+        transportOrder,
+        sandProvider,
       };
     },
   });
