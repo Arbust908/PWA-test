@@ -19,11 +19,11 @@
               class="input"
               name="sandProvider"
             >
-              <option selected disabled value="">
+              <option selected disabled value="-1">
                 Seleccciona Proveedor de Arena
               </option>
               <option
-                v-for="sP in sandProviders.data"
+                v-for="sP in sandProviders"
                 :key="sP.id + sP.name"
                 :value="sP.id"
               >
@@ -45,7 +45,7 @@
                   Seleccciona Tipo de Arena
                 </option>
                 <option
-                  v-for="sT in sandTypes.data"
+                  v-for="sT in sandTypes"
                   :key="sT.id + sT.type"
                   :value="sT.id"
                 >
@@ -151,7 +151,7 @@
                 Proveedor de Transporte
               </option>
               <option
-                v-for="tP in transportProviders.data"
+                v-for="tP in transportProviders"
                 :key="tP.id + tP.name"
                 :value="tP.id"
               >
@@ -225,216 +225,224 @@
         >
           Crear Orden
         </PrimaryBtn>
-        <PrimaryBtn type="submit" size="sm" class="p-4" @click.prevent="save()">
-          Crear r
-        </PrimaryBtn>
       </footer>
     </section>
   </Layout>
 </template>
 
 <script lang="ts">
-import { ref, Ref, reactive, computed, ComputedRef, toRaw } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter } from 'vue-router';
-import { useState, useActions } from 'vuex-composition-helpers';
+  import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRouter } from 'vue-router';
+  import { useState, useActions } from 'vuex-composition-helpers';
 
-import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
-import { PlusIcon } from '@heroicons/vue/solid';
-import Layout from '@/layouts/Main.vue';
-import PurchaseOrderForm from '@/components/purchaseOrder/Form.vue';
-import GhostBtn from '@/components/ui/GhostBtn.vue';
-import CircularBtn from '@/components/ui/CircularBtn.vue';
-import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-import {
-  PurchaseOrder,
-  SandProvider,
-  SandOrder,
-  TransportProvider,
-} from '@/interfaces/PurchaseOrder.ts';
-import axios from 'axios';
-import { useAxios } from '@vueuse/integrations/useAxios';
-const api = import.meta.env.VITE_API_URL;
+  import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
+  import { PlusIcon } from '@heroicons/vue/solid';
+  import Layout from '@/layouts/Main.vue';
+  import PurchaseOrderForm from '@/components/purchaseOrder/Form.vue';
+  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import {
+    PurchaseOrder,
+    SandProvider,
+    SandOrder,
+    TransportProvider,
+  } from '@/interfaces/PurchaseOrder.ts';
+  import axios from 'axios';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  import { SandProvider } from '@/interfaces/SandProvider';
+  import { Sand, SandOrder } from '@/interfaces/sandflow.Types';
+  const api = import.meta.env.VITE_API_URL;
 
-export default {
-  components: {
-    Layout,
-    GhostBtn,
-    BookmarkIcon,
-    TrashIcon,
-    PlusIcon,
-    CircularBtn,
-    PrimaryBtn,
-  },
-  setup() {
-    // Init
-    const store = useStore();
-    const router = useRouter();
-    const instance = axios.create({
-      baseURL: api,
-    });
-
-    const {
-      data: sandProviders,
-      isFinished: sPs_end,
-      isLoading: sPs_load,
-      error: sPs_error,
-    } = useAxios('/sandProvider', instance);
-    const sandProviderId: Ref<number> = ref('');
-    const sandOrder: Ref<Array<any>> = ref([
-      {
-        id: 0,
-        sandType: {},
-        sandTypeId: '',
-        quantity: null,
-        boxId: '',
-      },
-    ]);
-
-    const { data, isFinished, isLoading, error } = useAxios(
-      '/sandOrder',
-      instance
-    );
-    const {
-      data: sandTypes,
-      isFinished: sTs_end,
-      isLoading: sTs_load,
-      error: sTs_error,
-    } = useAxios('/sand', instance);
-
-    const removeOrder = (id: number): void => {
-      sandOrder.value = sandOrder.value.filter(
-        (sandOrder: SandOrder) => sandOrder.id !== id
-      );
-    };
-    const addOrder = (): void => {
-      const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
-      const newId = lastSandOrder.id + 1;
-      sandOrder.value.push({
-        id: newId,
-        type: {},
-        sandTypeId: '',
-        quantity: null,
-        boxId: '',
+  export default {
+    components: {
+      Layout,
+      GhostBtn,
+      BookmarkIcon,
+      TrashIcon,
+      PlusIcon,
+      CircularBtn,
+      PrimaryBtn,
+    },
+    setup() {
+      // :: Init
+      const store = useStore();
+      const router = useRouter();
+      const instance = axios.create({
+        baseURL: api,
       });
-    };
-    const removeEmptySandOrders = (): void => {
-      sandOrder.value = sandOrder.value
-        .filter((sandOrder: SandOrder) => sandOrder.quantity > 0)
-        .filter((sandOrder: SandOrder) => sandOrder.type !== '')
-        .filter((sandOrder: SandOrder) => sandOrder.boxId !== '');
-    };
-    // ::
-    // TransportProvider
-    const {
-      data: transportProviders,
-      isFinished: tPs_end,
-      isLoading: tPs_load,
-      error: tPs_error,
-    } = useAxios('/transportProvider', instance);
-    const transportProviderId: Ref<number> = ref(-1);
-    const transportProvider: TransportProvider = reactive({
-      id: 1,
-      name: '',
-      transportId: '',
-      boxQuantity: null,
-      observation: '',
-    });
+      // >> Init
+      // :: Proveedores de Sand
+      const sandProviders = ref([] as Array<SandProvider>);
+      const { data: sandProvidersData } = useAxios('/sandProvider', instance);
+      watch(sandProvidersData, (sPData, prevCount) => {
+        if (sPData && sPData.data) {
+          sandProviders.value = sPData.data;
+        }
+      });
+      const sandProviderId: Ref<number> = ref(-1);
+      // >> Proveedores de Sand
 
-    const isFull: ComputedRef<boolean> = computed(() => {
-      return false;
-    });
-    const getTPbyId = (id: number): TransportProvider => {
-      return transportProviders.value.data.find((tp) => tp.id === id);
-    };
-    const getSPbyId = (id: number): SandProvider => {
-      return sandProviders.value.data.find((sp) => sp.id === id);
-    };
+      // :: Ordenes de Sand
+      const sandOrder: Ref<Array<any>> = ref([
+        {
+          id: 0,
+          sandType: {},
+          sandTypeId: '',
+          quantity: null,
+          boxId: '',
+        },
+      ]);
 
-    const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
-    const save = (): void => {
-      removeEmptySandOrders();
-      if (isFull.value) {
-        const newTP = getTPbyId(transportProviderId.value);
-        const trueTP = {
-          ...transportProvider,
-          id: newTP.id,
-          name: newTP.name,
-        };
-        const purchaseOrder = {
-          sandProviderId: sandProviderId.value,
-          sandProvider: getSPbyId(sandProviderId.value),
-          sandOrders: [...sandOrder.value],
-          transportProviderId: transportProviderId.value,
-          transportProvider: trueTP,
-        } as PurchaseOrder;
-        savePurchaseOrder(purchaseOrder);
-        router.push('/orden-de-pedido');
-      }
-    };
-    return {
-      sandProviderId,
-      sandOrder,
-      removeOrder,
-      addOrder,
-      transportProvider,
-      isFull,
-      save,
-      data,
-      isFinished,
-      isLoading,
-      error,
-      sandProviders,
-      sPs_end,
-      sPs_load,
-      sPs_error,
-      sandTypes,
-      sTs_end,
-      sTs_load,
-      sTs_error,
-      transportProviders,
-      tPs_end,
-      tPs_load,
-      tPs_error,
-      transportProviderId,
-    };
-  },
-};
+      // :: Ordenes de Sand
+      const sandOrders = ref([] as Array<SandOrder>);
+      const { data: sandOrdersData } = useAxios('/sandOrder', instance);
+      watch(sandOrdersData, (sOData, prevCount) => {
+        if (sOData && sOData.data) {
+          sandOrders.value = sOData.data;
+        }
+      });
+      // >> Ordenes de Sand
+
+      // :: Tipos de Sand
+      const sandTypes = ref([] as Array<Sand>);
+      const { data: sandTypesData } = useAxios('/sand', instance);
+      watch(sandTypesData, (sOData, prevCount) => {
+        if (sOData && sOData.data) {
+          sandTypes.value = sOData.data;
+        }
+      });
+
+      // >> Tipos de Sand
+
+      const removeOrder = (id: number): void => {
+        sandOrder.value = sandOrder.value.filter(
+          (sandOrder: SandOrder) => sandOrder.id !== id
+        );
+      };
+      const addOrder = (): void => {
+        const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
+        const newId = lastSandOrder.id + 1;
+        sandOrder.value.push({
+          id: newId,
+          type: {},
+          sandTypeId: '',
+          quantity: null,
+          boxId: '',
+        });
+      };
+
+      // :: TransportProvider
+      const transportProviders = ref([] as Array<Sand>);
+      const { data: tPData } = useAxios('/transportProvider', instance);
+      watch(tPData, (tPData, prevCount) => {
+        if (tPData && tPData.data) {
+          transportProviders.value = tPData.data;
+        }
+      });
+
+      const transportProviderId: Ref<number> = ref(-1);
+      const transportProvider: TransportProvider = reactive({
+        id: 1,
+        name: '',
+        transportId: '',
+        boxQuantity: null,
+        observation: '',
+      });
+      // >> TransportProvider
+
+      const isFull: ComputedRef<boolean> = computed(() => {
+        return !!(
+          transportProviderId.value > -1 &&
+          transportProvider.transportId &&
+          transportProvider.boxQuantity &&
+          transportProvider.boxQuantity >= 0 &&
+          sandProviderId.value > -1 &&
+          sandOrder.value.length > 0 &&
+          sandOrder.value.every((sO: SandOrder) => sO.quantity > 0) &&
+          sandOrder.value.every((sO: SandOrder) => sO.type !== '')
+        );
+      });
+      const getTPbyId = (id: number): TransportProvider => {
+        return transportProviders.value.find((tp) => tp.id === id);
+      };
+      const getSPbyId = (id: number): SandProvider => {
+        return sandProviders.value.find((sp) => sp.id === id);
+      };
+
+      const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
+      const save = (): void => {
+        if (isFull.value) {
+          const newTP = getTPbyId(transportProviderId.value);
+          const trueTP = {
+            ...transportProvider,
+            id: newTP.id,
+            name: newTP.name,
+          };
+          const purchaseOrder = {
+            sandProviderId: sandProviderId.value,
+            sandProvider: getSPbyId(sandProviderId.value),
+            sandOrders: [...sandOrder.value],
+            transportProviderId: transportProviderId.value,
+            transportProvider: trueTP,
+          } as PurchaseOrder;
+          console.log(purchaseOrder);
+          savePurchaseOrder(purchaseOrder);
+          router.push('/orden-de-pedido');
+        }
+      };
+      return {
+        sandProviderId,
+        sandOrder,
+        removeOrder,
+        addOrder,
+        transportProvider,
+        isFull,
+        save,
+        sandOrders,
+        sandProviders,
+        sandTypes,
+        transportProviders,
+        transportProviderId,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.input {
-  @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 mt-1 flex shadow-sm;
-}
-fieldset:not(:last-of-type) {
-  @apply border-b pb-6;
-}
-label {
-  @apply flex flex-col;
-  span {
-    @apply text-sm;
+  .input {
+    @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 mt-1 flex shadow-sm;
   }
-}
-// Quizas hay que armar algo externo para los estilos de boton
-.btn {
-  &__draft {
-    @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+  fieldset:not(:last-of-type) {
+    @apply border-b pb-6;
   }
-  &__delete {
-    @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-    /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+  label {
+    @apply flex flex-col;
+    span {
+      @apply text-sm;
+    }
   }
-  &__add {
-    @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+  // Quizas hay que armar algo externo para los estilos de boton
+  .btn {
+    &__draft {
+      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+    }
+    &__delete {
+      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
+      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+    }
+    &__add {
+      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+    }
+    &__add--special {
+      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+    }
+    &__mobile-only {
+      @apply lg:hidden;
+    }
+    &__desktop-only {
+      @apply hidden lg:inline-flex;
+    }
   }
-  &__add--special {
-    @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-  }
-  &__mobile-only {
-    @apply lg:hidden;
-  }
-  &__desktop-only {
-    @apply hidden lg:inline-flex;
-  }
-}
 </style>

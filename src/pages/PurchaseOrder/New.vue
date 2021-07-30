@@ -19,11 +19,11 @@
               class="input"
               name="sandProvider"
             >
-              <option selected disabled value="">
+              <option selected disabled value="-1">
                 Seleccciona Proveedor de Arena
               </option>
               <option
-                v-for="sP in sandProviders.data"
+                v-for="sP in sandProviders"
                 :key="sP.id + sP.name"
                 :value="sP.id"
               >
@@ -45,7 +45,7 @@
                   Seleccciona Tipo de Arena
                 </option>
                 <option
-                  v-for="sT in sandTypes.data"
+                  v-for="sT in sandTypes"
                   :key="sT.id + sT.type"
                   :value="sT.id"
                 >
@@ -151,7 +151,7 @@
                 Proveedor de Transporte
               </option>
               <option
-                v-for="tP in transportProviders.data"
+                v-for="tP in transportProviders"
                 :key="tP.id + tP.name"
                 :value="tP.id"
               >
@@ -225,16 +225,13 @@
         >
           Crear Orden
         </PrimaryBtn>
-        <PrimaryBtn type="submit" size="sm" class="p-4" @click.prevent="save()">
-          Crear r
-        </PrimaryBtn>
       </footer>
     </section>
   </Layout>
 </template>
 
 <script lang="ts">
-  import { ref, Ref, reactive, computed, ComputedRef, toRaw } from 'vue';
+  import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useState, useActions } from 'vuex-composition-helpers';
@@ -254,6 +251,8 @@
   } from '@/interfaces/PurchaseOrder.ts';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
+  import { SandProvider } from '@/interfaces/SandProvider';
+  import { Sand, SandOrder } from '@/interfaces/sandflow.Types';
   const api = import.meta.env.VITE_API_URL;
 
   export default {
@@ -267,20 +266,25 @@
       PrimaryBtn,
     },
     setup() {
-      // Init
+      // :: Init
       const store = useStore();
       const router = useRouter();
       const instance = axios.create({
         baseURL: api,
       });
+      // >> Init
+      // :: Proveedores de Sand
+      const sandProviders = ref([] as Array<SandProvider>);
+      const { data: sandProvidersData } = useAxios('/sandProvider', instance);
+      watch(sandProvidersData, (sPData, prevCount) => {
+        if (sPData && sPData.data) {
+          sandProviders.value = sPData.data;
+        }
+      });
+      const sandProviderId: Ref<number> = ref(-1);
+      // >> Proveedores de Sand
 
-      const {
-        data: sandProviders,
-        isFinished: sPs_end,
-        isLoading: sPs_load,
-        error: sPs_error,
-      } = useAxios('/sandProvider', instance);
-      const sandProviderId: Ref<number> = ref('');
+      // :: Ordenes de Sand
       const sandOrder: Ref<Array<any>> = ref([
         {
           id: 0,
@@ -291,16 +295,26 @@
         },
       ]);
 
-      const { data, isFinished, isLoading, error } = useAxios(
-        '/sandOrder',
-        instance
-      );
-      const {
-        data: sandTypes,
-        isFinished: sTs_end,
-        isLoading: sTs_load,
-        error: sTs_error,
-      } = useAxios('/sand', instance);
+      // :: Ordenes de Sand
+      const sandOrders = ref([] as Array<SandOrder>);
+      const { data: sandOrdersData } = useAxios('/sandOrder', instance);
+      watch(sandOrdersData, (sOData, prevCount) => {
+        if (sOData && sOData.data) {
+          sandOrders.value = sOData.data;
+        }
+      });
+      // >> Ordenes de Sand
+
+      // :: Tipos de Sand
+      const sandTypes = ref([] as Array<Sand>);
+      const { data: sandTypesData } = useAxios('/sand', instance);
+      watch(sandTypesData, (sOData, prevCount) => {
+        if (sOData && sOData.data) {
+          sandTypes.value = sOData.data;
+        }
+      });
+
+      // >> Tipos de Sand
 
       const removeOrder = (id: number): void => {
         sandOrder.value = sandOrder.value.filter(
@@ -318,20 +332,16 @@
           boxId: '',
         });
       };
-      const removeEmptySandOrders = (): void => {
-        sandOrder.value = sandOrder.value
-          .filter((sandOrder: SandOrder) => sandOrder.quantity > 0)
-          .filter((sandOrder: SandOrder) => sandOrder.type !== '')
-          .filter((sandOrder: SandOrder) => sandOrder.boxId !== '');
-      };
-      // ::
-      // TransportProvider
-      const {
-        data: transportProviders,
-        isFinished: tPs_end,
-        isLoading: tPs_load,
-        error: tPs_error,
-      } = useAxios('/transportProvider', instance);
+
+      // :: TransportProvider
+      const transportProviders = ref([] as Array<Sand>);
+      const { data: tPData } = useAxios('/transportProvider', instance);
+      watch(tPData, (tPData, prevCount) => {
+        if (tPData && tPData.data) {
+          transportProviders.value = tPData.data;
+        }
+      });
+
       const transportProviderId: Ref<number> = ref(-1);
       const transportProvider: TransportProvider = reactive({
         id: 1,
@@ -340,20 +350,29 @@
         boxQuantity: null,
         observation: '',
       });
+      // >> TransportProvider
 
       const isFull: ComputedRef<boolean> = computed(() => {
-        return false;
+        return !!(
+          transportProviderId.value > -1 &&
+          transportProvider.transportId &&
+          transportProvider.boxQuantity &&
+          transportProvider.boxQuantity >= 0 &&
+          sandProviderId.value > -1 &&
+          sandOrder.value.length > 0 &&
+          sandOrder.value.every((sO: SandOrder) => sO.quantity > 0) &&
+          sandOrder.value.every((sO: SandOrder) => sO.type !== '')
+        );
       });
       const getTPbyId = (id: number): TransportProvider => {
-        return transportProviders.value.data.find((tp) => tp.id === id);
+        return transportProviders.value.find((tp) => tp.id === id);
       };
       const getSPbyId = (id: number): SandProvider => {
-        return sandProviders.value.data.find((sp) => sp.id === id);
+        return sandProviders.value.find((sp) => sp.id === id);
       };
 
       const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
       const save = (): void => {
-        removeEmptySandOrders();
         if (isFull.value) {
           const newTP = getTPbyId(transportProviderId.value);
           const trueTP = {
@@ -368,6 +387,7 @@
             transportProviderId: transportProviderId.value,
             transportProvider: trueTP,
           } as PurchaseOrder;
+          console.log(purchaseOrder);
           savePurchaseOrder(purchaseOrder);
           router.push('/orden-de-pedido');
         }
@@ -380,22 +400,10 @@
         transportProvider,
         isFull,
         save,
-        data,
-        isFinished,
-        isLoading,
-        error,
+        sandOrders,
         sandProviders,
-        sPs_end,
-        sPs_load,
-        sPs_error,
         sandTypes,
-        sTs_end,
-        sTs_load,
-        sTs_error,
         transportProviders,
-        tPs_end,
-        tPs_load,
-        tPs_error,
         transportProviderId,
       };
     },

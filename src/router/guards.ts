@@ -12,7 +12,6 @@ export const wokrOrdersID = store.state.workOrders.all.reduce((woIds, workOrder)
   return woIds;
 }, []);
 export const isLogged = (to, from, next) => {
-  console.log('In is Logged');
   recoverLocalUser();
   const isLogged = store.getters.isLogged;
   if (!isLogged) {

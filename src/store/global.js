@@ -3,6 +3,11 @@ export default {
     navigation: [
       { name: 'Panel', to: '/', icon: 'HomeIcon' },
       {
+        name: 'Planificacion de Arena',
+        to: '/planificacion-de-arena',
+        icon: 'ClipboardListIcon',
+      },
+      {
         name: 'Orden de Trabajo',
         to: '/orden-de-trabajo',
         icon: 'ClipboardListIcon',
@@ -30,11 +35,6 @@ export default {
       {
         name: 'Tipos de Arena',
         to: '/tipos-de-arena',
-        icon: 'ClipboardListIcon',
-      },
-      {
-        name: 'Planificacion de Arena',
-        to: '/planificacion-de-arena',
         icon: 'ClipboardListIcon',
       },
     ],

@@ -1,14 +1,13 @@
 import { createStore } from 'vuex';
 
-// import user from '@/store/user';
 import global from '@/store/global';
-import workOrders from '@/store/workOrders';
+import providerNotification from '@/store/providerNotification';
+import purchaseOrder from '@/store/purchaseOrder';
 import sand from '@/store/sand';
+import sandPlan from '@/store/sandPlan';
 import sandProviders from '@/store/sandProviders';
 import transportProviders from '@/store/transportProviders';
-import purchaseOrder from '@/store/purchaseOrder';
-import providerNotification from '@/store/providerNotification';
-import sandPlan from '@/store/sandPlan';
+import workOrders from '@/store/workOrders';
 
 const store = createStore({
   state: {
@@ -44,13 +43,13 @@ const store = createStore({
   modules: {
     global,
     providerNotification,
+    purchaseOrder,
     sand,
-    workOrders,
     sand,
+    sandPlan,
     sandProviders,
     transportProviders,
-    purchaseOrder,
-    sandPlan,
+    workOrders,
   },
   strict: true,
 });

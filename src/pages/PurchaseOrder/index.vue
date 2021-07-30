@@ -84,7 +84,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(po, poKey) in poDB"
+                  v-for="(po, poKey) in all"
                   :key="po.id"
                   :class="poKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                   class="hover:bg-gray-100"
@@ -103,7 +103,7 @@
                   </td>
                   <td
                     :class="
-                      po.sandProvider?.name
+                      po.sandProvider && po.sandProvider.name
                         ? 'text-gray-500'
                         : 'text-gray-400 italic'
                     "
@@ -113,34 +113,20 @@
                   </td>
                   <td
                     :class="
-                      po.sandProvider.sandOrders
+                      po.sandProvider && po.sandProvider.sandOrders
                         ? 'text-gray-500'
                         : 'text-gray-400 italic'
                     "
                     class="px-6 py-4 whitespace-nowrap text-sm"
-                  >
-                    {{
-                      po.sandProvider.sandOrders.length > 0
-                        ? sumTotalSand(po.sandProvider.sandOrders) + 't'
-                        : 'Sin orden de arena'
-                    }}
-                  </td>
+                  ></td>
                   <td
-                    :class="po.draft ? 'text-blue-500' : 'text-green-500'"
+                    :class="
+                      po.sandProvider && po.sandProvider.transportProvider
+                        ? 'text-gray-500'
+                        : 'text-gray-400 italic'
+                    "
                     class="px-6 py-4 whitespace-nowrap text-sm"
-                  >
-                    <div class="flex space-x-2">
-                      <ExclamationCircleIcon
-                        v-if="po.draft === 'error'"
-                        class="w-5 h-5"
-                      />
-                      <InformationCircleIcon v-if="po.draft" class="w-5 h-5" />
-                      <CheckCircleIcon v-else class="w-5 h-5" />
-                      <span>
-                        {{ po.draft ? 'Pendiente' : 'Completado' }}
-                      </span>
-                    </div>
-                  </td>
+                  ></td>
                   <td
                     class="
                       px-6
@@ -180,7 +166,7 @@
                     </div>
                   </td>
                 </tr>
-                <tr v-if="poDB.length <= 0">
+                <tr v-if="all.length <= 0">
                   <td
                     colspan="5"
                     class="text-center text-xs text-gray-500 px-6 py-4"
@@ -198,7 +184,7 @@
 </template>
 
 <script lang="ts">
-  import { onMounted, ref, Ref } from 'vue';
+  import { onMounted, ref, Ref, watch } from 'vue';
   import { createNamespacedHelpers } from 'vuex-composition-helpers';
   const { useState, useActions } = createNamespacedHelpers('purchaseOrder');
   import Layout from '@/layouts/Main.vue';
@@ -212,8 +198,7 @@
     CheckCircleIcon,
   } from '@heroicons/vue/solid';
   import { PurchaseOrder, SandOrder } from '@/interfaces/PurchaseOrder.ts';
-  import { PurchaseOrder, PurchaseOrder } from '../../interfaces/PurchaseOrder';
-  const api = 'https://sandflow-qa.bitpatagonia.com/api';
+  const api = import.meta.env.VITE_API_URL;
   export default {
     components: {
       ExclamationCircleIcon,
@@ -224,40 +209,11 @@
       Layout,
       InformationCircleIcon,
     },
+    // { "sandProviderId": "2", "sandProvider": { "id": "2", "name": "sand provider", "legalName": "sand provider legalName", "legalId": "234444444", "meshType": "mesh type", "grains": "grains", "observations": null, "companyRepresentativeId": null, "companyRepresentative": null }, "sandOrders": [ { "id": 0, "sandType": {}, "sandTypeId": "1", "quantity": "22", "boxId": "" } ], "transportProviderId": "5", "transportProvider": { "id": "5", "name": "Transportes Firulais", "transportId": "AC 245 WC", "boxQuantity": "2", "observation": "" }, "id": 1 }
     setup() {
-      const poDB: Ref<Array<PurchaseOrder>> = ref([] as Array<PurchaseOrder>);
       const { all } = useState(['all']);
       const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
-      const purchaseOrder: Array<PurchaseOrder> = all.value;
-      onMounted(async () => {
-        const loading: Ref<boolean> = ref(true);
-        if (poDB.value && poDB.value.length > 0) {
-          if (poDB.value.length > purchaseOrder.length) {
-            if (purchaseOrder.length === 0) {
-              poDB.value.forEach((wo) => {
-                savePurchaseOrder(wo);
-              });
-            } else {
-              const newWoDB = poDB.value.filter(
-                (woFromApi: PurchaseOrder, key: number) => {
-                  return (
-                    woFromApi.id &&
-                    purchaseOrder[key] &&
-                    woFromApi.id !== purchaseOrder[key].id
-                  );
-                }
-              );
-              newWoDB.forEach((wo) => {
-                savePurchaseOrder(wo);
-              });
-            }
-          } else {
-            poDB.value = purchaseOrder;
-          }
-        } else if (purchaseOrder.length > 0) {
-          poDB.value = purchaseOrder;
-        }
-      });
+
       const sumTotalSand = (sandOrders: Array<SandOrder>) => {
         return sandOrders.reduce((totalSand, order) => {
           return totalSand + order.quantity;
@@ -265,27 +221,13 @@
       };
 
       const deletePO = async (poId: number) => {
-        // const deleted = await axios
-        //   .delete(`${api}/purchaseOrder/${poId}`)
-        //   .catch((err) => {
-        //     console.log(err);
-        //   })
-        //   .then((res) => {
-        //     if (res.status === 200) {
-        //       console.log(res);
-        //       return res;
-        //     }
-        //     return [];
-        //   })
-        //   .finally(() => {
-        //     loading.value = false;
-        //   });
         poDB.value = poDB.value.filter((wo) => {
           return wo.id !== poId;
         });
       };
+
       return {
-        poDB,
+        all,
         deletePO,
         sumTotalSand,
       };
