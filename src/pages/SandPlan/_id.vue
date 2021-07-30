@@ -275,18 +275,18 @@
         ],
       });
       const vuexSPs = JSON.parse(JSON.stringify(store.state.sandPlan.all));
-      console.log(vuexSPs);
+      //   console.log(vuexSPs);
       const vuexSP = vuexSPs.find((sp) => {
         return sp.id == id;
       });
-      console.log(vuexSP);
-      console.log(currentSandPlan);
+      //   console.log(vuexSP);
+      //   console.log(currentSandPlan);
       if (!vuexSP) {
         const { data: spData } = useAxios('/sandPlan', instance);
         watch(spData, (sandplanApi, prevCount) => {
           if (sandplanApi && sandplanApi.data) {
             const sp = { ...currentSandPlan, ...sandplanApi.data };
-            console.log('API', sp);
+            // console.log('API', sp);
             currentSandPlan.companyId = sp.companyId;
             currentSandPlan.pitId = sp.pitId;
             currentSandPlan.stagesAmount = sp.stagesAmount;
@@ -296,14 +296,14 @@
         });
       } else {
         const sp = { ...currentSandPlan, ...vuexSP };
-        console.log('VUEX', sp);
+        // console.log('VUEX', sp);
         currentSandPlan.companyId = sp.companyId;
         currentSandPlan.pitId = sp.pitId;
         currentSandPlan.stagesAmount = sp.stagesAmount;
         currentSandPlan.stages = sp.stages;
         currentSandPlan.id = sp.id;
       }
-      console.log(currentSandPlan);
+      //   console.log(currentSandPlan);
 
       const addStage = () => {
         const defaultStage = {
@@ -364,7 +364,7 @@
       const upgrade = (stage) => {
         currentSandPlan.stages.map((s) => {
           if (s.id === stage.id) {
-            s.state += 1;
+            s.status += 1;
           }
           return s;
         });
@@ -411,14 +411,14 @@
       const isFull = computed(() => {
         return true;
       });
-      const { saveSandPlan } = useActions(['saveSandPlan']);
+      const { updateSandPlan } = useActions(['updateSandPlan']);
       const save = (): void => {
         const { data } = useAxios(
-          '/sandPlan',
-          { method: 'POST', data: currentSandPlan },
+          '/sandPlan/' + id,
+          { method: 'PUT', data: currentSandPlan },
           instance
         );
-        saveSandPlan(currentSandPlan);
+        updateSandPlan(currentSandPlan);
         router.push('/planificacion-de-arena');
       };
       return {

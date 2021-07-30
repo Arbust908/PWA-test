@@ -29,7 +29,7 @@
     </td>
     <td v-else class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
       <p v-if="sands.length > 0 && stage.sandId >= 0">
-        {{ getSand(stage.sandId).type }}
+        {{ getSand(stage.sandId)?.type }}
       </p>
       <p v-else>-</p>
       <p>{{ stage.quantity }}t</p>
