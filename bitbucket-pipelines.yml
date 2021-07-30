@@ -58,8 +58,10 @@ pipelines:
   branches:
     main:
       - step: *build
-      - step: *deploy-staging
       - step: *deploy-prod
+    staging:
+      - step: *build
+      - step: *deploy-staging
   pull-requests:
     feature/*:
       - step: *build
@@ -69,4 +71,3 @@ pipelines:
       - step: *deploy-qa
     release/*:
       - step: *build
-      - step: *deploy-staging
