@@ -11,36 +11,38 @@
 
 <script lang="ts">
   import {
+    AdjustmentsIcon,
+    AnnotationIcon,
+    ArchiveIcon,
+    AtSymbolIcon,
     BellIcon,
     ChipIcon,
+    ChipIcon,
+    ClipboardListIcon,
     ClipboardListIcon,
     HomeIcon,
+    LogoutIcon,
     LogoutIcon,
     MenuAlt2Icon,
     UsersIcon,
     XIcon,
-    AtSymbolIcon,
-    ClipboardListIcon,
-    AdjustmentsIcon,
-    LogoutIcon,
-    ChipIcon,
-    AnnotationIcon,
   } from '@heroicons/vue/outline';
   import { defineComponent, defineAsyncComponent } from 'vue';
 
   export default defineComponent({
     components: {
+      AdjustmentsIcon,
+      AnnotationIcon,
+      ArchiveIcon,
+      AtSymbolIcon,
       BellIcon,
+      ChipIcon,
+      ClipboardListIcon,
       HomeIcon,
+      LogoutIcon,
       MenuAlt2Icon,
       UsersIcon,
       XIcon,
-      AtSymbolIcon,
-      ClipboardListIcon,
-      AdjustmentsIcon,
-      LogoutIcon,
-      ChipIcon,
-      AnnotationIcon,
     },
     props: {
       to: {

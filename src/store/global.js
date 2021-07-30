@@ -2,14 +2,24 @@ export default {
   state: () => ({
     navigation: [
       { name: 'Panel', to: '/', icon: 'HomeIcon' },
-      // {
-      //   name: 'About',
-      //   to: '/about',
-      //   icon: 'AtSymbolIcon',
-      // },
       {
         name: 'Orden de Trabajo',
         to: '/orden-de-trabajo',
+        icon: 'ClipboardListIcon',
+      },
+      {
+        name: 'Orden de Pedido',
+        to: '/orden-de-pedido',
+        icon: 'ArchiveIcon',
+      },
+      {
+        name: 'Notificaciones a Proveedores',
+        to: '/notificaciones-a-proveedores',
+        icon: 'AnnotationIcon',
+      },
+      {
+        name: 'Proveedores de transporte',
+        to: '/proveedores-de-transporte',
         icon: 'ClipboardListIcon',
       },
       {
@@ -18,34 +28,9 @@ export default {
         icon: 'ClipboardListIcon',
       },
       {
-        name: 'Proveedores de transporte',
-        to: '/proveedores-de-transporte',
+        name: 'Tipos de Arena',
+        to: '/tipos-de-arena',
         icon: 'ClipboardListIcon',
-      },
-      {
-        name: 'Centro de Carga',
-        to: '/centro-de-carga-de-arena',
-        icon: 'ClipboardListIcon',
-      },
-      {
-        name: 'Notificaciones a Proveedores',
-        to: '/notificaciones-a-proveedores',
-        icon: 'AnnotationIcon',
-      },
-      // {
-      //   name: 'Componentes',
-      //   to: '/componentes',
-      //   icon: 'ChipIcon',
-      // },
-      // {
-      //   name: 'Tipos de Arena',
-      //   to: '/tipos-de-arena',
-      //   icon: 'ClipboardListIcon',
-      // }
-      {
-        name: 'Orden de Pedido',
-        to: '/orden-de-pedido',
-        icon: 'ArchiveIcon',
       },
     ],
     user_navigation: [
