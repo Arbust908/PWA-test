@@ -32,6 +32,11 @@ export default {
         to: '/tipos-de-arena',
         icon: 'ClipboardListIcon',
       },
+      {
+        name: 'Planificacion de Arena',
+        to: '/planificacion-de-arena',
+        icon: 'ClipboardListIcon',
+      },
     ],
     user_navigation: [
       // { name: 'Perfil', to: '/usuario', icon: 'AdjustmentsIcon' },
