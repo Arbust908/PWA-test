@@ -1,33 +1,45 @@
-import apiClient from "@/http-commons";
+import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import { WorkOrder } from "@/interfaces/WorkOrder";
 
-class WorkOrderService {
-  getAll(): Promise<any> {
-    return apiClient.get("/workOrder");
+export default class WorkOrderAPIService {
+  private axiosInstance: AxiosInstance;
+
+  constructor() {
+    this.axiosInstance = axios.create({
+      baseURL: "https://sandflow-qa.bitpatagonia.com/api/workOrder",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
   }
 
-  get(id: number): Promise<any> {
-    return apiClient.get(`/workOrder/${id}`);
+  private async axiosCall<T>(config: AxiosRequestConfig) {
+    try {
+      const { data } = await this.axiosInstance.request<T>(config);
+      return [null, data];
+    } catch (error) {
+      return [error];
+    }
   }
 
-  // create(data: any): Promise<any> {
-  //   return http.post("/tutorials", data);
-  // }
+  async getAllWorkOrders() {
+    return this.axiosCall<Array<WorkOrder>>({ method: "GET" });
+  }
 
-  // update(id: any, data: any): Promise<any> {
-  //   return http.put(`/tutorials/${id}`, data);
-  // }
+  async getWorkOrder(WorkOrderId: number) {
+    return this.axiosCall<WorkOrder>({ method: "GET", url: `/${WorkOrderId}` });
+  }
 
-  // delete(id: any): Promise<any> {
-  //   return http.delete(`/tutorials/${id}`);
-  // }
+  async createWorkOrder(WorkOrder: WorkOrder) {
+    return this.axiosCall<WorkOrder>({ method: "POST", data: WorkOrder });
+  }
 
-  // deleteAll(): Promise<any> {
-  //   return http.delete(`/tutorials`);
-  // }
+  async updateWorkOrder(WorkOrder: WorkOrder) {
+    return this.axiosCall<WorkOrder>({ method: "PUT", url: `/${WorkOrder.id}`, data: WorkOrder });
+  }
 
-  // findByTitle(title: string): Promise<any> {
-  //   return http.get(`/tutorials?title=${title}`);
-  // }
+  async deleteWorkOrder(WorkOrderId: number) {
+    return this.axiosCall<WorkOrder>({ method: "DELETE", url: `/${WorkOrderId}` });
+  }
 }
-
 export default new WorkOrderService();

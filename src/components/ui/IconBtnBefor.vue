@@ -87,11 +87,11 @@
 </template>
 
 <script>
-import { MailIcon } from '@heroicons/vue/solid';
+  import { MailIcon } from '@heroicons/vue/solid';
 
-export default {
-  components: {
-    MailIcon,
-  },
-};
+  export default {
+    components: {
+      MailIcon,
+    },
+  };
 </script>

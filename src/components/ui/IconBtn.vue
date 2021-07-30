@@ -88,17 +88,17 @@
 </template>
 
 <script>
-import { MailIcon } from '@heroicons/vue/solid';
+  import { MailIcon } from '@heroicons/vue/solid';
 
-export default {
-  components: {
-    MailIcon,
-  },
-  props: {
-    position: {
-      type: String,
-      default: 'before',
+  export default {
+    components: {
+      MailIcon,
     },
-  },
-};
+    props: {
+      position: {
+        type: String,
+        default: 'before',
+      },
+    },
+  };
 </script>

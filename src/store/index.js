@@ -1,7 +1,12 @@
 import { createStore } from 'vuex';
 
-// import user from '@/store/user';
 import global from '@/store/global';
+import providerNotification from '@/store/providerNotification';
+import purchaseOrder from '@/store/purchaseOrder';
+import sand from '@/store/sand';
+import sandPlan from '@/store/sandPlan';
+import sandProviders from '@/store/sandProviders';
+import transportProviders from '@/store/transportProviders';
 import workOrders from '@/store/workOrders';
 
 const store = createStore({
@@ -17,6 +22,9 @@ const store = createStore({
     },
     isGuest(state) {
       return state.user.role === 0;
+    },
+    getUserToken(state) {
+      return state.user.token || null;
     },
   },
   actions: {
@@ -34,6 +42,13 @@ const store = createStore({
   },
   modules: {
     global,
+    providerNotification,
+    purchaseOrder,
+    sand,
+    sand,
+    sandPlan,
+    sandProviders,
+    transportProviders,
     workOrders,
   },
   strict: true,

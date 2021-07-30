@@ -10,15 +10,18 @@ export default {
     UPDATE_WORKORDER(state, payload) {
       // Que no sea map
       state.all.map((workOrder, index) => {
-        console.log(workOrder, payload);
         if (workOrder.id === payload.id) {
           state.all[index] = payload;
         }
       });
     },
+    DELETE_WORKORDER(state, payload) {
+      state.all = state.all.filter((workOrder) => workOrder.id !== payload);
+    },
   },
   actions: {
     saveWorkOrder({ commit }, workOrder) {
+      console.log('saveWorkOrder', workOrder);
       const baseWO = {
         id: 0,
         client: '',
@@ -39,14 +42,12 @@ export default {
         cabin: 0,
       };
       commit('ADD_WORKORDER', { ...baseWO, ...workOrder });
-      if (workOrder.isFull) {
-        // Axios POST to api to create work order
-      } else {
-        // Axios POST to incomplete work order
-      }
     },
     updateWorkOrder({ commit }, workOrder) {
       commit('UPDATE_WORKORDER', workOrder);
+    },
+    deleteWorkOrder({ commit }, workOrderId) {
+      commit('DELETE_WORKORDER', workOrderId);
     },
   },
 };
