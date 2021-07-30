@@ -17,6 +17,11 @@ export default {
         to: '/proveedores-de-arena',
         icon: 'ClipboardListIcon',
       },
+      {
+        name: 'Proveedores de transporte',
+        to: '/proveedores-de-transporte',
+        icon: 'ClipboardListIcon',
+      },
       // {
       //   name: 'Componentes',
       //   to: '/componentes',

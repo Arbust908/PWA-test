@@ -2,7 +2,6 @@ import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/pages/Home.vue';
 import { isLogged, isAdmin, isGuest } from '@/router/guards';
 
-
 const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
@@ -77,6 +76,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/proveedores-de-transporte',
+    name: 'TransportProvider',
+    component: () => import('@/pages/TransportProvider/index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/proveedores-de-transporte/:id',
+    name: 'TransportProviderById',
+    component: () => import('@/pages/TransportProvider/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/proveedores-de-transporte/nuevo',
+    name: 'NewTransportProvider',
+    component: () => import('@/pages/TransportProvider/new.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/usuario/salir',
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),
@@ -96,8 +113,8 @@ const routes: Array<RouteRecordRaw> = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
-    routes,
+  history: createWebHistory(),
+  routes,
 })
 
 export default router;
