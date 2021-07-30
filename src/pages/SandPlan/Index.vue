@@ -173,7 +173,7 @@
 </template>
 
 <script>
-  import { onMounted, ref } from 'vue';
+  import { watch, ref } from 'vue';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
   import {
@@ -184,10 +184,11 @@
     CheckCircleIcon,
   } from '@heroicons/vue/solid';
   import UiBtn from '@/components/ui/Button.vue';
+  import { useAxios } from '@vueuse/integrations/useAxios';
   import axios from 'axios';
   // import { Sand } from '@/interfaces/sandflow.Types.ts';
 
-  const api = 'https://sandflow-qa.bitpatagonia.com/api';
+  const api = import.meta.env.VITE_API_URL;
   export default {
     components: {
       Layout,
@@ -196,11 +197,26 @@
       PencilAltIcon,
     },
     setup() {
-      const sandPlans = ref([]);
-      const store = useStore();
-      const allSandPlans = JSON.parse(JSON.stringify(store.state.sandPlan.all));
+      const instance = axios.create({
+        baseURL: api,
+      });
 
-      sandPlans.value = allSandPlans;
+      const store = useStore();
+
+      const sandPlans = ref([]);
+      const { data: sPData } = useAxios('/sandPlan', instance);
+      watch(sPData, (sPData, prevCount) => {
+        if (sPData && sPData.data) {
+          sandPlans.value = sPData.data;
+          sandPlans.value.map((sp) => {
+            storeToVuex(sp);
+          });
+        }
+      });
+
+      const storeToVuex = (sandPlan) => {
+        store.dispatch('saveSandPlan', sandPlan);
+      };
 
       const sumQty = (sandStages) => {
         return sandStages.reduce((totalSum, ss) => {
@@ -209,6 +225,12 @@
       };
       const deleteSP = (id) => {
         const loading = ref(true);
+        const { data } = useAxios(
+          '/sandPlan/' + id,
+          { method: 'POST' },
+          instance
+        );
+        store.dispatch('updateSandPlan', id);
         sandPlans.value = sandPlans.value.filter((sp) => {
           return sp.id !== id;
         });
