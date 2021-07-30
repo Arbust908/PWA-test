@@ -140,14 +140,26 @@
                     <div class="flex justify-end space-x-4">
                       <router-link
                         :to="`/planificacion-de-arena/${sp.id}`"
-                        class="text-indigo-600 hover:text-indigo-900"
+                        class="
+                          flex
+                          items-center
+                          gap-1
+                          text-indigo-600
+                          hover:text-indigo-900
+                        "
                       >
                         <PencilAltIcon class="w-5 h-5" />
                         <span> Editar </span>
                       </router-link>
                       <button
                         @click="deleteSP(sp.id)"
-                        class="text-red-600 hover:text-red-900"
+                        class="
+                          flex
+                          items-center
+                          gap-1
+                          text-red-600
+                          hover:text-red-900
+                        "
                       >
                         <TrashIcon class="w-5 h-5" />
                         <span> Eliminar </span>
