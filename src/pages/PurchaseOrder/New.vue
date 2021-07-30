@@ -88,7 +88,7 @@
                   list="sandQuantity"
                 />
                 <datalist id="sandQuantity">
-                  <option value="12">12</option>
+                  <option value="Doce">12</option>
                   <option value="22">22</option>
                   <option value="44">44</option>
                   <option value="88">88</option>
