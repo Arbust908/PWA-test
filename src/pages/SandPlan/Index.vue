@@ -92,7 +92,7 @@ import { useStore } from 'vuex';
 import Layout from '@/layouts/Main.vue';
 import UiBtn from '@/components/ui/Button.vue';
 import axios from 'axios';
-import { SandPlan } from '@/interfaces/sandflow.Types.ts';
+// import { Sand } from '@/interfaces/sandflow.Types.ts';
 
 const api = 'https://sandflow-qa.bitpatagonia.com/api';
 export default {
@@ -103,7 +103,7 @@ export default {
   setup() {
     const sandPlans = ref([]);
     const store = useStore();
-    const allSandPlans: Array<SandPlan> = JSON.parse(JSON.stringify(store.state.sandPlan.all));
+    const allSandPlans = JSON.parse(JSON.stringify(store.state.sandPlan.all));
 
     sandPlans.value = allSandPlans;
 
