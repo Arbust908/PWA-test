@@ -1,29 +1,55 @@
 <template>
   <Layout>
-    <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de trabajo - {{ woID }}</h1>
+    <header
+      class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
+    >
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+        Orden de trabajo - {{ woID }}
+      </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <nav class="flex justify-between">
-        <button class="section-tab" :selected="WO_section === 'orden'" @click="changeSection('orden')">
+        <button
+          class="section-tab"
+          :selected="WO_section === 'orden'"
+          @click="changeSection('orden')"
+        >
           <span> Orden </span>
           <CheckCircleIcon v-if="isOrderFull" class="w-5 h-5" />
         </button>
-        <button class="section-tab" :selected="WO_section === 'equipamento'" @click="changeSection('equipamento')">
+        <button
+          class="section-tab"
+          :selected="WO_section === 'equipamento'"
+          @click="changeSection('equipamento')"
+        >
           <span> Equipamento </span>
           <CheckCircleIcon v-if="isEquipmentFull" class="w-5 h-5" />
         </button>
-        <button class="section-tab" :selected="WO_section === 'rrhh'" @click="changeSection('rrhh')">
+        <button
+          class="section-tab"
+          :selected="WO_section === 'rrhh'"
+          @click="changeSection('rrhh')"
+        >
           <span> RRHH </span>
           <CheckCircleIcon v-if="isRRHHFull" class="w-5 h-5" />
         </button>
       </nav>
-      <form v-if="WO_section === 'orden'" method="POST" action="/" class="p-4 max-w-lg">
+      <form
+        v-if="WO_section === 'orden'"
+        method="POST"
+        action="/"
+        class="p-4 max-w-lg"
+      >
         <fieldset>
           <div class="input-block">
             <label for="client" class=""> Cliente </label>
             <div class="mt-1">
-              <input v-model="client" name="client" type="text" placeholder="Nombre de cliente" />
+              <input
+                v-model="client"
+                name="client"
+                type="text"
+                placeholder="Nombre de cliente"
+              />
               <!-- <select v-model="client" name="client">
                 <option selected disabled value="">ej: Nasta</option>
                 <option value="ypf">YPF</option>
@@ -33,9 +59,16 @@
             </div>
           </div>
           <div class="input-block">
-            <label for="serviceCompany" class=""> Operadora / Empresa de Servicios </label>
+            <label for="serviceCompany" class="">
+              Operadora / Empresa de Servicios
+            </label>
             <div class="mt-1">
-              <input v-model="serviceCompany" name="serviceCompany" type="text" placeholder="Nombre de Operadora" />
+              <input
+                v-model="serviceCompany"
+                name="serviceCompany"
+                type="text"
+                placeholder="Nombre de Operadora"
+              />
               <!-- <select v-model="serviceCompany" name="serviceCompany">
                 <option selected disabled value="">ej: Pipele</option>
                 <option value="ypf">YPF</option>
@@ -47,17 +80,34 @@
           <div class="input-block">
             <label for="pad" class=""> PAD </label>
             <div class="mt-1">
-              <input v-model="pad" name="pad" type="text" placeholder="ej: 12313" />
+              <input
+                v-model="pad"
+                name="pad"
+                type="text"
+                placeholder="ej: 12313"
+              />
             </div>
           </div>
         </fieldset>
         <fieldset>
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Pozos</legend>
+          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+            Pozos
+          </legend>
           <section class="input-block_multi">
             <label for="pit" class=""> Pozo </label>
             <div v-for="(pit, key) in pits" :key="pit.id" class="pit-block">
-              <input v-model="pits[key].name" :name="`pit-${pit.id}`" type="text" placeholder="Nuevo Pozo" />
-              <CircularBtn v-if="key !== pits.length - 1" class="btn__delete" size="sm" @click="removePit(pit.id)">
+              <input
+                v-model="pits[key].name"
+                :name="`pit-${pit.id}`"
+                type="text"
+                placeholder="Nuevo Pozo"
+              />
+              <CircularBtn
+                v-if="key !== pits.length - 1"
+                class="btn__delete"
+                size="sm"
+                @click="removePit(pit.id)"
+              >
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
               <CircularBtn v-else class="btn__delete invisible" size="sm">
@@ -73,15 +123,27 @@
           </section>
         </fieldset>
       </form>
-      <form v-else-if="WO_section === 'equipamento'" method="POST" action="/" class="p-4">
+      <form
+        v-else-if="WO_section === 'equipamento'"
+        method="POST"
+        action="/"
+        class="p-4"
+      >
         <section class="md:flex md:justify-between max-w-4xl gap-4">
           <fieldset class="w-full max-w-sm">
-            <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Cradle</legend>
+            <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+              Cradle
+            </legend>
             <section>
               <div class="input-block">
                 <label for="cradle_main" class=""> Operativo </label>
                 <div class="mt-1">
-                  <input v-model="operativeCradle" name="cradle_main" type="text" placeholder="Cradle 1" />
+                  <input
+                    v-model="operativeCradle"
+                    name="cradle_main"
+                    type="text"
+                    placeholder="Cradle 1"
+                  />
                   <!-- <select v-model="operativeCradle" name="cradle_main">
                     <option selected disabled value="">Cradle Operativo</option>
                     <option value="aplt">Aplt</option>
@@ -93,7 +155,12 @@
               <div class="input-block">
                 <label for="cradle_backup" class=""> Backup </label>
                 <div class="mt-1">
-                  <input v-model="backupCradle" name="cradle_backup" type="text" placeholder="Cradle 25" />
+                  <input
+                    v-model="backupCradle"
+                    name="cradle_backup"
+                    type="text"
+                    placeholder="Cradle 25"
+                  />
                   <!-- <select v-model="backupCradle" name="cradle_backup">
                     <option selected disabled value="">Backup Cradle</option>
                     <option value="aplt">Aplt</option>
@@ -105,12 +172,19 @@
             </section>
           </fieldset>
           <fieldset class="w-full max-w-sm">
-            <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Forklift</legend>
+            <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+              Forklift
+            </legend>
             <section>
               <div class="input-block">
                 <label for="operative_forklift" class=""> Operativo </label>
                 <div class="mt-1">
-                  <input v-model="operativeForklift" name="operative_forklift" type="text" placeholder="Forklift 1" />
+                  <input
+                    v-model="operativeForklift"
+                    name="operative_forklift"
+                    type="text"
+                    placeholder="Forklift 1"
+                  />
                   <!-- <select v-model="operativeForklift" name="client">
                     <option selected disabled value="">Forklift Operativo</option>
                     <option value="roklim">Roklim</option>
@@ -122,7 +196,12 @@
               <div class="input-block">
                 <label for="backup_forklift" class=""> Backup </label>
                 <div class="mt-1">
-                  <input v-model="backupForklift" name="backup_forklift" type="text" placeholder="forklift 7" />
+                  <input
+                    v-model="backupForklift"
+                    name="backup_forklift"
+                    type="text"
+                    placeholder="forklift 7"
+                  />
                   <!-- <select v-model="backupForklift" name="client">
                     <option selected disabled value="">Backup Forklift</option>
                     <option value="aplt">Aplt</option>
@@ -135,11 +214,21 @@
           </fieldset>
         </section>
         <fieldset>
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full max-w-4xl">Tractor / Chasis</legend>
+          <legend
+            class="font-bold text-2xl pb-1 border-b mb-3 w-full max-w-4xl"
+          >
+            Tractor / Chasis
+          </legend>
           <section class="divide-y">
-            <article v-for="traktor in traktors" :key="traktor.id" class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center">
+            <article
+              v-for="traktor in traktors"
+              :key="traktor.id"
+              class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center"
+            >
               <div>
-                <label :for="`tractor-${traktor.id}-chasis`"> ID Tractor / Chasis </label>
+                <label :for="`tractor-${traktor.id}-chasis`">
+                  ID Tractor / Chasis
+                </label>
                 <div class="pit-block">
                   <input
                     v-model="traktor.chassis"
@@ -147,13 +236,19 @@
                     type="text"
                     placeholder="#47AGH"
                   />
-                  <CircularBtn class="btn__delete btn__mobile-only" size="sm" @click="removeTraktor(traktor.id)">
+                  <CircularBtn
+                    class="btn__delete btn__mobile-only"
+                    size="sm"
+                    @click="removeTraktor(traktor.id)"
+                  >
                     <TrashIcon class="w-5 h-5" />
                   </CircularBtn>
                 </div>
               </div>
               <div class="input-block lg:w-5/12">
-                <label :for="`tractor-${traktor.id}-proveedor`"> Proveedor </label>
+                <label :for="`tractor-${traktor.id}-proveedor`">
+                  Proveedor
+                </label>
                 <div class="mt-1">
                   <input
                     v-model="traktor.supplier"
@@ -170,7 +265,9 @@
                 </div>
               </div>
               <div class="input-block">
-                <label :for="`tractor-${traktor.id}-description`"> Descripción </label>
+                <label :for="`tractor-${traktor.id}-description`">
+                  Descripción
+                </label>
                 <div class="mt-1">
                   <input
                     v-model="traktor.description"
@@ -181,7 +278,11 @@
                 </div>
               </div>
               <div class="mt-8 mb-5">
-                <CircularBtn class="btn__delete btn__desktop-only" size="sm" @click="removeTraktor(traktor.id)">
+                <CircularBtn
+                  class="btn__delete btn__desktop-only"
+                  size="sm"
+                  @click="removeTraktor(traktor.id)"
+                >
                   <TrashIcon class="w-5 h-5" />
                 </CircularBtn>
               </div>
@@ -195,9 +296,15 @@
           </button>
         </fieldset>
         <fieldset class="max-w-2xl">
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">ID Pickup</legend>
+          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+            ID Pickup
+          </legend>
           <section class="divide-y">
-            <article v-for="pickup in pickups" :key="pickup.id" class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center">
+            <article
+              v-for="pickup in pickups"
+              :key="pickup.id"
+              class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center"
+            >
               <div class="lg:w-5/12">
                 <label :for="`pickup-${pickup.id}-chassis`"> ID Pickup </label>
                 <div class="pit-block">
@@ -207,13 +314,19 @@
                     type="text"
                     placeholder="#456"
                   />
-                  <CircularBtn class="btn__delete btn__mobile-only" size="sm" @click="removePickup(pickup.id)">
+                  <CircularBtn
+                    class="btn__delete btn__mobile-only"
+                    size="sm"
+                    @click="removePickup(pickup.id)"
+                  >
                     <TrashIcon class="w-5 h-5" />
                   </CircularBtn>
                 </div>
               </div>
               <div class="input-block lg:w-8/12">
-                <label :for="`pickup-${pickup.id}-description`"> Descripción </label>
+                <label :for="`pickup-${pickup.id}-description`">
+                  Descripción
+                </label>
                 <div class="mt-1">
                   <input
                     v-model="pickup.description"
@@ -224,7 +337,11 @@
                 </div>
               </div>
               <div class="mt-8 mb-5">
-                <CircularBtn class="btn__delete btn__desktop-only" size="sm" @click="removePickup(pickup.id)">
+                <CircularBtn
+                  class="btn__delete btn__desktop-only"
+                  size="sm"
+                  @click="removePickup(pickup.id)"
+                >
                   <TrashIcon class="w-5 h-5" />
                 </CircularBtn>
               </div>
@@ -238,36 +355,63 @@
           </button>
         </fieldset>
         <fieldset class="max-w-xl">
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Equipamiento</legend>
+          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+            Equipamiento
+          </legend>
           <section class="equip-grid">
             <div class="input-block">
               <label for="rigmats">Rigmats</label>
               <div class="mt-1">
-                <input v-model="rigmats" name="rigmats" type="number" placeholder="cantidad" />
+                <input
+                  v-model="rigmats"
+                  name="rigmats"
+                  type="number"
+                  placeholder="cantidad"
+                />
               </div>
             </div>
             <div class="input-block">
               <label for="conex">Conex</label>
               <div class="mt-1">
-                <input v-model="conex" name="conex" type="number" placeholder="cantidad" />
+                <input
+                  v-model="conex"
+                  name="conex"
+                  type="number"
+                  placeholder="cantidad"
+                />
               </div>
             </div>
             <div class="input-block">
               <label for="generators">Generador de apoyo</label>
               <div class="mt-1">
-                <input v-model="generators" name="generators" type="number" placeholder="cantidad" />
+                <input
+                  v-model="generators"
+                  name="generators"
+                  type="number"
+                  placeholder="cantidad"
+                />
               </div>
             </div>
             <div class="input-block">
               <label for="tower">Torre de iluminación</label>
               <div class="mt-1">
-                <input v-model="tower" name="tower" type="number" placeholder="cantidad" />
+                <input
+                  v-model="tower"
+                  name="tower"
+                  type="number"
+                  placeholder="cantidad"
+                />
               </div>
             </div>
             <div class="input-block">
               <label for="cabin">Cabina de operador cradle</label>
               <div class="mt-1">
-                <input v-model="cabin" name="cabin" type="number" placeholder="cantidad" />
+                <input
+                  v-model="cabin"
+                  name="cabin"
+                  type="number"
+                  placeholder="cantidad"
+                />
               </div>
             </div>
           </section>
@@ -279,10 +423,31 @@
         action="/"
         class="p-4 md:flex md:flex-wrap md:gap-24 2xl:gap-32"
       >
-        <fieldset v-for="(crew, key) in crews" :key="crew.id" class="max-w-sm w-full">
-          <legend class="flex justify-between items-center font-bold text-2xl pb-4 border-b mb-3 w-full">
+        <fieldset
+          v-for="(crew, key) in crews"
+          :key="crew.id"
+          class="max-w-sm w-full"
+        >
+          <legend
+            class="
+              flex
+              justify-between
+              items-center
+              font-bold
+              text-2xl
+              pb-4
+              border-b
+              mb-3
+              w-full
+            "
+          >
             <span>{{ crew.title }}</span>
-            <CircularBtn v-if="key !== 0" class="btn__delete" size="xs" @click="removeCrew(crew.id)">
+            <CircularBtn
+              v-if="key !== 0"
+              class="btn__delete"
+              size="xs"
+              @click="removeCrew(crew.id)"
+            >
               <TrashIcon class="w-5 h-5" />
             </CircularBtn>
           </legend>
@@ -321,9 +486,15 @@
             </div>
           </section>
           <section class="divide-y">
-            <article v-for="people in crew.resources" :key="people.id" class="pt-2 pb-3">
+            <article
+              v-for="people in crew.resources"
+              :key="people.id"
+              class="pt-2 pb-3"
+            >
               <div class="">
-                <label :for="`crew-${crew.id}-${people.id}-rol`" class=""> Rol </label>
+                <label :for="`crew-${crew.id}-${people.id}-rol`" class="">
+                  Rol
+                </label>
                 <div class="pit-block relative">
                   <input
                     v-model="people.rol"
@@ -366,7 +537,10 @@
               </div>
             </article>
           </section>
-          <button class="mt-1 flex items-center" @click.prevent="addResource(crew.id)">
+          <button
+            class="mt-1 flex items-center"
+            @click.prevent="addResource(crew.id)"
+          >
             <CircularBtn class="btn__add" size="xs">
               <PlusIcon class="w-4 h-4" />
             </CircularBtn>
@@ -376,7 +550,13 @@
       </form>
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section>
-          <GhostBtn v-if="isLastSection()" class="btn__draft" @click.prevent="addCrew"> Agregar Crew </GhostBtn>
+          <GhostBtn
+            v-if="isLastSection()"
+            class="btn__draft"
+            @click.prevent="addCrew"
+          >
+            Agregar Crew
+          </GhostBtn>
         </section>
         <section class="space-x-6 flex items-center justify-end">
           <button @click.prevent="goToIndex">Cancelar</button>
@@ -384,7 +564,9 @@
             <BookmarkIcon class="w-4 h-4" />
             <span> Guardar Provisorio </span>
           </GhostBtn>
-          <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
+          <PrimaryBtn v-if="!isLastSection()" @click="nextSection">
+            Siguiente
+          </PrimaryBtn>
           <PrimaryBtn
             v-else
             :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
@@ -403,17 +585,28 @@
   import { ref, Ref, computed, toRefs, reactive } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
-  import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+  import {
+    BookmarkIcon,
+    TrashIcon,
+    CheckCircleIcon,
+  } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
-  import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
+  import {
+    Pit,
+    Traktor,
+    Pickup,
+    HumanResource,
+    Crew,
+    WorkOrder,
+  } from '@/interfaces/WorkOrder';
 
-import axios from 'axios';
-const api = import.meta.env.VITE_API_URL;
+  import axios from 'axios';
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
@@ -431,7 +624,9 @@ const api = import.meta.env.VITE_API_URL;
       const store = useStore();
       const router = useRouter();
       const route = useRoute();
-      const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
+      const workOrders: Array<WorkOrder> = JSON.parse(
+        JSON.stringify(store.state.workOrders.all)
+      );
       const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
         return wo.id == route.params.id;
       });
@@ -470,7 +665,9 @@ const api = import.meta.env.VITE_API_URL;
       }
       //Traktor
       const removeTraktor = (traktorId: number) => {
-        traktors.value = traktors.value.filter((traktor: Traktor) => traktor.id !== traktorId);
+        traktors.value = traktors.value.filter(
+          (traktor: Traktor) => traktor.id !== traktorId
+        );
       };
       const addTraktor = (): void => {
         const lastTraktorId = traktors.value.length;
@@ -485,7 +682,9 @@ const api = import.meta.env.VITE_API_URL;
       }
       // Pickup
       const removePickup = (pickupId: number) => {
-        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.id !== pickupId);
+        pickups.value = pickups.value.filter(
+          (pickup: Pickup) => pickup.id !== pickupId
+        );
       };
       const addPickup = (): void => {
         const lastTraktorId = pickups.value.length;
@@ -500,13 +699,17 @@ const api = import.meta.env.VITE_API_URL;
       }
       // Crew
       const removeResource = (crewId: number, peopleId: number) => {
-        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        const selectedCrew = crews.value.find(
+          (crew: Crew) => crew.id === crewId
+        );
         selectedCrew.resources.value = selectedCrew.resources.value.filter(
           (resource: HumanResource) => resource.id !== peopleId
         );
       };
       const addResource = (crewId: number): void => {
-        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        const selectedCrew = crews.value.find(
+          (crew: Crew) => crew.id === crewId
+        );
         const lastId = selectedCrew.resources.length;
         selectedCrew.resources.push({
           id: lastId,
@@ -552,7 +755,13 @@ const api = import.meta.env.VITE_API_URL;
       };
       // Is the Order section is full
       const isOrderFull = computed(() => {
-        return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+        return !!(
+          client.value &&
+          serviceCompany.value &&
+          pad.value &&
+          pits.value.length > 0 &&
+          pits.value[0].name
+        );
       });
       // Is the Equipment section is full
       const isEquipmentFull = computed(() => {
@@ -572,7 +781,11 @@ const api = import.meta.env.VITE_API_URL;
       });
       // Is the RRHH section is full
       const isRRHHFull = computed(() => {
-        return !!(crews.value.length > 0 && crews.value[0].start_time && crews.value[0].end_time);
+        return !!(
+          crews.value.length > 0 &&
+          crews.value[0].start_time &&
+          crews.value[0].end_time
+        );
       });
       // Is all sections full
       const isAllFull = computed(() => {
@@ -589,24 +802,42 @@ const api = import.meta.env.VITE_API_URL;
       // Remove empty traktors
       const removeEmptyTraktors = (): void => {
         traktors.value = traktors.value.filter(
-          (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
+          (traktor: Traktor) =>
+            !(
+              traktor.chassis === '' &&
+              traktor.supplier === '' &&
+              traktor.description === ''
+            )
         );
       };
       // Remove Empty Pickups
       const removeEmptyPickups = (): void => {
-        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
+        pickups.value = pickups.value.filter(
+          (pickup: Pickup) =>
+            pickup.pickup_id !== '' && pickup.description !== ''
+        );
       };
       // Remove empty Crews
       const removeEmptyCrews = (): void => {
         crews.value = crews.value
           .map((crew: Crew) => removeEmptyResource(crew.id))
-          .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
+          .filter(
+            (crew: Crew) =>
+              !(
+                crew.resources.length <= 0 &&
+                crew.start_time === '' &&
+                crew.end_time === ''
+              )
+          );
       };
       // Remove Empty Resource
       const removeEmptyResource = (crewId: number): void => {
-        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        const selectedCrew = crews.value.find(
+          (crew: Crew) => crew.id === crewId
+        );
         selectedCrew.resources = selectedCrew.resources.filter(
-          (resource: HumanResource) => resource.rol !== '' && resource.name !== ''
+          (resource: HumanResource) =>
+            resource.rol !== '' && resource.name !== ''
         );
         return selectedCrew;
       };

@@ -1,10 +1,18 @@
 <template>
   <Layout>
-    <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Nuevo proovedor de arena</h1>
+    <header
+      class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
+    >
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+        Nuevo proovedor de arena
+      </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
-      <form method="POST" action="/" class="p-4 w-full flex flex-col lg:flex-row">
+      <form
+        method="POST"
+        action="/"
+        class="p-4 w-full flex flex-col lg:flex-row"
+      >
         <fieldset class="flex flex-col w-full">
           <div class="input-block p-4">
             <label for="name" class=""> Cliente </label>
@@ -69,14 +77,20 @@
             </div>
           </div>
           <div class="input-block p-4">
-            <label for="companyRepresentativeId" class=""> CUIT Compañía representante </label>
+            <label for="companyRepresentativeId" class="">
+              CUIT Compañía representante
+            </label>
             <div class="mt-1">
               <select
                 name="companyRepresentativeId"
                 v-model="newSandProvider.companyRepresentativeId"
                 class="w-full rounded-md shadow"
               >
-                <option v-for="company in companyRepresentatives" :key="company.id" :value="company.id">
+                <option
+                  v-for="company in companyRepresentatives"
+                  :key="company.id"
+                  :value="company.id"
+                >
                   {{ company.legalId }} ({{ company.name }})
                 </option>
               </select>
@@ -118,10 +132,22 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, toRefs, reactive, onMounted, ComputedRef } from 'vue';
+  import {
+    ref,
+    Ref,
+    computed,
+    toRefs,
+    reactive,
+    onMounted,
+    ComputedRef,
+  } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
-  import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+  import {
+    BookmarkIcon,
+    TrashIcon,
+    CheckCircleIcon,
+  } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
@@ -130,7 +156,7 @@
 
   import axios from 'axios';
   import { SandProvider } from '@/interfaces/SandProvider';
-  const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {

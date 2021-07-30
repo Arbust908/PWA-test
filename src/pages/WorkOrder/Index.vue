@@ -214,7 +214,7 @@
   import { useNProgress } from '@vueuse/integrations/useNProgress';
   import { debouncedWatch } from '@vueuse/core';
   import { WorkOrder } from '@/interfaces/WorkOrder';
-  const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {

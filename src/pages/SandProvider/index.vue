@@ -175,7 +175,7 @@
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
   import axios from 'axios';
-  const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
   export default {
     components: {
       Layout,

@@ -9,37 +9,84 @@
     <div class="flex flex-col">
       <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div class="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+          <div
+            class="
+              shadow
+              overflow-hidden
+              border-b border-gray-200
+              sm:rounded-lg
+            "
+          >
             <table class="min-w-full divide-y divide-gray-200">
               <thead class="bg-gray-50">
                 <tr>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                   >
                     ID
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                   >
                     Tipo
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                   >
                     Descripción
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                   >
                     Malla
                   </th>
                   <th
                     scope="col"
-                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
                   >
                     Granaje
                   </th>
@@ -55,7 +102,16 @@
                   :class="sKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                   class="hover:bg-gray-100"
                 >
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td
+                    class="
+                      px-6
+                      py-4
+                      whitespace-nowrap
+                      text-sm
+                      font-medium
+                      text-gray-900
+                    "
+                  >
                     {{ st.id }}
                   </td>
                   <td
@@ -65,7 +121,9 @@
                     {{ st.type || 'Sin definir' }}
                   </td>
                   <td
-                    :class="st.description ? 'text-gray-500' : 'text-gray-400 italic'"
+                    :class="
+                      st.description ? 'text-gray-500' : 'text-gray-400 italic'
+                    "
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
                     {{ st.description || 'Sin definir' }}
@@ -82,19 +140,44 @@
                   >
                     {{ st.grainType || 'Sin definir' }}
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <span class="text-red-600 hover:text-red-900 cursor-pointer" @click="deleteFrom(st.id)">
+                  <td
+                    class="
+                      px-6
+                      py-4
+                      whitespace-nowrap
+                      text-right text-sm
+                      font-medium
+                    "
+                  >
+                    <span
+                      class="text-red-600 hover:text-red-900 cursor-pointer"
+                      @click="deleteFrom(st.id)"
+                    >
                       Delete
                     </span>
                   </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <router-link :to="`/tipos-de-arena/${st.id}`" class="text-indigo-600 hover:text-indigo-900">
+                  <td
+                    class="
+                      px-6
+                      py-4
+                      whitespace-nowrap
+                      text-right text-sm
+                      font-medium
+                    "
+                  >
+                    <router-link
+                      :to="`/tipos-de-arena/${st.id}`"
+                      class="text-indigo-600 hover:text-indigo-900"
+                    >
                       Editar
                     </router-link>
                   </td>
                 </tr>
                 <tr v-if="stDB.length <= 0">
-                  <td colspan="5" class="text-center text-xs text-gray-500 px-6 py-4">
+                  <td
+                    colspan="5"
+                    class="text-center text-xs text-gray-500 px-6 py-4"
+                  >
                     <p>No hay arenas cargadas</p>
                   </td>
                 </tr>
@@ -114,7 +197,7 @@
   import UiBtn from '@/components/ui/Button.vue';
   import { TrashIcon } from '@heroicons/vue/outline';
   import axios from 'axios';
-const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
@@ -153,7 +236,9 @@ const api = import.meta.env.VITE_API_URL;
               });
             } else {
               const newsDB = stDB.value.filter((stFromApi, key) => {
-                return stFromApi.id && sandDB[key] && stFromApi.id !== sandDB[key].id;
+                return (
+                  stFromApi.id && sandDB[key] && stFromApi.id !== sandDB[key].id
+                );
               });
               newsDB.forEach((st, stKey) => {
                 store.dispatch('saveSand', st);

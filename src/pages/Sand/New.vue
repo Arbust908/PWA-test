@@ -1,7 +1,11 @@
 <template>
   <Layout>
-    <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Arena - NUEVA</h1>
+    <header
+      class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
+    >
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+        Arena - NUEVA
+      </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 max-w-lg">
@@ -15,31 +19,56 @@
           <div class="input-block">
             <label for="type" class=""> Tipo </label>
             <div class="mt-1">
-              <input v-model="type" name="type" type="text" placeholder="Tipo de arena" />
+              <input
+                v-model="type"
+                name="type"
+                type="text"
+                placeholder="Tipo de arena"
+              />
             </div>
           </div>
           <div class="input-block">
             <label for="description" class=""> Descripción </label>
             <div class="mt-1">
-              <input v-model="description" name="description" type="text" placeholder="Ej: Resinada" />
+              <input
+                v-model="description"
+                name="description"
+                type="text"
+                placeholder="Ej: Resinada"
+              />
             </div>
           </div>
           <div class="input-block">
             <label for="meshType" class=""> Tipo de Malla </label>
             <div class="mt-1">
-              <input v-model="meshType" name="meshType" type="text" placeholder="Ej: 20" />
+              <input
+                v-model="meshType"
+                name="meshType"
+                type="text"
+                placeholder="Ej: 20"
+              />
             </div>
           </div>
           <div class="input-block">
             <label for="grainType" class=""> Tipo de Grano </label>
             <div class="mt-1">
-              <input v-model="grainType" name="grainType" type="text" placeholder="Ej: 50" />
+              <input
+                v-model="grainType"
+                name="grainType"
+                type="text"
+                placeholder="Ej: 50"
+              />
             </div>
           </div>
           <div class="input-block">
             <label for="observations" class=""> Observaciones </label>
             <div class="mt-1">
-              <input v-model="observations" name="observations" type="text" placeholder="Una observación ..." />
+              <input
+                v-model="observations"
+                name="observations"
+                type="text"
+                placeholder="Una observación ..."
+              />
             </div>
           </div>
         </fieldset>
@@ -70,7 +99,7 @@
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import axios from 'axios';
 
-  const api = import.meta.env.VITE_API_URL;
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {

@@ -1,55 +1,112 @@
 <template>
   <Layout>
-    <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Proovedor de arena - {{ id }}</h1>
+    <header
+      class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
+    >
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+        Proovedor de arena - {{ id }}
+      </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
-      <form method="POST" action="/" class="p-4 w-full flex flex-col lg:flex-row">
+      <form
+        method="POST"
+        action="/"
+        class="p-4 w-full flex flex-col lg:flex-row"
+      >
         <fieldset class="flex flex-col w-full">
           <div class="input-block p-4">
             <label for="name" class=""> Cliente </label>
             <div class="mt-1">
-              <input v-model="name" class="w-full rounded-md shadow" name="name" type="text" placeholder="Nombre de cliente" />
+              <input
+                v-model="name"
+                class="w-full rounded-md shadow"
+                name="name"
+                type="text"
+                placeholder="Nombre de cliente"
+              />
             </div>
           </div>
           <div class="input-block p-4">
             <label for="legalName" class=""> Razón Social </label>
             <div class="mt-1">
-              <input v-model="legalName" class="w-full rounded-md shadow" name="legalName" type="text" placeholder="Razón social del cliente" />
+              <input
+                v-model="legalName"
+                class="w-full rounded-md shadow"
+                name="legalName"
+                type="text"
+                placeholder="Razón social del cliente"
+              />
             </div>
           </div>
           <div class="input-block p-4">
             <label for="legalId" class=""> CUIT </label>
             <div class="mt-1">
-              <input v-model="legalId" class="w-full rounded-md shadow" name="legalId" type="text" placeholder="CUIT de cliente" />
+              <input
+                v-model="legalId"
+                class="w-full rounded-md shadow"
+                name="legalId"
+                type="text"
+                placeholder="CUIT de cliente"
+              />
             </div>
           </div>
           <div class="input-block p-4">
             <label for="meshType" class=""> Tipo de malla </label>
             <div class="mt-1">
-              <input v-model="meshType" class="w-full rounded-md shadow" name="meshType" type="text" placeholder="Tipo de malla" />
+              <input
+                v-model="meshType"
+                class="w-full rounded-md shadow"
+                name="meshType"
+                type="text"
+                placeholder="Tipo de malla"
+              />
             </div>
           </div>
         </fieldset>
-        <fieldset class="flex flex-col  w-full">
+        <fieldset class="flex flex-col w-full">
           <div class="input-block p-4">
             <label for="grains" class=""> Granulado </label>
             <div class="mt-1">
-              <input v-model="grains" class="w-full rounded-md shadow" name="grains" type="text" placeholder="Granulado" />
+              <input
+                v-model="grains"
+                class="w-full rounded-md shadow"
+                name="grains"
+                type="text"
+                placeholder="Granulado"
+              />
             </div>
           </div>
           <div class="input-block p-4">
-            <label for="companyRepresentativeId" class=""> CUIT Compañía representante </label>
+            <label for="companyRepresentativeId" class="">
+              CUIT Compañía representante
+            </label>
             <div class="mt-1">
-              <select name="companyRepresentativeId" :v-model="companyRepresentativeId" class="w-full rounded-md shadow">
-                <option v-for="company in companyRepresentatives" :key="company.id" :value="company.id">{{company.legalId}} ({{company.name}})</option>
+              <select
+                name="companyRepresentativeId"
+                :v-model="companyRepresentativeId"
+                class="w-full rounded-md shadow"
+              >
+                <option
+                  v-for="company in companyRepresentatives"
+                  :key="company.id"
+                  :value="company.id"
+                >
+                  {{ company.legalId }} ({{ company.name }})
+                </option>
               </select>
             </div>
           </div>
           <div class="input-block p-4">
             <label for="observations" class=""> Observaciones </label>
             <div class="mt-1">
-              <textarea v-model="observations" class="w-full rounded-md shadow px-3 py-2 focus:outline-none" rows="5" name="observations" type="text" placeholder="Observaciones"></textarea>
+              <textarea
+                v-model="observations"
+                class="w-full rounded-md shadow px-3 py-2 focus:outline-none"
+                rows="5"
+                name="observations"
+                type="text"
+                placeholder="Observaciones"
+              ></textarea>
             </div>
           </div>
         </fieldset>
@@ -61,9 +118,7 @@
             <BookmarkIcon class="w-4 h-4" />
             <span> Guardar Provisorio </span>
           </GhostBtn>
-          <PrimaryBtn @click="update()">
-            Finalizar
-          </PrimaryBtn>
+          <PrimaryBtn @click="update()"> Finalizar </PrimaryBtn>
         </section>
       </footer>
     </section>
@@ -71,172 +126,187 @@
 </template>
 
 <script lang="ts">
-import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
-import { useStore } from 'vuex';
-import { useRouter, useRoute } from 'vue-router';
-import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-import { PlusIcon } from '@heroicons/vue/solid';
-import Layout from '@/layouts/Main.vue';
-import GhostBtn from '@/components/ui/GhostBtn.vue';
-import CircularBtn from '@/components/ui/CircularBtn.vue';
-import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRouter, useRoute } from 'vue-router';
+  import {
+    BookmarkIcon,
+    TrashIcon,
+    CheckCircleIcon,
+  } from '@heroicons/vue/outline';
+  import { PlusIcon } from '@heroicons/vue/solid';
+  import Layout from '@/layouts/Main.vue';
+  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
-import { SandProvider, Driver, Vehicle, Sand, Cradle, Forklift, Company } from '@/interfaces/SandProvider';
+  import {
+    SandProvider,
+    Driver,
+    Vehicle,
+    Sand,
+    Cradle,
+    Forklift,
+    Company,
+  } from '@/interfaces/SandProvider';
 
-import axios from 'axios';
-const api = import.meta.env.VITE_API_URL;
+  import axios from 'axios';
+  const api = import.meta.env.VITE_API_URL || '/api';
 
-export default {
-  components: {
-    Layout: Layout,
-    GhostBtn: GhostBtn,
-    BookmarkIcon: BookmarkIcon,
-    TrashIcon: TrashIcon,
-    PlusIcon: PlusIcon,
-    CheckCircleIcon: CheckCircleIcon,
-    CircularBtn: CircularBtn,
-    PrimaryBtn: PrimaryBtn,
-  },
-  setup() {
-    const store = useStore();
-    const router = useRouter();
-    const route = useRoute();
-    const sandProviders: Array<SandProvider> = JSON.parse(JSON.stringify(store.state.sandProviders.all));
+  export default {
+    components: {
+      Layout: Layout,
+      GhostBtn: GhostBtn,
+      BookmarkIcon: BookmarkIcon,
+      TrashIcon: TrashIcon,
+      PlusIcon: PlusIcon,
+      CheckCircleIcon: CheckCircleIcon,
+      CircularBtn: CircularBtn,
+      PrimaryBtn: PrimaryBtn,
+    },
+    setup() {
+      const store = useStore();
+      const router = useRouter();
+      const route = useRoute();
+      const sandProviders: Array<SandProvider> = JSON.parse(
+        JSON.stringify(store.state.sandProviders.all)
+      );
 
-    const currentSandProvider: SandProvider = sandProviders.find((sp) => {
-      return sp.id == route.params.id;
-    });
+      const currentSandProvider: SandProvider = sandProviders.find((sp) => {
+        return sp.id == route.params.id;
+      });
 
-    let id = ref(0)
-    let name = ref("")
-    let legalName = ref("")
-    let legalId = ref(0)
-    let meshType = ref("")
-    let grains = ref("")
-    let observations = ref("")
-    let companyRepresentativeId = ref(0)
-    let companyRepresentatives = ref([])
+      let id = ref(0);
+      let name = ref('');
+      let legalName = ref('');
+      let legalId = ref(0);
+      let meshType = ref('');
+      let grains = ref('');
+      let observations = ref('');
+      let companyRepresentativeId = ref(0);
+      let companyRepresentatives = ref([]);
 
-    onMounted(async () => {
-      id.value = currentSandProvider.id
-      name.value = currentSandProvider.name
-      legalName.value = currentSandProvider.legalName
-      legalId.value = currentSandProvider.legalId
-      meshType.value = currentSandProvider.meshType
-      grains.value = currentSandProvider.grains
-      observations.value = currentSandProvider.observations
-      companyRepresentativeId.value = currentSandProvider.companyRepresentativeId
+      onMounted(async () => {
+        id.value = currentSandProvider.id;
+        name.value = currentSandProvider.name;
+        legalName.value = currentSandProvider.legalName;
+        legalId.value = currentSandProvider.legalId;
+        meshType.value = currentSandProvider.meshType;
+        grains.value = currentSandProvider.grains;
+        observations.value = currentSandProvider.observations;
+        companyRepresentativeId.value =
+          currentSandProvider.companyRepresentativeId;
 
-      companyRepresentatives.value = await axios
-      .get(`${api}/companyRepresentative`)
-      .catch((err) => {
-        console.log(err);
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          return res.data.data;
-        }
-        return {};
-      })
-    })
+        companyRepresentatives.value = await axios
+          .get(`${api}/companyRepresentative`)
+          .catch((err) => {
+            console.log(err);
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              return res.data.data;
+            }
+            return {};
+          });
+      });
 
-    const goToIndex = (): void => {
-      router.push('/proveedores-de-arena');
-    };
-   
-    const update = async () => {
-      const updatedSP = {
-        id: id.value,
-        name: name.value,
-        legalName: legalName.value,
-        legalId: legalId.value,
-        meshType: meshType.value,
-        grains: grains.value,
-        observations: observations.value,
-        companyRepresentativeId: companyRepresentativeId.value
+      const goToIndex = (): void => {
+        router.push('/proveedores-de-arena');
       };
 
-      let spDB = await axios
-        .put(`${api}/sandProvider/${updatedSP.id}`, updatedSP)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            return res.data;
-          }
-          return {};
-        })
-      // Update Work Order
-      store.dispatch('updateSandProvider', updatedSP);
-      router.push('/proveedores-de-arena');
-    }
+      const update = async () => {
+        const updatedSP = {
+          id: id.value,
+          name: name.value,
+          legalName: legalName.value,
+          legalId: legalId.value,
+          meshType: meshType.value,
+          grains: grains.value,
+          observations: observations.value,
+          companyRepresentativeId: companyRepresentativeId.value,
+        };
 
-    return {
-      id,
-      name,
-      legalName,
-      legalId,
-      meshType,
-      grains,
-      observations,
-      companyRepresentativeId,
-      goToIndex,
-      update,
-      companyRepresentatives
-    };
-  },
-};
+        let spDB = await axios
+          .put(`${api}/sandProvider/${updatedSP.id}`, updatedSP)
+          .catch((err) => {
+            console.log(err);
+          })
+          .then((res) => {
+            if (res.status === 200) {
+              return res.data;
+            }
+            return {};
+          });
+        // Update Work Order
+        store.dispatch('updateSandProvider', updatedSP);
+        router.push('/proveedores-de-arena');
+      };
+
+      return {
+        id,
+        name,
+        legalName,
+        legalId,
+        meshType,
+        grains,
+        observations,
+        companyRepresentativeId,
+        goToIndex,
+        update,
+        companyRepresentatives,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-.btn {
-  &__draft {
-    @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+  .btn {
+    &__draft {
+      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
+    }
+    &__delete {
+      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
+      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+    }
+    &__add {
+      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+    }
+    &__add--special {
+      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+    }
+    &__mobile-only {
+      @apply lg:hidden;
+    }
+    &__desktop-only {
+      @apply hidden lg:inline-flex;
+    }
   }
-  &__delete {
-    @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-    /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
+  .section-tab {
+    @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
   }
-  &__add {
-    @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+  .section-tab[selected='true'] {
+    @apply border-main-500 text-main-500;
   }
-  &__add--special {
-    @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+  .input-block select,
+  .input-block input {
+    @apply w-full rounded mb-3 p-2;
   }
-  &__mobile-only {
-    @apply lg:hidden;
-  }
-  &__desktop-only {
-    @apply hidden lg:inline-flex;
-  }
-}
-.section-tab {
-  @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
-}
-.section-tab[selected='true'] {
-  @apply border-main-500 text-main-500;
-}
-.input-block select,
-.input-block input {
-  @apply w-full rounded mb-3 p-2;
-}
 
-.pit-block {
-  @apply flex mt-1 items-center w-full mb-3;
-  & select,
-  & input {
-    @apply rounded p-2 max-w-md inline-block w-full;
+  .pit-block {
+    @apply flex mt-1 items-center w-full mb-3;
+    & select,
+    & input {
+      @apply rounded p-2 max-w-md inline-block w-full;
+    }
   }
-}
 
-fieldset {
-  @apply mb-6;
-}
-label {
-  @apply text-sm;
-}
-.equip-grid {
-  @apply grid gap-4 grid-cols-2 md:grid-cols-3;
-}
+  fieldset {
+    @apply mb-6;
+  }
+  label {
+    @apply text-sm;
+  }
+  .equip-grid {
+    @apply grid gap-4 grid-cols-2 md:grid-cols-3;
+  }
 </style>

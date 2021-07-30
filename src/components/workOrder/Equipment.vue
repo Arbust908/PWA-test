@@ -2,12 +2,19 @@
   <form method="POST" action="/" class="p-4">
     <section class="md:flex md:justify-between max-w-4xl gap-4">
       <fieldset class="w-full max-w-sm">
-        <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Cradle</legend>
+        <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+          Cradle
+        </legend>
         <section>
           <div class="input-block">
             <label for="cradle_main" class=""> Operativo </label>
             <div class="mt-1">
-              <input v-model="operativeCradle" name="cradle_main" type="text" placeholder="Cradle 1" />
+              <input
+                v-model="operativeCradle"
+                name="cradle_main"
+                type="text"
+                placeholder="Cradle 1"
+              />
               <!-- <select v-model="operativeCradle" name="cradle_main">
                     <option selected disabled value="">Cradle Operativo</option>
                     <option value="aplt">Aplt</option>
@@ -19,7 +26,12 @@
           <div class="input-block">
             <label for="cradle_backup" class=""> Backup </label>
             <div class="mt-1">
-              <input v-model="backupCradle" name="cradle_backup" type="text" placeholder="Cradle 25" />
+              <input
+                v-model="backupCradle"
+                name="cradle_backup"
+                type="text"
+                placeholder="Cradle 25"
+              />
               <!-- <select v-model="backupCradle" name="cradle_backup">
                     <option selected disabled value="">Backup Cradle</option>
                     <option value="aplt">Aplt</option>
@@ -31,12 +43,19 @@
         </section>
       </fieldset>
       <fieldset class="w-full max-w-sm">
-        <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Forklift</legend>
+        <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+          Forklift
+        </legend>
         <section>
           <div class="input-block">
             <label for="operative_forklift" class=""> Operativo </label>
             <div class="mt-1">
-              <input v-model="operativeForklift" name="operative_forklift" type="text" placeholder="Forklift 1" />
+              <input
+                v-model="operativeForklift"
+                name="operative_forklift"
+                type="text"
+                placeholder="Forklift 1"
+              />
               <!-- <select v-model="operativeForklift" name="client">
                     <option selected disabled value="">Forklift Operativo</option>
                     <option value="roklim">Roklim</option>
@@ -48,7 +67,12 @@
           <div class="input-block">
             <label for="backup_forklift" class=""> Backup </label>
             <div class="mt-1">
-              <input v-model="backupForklift" name="backup_forklift" type="text" placeholder="forklift 7" />
+              <input
+                v-model="backupForklift"
+                name="backup_forklift"
+                type="text"
+                placeholder="forklift 7"
+              />
               <!-- <select v-model="backupForklift" name="client">
                     <option selected disabled value="">Backup Forklift</option>
                     <option value="aplt">Aplt</option>
@@ -61,11 +85,19 @@
       </fieldset>
     </section>
     <fieldset>
-      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full max-w-4xl">Tractor / Chasis</legend>
+      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full max-w-4xl">
+        Tractor / Chasis
+      </legend>
       <section class="divide-y">
-        <article v-for="traktor in traktors" :key="traktor.id" class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center">
+        <article
+          v-for="traktor in traktors"
+          :key="traktor.id"
+          class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center"
+        >
           <div>
-            <label :for="`tractor-${traktor.id}-chasis`"> ID Tractor / Chasis </label>
+            <label :for="`tractor-${traktor.id}-chasis`">
+              ID Tractor / Chasis
+            </label>
             <div class="pit-block">
               <input
                 v-model="traktor.chassis"
@@ -73,7 +105,11 @@
                 type="text"
                 placeholder="#47AGH"
               />
-              <CircularBtn class="btn__delete btn__mobile-only" size="sm" @click="removeTraktor(traktor.id)">
+              <CircularBtn
+                class="btn__delete btn__mobile-only"
+                size="sm"
+                @click="removeTraktor(traktor.id)"
+              >
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
@@ -96,7 +132,9 @@
             </div>
           </div>
           <div class="input-block">
-            <label :for="`tractor-${traktor.id}-description`"> Descripción </label>
+            <label :for="`tractor-${traktor.id}-description`">
+              Descripción
+            </label>
             <div class="mt-1">
               <input
                 v-model="traktor.description"
@@ -107,7 +145,11 @@
             </div>
           </div>
           <div class="mt-8 mb-5">
-            <CircularBtn class="btn__delete btn__desktop-only" size="sm" @click="removeTraktor(traktor.id)">
+            <CircularBtn
+              class="btn__delete btn__desktop-only"
+              size="sm"
+              @click="removeTraktor(traktor.id)"
+            >
               <TrashIcon class="w-5 h-5" />
             </CircularBtn>
           </div>
@@ -121,20 +163,37 @@
       </button>
     </fieldset>
     <fieldset class="max-w-2xl">
-      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">ID Pickup</legend>
+      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+        ID Pickup
+      </legend>
       <section class="divide-y">
-        <article v-for="pickup in pickups" :key="pickup.id" class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center">
+        <article
+          v-for="pickup in pickups"
+          :key="pickup.id"
+          class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center"
+        >
           <div class="lg:w-5/12">
             <label :for="`pickup-${pickup.id}-chassis`"> ID Pickup </label>
             <div class="pit-block">
-              <input v-model="pickup.pickup_id" :name="`pickup-${pickup.id}-chassis`" type="text" placeholder="#456" />
-              <CircularBtn class="btn__delete btn__mobile-only" size="sm" @click="removePickup(pickup.id)">
+              <input
+                v-model="pickup.pickup_id"
+                :name="`pickup-${pickup.id}-chassis`"
+                type="text"
+                placeholder="#456"
+              />
+              <CircularBtn
+                class="btn__delete btn__mobile-only"
+                size="sm"
+                @click="removePickup(pickup.id)"
+              >
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
           </div>
           <div class="input-block lg:w-8/12">
-            <label :for="`pickup-${pickup.id}-description`"> Descripción </label>
+            <label :for="`pickup-${pickup.id}-description`">
+              Descripción
+            </label>
             <div class="mt-1">
               <input
                 v-model="pickup.description"
@@ -145,7 +204,11 @@
             </div>
           </div>
           <div class="mt-8 mb-5">
-            <CircularBtn class="btn__delete btn__desktop-only" size="sm" @click="removePickup(pickup.id)">
+            <CircularBtn
+              class="btn__delete btn__desktop-only"
+              size="sm"
+              @click="removePickup(pickup.id)"
+            >
               <TrashIcon class="w-5 h-5" />
             </CircularBtn>
           </div>
@@ -159,36 +222,63 @@
       </button>
     </fieldset>
     <fieldset class="max-w-xl">
-      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Equipamiento</legend>
+      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+        Equipamiento
+      </legend>
       <section class="equip-grid">
         <div class="input-block">
           <label for="rigmats">Rigmats</label>
           <div class="mt-1">
-            <input v-model="rigmats" name="rigmats" type="number" placeholder="cantidad" />
+            <input
+              v-model="rigmats"
+              name="rigmats"
+              type="number"
+              placeholder="cantidad"
+            />
           </div>
         </div>
         <div class="input-block">
           <label for="conex">Conex</label>
           <div class="mt-1">
-            <input v-model="conex" name="conex" type="number" placeholder="cantidad" />
+            <input
+              v-model="conex"
+              name="conex"
+              type="number"
+              placeholder="cantidad"
+            />
           </div>
         </div>
         <div class="input-block">
           <label for="generators">Generador de apoyo</label>
           <div class="mt-1">
-            <input v-model="generators" name="generators" type="number" placeholder="cantidad" />
+            <input
+              v-model="generators"
+              name="generators"
+              type="number"
+              placeholder="cantidad"
+            />
           </div>
         </div>
         <div class="input-block">
           <label for="tower">Torre de iluminación</label>
           <div class="mt-1">
-            <input v-model="tower" name="tower" type="number" placeholder="cantidad" />
+            <input
+              v-model="tower"
+              name="tower"
+              type="number"
+              placeholder="cantidad"
+            />
           </div>
         </div>
         <div class="input-block">
           <label for="cabin">Cabina de operador cradle</label>
           <div class="mt-1">
-            <input v-model="cabin" name="cabin" type="number" placeholder="cantidad" />
+            <input
+              v-model="cabin"
+              name="cabin"
+              type="number"
+              placeholder="cantidad"
+            />
           </div>
         </div>
       </section>
@@ -200,17 +290,28 @@
   import { ref, Ref, computed } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+  import {
+    BookmarkIcon,
+    TrashIcon,
+    CheckCircleIcon,
+  } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
-  import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
+  import {
+    Pit,
+    Traktor,
+    Pickup,
+    HumanResource,
+    Crew,
+    WorkOrder,
+  } from '@/interfaces/WorkOrder';
 
-import axios from 'axios';
-const api = import.meta.env.VITE_API_URL;
+  import axios from 'axios';
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
@@ -246,7 +347,9 @@ const api = import.meta.env.VITE_API_URL;
         },
       ]);
       const removeTraktor = (traktorId: number) => {
-        traktors.value = traktors.value.filter((traktor: Traktor) => traktor.id !== traktorId);
+        traktors.value = traktors.value.filter(
+          (traktor: Traktor) => traktor.id !== traktorId
+        );
       };
       const addTraktor = (): void => {
         const lastTraktorId = traktors.value.length;
@@ -260,7 +363,12 @@ const api = import.meta.env.VITE_API_URL;
       // Remove empty traktors
       const removeEmptyTraktors = (): void => {
         traktors.value = traktors.value.filter(
-          (traktor: Traktor) => !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
+          (traktor: Traktor) =>
+            !(
+              traktor.chassis === '' &&
+              traktor.supplier === '' &&
+              traktor.description === ''
+            )
         );
       };
       // ::
@@ -274,7 +382,9 @@ const api = import.meta.env.VITE_API_URL;
         },
       ]);
       const removePickup = (pickupId: number) => {
-        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.id !== pickupId);
+        pickups.value = pickups.value.filter(
+          (pickup: Pickup) => pickup.id !== pickupId
+        );
       };
       const addPickup = (): void => {
         const lastTraktorId = pickups.value.length;
@@ -286,7 +396,10 @@ const api = import.meta.env.VITE_API_URL;
       };
       // Remove Empty Pickups
       const removeEmptyPickups = (): void => {
-        pickups.value = pickups.value.filter((pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== '');
+        pickups.value = pickups.value.filter(
+          (pickup: Pickup) =>
+            pickup.pickup_id !== '' && pickup.description !== ''
+        );
       };
       // ::
       // Equipment

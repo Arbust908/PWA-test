@@ -1,9 +1,34 @@
 <template>
-  <form method="POST" action="/" class="p-4 md:flex md:flex-wrap md:gap-24 2xl:gap-32">
-    <fieldset v-for="(crew, key) in crews" :key="crew.id" class="max-w-sm w-full">
-      <legend class="flex justify-between items-center font-bold text-2xl pb-4 border-b mb-3 w-full">
+  <form
+    method="POST"
+    action="/"
+    class="p-4 md:flex md:flex-wrap md:gap-24 2xl:gap-32"
+  >
+    <fieldset
+      v-for="(crew, key) in crews"
+      :key="crew.id"
+      class="max-w-sm w-full"
+    >
+      <legend
+        class="
+          flex
+          justify-between
+          items-center
+          font-bold
+          text-2xl
+          pb-4
+          border-b
+          mb-3
+          w-full
+        "
+      >
         <span>{{ crew.title }}</span>
-        <CircularBtn v-if="key !== 0" class="btn__delete" size="xs" @click="removeCrew(crew.id)">
+        <CircularBtn
+          v-if="key !== 0"
+          class="btn__delete"
+          size="xs"
+          @click="removeCrew(crew.id)"
+        >
           <TrashIcon class="w-5 h-5" />
         </CircularBtn>
       </legend>
@@ -42,11 +67,22 @@
         </div>
       </section>
       <section class="divide-y">
-        <article v-for="people in crew.resources" :key="people.id" class="pt-2 pb-3">
+        <article
+          v-for="people in crew.resources"
+          :key="people.id"
+          class="pt-2 pb-3"
+        >
           <div class="">
-            <label :for="`crew-${crew.id}-${people.id}-rol`" class=""> Rol </label>
+            <label :for="`crew-${crew.id}-${people.id}-rol`" class="">
+              Rol
+            </label>
             <div class="pit-block relative">
-              <input v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`" type="text" placeholder="Rol" />
+              <input
+                v-model="people.rol"
+                :name="`crew-${crew.id}-${people.id}-rol`"
+                type="text"
+                placeholder="Rol"
+              />
               <!-- <select v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`">
                     <option selected disabled value="">Lead Operator</option>
                     <option value="7">7:00 PM</option>
@@ -82,7 +118,10 @@
           </div>
         </article>
       </section>
-      <button class="mt-1 flex items-center" @click.prevent="addResource(crew.id)">
+      <button
+        class="mt-1 flex items-center"
+        @click.prevent="addResource(crew.id)"
+      >
         <CircularBtn class="btn__add" size="xs">
           <PlusIcon class="w-4 h-4" />
         </CircularBtn>
@@ -96,17 +135,28 @@
   import { ref, Ref, computed } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+  import {
+    BookmarkIcon,
+    TrashIcon,
+    CheckCircleIcon,
+  } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
 
-  import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/WorkOrder';
+  import {
+    Pit,
+    Traktor,
+    Pickup,
+    HumanResource,
+    Crew,
+    WorkOrder,
+  } from '@/interfaces/WorkOrder';
 
-import axios from 'axios';
-const api = import.meta.env.VITE_API_URL;
+  import axios from 'axios';
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
@@ -131,14 +181,26 @@ const api = import.meta.env.VITE_API_URL;
         },
       ]);
       const crews: Ref<Array<Crew>> = ref([
-        { id: 1, start_time: '', end_time: '', title: 'Crew A', resources: resource },
+        {
+          id: 1,
+          start_time: '',
+          end_time: '',
+          title: 'Crew A',
+          resources: resource,
+        },
       ]);
       const removeResource = (crewId: number, peopleId: number) => {
-        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-        selectedCrew.resources = selectedCrew.resources.filter((resource: HumanResource) => resource.id !== peopleId);
+        const selectedCrew = crews.value.find(
+          (crew: Crew) => crew.id === crewId
+        );
+        selectedCrew.resources = selectedCrew.resources.filter(
+          (resource: HumanResource) => resource.id !== peopleId
+        );
       };
       const addResource = (crewId: number): void => {
-        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        const selectedCrew = crews.value.find(
+          (crew: Crew) => crew.id === crewId
+        );
         const lastId = selectedCrew.resources.length;
         selectedCrew.resources.push({
           id: lastId,
@@ -165,20 +227,34 @@ const api = import.meta.env.VITE_API_URL;
       const removeEmptyCrews = (): void => {
         crews.value = crews.value
           .map((crew: Crew) => removeEmptyResource(crew.id))
-          .filter((crew: Crew) => !(crew.resources.length <= 0 && crew.start_time === '' && crew.end_time === ''));
+          .filter(
+            (crew: Crew) =>
+              !(
+                crew.resources.length <= 0 &&
+                crew.start_time === '' &&
+                crew.end_time === ''
+              )
+          );
       };
       // Remove Empty Resource
       const removeEmptyResource = (crewId: number): void => {
-        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        const selectedCrew = crews.value.find(
+          (crew: Crew) => crew.id === crewId
+        );
         selectedCrew.resources = selectedCrew.resources.filter(
-          (resource: HumanResource) => resource.rol !== '' && resource.name !== ''
+          (resource: HumanResource) =>
+            resource.rol !== '' && resource.name !== ''
         );
         return selectedCrew;
       };
 
       // Is the RRHH section is full
       const isRRHHFull = computed(() => {
-        return !!(crews.value.length > 0 && crews.value[0].start_time && crews.value[0].end_time);
+        return !!(
+          crews.value.length > 0 &&
+          crews.value[0].start_time &&
+          crews.value[0].end_time
+        );
       });
 
       return {
