@@ -37,6 +37,11 @@ export default {
         to: '/tipos-de-arena',
         icon: 'ClipboardListIcon',
       },
+      {
+        name: 'Montacarga',
+        to: '/montacargas',
+        icon: 'ClipboardListIcon',
+      },
     ],
     user_navigation: [
       // { name: 'Perfil', to: '/usuario', icon: 'AdjustmentsIcon' },

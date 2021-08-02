@@ -147,7 +147,25 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/notificaciones-a-proveedores/nueva',
     name: 'NewProviderNotification',
-    component: () => import('@/pages/ProviderNotification/New.vue'),
+    component: () => import('@/pages/ProviderNotification/new.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/montacargas',
+    name: 'Forklift',
+    component: () => import('@/pages/Forklift/index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/montacargas/:id',
+    name: 'ForkliftById',
+    component: () => import('@/pages/Forklift/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/montacargas/nuevp',
+    name: 'NewForklift',
+    component: () => import('@/pages/Forklift/New.vue'),
     beforeEnter: isLogged,
   },
   {
