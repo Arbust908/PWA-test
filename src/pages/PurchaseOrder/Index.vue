@@ -192,7 +192,8 @@
 <script lang="ts">
   import { ref, watch } from 'vue';
   import { createNamespacedHelpers } from 'vuex-composition-helpers';
-  const { useState, useActions } = createNamespacedHelpers('PurchaseOrders');
+  const { useState } = createNamespacedHelpers('purchaseOrder');
+  import { useActions } from 'vuex-composition-helpers';
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
   import {
@@ -222,12 +223,15 @@
         baseURL: apiUrl,
       });
       const { all } = useState(['all']);
+      const { deletePurchaseOrder, savePurchaseOrder } = useActions([
+        'deletePurchaseOrder',
+        'savePurchaseOrder',
+      ]);
 
       const PurchaseOrders = ref([]);
       const { data: pOData } = useAxios('/purchaseOrder', instance);
       watch(pOData, (pOData, prevCount) => {
         if (pOData && pOData.data) {
-          console.log('PurchaseOrders', pOData.data);
           PurchaseOrders.value = pOData.data;
           const diff = useDiffArray(all.value, pOData.data);
           if (diff.length > 0) {
@@ -244,11 +248,11 @@
             diff.push(a);
           }
         });
+        console.log('diff', diff);
         return diff;
       };
 
       const storeToState = (pOs: PurchaseOrder[]) => {
-        const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
         return pOs.map((pO) => {
           savePurchaseOrder(pO);
         });
@@ -260,7 +264,6 @@
             return pO.id !== poId;
           }
         );
-        const { deletePurchaseOrder } = useActions(['deletePurchaseOrder']);
         const { data: pOData } = useAxios(
           `/purchaseOrder/${poId}`,
           { method: 'DELETE' },

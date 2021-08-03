@@ -33,7 +33,6 @@ export default {
   },
   actions: {
     savePurchaseOrder({ commit }, purchaseOrder) {
-      console.log('>>Adding Purchase Order', purchaseOrder);
       commit('ADD_PURCHASEORDER', purchaseOrder);
     },
     updatePurchaseOrder({ commit }, purchaseOrder) {
