@@ -147,7 +147,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/notificaciones-a-proveedores/nueva',
     name: 'NewProviderNotification',
-    component: () => import('@/pages/ProviderNotification/new.vue'),
+    component: () => import('@/pages/ProviderNotification/New.vue'),
     beforeEnter: isLogged,
   },
   {
