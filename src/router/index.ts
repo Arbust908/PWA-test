@@ -151,6 +151,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/montacargas',
+    name: 'Forklift',
+    component: () => import('@/pages/Forklift/index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/montacargas/:id',
+    name: 'ForkliftById',
+    component: () => import('@/pages/Forklift/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/montacargas/nuevo',
+    name: 'NewForklift',
+    component: () => import('@/pages/Forklift/new.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/usuario/salir',
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),
