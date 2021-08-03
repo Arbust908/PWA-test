@@ -29,7 +29,7 @@ export default {
     },
   },
   actions: {
-    setForklift({commit}, forklifts) {
+    setForklifts({commit}, forklifts) {
       commit('SET_FORKLIFTS', forklifts)
     },
     saveForklift({ commit }, forklift) {

@@ -163,9 +163,9 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
-    path: '/montacargas/nuevp',
+    path: '/montacargas/nuevo',
     name: 'NewForklift',
-    component: () => import('@/pages/Forklift/New.vue'),
+    component: () => import('@/pages/Forklift/new.vue'),
     beforeEnter: isLogged,
   },
   {

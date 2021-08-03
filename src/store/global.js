@@ -38,7 +38,7 @@ export default {
         icon: 'ClipboardListIcon',
       },
       {
-        name: 'Montacarga',
+        name: 'Montacargas',
         to: '/montacargas',
         icon: 'ClipboardListIcon',
       },
