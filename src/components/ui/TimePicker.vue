@@ -29,7 +29,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, defineComponent, watch } from 'vue';
+  import { defineComponent, watch } from 'vue';
   import { useVModels, useToggle } from '@vueuse/core';
   import { createFromDate, createToDate } from '@/helpers/useChronos';
 

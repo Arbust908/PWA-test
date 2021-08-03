@@ -25,6 +25,11 @@ export default {
         }
       });
     },
+    DELETE_PURCHASEORDER(state, payloadId) {
+      state.all = state.all.filter((purchaseOrder) => {
+        return purchaseOrder.id !== Number(payloadId);
+      });
+    },
   },
   actions: {
     savePurchaseOrder({ commit }, purchaseOrder) {
@@ -33,6 +38,9 @@ export default {
     },
     updatePurchaseOrder({ commit }, purchaseOrder) {
       commit('UPDATE_PURCHASEORDER', purchaseOrder);
+    },
+    deletePurchaseOrder({ commit }, purchaseOrderId) {
+      commit('DELETE_PURCHASEORDER', purchaseOrderId);
     },
   },
 };

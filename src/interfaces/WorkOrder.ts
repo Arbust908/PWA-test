@@ -40,7 +40,8 @@ export interface HumanResource {
 }
 export interface Crew {
   id: number;
-  time: number;
+  timeStart: number;
+  timeEnd: number;
   title: string;
   resources: Array<HumanResource>;
 }

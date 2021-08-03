@@ -50,12 +50,6 @@
                 type="text"
                 placeholder="Nombre de cliente"
               />
-              <!-- <select v-model="client" name="client">
-                <option selected disabled value="">ej: Nasta</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
             </div>
           </div>
           <div class="input-block">
@@ -69,12 +63,6 @@
                 type="text"
                 placeholder="Nombre de Operadora"
               />
-              <!-- <select v-model="serviceCompany" name="serviceCompany">
-                <option selected disabled value="">ej: Pipele</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
             </div>
           </div>
           <div class="input-block">
@@ -144,12 +132,6 @@
                     type="text"
                     placeholder="Cradle 1"
                   />
-                  <!-- <select v-model="operativeCradle" name="cradle_main">
-                    <option selected disabled value="">Cradle Operativo</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -161,12 +143,6 @@
                     type="text"
                     placeholder="Cradle 25"
                   />
-                  <!-- <select v-model="backupCradle" name="cradle_backup">
-                    <option selected disabled value="">Backup Cradle</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
                 </div>
               </div>
             </section>
@@ -185,12 +161,6 @@
                     type="text"
                     placeholder="Forklift 1"
                   />
-                  <!-- <select v-model="operativeForklift" name="client">
-                    <option selected disabled value="">Forklift Operativo</option>
-                    <option value="roklim">Roklim</option>
-                    <option value="salmin">Salmin</option>
-                    <option value="eroba">Eroba</option>
-                  </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -202,12 +172,6 @@
                     type="text"
                     placeholder="forklift 7"
                   />
-                  <!-- <select v-model="backupForklift" name="client">
-                    <option selected disabled value="">Backup Forklift</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
                 </div>
               </div>
             </section>
@@ -256,12 +220,6 @@
                     type="text"
                     placeholder="Nombre de proveedor"
                   />
-                  <!-- <select v-model="traktor.supplier" :name="`tractor-${traktor.id}-proveedor`">
-                    <option selected disabled value="">Proveedor</option>
-                    <option value="10223">Transportes Zaraza SRL</option>
-                    <option value="10224">Montoto Logistica SRL</option>
-                    <option value="10225">E Inc</option>
-                  </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -455,15 +413,15 @@
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
               <TimePicker
-                :timetrack="crew.start_time"
-                @update:timetrack="crew.start_time = $event"
+                :timetrack="crew.timeStart"
+                @update:timetrack="crew.timeStart = $event"
               />
             </div>
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
               <TimePicker
-                :timetrack="crew.end_time"
-                @update:timetrack="crew.end_time = $event"
+                :timetrack="crew.timeEnd"
+                @update:timetrack="crew.timeEnd = $event"
               />
             </div>
           </section>
@@ -767,8 +725,8 @@
             (crew: Crew) =>
               !(
                 crew.resources.length <= 0 &&
-                crew.start_time === '' &&
-                crew.end_time === ''
+                crew.timeStart === '' &&
+                crew.timeEnd === ''
               )
           );
       };
@@ -778,8 +736,8 @@
       const crews: Ref<Array<Crew>> = ref([
         {
           id: 1,
-          start_time: new Date().setHours(7),
-          end_time: new Date().setHours(19),
+          timeStart: new Date().setHours(7),
+          timeEnd: new Date().setHours(19),
           title: 'Crew A',
           resources: resource,
         },
@@ -787,15 +745,15 @@
       const addCrew = (): void => {
         const lastId = crews.value.length + 1;
         const crewLetter = String.fromCharCode(lastId + 64);
-        const start_time = new Date().setHours(7);
-        console.log(start_time);
-        const end_time = new Date().setHours(19);
-        console.log(end_time);
-        // const end_time = new Date().setHours(19).parse();
+        const timeStart = new Date().setHours(7);
+        console.log(timeStart);
+        const timeEnd = new Date().setHours(19);
+        console.log(timeEnd);
+        // const timeEnd = new Date().setHours(19).parse();
         crews.value.push({
           id: lastId,
-          start_time,
-          end_time,
+          timeStart,
+          timeEnd,
           title: `Crew ${crewLetter}`,
           resources: [],
         });
@@ -868,8 +826,8 @@
       const isRRHHFull: boolean = computed(() => {
         return !!(
           crews.value.length > 0 &&
-          crews.value[0].start_time &&
-          crews.value[0].end_time &&
+          crews.value[0].timeStart &&
+          crews.value[0].timeEnd &&
           crews.value[0].resources.length > 0 &&
           crews.value[0].resources.every((pipol) => pipol.rol !== '') &&
           crews.value[0].resources.every((pipol) => pipol.name !== '')

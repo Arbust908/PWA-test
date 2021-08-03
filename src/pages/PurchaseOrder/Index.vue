@@ -84,8 +84,8 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="(po, poKey) in all"
-                  :key="po.id"
+                  v-for="(pO, poKey) in PurchaseOrders"
+                  :key="pO.id"
                   :class="poKey % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
                   class="hover:bg-gray-100"
                 >
@@ -99,34 +99,40 @@
                       text-gray-900
                     "
                   >
-                    {{ po.id }}
+                    {{ pO.id }}
                   </td>
                   <td
                     :class="
-                      po.sandProvider && po.sandProvider.name
+                      pO.sandProvider ? 'text-gray-500' : 'text-gray-400 italic'
+                    "
+                    class="px-6 py-4 whitespace-nowrap text-sm"
+                  >
+                    {{
+                      (pO.sandProvider && pO.sandProvider.name) ||
+                      'Sin proveedor'
+                    }}
+                  </td>
+                  <td
+                    :class="
+                      pO.sandOrder ? 'text-gray-500' : 'text-gray-400 italic'
+                    "
+                    class="px-6 py-4 whitespace-nowrap text-sm"
+                  >
+                    {{ pO.sandOrder.amount }}
+                  </td>
+                  <td
+                    :class="
+                      pO.transportProvider
                         ? 'text-gray-500'
                         : 'text-gray-400 italic'
                     "
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ po.sandProvider.name || 'Sin proveedor' }}
+                    {{
+                      (pO.transportProvider && pO.transportProvider.name) ||
+                      'Sin proveedor'
+                    }}
                   </td>
-                  <td
-                    :class="
-                      po.sandProvider && po.sandProvider.sandOrders
-                        ? 'text-gray-500'
-                        : 'text-gray-400 italic'
-                    "
-                    class="px-6 py-4 whitespace-nowrap text-sm"
-                  ></td>
-                  <td
-                    :class="
-                      po.sandProvider && po.sandProvider.transportProvider
-                        ? 'text-gray-500'
-                        : 'text-gray-400 italic'
-                    "
-                    class="px-6 py-4 whitespace-nowrap text-sm"
-                  ></td>
                   <td
                     class="
                       px-6
@@ -138,7 +144,7 @@
                   >
                     <div class="flex justify-end space-x-4">
                       <router-link
-                        :to="`/orden-de-pedido/${po.id}`"
+                        :to="`/orden-de-pedido/${pO.id}`"
                         class="
                           flex
                           justify-between
@@ -151,7 +157,7 @@
                         <span> Editar </span>
                       </router-link>
                       <button
-                        @click="deletePO(po.id)"
+                        @click="deletePO(pO.id)"
                         class="
                           flex
                           justify-between
@@ -166,7 +172,7 @@
                     </div>
                   </td>
                 </tr>
-                <tr v-if="all.length <= 0">
+                <tr v-if="PurchaseOrders.length <= 0">
                   <td
                     colspan="5"
                     class="text-center text-xs text-gray-500 px-6 py-4"
@@ -184,12 +190,11 @@
 </template>
 
 <script lang="ts">
-  import { onMounted, ref, Ref, watch } from 'vue';
+  import { ref, watch } from 'vue';
   import { createNamespacedHelpers } from 'vuex-composition-helpers';
-  const { useState, useActions } = createNamespacedHelpers('purchaseOrder');
+  const { useState, useActions } = createNamespacedHelpers('PurchaseOrders');
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
-  import axios from 'axios';
   import {
     TrashIcon,
     PencilAltIcon,
@@ -197,8 +202,11 @@
     ExclamationCircleIcon,
     CheckCircleIcon,
   } from '@heroicons/vue/solid';
-  import { PurchaseOrder, SandOrder } from '@/interfaces/PurchaseOrder.ts';
-  const api = import.meta.env.VITE_API_URL;
+  import { PurchaseOrder } from '@/interfaces/sandflow.Types';
+
+  import axios from 'axios';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
   export default {
     components: {
       ExclamationCircleIcon,
@@ -209,27 +217,61 @@
       Layout,
       InformationCircleIcon,
     },
-    // { "sandProviderId": "2", "sandProvider": { "id": "2", "name": "sand provider", "legalName": "sand provider legalName", "legalId": "234444444", "meshType": "mesh type", "grains": "grains", "observations": null, "companyRepresentativeId": null, "companyRepresentative": null }, "sandOrders": [ { "id": 0, "sandType": {}, "sandTypeId": "1", "quantity": "22", "boxId": "" } ], "transportProviderId": "5", "transportProvider": { "id": "5", "name": "Transportes Firulais", "transportId": "AC 245 WC", "boxQuantity": "2", "observation": "" }, "id": 1 }
     setup() {
+      const instance = axios.create({
+        baseURL: apiUrl,
+      });
       const { all } = useState(['all']);
-      const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
 
-      const sumTotalSand = (sandOrders: Array<SandOrder>) => {
-        return sandOrders.reduce((totalSand, order) => {
-          return totalSand + order.quantity;
-        }, 0);
+      const PurchaseOrders = ref([]);
+      const { data: pOData } = useAxios('/purchaseOrder', instance);
+      watch(pOData, (pOData, prevCount) => {
+        if (pOData && pOData.data) {
+          console.log('PurchaseOrders', pOData.data);
+          PurchaseOrders.value = pOData.data;
+          const diff = useDiffArray(all.value, pOData.data);
+          if (diff.length > 0) {
+            storeToState(diff);
+          }
+        }
+      });
+
+      const useDiffArray = (state: PurchaseOrder[], api: PurchaseOrder[]) => {
+        const diff: PurchaseOrder[] = [];
+        const prev = state.map((s) => s.id);
+        api.map((a) => {
+          if (prev.indexOf(a.id) === -1) {
+            diff.push(a);
+          }
+        });
+        return diff;
       };
 
-      const deletePO = async (poId: number) => {
-        poDB.value = poDB.value.filter((wo) => {
-          return wo.id !== poId;
+      const storeToState = (pOs: PurchaseOrder[]) => {
+        const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
+        return pOs.map((pO) => {
+          savePurchaseOrder(pO);
         });
       };
 
+      const deletePO = async (poId: number) => {
+        PurchaseOrders.value = PurchaseOrders.value.filter(
+          (pO: PurchaseOrders) => {
+            return pO.id !== poId;
+          }
+        );
+        const { deletePurchaseOrder } = useActions(['deletePurchaseOrder']);
+        const { data: pOData } = useAxios(
+          `/purchaseOrder/${poId}`,
+          { method: 'DELETE' },
+          instance
+        );
+        deletePurchaseOrder(poId);
+      };
+
       return {
-        all,
+        PurchaseOrders,
         deletePO,
-        sumTotalSand,
       };
     },
   };
