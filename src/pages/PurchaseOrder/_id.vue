@@ -231,28 +231,25 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
+  import { ref, Ref, reactive, computed, ComputedRef, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { useState, useActions } from 'vuex-composition-helpers';
-
   import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import PurchaseOrderForm from '@/components/purchaseOrder/Form.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import {
+    Sand,
+    SandOrder,
     PurchaseOrder,
     SandProvider,
-    SandOrder,
     TransportProvider,
-  } from '@/interfaces/PurchaseOrder.ts';
+  } from '@/interfaces/sandflow.Types';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  import { SandProvider } from '@/interfaces/SandProvider';
-  import { Sand, SandOrder } from '@/interfaces/sandflow.Types';
   const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {

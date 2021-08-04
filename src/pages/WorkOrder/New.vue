@@ -50,12 +50,6 @@
                 type="text"
                 placeholder="Nombre de cliente"
               />
-              <!-- <select v-model="client" name="client">
-                <option selected disabled value="">ej: Nasta</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
             </div>
           </div>
           <div class="input-block">
@@ -69,12 +63,6 @@
                 type="text"
                 placeholder="Nombre de Operadora"
               />
-              <!-- <select v-model="serviceCompany" name="serviceCompany">
-                <option selected disabled value="">ej: Pipele</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
             </div>
           </div>
           <div class="input-block">
@@ -144,12 +132,6 @@
                     type="text"
                     placeholder="Cradle 1"
                   />
-                  <!-- <select v-model="operativeCradle" name="cradle_main">
-                    <option selected disabled value="">Cradle Operativo</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -161,12 +143,6 @@
                     type="text"
                     placeholder="Cradle 25"
                   />
-                  <!-- <select v-model="backupCradle" name="cradle_backup">
-                    <option selected disabled value="">Backup Cradle</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
                 </div>
               </div>
             </section>
@@ -185,12 +161,6 @@
                     type="text"
                     placeholder="Forklift 1"
                   />
-                  <!-- <select v-model="operativeForklift" name="client">
-                    <option selected disabled value="">Forklift Operativo</option>
-                    <option value="roklim">Roklim</option>
-                    <option value="salmin">Salmin</option>
-                    <option value="eroba">Eroba</option>
-                  </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -202,12 +172,6 @@
                     type="text"
                     placeholder="forklift 7"
                   />
-                  <!-- <select v-model="backupForklift" name="client">
-                    <option selected disabled value="">Backup Forklift</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
                 </div>
               </div>
             </section>
@@ -256,12 +220,6 @@
                     type="text"
                     placeholder="Nombre de proveedor"
                   />
-                  <!-- <select v-model="traktor.supplier" :name="`tractor-${traktor.id}-proveedor`">
-                    <option selected disabled value="">Proveedor</option>
-                    <option value="10223">Transportes Zaraza SRL</option>
-                    <option value="10224">Montoto Logistica SRL</option>
-                    <option value="10225">E Inc</option>
-                  </select> -->
                 </div>
               </div>
               <div class="input-block">
@@ -428,7 +386,7 @@
           :key="crew.id"
           class="max-w-sm w-full"
         >
-          <legend
+          <h2
             class="
               flex
               justify-between
@@ -450,39 +408,21 @@
             >
               <TrashIcon class="w-5 h-5" />
             </CircularBtn>
-          </legend>
-          <section class="flex gap-6">
+          </h2>
+          <section class="flex gap-2 flex-col xl:flex-row items-start mb-4">
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
-              <input
-                v-model="crew.start_time"
-                class="rounded max-w-[8rem]"
-                :name="`crew-${crew.id}-start-time`"
-                type="text"
-                placeholder="00:00"
+              <TimePicker
+                :timetrack="crew.timeStart"
+                @update:timetrack="crew.timeStart = $event"
               />
-              <!-- <select class="rounded" :name="`crew-${crew.id}-start-time`" v-model="crew.start_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
             </div>
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
-              <input
-                v-model="crew.end_time"
-                class="rounded max-w-[8rem]"
-                :name="`crew-${crew.id}-end-time`"
-                type="text"
-                placeholder="00:00"
+              <TimePicker
+                :timetrack="crew.timeEnd"
+                @update:timetrack="crew.timeEnd = $event"
               />
-              <!-- <select class="rounded" :name="`crew-${crew.id}-end-time`" v-model="crew.end_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
             </div>
           </section>
           <section class="divide-y">
@@ -502,12 +442,6 @@
                     type="text"
                     placeholder="Rol"
                   />
-                  <!-- <select v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`">
-                    <option selected disabled value="">Lead Operator</option>
-                    <option value="7">7:00 PM</option>
-                    <option value="8">8:00 PM</option>
-                    <option value="9">9:00 PM</option>
-                  </select> -->
                   <CircularBtn
                     class="btn__delete md:absolute md:right-[-3rem]"
                     size="sm"
@@ -526,12 +460,6 @@
                       type="text"
                       placeholder="Empleado"
                     />
-                    <!-- <select v-model="people.name" :name="`crew-${crew.id}-${people.id}-name`">
-                      <option selected disabled value="">Selecciona Empleado</option>
-                      <option value="7">7:00 PM</option>
-                      <option value="8">8:00 PM</option>
-                      <option value="9">9:00 PM</option>
-                    </select> -->
                   </label>
                 </div>
               </div>
@@ -595,6 +523,7 @@
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import TimePicker from '@/components/ui/TimePicker.vue';
 
   import {
     Pit,
@@ -618,6 +547,7 @@
       PlusIcon,
       PrimaryBtn,
       TrashIcon,
+      TimePicker,
     },
     setup() {
       // Init
@@ -795,8 +725,8 @@
             (crew: Crew) =>
               !(
                 crew.resources.length <= 0 &&
-                crew.start_time === '' &&
-                crew.end_time === ''
+                crew.timeStart === '' &&
+                crew.timeEnd === ''
               )
           );
       };
@@ -806,8 +736,8 @@
       const crews: Ref<Array<Crew>> = ref([
         {
           id: 1,
-          start_time: '',
-          end_time: '',
+          timeStart: new Date().setHours(7),
+          timeEnd: new Date().setHours(19),
           title: 'Crew A',
           resources: resource,
         },
@@ -815,10 +745,15 @@
       const addCrew = (): void => {
         const lastId = crews.value.length + 1;
         const crewLetter = String.fromCharCode(lastId + 64);
+        const timeStart = new Date().setHours(7);
+        console.log(timeStart);
+        const timeEnd = new Date().setHours(19);
+        console.log(timeEnd);
+        // const timeEnd = new Date().setHours(19).parse();
         crews.value.push({
           id: lastId,
-          start_time: '',
-          end_time: '',
+          timeStart,
+          timeEnd,
           title: `Crew ${crewLetter}`,
           resources: [],
         });
@@ -836,6 +771,9 @@
             resource.rol !== '' && resource.name !== ''
         );
         return selectedCrew;
+      };
+      const updateTimetrack = (crewId: number, time): void => {
+        console.log(crewId, time);
       };
 
       // :: >>>
@@ -885,11 +823,14 @@
         );
       });
       // Is the RRHH section is full
-      const isRRHHFull = computed(() => {
+      const isRRHHFull: boolean = computed(() => {
         return !!(
           crews.value.length > 0 &&
-          crews.value[0].start_time &&
-          crews.value[0].end_time
+          crews.value[0].timeStart &&
+          crews.value[0].timeEnd &&
+          crews.value[0].resources.length > 0 &&
+          crews.value[0].resources.every((pipol) => pipol.rol !== '') &&
+          crews.value[0].resources.every((pipol) => pipol.name !== '')
         );
       });
       // Is all sections full
@@ -982,6 +923,7 @@
         crews,
         removeCrew,
         addCrew,
+        updateTimetrack,
         goToIndex,
         save,
         isAllFull,
@@ -1039,5 +981,9 @@
   }
   .equip-grid {
     @apply grid gap-4 grid-cols-2 md:grid-cols-3;
+  }
+
+  .vc-time-date {
+    @apply hidden;
   }
 </style>
