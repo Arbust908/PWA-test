@@ -204,10 +204,8 @@
     CheckCircleIcon,
   } from '@heroicons/vue/solid';
   import { PurchaseOrder } from '@/interfaces/sandflow.Types';
+  import { useApi } from '@/helpers/useApi';
 
-  import axios from 'axios';
-  import { useAxios } from '@vueuse/integrations/useAxios';
-  const apiUrl = import.meta.env.VITE_API_URL || '/api';
   export default {
     components: {
       ExclamationCircleIcon,
@@ -219,21 +217,18 @@
       InformationCircleIcon,
     },
     setup() {
-      const instance = axios.create({
-        baseURL: apiUrl,
-      });
       const { all } = useState(['all']);
       const { deletePurchaseOrder, savePurchaseOrder } = useActions([
         'deletePurchaseOrder',
         'savePurchaseOrder',
       ]);
 
-      const PurchaseOrders = ref([]);
-      const { data: pOData } = useAxios('/purchaseOrder', instance);
-      watch(pOData, (pOData, prevCount) => {
-        if (pOData && pOData.data) {
-          PurchaseOrders.value = pOData.data;
-          const diff = useDiffArray(all.value, pOData.data);
+      const { read, destroy } = useApi('/purchaseOrder');
+
+      const PurchaseOrders = read();
+      watch(PurchaseOrders, (newValue, oldValue) => {
+        if (newValue) {
+          const diff = useDiffArray(all.value, PurchaseOrders.value);
           if (diff.length > 0) {
             storeToState(diff);
           }
@@ -260,15 +255,11 @@
 
       const deletePO = async (poId: number) => {
         PurchaseOrders.value = PurchaseOrders.value.filter(
-          (pO: PurchaseOrders) => {
+          (pO: PurchaseOrder) => {
             return pO.id !== poId;
           }
         );
-        const { data: pOData } = useAxios(
-          `/purchaseOrder/${poId}`,
-          { method: 'DELETE' },
-          instance
-        );
+        const { data } = destroy(poId);
         deletePurchaseOrder(poId);
       };
 
