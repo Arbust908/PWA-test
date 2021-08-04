@@ -15,15 +15,14 @@
     AtSymbolIcon,
     BellIcon,
     ChipIcon,
-    ChipIcon,
-    ClipboardListIcon,
     ClipboardListIcon,
     HomeIcon,
-    LogoutIcon,
     LogoutIcon,
     MenuAlt2Icon,
     UsersIcon,
     XIcon,
+    ViewGridAddIcon,
+    ClipboardIcon,
   } from '@heroicons/vue/outline';
   import { defineComponent, toRefs } from 'vue';
   export default defineComponent({
@@ -41,6 +40,8 @@
       MenuAlt2Icon,
       UsersIcon,
       XIcon,
+      ViewGridAddIcon,
+      ClipboardIcon,
     },
     props: {
       name: {

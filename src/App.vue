@@ -38,7 +38,6 @@
       // StatusOfflineIcon,
     },
     setup() {
-      console.log(import.meta.env);
       const isDark = useDark();
       const toggleDark = useToggle(isDark);
       if (isDark.value) {

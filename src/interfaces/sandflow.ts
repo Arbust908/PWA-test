@@ -1,3 +1,15 @@
+export enum Role {
+  SuperAdmin = 99,
+  Admin = 10,
+  Logged = 1,
+  Guest = 0,
+}
+export interface User {
+  id: number;
+  username: string;
+  role: Role;
+}
+
 export interface Pit {
     id?: number;
     name: string;
@@ -180,4 +192,27 @@ export interface PurchaseOrder {
     sandProvider?: SandProvider;
     transportProvider?: TransportProvider;
     sandOrders?: SandOrder[];
+}
+export interface Warehouse {
+    id?: number;
+    clientCompanyId: number;
+    clientCompany?: Company;
+    pitId: number;
+    pit?: Pit;
+    layout: any;
+}
+
+export interface Box {
+  category: string;
+  col: number;
+  floor: number;
+  row: number;
+}
+
+export enum BoxCategory {
+  empty = 'Vacio',
+  cut = 'Caja cortada',
+  thick = 'Arena gruesa',
+  fine = 'Arena fina',
+  aisle = 'Pasillo',
 }

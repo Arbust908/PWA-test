@@ -241,15 +241,10 @@
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import {
-    Sand,
-    SandOrder,
-    PurchaseOrder,
-    SandProvider,
-    TransportProvider,
-  } from '@/interfaces/sandflow.Types';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
+  import { SandProvider } from '@/interfaces/SandProvider';
+  import { Sand, SandOrder } from '@/interfaces/sandflow';
   const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {

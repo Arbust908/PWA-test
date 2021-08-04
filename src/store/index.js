@@ -2,6 +2,7 @@ import { createStore } from 'vuex';
 
 import client from '@/store/client';
 import cradle from '@/store/cradle';
+import depositDesign from '@/store/depositDesign';
 import forklifts from '@/store/forklifts';
 import global from '@/store/global';
 import providerNotification from '@/store/providerNotification';
@@ -47,6 +48,7 @@ const store = createStore({
   modules: {
     client,
     cradle,
+    depositDesign,
     forklifts,
     global,
     providerNotification,
