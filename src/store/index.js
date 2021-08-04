@@ -10,6 +10,7 @@ import transportProviders from '@/store/transportProviders';
 import workOrders from '@/store/workOrders';
 import forklifts from '@/store/forklifts';
 import sandCenter from '@/store/sandCenter';
+import client from '@/store/client';
 
 const store = createStore({
   state: {
@@ -53,6 +54,7 @@ const store = createStore({
     transportProviders,
     workOrders,
     sandCenter,
+    client
   },
   strict: true,
 });

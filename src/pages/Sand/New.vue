@@ -150,9 +150,21 @@
           })
           .finally(() => {});
 
-        store.dispatch('saveSand', newSand);
-        router.push('/tipos-de-arena');
-      };
+      let sandDB = await axios
+        .post(`${api}/sand`, newSand)
+        .catch((err) => {
+          console.log(err);
+        })
+        .then((res) => {
+          console.log(res);
+          if (res.status === 200) {
+            return res.data.data;
+          }
+          return {};
+        })
+        .finally(() => {
+
+        });
 
       return {
         goToIndex,

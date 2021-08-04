@@ -97,6 +97,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/clientes',
+    name: 'Clients',
+    component: () => import('@/pages/Company/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/clientes/:id',
+    name: 'ClientsById',
+    component: () => import('@/pages/Company/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/clientes/nuevo',
+    name: 'NewClient',
+    component: () => import('@/pages/Company/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/proveedores-de-arena',
     name: 'SandProvider',
     component: () => import('@/pages/SandProvider/index.vue'),
