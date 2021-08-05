@@ -44,12 +44,23 @@ export default {
       },
     ],
     user_navigation: [
-      // { name: 'Perfil', to: '/usuario', icon: 'AdjustmentsIcon' },
-      // { name: 'Ajustes', to: '/usuaruio/ajustes', icon: 'UsersIcon' },
       { name: 'Salir', to: '/usuario/salir', icon: 'LogoutIcon' },
     ],
+    areWeConnected: false
   }),
-  getters: {},
-  mutations: {},
-  actions: {},
+  getters: {
+    getInternetConnection: state => {
+      return state.areWeConnected
+    }
+  },
+  mutations: {
+    SET_INTERNET_CONNECTION(state) {
+      state.areWeConnected = navigator.onLine
+    }
+  },
+  actions: {
+    verifyInternetConnection({commit}) {
+      commit('SET_INTERNET_CONNECTION')
+    }
+  },
 };
