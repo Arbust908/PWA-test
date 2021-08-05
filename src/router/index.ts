@@ -115,6 +115,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/cradle',
+    name: 'Cradle',
+    component: () => import('@/pages/Cradle/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/cradle/:id',
+    name: 'CradleById',
+    component: () => import('@/pages/Cradle/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/cradle/nuevo',
+    name: 'NewCradle',
+    component: () => import('@/pages/Cradle/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/proveedores-de-arena',
     name: 'SandProvider',
     component: () => import('@/pages/SandProvider/index.vue'),

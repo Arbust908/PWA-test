@@ -125,64 +125,55 @@ export default {
         const store = useStore();
         const clDB = ref([]);
         const clStoreDB = JSON.parse(JSON.stringify(store.state.client.all));
+        const loading = ref(false)
 
-        onMounted(async () => {
-        const loading = ref(true);
-        clDB.value = await axios
-            .get(`${api}/company`)
-            .catch((err) => {
+        const getClients = async() => {
+            loading.value = true;
+            clDB.value = await axios
+                .get(`${api}/company`)
+                .catch((err) => {
                 console.log(err);
-            })
-            .then((res) => {
+                })
+                .then((res) => {
                 if (res.status === 200) {
-                    return res.data.data;
+                    return res.data.data
                 }
                 return [];
             })
+        
+        store.dispatch('setClients', clDB.value)
+    }
+
+        const deleteFrom = async(id) => {
+        const loading = ref(true);
+        let clStoreDB = await axios
+            .delete(`${api}/company/${id}`)
+            .catch((err) => {
+            console.log(err);
+            })
+            .then((res) => {
+                console.log('OK', id)
+            return {};
+            })
             .finally(() => {
                 loading.value = false;
+                clDB.value = clDB.value.filter(st => st.id !== id)
             });
-
-            if (clDB.value && clDB.value.length > 0) {
-                if (clDB.value.length > clStoreDB.length) {
-                    if (clStoreDB.length === 0) {
-                        console.log(clDB.value, 'llega')
-                        clDB.value.forEach((client, sKey) => {
-                        store.dispatch('saveClient', client);
-                    });
-                } else {
-                    const newsDB = clDB.value.filter((clFromApi, key) => {
-                    return clFromApi.id && clStoreDB[key] && clFromApi.id !== clStoreDB[key].id;
-                    });
-                    newsDB.forEach((client, stKey) => {
-                    store.dispatch('saveClient', client);
-                    });
-                }
-                }
-            }
-            });
-
-            const deleteFrom = async(id) => {
-                const loading = ref(true);
-                let clStoreDB = await axios
-                    .delete(`${api}/company/${id}`)
-                    .catch((err) => {
-                    console.log(err);
-                    })
-                    .then((res) => {
-                        console.log('OK', id)
-                    return {};
-                    })
-                    .finally(() => {
-                        loading.value = false;
-                        clDB.value = clDB.value.filter(st => st.id !== id)
-                    });
-            }
-
-        return {
-            clDB,
-            deleteFrom
-        }
     }
-}
+
+
+
+    onMounted(async () => {
+        loading.value = true
+        await getClients()
+        loading.value = false
+    });
+    return {
+        clDB,
+        deleteFrom,
+        loading
+    };
+  },
+};
+
 </script>

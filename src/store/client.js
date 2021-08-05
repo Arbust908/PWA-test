@@ -29,6 +29,9 @@ export default {
       },
     },
     mutations: {
+      SET_CLIENTS(state,payload) {
+        state.all = payload
+      },
       ADD_CLIENT(state, payload) {
         state.all.push(payload);
       },
@@ -41,6 +44,9 @@ export default {
       },
     },
     actions: {
+      setClients({commit}, clients) {
+        commit('SET_CLIENTS', clients)
+      },
       saveClient({ commit }, client) {
         console.log('>>Adding Client STORE', client);
         console.table(client);
@@ -50,12 +56,9 @@ export default {
             legalName: "",
             legalId: "",
             isOperator: false,
-            childId: "",
             observations: "",
             companyRepresentativeId: "",
-            child: "",
             companyRepresentative: {},
-            sandPlans: {}
     };
 
     commit('ADD_CLIENT', { ...baseC, ...client });

@@ -11,6 +11,7 @@ import workOrders from '@/store/workOrders';
 import forklifts from '@/store/forklifts';
 import sandCenter from '@/store/sandCenter';
 import client from '@/store/client';
+import cradle from '@/store/cradle';
 
 const store = createStore({
   state: {
@@ -54,7 +55,8 @@ const store = createStore({
     transportProviders,
     workOrders,
     sandCenter,
-    client
+    client,
+    cradle
   },
   strict: true,
 });

@@ -48,6 +48,11 @@ export default {
         icon: 'ClipboardListIcon',
       },
       {
+        name: 'Cradle',
+        to: '/cradle',
+        icon: 'ClipboardListIcon',
+      },
+      {
         name: 'Clientes',
         to: '/clientes',
         icon: 'ClipboardListIcon',
