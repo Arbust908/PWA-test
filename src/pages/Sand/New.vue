@@ -78,10 +78,6 @@
         <section></section>
         <section class="space-x-6 flex items-center justify-end">
           <button @click="goToIndex">Cancelar</button>
-          <!-- <GhostBtn class="btn__draft">
-                <BookmarkIcon class="w-4 h-4" />
-                <span @click="save"> Guardar Provisorio </span>
-              </GhostBtn> -->
           <PrimaryBtn @click="save"> Finalizar </PrimaryBtn>
         </section>
       </footer>
@@ -149,23 +145,7 @@
             return {};
           })
           .finally(() => {});
-
-      let sandDB = await axios
-        .post(`${api}/sand`, newSand)
-        .catch((err) => {
-          console.log(err);
-        })
-        .then((res) => {
-          console.log(res);
-          if (res.status === 200) {
-            return res.data.data;
-          }
-          return {};
-        })
-        .finally(() => {
-
-        });
-
+      };
       return {
         goToIndex,
         save,
