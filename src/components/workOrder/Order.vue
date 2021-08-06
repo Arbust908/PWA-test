@@ -4,7 +4,12 @@
       <div class="input-block">
         <label for="client" class=""> Cliente </label>
         <div class="mt-1">
-          <input v-model="client" name="client" type="text" placeholder="Nombre de cliente" />
+          <input
+            v-model="client"
+            name="client"
+            type="text"
+            placeholder="Nombre de cliente"
+          />
           <!-- <select v-model="client" name="client">
             <option selected disabled value="">ej: Nasta</option>
             <option value="ypf">YPF</option>
@@ -14,9 +19,16 @@
         </div>
       </div>
       <div class="input-block">
-        <label for="serviceCompany" class=""> Operadora / Empresa de Servicios </label>
+        <label for="serviceCompany" class="">
+          Operadora / Empresa de Servicios
+        </label>
         <div class="mt-1">
-          <input v-model="serviceCompany" name="serviceCompany" type="text" placeholder="Nombre de Operadora" />
+          <input
+            v-model="serviceCompany"
+            name="serviceCompany"
+            type="text"
+            placeholder="Nombre de Operadora"
+          />
           <!-- <select v-model="serviceCompany" name="serviceCompany">
             <option selected disabled value="">ej: Pipele</option>
             <option value="ypf">YPF</option>
@@ -33,12 +45,24 @@
       </div>
     </fieldset>
     <fieldset>
-      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">Pozos</legend>
+      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
+        Pozos
+      </legend>
       <section class="input-block_multi">
         <label for="pit" class=""> Pozo </label>
         <div v-for="(pit, key) in pits" :key="pit.id" class="pit-block">
-          <input v-model="pits[key].name" :name="`pit-${pit.id}`" type="text" placeholder="Nuevo Pozo" />
-          <CircularBtn v-if="key !== pits.length - 1" class="btn__delete" size="sm" @click="removePit(pit.id)">
+          <input
+            v-model="pits[key].name"
+            :name="`pit-${pit.id}`"
+            type="text"
+            placeholder="Nuevo Pozo"
+          />
+          <CircularBtn
+            v-if="key !== pits.length - 1"
+            class="btn__delete"
+            size="sm"
+            @click="removePit(pit.id)"
+          >
             <TrashIcon class="w-5 h-5" />
           </CircularBtn>
           <CircularBtn v-else class="btn__delete invisible" size="sm">
@@ -58,7 +82,11 @@
 
 <script lang="ts">
   import { ref, Ref, computed } from 'vue';
-  import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+  import {
+    BookmarkIcon,
+    TrashIcon,
+    CheckCircleIcon,
+  } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
@@ -108,7 +136,13 @@
       };
       // Is the Order section is full
       const isOrderFull = computed(() => {
-        return !!(client.value && serviceCompany.value && pad.value && pits.value.length > 0 && pits.value[0].name);
+        return !!(
+          client.value &&
+          serviceCompany.value &&
+          pad.value &&
+          pits.value.length > 0 &&
+          pits.value[0].name
+        );
       });
 
       return {

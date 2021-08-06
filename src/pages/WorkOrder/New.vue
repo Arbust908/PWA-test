@@ -7,7 +7,7 @@
         Nueva orden de trabajo
       </h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm">
+    <section class="bg-second-50 rounded-md shadow-sm">
       <nav class="flex justify-between">
         <button
           class="section-tab"

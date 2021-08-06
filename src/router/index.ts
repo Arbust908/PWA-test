@@ -61,6 +61,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/centro-de-carga-de-arena',
+    name: 'SandCenters',
+    component: () => import('@/pages/SandCenter/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/centro-de-carga-de-arena/:id',
+    name: 'SandCenterById',
+    component: () => import('@/pages/SandCenter/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/centro-de-carga-de-arena/nueva',
+    name: 'NewSandCenter',
+    component: () => import('@/pages/SandCenter/New.vue'),
+    beforeEnter: isLogged
+  },
+  {
     path: '/tipos-de-arena',
     name: 'Sand',
     component: () => import('@/pages/Sand/Index.vue'),
@@ -76,6 +94,42 @@ const routes: Array<RouteRecordRaw> = [
     path: '/tipos-de-arena/nueva',
     name: 'NewSand',
     component: () => import('@/pages/Sand/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/clientes',
+    name: 'Clients',
+    component: () => import('@/pages/Company/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/clientes/:id',
+    name: 'ClientsById',
+    component: () => import('@/pages/Company/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/clientes/nuevo',
+    name: 'NewClient',
+    component: () => import('@/pages/Company/New.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/cradle',
+    name: 'Cradle',
+    component: () => import('@/pages/Cradle/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/cradle/:id',
+    name: 'CradleById',
+    component: () => import('@/pages/Cradle/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/cradle/nuevo',
+    name: 'NewCradle',
+    component: () => import('@/pages/Cradle/New.vue'),
     beforeEnter: isLogged,
   },
   {
@@ -166,6 +220,24 @@ const routes: Array<RouteRecordRaw> = [
     path: '/montacargas/nuevo',
     name: 'NewForklift',
     component: () => import('@/pages/Forklift/new.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/centro-de-carga-de-arena',
+    name: 'SandCenters',
+    component: () => import('@/pages/SandCenter/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/centro-de-carga-de-arena/:id',
+    name: 'SandCenterById',
+    component: () => import('@/pages/SandCenter/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/centro-de-carga-de-arena/nueva',
+    name: 'NewSandCenter',
+    component: () => import('@/pages/SandCenter/New.vue'),
     beforeEnter: isLogged,
   },
   {

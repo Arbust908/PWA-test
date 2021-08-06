@@ -78,10 +78,6 @@
         <section></section>
         <section class="space-x-6 flex items-center justify-end">
           <button @click="goToIndex">Cancelar</button>
-          <!-- <GhostBtn class="btn__draft">
-                <BookmarkIcon class="w-4 h-4" />
-                <span @click="save"> Guardar Provisorio </span>
-              </GhostBtn> -->
           <PrimaryBtn @click="save"> Finalizar </PrimaryBtn>
         </section>
       </footer>
@@ -149,11 +145,7 @@
             return {};
           })
           .finally(() => {});
-
-        store.dispatch('saveSand', newSand);
-        router.push('/tipos-de-arena');
       };
-
       return {
         goToIndex,
         save,
