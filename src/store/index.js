@@ -1,17 +1,17 @@
 import { createStore } from 'vuex';
 
+import client from '@/store/client';
+import cradle from '@/store/cradle';
+import forklifts from '@/store/forklifts';
 import global from '@/store/global';
 import providerNotification from '@/store/providerNotification';
 import purchaseOrder from '@/store/purchaseOrder';
 import sand from '@/store/sand';
+import sandCenter from '@/store/sandCenter';
 import sandPlan from '@/store/sandPlan';
 import sandProviders from '@/store/sandProviders';
 import transportProviders from '@/store/transportProviders';
 import workOrders from '@/store/workOrders';
-import forklifts from '@/store/forklifts';
-import sandCenter from '@/store/sandCenter';
-import client from '@/store/client';
-import cradle from '@/store/cradle';
 
 const store = createStore({
   state: {
@@ -45,18 +45,19 @@ const store = createStore({
     },
   },
   modules: {
+    client,
+    cradle,
+    forklifts,
     global,
     providerNotification,
     purchaseOrder,
     sand,
     sand,
+    sandCenter,
     sandPlan,
     sandProviders,
     transportProviders,
     workOrders,
-    sandCenter,
-    client,
-    cradle
   },
   strict: true,
 });
