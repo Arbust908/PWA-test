@@ -39,13 +39,10 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/pages/WorkOrder/New.vue'),
     beforeEnter: isLogged,
   },
-  // > :: 
-  // PurchaseOrder
-  // > ::
   {
     path: '/orden-de-pedido',
     name: 'PurchaseOrders',
-    component: () => import('@/pages/PurchaseOrder/Index.vue'),
+    component: () => import('@/pages/PurchaseOrder/index.vue'),
     beforeEnter: isLogged,
   },
   {
