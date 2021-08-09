@@ -60,14 +60,40 @@
                     class="
                       px-6
                       py-3
+                      text-left text-xs
                       font-medium
                       text-gray-500
                       uppercase
                       tracking-wider
                     "
                   >
-                    scope="col" class=" px-6 py-3 font-medium text-gray-500
-                    uppercase tracking-wider " >
+                    Operadora
+                  </th>
+                  <th
+                    scope="col"
+                    class="
+                      px-6
+                      py-3
+                      text-left text-xs
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
+                  >
+                    Estado
+                  </th>
+                  <th
+                    scope="col"
+                    class="
+                      px-6
+                      py-3
+                      font-medium
+                      text-gray-500
+                      uppercase
+                      tracking-wider
+                    "
+                  >
                     <span class="sr-only">Actions</span>
                   </th>
                 </tr>
