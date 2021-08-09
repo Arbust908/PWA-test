@@ -57,6 +57,28 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/pages/PurchaseOrder/New.vue'),
     beforeEnter: isLogged,
   },
+  // > :: 
+  // DepositDesign
+  // > ::
+  {
+    path: '/diseno-de-deposito',
+    name: 'DepositDesigns',
+    component: () => import('@/pages/DepositDesign/Index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/diseno-de-deposito/:id',
+    name: 'DepositDesignById',
+    component: () => import('@/pages/DepositDesign/_id.vue'),
+    beforeEnter: isLogged
+  },
+  {
+    path: '/diseno-de-deposito/nueva',
+    name: 'NewDepositDesign',
+    component: () => import('@/pages/DepositDesign/New.vue'),
+    beforeEnter: isLogged,
+  },
+  // < ::
   {
     path: '/centro-de-carga-de-arena',
     name: 'SandCenters',

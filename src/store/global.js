@@ -8,6 +8,11 @@ export default {
         icon: 'ClipboardListIcon',
       },
       {
+        name: 'Diseño de Deposito',
+        to: '/diseno-de-deposito',
+        icon: 'ViewGridAddIcon',
+      },
+      {
         name: 'Orden de Trabajo',
         to: '/orden-de-trabajo',
         icon: 'ClipboardListIcon',
@@ -30,7 +35,7 @@ export default {
       {
         name: 'Proveedores de arena',
         to: '/proveedores-de-arena',
-        icon: 'Clipboard',
+        icon: 'ClipboardIcon',
       },
       {
         name: 'Centro de Carga',

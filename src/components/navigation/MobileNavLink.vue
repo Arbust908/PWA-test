@@ -23,6 +23,8 @@
     MenuAlt2Icon,
     UsersIcon,
     XIcon,
+    ViewGridAddIcon,
+    ClipboardIcon,
   } from '@heroicons/vue/outline';
   import { defineComponent, defineAsyncComponent } from 'vue';
 
@@ -40,6 +42,8 @@
       MenuAlt2Icon,
       UsersIcon,
       XIcon,
+      ViewGridAddIcon,
+      ClipboardIcon,
     },
     props: {
       to: {
