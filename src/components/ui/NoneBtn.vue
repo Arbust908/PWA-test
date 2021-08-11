@@ -1,6 +1,6 @@
 <template>
   <button :type="type" :size="size">
-    <slot>Fantasma</slot>
+    <slot> Nada </slot>
   </button>
 </template>
 
@@ -20,9 +20,11 @@
 </script>
 
 <style lang="scss" scoped>
-  // border-gray-300 text-gray-700 bg-transparent hover:bg-gray-50
   button {
-    @apply inline-flex items-center border shadow-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 space-x-2 transition duration-150 ease-out;
+    @apply inline-flex items-center font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 space-x-2 transition duration-150 ease-out;
+    &:hover {
+      @apply bg-second-100 bg-opacity-50 shadow;
+    }
   }
   button[size='xs'] {
     @apply px-2.5 py-1.5 text-xs rounded;

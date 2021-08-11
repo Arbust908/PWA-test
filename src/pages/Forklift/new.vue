@@ -29,15 +29,16 @@
           <div class="p-4 d-flex">
             <label for="owned" class="">Asignada</label>
             <div class="mt-1">
-              <div :class="['switch', newForklift.owned ? 'true' : '']" @click="handleSwitchClick">
+              <div
+                :class="['switch', newForklift.owned ? 'true' : '']"
+                @click="handleSwitchClick"
+              >
                 <div class="switch-circle"></div>
               </div>
             </div>
           </div>
           <div class="input-block p-4">
-            <label for="ownerName" class="">
-              Nombre del dueño
-            </label>
+            <label for="ownerName" class=""> Nombre del dueño </label>
             <div class="mt-1">
               <input
                 v-model="newForklift.ownerName"
@@ -49,9 +50,7 @@
             </div>
           </div>
           <div class="input-block p-4">
-            <label for="ownerContact" class="">
-              Contacto del dueño
-            </label>
+            <label for="ownerContact" class=""> Contacto del dueño </label>
             <div class="mt-1">
               <input
                 v-model="newForklift.ownerContact"
@@ -86,7 +85,7 @@
           </GhostBtn>
           <PrimaryBtn
             :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save(true)"
+            @click="isFull && save()"
             :disabled="!isFull"
           >
             Finalizar
@@ -141,8 +140,8 @@
       });
 
       const handleSwitchClick = () => {
-        newForklift.owned = !newForklift.owned
-      }
+        newForklift.owned = !newForklift.owned;
+      };
 
       const goToIndex = (): void => {
         router.push('/montacargas');
@@ -182,7 +181,7 @@
         goToIndex,
         save,
         isFull,
-        handleSwitchClick
+        handleSwitchClick,
       };
     },
   };
@@ -254,12 +253,12 @@
       @apply bg-gray-400;
       transition: all 500ms ease-in-out;
     }
-    
+
     &.true {
       transition: all 500ms ease-in-out;
       @apply bg-green-300;
       @apply border-green-500;
-      
+
       .switch-circle {
         transition: all 500ms ease-in-out;
         transform: translateX(25px);

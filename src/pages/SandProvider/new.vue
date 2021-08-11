@@ -37,7 +37,8 @@
             <span>CUIT / CUIL</span>
             <input
               id="legalId"
-              v-model="newSandProvider.legalId"
+              v-model.number="newSandProvider.legalId"
+              v-maska="'###########'"
               class="input"
               type="text"
               name="legalId"
@@ -52,7 +53,7 @@
               class="input"
               type="text"
               name="observations"
-              placeholder="Observaciones.."
+              placeholder="Observaciones..."
             />
           </label>
         </fieldset>
@@ -115,7 +116,8 @@
             <input
               id="nr-legalId"
               :read-only="!isNewRep"
-              v-model="companyRepresentative.legalId"
+              v-maska="'###########'"
+              v-model.number="companyRepresentative.legalId"
               class="input"
               type="text"
               name="legalId"
@@ -127,6 +129,7 @@
             <input
               id="nr-phone"
               :read-only="!isNewRep"
+              v-maska="'##-####-####'"
               v-model="companyRepresentative.phone"
               class="input"
               type="text"
@@ -150,9 +153,9 @@
       </form>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
-          <button @click.prevent="$router.push('/proveedores-de-arena')">
+          <NoneBtn @click.prevent="$router.push('/proveedores-de-arena')">
             Cancelar
-          </button>
+          </NoneBtn>
           <PrimaryBtn
             :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
             @click="isFull && save()"
@@ -169,18 +172,12 @@
 <script lang="ts">
   import { ref, Ref, computed, reactive, watch, ComputedRef } from 'vue';
   import { useStore } from 'vuex';
-  import { useRouter, useRoute } from 'vue-router';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
-  import { PlusIcon } from '@heroicons/vue/solid';
+  import { useRouter } from 'vue-router';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import { useToggle } from '@vueuse/core';
+  import { maska } from 'maska';
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -189,20 +186,15 @@
   import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
   export default {
+    directives: { maska },
     components: {
       Layout,
-      GhostBtn,
-      BookmarkIcon,
-      TrashIcon,
-      PlusIcon,
-      CheckCircleIcon,
-      CircularBtn,
+      NoneBtn,
       PrimaryBtn,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
-      const route = useRoute();
       const instance = axios.create({
         baseURL: apiUrl,
       });
@@ -211,41 +203,49 @@
       const toggleRepStatus = useToggle(isNewRep);
       const companyRepresentative: CompanyRepresentative = reactive({
         name: '',
-        legalId: 0,
+        legalId: null,
         phone: '',
         email: '',
       });
 
-      const companyRepresentativeId = ref(-1);
-      const companyRepresentatives = ref([] as Array<CompanyRepresentative>);
-      const { data: corpoRepData } = useAxios('/company', instance);
-      watch(corpoRepData, (corpoRepApi, prevCount) => {
-        if (corpoRepApi && corpoRepApi.data) {
-          companyRepresentatives.value = corpoRepApi.data;
-        }
-      });
+      // const companyRepresentativeId = ref(-1);
+      // const companyRepresentatives = ref([] as Array<CompanyRepresentative>);
+      // const { data: corpoRepData } = useAxios('/company', instance);
+      // watch(corpoRepData, (corpoRepApi, prevCount) => {
+      //   if (corpoRepApi && corpoRepApi.data) {
+      //     companyRepresentatives.value = corpoRepApi.data;
+      //   }
+      // });
 
       const newSandProvider: SandProvider = reactive({
-        id: 0,
         name: '',
         legalName: '',
-        legalId: 0,
+        legalId: null,
         meshType: '',
         grains: '',
         observations: '',
         companyRepresentativeId: -1,
       });
 
-      const isFull: ComputedRef<boolean> = computed(() => {
+      const providerFull: ComputedRef<boolean> = computed(() => {
         return !!(
+          newSandProvider.name !== '' &&
           newSandProvider.legalName !== '' &&
-          newSandProvider.legalId >= 0 &&
-          newSandProvider.meshType !== '' &&
-          newSandProvider.grains !== '' &&
-          newSandProvider.observations !== '' &&
-          newSandProvider.companyRepresentativeId >= 0 &&
-          newSandProvider.name !== ''
+          newSandProvider.legalId >= 0
         );
+      });
+
+      const repFull: ComputedRef<boolean> = computed(() => {
+        return !!(
+          companyRepresentative.name !== '' &&
+          companyRepresentative.legalId >= 0 &&
+          companyRepresentative.phone !== '' &&
+          companyRepresentative.email !== ''
+        );
+      });
+
+      const isFull: ComputedRef<boolean> = computed(() => {
+        return providerFull.value && repFull.value;
       });
 
       const save = async () => {
@@ -258,42 +258,29 @@
           if (newData && newData.data) {
             const compRep = newData.data;
             companyRepresentative.id = compRep.id;
-            companyRepresentativeId.value = compRep.id;
-
+            newSandProvider.companyRepresentativeId = compRep.id;
             const { data: spData } = useAxios(
               '/sandProvider',
-              { method: 'POST', data: companyRepresentative },
+              { method: 'POST', data: newSandProvider },
               instance
             );
+            watch(spData, (newData, _) => {
+              if (newData && newData.data) {
+                store.dispatch('saveSandProvider', newSandProvider);
+                router.push('/proveedores-de-arena');
+              }
+            });
           }
         });
-        // TO FIX
-        let spDB = await axios
-          .post(`${api}/sandProvider`, newSandProvider)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              newSandProvider.id = res.data.data.id;
-              return res.data;
-            }
-            return {};
-          })
-          .finally(() => {});
-
-        // Update Sand Provider
-        store.dispatch('saveSandProvider', newSandProvider);
-        router.push('/proveedores-de-arena');
       };
 
       return {
         isNewRep,
         toggleRepStatus,
-        companyRepresentativeId,
+        // companyRepresentativeId,
         companyRepresentative,
         newSandProvider,
-        companyRepresentatives,
+        // companyRepresentatives,
         isFull,
         save,
       };

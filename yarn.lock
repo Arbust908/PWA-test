@@ -3208,6 +3208,11 @@
   dependencies:
     "sourcemap-codec" "^1.4.4"
 
+"maska@^1.4.5":
+  "integrity" "sha512-RTtysWQGipkQNC/Baq4/VsWIh4pAw9TRXDZhqSyrrIaGCXFRkfXORWu7d6Jj1Xbnp7rE0Gnnbwx5ylfLRfCdTA=="
+  "resolved" "https://registry.npmjs.org/maska/-/maska-1.4.5.tgz"
+  "version" "1.4.5"
+
 "merge-source-map@^1.1.0":
   "integrity" "sha512-Qkcp7P2ygktpMPh2mCQZaf3jhN6D3Z/qVZHSdWvQ+2Ef5HgRAPBO57A77+ENm0CPx2+1Ce/MYKi3ymqdfuqibw=="
   "resolved" "https://registry.npmjs.org/merge-source-map/-/merge-source-map-1.1.0.tgz"

@@ -217,9 +217,9 @@
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
-        <GhostBtn @click.prevent="$router.push('/notificaciones-a-proveedores')"
-          >Cancelar</GhostBtn
-        >
+        <NoneBtn @click.prevent="$router.push('/notificaciones-a-proveedores')">
+          Cancelar
+        </NoneBtn>
         <PrimaryBtn
           type="submit"
           size="sm"
@@ -228,7 +228,7 @@
           :disabled="!isFull"
           @click.prevent="isFull && save()"
         >
-          Cargar Planificacíon
+          Finalizar
         </PrimaryBtn>
       </footer>
     </section>
@@ -346,7 +346,7 @@
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import {
@@ -371,7 +371,7 @@
     components: {
       BellIcon,
       CircularBtn,
-      GhostBtn,
+      NoneBtn,
       Layout,
       Modal,
       PlusIcon,
