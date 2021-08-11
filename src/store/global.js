@@ -15,22 +15,22 @@ export default {
       {
         name: 'Orden de Trabajo',
         to: '/orden-de-trabajo',
-        icon: 'ClipboardListIcon',
+        icon: 'BriefcaseIcon',
       },
       {
         name: 'Orden de Pedido',
         to: '/orden-de-pedido',
-        icon: 'ArchiveIcon',
+        icon: 'TagIcon',
       },
       {
         name: 'Notificaciones a Proveedores',
         to: '/notificaciones-a-proveedores',
-        icon: 'AnnotationIcon',
+        icon: 'BellIcon',
       },
       {
         name: 'Centro de Carga',
         to: '/centro-de-carga-de-arena',
-        icon: 'ClipboardListIcon',
+        icon: 'ClipboardCopyIcon',
       },
 
       {

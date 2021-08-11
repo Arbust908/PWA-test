@@ -40,9 +40,6 @@
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
-      const update = (event) => {
-        value.value = event.target.value;
-      };
       return {
         value,
         update,

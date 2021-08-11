@@ -13,75 +13,31 @@
         action="/"
         class="p-4 w-full flex flex-col lg:flex-row"
       >
-        <fieldset class="flex flex-col w-full">
-          <div class="input-block p-4">
-            <label for="name" class="">Nombre</label>
-            <div class="mt-1">
-              <input
-                v-model="name"
-                class="w-full rounded-md shadow"
-                name="name"
-                type="text"
-                placeholder="Nombre"
-              />
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="providerNotificationId" class="">
-              ProviderNotificationID
-            </label>
-            <div class="mt-1">
-              <select
-                name="providerNotificationId"
-                v-model="providerNotificationId"
-                class="w-full rounded-md shadow"
-              >
-                <option
-                  v-for="provider in providers"
-                  :key="provider.id"
-                  :value="provider.id"
-                >
-                  {{ provider.sandProvider.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="amount" class="">Cantidad de cajas</label>
-            <div class="mt-1">
-              <div class="mt-1">
-                <input
-                  v-model="amount"
-                  class="w-full rounded-md shadow"
-                  name="amount"
-                  type="text"
-                  placeholder="Cantidad de cajas"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="observations" class=""> Observaciones </label>
-            <div class="mt-1">
-              <textarea
-                v-model="observations"
-                class="w-full rounded-md shadow px-3 py-2 focus:outline-none"
-                rows="5"
-                name="observations"
-                type="text"
-                placeholder="Observaciones"
-              ></textarea>
-            </div>
-          </div>
-        </fieldset>
+        <FieldGroup>
+          <FieldLegend>Proveedor</FieldLegend>
+          <FieldInput
+            class="col-span-full"
+            name="name"
+            placeholder="Nombre"
+            title="Nombre"
+            :data="currentTransportProvider.name"
+            @update:data="currentTransportProvider.name = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            name="observations"
+            placeholder="Observaciones..."
+            title="Observaciones"
+            :data="currentTransportProvider.observations"
+            @update:data="currentTransportProvider.observations = $event"
+          />
+        </FieldGroup>
       </form>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
-          <button @click.prevent="goToIndex">Cancelar</button>
-          <GhostBtn class="btn__draft" @click="save()">
-            <BookmarkIcon class="w-4 h-4" />
-            <span> Guardar Provisorio </span>
-          </GhostBtn>
+          <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')">
+            Cancelar
+          </NoneBtn>
           <PrimaryBtn @click="update()"> Finalizar </PrimaryBtn>
         </section>
       </footer>
@@ -90,7 +46,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
+  import { computed, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import {
@@ -100,105 +56,73 @@
   } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-
-  import { TransportProvider } from '@/interfaces/TransportProvider';
-
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  // AXIOS
   import axios from 'axios';
+  import { useAxios } from '@vueuse/integrations/useAxios';
   const api = import.meta.env.VITE_API_URL || '/api';
+  // TIPOS
+  import { TransportProvider } from '@/interfaces/sandflow';
 
   export default {
     components: {
-      Layout: Layout,
-      GhostBtn: GhostBtn,
-      BookmarkIcon: BookmarkIcon,
-      TrashIcon: TrashIcon,
-      PlusIcon: PlusIcon,
-      CheckCircleIcon: CheckCircleIcon,
-      CircularBtn: CircularBtn,
-      PrimaryBtn: PrimaryBtn,
+      Layout,
+      NoneBtn,
+      BookmarkIcon,
+      TrashIcon,
+      PlusIcon,
+      CheckCircleIcon,
+      CircularBtn,
+      PrimaryBtn,
+      FieldGroup,
+      FieldInput,
+      FieldLegend,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
       const route = useRoute();
+      const instance = axios.create({
+        baseURL: api,
+      });
+      const id = Number(route.params.id);
+
       const transportProviders: Array<TransportProvider> = JSON.parse(
         JSON.stringify(store.state.transportProviders.all)
       );
 
       const currentTransportProvider: TransportProvider =
         transportProviders.find((sp) => {
-          return sp.id == route.params.id;
+          return sp.id == id;
         });
 
-      let id = ref(0);
-      let name = ref('');
-      let providerNotificationId = ref(0);
-      let amount = ref(0);
-      let observations = ref('');
-      let providers = ref([]);
-
-      onMounted(async () => {
-        id.value = currentTransportProvider.id;
-        name.value = currentTransportProvider.name;
-        providerNotificationId.value =
-          currentTransportProvider.providerNotificationId;
-        amount.value = currentTransportProvider.amount;
-        observations.value = currentTransportProvider.observations;
-
-        providers.value = await axios
-          .get(`${api}/providerNotification`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data.data;
-            }
-            return {};
-          });
+      const isFull = computed(() => {
+        return !!(currentTransportProvider.name !== '');
       });
 
-      const goToIndex = (): void => {
-        router.push('/proveedores-de-transporte');
-      };
-
       const update = async () => {
-        const updatedTP = {
-          id: id.value,
-          name: name.value,
-          providerNotificationId: providerNotificationId.value,
-          amount: amount.value,
-          observations: observations.value,
-        };
-
-        let tpDB = await axios
-          .put(`${api}/transportProvider/${updatedTP.id}`, updatedTP)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data;
-            }
-            return {};
-          });
-        // Update Work Order
-        store.dispatch('updateTransportProvider', updatedTP);
-        router.push('/proveedores-de-transporte');
+        const { data } = useAxios(
+          `/transportProvider/${id}`,
+          { method: 'PUT', data: currentTransportProvider },
+          instance
+        );
+        watch(data, (newData, _) => {
+          if (newData && newData.data) {
+            store.dispatch('updateTransportProvider', newData.data);
+            router.push('/proveedores-de-transporte');
+          }
+        });
       };
 
       return {
         id,
-        name,
-        providerNotificationId,
-        amount,
-        observations,
-        goToIndex,
+        currentTransportProvider,
         update,
-        providers,
       };
     },
   };
