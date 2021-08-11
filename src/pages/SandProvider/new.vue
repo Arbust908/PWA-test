@@ -233,7 +233,7 @@
         meshType: '',
         grains: '',
         observations: '',
-        companyRepresentativeId: 0,
+        companyRepresentativeId: -1,
       });
 
       const isFull: ComputedRef<boolean> = computed(() => {
@@ -259,6 +259,12 @@
             const compRep = newData.data;
             companyRepresentative.id = compRep.id;
             companyRepresentativeId.value = compRep.id;
+
+            const { data: spData } = useAxios(
+              '/sandProvider',
+              { method: 'POST', data: companyRepresentative },
+              instance
+            );
           }
         });
         // TO FIX
