@@ -69,7 +69,6 @@
             />
           </label>
         </fieldset>
-
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Representante</h2>
 

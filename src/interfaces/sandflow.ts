@@ -77,8 +77,8 @@ export interface SandProvider {
     name: string;
     legalName: string;
     legalId: number;
-    meshType: string;
-    grains: string;
+    meshType: string; // Se irian
+    grains: string; // Se irian
     observations?: string;
     companyRepresentativeId: number;
     CompanyRepresentative?: CompanyRepresentative;
@@ -131,7 +131,7 @@ export interface Company {
     legalName: string;
     legalId: number;
     isOperator: boolean;
-    childId: number;
+    childId?: number; // opcional
     observations?: string;
     companyRepresentativeId: number;
     company?: Company;
@@ -180,12 +180,12 @@ export interface TransportProvider {
     name: string;
     amount: number;
     observations?: string;
-    providerNotificationId: number;
+    providerNotificationId: number; // no se si va aca
     providerNotification?: ProviderNotification;
     purchaseOrders?: PurchaseOrder[];
 }
 
-export interface ProviderNotification {
+export interface ProviderNotification { // ??? Dudas
     id?: number;
     sandProviderId: number;
     sandProvider?: SandProvider;

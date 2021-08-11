@@ -348,11 +348,14 @@
   import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import SelectList from '@/components/ui/SelectList.vue';
   import {
     ProviderNotification,
     SandOrder,
     TransportProvider,
-  } from '@/interfaces/ProviderNotification.ts';
+    SandProvider,
+    Sand,
+  } from '@/interfaces/sandflow';
   import { useToggle } from '@vueuse/core';
 
   const Modal = defineAsyncComponent(
@@ -361,9 +364,6 @@
 
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  import { SandProvider } from '@/interfaces/SandProvider';
-  import { Sand } from '@/interfaces/SandType';
-  import SelectList from '@/components/ui/SelectList.vue';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
@@ -381,12 +381,11 @@
     setup() {
       const router = useRouter();
       const store = useStore();
-
-      const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
-
       const instance = axios.create({
         baseURL: apiUrl,
       });
+
+      const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
 
       const sandProviders = ref([] as Array<Sand>);
       const { data: sPData } = useAxios('/sandProvider', instance);
