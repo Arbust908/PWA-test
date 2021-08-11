@@ -23,7 +23,7 @@ export default {
         icon: 'TagIcon',
       },
       {
-        name: 'Notificaciones a Proveedores',
+        name: 'Notificaciones',
         to: '/notificaciones-a-proveedores',
         icon: 'BellIcon',
       },
@@ -32,7 +32,22 @@ export default {
         to: '/centro-de-carga-de-arena',
         icon: 'ClipboardCopyIcon',
       },
-
+      {
+        name: 'Proveedores',
+        icon: 'ChevronRightIcon',
+        subNav: [
+          {
+            name: 'Arena',
+            to: '/proveedores-de-arena',
+            icon: 'UserGroupIcon',
+          },
+          {
+            name: 'Transporte',
+            to: '/proveedores-de-transporte',
+            icon: 'TruckIcon',
+          },
+        ],
+      },
       {
         name: 'Configuracion',
         icon: 'CogIcon',
@@ -41,16 +56,6 @@ export default {
             name: 'Clientes',
             to: '/clientes',
             icon: 'UserCircleIcon',
-          },
-          {
-            name: 'Proveedores de arena',
-            to: '/proveedores-de-arena',
-            icon: 'UserGroupIcon',
-          },
-          {
-            name: 'Proveedores de transporte',
-            to: '/proveedores-de-transporte',
-            icon: 'TruckIcon',
           },
           {
             name: 'Tipos de Arena',
