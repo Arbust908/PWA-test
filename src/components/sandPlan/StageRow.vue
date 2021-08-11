@@ -1,15 +1,15 @@
 <template>
   <tr>
-    <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-lg">
+    <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-lg">
       {{ stage.stage }} - 40
     </td>
     <!-- Tipos -->
     <td
       v-if="editing === stage.id"
-      class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm"
+      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
       :id="`sandType${stage.id}`"
     >
-      <select id="pit" v-model="stage.sandId" class="input" name="pit">
+      <select id="pit" v-model="stage.sandId1" class="input" name="pit">
         <option disabled selected value="-1">Seleccionar</option>
         <option v-for="sand in sands" :key="sand.id" :value="sand.id">
           {{ sand.type }}
@@ -17,7 +17,7 @@
       </select>
       <div class="amountWrapper">
         <input
-          v-model.number="stage.quantity"
+          v-model.number="stage.quantity1"
           type="number"
           name="sandQuantity"
           class="amountInput"
@@ -27,20 +27,20 @@
         <span class="amountInput__unit" title="Peso en Toneladas"> t </span>
       </div>
     </td>
-    <td v-else class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length > 0 && stage.sandId >= 0">
-        {{ getSand(stage.sandId)?.type }}
+    <td v-else class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+      <p v-if="sands.length > 0 && stage.sandId1 >= 0">
+        {{ getSand(stage.sandId1)?.type }}
       </p>
-      <p v-else>-</p>
-      <p>{{ stage.quantity }}t</p>
+      <p v-else></p>
+      <p v-if="stage.quantity1 > 0">{{ stage.quantity1 }}t</p>
     </td>
     <!-- /Tipos -->
     <!-- Tipos -->
     <td
       v-if="editing === stage.id"
-      class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm"
+      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
     >
-      <select id="pit" v-model="stageB.sandId" class="input" name="pit">
+      <select id="pit" v-model="stage.sandId2" class="input" name="pit">
         <option disabled selected value="-1">Seleccionar</option>
         <option v-for="sand in sands" :key="sand.id" :value="sand.id">
           {{ sand.type }}
@@ -48,7 +48,7 @@
       </select>
       <div class="amountWrapper">
         <input
-          v-model.number="stageB.quantity"
+          v-model.number="stage.quantity2"
           type="number"
           name="sandQuantity"
           class="amountInput"
@@ -58,20 +58,20 @@
         <span class="amountInput__unit" title="Peso en Toneladas"> t </span>
       </div>
     </td>
-    <td v-else class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length > 0 && stageB.sandId > 0">
-        {{ getSand(stageB.sandId).type }}
+    <td v-else class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+      <p v-if="sands.length > 0 && stage.sandId2 > 0">
+        {{ getSand(stage.sandId2)?.type }}
       </p>
-      <p v-else>-</p>
-      <p>{{ stageB.quantity }}t</p>
+      <p v-else></p>
+      <p v-if="stage.quantity2 > 0">{{ stage.quantity2 }}t</p>
     </td>
     <!-- /Tipos -->
     <!-- Tipos -->
     <td
       v-if="editing === stage.id"
-      class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm"
+      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
     >
-      <select id="pit" v-model="stageC.sandId" class="input" name="pit">
+      <select id="pit" v-model="stage.sandId3" class="input" name="pit">
         <option disabled selected value="-1">Seleccionar</option>
         <option v-for="sand in sands" :key="sand.id" :value="sand.id">
           {{ sand.type }}
@@ -79,7 +79,7 @@
       </select>
       <div class="amountWrapper">
         <input
-          v-model.number="stageC.quantity"
+          v-model.number="stage.quantity3"
           type="number"
           name="sandQuantity"
           class="amountInput"
@@ -89,68 +89,44 @@
         <span class="amountInput__unit" title="Peso en Toneladas"> t </span>
       </div>
     </td>
-    <td v-else class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length > 0 && stageC.sandId > 0">
-        {{ getSand(stageC.sandId).type }}
+    <td v-else class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+      <p v-if="sands.length > 0 && stage.sandId3 > 0">
+        {{ getSand(stage.sandId3)?.type }}
       </p>
-      <p v-else>-</p>
-      <p>{{ stageC.quantity }}t</p>
+      <p v-else></p>
+      <p v-if="stage.quantity3 > 0">{{ stage.quantity3 }}t</p>
     </td>
     <!-- /Tipos -->
-    <td class="text-gray-500 px-6 py-4 whitespace-nowrap font-bold">
+    <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-center">
       {{ totalWheight }}t
+      <!-- Mecanica de x/total para ir agregando / descontando -->
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm">
-      <span
-        v-if="stage.status === 0"
-        class="
-          flex
-          justify-center
-          rounded-full
-          bg-gray-500
-          text-white
-          px-4
-          w-28
-        "
-      >
-        Creada
-      </span>
-      <span
-        v-else-if="stage.status === 1"
-        class="
-          flex
-          justify-center
-          rounded-full
-          bg-blue-500
-          text-white
-          px-4
-          w-28
-        "
-      >
+
+    <td class="px-1 py-4 whitespace-nowrap text-sm">
+      <!-- Atar el cambio de estado a el x sobre total -->
+      <span v-if="stage.status === 0" class="pill bg-gray-500"> Creada </span>
+      <span v-else-if="stage.status === 1" class="pill bg-blue-500">
         En Progreso
       </span>
-      <span
-        v-else-if="stage.status === 2"
-        class="
-          flex
-          justify-center
-          rounded-full
-          bg-green-600
-          text-white
-          px-4
-          w-28
-        "
-      >
+      <span v-else-if="stage.status === 2" class="pill bg-green-600">
         Finalizada
       </span>
     </td>
-    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+    <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
       <div>
-        <button @click.prevent="upgrade" class="action duplicate">
+        <button
+          @click.prevent="upgrade"
+          class="action duplicate"
+          title="Mejorar"
+        >
           <ReceiptRefundIcon class="w-6 h-6" />
-          <span class="sr-only">Actualizar</span>
+          <span class="sr-only">Mejorar</span>
         </button>
-        <button @click.prevent="duplicateStage" class="action duplicate">
+        <button
+          @click.prevent="duplicateStage"
+          class="action duplicate"
+          title="Duplicar"
+        >
           <DocumentDuplicateIcon class="w-6 h-6" />
           <span class="sr-only">Duplicar</span>
         </button>
@@ -159,6 +135,7 @@
           @click.prevent="editStage"
           :disabled="stage.status > 0"
           class="action edit text-gray-600 hover:text-blue-800 p-2"
+          title="Editar"
         >
           <PencilAltIcon class="w-6 h-6" />
           <span class="sr-only">Editar</span>
@@ -168,6 +145,7 @@
           @click.prevent="saveStage"
           :disabled="stage.status > 0"
           class="action edit text-gray-600 hover:text-blue-800 p-2"
+          title="Guardar"
         >
           <SaveIcon class="w-6 h-6" />
           <span class="sr-only">Guardar</span>
@@ -176,6 +154,7 @@
           @click.prevent="deleteStage"
           :disabled="stage.status > 0"
           class="action delete text-gray-600 hover:text-red-800 p-2"
+          title="Borrar"
         >
           <TrashIcon class="w-6 h-6" />
           <span class="sr-only">Borrar</span>
@@ -194,7 +173,7 @@
     SaveIcon,
     ReceiptRefundIcon,
   } from '@heroicons/vue/solid';
-  import { useVModel } from '@vueuse/core';
+  import { Sand } from '@/interfaces/sandflow';
 
   export default defineComponent({
     props: {
@@ -222,23 +201,17 @@
       const { stage, editing, sands } = toRefs(props);
 
       const totalWheight = computed(() => {
-        return [stage.value, stageB.value, stageC.value].reduce((acc, sand) => {
-          return acc + sand.quantity;
-        }, 0);
+        return (
+          stage.value.quantity1 + stage.value.quantity2 + stage.value.quantity3
+        );
       });
       const getSand = (sandId: number) => {
-        return sands.value.find((sand) => sand.id === sandId);
+        return (
+          sands.value.find((sand: Sand) => {
+            return sand.id === sandId;
+          }) || { tpye: '' }
+        );
       };
-
-      // dummy sands
-      const stageB = ref({
-        sandId: -1,
-        quantity: 0,
-      });
-      const stageC = ref({
-        sandId: -1,
-        quantity: 0,
-      });
 
       const editStage = () => {
         emit('editStage', stage.value);
@@ -253,13 +226,16 @@
         emit('deleteStage', stage.value);
       };
       const upgrade = () => {
-        emit('upgrade', stage.value);
+        if (stage.value.status >= 2) {
+          console.error('Reset status');
+          stage.value.status = 0;
+          return;
+        }
+        stage.value.status++;
       };
 
       return {
         stage,
-        stageB,
-        stageC,
         editing,
         sands,
         totalWheight,
@@ -275,6 +251,9 @@
 </script>
 
 <style lang="scss" scoped>
+  .pill {
+    @apply flex justify-center rounded-full text-white px-1 w-28;
+  }
   .input {
     @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 mt-1 flex shadow-sm;
   }

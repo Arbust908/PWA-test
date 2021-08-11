@@ -126,7 +126,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, defineAsyncComponent } from 'vue';
+  import { ref, Ref, defineAsyncComponent, defineComponent } from 'vue';
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
   import { Role } from '@/interfaces/User';

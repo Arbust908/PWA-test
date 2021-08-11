@@ -28,59 +28,66 @@ export default {
         icon: 'AnnotationIcon',
       },
       {
-        name: 'Proveedores de transporte',
-        to: '/proveedores-de-transporte',
-        icon: 'ClipboardListIcon',
-      },
-      {
-        name: 'Proveedores de arena',
-        to: '/proveedores-de-arena',
-        icon: 'ClipboardIcon',
-      },
-      {
         name: 'Centro de Carga',
         to: '/centro-de-carga-de-arena',
         icon: 'ClipboardListIcon',
       },
+
       {
-        name: 'Tipos de Arena',
-        to: '/tipos-de-arena',
-        icon: 'ClipboardListIcon',
-      },
-      {
-        name: 'Montacargas',
-        to: '/montacargas',
-        icon: 'ClipboardListIcon',
-      },
-      {
-        name: 'Cradle',
-        to: '/cradle',
-        icon: 'ClipboardListIcon',
-      },
-      {
-        name: 'Clientes',
-        to: '/clientes',
-        icon: 'ClipboardListIcon',
+        name: 'Configuracion',
+        icon: 'CogIcon',
+        subNav: [
+          {
+            name: 'Clientes',
+            to: '/clientes',
+            icon: 'UserCircleIcon',
+          },
+          {
+            name: 'Proveedores de arena',
+            to: '/proveedores-de-arena',
+            icon: 'UserGroupIcon',
+          },
+          {
+            name: 'Proveedores de transporte',
+            to: '/proveedores-de-transporte',
+            icon: 'TruckIcon',
+          },
+          {
+            name: 'Tipos de Arena',
+            to: '/tipos-de-arena',
+            icon: 'ClipboardListIcon',
+          },
+          {
+            name: 'Montacargas',
+            to: '/montacargas',
+            icon: 'ClipboardListIcon',
+          },
+          {
+            name: 'Cradle',
+            to: '/cradle',
+            icon: 'ClipboardListIcon',
+          },
+        ],
       },
     ],
     user_navigation: [
       { name: 'Salir', to: '/usuario/salir', icon: 'LogoutIcon' },
     ],
-    areWeConnected: false
+    areWeConnected: false,
   }),
   getters: {
-    getInternetConnection: state => {
-      return state.areWeConnected
-    }
+    getInternetConnection: (state) => {
+      return state.areWeConnected;
+    },
   },
   mutations: {
     SET_INTERNET_CONNECTION(state) {
-      state.areWeConnected = navigator.onLine
-    }
+      state.areWeConnected = navigator.onLine;
+    },
   },
   actions: {
-    verifyInternetConnection({commit}) {
-      commit('SET_INTERNET_CONNECTION')
-    }
+    verifyInternetConnection({ commit }) {
+      commit('SET_INTERNET_CONNECTION');
+    },
   },
 };
