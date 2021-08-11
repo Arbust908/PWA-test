@@ -234,7 +234,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
+  import { ref, Ref, reactive, computed, ComputedRef, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useState, useActions } from 'vuex-composition-helpers';
@@ -242,25 +242,24 @@
   import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import {
-    PurchaseOrder,
-    SandProvider,
-    SandOrder,
-    TransportProvider,
-  } from '@/interfaces/PurchaseOrder.ts';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  import { SandProvider } from '@/interfaces/SandProvider';
-  import { Sand, SandOrder } from '@/interfaces/sandflow';
+  import {
+    Sand,
+    SandOrder,
+    SandProvider,
+    PurchaseOrder,
+    TransportProvider,
+  } from '@/interfaces/sandflow';
   const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
       Layout,
-      GhostBtn,
+      NoneBtn,
       BookmarkIcon,
       TrashIcon,
       PlusIcon,
@@ -361,6 +360,7 @@
           transportProvider.transportId &&
           transportProvider.boxQuantity &&
           transportProvider.boxQuantity >= 0 &&
+          transportProvider.observation &&
           sandProviderId.value > -1 &&
           sandOrder.value.length > 0 &&
           sandOrder.value.every((sO: SandOrder) => sO.quantity > 0) &&
