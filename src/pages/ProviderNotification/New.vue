@@ -217,9 +217,9 @@
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
-        <GhostBtn @click.prevent="$router.push('/notificaciones-a-proveedores')"
-          >Cancelar</GhostBtn
-        >
+        <NoneBtn @click.prevent="$router.push('/notificaciones-a-proveedores')">
+          Cancelar
+        </NoneBtn>
         <PrimaryBtn
           type="submit"
           size="sm"
@@ -228,7 +228,7 @@
           :disabled="!isFull"
           @click.prevent="isFull && save()"
         >
-          Cargar Planificacíon
+          Finalizar
         </PrimaryBtn>
       </footer>
     </section>
@@ -345,14 +345,17 @@
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import SelectList from '@/components/ui/SelectList.vue';
   import {
     ProviderNotification,
     SandOrder,
     TransportProvider,
-  } from '@/interfaces/ProviderNotification.ts';
+    SandProvider,
+    Sand,
+  } from '@/interfaces/sandflow';
   import { useToggle } from '@vueuse/core';
 
   const Modal = defineAsyncComponent(
@@ -361,16 +364,13 @@
 
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  import { SandProvider } from '@/interfaces/SandProvider';
-  import { Sand } from '@/interfaces/SandType';
-  import SelectList from '@/components/ui/SelectList.vue';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
     components: {
       BellIcon,
       CircularBtn,
-      GhostBtn,
+      NoneBtn,
       Layout,
       Modal,
       PlusIcon,
@@ -381,12 +381,11 @@
     setup() {
       const router = useRouter();
       const store = useStore();
-
-      const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
-
       const instance = axios.create({
         baseURL: apiUrl,
       });
+
+      const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
 
       const sandProviders = ref([] as Array<Sand>);
       const { data: sPData } = useAxios('/sandProvider', instance);

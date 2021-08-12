@@ -354,6 +354,7 @@
       });
 
       const selectedBox: Ref<Box> = ref({
+        warehouseId: null,
         floor: 1,
         col: 0,
         row: 0,
@@ -365,7 +366,13 @@
       const setCat = (cat: string) => {
         selectedBox.value.category = cat;
         const box = selectedBox.value;
-        deposit.value[`${box.floor}|${box.row}|${box.col}`] = box.category;
+        deposit.value[`${box.floor}|${box.row}|${box.col}`] = {
+          category: box.category,
+          warehouseId: null,
+          floor: box.floor,
+          col: box.col,
+          row: box.row,
+        };
       };
 
       // :: DEPOSIT
@@ -388,7 +395,7 @@
         return dimensions;
       };
 
-      const updateData = (newData) => {
+      const updateData = (newData: Warehouse | null) => {
         if (newData) {
           pitId.value = newData.pitId;
           clientId.value = newData.clientCompanyId;
@@ -401,9 +408,11 @@
       };
 
       const vuexData = ref(
-        store.state.depositDesign.all.find((depo) => {
-          return depo.id === id;
-        })
+        JSON.parse(JSON.stringify(store.state.depositDesign.all)).find(
+          (depo: Warehouse) => {
+            return depo.id === Number(id);
+          }
+        )
       );
       if (vuexData.value) {
         Deposit.value = vuexData;

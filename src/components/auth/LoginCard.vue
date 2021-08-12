@@ -77,6 +77,7 @@
             class="mx-auto px-6 bg-main-500"
             @click.prevent="formValidation"
           >
+            Iniciar sesión
           </Button>
         </div>
       </form>
@@ -85,7 +86,7 @@
       title="Hubo un error"
       type="error"
       :open="showModal"
-      @close="closeModal"
+      @close="toggleModal(false)"
     >
       <template v-slot:body>
         <div>
@@ -116,7 +117,7 @@
             focus:ring-red-500
             sm:text-sm
           "
-          @click.prevent="closeModal"
+          @click.prevent="toggleModal(false)"
         >
           Ok
         </button>
@@ -126,15 +127,13 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, defineAsyncComponent } from 'vue';
+  import { ref, Ref, defineAsyncComponent, defineComponent } from 'vue';
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
   import { Role } from '@/interfaces/User';
+  import Logo from '@/components/Logo.vue';
+  import Button from '@/components/ui/Button.vue';
 
-  const Logo = defineAsyncComponent(() => import('@/components/Logo.vue'));
-  const Button = defineAsyncComponent(
-    () => import('@/components/ui/Button.vue')
-  );
   const Modal = defineAsyncComponent(
     () => import('@/components/modal/General.vue')
   );

@@ -7,84 +7,36 @@
         Nuevo proovedor de transporte
       </h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm">
-      <form
-        method="POST"
-        action="/"
-        class="p-4 w-full flex flex-col lg:flex-row"
-      >
-        <fieldset class="flex flex-col w-full">
-          <div class="input-block p-4">
-            <label for="name" class="">Nombre</label>
-            <div class="mt-1">
-              <input
-                v-model="newTransportProvider.name"
-                class="w-full rounded-md shadow"
-                name="name"
-                type="text"
-                placeholder="Nombre"
-              />
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="providerNotificationId" class="">
-              ProviderNotificationID
-            </label>
-            <div class="mt-1">
-              <select
-                name="providerNotificationId"
-                v-model="newTransportProvider.providerNotificationId"
-                class="w-full rounded-md shadow"
-              >
-                <option
-                  v-for="provider in providers"
-                  :key="provider.id"
-                  :value="provider.id"
-                >
-                  {{ provider.sandProvider.name }}
-                </option>
-              </select>
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="amount" class="">Cantidad de cajas</label>
-            <div class="mt-1">
-              <div class="mt-1">
-                <input
-                  v-model="newTransportProvider.amount"
-                  class="w-full rounded-md shadow"
-                  name="amount"
-                  type="text"
-                  placeholder="Cantidad de cajas"
-                />
-              </div>
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="observations" class=""> Observaciones </label>
-            <div class="mt-1">
-              <textarea
-                v-model="newTransportProvider.observations"
-                class="w-full rounded-md shadow px-3 py-2 focus:outline-none"
-                rows="5"
-                name="observations"
-                type="text"
-                placeholder="Observaciones"
-              ></textarea>
-            </div>
-          </div>
-        </fieldset>
+    <section class="bg-white rounded-md max-w-2xl shadow-sm">
+      <form method="POST" action="/" class="p-4 max-w-lg">
+        <FieldGroup>
+          <FieldLegend>Proveedor</FieldLegend>
+          <FieldInput
+            class="col-span-full"
+            name="name"
+            placeholder="Nombre"
+            title="Nombre"
+            :data="newTransportProvider.name"
+            @update:data="newTransportProvider.name = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            name="observations"
+            placeholder="Observaciones..."
+            title="Observaciones"
+            :data="newTransportProvider.observations"
+            @update:data="newTransportProvider.observations = $event"
+          />
+        </FieldGroup>
       </form>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
-          <button @click.prevent="goToIndex">Cancelar</button>
-          <GhostBtn class="btn__draft" @click="save()">
-            <BookmarkIcon class="w-4 h-4" />
-            <span> Guardar Provisorio </span>
-          </GhostBtn>
+          <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')">
+            Cancelar
+          </NoneBtn>
           <PrimaryBtn
             :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save(true)"
+            @click="isFull && save()"
             :disabled="!isFull"
           >
             Finalizar
@@ -96,9 +48,9 @@
 </template>
 
 <script lang="ts">
-  import { ref, onMounted, computed, reactive } from 'vue';
+  import { computed, reactive, watch } from 'vue';
   import { useStore } from 'vuex';
-  import { useRouter, useRoute } from 'vue-router';
+  import { useRouter } from 'vue-router';
   import {
     BookmarkIcon,
     TrashIcon,
@@ -106,92 +58,69 @@
   } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  // AXIOS
   import axios from 'axios';
-  import { TransportProvider } from '@/interfaces/TransportProvider';
+  import { useAxios } from '@vueuse/integrations/useAxios';
   const api = import.meta.env.VITE_API_URL || '/api';
+  // TIPOS
+  import { TransportProvider } from '@/interfaces/sandflow';
 
   export default {
     components: {
       Layout,
-      GhostBtn,
+      NoneBtn,
       BookmarkIcon,
       TrashIcon,
       PlusIcon,
       CheckCircleIcon,
       CircularBtn,
       PrimaryBtn,
+      FieldGroup,
+      FieldInput,
+      FieldLegend,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
+      const instance = axios.create({
+        baseURL: api,
+      });
 
       const newTransportProvider: TransportProvider = reactive({
-        id: 0,
         name: '',
-        providerNotificationId: '',
         amount: 0,
         observations: '',
+        providerNotificationId: -1,
       });
-
-      const providers = ref([]);
-
-      onMounted(async () => {
-        providers.value = await axios
-          .get(`${api}/providerNotification`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data.data;
-            }
-            return {};
-          });
-      });
-
-      const goToIndex = (): void => {
-        router.push('/proveedores-de-transporte');
-      };
 
       const isFull = computed(() => {
-        return !!(
-          newTransportProvider.name !== '' &&
-          newTransportProvider.providerNotificationId !== '' &&
-          newTransportProvider.amount !== 0 &&
-          newTransportProvider.observations !== ''
-        );
+        return !!(newTransportProvider.name !== '');
       });
 
       const save = async () => {
-        let tpDB = await axios
-          .post(`${api}/transportProvider`, newTransportProvider)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              newTransportProvider.id = res.data.data.id;
-              return res.data;
-            }
-            return {};
-          })
-          .finally(() => {});
-
-        // Update Transport Provider
-        store.dispatch('saveTransportProvider', newTransportProvider);
-        router.push('/proveedores-de-transporte');
+        const { data } = useAxios(
+          '/transportProvider',
+          { method: 'POST', data: newTransportProvider },
+          instance
+        );
+        watch(data, (newData, _) => {
+          if (newData && newData.data) {
+            store.dispatch('saveTransportProvider', newData.data);
+            router.push('/proveedores-de-transporte');
+          }
+        });
       };
 
       return {
         newTransportProvider,
-        goToIndex,
-        save,
-        providers,
         isFull,
+        save,
       };
     },
   };
@@ -238,13 +167,19 @@
     }
   }
 
-  fieldset {
-    @apply mb-6;
+  .input {
+    @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
   }
-  label {
-    @apply text-sm;
+  input:read-only {
+    @apply bg-second-200 border cursor-not-allowed;
   }
-  .equip-grid {
-    @apply grid gap-4 grid-cols-2 md:grid-cols-3;
+  fieldset:not(:last-of-type) {
+    @apply border-b pb-6;
+  }
+  label:not(.toggle) {
+    @apply flex flex-col;
+    span {
+      @apply text-sm;
+    }
   }
 </style>

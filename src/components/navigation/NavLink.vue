@@ -4,46 +4,18 @@
     :class="to === $route.fullPath ? 'selected' : null"
     class="nav-link group"
   >
-    <component :is="icon" class="icon" aria-hidden="true" />
+    <GenericIcon :icon="icon" class="icon" />
     {{ name }}
   </router-link>
 </template>
 
 <script lang="ts">
-  import {
-    AdjustmentsIcon,
-    AnnotationIcon,
-    ArchiveIcon,
-    AtSymbolIcon,
-    BellIcon,
-    ChipIcon,
-    ClipboardListIcon,
-    HomeIcon,
-    LogoutIcon,
-    MenuAlt2Icon,
-    UsersIcon,
-    XIcon,
-    ViewGridAddIcon,
-    ClipboardIcon,
-  } from '@heroicons/vue/outline';
-  import { defineComponent, defineAsyncComponent } from 'vue';
+  import GenericIcon from '@/components/icon/GenericIcon.vue';
+  import { defineComponent } from 'vue';
 
   export default defineComponent({
     components: {
-      AdjustmentsIcon,
-      AnnotationIcon,
-      ArchiveIcon,
-      AtSymbolIcon,
-      BellIcon,
-      ChipIcon,
-      ClipboardListIcon,
-      HomeIcon,
-      LogoutIcon,
-      MenuAlt2Icon,
-      UsersIcon,
-      XIcon,
-      ViewGridAddIcon,
-      ClipboardIcon,
+      GenericIcon,
     },
     props: {
       to: {
