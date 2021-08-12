@@ -113,7 +113,7 @@
 
   import axios from 'axios';
   import { Forklift } from '@/interfaces/Forklift';
-  const api = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
@@ -158,7 +158,7 @@
 
       const save = async () => {
         let tpDB = await axios
-          .post(`${api}/forklift`, newForklift)
+          .post(`${apiUrl}/forklift`, newForklift)
           .catch((err) => {
             console.log(err);
           })

@@ -147,7 +147,7 @@
   import axios from 'axios';
   import { Company, companyRepresentative } from '@/interfaces/SandProvider';
 
-  const api = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
@@ -194,7 +194,7 @@
         if (newClient.companyRepresentative != 0) {
           let companyRepresentativeDB = await axios
             .post(
-              `${api}/companyRepresentative`,
+              `${apiUrl}/companyRepresentative`,
               newClient.companyRepresentative
             )
             .catch((err) => {
@@ -207,7 +207,7 @@
             .finally(() => {});
 
           let companyDB = await axios
-            .post(`${api}/company`, newClient)
+            .post(`${apiUrl}/company`, newClient)
             .catch((err) => {
               console.log(err);
             })

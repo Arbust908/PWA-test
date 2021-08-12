@@ -23,6 +23,7 @@
           v-for="(depo, Key) in Deposits"
           :key="Key"
           :class="Key % 2 === 0 ? 'even' : 'odd'"
+          class="body-row"
         >
           <td>
             {{ depo.clientCompany.name }}

@@ -1,9 +1,7 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">
-        Montacargas
-      </h2>
+      <h2 class="text-2xl font-semibold text-gray-900">Montacargas</h2>
       <router-link to="/montacargas/nuevo">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
@@ -121,10 +119,10 @@
                   >
                     {{ f.name || 'Sin nombre' }}
                   </td>
-                  <td
-                    class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm"
-                  >
-                    {{ f.owned ? "Asignado" : "Sin asignar" || 'Sin asignación' }}
+                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
+                    {{
+                      f.owned ? 'Asignado' : 'Sin asignar' || 'Sin asignación'
+                    }}
                   </td>
                   <td
                     :class="
@@ -197,7 +195,7 @@
   import UiBtn from '@/components/ui/Button.vue';
   import axios from 'axios';
 
-  const api = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
   export default {
     components: {
       Layout,
@@ -211,7 +209,7 @@
       const getForklifts = async () => {
         loading.value = true;
         fDB.value = await axios
-          .get(`${api}/forklift`)
+          .get(`${apiUrl}/forklift`)
           .catch((err) => {
             console.log(err);
           })
@@ -227,7 +225,7 @@
 
       const deleteTP = async (tpID) => {
         let response = await axios
-          .delete(`${api}/forklift/${tpID}`)
+          .delete(`${apiUrl}/forklift/${tpID}`)
           .catch((err) => {
             console.log(err);
           })
