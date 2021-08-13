@@ -23,6 +23,8 @@
               :floor="currentFloor"
               :deposit="deposit"
               :selectedBox="selectedBox"
+              :category="category"
+              :visibleCategories="visibleCategories"
               @select-box="selectBox"
             />
             <!-- <button
@@ -61,7 +63,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, watch, toRefs, computed } from 'vue';
+  import { defineComponent, ref, watch, toRefs, reactive } from 'vue';
   import { useCssVar } from '@vueuse/core';
   import { Box } from '@/interfaces/sandflow';
   import DepositBox from '@/components/depositDesign/DepositBox.vue';
@@ -89,6 +91,10 @@
         type: Number,
         required: true,
       },
+      visibleCategories: {
+        type: Array,
+        required: false
+      }
     },
     components: {
       DepositBox,
@@ -117,6 +123,8 @@
         return deposit.value[`${floor}|${row}|${col}`] || 'empty';
       };
 
+      let visibleCategories = ref(props.visibleCategories)
+
       return {
         deposit,
         floor,
@@ -127,6 +135,7 @@
         getCategory,
         setFloor,
         selectBox,
+        visibleCategories
       };
     },
   });
