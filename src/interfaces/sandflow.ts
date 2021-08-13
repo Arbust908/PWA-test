@@ -193,6 +193,7 @@ export interface PurchaseOrder {
     transportProvider?: TransportProvider;
     sandOrders?: SandOrder[];
 }
+
 export interface Warehouse {
     id?: number;
     clientCompanyId: number;
@@ -203,6 +204,9 @@ export interface Warehouse {
 }
 
 export interface Box {
+  id?: number;
+  warehouseId: number | null;
+  warehouse?: Warehouse;
   category: string;
   col: number;
   floor: number;
@@ -216,3 +220,5 @@ export enum BoxCategory {
   fine = 'Arena fina',
   aisle = 'Pasillo',
 }
+
+
