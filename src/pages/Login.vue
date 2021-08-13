@@ -39,29 +39,39 @@
   </main>
 </template>
 
-<script>
+<script lang="ts">
+  import { defineComponent, ref } from 'vue';
   import LoginCard from '@/components/auth/LoginCard.vue';
   import PassRecover from '@/components/auth/PassRecover.vue';
   import Success from '@/components/auth/Success.vue';
   import Error from '@/components/auth/Error.vue';
-  export default {
+  import { useTitle } from '@vueuse/core';
+  export default defineComponent({
     components: {
       LoginCard,
       PassRecover,
       Success,
       Error,
     },
-    data() {
+    setup() {
+      // const templateTitle = '<> Sandflow';
+      const title = useTitle('Login <> Sandflow');
+      const selected_card = ref('login');
+      const selectedCard = (card) => {
+        selected_card.value = card;
+        // Implementar cambio de titulo
+      };
+      // const useCapitalize = (str) => {
+      //   return str.charAt(0).toUpperCase() + str.slice(1);
+      // };
+
       return {
-        selected_card: 'login',
+        selected_card,
+        selectedCard,
+        title,
       };
     },
-    methods: {
-      selectedCard(card) {
-        this.selected_card = card;
-      },
-    },
-  };
+  });
 </script>
 
 <style lang="scss" scoped>

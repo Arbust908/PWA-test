@@ -15,7 +15,7 @@ export function useApi(endpoint: string) {
       if (newValue && newValue.data) {
         entity.value = newValue.data;
       }
-    });
+    })
     return entity;
   }
   const destroy = (id: number) => {

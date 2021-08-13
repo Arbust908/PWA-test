@@ -4,121 +4,165 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Proovedor de arena - {{ id }}
+        Proveedor de arena - {{ id }}
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
-      <form
-        method="POST"
-        action="/"
-        class="p-4 w-full flex flex-col lg:flex-row"
-      >
-        <fieldset class="flex flex-col w-full">
-          <div class="input-block p-4">
-            <label for="name" class=""> Cliente </label>
-            <div class="mt-1">
-              <input
-                v-model="name"
-                class="w-full rounded-md shadow"
-                name="name"
-                type="text"
-                placeholder="Nombre de cliente"
-              />
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="legalName" class=""> Razón Social </label>
-            <div class="mt-1">
-              <input
-                v-model="legalName"
-                class="w-full rounded-md shadow"
-                name="legalName"
-                type="text"
-                placeholder="Razón social del cliente"
-              />
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="legalId" class=""> CUIT </label>
-            <div class="mt-1">
-              <input
-                v-model="legalId"
-                class="w-full rounded-md shadow"
-                name="legalId"
-                type="text"
-                placeholder="CUIT de cliente"
-              />
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="meshType" class=""> Tipo de malla </label>
-            <div class="mt-1">
-              <input
-                v-model="meshType"
-                class="w-full rounded-md shadow"
-                name="meshType"
-                type="text"
-                placeholder="Tipo de malla"
-              />
-            </div>
-          </div>
+      <form method="POST" action="/" class="p-4 max-w-lg">
+        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
+          <h2 class="col-span-full text-xl">Proveedor</h2>
+          <label class="col-span-full" for="name">
+            <span>Nombre</span>
+            <input
+              id="name"
+              v-model="newSandProvider.name"
+              class="input"
+              type="text"
+              name="name"
+              placeholder="Nombre del proveedor"
+            />
+          </label>
+          <label class="col-span-full" for="legalName">
+            <span>Razón Social</span>
+            <input
+              id="legalName"
+              v-model="newSandProvider.legalName"
+              class="input"
+              type="text"
+              name="legalName"
+              placeholder="Razón Social"
+            />
+          </label>
+          <label class="col-span-full" for="legalId">
+            <span>CUIT / CUIL</span>
+            <input
+              id="legalId"
+              v-model.number="newSandProvider.legalId"
+              v-maska="'###########'"
+              class="input"
+              type="text"
+              name="legalId"
+              placeholder="CUIT / CUIL"
+            />
+          </label>
+          <label class="col-span-full" for="observations">
+            <span>Observaciones</span>
+            <input
+              id="observations"
+              v-model="newSandProvider.observations"
+              class="input"
+              type="text"
+              name="observations"
+              placeholder="Observaciones..."
+            />
+          </label>
         </fieldset>
-        <fieldset class="flex flex-col w-full">
-          <div class="input-block p-4">
-            <label for="grains" class=""> Granulado </label>
-            <div class="mt-1">
-              <input
-                v-model="grains"
-                class="w-full rounded-md shadow"
-                name="grains"
-                type="text"
-                placeholder="Granulado"
-              />
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="companyRepresentativeId" class="">
-              CUIT Compañía representante
-            </label>
-            <div class="mt-1">
-              <select
-                name="companyRepresentativeId"
-                :v-model="companyRepresentativeId"
-                class="w-full rounded-md shadow"
+        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
+          <h2 class="col-span-full text-xl flex justify-between items-end">
+            <span> Representante </span>
+            <!-- <span>
+              <label class="toggle text-sm" for="is-new-rep">
+                <input
+                  id="is-new-rep"
+                  type="checkbox"
+                  @click="toggleRepStatus"
+                  :checked="isNewRep"
+                  class="form-checkbox bg-transparent rounded-sm"
+                  name="is-new-rep"
+                />
+                <span class="text-second-600">Es nuevo</span>
+              </label>
+            </span> -->
+          </h2>
+          <label class="col-span-full" for="nr-name">
+            <span>Nombre Legal</span>
+            <input
+              id="nr-name"
+              v-model="companyRepresentative.name"
+              class="input"
+              type="text"
+              name="name"
+              placeholder="Nombre de representante"
+            />
+            <!-- <input
+              v-if="isNewRep"
+              id="nr-name"
+              v-model="companyRepresentative.name"
+              class="input"
+              type="text"
+              name="name"
+              placeholder="Nombre de representante"
+            />
+            <select
+              v-else
+              id="nr-name"
+              name="nr-name"
+              v-model="companyRepresentativeId"
+              class="input"
+            >
+              <option disabled value="-1">Seleccionar Representante</option>
+              <option
+                v-for="corpoRep in companyRepresentatives"
+                :key="corpoRep.id"
+                :value="corpoRep.id"
               >
-                <option
-                  v-for="company in companyRepresentatives"
-                  :key="company.id"
-                  :value="company.id"
-                >
-                  {{ company.legalId }} ({{ company.name }})
-                </option>
-              </select>
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="observations" class=""> Observaciones </label>
-            <div class="mt-1">
-              <textarea
-                v-model="observations"
-                class="w-full rounded-md shadow px-3 py-2 focus:outline-none"
-                rows="5"
-                name="observations"
-                type="text"
-                placeholder="Observaciones"
-              ></textarea>
-            </div>
-          </div>
+                {{ corpoRep.name }}
+              </option>
+            </select> -->
+          </label>
+
+          <label class="col-span-full" for="nr-legalId">
+            <span>CUIL/CUIT</span>
+            <input
+              id="nr-legalId"
+              :read-only="!isNewRep"
+              v-maska="'###########'"
+              v-model.number="companyRepresentative.legalId"
+              class="input"
+              type="text"
+              name="legalId"
+              placeholder="CUIL / CUIT"
+            />
+          </label>
+          <label class="col-span-full" for="phone">
+            <span>Teléfono</span>
+            <input
+              id="nr-phone"
+              :read-only="!isNewRep"
+              v-maska="'##-####-####'"
+              v-model="companyRepresentative.phone"
+              class="input"
+              type="text"
+              name="phone"
+              placeholder="+11 1234 5678"
+            />
+          </label>
+          <label class="col-span-full" for="email">
+            <span>Email</span>
+            <input
+              id="nr-email"
+              :read-only="!isNewRep"
+              v-model="companyRepresentative.email"
+              class="input"
+              type="text"
+              name="email"
+              placeholder="empresa@mail.com"
+            />
+          </label>
         </fieldset>
       </form>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
-          <button @click.prevent="goToIndex">Cancelar</button>
-          <GhostBtn class="btn__draft" @click="update()">
-            <BookmarkIcon class="w-4 h-4" />
-            <span> Guardar Provisorio </span>
-          </GhostBtn>
-          <PrimaryBtn @click="update()"> Finalizar </PrimaryBtn>
+          <NoneBtn @click.prevent="$router.push('/proveedores-de-arena')">
+            Cancelar
+          </NoneBtn>
+          <PrimaryBtn
+            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isFull && save()"
+            :disabled="!isFull"
+          >
+            Finalizar
+          </PrimaryBtn>
         </section>
       </footer>
     </section>
@@ -126,134 +170,138 @@
 </template>
 
 <script lang="ts">
-  import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
+  import { ref, reactive, ComputedRef, Ref, computed, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
-  import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-
-  import {
-    SandProvider,
-    Driver,
-    Vehicle,
-    Sand,
-    Cradle,
-    Forklift,
-    Company,
-  } from '@/interfaces/SandProvider';
-
+  import { useToggle } from '@vueuse/core';
+  import { maska } from 'maska';
+  // AXIOS
   import axios from 'axios';
-  const api = import.meta.env.VITE_API_URL || '/api';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
+  // TIPOS
+  import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
   export default {
+    directives: { maska },
     components: {
-      Layout: Layout,
-      GhostBtn: GhostBtn,
-      BookmarkIcon: BookmarkIcon,
-      TrashIcon: TrashIcon,
-      PlusIcon: PlusIcon,
-      CheckCircleIcon: CheckCircleIcon,
-      CircularBtn: CircularBtn,
-      PrimaryBtn: PrimaryBtn,
+      Layout,
+      NoneBtn,
+      PrimaryBtn,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
       const route = useRoute();
+      const instance = axios.create({
+        baseURL: apiUrl,
+      });
       const sandProviders: Array<SandProvider> = JSON.parse(
         JSON.stringify(store.state.sandProviders.all)
       );
+      const id = Number(route.params.id);
 
       const currentSandProvider: SandProvider = sandProviders.find((sp) => {
-        return sp.id == route.params.id;
+        return sp.id == id;
+      });
+      const newSandProvider: SandProvider = reactive({
+        ...currentSandProvider,
       });
 
-      let id = ref(0);
-      let name = ref('');
-      let legalName = ref('');
-      let legalId = ref(0);
-      let meshType = ref('');
-      let grains = ref('');
-      let observations = ref('');
-      let companyRepresentativeId = ref(0);
-      let companyRepresentatives = ref([]);
+      const isNewRep: Ref<boolean> = ref(false);
+      const toggleRepStatus = useToggle(isNewRep);
+      const companyRepresentative: CompanyRepresentative = reactive({
+        name: '',
+        legalId: null,
+        phone: '',
+        email: '',
+      });
+      if (newSandProvider.companyRepresentativeId) {
+        const repId = newSandProvider.companyRepresentativeId;
+        const { data } = useAxios(
+          `/companyRepresentative/${repId}`,
+          { method: 'get' },
+          instance
+        );
+        watch(data, (newVal, _) => {
+          if (newVal && newVal.data) {
+            companyRepresentative.name = newVal.data.name;
+            companyRepresentative.legalId = newVal.data.legalId;
+            companyRepresentative.phone = newVal.data.phone;
+            companyRepresentative.email = newVal.data.email;
+          }
+        });
+      }
+      // const companyRepresentativeId = ref(-1);
+      // const companyRepresentatives = ref([] as Array<CompanyRepresentative>);
+      // const { data: corpoRepData } = useAxios('/company', instance);
+      // watch(corpoRepData, (corpoRepApi, prevCount) => {
+      //   if (corpoRepApi && corpoRepApi.data) {
+      //     companyRepresentatives.value = corpoRepApi.data;
+      //   }
+      // });
 
-      onMounted(async () => {
-        id.value = currentSandProvider.id;
-        name.value = currentSandProvider.name;
-        legalName.value = currentSandProvider.legalName;
-        legalId.value = currentSandProvider.legalId;
-        meshType.value = currentSandProvider.meshType;
-        grains.value = currentSandProvider.grains;
-        observations.value = currentSandProvider.observations;
-        companyRepresentativeId.value =
-          currentSandProvider.companyRepresentativeId;
-
-        companyRepresentatives.value = await axios
-          .get(`${api}/companyRepresentative`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data.data;
-            }
-            return {};
-          });
+      const providerFull: ComputedRef<boolean> = computed(() => {
+        return !!(
+          newSandProvider.name !== '' &&
+          newSandProvider.legalName !== '' &&
+          newSandProvider.legalId >= 0
+        );
       });
 
-      const goToIndex = (): void => {
-        router.push('/proveedores-de-arena');
-      };
+      const repFull: ComputedRef<boolean> = computed(() => {
+        return !!(
+          companyRepresentative.name !== '' &&
+          companyRepresentative.legalId >= 0 &&
+          companyRepresentative.phone !== '' &&
+          companyRepresentative.email !== ''
+        );
+      });
 
-      const update = async () => {
-        const updatedSP = {
-          id: id.value,
-          name: name.value,
-          legalName: legalName.value,
-          legalId: legalId.value,
-          meshType: meshType.value,
-          grains: grains.value,
-          observations: observations.value,
-          companyRepresentativeId: companyRepresentativeId.value,
-        };
+      const isFull: ComputedRef<boolean> = computed(() => {
+        return providerFull.value && repFull.value;
+      });
 
-        let spDB = await axios
-          .put(`${api}/sandProvider/${updatedSP.id}`, updatedSP)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data;
-            }
-            return {};
-          });
-        // Update Work Order
-        store.dispatch('updateSandProvider', updatedSP);
-        router.push('/proveedores-de-arena');
+      const save = async () => {
+        const repId = newSandProvider.companyRepresentativeId;
+        const { data } = useAxios(
+          `/companyRepresentative/${repId}`,
+          { method: 'PUT', data: companyRepresentative },
+          instance
+        );
+        watch(data, (newData, _) => {
+          if (newData && newData.data) {
+            const compRep = newData.data;
+            companyRepresentative.id = compRep.id;
+            newSandProvider.companyRepresentativeId = compRep.id;
+            const { data: spData } = useAxios(
+              `/sandProvider/${newSandProvider.id}`,
+              { method: 'PUT', data: newSandProvider },
+              instance
+            );
+            watch(spData, (newData, _) => {
+              if (newData && newData.data) {
+                store.dispatch('updateSandProvider', newSandProvider);
+                router.push('/proveedores-de-arena');
+              }
+            });
+          }
+        });
       };
 
       return {
         id,
-        name,
-        legalName,
-        legalId,
-        meshType,
-        grains,
-        observations,
-        companyRepresentativeId,
-        goToIndex,
-        update,
-        companyRepresentatives,
+        isNewRep,
+        toggleRepStatus,
+        // companyRepresentativeId,
+        companyRepresentative,
+        newSandProvider,
+        // companyRepresentatives,
+        isFull,
+        save,
       };
     },
   };
@@ -281,30 +329,23 @@
       @apply hidden lg:inline-flex;
     }
   }
-  .section-tab {
-    @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
+  .input {
+    @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
   }
-  .section-tab[selected='true'] {
-    @apply border-main-500 text-main-500;
+  input:read-only {
+    @apply bg-second-200 border cursor-not-allowed;
   }
-  .input-block select,
-  .input-block input {
-    @apply w-full rounded mb-3 p-2;
+  fieldset:not(:last-of-type) {
+    @apply border-b pb-6;
   }
-
-  .pit-block {
-    @apply flex mt-1 items-center w-full mb-3;
-    & select,
-    & input {
-      @apply rounded p-2 max-w-md inline-block w-full;
+  label:not(.toggle) {
+    @apply flex flex-col;
+    span {
+      @apply text-sm;
     }
   }
-
-  fieldset {
-    @apply mb-6;
-  }
-  label {
-    @apply text-sm;
+  .toggle {
+    @apply flex space-x-3 items-center;
   }
   .equip-grid {
     @apply grid gap-4 grid-cols-2 md:grid-cols-3;

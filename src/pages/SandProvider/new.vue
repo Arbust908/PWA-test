@@ -250,7 +250,7 @@
 
       const save = async () => {
         const { data } = useAxios(
-          '/warehouse',
+          '/companyRepresentative',
           { method: 'POST', data: companyRepresentative },
           instance
         );

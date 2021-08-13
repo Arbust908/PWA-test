@@ -12,16 +12,18 @@
 </template>
 
 <script lang="ts">
-  import { computed } from 'vue';
+  import { computed, defineComponent } from 'vue';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import PanelControlCard from '@/components/panel/ControlCard.vue';
-  export default {
+  export default defineComponent({
     components: {
       Layout,
       PanelControlCard,
     },
     setup() {
+      const title = useTitle('Home <> Sandflow');
       const store = useStore();
       const navigation = computed(() => {
         return store.state.global.navigation;
@@ -30,5 +32,5 @@
         navigation,
       };
     },
-  };
+  });
 </script>

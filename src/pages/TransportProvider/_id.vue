@@ -17,7 +17,7 @@
           <FieldLegend>Proveedor</FieldLegend>
           <FieldInput
             class="col-span-full"
-            name="name"
+            fieldName="name"
             placeholder="Nombre"
             title="Nombre"
             :data="currentTransportProvider.name"
@@ -25,7 +25,7 @@
           />
           <FieldInput
             class="col-span-full"
-            name="observations"
+            fieldName="observations"
             placeholder="Observaciones..."
             title="Observaciones"
             :data="currentTransportProvider.observations"

@@ -28,11 +28,6 @@ export default {
         icon: 'BellIcon',
       },
       {
-        name: 'Centro de Carga',
-        to: '/centro-de-carga-de-arena',
-        icon: 'ClipboardCopyIcon',
-      },
-      {
         name: 'Proveedores',
         icon: 'ChevronRightIcon',
         subNav: [

@@ -114,14 +114,14 @@
     </td>
     <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
       <div>
-        <button
+        <!-- <button
           @click.prevent="upgrade"
           class="action duplicate"
           title="Mejorar"
         >
           <ReceiptRefundIcon class="w-6 h-6" />
           <span class="sr-only">Mejorar</span>
-        </button>
+        </button> -->
         <button
           @click.prevent="duplicateStage"
           class="action duplicate"
@@ -202,7 +202,9 @@
 
       const totalWheight = computed(() => {
         return (
-          stage.value.quantity1 + stage.value.quantity2 + stage.value.quantity3
+          stage.value.quantity1 +
+            stage.value.quantity2 +
+            stage.value.quantity3 || 0
         );
       });
       const getSand = (sandId: number) => {
