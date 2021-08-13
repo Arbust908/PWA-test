@@ -7,6 +7,7 @@
         Nuevo Cliente
       </h1>
     </header>
+    {{ isFull }}
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <FieldGroup>
@@ -104,7 +105,7 @@
       </form>
 
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-        <section class="space-x-6 flex items-center justify-end">
+        <section class="w-full space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="$router.push('/clientes')">
             Cancelar
           </NoneBtn>
@@ -122,7 +123,7 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, computed, defineComponent } from 'vue';
+  import { reactive, toRefs, computed, defineComponent, watch } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
@@ -136,11 +137,10 @@
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  const api = import.meta.env.VITE_API_URL || '/api';
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
   // TIPOS
   import { Company, companyRepresentative } from '@/interfaces/sandflow';
 
-  import { reactive, toRefs, computed, defineComponent } from 'vue';
   export default {
     components: {
       Layout,
@@ -156,6 +156,9 @@
     setup() {
       const router = useRouter();
       const store = useStore();
+      const instance = axios.create({
+        baseURL: apiUrl,
+      });
 
       const goToIndex = () => {
         router.push('/clientes');
@@ -168,54 +171,49 @@
         legalId: '',
         isOperator: false,
         observations: '',
-        companyRepresentativeId: 0,
         companyRepresentative: {},
         sandPlans: {},
       });
 
       const isFull = computed(() => {
         return !!(
-          newClient.name.length > 0 &&
-          newClient.businessName.length > 0 &&
-          newClient.socialNumber.length > 0 &&
-          newClient.representativeLabor.length > 0 &&
-          newClient.representativeData.length > 0 &&
-          newClient.representativeContact.length > 0 &&
-          newClient.observations.length > 0
+          newClient.name !== '' &&
+          newClient.name.length > 3 &&
+          newClient.legalName.length > 0 &&
+          newClient.legalId >= 0 &&
+          newClient.companyRepresentative?.name &&
+          newClient.companyRepresentative?.name.length > 0 &&
+          newClient.companyRepresentative?.legalId &&
+          newClient.companyRepresentative?.legalId > 0 &&
+          newClient.companyRepresentative?.email &&
+          newClient.companyRepresentative?.email.length > 0 &&
+          newClient.companyRepresentative?.phone &&
+          newClient.companyRepresentative?.phone.length > 0
         );
       });
 
       const save = async () => {
-        if (newClient.companyRepresentative != 0) {
-          let companyRepresentativeDB = await axios
-            .post(
-              `${apiUrl}/companyRepresentative`,
-              newClient.companyRepresentative
-            )
-            .catch((err) => {
-              console.log(err);
-            })
-            .then((res) => {
-              newClient.companyRepresentativeId = res.data.data.id;
-              return res.data.data;
-            })
-            .finally(() => {});
-
-          let companyDB = await axios
-            .post(`${apiUrl}/company`, newClient)
-            .catch((err) => {
-              console.log(err);
-            })
-            .then((res) => {
-              if (res.status === 200) {
-                return res.data.data;
+        const { data: CRdata } = useAxios(
+          '/companyRepresentative',
+          { method: 'POST', data: newClient.companyRepresentative },
+          instance
+        );
+        watch(CRdata, (newVal, _) => {
+          if (newVal && newVal.data) {
+            newClient.companyRepresentative = newVal.data;
+            const { data: Cdata } = useAxios(
+              '/company',
+              { method: 'POST', data: newClient },
+              instance
+            );
+            watch(Cdata, (newVal, _) => {
+              if (newVal && newVal.data) {
+                store.dispatch('saveClient', newClient);
+                router.push('/clientes');
               }
-              return {};
-            })
-            .finally(() => {});
-          store.dispatch('saveClient', newClient);
-          router.push('/clientes');
-        }
+            });
+          }
+        });
       };
 
       return {

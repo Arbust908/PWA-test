@@ -368,10 +368,49 @@
       // << SAND
 
       const isFull = computed(() => {
-        return true;
+        console.log(currentSandPlan.stages);
+        const noZeroSandTypeNull =
+          (currentSandPlan.stages[0].sandId1 !== null &&
+            currentSandPlan.stages[0].sandId1 !== -1) ||
+          (currentSandPlan.stages[0].sandId2 !== null &&
+            currentSandPlan.stages[0].sandId2 !== -1) ||
+          (currentSandPlan.stages[0].sandId3 !== null &&
+            currentSandPlan.stages[0].sandId3 !== -1);
+        const noZeroSandTypeZero =
+          currentSandPlan.stages[0].quantity1 !== 0 ||
+          currentSandPlan.stages[0].quantity2 !== 0 ||
+          currentSandPlan.stages[0].quantity3 !== 0;
+        return !!(
+          currentSandPlan.companyId >= 0 &&
+          currentSandPlan.pitId >= 0 &&
+          currentSandPlan.stages.length > 0 &&
+          currentSandPlan.stages.length <= 40 &&
+          noZeroSandTypeNull &&
+          noZeroSandTypeZero
+        );
       });
       const { saveSandPlan } = useActions(['saveSandPlan']);
       const save = (): void => {
+        console.log(currentSandPlan.stages);
+        currentSandPlan.stages.map((stage) => {
+          if (stage.sandId1 === -1) {
+            stage.sandId1 = null;
+          }
+          if (stage.sandId2 === -1) {
+            stage.sandId2 = null;
+          }
+          if (stage.sandId3 === -1) {
+            stage.sandId3 = null;
+          }
+          return stage;
+        });
+        currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
+          const noSandTypeNull =
+            (stage.sandId1 !== null && stage.quantity1 > 0) ||
+            (stage.sandId2 !== null && stage.quantity2 > 0) ||
+            (stage.sandId3 !== null && stage.quantity3 > 0);
+          return noSandTypeNull;
+        });
         const { data } = useAxios(
           '/sandPlan',
           { method: 'POST', data: currentSandPlan },

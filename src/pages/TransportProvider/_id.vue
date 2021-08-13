@@ -106,9 +106,11 @@
       });
 
       const update = async () => {
+        const { providerNotificationId, providerNotification, ...newTProv } =
+          currentTransportProvider;
         const { data } = useAxios(
           `/transportProvider/${id}`,
-          { method: 'PUT', data: currentTransportProvider },
+          { method: 'PUT', data: newTProv },
           instance
         );
         watch(data, (newData, _) => {

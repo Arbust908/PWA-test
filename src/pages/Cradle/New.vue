@@ -37,8 +37,14 @@
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section></section>
         <section class="space-x-6 flex items-center justify-end">
-          <button @click="goToIndex">Cancelar</button>
-          <PrimaryBtn @click="save"> Finalizar </PrimaryBtn>
+          <NoneBtn @click="goToIndex">Cancelar</NoneBtn>
+          <PrimaryBtn
+            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isFull && save()"
+            :disabled="!isFull"
+          >
+            Finalizar
+          </PrimaryBtn>
         </section>
       </footer>
     </section>
@@ -46,24 +52,23 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs } from 'vue';
+  import { reactive, toRefs, computed } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
   import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import axios from 'axios';
-
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
-      BookmarkIcon: BookmarkIcon,
-      CheckCircleIcon: CheckCircleIcon,
-      PrimaryBtn: PrimaryBtn,
-      GhostBtn: GhostBtn,
-      Layout: Layout,
+      BookmarkIcon,
+      CheckCircleIcon,
+      PrimaryBtn,
+      NoneBtn,
+      Layout,
     },
     setup() {
       const router = useRouter();
@@ -76,6 +81,9 @@
       const newCradle = reactive({
         name: '',
         observations: '',
+      });
+      const isFull = computed(() => {
+        return !!(newCradle.name && newCradle.name.length > 3);
       });
 
       const save = async () => {
@@ -101,6 +109,7 @@
         goToIndex,
         save,
         newCradle,
+        isFull,
         ...toRefs(newCradle),
       };
     },

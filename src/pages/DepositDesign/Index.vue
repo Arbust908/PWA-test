@@ -65,6 +65,9 @@
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
+
+  import '@/assets/table.scss';
+
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';

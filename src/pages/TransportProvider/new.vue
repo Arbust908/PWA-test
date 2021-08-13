@@ -96,7 +96,6 @@
         name: '',
         amount: 0,
         observations: '',
-        providerNotificationId: -1,
       });
 
       const isFull = computed(() => {

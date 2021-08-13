@@ -29,15 +29,16 @@
           <div class="p-4 d-flex">
             <label for="owned" class="">Asignada</label>
             <div class="mt-1">
-              <div :class="['switch', owned ? 'true' : '']" @click="handleSwitchClick">
+              <div
+                :class="['switch', owned ? 'true' : '']"
+                @click="handleSwitchClick"
+              >
                 <div class="switch-circle"></div>
               </div>
             </div>
           </div>
           <div class="input-block p-4">
-            <label for="ownerName" class="">
-              Nombre del dueño
-            </label>
+            <label for="ownerName" class=""> Nombre del dueño </label>
             <div class="mt-1">
               <input
                 v-model="ownerName"
@@ -49,9 +50,7 @@
             </div>
           </div>
           <div class="input-block p-4">
-            <label for="ownerContact" class="">
-              Contacto del dueño
-            </label>
+            <label for="ownerContact" class=""> Contacto del dueño </label>
             <div class="mt-1">
               <input
                 v-model="ownerContact"
@@ -113,14 +112,14 @@
 
   export default {
     components: {
-      Layout: Layout,
-      GhostBtn: GhostBtn,
-      BookmarkIcon: BookmarkIcon,
-      TrashIcon: TrashIcon,
-      PlusIcon: PlusIcon,
-      CheckCircleIcon: CheckCircleIcon,
-      CircularBtn: CircularBtn,
-      PrimaryBtn: PrimaryBtn,
+      Layout,
+      GhostBtn,
+      BookmarkIcon,
+      TrashIcon,
+      PlusIcon,
+      CheckCircleIcon,
+      CircularBtn,
+      PrimaryBtn,
     },
     setup() {
       const store = useStore();
@@ -130,16 +129,15 @@
         JSON.stringify(store.state.forklifts.all)
       );
 
-      const currentForklift: Forklift =
-        forklifts.find((forklift) => {
-          return forklift.id == route.params.id;
-        });
+      const currentForklift: Forklift = forklifts.find((forklift) => {
+        return forklift.id == route.params.id;
+      });
 
       let id = ref(0);
       let name = ref('');
-      let owned = ref(false)
-      let ownerName = ref('')
-      let ownerContact = ref('')
+      let owned = ref(false);
+      let ownerName = ref('');
+      let ownerContact = ref('');
       let observations = ref('');
 
       onMounted(async () => {
@@ -148,7 +146,7 @@
         owned.value = currentForklift.owned;
         ownerName.value = currentForklift.ownerName;
         ownerContact.value = currentForklift.ownerContact;
-        observations.value = currentForklift.observations ;
+        observations.value = currentForklift.observations;
       });
 
       const goToIndex = (): void => {
@@ -182,8 +180,8 @@
       };
 
       const handleSwitchClick = () => {
-        owned.value = !owned.value
-      }
+        owned.value = !owned.value;
+      };
 
       return {
         id,
@@ -194,7 +192,7 @@
         observations,
         goToIndex,
         update,
-        handleSwitchClick
+        handleSwitchClick,
       };
     },
   };
@@ -266,12 +264,12 @@
       @apply bg-gray-400;
       transition: all 500ms ease-in-out;
     }
-    
+
     &.true {
       transition: all 500ms ease-in-out;
       @apply bg-green-300;
       @apply border-green-500;
-      
+
       .switch-circle {
         transition: all 500ms ease-in-out;
         transform: translateX(25px);

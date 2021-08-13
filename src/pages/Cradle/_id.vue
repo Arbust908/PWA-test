@@ -37,8 +37,14 @@
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section></section>
         <section class="space-x-6 flex items-center justify-end">
-          <button @click="goToIndex">Cancelar</button>
-          <PrimaryBtn @click="update"> Finalizar </PrimaryBtn>
+          <NoneBtn @click="goToIndex">Cancelar</NoneBtn>
+          <PrimaryBtn
+            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isFull && save()"
+            :disabled="!isFull"
+          >
+            Finalizar
+          </PrimaryBtn>
         </section>
       </footer>
     </section>
@@ -52,6 +58,7 @@
   import { useStore } from 'vuex';
   import { Cradle } from '@/interfaces/SandProvider';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import axios from 'axios';
 
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -60,6 +67,7 @@
     components: {
       Layout,
       PrimaryBtn,
+      NoneBtn,
     },
     setup() {
       const route = useRoute();
@@ -77,6 +85,10 @@
         id: currentCradle.id,
         name: currentCradle.name,
         observations: currentCradle.observations,
+      });
+
+      const isFull = computed(() => {
+        return !!(newCradle.name && newCradle.name.length > 3);
       });
 
       const update = async () => {
@@ -106,6 +118,7 @@
       return {
         update,
         goToIndex,
+        isFull,
         ...toRefs(cradleToUpdate),
       };
     },

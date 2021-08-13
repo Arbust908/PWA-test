@@ -6,79 +6,61 @@
         <UiBtn>Nuevo</UiBtn>
       </router-link>
     </header>
-    <div class="flex flex-col">
-      <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div
-            class="
-              shadow
-              overflow-hidden
-              border-b border-gray-200
-              sm:rounded-lg
-            "
-          >
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Nombre</th>
-                  <th scope="col">Razón social</th>
-                  <th scope="col">CUIL/CUIT</th>
-                  <th scope="col">Obersvaciones</th>
-                  <th scope="col">
-                    <span class="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(client, cKey) in clDB"
-                  :key="client.id"
-                  :class="cKey % 2 === 0 ? 'even' : 'odd'"
-                  class="body-row"
-                >
-                  <td class="">
-                    {{ client.id }}
-                  </td>
-                  <td :class="client.name ? null : 'empty'">
-                    {{ client.name || 'Sin definir' }}
-                  </td>
-                  <td :class="client.legalName ? null : 'empty'">
-                    {{ client.legalName || 'Sin definir' }}
-                  </td>
-                  <td :class="client.legalId ? null : 'empty'">
-                    {{ client.legalId || 'Sin definir' }}
-                  </td>
-                  <td :class="client.observations ? null : 'empty'">
-                    {{ client.observations || 'Sin definir' }}
-                  </td>
-                  <td>
-                    <div class="btn-panel">
-                      <router-link :to="`/clientes/${client.id}`" class="edit">
-                        <Icon icon="PencilAlt" class="w-5 h-5" />
-                        <span> Editar </span>
-                      </router-link>
-                      <button class="delete" @click="deleteFrom(client.id)">
-                        <Icon icon="Trash" class="w-5 h-5" />
-                        <span> Eliminar </span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-if="clDB && clDB.length <= 0">
-                  <td
-                    colspan="5"
-                    class="text-center text-xs text-gray-500 px-6 py-4"
-                  >
-                    <p>No hay clientes cargados</p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <UiTable>
+      <template #header>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Nombre</th>
+          <th scope="col">Razón social</th>
+          <th scope="col">CUIL/CUIT</th>
+          <th scope="col">Obersvaciones</th>
+          <th scope="col">
+            <span class="sr-only">Actions</span>
+          </th>
+        </tr>
+      </template>
+      <template #body>
+        <tr
+          v-for="(client, cKey) in clDB"
+          :key="client.id"
+          :class="cKey % 2 === 0 ? 'even' : 'odd'"
+          class="body-row"
+        >
+          <td class="">
+            {{ client.id }}
+          </td>
+          <td :class="client.name ? null : 'empty'">
+            {{ client.name || 'Sin definir' }}
+          </td>
+          <td :class="client.legalName ? null : 'empty'">
+            {{ client.legalName || 'Sin definir' }}
+          </td>
+          <td :class="client.legalId ? null : 'empty'">
+            {{ client.legalId || 'Sin definir' }}
+          </td>
+          <td :class="client.observations ? null : 'empty'">
+            {{ client.observations || 'Sin definir' }}
+          </td>
+          <td>
+            <div class="btn-panel">
+              <router-link :to="`/clientes/${client.id}`" class="edit">
+                <Icon icon="PencilAlt" class="w-5 h-5" />
+                <span> Editar </span>
+              </router-link>
+              <button class="delete" @click="deleteFrom(client.id)">
+                <Icon icon="Trash" class="w-5 h-5" />
+                <span> Eliminar </span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr v-if="clDB && clDB.length <= 0">
+          <td colspan="5" class="emptyState">
+            <p>No hay clientes cargados</p>
+          </td>
+        </tr>
+      </template>
+    </UiTable>
   </Layout>
 </template>
 
@@ -86,6 +68,7 @@
   import { onMounted, ref } from 'vue';
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
+  import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import { useClone } from '@/helpers/useClone';
   import '@/assets/table.scss';
@@ -98,6 +81,7 @@
     components: {
       Layout,
       UiBtn,
+      UiTable,
       Icon,
     },
     setup() {

@@ -9,11 +9,31 @@ export interface User {
   username: string;
   role: Role;
 }
+export interface Box {
+  category: string;
+  col: number;
+  floor: number;
+  row: number;
+}
+export enum BoxCategory {
+  empty = 'Vacio',
+  cut = 'Caja cortada',
+  thick = 'Arena gruesa',
+  fine = 'Arena fina',
+  aisle = 'Pasillo',
+}
+export enum SandStageStatus {
+  started = 0,
+  in_progress = 1,
+  finished = 2,
+}
 
 export interface Pit {
     id?: number;
     name: string;
     workOrderId?: number;
+    companyId?: number;
+    company?: Company;
 }
 export interface Traktor {
     id?: number;
@@ -137,6 +157,7 @@ export interface Company {
     company?: Company;
     companyRepresentative?: CompanyRepresentative;
     sandPlans?: SandPlan[];
+    pits?: Pit[];
 }
 
 export interface SandStage {
@@ -165,7 +186,6 @@ export interface SandPlan {
     company?: Company;
     stagesAmount?: number;
     stages?: SandStage[];
-    status: null | 'started' | 'in_progress' | 'finished'; // no va
 }
 
 export interface SandOrder {
@@ -173,7 +193,9 @@ export interface SandOrder {
     sandTypeId: number;
     sandType?: Sand;
     amount: number;
-    purchaseOrders?: PurchaseOrder[];
+    purchaseOrderId: number;
+    purchaseOrder?: PurchaseOrder;
+    boxId?: string;
 }
 
 export interface TransportProvider {
@@ -197,7 +219,6 @@ export interface ProviderNotification { // ??? Dudas
 
 export interface PurchaseOrder {
     id?: number;
-    sandOrderId: number;
     transportProviderId: number;
     sandProviderId: number;
     sandProvider?: SandProvider;
@@ -218,24 +239,4 @@ export interface sandCategory {
     id?: number;
     name: string;
     sands?: Sand[];
-}
-export interface Box {
-  category: string;
-  col: number;
-  floor: number;
-  row: number;
-}
-
-export enum BoxCategory {
-  empty = 'Vacio',
-  cut = 'Caja cortada',
-  thick = 'Arena gruesa',
-  fine = 'Arena fina',
-  aisle = 'Pasillo',
-}
-
-export enum SandStageStatus {
-  started = 0,
-  in_progress = 1,
-  finished = 2,
 }

@@ -151,8 +151,7 @@
         return !!(
           newForklift.name !== '' &&
           newForklift.ownerName !== '' &&
-          newForklift.ownerContact !== '' &&
-          newForklift.observations !== ''
+          newForklift.ownerContact !== ''
         );
       });
 
