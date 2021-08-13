@@ -484,15 +484,6 @@
       const showModal = ref(false);
       const toggleModal = useToggle(showModal);
       const save = async () => {
-        console.log(
-          sandProviderId.value,
-          sandOrder.value,
-          transportProviders.value
-        );
-        console.log({
-          sandProviderId: sandProviderId.value,
-          sandOrder: sandOrder.value,
-        });
         toggleModal(true);
       };
       const confirm = async () => {

@@ -131,7 +131,7 @@ export interface Company {
     legalName: string;
     legalId: number;
     isOperator: boolean;
-    childId?: number; // opcional
+    childId?: number;
     observations?: string;
     companyRepresentativeId: number;
     company?: Company;
@@ -154,6 +154,7 @@ export interface SandStage {
     action?: 'create' | 'update' | 'delete';
     sandPlanId: number;
     sandPlan?: SandPlan;
+    status: null | 'started' | 'in_progress' | 'finished';
 }
 
 export interface SandPlan {
@@ -164,7 +165,7 @@ export interface SandPlan {
     company?: Company;
     stagesAmount?: number;
     stages?: SandStage[];
-    status: null | 'started' | 'in_progress' | 'finished';
+    status: null | 'started' | 'in_progress' | 'finished'; // no va
 }
 
 export interface SandOrder {
@@ -178,7 +179,7 @@ export interface SandOrder {
 export interface TransportProvider {
     id?: number;
     name: string;
-    amount: number;
+    amount: number; // no va
     observations?: string;
     providerNotificationId: number; // no se si va aca
     providerNotification?: ProviderNotification;

@@ -4,46 +4,41 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Cliente - NUEVO
+        Nuevo Cliente
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-full text-xl">Cliente</h2>
-          <label class="col-span-12" for="name">
-            <span>Nombre</span>
-            <input
-              id="name"
-              v-model="name"
-              class="input"
-              type="text"
-              name="name"
-              placeholder="Nombre del cliente"
-            />
-          </label>
-          <label class="col-span-12" for="legalName">
-            <span>Razón Social</span>
-            <input
-              id="legalName"
-              v-model="legalName"
-              class="input"
-              type="text"
-              name="legalName"
-              placeholder="Razón social"
-            />
-          </label>
-          <label class="col-span-12" for="legalId">
-            <span>CUIL/CUIT</span>
-            <input
-              id="legalId"
-              v-model="legalId"
-              class="input"
-              type="text"
-              name="legalId"
-              placeholder="CUIL / CUIT"
-            />
-          </label>
+        <FieldGroup>
+          <FieldLegend>Cliente</FieldLegend>
+          <FieldInput
+            class="col-span-full"
+            fieldName="name"
+            placeholder="Nombre de representante"
+            title="Nombre"
+            mask="S*"
+            :data="name"
+            @update:data="name = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="legalName"
+            placeholder="Razón social"
+            mask="S*"
+            title="Razón social"
+            :data="legalName"
+            @update:data="legalName = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="legalId"
+            placeholder="CUIL / CUIT"
+            mask="###########"
+            title="CUIL / CUIT"
+            :data="legalId"
+            @update:data="legalId = $event"
+          />
+          <!-- Armar el Field Check o Toggle -->
           <label class="col-span-12" for="isOperator">
             <div>
               <input
@@ -57,78 +52,69 @@
               <span>Es Operadora</span>
             </div>
           </label>
-          <label class="col-span-12" for="observations">
-            <span>Observaciones</span>
-            <input
-              id="observations"
-              v-model="observations"
-              class="input"
-              type="text"
-              name="observations"
-              placeholder="Observaciones.."
-            />
-          </label>
-        </fieldset>
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-full text-xl">Representante</h2>
-
-          <label class="col-span-full" for="nr-name">
-            <span>Nombre</span>
-            <input
-              id="nr-name"
-              v-model="companyRepresentative.name"
-              class="input"
-              type="text"
-              name="name"
-              placeholder="Nombre de representante"
-            />
-          </label>
-
-          <label class="col-span-full" for="nr-legalId">
-            <span>CUIL/CUIT</span>
-            <input
-              id="nr-legalId"
-              v-model="companyRepresentative.legalId"
-              class="input"
-              type="text"
-              name="legalId"
-              placeholder="CUIL / CUIT"
-            />
-          </label>
-          <label class="col-span-full" for="phone">
-            <span>Teléfono</span>
-            <input
-              id="nr-phone"
-              v-model="companyRepresentative.phone"
-              class="input"
-              type="text"
-              name="phone"
-              placeholder="+11 1111 1111"
-            />
-          </label>
-          <label class="col-span-full" for="email">
-            <span>Email</span>
-            <input
-              id="nr-email"
-              v-model="companyRepresentative.email"
-              class="input"
-              type="text"
-              name="email"
-              placeholder="ejemplo@ejemplo.com"
-            />
-          </label>
-        </fieldset>
+          <FieldInput
+            class="col-span-full"
+            fieldName="observations"
+            placeholder="Observaciones..."
+            title="Observaciones"
+            mask="S*"
+            :data="observations"
+            @update:data="observations = $event"
+          />
+        </FieldGroup>
+        <FieldGroup>
+          <FieldLegend>Representante</FieldLegend>
+          <FieldInput
+            class="col-span-full"
+            fieldName="nr-name"
+            placeholder="Nombre de representante"
+            title="Nombre"
+            mask="S*"
+            :data="companyRepresentative.name"
+            @update:data="companyRepresentative.name = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="nr-legalId"
+            placeholder="CUIL / CUIT"
+            mask="###########"
+            title="CUIL / CUIT"
+            :data="companyRepresentative.legalId"
+            @update:data="companyRepresentative.legalId = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="nr-phone"
+            placeholder="+11 1111 1111"
+            mask="+##-####-####"
+            title="Teléfono"
+            :data="companyRepresentative.phone"
+            @update:data="companyRepresentative.phone = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="nr-email"
+            placeholder="empresa@mail.com"
+            mask="X*@X*.X*"
+            title="Email"
+            :data="companyRepresentative.email"
+            @update:data="companyRepresentative.email = $event"
+          />
+        </FieldGroup>
       </form>
 
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-        <section></section>
         <section class="space-x-6 flex items-center justify-end">
-          <button @click="goToIndex">Cancelar</button>
-          <!-- <GhostBtn class="btn__draft">
-                        <BookmarkIcon class="w-4 h-4" />
-                        <span @click="save"> Guardar Provisorio </span>
-                    </GhostBtn> -->
-          <PrimaryBtn @click="save"> Finalizar </PrimaryBtn>
+          <NoneBtn @click.prevent="$router.push('/clientes')">
+            Cancelar
+          </NoneBtn>
+          <PrimaryBtn
+            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isFull && save()"
+            :disabled="!isFull"
+          >
+            Finalizar
+          </PrimaryBtn>
         </section>
       </footer>
     </section>
@@ -136,27 +122,36 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, computed } from 'vue';
+  import { reactive, toRefs, computed, defineComponent } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
   import InputPack from '@/components/ui/InputPack.vue';
   import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  // AXIOS
   import axios from 'axios';
-  import { Company, companyRepresentative } from '@/interfaces/SandProvider';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  const api = import.meta.env.VITE_API_URL || '/api';
+  // TIPOS
+  import { Company, companyRepresentative } from '@/interfaces/sandflow';
 
-  const apiUrl = import.meta.env.VITE_API_URL || '/api';
-
+  import { reactive, toRefs, computed, defineComponent } from 'vue';
   export default {
     components: {
       Layout,
       InputPack,
       BookmarkIcon,
       CheckCircleIcon,
-      GhostBtn,
+      NoneBtn,
       PrimaryBtn,
+      FieldGroup,
+      FieldInput,
+      FieldLegend,
     },
     setup() {
       const router = useRouter();
@@ -237,7 +232,7 @@
   .input {
     @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
   }
-  input:read-only {
+  input[type='text']:read-only {
     @apply bg-second-200 border cursor-not-allowed;
   }
   fieldset:not(:last-of-type) {

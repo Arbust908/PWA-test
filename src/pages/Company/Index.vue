@@ -54,17 +54,11 @@
                   </td>
                   <td>
                     <div class="btn-panel">
-                      <router-link
-                        :to="`/clientes/${client.id}`"
-                        class="flex text-indigo-600 hover:text-indigo-800"
-                      >
-                        <Icon icon="PencilAlt" type="outline" class="w-5 h-5" />
+                      <router-link :to="`/clientes/${client.id}`" class="edit">
+                        <Icon icon="PencilAlt" class="w-5 h-5" />
                         <span> Editar </span>
                       </router-link>
-                      <button
-                        class="flex text-red-600 hover:text-red-800"
-                        @click="deleteFrom(client.id)"
-                      >
+                      <button class="delete" @click="deleteFrom(client.id)">
                         <Icon icon="Trash" class="w-5 h-5" />
                         <span> Eliminar </span>
                       </button>
@@ -93,8 +87,8 @@
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
-
   import { useClone } from '@/helpers/useClone';
+  import '@/assets/table.scss';
 
   import { useStore } from 'vuex';
   import axios from 'axios';
@@ -160,7 +154,7 @@
   };
 </script>
 
-<style lang="scss" scoped>
+<!-- <style lang="scss" scoped>
   th {
     @apply px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider;
   }
@@ -174,12 +168,18 @@
     }
   }
   td {
-    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-second-900;
+    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-second-700;
     &.empty {
-      @apply text-gray-400 italic;
+      @apply text-second-400 italic;
     }
   }
   .btn-panel {
     @apply flex justify-end space-x-4;
+    .edit {
+      @apply flex items-center text-indigo-600 hover:text-indigo-800;
+    }
+    .delete {
+      @apply flex items-center text-red-600 hover:text-red-800;
+    }
   }
-</style>
+</style> -->

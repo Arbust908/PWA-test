@@ -1,32 +1,33 @@
 <template>
   <label :for="fieldName">
     <span v-if="title">{{ title }}</span>
-    <input
+    <!-- TODO: Dropdown con Busqueda -->
+    <!-- TODO: Options con entrada cheta -->
+    <select
       :id="fieldName"
       class="input"
-      :type="type"
       :name="fieldName"
-      :placeholder="placeholder"
-      v-model="value"
-    />
-    <!-- TODO: Masking & Validaciones -->
+      v-model.number="value"
+    >
+      <option disabled value="-1">
+        {{ placeholder }}
+      </option>
+      <option v-for="(res, i) in resources" :key="res.id + i" :value="res.id">
+        {{ res[enpointKey] }}
+      </option>
+    </select>
   </label>
 </template>
 
 <script>
-  import { defineComponent, computed } from 'vue';
+  import { defineComponent, ref, watch } from 'vue';
   import { useVModel } from '@vueuse/core';
-  // import { maska, mask } from 'maska';
+  import { useApi } from '@/helpers/useApi';
   export default defineComponent({
-    // directives: { maska },
     name: 'FieldInput',
     props: {
       data: {
         default: '',
-      },
-      type: {
-        type: String,
-        default: 'text',
       },
       fieldName: {
         type: String,
@@ -37,18 +38,26 @@
         default: 'Input',
       },
       title: {
-        type: [String, null],
+        type: String,
         default: null,
       },
-      mask: {
+      endpoint: {
         type: String,
-        default: '',
+        default: '/',
+      },
+      enpointKey: {
+        type: String,
+        default: 'name',
       },
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
+      const { read } = useApi(props.endpoint);
+      const resources = read();
+
       return {
         value,
+        resources,
         ...props,
       };
     },

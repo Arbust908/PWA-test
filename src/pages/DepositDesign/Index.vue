@@ -37,17 +37,11 @@
           </td>
           <td>
             <div class="btn-panel">
-              <router-link
-                :to="`/diseno-de-deposito/${depo.id}`"
-                class="flex text-indigo-600 hover:text-indigo-800"
-              >
+              <router-link :to="`/diseno-de-deposito/${depo.id}`" class="edit">
                 <PencilAltIcon class="w-5 h-5" />
                 <span> Editar </span>
               </router-link>
-              <button
-                class="flex text-red-600 hover:text-red-800"
-                @click="deleteSP(depo.id)"
-              >
+              <button class="delete" @click="deleteDeposit(depo.id)">
                 <TrashIcon class="w-5 h-5" />
                 <span> Eliminar </span>
               </button>
@@ -55,7 +49,7 @@
           </td>
         </tr>
         <tr v-if="Deposits.length <= 0">
-          <td colspan="5" class="text-center text-xs text-second-300 px-6 py-4">
+          <td colspan="5" class="emptyState">
             <p>No hay Depositos</p>
           </td>
         </tr>
@@ -113,7 +107,6 @@
         dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
         return dimensions;
       };
-
       const deleteDeposit = (id) => {
         const loading = ref(true);
         const { data } = useAxios(
@@ -151,8 +144,14 @@
   }
   td {
     @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-second-900;
+    &.empty {
+      @apply text-gray-400 italic;
+    }
   }
   .btn-panel {
     @apply flex justify-end space-x-4;
+  }
+  td.emptyState {
+    @apply text-center text-xs text-second-300 px-6 py-4;
   }
 </style>

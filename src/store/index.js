@@ -8,7 +8,6 @@ import global from '@/store/global';
 import providerNotification from '@/store/providerNotification';
 import purchaseOrder from '@/store/purchaseOrder';
 import sand from '@/store/sand';
-import sandCenter from '@/store/sandCenter';
 import sandPlan from '@/store/sandPlan';
 import sandProviders from '@/store/sandProviders';
 import transportProviders from '@/store/transportProviders';
@@ -55,7 +54,6 @@ const store = createStore({
     purchaseOrder,
     sand,
     sand,
-    sandCenter,
     sandPlan,
     sandProviders,
     transportProviders,

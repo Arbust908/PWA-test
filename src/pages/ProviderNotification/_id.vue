@@ -394,9 +394,7 @@
         (notification: ProviderNotification) => notification.id == id
       );
       const currentProviderNotification = ref({});
-      console.log(stateNot);
       if (!stateNot) {
-        console.log('Api');
         const { data: pNData } = useAxios('/ProviderNotification', instance);
         watch(pNData, (pNData, prevCount) => {
           if (pNData && pNData.data) {
@@ -408,7 +406,6 @@
       }
 
       const { sandProviderId, sandOrder } = currentProviderNotification.value;
-      console.log(sandProviderId, sandOrder);
 
       const sandProviders = ref([] as Array<Sand>);
       const { data: sPData } = useAxios('/sandProvider', instance);
@@ -510,15 +507,6 @@
       const showModal = ref(false);
       const toggleModal = useToggle(showModal);
       const save = async () => {
-        console.log(
-          sandProviderId.value,
-          sandOrder.value,
-          transportProviders.value
-        );
-        console.log({
-          sandProviderId: sandProviderId.value,
-          sandOrder: sandOrder.value,
-        });
         toggleModal(true);
       };
       const confirm = async () => {

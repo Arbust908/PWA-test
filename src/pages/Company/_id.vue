@@ -8,26 +8,6 @@
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
-      <!-- <form method="POST" action="/" class="p-4 max-w-lg">
-                <InputPack
-                    v-model="id"
-                    title="ID"
-                    naming='id'
-                    type='number'
-                />
-                <InputPack
-                    v-model="name"
-                    title="Nombre"
-                    naming='name'
-                    type='text'
-                />
-                <input v-model="socialNumber" name="socialNumber" type="text" placeholder= ".."/>
-                <input v-model="representativeLabor" name="representativeLabor" type="text" placeholder= ".."/>
-                <input v-model="representativeData" name="representativeData" type="text" placeholder= ".."/>
-                <input v-model="representativeContact" name="representativeContact" type="text" placeholder= ".."/>
-                <input v-model="observations" name="observations" type="text" placeholder= ".."/>
-            </form> -->
-
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Cliente</h2>
@@ -143,10 +123,6 @@
         <section></section>
         <section class="space-x-6 flex items-center justify-end">
           <button @click="goToIndex">Cancelar</button>
-          <!-- <GhostBtn class="btn__draft">
-                        <BookmarkIcon class="w-4 h-4" />
-                        <span @click="save"> Guardar Provisorio </span>
-                    </GhostBtn> -->
           <PrimaryBtn @click="update"> Finalizar </PrimaryBtn>
         </section>
       </footer>
@@ -186,9 +162,6 @@
         return client.id == route.params.id;
       });
 
-      console.log('clients list', clients);
-      console.log('current', currentClient);
-
       const clientToUpdate = reactive({
         name: currentClient.name,
         legalName: currentClient.legalName,
@@ -197,8 +170,6 @@
         observations: currentClient.observations,
         companyRepresentative: currentClient.companyRepresentative,
       });
-
-      console.log(currentClient.id);
 
       const goToIndex = () => {
         router.push('/clientes');
@@ -256,7 +227,7 @@
   .input {
     @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
   }
-  input:read-only {
+  input[type='text']:read-only {
     @apply bg-second-200 border cursor-not-allowed;
   }
   fieldset:not(:last-of-type) {

@@ -63,7 +63,7 @@
               <CircularBtn class="btn__add" size="xs">
                 <PlusIcon class="w-4 h-4" />
               </CircularBtn>
-              <span class="font-bold"> Agregar pozo </span>
+              <span class="font-bold"> Agregar etapa </span>
             </button>
           </section>
           <section class="flex space-x-4">
@@ -281,8 +281,12 @@
         const defaultStage = {
           id: 0,
           stage: 1,
-          sandId: -1,
-          quantity: 0,
+          sandId1: -1,
+          quantity1: null,
+          sandId2: -1,
+          quantity2: null,
+          sandId3: -1,
+          quantity3: null,
           sandPlanId: 0,
           status: 0,
         };
@@ -298,7 +302,6 @@
       const editingStage = ref(0);
 
       const editStage = (stage) => {
-        console.log(stage.id);
         editingStage.value = stage.id;
       };
       const saveStage = (stage) => {
@@ -318,6 +321,7 @@
           ...newStatus,
         };
         currentSandPlan.stages.push(newStage);
+        editStage(newStage);
       };
       const deleteStage = (stage) => {
         const stageId = stage.id;
