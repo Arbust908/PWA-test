@@ -94,9 +94,10 @@
   import UiBtn from '@/components/ui/Button.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
 
+  import { useClone } from '@/helpers/useClone';
+
   import { useStore } from 'vuex';
   import axios from 'axios';
-
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default {
@@ -108,7 +109,7 @@
     setup() {
       const store = useStore();
       const clDB = ref([]);
-      const clStoreDB = JSON.parse(JSON.stringify(store.state.client.all));
+      const clStoreDB = useClone(store.state.client.all);
       const loading = ref(false);
 
       const getClients = async () => {
