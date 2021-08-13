@@ -224,24 +224,6 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
-    path: '/centro-de-carga-de-arena',
-    name: 'SandCenters',
-    component: () => import('@/pages/SandCenter/Index.vue'),
-    beforeEnter: isLogged,
-  },
-  {
-    path: '/centro-de-carga-de-arena/:id',
-    name: 'SandCenterById',
-    component: () => import('@/pages/SandCenter/_id.vue'),
-    beforeEnter: isLogged
-  },
-  {
-    path: '/centro-de-carga-de-arena/nueva',
-    name: 'NewSandCenter',
-    component: () => import('@/pages/SandCenter/New.vue'),
-    beforeEnter: isLogged,
-  },
-  {
     path: '/usuario/salir',
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),
