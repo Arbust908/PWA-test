@@ -37,9 +37,10 @@
               <span>Tipo</span>
               <select
                 id="sandProvider"
-                v-model="sO.sandType.id"
+                v-model="sO.sandTypeId"
                 class="input"
                 name="sandProvider"
+                @change="fillSandType(sO.id)"
               >
                 <option selected disabled value="">
                   Seleccionar Tipo de Arena
@@ -135,7 +136,7 @@
                 :name="'transportProvider' + tO.id"
               >
                 <option selected disabled value="-1">
-                  Proveedor de Transpore
+                  Proveedor de Transporte
                 </option>
                 <option
                   v-for="(tP, tPKey) in transportProviders"
@@ -218,9 +219,13 @@
           type="submit"
           size="sm"
           class="p-4"
-          :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-          :disabled="!isFull"
-          @click.prevent="isFull && save()"
+          :class="
+            isSandFull || isTransportFull
+              ? null
+              : 'opacity-50 cursor-not-allowed'
+          "
+          :disabled="!isSandFull"
+          @click.prevent="isSandFull && save()"
         >
           Finalizar
         </PrimaryBtn>
@@ -234,7 +239,7 @@
     >
       <template #body>
         <div class="divide-y text-left">
-          <section class="py-2 space-y-2">
+          <section v-show="isSandFull" class="py-2 space-y-2">
             <h3 class="text-xl">Arena</h3>
             <article class="text-sm text-indigo-500">
               <header class="flex items-center gap-2">
@@ -243,22 +248,25 @@
               </header>
               <ul class="list-disc pl-6 ml-2">
                 <li v-for="sOli in sandOrder" :key="sOli.id">
-                  Tipo {{ sOli.sandType.name }}, {{ sOli.amount }}
+                  Tipo: {{ sOli.sandType.type }}, {{ sOli.amount }} tonelada(s)
                 </li>
               </ul>
             </article>
           </section>
-          <section class="py-2 space-y-2">
+          <section v-show="isTransportFull" class="py-2 space-y-2">
             <h3 class="text-xl">Transporte</h3>
             <template v-for="tPNot in transportOrder" :key="tPNot.id">
               <article class="text-sm text-indigo-500">
                 <header class="flex items-center gap-2">
                   <BellIcon class="w-4 h-4" />
-                  <span>
-                    Notificación para {{ tPNot.name }}, {{ tPNot.amount }}U,
-                    {{ tPNot.observation }}
-                  </span>
+                  <span>Notificación para {{ tPNot.name }}</span>
                 </header>
+                <ul class="list-disc pl-6 ml-2">
+                  <li v-for="tPNot in transportOrder" :key="tPNot.id">
+                    Cantidad de camiones: {{ tPNot.amount }},
+                    {{ tPNot.observation }}
+                  </li>
+                </ul>
               </article>
             </template>
           </section>
@@ -405,13 +413,21 @@
         }
       });
 
-      const sandProviderId: Ref<string> = ref('');
+      const sandProviderId: Ref<number> = ref('');
       const sandProvider: ComputedRef<SandProvider> = computed(() =>
         sandProviders.value.find((sp) => sp.id === sandProviderId.value)
       );
-
       const sandOrder: Ref<Array<SandOrder>> = ref([]);
+      const fillSandType = (soId) => {
+        const currSO = sandOrder.value.find((so) => so.id === soId);
+        const currST = sandTypes.value.find(
+          (st) => st.id === currSO?.sandTypeId
+        );
+        currSO.sandType = currST;
+      };
+
       const transportOrder: Ref<Array<TransportProvider>> = ref([]);
+      console.log(transportOrder);
 
       const defaultSandOrder: SandOrder = {
         id: 0,
@@ -426,6 +442,7 @@
         },
         amount: null,
       };
+
       const addSandOrder = () => {
         const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
         const lastSandOrderId = lastSandOrder ? lastSandOrder.id : -1;
@@ -466,12 +483,19 @@
         addTransportProvider();
       }
 
-      const isFull = computed(() => {
+      const isSandFull = computed(() => {
         return !!(
           sandProviderId.value &&
           sandOrder.value &&
-          sandOrder.value.every((so) => so.amount >= 0) &&
-          sandOrder.value.every((so) => so.sandType)
+          sandOrder.value.every((so) => so.amount && so.amount > 0) &&
+          sandOrder.value.every((so) => so.sandType && so.sandType.id > 0)
+        );
+      });
+
+      const isTransportFull = computed(() => {
+        return !!(
+          transportOrder.value &&
+          transportOrder.value.every((to) => to.amount && to.amount > 0)
         );
       });
 
@@ -482,18 +506,17 @@
       };
       const confirm = async () => {
         pN.value = {
-          sandProviderId: sandProviderId.value,
-          sandProvider: sandProvider,
+          sandProviderId: Number(sandProviderId.value),
+          sandProvider: sandProvider.value,
           sandOrderId: sandOrder.value[0].id,
           sandOrder: sandOrder.value,
-          transportProviderId: transportOrder.value[0].id,
+          transportProviderId: Number(transportOrder.value[0].id),
         };
         const { data } = useAxios(
           '/ProviderNotification',
           { method: 'POST', data: pN.value },
           instance
         );
-        console.log(data.value);
         toggleModal(false);
         store.dispatch('saveProviderNotification', pN.value);
         router.push('/notificaciones-a-proveedores');
@@ -514,13 +537,15 @@
         save,
         showModal,
         toggleModal,
-        isFull,
+        isSandFull,
+        isTransportFull,
         confirm,
         sandProviders,
         toCapitalize,
         sandTypes,
         transportOrder,
         sandProvider,
+        fillSandType,
       };
     },
   });
