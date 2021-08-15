@@ -9,9 +9,9 @@
       fieldName="pickupId"
       placeholder="Patente"
       :title="pickupI === firstIndex ? 'ID Pickup' : null"
-      mask="S*"
-      :data="pickup.pickup_id"
-      @update:data="pickup.pickup_id = $event"
+      mask="#*"
+      :data="pickup.pickupId"
+      @update:data="pickup.pickupId = Number($event)"
     />
     <FieldInput
       class="col-span-6"
