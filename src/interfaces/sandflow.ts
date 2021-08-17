@@ -234,9 +234,17 @@ export interface Warehouse {
     pit?: Pit;
     layout: any;
 }
-
 export interface sandCategory {
     id?: number;
     name: string;
     sands?: Sand[];
+}
+export interface Box {
+  id?: number;
+  warehouseId: number | null;
+  warehouse?: Warehouse;
+  category: string;
+  col: number;
+  floor: number;
+  row: number;
 }

@@ -1,7 +1,6 @@
 <template>
   <button
-    :class="[category, isTheSelected ? 'selected' : null]"
-    class="box"
+    :class="['box', category, isTheSelected ? 'selected' : null, isBlocked() ? 'blocked' : null]"
     @click.prevent="selectBox"
   >
     <span class="text-sm">{{ row }} - {{ col }}</span>
@@ -35,9 +34,13 @@
         type: Number,
         required: true,
       },
+      visibleCategories: {
+        type: Array,
+        required: false
+      }
     },
     setup(props, { emit }) {
-      const { deposit, floor, row, col, selectedBox } = toRefs(props);
+      let { deposit, floor, row, col, selectedBox } = toRefs(props);
       const selectBox = () => {
         const box: Box = {
           floor: floor.value,
@@ -60,6 +63,17 @@
         );
       });
 
+      let visibleCategories = ref(props.visibleCategories)
+
+      const isBlocked = () => {
+        if(!visibleCategories.value) return false
+        if(visibleCategories.value.includes(category.value) || category.value == 'aisle') {
+          return false
+        } else {
+          return true
+        }
+      }
+
       return {
         deposit,
         floor,
@@ -69,6 +83,7 @@
         category,
         selectBox,
         isTheSelected,
+        isBlocked
       };
     },
   });

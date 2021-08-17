@@ -69,6 +69,16 @@ export default {
           },
         ],
       },
+      {
+        name: 'Ingreso de cajas',
+        to: '/ingreso-de-cajas',
+        icon: 'ClipboardListIcon',
+      },
+      {
+        name: 'Ingreso de cajas',
+        to: '/ingreso-de-cajas',
+        icon: 'ClipboardListIcon',
+      },
     ],
     user_navigation: [
       { name: 'Salir', to: '/usuario/salir', icon: 'LogoutIcon' },

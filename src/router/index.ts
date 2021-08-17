@@ -78,6 +78,19 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('@/pages/DepositDesign/New.vue'),
     beforeEnter: isLogged,
   },
+  {
+    path: '/ingreso-de-cajas',
+    name: 'BoxEntry',
+    component: () => import('@/pages/BoxEntry/index.vue'),
+    beforeEnter: isLogged,
+  },
+  // < ::
+  {
+    path: '/ingreso-de-cajas',
+    name: 'BoxEntry',
+    component: () => import('@/pages/BoxEntry/index.vue'),
+    beforeEnter: isLogged,
+  },
   // < ::
   {
     path: '/tipos-de-arena',
