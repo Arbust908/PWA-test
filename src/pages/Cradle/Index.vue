@@ -35,11 +35,11 @@
           </td>
           <td>
             <div class="btn-panel">
-              <router-link :to="`/diseno-de-deposito/${cr.id}`" class="edit">
+              <router-link :to="`/cradle/${cr.id}`" class="edit">
                 <Icon icon="PencilAlt" class="w-5 h-5" />
                 <span> Editar </span>
               </router-link>
-              <button class="delete" @click="deleteDeposit(cr.id)">
+              <button class="delete" @click="deleteFrom(cr.id)">
                 <Icon icon="Trash" class="w-5 h-5" />
                 <span> Eliminar </span>
               </button>
