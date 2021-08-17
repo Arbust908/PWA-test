@@ -9,52 +9,51 @@
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-12 text-xl">Arena</h2>
-          <label class="col-span-12" for="sandProvider">
-            <span>Proveedor</span>
-            <select
-              id="sandProvider"
-              v-model="sandProviderId"
-              class="input"
-              name="sandProvider"
-            >
-              <option selected disabled value="-1">
-                Seleccciona Proveedor de Arena
-              </option>
-              <option
-                v-for="sP in sandProviders"
-                :key="sP.id + sP.name"
-                :value="sP.id"
-              >
-                {{ sP.name }}
-              </option>
-            </select>
-          </label>
+        <FieldGroup class="max-w-2xl">
+          <FieldSelect
+            class="col-span-6"
+            fieldName="client"
+            title="Cliente"
+            placeholder="Selecciona cliente"
+            endpoint="/company"
+            :data="companyClientId"
+            @update:data="companyClientId = $event"
+          />
+          <FieldSelect
+            class="col-span-6"
+            fieldName="pit"
+            title="Pozo"
+            placeholder="Selecciona pozo"
+            endpoint="/pit"
+            :data="pitId"
+            @update:data="pitId = $event"
+          />
+        </FieldGroup>
+        <FieldGroup class="max-w-xl">
+          <FieldLegend>Arena</FieldLegend>
+          <FieldSelect
+            class="col-span-8"
+            fieldName="sandProvider"
+            title="Proveedor"
+            placeholder="Selecciona proveedor"
+            endpoint="/sandProvider"
+            :data="sandProviderId"
+            @update:data="sandProviderId = $event"
+          />
           <template v-for="(order, orderKey) in sandOrder" :key="orderKey">
             <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
-            <label class="col-span-10" for="sandType">
-              <span>Tipo</span>
-              <select
-                id="sandType"
-                v-model="order.sandTypeId"
-                class="input"
-                name="sandType"
-              >
-                <option selected disabled value="">
-                  Seleccciona Tipo de Arena
-                </option>
-                <option
-                  v-for="sT in sandTypes"
-                  :key="sT.id + sT.type"
-                  :value="sT.id"
-                >
-                  {{ sT.type }}
-                </option>
-              </select>
-            </label>
+            <FieldSelect
+              :title="orderKey === 0 ? 'Tipo' : ''"
+              class="col-span-10"
+              fieldName="sandType"
+              placeholder="Seleccciona Tipo de Arena"
+              endpoint="/sand"
+              enpointKey="type"
+              :data="order.sandTypeId"
+              @update:data="order.sandTypeId = $event"
+            />
             <div
-              v-if="sandOrder.length > 1"
+              v-if="orderKey !== 0"
               class="col-span-2 flex justify-end items-end"
             >
               <CircularBtn
@@ -65,12 +64,12 @@
                 <TrashIcon class="w-5 h-5" />
               </CircularBtn>
             </div>
-
+            <!-- TODO: Input con Frente o Fondo fijo ;D -->
             <label class="col-span-6" for="sandQuantity">
               <span>Cantidad</span>
               <div class="mt-1 flex rounded shadow-sm">
                 <input
-                  v-model="order.quantity"
+                  v-model="order.amount"
                   type="number"
                   name="sandQuantity"
                   class="
@@ -90,12 +89,6 @@
                   placeholder="Cantidad de Arena"
                   list="sandQuantity"
                 />
-                <datalist id="sandQuantity">
-                  <option value="Doce">12</option>
-                  <option value="22">22</option>
-                  <option value="44">44</option>
-                  <option value="88">88</option>
-                </datalist>
                 <span
                   class="
                     inline-flex
@@ -113,22 +106,15 @@
                 </span>
               </div>
             </label>
-
-            <label class="col-span-6" for="sandBoxId">
-              <span>ID Caja</span>
-              <input
-                v-model="order.boxId"
-                class="input"
-                type="text"
-                name="sandBoxId"
-                list="sandBoxId"
-                placeholder="Ingrear ID de caja"
-              />
-              <datalist id="sandBoxId">
-                <option value="#123">#123</option>
-                <option value="#856">#856</option>
-              </datalist>
-            </label>
+            <FieldInput
+              class="col-span-6"
+              fieldName="sandBoxId"
+              placeholder="Ingrear ID de caja"
+              title="ID de caja"
+              mask="X*"
+              :data="order.boxId"
+              @update:data="order.boxId = $event"
+            />
           </template>
           <button
             class="col-span-full mt-1 flex items-center"
@@ -139,85 +125,51 @@
             </CircularBtn>
             <span class="font-bold text"> Agregar </span>
           </button>
-        </fieldset>
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-full text-xl">Transporte</h2>
-          <label class="col-span-full" for="transportProvider">
-            <span>Proveedor</span>
-            <select
-              id="transportProvider"
-              v-model="transportProviderId"
-              class="input"
-              name="transportProvider"
-            >
-              <option selected disabled value="-1">
-                Proveedor de Transporte
-              </option>
-              <option
-                v-for="tP in transportProviders"
-                :key="tP.id + tP.name"
-                :value="tP.id"
-              >
-                {{ tP.name }}
-              </option>
-            </select>
-          </label>
-
-          <label class="col-span-6" for="transportId">
-            <span>Patente</span>
-            <input
-              v-model="transportProvider.transportId"
-              class="input"
-              type="text"
-              name="transportId"
-              list="transportId"
-              placeholder="Patente del Transporte"
-            />
-            <datalist id="transportId">
-              <option value="AC 245 WC">AC 245 WC</option>
-              <option value="CC 345 ER">CC 345 ER</option>
-            </datalist>
-          </label>
-
-          <label class="col-span-6" for="quantityBoxes">
-            <span>Cantidad de cajas</span>
-            <input
-              v-model="transportProvider.boxQuantity"
-              class="input"
-              type="number"
-              name="quantityBoxes"
-              list="quantityBoxes"
-              placeholder="Cantidad de cajas"
-            />
-            <datalist id="quantityBoxes">
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="4">4</option>
-            </datalist>
-          </label>
-
-          <label class="col-span-full" for="transportDescription">
-            <span>Observaciones</span>
-            <input
-              v-model="transportProvider.observation"
-              class="input"
-              type="text"
-              name="transportDescription"
-              list="transportDescription"
-              placeholder="Chasis chico"
-            />
-            <datalist id="transportDescription">
-              <option value="Chasis Grande">Chasis Grande</option>
-              <option value="Chasis Chico">Chasis Chico</option>
-            </datalist>
-          </label>
-        </fieldset>
+        </FieldGroup>
+        <FieldGroup>
+          <FieldLegend>Transporte</FieldLegend>
+          <FieldSelect
+            class="col-span-full"
+            fieldName="transportProvider"
+            title="Proveedor"
+            placeholder="Selecciona proveedor"
+            endpoint="/transportProvider"
+            :data="transportProviderId"
+            @update:data="transportProviderId = $event"
+          />
+          <!-- <FieldInput
+            class="col-span-6"
+            fieldName="transportId"
+            placeholder="Patente del Transporte"
+            title="Patente"
+            mask="X*"
+            :data="transportProvider.transportId"
+            @update:data="transportProvider.transportId = $event"
+          />
+          <FieldInput
+            class="col-span-6"
+            fieldName="quantityBoxes"
+            placeholder="Cantidad de cajas"
+            title="Cantidad de cajas"
+            mask="##"
+            :data="transportProvider.boxQuantity"
+            @update:data="transportProvider.boxQuantity = Number($event)"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="transportDescription"
+            placeholder="Observaciones..."
+            title="Observaciones"
+            mask="X*"
+            :data="transportProvider.observation"
+            @update:data="transportProvider.observation = $event"
+          /> -->
+        </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
-        <button @click.prevent="$router.push('/orden-de-pedido')">
+        <NoneBtn @click.prevent="$router.push('/orden-de-pedido')">
           Cancelar
-        </button>
+        </NoneBtn>
         <PrimaryBtn
           type="submit"
           size="sm"
@@ -234,42 +186,55 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
+  import {
+    ref,
+    Ref,
+    reactive,
+    computed,
+    ComputedRef,
+    watch,
+    watchEffect,
+  } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import { useState, useActions } from 'vuex-composition-helpers';
+  import { useActions } from 'vuex-composition-helpers';
 
   import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import {
-    PurchaseOrder,
-    SandProvider,
-    SandOrder,
-    TransportProvider,
-  } from '@/interfaces/PurchaseOrder.ts';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  import { SandProvider } from '@/interfaces/SandProvider';
-  import { Sand, SandOrder } from '@/interfaces/sandflow';
+  import {
+    Sand,
+    SandOrder,
+    SandProvider,
+    PurchaseOrder,
+    TransportProvider,
+  } from '@/interfaces/sandflow';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
       Layout,
-      GhostBtn,
+      NoneBtn,
       BookmarkIcon,
       TrashIcon,
       PlusIcon,
       CircularBtn,
       PrimaryBtn,
+      FieldGroup,
+      FieldLegend,
+      FieldInput,
+      FieldSelect,
     },
     setup() {
-      // :: Init
-      const store = useStore();
       const router = useRouter();
       const instance = axios.create({
         baseURL: api,
@@ -284,30 +249,20 @@
         }
       });
       const sandProviderId: Ref<number> = ref(-1);
-
+      const companyClientId: Ref<number> = ref(-1);
+      const pitId: Ref<number> = ref(-1);
       // >> Proveedores de Sand
-
       // :: Ordenes de Sand
       const sandOrder: Ref<Array<any>> = ref([
         {
           id: 0,
-          sandType: {},
-          sandTypeId: '',
-          quantity: null,
+          sandTypeId: -1,
+          amount: null,
           boxId: '',
         },
       ]);
-
       // :: Ordenes de Sand
       const sandOrders = ref([] as Array<SandOrder>);
-      const { data: sandOrdersData } = useAxios('/sandOrder', instance);
-      watch(sandOrdersData, (sOData, prevCount) => {
-        if (sOData && sOData.data) {
-          sandOrders.value = sOData.data;
-        }
-      });
-      // >> Ordenes de Sand
-
       // :: Tipos de Sand
       const sandTypes = ref([] as Array<Sand>);
       const { data: sandTypesData } = useAxios('/sand', instance);
@@ -316,9 +271,7 @@
           sandTypes.value = sOData.data;
         }
       });
-
       // >> Tipos de Sand
-
       const removeOrder = (id: number): void => {
         sandOrder.value = sandOrder.value.filter(
           (sandOrder: SandOrder) => sandOrder.id !== id
@@ -329,22 +282,19 @@
         const newId = lastSandOrder.id + 1;
         sandOrder.value.push({
           id: newId,
-          type: {},
           sandTypeId: '',
-          quantity: null,
+          amount: null,
           boxId: '',
         });
       };
-
       // :: TransportProvider
-      const transportProviders = ref([] as Array<Sand>);
+      const transportProviders = ref([]);
       const { data: tPData } = useAxios('/transportProvider', instance);
       watch(tPData, (tPData, prevCount) => {
         if (tPData && tPData.data) {
           transportProviders.value = tPData.data;
         }
       });
-
       const transportProviderId: Ref<number> = ref(-1);
       const transportProvider: TransportProvider = reactive({
         id: 1,
@@ -352,47 +302,64 @@
         transportId: '',
         boxQuantity: null,
         observation: '',
+        amount: null,
       });
       // >> TransportProvider
-
       const isFull: ComputedRef<boolean> = computed(() => {
         return !!(
           transportProviderId.value > -1 &&
-          transportProvider.transportId &&
-          transportProvider.boxQuantity &&
-          transportProvider.boxQuantity >= 0 &&
+          // transportProvider.transportId &&
+          // transportProvider.boxQuantity &&
+          // transportProvider.boxQuantity >= 0 &&
           sandProviderId.value > -1 &&
           sandOrder.value.length > 0 &&
-          sandOrder.value.every((sO: SandOrder) => sO.quantity > 0) &&
+          sandOrder.value.every((sO: SandOrder) => sO.amount > 0) &&
           sandOrder.value.every((sO: SandOrder) => sO.type !== '')
         );
       });
-      const getTPbyId = (id: number): TransportProvider => {
-        return transportProviders.value.find((tp) => tp.id === id);
-      };
-      const getSPbyId = (id: number): SandProvider => {
-        return sandProviders.value.find((sp) => sp.id === id);
-      };
-
       const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
       const save = (): void => {
         if (isFull.value) {
-          const newTP = getTPbyId(transportProviderId.value);
-          const trueTP = {
-            ...transportProvider,
-            id: newTP.id,
-            name: newTP.name,
-          };
-          const purchaseOrder = {
+          const purchaseOrder: PurchaseOrder = {
             sandProviderId: sandProviderId.value,
-            sandProvider: getSPbyId(sandProviderId.value),
-            sandOrders: [...sandOrder.value],
             transportProviderId: transportProviderId.value,
-            transportProvider: trueTP,
-          } as PurchaseOrder;
+          };
           console.log(purchaseOrder);
-          savePurchaseOrder(purchaseOrder);
-          router.push('/orden-de-pedido');
+          const { data: pODone } = useAxios(
+            '/purchaseOrder',
+            { method: 'POST', data: purchaseOrder },
+            instance
+          );
+          const sOisDone = ref([]);
+          watch(pODone, (newVal, _) => {
+            if (newVal && newVal.data) {
+              console.log(newVal.data);
+              console.log(sandOrder.value);
+              sandOrder.value.map((sO: SandOrder) => {
+                console.log(sO);
+                sO.purchaseOrderId = newVal.data.id;
+                const { data: sODone } = useAxios(
+                  '/sandOrder',
+                  { method: 'POST', data: sO },
+                  instance
+                );
+                watch(sODone, (newVal, _) => {
+                  if (newVal && newVal.data) {
+                    sOisDone.value.push(newVal.data);
+                  }
+                });
+              });
+            }
+          });
+          watchEffect(() => {
+            if (sOisDone.value.length >= sandOrder.value.length) {
+              const ordenDePedido = pODone.value.data;
+              const pedidoDeArena = sOisDone.value;
+              ordenDePedido.sandOrders = pedidoDeArena;
+              savePurchaseOrder(ordenDePedido);
+              router.push('/orden-de-pedido');
+            }
+          });
         }
       };
       return {
@@ -408,6 +375,8 @@
         sandTypes,
         transportProviders,
         transportProviderId,
+        companyClientId,
+        pitId,
       };
     },
   };

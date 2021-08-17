@@ -2,185 +2,66 @@
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">
-        Planificacónes de arenas
+        Planificacíon de arenas
       </h2>
       <router-link to="/planificacion-de-arena/nueva">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
     </header>
-    <div class="flex flex-col">
-      <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div
-            class="
-              shadow
-              overflow-hidden
-              border-b border-gray-200
-              sm:rounded-lg
-            "
-          >
-            <table class="min-w-full divide-y divide-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-gray-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Cliente
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-gray-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Pozo
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-gray-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Etapas
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-gray-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Total
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-gray-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Estado
-                  </th>
-                  <th scope="col" class="relative px-6 py-3">
-                    <span class="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(sp, Key) in sandPlans"
-                  :key="Key"
-                  :class="Key % 2 === 0 ? 'bg-white' : 'bg-gray-50'"
-                  class="hover:bg-gray-100"
-                >
-                  <td
-                    class="
-                      px-6
-                      py-4
-                      whitespace-nowrap
-                      text-sm
-                      font-medium
-                      text-gray-900
-                    "
-                  >
-                    {{ sp?.company?.name || '-' }}
-                  </td>
-                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-                    {{ sp?.pit?.name || '-' }}
-                  </td>
-                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-                    {{ sp?.stagesAmount || 0 }}
-                  </td>
-                  <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-                    {{ sumQty(sp?.stages) || 0 }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    {{ sp?.state || '-' }}
-                  </td>
-                  <td
-                    class="
-                      px-6
-                      py-4
-                      whitespace-nowrap
-                      text-right text-sm
-                      font-medium
-                    "
-                  >
-                    <div class="flex justify-end space-x-4">
-                      <router-link
-                        :to="`/planificacion-de-arena/${sp.id}`"
-                        class="
-                          flex
-                          items-center
-                          gap-1
-                          text-indigo-600
-                          hover:text-indigo-900
-                        "
-                      >
-                        <PencilAltIcon class="w-5 h-5" />
-                        <span> Editar </span>
-                      </router-link>
-                      <button
-                        @click="deleteSP(sp.id)"
-                        class="
-                          flex
-                          items-center
-                          gap-1
-                          text-red-600
-                          hover:text-red-900
-                        "
-                      >
-                        <TrashIcon class="w-5 h-5" />
-                        <span> Eliminar </span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-if="sandPlans.length <= 0">
-                  <td
-                    colspan="5"
-                    class="text-center text-xs text-gray-500 px-6 py-4"
-                  >
-                    <p>No hay Planificacion de Arena</p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <UiTable>
+      <template #header>
+        <tr>
+          <th scope="col">Cliente</th>
+          <th scope="col">Pozo</th>
+          <th scope="col">Etapas</th>
+          <th scope="col">Total</th>
+          <th scope="col">
+            <span class="sr-only">Actions</span>
+          </th>
+        </tr>
+      </template>
+      <template #body>
+        <tr
+          v-for="(sp, Key) in sandPlans"
+          :key="Key"
+          :class="Key % 2 === 0 ? 'even' : 'odd'"
+          class="body-row"
+        >
+          <td>
+            {{ sp?.company?.name || '-' }}
+          </td>
+          <td>
+            {{ sp?.pit?.name || '-' }}
+          </td>
+          <td>
+            {{ sp?.stages.length || '-' }}
+          </td>
+          <td>
+            {{ sumQty(sp?.stages) || 0 }}
+          </td>
+          <td>
+            <div class="btn-panel">
+              <router-link
+                :to="`/planificacion-de-arena/${sp.id}`"
+                class="edit"
+              >
+                <Icon icon="PencilAlt" class="w-5 h-5" />
+                <span> Editar </span>
+              </router-link>
+              <button class="delete" @click="deleteSP(sp.id)">
+                <Icon icon="Trash" class="w-5 h-5" />
+                <span> Eliminar </span>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr v-if="sandPlans.length <= 0">
+          <td colspan="5" class="emptyState">
+            <p>No hay Planificacion de Arena</p>
+          </td>
+        </tr>
+      </template>
+    </UiTable>
   </Layout>
 </template>
 
@@ -196,6 +77,15 @@
     CheckCircleIcon,
   } from '@heroicons/vue/solid';
   import UiBtn from '@/components/ui/Button.vue';
+  import UiTable from '@/components/ui/TableWrapper.vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
+
+  import '@/assets/table.scss';
+
+  import { useApi } from '@/helpers/useApi';
+
+  import { useTitle } from '@vueuse/core';
+
   import { useAxios } from '@vueuse/integrations/useAxios';
   import axios from 'axios';
   // import { Sand } from '@/interfaces/sandflow.Types.ts';
@@ -205,10 +95,11 @@
     components: {
       Layout,
       UiBtn,
-      TrashIcon,
-      PencilAltIcon,
+      UiTable,
+      Icon,
     },
     setup() {
+      const title = useTitle('Planificacíon de Arena <> Sandflow');
       const instance = axios.create({
         baseURL: api,
       });
@@ -239,7 +130,7 @@
         const loading = ref(true);
         const { data } = useAxios(
           '/sandPlan/' + id,
-          { method: 'POST' },
+          { method: 'DELETE' },
           instance
         );
         store.dispatch('updateSandPlan', id);

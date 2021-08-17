@@ -7,7 +7,7 @@
         Orden de trabajo - {{ woID }}
       </h1>
     </header>
-    <section class="bg-second-50 rounded-md shadow-sm">
+    <section class="bg-second-0 rounded-md shadow-sm">
       <nav class="flex justify-between">
         <button
           class="section-tab"
@@ -34,389 +34,46 @@
           <CheckCircleIcon v-if="isRRHHFull" class="w-5 h-5" />
         </button>
       </nav>
-      <form
+      <OrderSection
         v-if="WO_section === 'orden'"
-        method="POST"
-        action="/"
-        class="p-4 max-w-lg"
-      >
-        <fieldset>
-          <div class="input-block">
-            <label for="client" class=""> Cliente </label>
-            <div class="mt-1">
-              <input
-                v-model="client"
-                name="client"
-                type="text"
-                placeholder="Nombre de cliente"
-              />
-              <!-- <select v-model="client" name="client">
-                <option selected disabled value="">ej: Nasta</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
-            </div>
-          </div>
-          <div class="input-block">
-            <label for="serviceCompany" class="">
-              Operadora / Empresa de Servicios
-            </label>
-            <div class="mt-1">
-              <input
-                v-model="serviceCompany"
-                name="serviceCompany"
-                type="text"
-                placeholder="Nombre de Operadora"
-              />
-              <!-- <select v-model="serviceCompany" name="serviceCompany">
-                <option selected disabled value="">ej: Pipele</option>
-                <option value="ypf">YPF</option>
-                <option value="ypf2">YPF2</option>
-                <option value="ypf3">YPF3</option>
-              </select> -->
-            </div>
-          </div>
-          <div class="input-block">
-            <label for="pad" class=""> PAD </label>
-            <div class="mt-1">
-              <input
-                v-model="pad"
-                name="pad"
-                type="text"
-                placeholder="ej: 12313"
-              />
-            </div>
-          </div>
-        </fieldset>
-        <fieldset>
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-            Pozos
-          </legend>
-          <section class="input-block_multi">
-            <label for="pit" class=""> Pozo </label>
-            <div v-for="(pit, key) in pits" :key="pit.id" class="pit-block">
-              <input
-                v-model="pits[key].name"
-                :name="`pit-${pit.id}`"
-                type="text"
-                placeholder="Nuevo Pozo"
-              />
-              <CircularBtn
-                v-if="key !== pits.length - 1"
-                class="btn__delete"
-                size="sm"
-                @click="removePit(pit.id)"
-              >
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
-              <CircularBtn v-else class="btn__delete invisible" size="sm">
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
-            </div>
-            <button class="mt-1 flex items-center" @click.prevent="addPit">
-              <CircularBtn class="btn__add" size="xs">
-                <PlusIcon class="w-5 h-5" />
-              </CircularBtn>
-              <span class="font-bold text-lg"> Agregar pozo </span>
-            </button>
-          </section>
-        </fieldset>
-      </form>
-      <form
+        :clientId="clientId"
+        :serviceCompanyId="serviceCompanyId"
+        :pad="pad"
+        :pits="pits"
+        :isFull="isOrderFull"
+        @update:clientId="clientId = $event"
+        @update:serviceCompanyId="serviceCompanyId = $event"
+        @update:pad="pad = $event"
+        @update:pits="pits = $event"
+        @update:isFull="isOrderFull = $event"
+      />
+      <EquipmentSection
         v-else-if="WO_section === 'equipamento'"
-        method="POST"
-        action="/"
-        class="p-4"
-      >
-        <section class="md:flex md:justify-between max-w-4xl gap-4">
-          <fieldset class="w-full max-w-sm">
-            <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-              Cradle
-            </legend>
-            <section>
-              <div class="input-block">
-                <label for="cradle_main" class=""> Operativo </label>
-                <div class="mt-1">
-                  <input
-                    v-model="operativeCradle"
-                    name="cradle_main"
-                    type="text"
-                    placeholder="Cradle 1"
-                  />
-                  <!-- <select v-model="operativeCradle" name="cradle_main">
-                    <option selected disabled value="">Cradle Operativo</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
-                </div>
-              </div>
-              <div class="input-block">
-                <label for="cradle_backup" class=""> Backup </label>
-                <div class="mt-1">
-                  <input
-                    v-model="backupCradle"
-                    name="cradle_backup"
-                    type="text"
-                    placeholder="Cradle 25"
-                  />
-                  <!-- <select v-model="backupCradle" name="cradle_backup">
-                    <option selected disabled value="">Backup Cradle</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
-                </div>
-              </div>
-            </section>
-          </fieldset>
-          <fieldset class="w-full max-w-sm">
-            <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-              Forklift
-            </legend>
-            <section>
-              <div class="input-block">
-                <label for="operative_forklift" class=""> Operativo </label>
-                <div class="mt-1">
-                  <input
-                    v-model="operativeForklift"
-                    name="operative_forklift"
-                    type="text"
-                    placeholder="Forklift 1"
-                  />
-                  <!-- <select v-model="operativeForklift" name="client">
-                    <option selected disabled value="">Forklift Operativo</option>
-                    <option value="roklim">Roklim</option>
-                    <option value="salmin">Salmin</option>
-                    <option value="eroba">Eroba</option>
-                  </select> -->
-                </div>
-              </div>
-              <div class="input-block">
-                <label for="backup_forklift" class=""> Backup </label>
-                <div class="mt-1">
-                  <input
-                    v-model="backupForklift"
-                    name="backup_forklift"
-                    type="text"
-                    placeholder="forklift 7"
-                  />
-                  <!-- <select v-model="backupForklift" name="client">
-                    <option selected disabled value="">Backup Forklift</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
-                </div>
-              </div>
-            </section>
-          </fieldset>
-        </section>
-        <fieldset>
-          <legend
-            class="font-bold text-2xl pb-1 border-b mb-3 w-full max-w-4xl"
-          >
-            Tractor / Chasis
-          </legend>
-          <section class="divide-y">
-            <article
-              v-for="traktor in traktors"
-              :key="traktor.id"
-              class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center"
-            >
-              <div>
-                <label :for="`tractor-${traktor.id}-chasis`">
-                  ID Tractor / Chasis
-                </label>
-                <div class="pit-block">
-                  <input
-                    v-model="traktor.chassis"
-                    :name="`tractor-${traktor.id}-chasis`"
-                    type="text"
-                    placeholder="#47AGH"
-                  />
-                  <CircularBtn
-                    class="btn__delete btn__mobile-only"
-                    size="sm"
-                    @click="removeTraktor(traktor.id)"
-                  >
-                    <TrashIcon class="w-5 h-5" />
-                  </CircularBtn>
-                </div>
-              </div>
-              <div class="input-block lg:w-5/12">
-                <label :for="`tractor-${traktor.id}-proveedor`">
-                  Proveedor
-                </label>
-                <div class="mt-1">
-                  <input
-                    v-model="traktor.supplier"
-                    :name="`tractor-${traktor.id}-proveedor`"
-                    type="text"
-                    placeholder="Nombre de proveedor"
-                  />
-                  <!-- <select v-model="traktor.supplier" :name="`tractor-${traktor.id}-proveedor`">
-                    <option selected disabled value="">Proveedor</option>
-                    <option value="10223">Transportes Zaraza SRL</option>
-                    <option value="10224">Montoto Logistica SRL</option>
-                    <option value="10225">E Inc</option>
-                  </select> -->
-                </div>
-              </div>
-              <div class="input-block">
-                <label :for="`tractor-${traktor.id}-description`">
-                  Descripción
-                </label>
-                <div class="mt-1">
-                  <input
-                    v-model="traktor.description"
-                    :for="`tractor-${traktor.id}-description`"
-                    type="text"
-                    placeholder="Tractor rojo"
-                  />
-                </div>
-              </div>
-              <div class="mt-8 mb-5">
-                <CircularBtn
-                  class="btn__delete btn__desktop-only"
-                  size="sm"
-                  @click="removeTraktor(traktor.id)"
-                >
-                  <TrashIcon class="w-5 h-5" />
-                </CircularBtn>
-              </div>
-            </article>
-          </section>
-          <button class="mt-1 flex items-center" @click.prevent="addTraktor">
-            <CircularBtn class="btn__add" size="xs">
-              <PlusIcon class="w-4 h-4" />
-            </CircularBtn>
-            <span class="font-bold text-lg"> Agregar tractor / chasis </span>
-          </button>
-        </fieldset>
-        <fieldset class="max-w-2xl">
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-            ID Pickup
-          </legend>
-          <section class="divide-y">
-            <article
-              v-for="pickup in pickups"
-              :key="pickup.id"
-              class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center"
-            >
-              <div class="lg:w-5/12">
-                <label :for="`pickup-${pickup.id}-chassis`"> ID Pickup </label>
-                <div class="pit-block">
-                  <input
-                    v-model="pickup.pickup_id"
-                    :name="`pickup-${pickup.id}-chassis`"
-                    type="text"
-                    placeholder="#456"
-                  />
-                  <CircularBtn
-                    class="btn__delete btn__mobile-only"
-                    size="sm"
-                    @click="removePickup(pickup.id)"
-                  >
-                    <TrashIcon class="w-5 h-5" />
-                  </CircularBtn>
-                </div>
-              </div>
-              <div class="input-block lg:w-8/12">
-                <label :for="`pickup-${pickup.id}-description`">
-                  Descripción
-                </label>
-                <div class="mt-1">
-                  <input
-                    v-model="pickup.description"
-                    :name="`pickup-${pickup.id}-description`"
-                    type="text"
-                    placeholder="Pickup de color"
-                  />
-                </div>
-              </div>
-              <div class="mt-8 mb-5">
-                <CircularBtn
-                  class="btn__delete btn__desktop-only"
-                  size="sm"
-                  @click="removePickup(pickup.id)"
-                >
-                  <TrashIcon class="w-5 h-5" />
-                </CircularBtn>
-              </div>
-            </article>
-          </section>
-          <button class="mt-1 flex items-center" @click.prevent="addPickup">
-            <CircularBtn class="btn__add" size="xs">
-              <PlusIcon class="w-4 h-4" />
-            </CircularBtn>
-            <span class="font-bold text-lg"> Agregar pickup </span>
-          </button>
-        </fieldset>
-        <fieldset class="max-w-xl">
-          <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-            Equipamiento
-          </legend>
-          <section class="equip-grid">
-            <div class="input-block">
-              <label for="rigmats">Rigmats</label>
-              <div class="mt-1">
-                <input
-                  v-model="rigmats"
-                  name="rigmats"
-                  type="number"
-                  placeholder="cantidad"
-                />
-              </div>
-            </div>
-            <div class="input-block">
-              <label for="conex">Conex</label>
-              <div class="mt-1">
-                <input
-                  v-model="conex"
-                  name="conex"
-                  type="number"
-                  placeholder="cantidad"
-                />
-              </div>
-            </div>
-            <div class="input-block">
-              <label for="generators">Generador de apoyo</label>
-              <div class="mt-1">
-                <input
-                  v-model="generators"
-                  name="generators"
-                  type="number"
-                  placeholder="cantidad"
-                />
-              </div>
-            </div>
-            <div class="input-block">
-              <label for="tower">Torre de iluminación</label>
-              <div class="mt-1">
-                <input
-                  v-model="tower"
-                  name="tower"
-                  type="number"
-                  placeholder="cantidad"
-                />
-              </div>
-            </div>
-            <div class="input-block">
-              <label for="cabin">Cabina de operador cradle</label>
-              <div class="mt-1">
-                <input
-                  v-model="cabin"
-                  name="cabin"
-                  type="number"
-                  placeholder="cantidad"
-                />
-              </div>
-            </div>
-          </section>
-        </fieldset>
-      </form>
+        :operativeCradleId="operativeCradleId"
+        :backupCradleId="backupCradleId"
+        :operativeForkliftId="operativeForkliftId"
+        :backupForkliftId="backupForkliftId"
+        :traktors="traktors"
+        :pickups="pickups"
+        :rigmats="rigmats"
+        :conex="conex"
+        :generators="generators"
+        :tower="tower"
+        :cabin="cabin"
+        :isFull="isEquipmentFull"
+        @update:operativeCradleId="operativeCradleId = $event"
+        @update:backupCradleId="backupCradleId = $event"
+        @update:operativeForkliftId="operativeForkliftId = $event"
+        @update:backupForkliftId="backupForkliftId = $event"
+        @update:traktors="traktors = $event"
+        @update:pickups="pickups = $event"
+        @update:rigmats="rigmats = $event"
+        @update:conex="conex = $event"
+        @update:generators="generators = $event"
+        @update:tower="tower = $event"
+        @update:cabin="cabin = $event"
+        @update:isFull="isEquipmentFull = $event"
+      />
       <form
         v-else-if="WO_section === 'rrhh'"
         method="POST"
@@ -428,7 +85,7 @@
           :key="crew.id"
           class="max-w-sm w-full"
         >
-          <legend
+          <h2
             class="
               flex
               justify-between
@@ -450,44 +107,26 @@
             >
               <TrashIcon class="w-5 h-5" />
             </CircularBtn>
-          </legend>
-          <section class="flex gap-6">
+          </h2>
+          <section class="flex gap-2 flex-col xl:flex-row items-start mb-4">
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
-              <input
-                v-model="crew.start_time"
-                class="rounded max-w-[8rem]"
-                :name="`crew-${crew.id}-start-time`"
-                type="text"
-                placeholder="00:00"
+              <TimePicker
+                :timetrack="crew.timeStart"
+                @update:timetrack="crew.timeStart = $event"
               />
-              <!-- <select class="rounded" :name="`crew-${crew.id}-start-time`" v-model="crew.start_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
             </div>
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
-              <input
-                v-model="crew.end_time"
-                class="rounded max-w-[8rem]"
-                :name="`crew-${crew.id}-end-time`"
-                type="text"
-                placeholder="00:00"
+              <TimePicker
+                :timetrack="crew.timeEnd"
+                @update:timetrack="crew.timeEnd = $event"
               />
-              <!-- <select class="rounded" :name="`crew-${crew.id}-end-time`" v-model="crew.end_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
             </div>
           </section>
           <section class="divide-y">
             <article
-              v-for="people in crew.resources"
+              v-for="(people, peopleI) in crew.resources"
               :key="people.id"
               class="pt-2 pb-3"
             >
@@ -497,18 +136,13 @@
                 </label>
                 <div class="pit-block relative">
                   <input
-                    v-model="people.rol"
+                    v-model="people.role"
                     :name="`crew-${crew.id}-${people.id}-rol`"
                     type="text"
                     placeholder="Rol"
                   />
-                  <!-- <select v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`">
-                    <option selected disabled value="">Lead Operator</option>
-                    <option value="7">7:00 PM</option>
-                    <option value="8">8:00 PM</option>
-                    <option value="9">9:00 PM</option>
-                  </select> -->
                   <CircularBtn
+                    v-if="peopleI !== 0"
                     class="btn__delete md:absolute md:right-[-3rem]"
                     size="sm"
                     @click="removeResource(crew.id, people.id)"
@@ -526,12 +160,6 @@
                       type="text"
                       placeholder="Empleado"
                     />
-                    <!-- <select v-model="people.name" :name="`crew-${crew.id}-${people.id}-name`">
-                      <option selected disabled value="">Selecciona Empleado</option>
-                      <option value="7">7:00 PM</option>
-                      <option value="8">8:00 PM</option>
-                      <option value="9">9:00 PM</option>
-                    </select> -->
                   </label>
                 </div>
               </div>
@@ -559,7 +187,9 @@
           </GhostBtn>
         </section>
         <section class="space-x-6 flex items-center justify-end">
-          <button @click.prevent="goToIndex">Cancelar</button>
+          <NoneBtn @click.prevent="$router.push('/orden-de-trabajo')">
+            Cancelar
+          </NoneBtn>
           <GhostBtn class="btn__draft" @click="save()">
             <BookmarkIcon class="w-4 h-4" />
             <span> Guardar Provisorio </span>
@@ -582,9 +212,10 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, toRefs, reactive } from 'vue';
+  import { ref, watch, computed, toRefs, reactive, watchEffect } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
+  import { useToggle } from '@vueuse/core';
   import {
     BookmarkIcon,
     TrashIcon,
@@ -592,10 +223,19 @@
   } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
+  import OrderSection from '@/components/workOrder/Order.vue';
+  import EquipmentSection from '@/components/workOrder/Equipment.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import TimePicker from '@/components/ui/form/TimePicker.vue';
 
+  // AXIOS
+  import axios from 'axios';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  const api = import.meta.env.VITE_API_URL || '/api';
+  // TIPOS
   import {
     Pit,
     Traktor,
@@ -603,10 +243,7 @@
     HumanResource,
     Crew,
     WorkOrder,
-  } from '@/interfaces/WorkOrder';
-
-  import axios from 'axios';
-  const api = import.meta.env.VITE_API_URL || '/api';
+  } from '@/interfaces/sandflow';
 
   export default {
     components: {
@@ -618,28 +255,45 @@
       CheckCircleIcon,
       CircularBtn,
       PrimaryBtn,
+      OrderSection,
+      EquipmentSection,
+      NoneBtn,
+      TimePicker,
     },
     setup() {
       // Init
       const store = useStore();
       const router = useRouter();
       const route = useRoute();
+      const instance = axios.create({
+        baseURL: api,
+      });
+      const isDraft = ref(true);
+      const toggleDraft = useToggle(isDraft);
       const workOrders: Array<WorkOrder> = JSON.parse(
         JSON.stringify(store.state.workOrders.all)
       );
+      console.log(workOrders);
       const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
         return wo.id == route.params.id;
       });
+      const newCWO = reactive({ ...currentWorkOrder });
       const {
         id: woID,
         client,
         serviceCompany,
+        // clientId,
+        // serviceCompanyId,
         pad,
         pits,
         operativeCradle,
         backupCradle,
         operativeForklift,
         backupForklift,
+        // operativeCradleId,
+        // backupCradleId,
+        // operativeForkliftId,
+        // backupForkliftId,
         traktors,
         pickups,
         crews,
@@ -648,55 +302,17 @@
         generators,
         tower,
         cabin,
-      } = toRefs(reactive({ ...currentWorkOrder }));
-      //Pit
-      const removePit = (pitId: number) => {
-        pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
-      };
-      const addPit = () => {
-        const lastPitId = pits.value.length;
-        pits.value.push({
-          id: lastPitId,
-          name: '',
-        });
-      };
-      if (pits.value && pits.value.length === 0) {
-        addPit();
-      }
-      //Traktor
-      const removeTraktor = (traktorId: number) => {
-        traktors.value = traktors.value.filter(
-          (traktor: Traktor) => traktor.id !== traktorId
-        );
-      };
-      const addTraktor = (): void => {
-        const lastTraktorId = traktors.value.length;
-        traktors.value.push({
-          id: lastTraktorId,
-          chassis: '',
-          description: '',
-        });
-      };
-      if (traktors.value.length === 0) {
-        addTraktor();
-      }
-      // Pickup
-      const removePickup = (pickupId: number) => {
-        pickups.value = pickups.value.filter(
-          (pickup: Pickup) => pickup.id !== pickupId
-        );
-      };
-      const addPickup = (): void => {
-        const lastTraktorId = pickups.value.length;
-        pickups.value.push({
-          id: lastTraktorId,
-          pickup_id: '',
-          description: '',
-        });
-      };
-      if (pickups.value.length === 0) {
-        addPickup();
-      }
+      } = toRefs(newCWO);
+
+      const clientId = ref(Number(client.value));
+      const serviceCompanyId = ref(Number(serviceCompany.value));
+      const operativeCradleId = ref(Number(operativeCradle.value));
+      const backupCradleId = ref(Number(backupCradle.value));
+      const operativeForkliftId = ref(Number(operativeForklift.value));
+      const backupForkliftId = ref(Number(backupForklift.value));
+
+      console.log(crews.value);
+
       // Crew
       const removeResource = (crewId: number, peopleId: number) => {
         const selectedCrew = crews.value.find(
@@ -732,8 +348,12 @@
       const removeCrew = (crewId: number): void => {
         crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
       };
-      if (crews.value.length === 0) {
-        addCrew();
+      if (crews) {
+        if (crews.value.length === 0) {
+          addCrew();
+        }
+      } else {
+        console.log(crews);
       }
       // Sections
       const WO_section = ref('orden');
@@ -754,53 +374,39 @@
         WO_section.value = section_order[currentSectionIndex() + 1];
       };
       // Is the Order section is full
-      const isOrderFull = computed(() => {
-        return !!(
-          client.value &&
-          serviceCompany.value &&
-          pad.value &&
-          pits.value.length > 0 &&
-          pits.value[0].name
-        );
-      });
+      const isOrderFull = ref(false);
       // Is the Equipment section is full
-      const isEquipmentFull = computed(() => {
-        return !!(
-          operativeCradle.value &&
-          // backupCradle.value &&
-          operativeForklift.value &&
-          // backupForklift.value &&
-          traktors.value.length > 0 &&
-          traktors.value[0].chassis &&
-          traktors.value[0].description &&
-          traktors.value[0].supplier &&
-          pickups.value.length > 0 &&
-          pickups.value[0].pickup_id &&
-          pickups.value[0].description
-        );
-      });
+      const isEquipmentFull = ref(false);
       // Is the RRHH section is full
       const isRRHHFull = computed(() => {
         return !!(
           crews.value.length > 0 &&
-          crews.value[0].start_time &&
-          crews.value[0].end_time
+          crews.value[0].timeStart &&
+          crews.value[0].timeEnd &&
+          crews.value[0].resources.length > 0 &&
+          crews.value[0].resources[0].role !== '' &&
+          crews.value[0].resources[0].name !== ''
         );
       });
       // Is all sections full
       const isAllFull = computed(() => {
         return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
       });
-      // method go to index that goes to the index page
-      const goToIndex = (): void => {
-        router.push('/orden-de-trabajo');
-      };
       // Remove Empty pits
       const removeEmptyPits = () => {
+        if (!isDraft.value) {
+          const savedPit = pits.value[0];
+        }
         pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
+        if (!isDraft.value && pits.value.length === 0) {
+          pits.value.push(savedPit);
+        }
       };
       // Remove empty traktors
       const removeEmptyTraktors = (): void => {
+        if (!isDraft.value) {
+          const savedTraktor = traktors.value[0];
+        }
         traktors.value = traktors.value.filter(
           (traktor: Traktor) =>
             !(
@@ -809,36 +415,56 @@
               traktor.description === ''
             )
         );
+        if (!isDraft.value && traktors.value.length === 0) {
+          traktors.value.push(savedTraktor);
+        }
       };
-      // Remove Empty Pickups
       const removeEmptyPickups = (): void => {
+        if (!isDraft.value) {
+          const savedPickup = pickups.value[0];
+        }
         pickups.value = pickups.value.filter(
           (pickup: Pickup) =>
             pickup.pickup_id !== '' && pickup.description !== ''
         );
+        if (!isDraft.value && pickups.value.length === 0) {
+          pickups.value.push(savedPickup);
+        }
       };
       // Remove empty Crews
       const removeEmptyCrews = (): void => {
+        if (!isDraft.value) {
+          const savedCrew = crews.value[0];
+        }
         crews.value = crews.value
           .map((crew: Crew) => removeEmptyResource(crew.id))
-          .filter(
-            (crew: Crew) =>
-              !(
-                crew.resources.length <= 0 &&
-                crew.start_time === '' &&
-                crew.end_time === ''
-              )
-          );
+          .filter((crew: Crew) => {
+            console.log(crew);
+            return !(
+              crew.resources.length <= 0 &&
+              crew.timeStart === '' &&
+              crew.timeEnd === ''
+            );
+          });
+        if (!isDraft.value && crews.value.length === 0) {
+          crews.value.push(savedCrew);
+        }
       };
       // Remove Empty Resource
       const removeEmptyResource = (crewId: number): void => {
         const selectedCrew = crews.value.find(
           (crew: Crew) => crew.id === crewId
         );
+        if (!isDraft.value) {
+          const saveResourse = selectedCrew.resources[0];
+        }
         selectedCrew.resources = selectedCrew.resources.filter(
           (resource: HumanResource) =>
             resource.rol !== '' && resource.name !== ''
         );
+        if (!isDraft.value && selectedCrew.resources.length === 0) {
+          selectedCrew.resources.push(saveResourse);
+        }
         return selectedCrew;
       };
       const removeAllEmptys = (): void => {
@@ -849,19 +475,19 @@
       };
 
       const save = async (draft = true) => {
+        toggleDraft(draft);
         removeAllEmptys();
         const newWO = {
           id: woID.value,
           client: client.value,
           serviceCompany: serviceCompany.value,
+          clientId: clientId.value,
+          serviceCompanyId: serviceCompanyId.value,
           pad: pad.value,
-          pits: pits.value,
-          operativeCradle: operativeCradle.value,
-          backupCradle: backupCradle.value,
-          operativeForklift: operativeForklift.value,
-          backupForklift: backupForklift.value,
-          traktors: traktors.value,
-          pickups: pickups.value,
+          operativeCradleId: operativeCradleId.value,
+          backupCradleId: backupCradleId.value,
+          operativeForkliftId: operativeForkliftId.value,
+          backupForkliftId: backupForkliftId.value,
           crews: crews.value,
           rigmats: rigmats.value,
           conex: conex.value,
@@ -870,25 +496,55 @@
           cabin: cabin.value,
           draft,
         };
-        const loading = ref(true);
-        // Update Work Order
-        let woDB = await axios
-          .put(`${api}/workOrder/${newWO.id}`, newWO)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data.data;
+        const { data: WODone } = useAxios(
+          `/workOrder/${woID.value}`,
+          { method: 'PUT', data: newWO },
+          instance
+        );
+        watch(WODone, (newVal, _) => {
+          console.log('nuevo', newVal);
+          if (newVal && newVal.data && newVal.data.id) {
+            if (pits.value.length > 0) {
+              const isPitsFinished = ref([]);
+              pits.value.forEach((pit: Pit) => {
+                const { data } = useAxios(
+                  `/pit/${pit.id}`,
+                  { method: 'PUT', data: pit },
+                  instance
+                );
+                isPitsFinished.value.push(data);
+              });
+              console.log(isPitsFinished.value);
             }
-            return {};
-          })
-          .finally(() => {
-            loading.value = false;
-          });
-        // Update Work Order
-        store.dispatch('updateWorkOrder', woDB);
-        router.push('/orden-de-trabajo');
+            if (traktors.value.length > 0) {
+              const isTraktorsFinished = ref([]);
+              traktors.value.forEach((traktor) => {
+                const { data } = useAxios(
+                  `/traktor/${traktor.id}`,
+                  { method: 'PUT', data: traktor },
+                  instance
+                );
+                isTraktorsFinished.value.push(data);
+              });
+              console.log(isTraktorsFinished.value);
+            }
+            if (pickups.value.length > 0) {
+              const isPickupFinished = ref([]);
+              pickups.value.forEach((pickup) => {
+                console.log(pickup);
+                const { data } = useAxios(
+                  `/pickup/${pickup.id}`,
+                  { method: 'POST', data: pickup },
+                  instance
+                );
+                isPickupFinished.value.push(data);
+              });
+              console.log(isPickupFinished.value);
+            }
+            store.dispatch('updateWorkOrder', newVal.data);
+            router.push('/orden-de-trabajo');
+          }
+        });
       };
 
       return {
@@ -902,20 +558,16 @@
         isRRHHFull,
         client,
         serviceCompany,
+        clientId,
+        serviceCompanyId,
         pad,
         pits,
-        removePit,
-        addPit,
-        operativeCradle,
-        backupCradle,
-        operativeForklift,
-        backupForklift,
+        operativeCradleId,
+        backupCradleId,
+        operativeForkliftId,
+        backupForkliftId,
         traktors,
-        removeTraktor,
-        addTraktor,
         pickups,
-        removePickup,
-        addPickup,
         rigmats,
         conex,
         generators,
@@ -926,7 +578,6 @@
         crews,
         removeCrew,
         addCrew,
-        goToIndex,
         save,
         isAllFull,
       };

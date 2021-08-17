@@ -63,28 +63,29 @@
               <CircularBtn class="btn__add" size="xs">
                 <PlusIcon class="w-4 h-4" />
               </CircularBtn>
-              <span class="font-bold"> Agregar pozo </span>
+              <span class="font-bold"> Agregar etapa </span>
             </button>
           </section>
           <section class="flex space-x-4">
-            <!-- <CircularBtn class="btn__add hidden" size="xs">
-              <PlusIcon class="w-4 h-4" />
-            </CircularBtn> -->
-            <ChevronUpIcon
-              :opened="currentOpened"
-              :class="currentOpened ? 'rotate-180' : null"
-              class="
-                w-8
-                h-8
-                text-gray-600
-                transition
-                transform
-                duration-300
-                ease-out
-                cursor-pointer
-              "
-              @click="toggleCurOp"
-            />
+            <button
+              @click.prevent="toggleCurOp()"
+              :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
+            >
+              <ChevronUpIcon
+                :opened="currentOpened"
+                :class="currentOpened ? 'rotate-180' : null"
+                class="
+                  w-8
+                  h-8
+                  text-gray-600
+                  transition
+                  transform
+                  duration-300
+                  ease-out
+                  cursor-pointer
+                "
+              />
+            </button>
           </section>
         </header>
         <div class="flex flex-col">
@@ -127,21 +128,25 @@
             </h2>
           </section>
           <section class="flex space-x-4">
-            <ChevronUpIcon
-              :opened="finishedOpened"
-              :class="finishedOpened ? 'rotate-180' : null"
-              class="
-                w-8
-                h-8
-                text-gray-600
-                transition
-                transform
-                duration-300
-                ease-out
-                cursor-pointer
-              "
-              @click="toggleFinOp"
-            />
+            <button
+              @click.prevent="toggleFinOp()"
+              :title="finishedOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
+            >
+              <ChevronUpIcon
+                :opened="finishedOpened"
+                :class="finishedOpened ? 'rotate-180' : null"
+                class="
+                  w-8
+                  h-8
+                  text-gray-600
+                  transition
+                  transform
+                  duration-300
+                  ease-out
+                  cursor-pointer
+                "
+              />
+            </button>
           </section>
         </header>
         <div class="flex flex-col">
@@ -197,7 +202,7 @@
   import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import { useState, useActions } from 'vuex-composition-helpers';
+  import { useActions } from 'vuex-composition-helpers';
 
   import {
     BookmarkIcon,
@@ -217,14 +222,7 @@
   import SandPlanStage from '@/components/sandPlan/StageRow.vue';
   import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
   import StageHeader from '@/components/sandPlan/StageHeader.vue';
-  import {
-    PurchaseOrder,
-    SandProvider,
-    SandOrder,
-    TransportProvider,
-    Pit,
-    Company,
-  } from '@/interfaces/sandflow.Types.ts';
+  import { Pit, Company, SandPlan } from '@/interfaces/sandflow';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   import { useToggle } from '@vueuse/core';
@@ -254,16 +252,21 @@
       const instance = axios.create({
         baseURL: api,
       });
-      const currentSandPlan = reactive({
+      const currentSandPlan: SandPlan = reactive({
         companyId: -1,
         pitId: -1,
         stagesAmount: 1,
+        status: 'started',
         stages: [
           {
             id: 0,
             stage: 1,
-            sandId: -1,
-            quantity: 0,
+            sandId1: -1,
+            quantity1: 0,
+            sandId2: -1,
+            quantity2: 0,
+            sandId3: -1,
+            quantity3: 0,
             sandPlanId: 0,
             status: 0,
           },
@@ -271,11 +274,19 @@
       });
 
       const addStage = () => {
+        if (currentSandPlan.stages?.length >= 39) {
+          // Disparar modal. No se puede mas de 40 etapas
+          return;
+        }
         const defaultStage = {
           id: 0,
           stage: 1,
-          sandId: -1,
-          quantity: 0,
+          sandId1: -1,
+          quantity1: null,
+          sandId2: -1,
+          quantity2: null,
+          sandId3: -1,
+          quantity3: null,
           sandPlanId: 0,
           status: 0,
         };
@@ -288,10 +299,9 @@
       const finishedStages = computed(() => {
         return currentSandPlan.stages.filter((stage) => stage.status >= 2);
       });
-      const editingStage = ref(-1);
+      const editingStage = ref(0);
 
       const editStage = (stage) => {
-        console.log(stage.id);
         editingStage.value = stage.id;
       };
       const saveStage = (stage) => {
@@ -304,7 +314,6 @@
         const lastStageId = { id: lastStage.id + 1 };
         const lastStageStage = { stage: lastStage.stage + 1 };
         const newStatus = { status: 0 };
-        console.log(lastStage, lastStageId, lastStageStage, newStatus);
         const newStage = {
           ...stage,
           ...lastStageId,
@@ -312,6 +321,7 @@
           ...newStatus,
         };
         currentSandPlan.stages.push(newStage);
+        editStage(newStage);
       };
       const deleteStage = (stage) => {
         const stageId = stage.id;
@@ -358,17 +368,70 @@
       // << SAND
 
       const isFull = computed(() => {
-        return true;
+        const noZeroSandTypeNull =
+          (currentSandPlan.stages[0].sandId1 !== null &&
+            currentSandPlan.stages[0].sandId1 !== -1) ||
+          (currentSandPlan.stages[0].sandId2 !== null &&
+            currentSandPlan.stages[0].sandId2 !== -1) ||
+          (currentSandPlan.stages[0].sandId3 !== null &&
+            currentSandPlan.stages[0].sandId3 !== -1);
+        const noZeroSandTypeZero =
+          currentSandPlan.stages[0].quantity1 !== 0 ||
+          currentSandPlan.stages[0].quantity2 !== 0 ||
+          currentSandPlan.stages[0].quantity3 !== 0;
+        return !!(
+          currentSandPlan.companyId >= 0 &&
+          currentSandPlan.pitId >= 0 &&
+          currentSandPlan.stages.length > 0 &&
+          currentSandPlan.stages.length <= 40 &&
+          noZeroSandTypeNull &&
+          noZeroSandTypeZero
+        );
       });
       const { saveSandPlan } = useActions(['saveSandPlan']);
       const save = (): void => {
+        currentSandPlan.stages.map((stage) => {
+          console.log(stage);
+          if (stage.sandId1 === -1) {
+            stage.sandId1 = null;
+          }
+          if (stage.sandId2 === -1) {
+            stage.sandId2 = null;
+          }
+          if (stage.sandId3 === -1) {
+            stage.sandId3 = null;
+          }
+          return stage;
+        });
+        currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
+          const noSandTypeNull =
+            (stage.sandId1 !== null && stage.quantity1 > 0) ||
+            (stage.sandId2 !== null && stage.quantity2 > 0) ||
+            (stage.sandId3 !== null && stage.quantity3 > 0);
+          return noSandTypeNull;
+        });
         const { data } = useAxios(
           '/sandPlan',
           { method: 'POST', data: currentSandPlan },
           instance
         );
-        saveSandPlan(currentSandPlan);
-        router.push('/planificacion-de-arena');
+        watch(data, (apiData) => {
+          if (apiData && apiData.data) {
+            const sandPlanId = apiData.data.id;
+            currentSandPlan.stages.map((stage) => {
+              const { id, ...sandStage } = stage;
+              stage.sandPlanId = sandPlanId;
+              stage.action = 'create';
+              const { data } = useAxios(
+                '/sandStage',
+                { method: 'POST', data: sandStage },
+                instance
+              );
+            });
+            saveSandPlan(currentSandPlan);
+            router.push('/planificacion-de-arena');
+          }
+        });
       };
       return {
         currentSandPlan,

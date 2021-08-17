@@ -28,7 +28,17 @@
           leave-from="translate-x-0"
           leave-to="-translate-x-full"
         >
-          <div class="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-second-50">
+          <div
+            class="
+              relative
+              flex-1 flex flex-col
+              max-w-xs
+              w-full
+              pt-5
+              pb-4
+              bg-second-50
+            "
+          >
             <TransitionChild
               as="template"
               enter="ease-in-out duration-300"
@@ -48,7 +58,10 @@
                     h-10
                     w-10
                     rounded-full
-                    focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-inset
+                    focus:ring-white
                   "
                   @click="sidebarOpen = false"
                 >
@@ -62,7 +75,11 @@
             </div>
             <div class="mt-5 flex-1 h-0 overflow-y-auto">
               <nav class="px-2 space-y-1">
-                <MobileNavLink v-for="item in navigation" :key="item.to" v-bind="item" />
+                <NavWrapper
+                  v-for="item in navigation"
+                  :key="item.to"
+                  v-bind="item"
+                />
               </nav>
             </div>
           </div>
@@ -77,13 +94,26 @@
     <div class="hidden md:flex md:flex-shrink-0">
       <div class="flex flex-col w-64">
         <!-- Sidebar component, swap this element with another sidebar if you like -->
-        <div class="flex flex-col flex-grow border-r border-second-200 pt-5 pb-4 bg-second-50 overflow-y-auto">
+        <div
+          class="
+            flex flex-col flex-grow
+            border-r border-second-200
+            pt-5
+            pb-4
+            bg-second-50
+            overflow-y-auto
+          "
+        >
           <div class="flex items-center flex-shrink-0 px-4">
             <Logo class="h-8 w-auto" />
           </div>
           <div class="mt-5 flex-grow flex flex-col">
             <nav class="flex-1 px-2 bg-second-50 space-y-1">
-              <MobileNavLink v-for="item in navigation" :key="item.to" v-bind="item" />
+              <NavWrapper
+                v-for="item in navigation"
+                :key="item.to"
+                v-bind="item"
+              />
               <!-- <router-link
                 v-for="item in navigation"
                 :key="item.name"
@@ -117,7 +147,10 @@
             px-4
             border-r border-second-200
             text-second-500
-            focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500
+            focus:outline-none
+            focus:ring-2
+            focus:ring-inset
+            focus:ring-indigo-500
             md:hidden
           "
           @click="sidebarOpen = true"
@@ -129,8 +162,24 @@
           <div class="flex-1 flex">
             <form class="w-full flex md:ml-0" action="#" method="GET">
               <label for="search_field" class="sr-only">Search</label>
-              <div class="relative w-full text-second-400 focus-within:text-second-600">
-                <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
+              <div
+                class="
+                  relative
+                  w-full
+                  text-second-400
+                  focus-within:text-second-600
+                "
+              >
+                <div
+                  class="
+                    absolute
+                    inset-y-0
+                    left-0
+                    flex
+                    items-center
+                    pointer-events-none
+                  "
+                >
                   <!-- <SearchIcon class="h-5 w-5" aria-hidden="true" /> -->
                 </div>
                 <!-- <input
@@ -181,7 +230,10 @@
                     items-center
                     text-sm
                     rounded-full
-                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
+                    focus:outline-none
+                    focus:ring-2
+                    focus:ring-offset-2
+                    focus:ring-indigo-500
                   "
                 >
                   <span class="sr-only">Open user menu</span>
@@ -202,7 +254,10 @@
                       uppercase
                       text-second-50
                       font-bold
-                      hover:bg-gradient-br hover:from-main-400 hover:to-main-700 hover:shadow-lg
+                      hover:bg-gradient-br
+                      hover:from-main-400
+                      hover:to-main-700
+                      hover:shadow-lg
                     "
                     >{{ user.username.split('')[0] }}</span
                   >
@@ -231,11 +286,21 @@
                     focus:outline-none
                   "
                 >
-                  <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
+                  <MenuItem
+                    v-for="item in userNavigation"
+                    :key="item.name"
+                    v-slot="{ active }"
+                  >
                     <router-link
                       :to="item.to"
                       :class="active ? 'bg-second-100' : ''"
-                      class="flex px-4 py-2 text-sm text-second-700 items-center"
+                      class="
+                        flex
+                        px-4
+                        py-2
+                        text-sm text-second-700
+                        items-center
+                      "
                     >
                       <component
                         :is="item.icon"
@@ -290,7 +355,7 @@
   } from '@heroicons/vue/outline';
   import { SearchIcon } from '@heroicons/vue/solid';
   import Logo from '@/components/Logo.vue';
-  import MobileNavLink from '@/components/navigation/MobileNavLink.vue';
+  import NavWrapper from '@/components/navigation/NavWrapper.vue';
 
   export default defineComponent({
     components: {
@@ -303,7 +368,7 @@
       TransitionChild,
       TransitionRoot,
       Logo,
-      MobileNavLink,
+      NavWrapper,
       HomeIcon,
       BellIcon,
       MenuAlt2Icon,

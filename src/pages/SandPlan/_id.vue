@@ -292,6 +292,7 @@
             currentSandPlan.stagesAmount = sp.stagesAmount;
             currentSandPlan.stages = sp.stages;
             currentSandPlan.id = sp.id;
+            console.log('SP API', currentSandPlan);
           }
         });
       } else {
@@ -302,6 +303,7 @@
         currentSandPlan.stagesAmount = sp.stagesAmount;
         currentSandPlan.stages = sp.stages;
         currentSandPlan.id = sp.id;
+        console.log('SP Vuex', currentSandPlan);
       }
       //   console.log(currentSandPlan);
 

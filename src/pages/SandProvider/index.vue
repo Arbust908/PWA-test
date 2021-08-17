@@ -60,21 +60,7 @@
                       tracking-wider
                     "
                   >
-                    Tipo de malla
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-gray-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    grains
+                    CUIL/CUIT
                   </th>
                   <th
                     scope="col"
@@ -115,19 +101,11 @@
                   </td>
                   <td
                     :class="
-                      sp.meshType ? 'text-gray-500' : 'text-gray-400 italic'
+                      sp.legalId ? 'text-gray-500' : 'text-gray-400 italic'
                     "
                     class="px-6 py-4 whitespace-nowrap text-sm"
                   >
-                    {{ sp.meshType || 'Sin empresa de servicio' }}
-                  </td>
-                  <td
-                    :class="
-                      sp.grains ? 'text-gray-500' : 'text-gray-400 italic'
-                    "
-                    class="px-6 py-4 whitespace-nowrap text-sm"
-                  >
-                    {{ sp.grains || 'Sin empresa de servicio' }}
+                    {{ sp.legalId || 'Sin CUIL/CUIT' }}
                   </td>
                   <td
                     class="
@@ -138,18 +116,34 @@
                       font-medium
                     "
                   >
-                    <span
-                      @click="deleteSP(sp.id)"
-                      class="text-red-600 hover:text-red-900 cursor-pointer"
-                    >
-                      Borrar
-                    </span>
-                    <router-link
-                      :to="`/proveedores-de-arena/${sp.id}`"
-                      class="ml-4 text-indigo-600 hover:text-indigo-900"
-                    >
-                      Editar
-                    </router-link>
+                    <div class="flex justify-end space-x-4">
+                      <router-link
+                        :to="`/proveedores-de-arena/${sp.id}`"
+                        class="
+                          flex
+                          justify-between
+                          items-center
+                          text-indigo-600
+                          hover:text-indigo-900
+                        "
+                      >
+                        <Icon icon="PencilAlt" class="w-5 h-5" />
+                        <span> Editar </span>
+                      </router-link>
+                      <button
+                        class="
+                          flex
+                          justify-between
+                          items-center
+                          text-red-600
+                          hover:text-red-900
+                        "
+                        @click="deleteSP(sp.id)"
+                      >
+                        <Icon icon="Trash" class="w-5 h-5" />
+                        <span> Eliminar </span>
+                      </button>
+                    </div>
                   </td>
                 </tr>
                 <tr v-if="spDB.length <= 0">
@@ -174,12 +168,14 @@
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
   import axios from 'axios';
   const api = import.meta.env.VITE_API_URL || '/api';
   export default {
     components: {
       Layout,
       UiBtn,
+      Icon,
     },
     setup() {
       const spDB = ref([]);

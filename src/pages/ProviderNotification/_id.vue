@@ -217,9 +217,9 @@
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
-        <GhostBtn @click.prevent="$router.push('/notificaciones-a-proveedores')"
-          >Cancelar</GhostBtn
-        >
+        <NoneBtn @click.prevent="$router.push('/notificaciones-a-proveedores')">
+          Cancelar
+        </NoneBtn>
         <PrimaryBtn
           type="submit"
           size="sm"
@@ -228,7 +228,7 @@
           :disabled="!isFull"
           @click.prevent="isFull && save()"
         >
-          Cargar Planificacíon
+          Finalizar
         </PrimaryBtn>
       </footer>
     </section>
@@ -346,7 +346,7 @@
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import {
@@ -371,7 +371,7 @@
     components: {
       BellIcon,
       CircularBtn,
-      GhostBtn,
+      NoneBtn,
       Layout,
       Modal,
       PlusIcon,
@@ -394,9 +394,7 @@
         (notification: ProviderNotification) => notification.id == id
       );
       const currentProviderNotification = ref({});
-      console.log(stateNot);
       if (!stateNot) {
-        console.log('Api');
         const { data: pNData } = useAxios('/ProviderNotification', instance);
         watch(pNData, (pNData, prevCount) => {
           if (pNData && pNData.data) {
@@ -408,7 +406,6 @@
       }
 
       const { sandProviderId, sandOrder } = currentProviderNotification.value;
-      console.log(sandProviderId, sandOrder);
 
       const sandProviders = ref([] as Array<Sand>);
       const { data: sPData } = useAxios('/sandProvider', instance);
@@ -510,15 +507,6 @@
       const showModal = ref(false);
       const toggleModal = useToggle(showModal);
       const save = async () => {
-        console.log(
-          sandProviderId.value,
-          sandOrder.value,
-          transportProviders.value
-        );
-        console.log({
-          sandProviderId: sandProviderId.value,
-          sandOrder: sandOrder.value,
-        });
         toggleModal(true);
       };
       const confirm = async () => {

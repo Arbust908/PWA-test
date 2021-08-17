@@ -1,127 +1,107 @@
 <template>
   <form method="POST" action="/" class="p-4 max-w-lg">
-    <fieldset>
-      <div class="input-block">
-        <label for="client" class=""> Cliente </label>
-        <div class="mt-1">
-          <input
-            v-model="client"
-            name="client"
-            type="text"
-            placeholder="Nombre de cliente"
-          />
-          <!-- <select v-model="client" name="client">
-            <option selected disabled value="">ej: Nasta</option>
-            <option value="ypf">YPF</option>
-            <option value="ypf2">YPF2</option>
-            <option value="ypf3">YPF3</option>
-          </select> -->
-        </div>
-      </div>
-      <div class="input-block">
-        <label for="serviceCompany" class="">
-          Operadora / Empresa de Servicios
-        </label>
-        <div class="mt-1">
-          <input
-            v-model="serviceCompany"
-            name="serviceCompany"
-            type="text"
-            placeholder="Nombre de Operadora"
-          />
-          <!-- <select v-model="serviceCompany" name="serviceCompany">
-            <option selected disabled value="">ej: Pipele</option>
-            <option value="ypf">YPF</option>
-            <option value="ypf2">YPF2</option>
-            <option value="ypf3">YPF3</option>
-          </select> -->
-        </div>
-      </div>
-      <div class="input-block">
-        <label for="pad" class=""> PAD </label>
-        <div class="mt-1">
-          <input v-model="pad" name="pad" type="text" placeholder="ej: 12313" />
-        </div>
-      </div>
-    </fieldset>
-    <fieldset>
-      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-        Pozos
-      </legend>
-      <section class="input-block_multi">
-        <label for="pit" class=""> Pozo </label>
-        <div v-for="(pit, key) in pits" :key="pit.id" class="pit-block">
-          <input
-            v-model="pits[key].name"
-            :name="`pit-${pit.id}`"
-            type="text"
-            placeholder="Nuevo Pozo"
-          />
-          <CircularBtn
-            v-if="key !== pits.length - 1"
-            class="btn__delete"
-            size="sm"
-            @click="removePit(pit.id)"
-          >
-            <TrashIcon class="w-5 h-5" />
-          </CircularBtn>
-          <CircularBtn v-else class="btn__delete invisible" size="sm">
-            <TrashIcon class="w-5 h-5" />
-          </CircularBtn>
-        </div>
-        <button class="mt-1 flex items-center" @click.prevent="addPit">
-          <CircularBtn class="btn__add" size="xs">
-            <PlusIcon class="w-5 h-5" />
-          </CircularBtn>
-          <span class="font-bold text-lg"> Agregar pozo </span>
-        </button>
-      </section>
-    </fieldset>
+    <FieldGroup>
+      <FieldSelect
+        class="col-span-full"
+        fieldName="name"
+        placeholder="Nombre de cliente"
+        title="Cliente"
+        endpoint="/company"
+        :data="clientId"
+        @update:data="clientId = $event"
+      />
+      <FieldSelect
+        class="col-span-full"
+        fieldName="serviceCompany"
+        placeholder="Nombre de Operadora"
+        title="Operadora / Empresa de Servicios"
+        endpoint="/company"
+        :data="serviceCompanyId"
+        @update:data="serviceCompanyId = $event"
+      />
+      <FieldInput
+        class="col-span-full"
+        fieldName="observations"
+        placeholder="ej: 12313"
+        title="PAD"
+        mask="S*"
+        :data="pad"
+        @update:data="pad = $event"
+      />
+    </FieldGroup>
+    <FieldGroup class="max-w-lg">
+      <FieldLegend>Pozos</FieldLegend>
+      <PitFields
+        :pits="pits"
+        @update:pits="pits = $event"
+        @removePit="removePit"
+      />
+      <button class="mt-1 flex items-center col-span-6" @click.prevent="addPit">
+        <CircularBtn class="btn__add" size="xs">
+          <Icon icon="Plus" class="w-5 h-5" />
+        </CircularBtn>
+        <span class="font-bold"> Agregar pozo </span>
+      </button>
+    </FieldGroup>
   </form>
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed } from 'vue';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
-  import { PlusIcon } from '@heroicons/vue/solid';
+  import { watchEffect, defineComponent } from 'vue';
+  import { useVModels } from '@vueuse/core';
+
+  import Icon from '@/components/icon/TheAllIcon.vue';
+
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  import PitFields from '@/components/workOrder/woPitField.vue';
+
   import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import Layout from '@/layouts/Main.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import { Pit } from '@/interfaces/WorkOrder';
+  import { Pit } from '@/interfaces/sandflow';
 
-  export default {
+  export default defineComponent({
     components: {
-      BookmarkIcon,
-      CheckCircleIcon,
+      FieldGroup,
+      FieldSelect,
+      FieldInput,
+      FieldLegend,
+      PitFields,
+      Icon,
       CircularBtn,
-      GhostBtn,
-      Layout,
-      PlusIcon,
-      PrimaryBtn,
-      TrashIcon,
     },
-    setup() {
-      // Cliente
-      const client: Ref<string> = ref('');
-      // Service Company
-      const serviceCompany: Ref<string> = ref('');
-      // PAD
-      const pad: Ref<string> = ref('');
-      // Pozos
-      const pits: Ref<Array<Pit>> = ref([
-        {
-          id: 0,
-          name: '',
-        },
-      ]);
-
+    props: {
+      clientId: {
+        type: Number,
+        required: true,
+      },
+      serviceCompanyId: {
+        type: Number,
+        required: true,
+      },
+      pad: {
+        type: String,
+        default: '',
+      },
+      pits: {
+        type: Array,
+        default: () => [],
+      },
+      isFull: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props, { emit }) {
+      const { clientId, serviceCompanyId, pad, pits, isFull } = useVModels(
+        props,
+        emit
+      );
       const removePit = (pitId: number) => {
-        pits.value = pits.value.filter((pit: Pit) => pit.id !== pitId);
+        pits.value = pits.value.filter((pit: Pit) => {
+          return pit.id !== pitId;
+        });
       };
       const addPit = () => {
         const lastPitId = pits.value.length;
@@ -130,32 +110,26 @@
           name: '',
         });
       };
-      // Remove Empty pits
-      const removeEmptyPits = () => {
-        pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
-      };
-      // Is the Order section is full
-      const isOrderFull = computed(() => {
-        return !!(
-          client.value &&
-          serviceCompany.value &&
-          pad.value &&
+      watchEffect(() => {
+        isFull.value = !!(
+          clientId.value >= 0 &&
+          serviceCompanyId.value >= 0 &&
+          pad.value.length > 2 &&
           pits.value.length > 0 &&
-          pits.value[0].name
+          pits.value[0].name.length > 0
         );
       });
 
       return {
-        isOrderFull,
-        client,
-        serviceCompany,
+        clientId,
+        serviceCompanyId,
         pad,
         pits,
-        removePit,
         addPit,
+        removePit,
       };
     },
-  };
+  });
 </script>
 
 <style lang="scss" scoped>

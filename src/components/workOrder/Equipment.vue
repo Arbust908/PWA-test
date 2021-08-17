@@ -1,454 +1,337 @@
 <template>
   <form method="POST" action="/" class="p-4">
-    <section class="md:flex md:justify-between max-w-4xl gap-4">
-      <fieldset class="w-full max-w-sm">
-        <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-          Cradle
-        </legend>
-        <section>
-          <div class="input-block">
-            <label for="cradle_main" class=""> Operativo </label>
-            <div class="mt-1">
-              <input
-                v-model="operativeCradle"
-                name="cradle_main"
-                type="text"
-                placeholder="Cradle 1"
-              />
-              <!-- <select v-model="operativeCradle" name="cradle_main">
-                    <option selected disabled value="">Cradle Operativo</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
-            </div>
-          </div>
-          <div class="input-block">
-            <label for="cradle_backup" class=""> Backup </label>
-            <div class="mt-1">
-              <input
-                v-model="backupCradle"
-                name="cradle_backup"
-                type="text"
-                placeholder="Cradle 25"
-              />
-              <!-- <select v-model="backupCradle" name="cradle_backup">
-                    <option selected disabled value="">Backup Cradle</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
-            </div>
-          </div>
-        </section>
-      </fieldset>
-      <fieldset class="w-full max-w-sm">
-        <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-          Forklift
-        </legend>
-        <section>
-          <div class="input-block">
-            <label for="operative_forklift" class=""> Operativo </label>
-            <div class="mt-1">
-              <input
-                v-model="operativeForklift"
-                name="operative_forklift"
-                type="text"
-                placeholder="Forklift 1"
-              />
-              <!-- <select v-model="operativeForklift" name="client">
-                    <option selected disabled value="">Forklift Operativo</option>
-                    <option value="roklim">Roklim</option>
-                    <option value="salmin">Salmin</option>
-                    <option value="eroba">Eroba</option>
-                  </select> -->
-            </div>
-          </div>
-          <div class="input-block">
-            <label for="backup_forklift" class=""> Backup </label>
-            <div class="mt-1">
-              <input
-                v-model="backupForklift"
-                name="backup_forklift"
-                type="text"
-                placeholder="forklift 7"
-              />
-              <!-- <select v-model="backupForklift" name="client">
-                    <option selected disabled value="">Backup Forklift</option>
-                    <option value="aplt">Aplt</option>
-                    <option value="rotum">Rotum</option>
-                    <option value="xacje">Xacje</option>
-                  </select> -->
-            </div>
-          </div>
-        </section>
-      </fieldset>
-    </section>
-    <fieldset>
-      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full max-w-4xl">
-        Tractor / Chasis
-      </legend>
-      <section class="divide-y">
-        <article
-          v-for="traktor in traktors"
-          :key="traktor.id"
-          class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center"
-        >
-          <div>
-            <label :for="`tractor-${traktor.id}-chasis`">
-              ID Tractor / Chasis
-            </label>
-            <div class="pit-block">
-              <input
-                v-model="traktor.chassis"
-                :name="`tractor-${traktor.id}-chasis`"
-                type="text"
-                placeholder="#47AGH"
-              />
-              <CircularBtn
-                class="btn__delete btn__mobile-only"
-                size="sm"
-                @click="removeTraktor(traktor.id)"
-              >
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
-            </div>
-          </div>
-          <div class="input-block lg:w-5/12">
-            <label :for="`tractor-${traktor.id}-proveedor`"> Proveedor </label>
-            <div class="mt-1">
-              <input
-                v-model="traktor.supplier"
-                :name="`tractor-${traktor.id}-proveedor`"
-                type="text"
-                placeholder="Nombre de proveedor"
-              />
-              <!-- <select v-model="traktor.supplier" :name="`tractor-${traktor.id}-proveedor`">
-                    <option selected disabled value="">Proveedor</option>
-                    <option value="10223">Transportes Zaraza SRL</option>
-                    <option value="10224">Montoto Logistica SRL</option>
-                    <option value="10225">E Inc</option>
-                  </select> -->
-            </div>
-          </div>
-          <div class="input-block">
-            <label :for="`tractor-${traktor.id}-description`">
-              Descripción
-            </label>
-            <div class="mt-1">
-              <input
-                v-model="traktor.description"
-                :for="`tractor-${traktor.id}-description`"
-                type="text"
-                placeholder="Tractor rojo"
-              />
-            </div>
-          </div>
-          <div class="mt-8 mb-5">
-            <CircularBtn
-              class="btn__delete btn__desktop-only"
-              size="sm"
-              @click="removeTraktor(traktor.id)"
-            >
-              <TrashIcon class="w-5 h-5" />
-            </CircularBtn>
-          </div>
-        </article>
-      </section>
-      <button class="mt-1 flex items-center" @click.prevent="addTraktor">
+    <div class="flex flex-col md:flex-row gap-6 md:gap-8 xl:gap-16">
+      <FieldGroup>
+        <FieldLegend>Cradle</FieldLegend>
+        <FieldSelect
+          class="col-span-full"
+          fieldName="operativeCradle"
+          placeholder="Selecciona un operativo"
+          title="Operativo"
+          endpoint="/cradle"
+          :data="operativeCradleId"
+          @update:data="operativeCradleId = $event"
+        />
+        <FieldSelect
+          class="col-span-full"
+          fieldName="backupCradle"
+          placeholder="Selecciona un backup"
+          title="Backup"
+          endpoint="/cradle"
+          :data="backupCradleId"
+          @update:data="backupCradleId = $event"
+        />
+      </FieldGroup>
+      <FieldGroup>
+        <FieldLegend>Forklift</FieldLegend>
+        <FieldSelect
+          class="col-span-full"
+          fieldName="operativeForklift"
+          placeholder="Selecciona un operativo"
+          title="Operativo"
+          endpoint="/forklift"
+          :data="operativeForkliftId"
+          @update:data="operativeForkliftId = $event"
+        />
+        <FieldSelect
+          class="col-span-full"
+          fieldName="backupForklift"
+          placeholder="Selecciona un backup"
+          title="Backup"
+          endpoint="/forklift"
+          :data="backupForkliftId"
+          @update:data="backupForkliftId = $event"
+        />
+      </FieldGroup>
+    </div>
+    <FieldGroup class="max-w-2xl">
+      <FieldLegend>Tractor / Chasis</FieldLegend>
+      <TracktoField
+        :traktors="traktors"
+        @update:traktors="traktors = $event"
+        @remove="removeTraktor"
+      />
+      <button
+        class="mt-1 flex items-center col-span-6"
+        @click.prevent="addTraktor"
+      >
         <CircularBtn class="btn__add" size="xs">
-          <PlusIcon class="w-4 h-4" />
+          <Icon icon="Plus" class="w-5 h-5" />
         </CircularBtn>
-        <span class="font-bold text-lg"> Agregar tractor / chasis </span>
+        <span class="font-bold"> Agregar tractor/chasis </span>
       </button>
-    </fieldset>
-    <fieldset class="max-w-2xl">
-      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-        ID Pickup
-      </legend>
-      <section class="divide-y">
-        <article
-          v-for="pickup in pickups"
-          :key="pickup.id"
-          class="pt-2 pb-3 lg:flex lg:gap-4 lg:items-center"
-        >
-          <div class="lg:w-5/12">
-            <label :for="`pickup-${pickup.id}-chassis`"> ID Pickup </label>
-            <div class="pit-block">
-              <input
-                v-model="pickup.pickup_id"
-                :name="`pickup-${pickup.id}-chassis`"
-                type="text"
-                placeholder="#456"
-              />
-              <CircularBtn
-                class="btn__delete btn__mobile-only"
-                size="sm"
-                @click="removePickup(pickup.id)"
-              >
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
-            </div>
-          </div>
-          <div class="input-block lg:w-8/12">
-            <label :for="`pickup-${pickup.id}-description`">
-              Descripción
-            </label>
-            <div class="mt-1">
-              <input
-                v-model="pickup.description"
-                :name="`pickup-${pickup.id}-description`"
-                type="text"
-                placeholder="Pickup de color"
-              />
-            </div>
-          </div>
-          <div class="mt-8 mb-5">
-            <CircularBtn
-              class="btn__delete btn__desktop-only"
-              size="sm"
-              @click="removePickup(pickup.id)"
-            >
-              <TrashIcon class="w-5 h-5" />
-            </CircularBtn>
-          </div>
-        </article>
-      </section>
-      <button class="mt-1 flex items-center" @click.prevent="addPickup">
+    </FieldGroup>
+    <FieldGroup class="max-w-lg">
+      <FieldLegend>Pickup</FieldLegend>
+      <PickupField
+        :pickups="pickups"
+        @update:pickups="pickups = $event"
+        @remove="removePickup"
+      />
+      <button
+        class="mt-1 flex items-center col-span-6"
+        @click.prevent="addPickup"
+      >
         <CircularBtn class="btn__add" size="xs">
-          <PlusIcon class="w-4 h-4" />
+          <Icon icon="Plus" class="w-5 h-5" />
         </CircularBtn>
-        <span class="font-bold text-lg"> Agregar pickup </span>
+        <span class="font-bold"> Agregar pickup </span>
       </button>
-    </fieldset>
-    <fieldset class="max-w-xl">
-      <legend class="font-bold text-2xl pb-1 border-b mb-3 w-full">
-        Equipamiento
-      </legend>
-      <section class="equip-grid">
-        <div class="input-block">
-          <label for="rigmats">Rigmats</label>
-          <div class="mt-1">
-            <input
-              v-model="rigmats"
-              name="rigmats"
-              type="number"
-              placeholder="cantidad"
-            />
-          </div>
-        </div>
-        <div class="input-block">
-          <label for="conex">Conex</label>
-          <div class="mt-1">
-            <input
-              v-model="conex"
-              name="conex"
-              type="number"
-              placeholder="cantidad"
-            />
-          </div>
-        </div>
-        <div class="input-block">
-          <label for="generators">Generador de apoyo</label>
-          <div class="mt-1">
-            <input
-              v-model="generators"
-              name="generators"
-              type="number"
-              placeholder="cantidad"
-            />
-          </div>
-        </div>
-        <div class="input-block">
-          <label for="tower">Torre de iluminación</label>
-          <div class="mt-1">
-            <input
-              v-model="tower"
-              name="tower"
-              type="number"
-              placeholder="cantidad"
-            />
-          </div>
-        </div>
-        <div class="input-block">
-          <label for="cabin">Cabina de operador cradle</label>
-          <div class="mt-1">
-            <input
-              v-model="cabin"
-              name="cabin"
-              type="number"
-              placeholder="cantidad"
-            />
-          </div>
-        </div>
-      </section>
-    </fieldset>
+    </FieldGroup>
+    <FieldGroup class="max-w-lg">
+      <FieldLegend>Equipamento</FieldLegend>
+      <FieldInput
+        class="col-span-4"
+        fieldName="rigmats"
+        placeholder="Rigmats"
+        title="Rigmats"
+        mask="#*"
+        :data="rigmats"
+        @update:data="rigmats = Number($event)"
+      />
+      <FieldInput
+        class="col-span-4"
+        fieldName="conex"
+        placeholder="Conex"
+        title="Conex"
+        mask="#*"
+        :data="conex"
+        @update:data="conex = Number($event)"
+      />
+      <FieldInput
+        class="col-span-4"
+        fieldName="generators"
+        placeholder="Generador de apoyo"
+        title="Generador de apoyo"
+        mask="#*"
+        :data="generators"
+        @update:data="generators = Number($event)"
+      />
+      <FieldInput
+        class="col-span-4"
+        fieldName="tower"
+        placeholder="Torre de iluminación"
+        title="Torre de iluminación"
+        mask="#*"
+        :data="tower"
+        @update:data="tower = Number($event)"
+      />
+      <FieldInput
+        class="col-span-4"
+        fieldName="cabin"
+        placeholder="Cabina de operador"
+        title="Cabina de operador"
+        mask="#*"
+        :data="cabin"
+        @update:data="cabin = Number($event)"
+      />
+    </FieldGroup>
   </form>
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed } from 'vue';
-  import { useStore } from 'vuex';
-  import { useRouter } from 'vue-router';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
-  import { PlusIcon } from '@heroicons/vue/solid';
+  import { watch, watchEffect, defineComponent, computed } from 'vue';
+  import { useVModels } from '@vueuse/core';
+  import { useRoute } from 'vue-router';
+
+  import Icon from '@/components/icon/TheAllIcon.vue';
+
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  import TracktoField from '@/components/workOrder/woTraktorField.vue';
+  import PickupField from '@/components/workOrder/woPickupField.vue';
+
   import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import Layout from '@/layouts/Main.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import { Pit } from '@/interfaces/sandflow';
+  import { useApi } from '@/helpers/useApi';
 
-  import {
-    Pit,
-    Traktor,
-    Pickup,
-    HumanResource,
-    Crew,
-    WorkOrder,
-  } from '@/interfaces/WorkOrder';
-
-  import axios from 'axios';
-  const api = import.meta.env.VITE_API_URL || '/api';
-
-  export default {
+  export default defineComponent({
     components: {
-      BookmarkIcon,
-      CheckCircleIcon,
+      FieldGroup,
+      FieldSelect,
+      FieldInput,
+      FieldLegend,
+      Icon,
+      TracktoField,
+      PickupField,
       CircularBtn,
-      GhostBtn,
-      Layout,
-      PlusIcon,
-      PrimaryBtn,
-      TrashIcon,
     },
-    setup() {
-      // ::
-      // Cradle
-      // ::
-      const operativeCradle: Ref<string> = ref('');
-      const backupCradle: Ref<string> = ref('');
-      // ::
-      // Forklift
-      // ::
-      const operativeForklift: Ref<string> = ref('');
-      const backupForklift: Ref<string> = ref('');
-      // ::
-      // Tractor
-      // ::
-      const traktors: Ref<Array<Traktor>> = ref([
-        {
-          id: 0,
-          chassis: '',
-          supplier: '',
-          description: '',
-        },
-      ]);
+    props: {
+      operativeCradleId: {
+        type: Number,
+        required: true,
+      },
+      backupCradleId: {
+        type: Number,
+        required: true,
+      },
+      operativeForkliftId: {
+        type: Number,
+        required: true,
+      },
+      backupForkliftId: {
+        type: Number,
+        required: true,
+      },
+      traktors: {
+        type: Array,
+        default: () => [],
+      },
+      pickups: {
+        type: Array,
+        default: () => [],
+      },
+      rigmats: {
+        type: Number,
+        required: true,
+      },
+      conex: {
+        type: Number,
+        required: true,
+      },
+      generators: {
+        type: Number,
+        required: true,
+      },
+      tower: {
+        type: Number,
+        required: true,
+      },
+      cabin: {
+        type: Number,
+        required: true,
+      },
+      isFull: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props, { emit }) {
+      const route = useRoute();
+      const id = route.params.id;
+      const {
+        operativeCradleId,
+        backupCradleId,
+        operativeForkliftId,
+        backupForkliftId,
+        traktors,
+        pickups,
+        rigmats,
+        conex,
+        generators,
+        tower,
+        cabin,
+        isFull,
+      } = useVModels(props, emit);
+
+      const { read: readT } = useApi('/traktor');
+      const allTracktors = readT();
+      watch(allTracktors, (newVal, _) => {
+        traktors.value = newVal.filter((t) => {
+          console.log(t.workOrderId, id);
+          return t.workOrderId === id;
+        });
+        console.log(traktors.value);
+        console.log(traktors.value.length);
+        if (traktors.value.length === 0) {
+          console.log('agregar');
+          addTraktor();
+        }
+      });
+
+      const { read: readP } = useApi('/pickup');
+      const allPickups = readP();
+      watch(allPickups, (newVal, _) => {
+        pickups.value = newVal.filter((p) => {
+          console.log(p.workOrderId, id);
+          return p.workOrderId === id;
+        });
+        console.log(pickups.value);
+        if (pickups.value.length === 0) {
+          addPickup();
+        }
+        console.log(pickups.value);
+      });
+
       const removeTraktor = (traktorId: number) => {
         traktors.value = traktors.value.filter(
           (traktor: Traktor) => traktor.id !== traktorId
         );
       };
       const addTraktor = (): void => {
-        const lastTraktorId = traktors.value.length;
+        const lastTraktor = traktors.value[traktors.value.length - 1];
+        const newTraktorId = lastTraktor ? lastTraktor.id + 1 : 0;
         traktors.value.push({
-          id: lastTraktorId,
+          id: newTraktorId,
           chassis: '',
           supplier: '',
           description: '',
         });
       };
-      // Remove empty traktors
-      const removeEmptyTraktors = (): void => {
-        traktors.value = traktors.value.filter(
-          (traktor: Traktor) =>
-            !(
-              traktor.chassis === '' &&
-              traktor.supplier === '' &&
-              traktor.description === ''
-            )
-        );
-      };
-      // ::
-      // Pickup
-      // ::
-      const pickups: Ref<Array<Pickup>> = ref([
-        {
-          id: 0,
-          pickup_id: '',
-          description: '',
-        },
-      ]);
       const removePickup = (pickupId: number) => {
         pickups.value = pickups.value.filter(
           (pickup: Pickup) => pickup.id !== pickupId
         );
       };
       const addPickup = (): void => {
-        const lastTraktorId = pickups.value.length;
+        const lastPickup = pickups.value[pickups.value.length - 1];
+        const newPickupId = lastPickup ? lastPickup.id + 1 : 0;
         pickups.value.push({
-          id: lastTraktorId,
-          pickup_id: '',
+          id: newPickupId,
+          pickupId: '',
           description: '',
         });
       };
-      // Remove Empty Pickups
-      const removeEmptyPickups = (): void => {
-        pickups.value = pickups.value.filter(
-          (pickup: Pickup) =>
-            pickup.pickup_id !== '' && pickup.description !== ''
+
+      const firstTracktorFull = computed(() => {
+        const trackto = traktors.value[0];
+        return (
+          trackto.chassis !== '' &&
+          trackto.supplier !== '' &&
+          trackto.description !== ''
         );
-      };
-      // ::
-      // Equipment
-      // ::
-
-      // rigmats, conex, generators, tower, cabin
-      const rigmats: Ref<number> = ref(0);
-      const conex: Ref<number> = ref(0);
-      const generators: Ref<number> = ref(0);
-      const tower: Ref<number> = ref(0);
-      const cabin: Ref<number> = ref(0);
-
-      // Is the Equipment section is full
-      const isEquipmentFull = computed(() => {
-        return !!(
-          operativeCradle.value &&
-          // backupCradle.value &&
-          operativeForklift.value &&
-          // backupForklift.value &&
-          traktors.value.length > 0 &&
-          traktors.value[0].chassis &&
-          traktors.value[0].description &&
-          traktors.value[0].supplier &&
-          pickups.value.length > 0 &&
-          pickups.value[0].pickup_id &&
-          pickups.value[0].description
+      });
+      const firstPickupFull = computed(() => {
+        const pickup = pickups.value[0];
+        return pickup.pickup_id !== '' && pickup.description !== '';
+      });
+      watchEffect(() => {
+        isFull.value = !!(
+          operativeCradleId.value >= 0 &&
+          operativeForkliftId.value >= 0 &&
+          traktors.value.length &&
+          pickups.value.length &&
+          firstTracktorFull.value &&
+          firstPickupFull.value &&
+          conex.value >= 0 &&
+          generators.value >= 0 &&
+          rigmats.value >= 0 &&
+          tower.value >= 0 &&
+          cabin.value >= 0
         );
       });
 
       return {
-        isEquipmentFull,
-        operativeCradle,
-        backupCradle,
-        operativeForklift,
-        backupForklift,
+        operativeCradleId,
+        backupCradleId,
+        operativeForkliftId,
+        backupForkliftId,
         traktors,
-        removeTraktor,
-        addTraktor,
         pickups,
-        removePickup,
-        addPickup,
         rigmats,
         conex,
         generators,
         tower,
         cabin,
+        removeTraktor,
+        addTraktor,
+        removePickup,
+        addPickup,
       };
     },
-  };
+  });
 </script>
 
 <style lang="scss" scoped>
@@ -473,7 +356,6 @@
       @apply hidden lg:inline-flex;
     }
   }
-
   .input-block select,
   .input-block input {
     @apply w-full rounded mb-3 p-2;
@@ -492,8 +374,5 @@
   }
   label {
     @apply text-sm;
-  }
-  .equip-grid {
-    @apply grid gap-4 grid-cols-2 md:grid-cols-3;
   }
 </style>

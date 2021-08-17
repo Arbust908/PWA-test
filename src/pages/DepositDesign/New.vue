@@ -248,8 +248,8 @@
         }
       };
       const removeRow = (row: number) => {
-        for (let c = 1; c <= cols.value; c++) {
-          for (let f = 1; f <= floors.value; f++) {
+        for (let c = cols.value; c > 1; c--) {
+          for (let f = floors.value; f > 1; f--) {
             removeCell(f, row, c);
           }
         }
@@ -270,8 +270,8 @@
         }
       };
       const removeCol = (col: number) => {
-        for (let r = 1; r <= rows.value; r++) {
-          for (let f = 1; f <= floors.value; f++) {
+        for (let r = rows.value; r > 1; r--) {
+          for (let f = floors.value; f > 1; f--) {
             removeCell(f, r, col);
           }
         }
@@ -292,8 +292,8 @@
         }
       };
       const removeFloor = (floor: number) => {
-        for (let c = 1; c <= cols.value; c++) {
-          for (let r = 1; r <= rows.value; r++) {
+        for (let c = cols.value; c > 1; c--) {
+          for (let r = rows.value; r > 1; r--) {
             removeCell(floor, c, r);
           }
         }
@@ -306,11 +306,8 @@
       };
       const removeCell = (floor: number, row: number, col: number) => {
         if (deposit.value[`${floor}|${row}|${col}`] !== undefined) {
-          console.log('delete');
-          console.log('Pre Delete', deposit.value[`${floor}|${row}|${col}`]);
+          deposit.value[`${floor}|${row}|${col}`] = 'DELETED';
           delete deposit.value[`${floor}|${row}|${col}`];
-          console.log(deposit.value);
-          console.log('Post Delete', deposit.value[`${floor}|${row}|${col}`]);
         }
       };
 

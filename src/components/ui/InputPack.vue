@@ -72,7 +72,6 @@
       const things: ComputedRef<String> = computed(() => {
         return state.input_errors[0];
       });
-      // console.log('withList:_', props.withList)
       return {
         state,
         things,

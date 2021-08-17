@@ -251,9 +251,13 @@
         }
       };
       const removeRow = (row: number) => {
-        for (let c = 1; c <= cols.value; c++) {
-          for (let f = 1; f <= floors.value; f++) {
-            removeCell(f, row, c);
+        for (const key in deposit.value) {
+          if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
+            const proxy = key.split('|');
+            const [Pfloor, Prow, Pcol] = proxy;
+            if (Number(Prow) > row) {
+              removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
+            }
           }
         }
       };
@@ -273,9 +277,13 @@
         }
       };
       const removeCol = (col: number) => {
-        for (let r = 1; r <= rows.value; r++) {
-          for (let f = 1; f <= floors.value; f++) {
-            removeCell(f, r, col);
+        for (const key in deposit.value) {
+          if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
+            const proxy = key.split('|');
+            const [Pfloor, Prow, Pcol] = proxy;
+            if (Number(Pcol) > col) {
+              removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
+            }
           }
         }
       };
@@ -295,9 +303,32 @@
         }
       };
       const removeFloor = (floor: number) => {
-        for (let c = 1; c <= cols.value; c++) {
-          for (let r = 1; r <= rows.value; r++) {
-            removeCell(floor, c, r);
+        for (const key in deposit.value) {
+          if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
+            const proxy = key.split('|');
+            const [Pfloor, Prow, Pcol] = proxy;
+            if (Number(Pfloor) > floor) {
+              removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
+            }
+          }
+        }
+      };
+      const purgeOffCells = () => {
+        for (const key in deposit.value) {
+          if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
+            const cell = deposit.value[key];
+            const proxy = key.split('|');
+            const [Pfloor, Prow, Pcol] = proxy;
+            if (cell === 'DELETED') {
+              //BOrrar ?
+            }
+            if (
+              Number(Pfloor) > floors.value ||
+              Number(Prow) > rows.value ||
+              Number(Pcol) > cols.value
+            ) {
+              removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
+            }
           }
         }
       };
@@ -309,6 +340,7 @@
       };
       const removeCell = (floor: number, row: number, col: number) => {
         if (deposit.value[`${floor}|${row}|${col}`] !== undefined) {
+          deposit.value[`${floor}|${row}|${col}`] = 'DELETED';
           delete deposit.value[`${floor}|${row}|${col}`];
         }
       };
@@ -354,6 +386,7 @@
       });
 
       const selectedBox: Ref<Box> = ref({
+        warehouseId: null,
         floor: 1,
         col: 0,
         row: 0,
@@ -365,7 +398,14 @@
       const setCat = (cat: string) => {
         selectedBox.value.category = cat;
         const box = selectedBox.value;
-        deposit.value[`${box.floor}|${box.row}|${box.col}`] = box.category;
+        deposit.value[`${box.floor}|${box.row}|${box.col}`] = cat;
+        // deposit.value[`${box.floor}|${box.row}|${box.col}`] = {
+        //   category: box.category,
+        //   warehouseId: null,
+        //   floor: box.floor,
+        //   col: box.col,
+        //   row: box.row,
+        // };
       };
 
       // :: DEPOSIT
@@ -388,7 +428,7 @@
         return dimensions;
       };
 
-      const updateData = (newData) => {
+      const updateData = (newData: Warehouse | null) => {
         if (newData) {
           pitId.value = newData.pitId;
           clientId.value = newData.clientCompanyId;
@@ -401,9 +441,11 @@
       };
 
       const vuexData = ref(
-        store.state.depositDesign.all.find((depo) => {
-          return depo.id === id;
-        })
+        JSON.parse(JSON.stringify(store.state.depositDesign.all)).find(
+          (depo: Warehouse) => {
+            return depo.id === Number(id);
+          }
+        )
       );
       if (vuexData.value) {
         Deposit.value = vuexData;
@@ -431,6 +473,7 @@
         return hasClientAndPit && hasDeposit;
       });
       const save = () => {
+        purgeOffCells();
         const wH: Warehouse = {
           id: Number(id),
           clientCompanyId: clientId.value,

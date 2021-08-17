@@ -1,6 +1,6 @@
 <template>
   <button :type="type" :size="size">
-    <slot></slot>
+    <slot>Fantasma</slot>
   </button>
 </template>
 

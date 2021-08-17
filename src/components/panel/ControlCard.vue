@@ -1,47 +1,23 @@
 <template>
-  <router-link :to="to" class="nav__card">
+  <component
+    :is="to !== '' ? 'router-link' : 'span'"
+    :to="to"
+    class="nav__card"
+  >
     <h3>{{ name }}</h3>
-    <component :is="icon" class="nav__pic" aria-hidden="true" />
-    <component :is="icon" class="nav__pic--bg" aria-hidden="true" />
-    <button>ir</button>
-  </router-link>
+    <GenericIcon :icon="icon" class="nav__pic" />
+    <GenericIcon :icon="icon" class="nav__pic--bg" />
+    <button v-if="to !== ''">ir</button>
+  </component>
 </template>
 
 <script lang="ts">
-  import {
-    AdjustmentsIcon,
-    AnnotationIcon,
-    ArchiveIcon,
-    AtSymbolIcon,
-    BellIcon,
-    ChipIcon,
-    ClipboardListIcon,
-    HomeIcon,
-    LogoutIcon,
-    MenuAlt2Icon,
-    UsersIcon,
-    XIcon,
-    ViewGridAddIcon,
-    ClipboardIcon,
-  } from '@heroicons/vue/outline';
+  import GenericIcon from '@/components/icon/GenericIcon.vue';
   import { defineComponent, toRefs } from 'vue';
   export default defineComponent({
     name: 'PanelControlCard',
     components: {
-      AdjustmentsIcon,
-      AnnotationIcon,
-      ArchiveIcon,
-      AtSymbolIcon,
-      BellIcon,
-      ChipIcon,
-      ClipboardListIcon,
-      HomeIcon,
-      LogoutIcon,
-      MenuAlt2Icon,
-      UsersIcon,
-      XIcon,
-      ViewGridAddIcon,
-      ClipboardIcon,
+      GenericIcon,
     },
     props: {
       name: {
@@ -50,7 +26,7 @@
       },
       to: {
         type: String,
-        required: true,
+        default: '',
       },
       icon: {
         type: String,

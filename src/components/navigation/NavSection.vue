@@ -1,0 +1,115 @@
+<template>
+  <div :class="isSectionOpen ? 'opened' : null" class="section">
+    <button class="nav-link group" @click.prevent="toggleSection()">
+      <GenericIcon :icon="icon" class="icon" />
+      <span>
+        {{ name }}
+      </span>
+    </button>
+    <transition-group
+      v-if="isSectionOpen"
+      appear
+      class="sub-section"
+      tag="div"
+      @before-enter="beforeEnter"
+      @enter="enter"
+    >
+      <MobileNavLink
+        v-for="(item, index) in subNav"
+        :key="item.to"
+        v-bind="item"
+        :data-stagger-index="index"
+      />
+    </transition-group>
+  </div>
+</template>
+
+<script lang="ts">
+  import { defineComponent, Ref, ref } from 'vue';
+  import { useToggle } from '@vueuse/core';
+  import gsap from 'gsap';
+
+  import MobileNavLink from '@/components/navigation/NavLink.vue';
+  import GenericIcon from '@/components/icon/GenericIcon.vue';
+
+  export default defineComponent({
+    props: {
+      icon: {
+        type: String,
+        required: true,
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      subNav: {
+        type: Array,
+        required: true,
+      },
+    },
+    components: {
+      GenericIcon,
+      MobileNavLink,
+    },
+    setup() {
+      const isSectionOpen: Ref<boolean> = ref(false);
+      const toggleSection = useToggle(isSectionOpen);
+      const beforeEnter = (el) => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateX(50%)';
+      };
+      const enter = (el, done) => {
+        const staggerIndex = el.dataset.staggerIndex;
+        gsap.to(el, {
+          opacity: 1,
+          x: 0,
+          duration: 0.1,
+          delay: 0.05 * staggerIndex,
+          onComplete: done,
+        });
+      };
+      return {
+        isSectionOpen,
+        toggleSection,
+        beforeEnter,
+        enter,
+      };
+    },
+  });
+</script>
+
+<style lang="scss" scoped>
+  .section {
+    @apply rounded-md overflow-hidden;
+    &.opened {
+      @apply bg-gray-100;
+      & .icon {
+        @apply rotate-90;
+      }
+    }
+  }
+  button {
+    @apply w-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-main-600;
+  }
+  .nav-link {
+    @apply flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer;
+    &.selected {
+      @apply bg-gray-100 text-gray-900;
+      & > .icon {
+        @apply text-gray-500;
+      }
+    }
+    &:not(.selected) {
+      @apply text-gray-600 hover:bg-gray-50 hover:text-gray-900;
+      & > .icon {
+        @apply text-gray-400 group-hover:text-gray-500;
+      }
+    }
+  }
+  .icon {
+    @apply mr-4 flex-shrink-0 h-6 w-6 transition transform duration-200 ease-in-out;
+  }
+  .sub-section {
+    @apply ml-3 pr-1 space-y-1;
+  }
+</style>

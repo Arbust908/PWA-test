@@ -84,12 +84,15 @@
   });
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
   .sel {
     @apply h-8 rounded bg-transparent border-none;
   }
   .selecThor {
-    @apply pl-2 pr-10 py-0;
+    @apply pl-1 pr-1 py-0 text-right;
+  }
+  select {
+    @apply bg-none;
   }
   .selecTime {
     @apply px-2 flex relative gap-2;

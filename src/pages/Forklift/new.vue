@@ -29,15 +29,16 @@
           <div class="p-4 d-flex">
             <label for="owned" class="">Asignada</label>
             <div class="mt-1">
-              <div :class="['switch', newForklift.owned ? 'true' : '']" @click="handleSwitchClick">
+              <div
+                :class="['switch', newForklift.owned ? 'true' : '']"
+                @click="handleSwitchClick"
+              >
                 <div class="switch-circle"></div>
               </div>
             </div>
           </div>
           <div class="input-block p-4">
-            <label for="ownerName" class="">
-              Nombre del dueño
-            </label>
+            <label for="ownerName" class=""> Nombre del dueño </label>
             <div class="mt-1">
               <input
                 v-model="newForklift.ownerName"
@@ -49,9 +50,7 @@
             </div>
           </div>
           <div class="input-block p-4">
-            <label for="ownerContact" class="">
-              Contacto del dueño
-            </label>
+            <label for="ownerContact" class=""> Contacto del dueño </label>
             <div class="mt-1">
               <input
                 v-model="newForklift.ownerContact"
@@ -86,7 +85,7 @@
           </GhostBtn>
           <PrimaryBtn
             :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save(true)"
+            @click="isFull && save()"
             :disabled="!isFull"
           >
             Finalizar
@@ -114,7 +113,7 @@
 
   import axios from 'axios';
   import { Forklift } from '@/interfaces/Forklift';
-  const api = import.meta.env.VITE_API_URL;
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
@@ -141,8 +140,8 @@
       });
 
       const handleSwitchClick = () => {
-        newForklift.owned = !newForklift.owned
-      }
+        newForklift.owned = !newForklift.owned;
+      };
 
       const goToIndex = (): void => {
         router.push('/montacargas');
@@ -152,14 +151,13 @@
         return !!(
           newForklift.name !== '' &&
           newForklift.ownerName !== '' &&
-          newForklift.ownerContact !== '' &&
-          newForklift.observations !== ''
+          newForklift.ownerContact !== ''
         );
       });
 
       const save = async () => {
         let tpDB = await axios
-          .post(`${api}/forklift`, newForklift)
+          .post(`${apiUrl}/forklift`, newForklift)
           .catch((err) => {
             console.log(err);
           })
@@ -182,7 +180,7 @@
         goToIndex,
         save,
         isFull,
-        handleSwitchClick
+        handleSwitchClick,
       };
     },
   };
@@ -254,12 +252,12 @@
       @apply bg-gray-400;
       transition: all 500ms ease-in-out;
     }
-    
+
     &.true {
       transition: all 500ms ease-in-out;
       @apply bg-green-300;
       @apply border-green-500;
-      
+
       .switch-circle {
         transition: all 500ms ease-in-out;
         transform: translateX(25px);
