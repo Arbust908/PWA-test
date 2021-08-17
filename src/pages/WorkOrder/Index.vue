@@ -29,10 +29,10 @@
             {{ wo.id }}
           </td>
           <td :class="wo.client ? null : 'empty'">
-            {{ wo.client || 'Sin cliente' }}
+            {{ clientIdToName(wo.client) }}
           </td>
           <td :class="wo.serviceCompany ? null : 'empty'">
-            {{ wo.serviceCompany || 'Sin empresa de servicio' }}
+            {{ clientIdToName(wo.serviceCompany) }}
           </td>
           <td :class="!wo.draft ? 'done' : 'idle'">
             <div class="flex space-x-2">
@@ -104,6 +104,20 @@
           storeToState(newValue);
         }
       });
+      const { read: getCompanies } = useApi('/company');
+      const companies = getCompanies();
+      const clientIdToName = (id: number) => {
+        if (typeof id === 'string' && Number.isNaN(Number(id))) {
+          return id;
+        }
+        if (!companies && !companies.value) {
+          return '-';
+        }
+        const client = companies.value.find((c) => {
+          return c.id === id;
+        });
+        return client ? client.name : 'Sin cliente';
+      };
       const storeToState = (wOs: Array<WorkOrder>) => {
         return wOs.map((wO) => {
           store.dispatch('saveWorkOrder', wO);
@@ -122,6 +136,7 @@
       return {
         workOrders,
         deleteWO,
+        clientIdToName,
       };
     },
   });

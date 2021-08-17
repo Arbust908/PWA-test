@@ -28,6 +28,11 @@ export default {
         icon: 'BellIcon',
       },
       {
+        name: 'Ingreso de cajas',
+        to: '/ingreso-de-cajas',
+        icon: 'ArchiveIcon',
+      },
+      {
         name: 'Proveedores',
         icon: 'ChevronRightIcon',
         subNav: [
@@ -68,16 +73,6 @@ export default {
             icon: 'ClipboardListIcon',
           },
         ],
-      },
-      {
-        name: 'Ingreso de cajas',
-        to: '/ingreso-de-cajas',
-        icon: 'ClipboardListIcon',
-      },
-      {
-        name: 'Ingreso de cajas',
-        to: '/ingreso-de-cajas',
-        icon: 'ClipboardListIcon',
       },
     ],
     user_navigation: [
