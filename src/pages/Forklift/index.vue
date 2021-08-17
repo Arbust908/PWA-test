@@ -13,7 +13,7 @@
           <th scope="col">Asignación</th>
           <th scope="col">Nombre dueño</th>
           <th scope="col">Contacto dueño</th>
-          <th scope="col">Observaciones</th>
+          <th scope="col">Observaciónes</th>
           <th scope="col">
             <span>Actions</span>
           </th>

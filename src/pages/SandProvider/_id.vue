@@ -46,7 +46,7 @@
             />
           </label>
           <label class="col-span-full" for="observations">
-            <span>Observaciones</span>
+            <span>Observaciónes</span>
             <input
               id="observations"
               v-model="newSandProvider.observations"

@@ -11,7 +11,7 @@
         <tr>
           <th scope="col">ID</th>
           <th scope="col">Nombre</th>
-          <th scope="col">Observaciones</th>
+          <th scope="col">Observaciónes</th>
           <th scope="col">
             <span class="sr-only">Actions</span>
           </th>

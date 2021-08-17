@@ -161,7 +161,7 @@
             </label>
 
             <label class="col-span-full" :for="'transportObservations' + tO.id">
-              <span>Observaciones</span>
+              <span>Observaciónes</span>
               <input
                 :id="'transportObservations' + tO.id"
                 v-model="tO.observation"

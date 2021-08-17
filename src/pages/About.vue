@@ -1,5 +1,6 @@
 <template>
   <Layout>
+    <input class="cajitaMagica" type="text" name="" id="" />
     <section class="grid grid-cols-8 gap-6">
       <p class="col-span-full">About page.</p>
       <p class="col-span-full">
@@ -52,7 +53,7 @@
         class="
           px-3
           py-1
-          rounded
+          rounded-lg
           bg-green-500
           text-green-100
           hover:bg-green-700 hover:shadow
@@ -110,6 +111,17 @@
 </script>
 
 <style lang="scss" scoped>
+  .cajitaMagica {
+    @apply w-[58px]
+        h-[58px]
+        m-[58px]
+        rounded
+        shadow-md
+        border-none
+        bg-gradient-to-tr
+        from-purple-500
+        to-pink-500;
+  }
   progress {
     @apply bg-green-500;
   }

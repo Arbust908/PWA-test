@@ -13,7 +13,7 @@
           <th scope="col">Nombre</th>
           <th scope="col">Razón social</th>
           <th scope="col">CUIL/CUIT</th>
-          <th scope="col">Obersvaciones</th>
+          <th scope="col">Observaciónes</th>
           <th scope="col">
             <span class="sr-only">Actions</span>
           </th>
