@@ -8,175 +8,65 @@
         <UiBtn>Nueva Notificacion</UiBtn>
       </router-link>
     </header>
-    <div class="flex flex-col">
-      <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-        <div class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-          <div
-            class="
-              shadow
-              overflow-hidden
-              border-b border-second-200
-              sm:rounded-lg
-            "
-          >
-            <table class="min-w-full divide-y divide-second-200">
-              <thead class="bg-second-50">
-                <tr>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-second-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Proveedor
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-second-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Ordenes
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-second-500
-                      uppercase
-                      tracking-wider
-                    "
-                    title="Cantidad de Arena"
-                  >
-                    C° Arena
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-second-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    Transportes
-                  </th>
-                  <th
-                    scope="col"
-                    class="
-                      px-6
-                      py-3
-                      text-left text-xs
-                      font-medium
-                      text-second-500
-                      uppercase
-                      tracking-wider
-                    "
-                  >
-                    C° de Camiones
-                  </th>
-                  <th scope="col" class="relative px-6 py-3">
-                    <span class="sr-only">Actions</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(pn, Key) in ProviderNotifications"
-                  :key="Key"
-                  :class="Key % 2 === 0 ? 'bg-second-100' : 'bg-second-50'"
-                  class="hover:bg-second-200"
-                >
-                  <td
-                    class="
-                      px-6
-                      py-4
-                      whitespace-nowrap
-                      text-sm
-                      font-medium
-                      text-second-900
-                    "
-                  >
-                    {{ pn.sandProvider.name }}
-                  </td>
-                  <td
-                    class="text-second-500 px-6 py-4 whitespace-nowrap text-sm"
-                  >
-                    {{ pn.sandOrder.amount }}t
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    {{
-                      pn.transportProviders
-                        ? pn.transportProviders.length
-                        : 'No hay transporte'
-                    }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    {{
-                      pn.transportProviders
-                        ? sumTransport(pn.transportProviders)
-                        : '-'
-                    }}
-                  </td>
-                  <td
-                    class="
-                      px-6
-                      py-4
-                      whitespace-nowrap
-                      text-right text-sm
-                      font-medium
-                    "
-                  >
-                    <div class="flex justify-end space-x-4">
-                      <router-link
-                        :to="`/notificaciones-a-proveedores/${pn.id}`"
-                        class="flex text-indigo-600 hover:text-indigo-900"
-                      >
-                        <PencilAltIcon class="w-5 h-5" />
-                        <span> Editar </span>
-                      </router-link>
-                      <button
-                        class="flex text-red-600 hover:text-red-900"
-                        @click="deleteSP(pn.id)"
-                      >
-                        <TrashIcon class="w-5 h-5" />
-                        <span> Eliminar </span>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-                <tr v-if="ProviderNotifications.length <= 0">
-                  <td
-                    colspan="5"
-                    class="text-center text-xs text-second-500 px-6 py-4"
-                  >
-                    <p>No hay Notificaciones a Proveedores</p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
+    <UiTable>
+      <template #header>
+        <tr>
+          <th scope="col">Proveedor</th>
+          <th scope="col">Ordenes</th>
+          <th scope="col" title="Cantidad de Arena">C° Arena</th>
+          <th scope="col">Transportes</th>
+          <th scope="col">C° de Camiones</th>
+          <!-- <th scope="col">
+            <span class="sr-only">Actions</span>
+          </th> -->
+        </tr>
+      </template>
+      <template #body>
+        <tr
+          v-for="(pn, Key) in ProviderNotifications"
+          :key="Key"
+          :class="Key % 2 === 0 ? 'even' : 'odd'"
+          class="body-row"
+        >
+          <td>
+            {{ pn.sandProvider.name }}
+          </td>
+          <td>{{ pn.sandOrder.amount }}t</td>
+          <td>
+            {{
+              pn.transportProviders
+                ? pn.transportProviders.length
+                : 'No hay transporte'
+            }}
+          </td>
+          <td>
+            {{
+              pn.transportProviders ? sumTransport(pn.transportProviders) : '-'
+            }}
+          </td>
+          <!-- <td>
+            <div class="btn-panel">
+              <router-link
+                :to="`/notificaciones-a-proveedores/${pn.id}`"
+                class="edit"
+              >
+                <Icon icon="PencilAlt" class="w-5 h-5" />
+                <span> Editar </span>
+              </router-link>
+              <button class="delete" @click="deleteSP(pn.id)">
+                <Icon icon="Trash" class="w-5 h-5" />
+                <span> Eliminar </span>
+              </button>
+            </div>
+          </td> -->
+        </tr>
+        <tr v-if="ProviderNotifications.length <= 0">
+          <td colspan="5" class="emptyState">
+            <p>No hay Notificaciones a Proveedores</p>
+          </td>
+        </tr>
+      </template>
+    </UiTable>
   </Layout>
 </template>
 
@@ -186,6 +76,11 @@
   import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
+  import UiTable from '@/components/ui/TableWrapper.vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
+
+  import '@/assets/table.scss';
+
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -196,6 +91,8 @@
       PencilAltIcon,
       TrashIcon,
       UiBtn,
+      UiTable,
+      Icon,
     },
     setup() {
       const store = useStore();
