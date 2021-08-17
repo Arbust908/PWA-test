@@ -9,9 +9,7 @@
     </header>
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
-        <fieldset
-          class="py-2 w-full grid grid-cols-12 gap-y-4 gap-x-14"
-        >
+        <fieldset class="py-2 w-full grid grid-cols-12 gap-y-4 gap-x-14">
           <label class="col-span-4" for="depositClient">
             <span>Cliente</span>
             <select
@@ -48,112 +46,159 @@
             <span>Orden de pedido</span>
             <select
               id="depositPit"
-              v-model="purchaseOrder"
+              v-model="purchaseOrderId"
               class="input"
               name="depositPit"
             >
-              <option selected disabled value="-1">Seleccionar orden de pedido</option>
-              <option v-for="purchaseOrder in purchaseOrders" :key="purchaseOrder.id" :value="purchaseOrder.id">
+              <option selected disabled value="-1">
+                Seleccionar orden de pedido
+              </option>
+              <option
+                v-for="purchaseOrder in purchaseOrders"
+                :key="purchaseOrder.id"
+                :value="purchaseOrder.id"
+              >
                 #{{ purchaseOrder.id }}
+              </option>
+              <option v-if="purchaseOrders.length <= 0" value="-1">
+                No hay ordenes de piedido para este Pozo y/o cliente
               </option>
             </select>
           </label>
         </fieldset>
         <fieldset v-if="selectionsAreDone" class="w-full py-5 px-2">
           <div v-for="box in boxes" :key="box.id" class="available-box">
-            <div :class="['radio-button', choosedBox.id == box.id ? 'active' : '']" @click.prevent="setSelectedBox(box.id)"></div>
-            <div class="box-id"># {{box.id}}</div>
+            <div
+              :class="['radio-button', choosedBox.id == box.id ? 'active' : '']"
+              @click.prevent="setSelectedBox(box.id)"
+            ></div>
+            <div class="box-id"># {{ box.id }}</div>
           </div>
         </fieldset>
         <nav class="flex justify-between">
           <button
-            :class="['section-tab', activeSection === 'deposit' ? 'active' : '']"
-            :selected="WO_section === 'deposit'"
+            :class="[
+              'section-tab',
+              activeSection === 'deposit' ? 'active' : '',
+            ]"
+            :selected="activeSection === 'deposit'"
             @click.prevent="changeSection('deposit')"
           >
             <span> Depósito </span>
-            <CheckCircleIcon v-if="isOrderFull" class="w-5 h-5" />
           </button>
           <button
             :class="['section-tab', activeSection === 'cradle' ? 'active' : '']"
-            :selected="WO_section === 'cradle'"
+            :selected="activeSection === 'cradle'"
             @click.prevent="changeSection('cradle')"
           >
             <span> Cradle </span>
-            
           </button>
         </nav>
         <div v-if="selectionsAreDone">
-        <fieldset v-if="activeSection === 'deposit'" class="py-2 flex gap-x-10 2xl:gap-x-40">
-          <section
-            class="
-              w-full
-              max-w-[170px]
-              lg:max-w-[260px]
-              flex flex-col
-              gap-6
-              md:gap-8
-            "
+          <fieldset
+            v-if="activeSection === 'deposit'"
+            class="py-2 flex gap-x-10 2xl:gap-x-40"
           >
-            <BoxCard v-if="choosedBox.category !== ''" v-bind="choosedBox" />
-            <h2 class="col-span-full text-xl font-bold">Referencias</h2>
-            <div class="flex flex-col gap-5 ml-4">
-              <span class="select-category fine" @click="setVisibleCategories('fine')">
-                <EyeIcon class="icon" v-if="visibleCategories.includes('fine')" />
-                <EyeIconOff class="icon" v-else />
-                Arena fina</span>
-              <span class="select-category thick" @click="setVisibleCategories('thick')">
-                <EyeIcon class="icon" v-if="visibleCategories.includes('thick')"/>
-                <EyeIconOff class="icon" v-else />
-                Arena gruesa</span>
-              <span class="select-category cut" @click="setVisibleCategories('cut')">
-                <EyeIcon class="icon" v-if="visibleCategories.includes('cut')" />
-                <EyeIconOff class="icon" v-else />
-                Caja cortada</span>
-              <span class="select-category aisle">Pasillo</span>
-              <span class="select-category full">Ocupado</span>
-            </div>
-            
-          </section>
-          <DepositGrid
-            class="w-full flex flex-col gap-5"
-            :selectedBox="choosedBox"
-            :rows="row"
-            :cols="col"
-            :floor="floor"
-            :deposit="warehouse.layout"
-            :visibleCategories="visibleCategories"
-            @select-box="selectBox"
-          />
-        </fieldset>
-        <fieldset v-if="activeSection === 'cradle'" class="py-2 flex flex-col gap-x-10 2xl:gap-x-40">
-          <h2 class="text-xl font-bold">Elegir Cradle para montar</h2>
-          <div class="mt-4 w-full
-              max-w-[170px]
-              lg:max-w-[260px]
-              flex flex-col
-              gap-6
-              md:gap-8">
-            <CradleCard 
-              :id="cradle.id" 
-              :selected="selectedCradle == cradle.id" 
-              v-for="cradle in cradles" 
-              :key="cradle.id"
-              @click="handleSelectedCradle(cradle.id)"
+            <section
+              class="
+                w-full
+                max-w-[170px]
+                lg:max-w-[260px]
+                flex flex-col
+                gap-6
+                md:gap-8
+              "
+            >
+              <BoxCard v-if="choosedBox.category !== ''" v-bind="choosedBox" />
+              <h2 class="col-span-full text-xl font-bold">Referencias</h2>
+              <div class="flex flex-col gap-5 ml-4">
+                <span
+                  class="select-category fine"
+                  @click="setVisibleCategories('fine')"
+                >
+                  <EyeIcon
+                    class="icon"
+                    v-if="visibleCategories.includes('fine')"
+                  />
+                  <EyeIconOff class="icon" v-else />
+                  Arena fina</span
+                >
+                <span
+                  class="select-category thick"
+                  @click="setVisibleCategories('thick')"
+                >
+                  <EyeIcon
+                    class="icon"
+                    v-if="visibleCategories.includes('thick')"
+                  />
+                  <EyeIconOff class="icon" v-else />
+                  Arena gruesa</span
+                >
+                <span
+                  class="select-category cut"
+                  @click="setVisibleCategories('cut')"
+                >
+                  <EyeIcon
+                    class="icon"
+                    v-if="visibleCategories.includes('cut')"
+                  />
+                  <EyeIconOff class="icon" v-else />
+                  Caja cortada</span
+                >
+                <span class="select-category aisle">Pasillo</span>
+                <span class="select-category full">Ocupado</span>
+              </div>
+            </section>
+            <DepositGrid
+              class="w-full flex flex-col gap-5"
+              :selectedBox="choosedBox"
+              :rows="row"
+              :cols="col"
+              :floor="floor"
+              :deposit="warehouse.layout"
+              :visibleCategories="visibleCategories"
+              @select-box="selectBox"
             />
-          </div>
-        </fieldset>
+          </fieldset>
+          <fieldset
+            v-if="activeSection === 'cradle'"
+            class="py-2 flex flex-col gap-x-10 2xl:gap-x-40"
+          >
+            <h2 class="text-xl font-bold">Elegir Cradle para montar</h2>
+            <div
+              class="
+                mt-4
+                w-full
+                max-w-[170px]
+                lg:max-w-[260px]
+                flex flex-col
+                gap-6
+                md:gap-8
+              "
+            >
+              <CradleCard
+                :id="cradle.id"
+                :selected="selectedCradle == cradle.id"
+                v-for="cradle in cradles"
+                :key="cradle.id"
+                @click="handleSelectedCradle(cradle.id)"
+              />
+            </div>
+          </fieldset>
         </div>
-        <div v-else class="
-          w-full
-          max-w-sm
-          border border-dashed border-
-          rounded-xl
-          p-5
-          my-3
-          mx-auto
-        ">
-          Seleccionar cliente, pozo y orden de pedido para comenzar. 
+        <div
+          v-else
+          class="
+            w-full
+            max-w-sm
+            border border-dashed border-
+            rounded-xl
+            p-5
+            my-3
+            mx-auto
+          "
+        >
+          Seleccionar cliente, pozo y orden de pedido para comenzar.
         </div>
       </form>
       <!-- {{ selectedBox }}
@@ -167,11 +212,7 @@
       >
         Cancelar
       </GhostBtn>
-      <PrimaryBtn
-        type="submit"
-        size="lg"
-        @click.prevent="save()"
-      >
+      <PrimaryBtn type="submit" size="lg" @click.prevent="save()">
         Guardar
       </PrimaryBtn>
     </footer>
@@ -179,13 +220,21 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, defineComponent, watch, onMounted } from 'vue';
+  import {
+    ref,
+    Ref,
+    computed,
+    defineComponent,
+    watch,
+    onMounted,
+    watchEffect,
+  } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
 
-  import { TrashIcon,  } from '@heroicons/vue/outline';
+  import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon, EyeIcon } from '@heroicons/vue/solid';
-  import EyeIconOff from './EyeIconOff.vue'
+  import EyeIconOff from './EyeIconOff.vue';
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
@@ -214,7 +263,7 @@
       BoxCard,
       CradleCard,
       EyeIcon,
-      EyeIconOff
+      EyeIconOff,
     },
     setup() {
       const router = useRouter();
@@ -223,8 +272,8 @@
         baseURL: apiUrl,
       });
 
-      let activeSection = ref('deposit')
-      let boxes= ref([
+      let activeSection = ref('deposit');
+      let boxes = ref([
         {
           id: 1,
           warehouseId: 1,
@@ -234,15 +283,15 @@
             pitId: 1,
             pit: {
               id: 1,
-              name: "Test",
+              name: 'Test',
               workOrderId: 1,
             },
-            layout: 'any'
+            layout: 'any',
           },
           category: 'cut',
           col: 1,
           floor: 1,
-          row: 1
+          row: 1,
         },
         {
           id: 2,
@@ -253,31 +302,44 @@
             pitId: 1,
             pit: {
               id: 1,
-              name: "Test",
+              name: 'Test',
               workOrderId: 1,
             },
-            layout: 'any'
+            layout: 'any',
           },
           category: 'fine',
           col: 2,
           floor: 1,
-          row: 2
+          row: 2,
         },
-      ])
-
-      let purchaseOrders = ref([
-        {
-          id: 1235,
-        },
-        {
-          id: 2356
-        },
-        {
-          id: 2254
+      ]);
+      const purchaseOrders = ref([]);
+      const { data: poData } = useAxios('/purchaseOrder', instance);
+      watch(poData, (api) => {
+        if (api && api.data) {
+          console.log('purchaseOrders', api.data);
+          purchaseOrders.value = api.data;
         }
-      ])
-
-      let purchaseOrder = ref(-1)
+      });
+      watchEffect(() => {
+        if (
+          purchaseOrders.value.length > 0 &&
+          clients.value.length > 0 &&
+          pits.value.length
+        ) {
+          if (clientId.value !== -1) {
+            purchaseOrders.value = purchaseOrders.value.filter(
+              (po) => po.clientCompanyId === clientId.value
+            );
+          }
+          if (pitId.value !== -1) {
+            purchaseOrders.value = purchaseOrders.value.filter(
+              (po) => po.pitId === pitId.value
+            );
+          }
+        }
+      });
+      const purchaseOrderId = ref(-1);
 
       const choosedBox: Ref<Box> = ref({
         floor: 1,
@@ -287,84 +349,89 @@
       });
 
       const setSelectedBox = (id: Number) => {
-        choosedBox.value = boxes.value.filter(box => {
-          if(box.id === id) {
-            if(choosedBox.value.category !== box.category) {
-              setVisibleCategories(choosedBox.value.category)
-              setVisibleCategories(box.category)
+        choosedBox.value = boxes.value.filter((box) => {
+          if (box.id === id) {
+            if (choosedBox.value.category !== box.category) {
+              setVisibleCategories(choosedBox.value.category);
+              setVisibleCategories(box.category);
             }
-            return box
+            return box;
           }
-        })[0]
-      }
-            
-      const selectBox = (box: Box) => {
-        if(box.category == 'aisle') return
-        if(box.category == 'empty') { 
-          let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}` 
-          let selectedBoxPosition = `${box.floor}|${box.row}|${box.col}`
+        })[0];
+      };
 
-          choosedBox.value.floor = box.floor
-          choosedBox.value.col = box.col
-          choosedBox.value.row = box.row
-          warehouse.value.layout[`${selectedBoxPosition}`] = choosedBox.value.category
-          warehouse.value.layout[`${prevBoxPosition}`] = "empty"
+      const selectBox = (box: Box) => {
+        if (box.category == 'aisle') return;
+        if (box.category == 'empty') {
+          let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
+          let selectedBoxPosition = `${box.floor}|${box.row}|${box.col}`;
+
+          choosedBox.value.floor = box.floor;
+          choosedBox.value.col = box.col;
+          choosedBox.value.row = box.row;
+          warehouse.value.layout[`${selectedBoxPosition}`] =
+            choosedBox.value.category;
+          warehouse.value.layout[`${prevBoxPosition}`] = 'empty';
         }
       };
 
       const changeSection = (option: String) => {
-        return activeSection.value = option
-      }
+        return (activeSection.value = option);
+      };
 
       const selectionsAreDone = computed(() => {
-        if(clientId.value !== -1 && pitId.value !== -1 && purchaseOrder.value !== -1) {
-          if(originalWarehouseWasSaved == false) {
-            originalWarehouseWasSaved = true
-            originalWarehouseLayout = warehouse.value.layout
+        if (
+          clientId.value !== -1 &&
+          pitId.value !== -1 &&
+          purchaseOrderId.value !== -1
+        ) {
+          if (originalWarehouseWasSaved == false) {
+            originalWarehouseWasSaved = true;
+            originalWarehouseLayout = warehouse.value.layout;
           }
-          return true
+          return true;
         }
-      })
+      });
 
       const warehouse = ref({
         id: 2,
         clientCompanyId: 7,
         pitId: 1,
         layout: {
-          "1|1|1": "cut",
-          "1|1|2": "fine",
-          "1|2|1": "empty",
-          "1|2|2": "fine",
-          "2|1|1": "aisle",
-          "2|1|2": "fine",
-          "2|2|1": "aisle",
-          "2|2|2": "fine",
-          "3|1|1": "aisle",
-          "3|1|2": "cut",
-          "3|2|1": "aisle",
-          "3|2|2": "cut"
+          '1|1|1': 'cut',
+          '1|1|2': 'fine',
+          '1|2|1': 'empty',
+          '1|2|2': 'fine',
+          '2|1|1': 'aisle',
+          '2|1|2': 'fine',
+          '2|2|1': 'aisle',
+          '2|2|2': 'fine',
+          '3|1|1': 'aisle',
+          '3|1|2': 'cut',
+          '3|2|1': 'aisle',
+          '3|2|2': 'cut',
         },
-        createdAt: "2021-08-06T14:44:26.000Z",
+        createdAt: '2021-08-06T14:44:26.000Z',
         updatedAt: null,
         deletedAt: null,
         pit: {
           id: 1,
-          name: "pit 1"
+          name: 'pit 1',
         },
         clientCompany: {
           id: 7,
-          name: "OtroCliente",
-          legalName: "asd",
+          name: 'OtroCliente',
+          legalName: 'asd',
           legalId: 789,
           isOperator: false,
           childId: null,
-          observations: "asd",
-          companyRepresentativeId: 8
-        }
-      })
+          observations: 'asd',
+          companyRepresentativeId: 8,
+        },
+      });
 
-      let originalWarehouseLayout = {}
-      let originalWarehouseWasSaved = false
+      let originalWarehouseLayout = {};
+      let originalWarehouseWasSaved = false;
 
       const formatDeposit = (deposit) => {
         const dimensions = Object.keys(deposit).reduce(
@@ -382,53 +449,57 @@
         return dimensions;
       };
 
-      formatDeposit(warehouse.value.layout)
+      formatDeposit(warehouse.value.layout);
 
-      let {floor,row,col, dimensions} = formatDeposit(warehouse.value.layout)
+      let { floor, row, col, dimensions } = formatDeposit(
+        warehouse.value.layout
+      );
 
-      let visibleCategories = ref([])
+      let visibleCategories = ref([]);
 
       const setVisibleCategories = (category: String) => {
-        if(visibleCategories.value.includes(category)) {
-          visibleCategories.value.splice(visibleCategories.value.indexOf(category))
+        if (visibleCategories.value.includes(category)) {
+          visibleCategories.value.splice(
+            visibleCategories.value.indexOf(category)
+          );
         } else {
-          visibleCategories.value.push(category)
+          visibleCategories.value.push(category);
         }
-      }
+      };
 
       let cradles = ref([
         {
-          "id": "1",
-          "name": "MXH123",
-          "observations": ""
+          id: '1',
+          name: 'MXH123',
+          observations: '',
         },
         {
-          "id": "3",
-          "name": "AB0012",
-          "observations": "No funciona"
+          id: '3',
+          name: 'AB0012',
+          observations: 'No funciona',
         },
         {
-          "id": "4",
-          "name": "SBC123",
-          "observations": "No funciona"
+          id: '4',
+          name: 'SBC123',
+          observations: 'No funciona',
         },
         {
-          "id": "5",
-          "name": "Gruita",
-          "observations": "Es Camufalada ... FUaa"
+          id: '5',
+          name: 'Gruita',
+          observations: 'Es Camufalada ... FUaa',
         },
         {
-          "id": "6",
-          "name": "Pancho ",
-          "observations": ""
-        }
-      ])
+          id: '6',
+          name: 'Pancho ',
+          observations: '',
+        },
+      ]);
 
-      let selectedCradle = ref(0) 
+      let selectedCradle = ref(0);
 
       const handleSelectedCradle = (id) => {
-        selectedCradle.value = id
-      }
+        selectedCradle.value = id;
+      };
 
       // :: CLIENT
       const clientId = ref(-1);
@@ -482,7 +553,6 @@
 
       const save = () => {
         // No está funcionando
-
         // console.log("ORIGINAL", originalWarehouseLayout)
         // console.log("MODIF", warehouse.value.layout)
       };
@@ -513,8 +583,8 @@
         handleSelectedCradle,
         cradles,
         selectedCradle,
-        purchaseOrder,
-        purchaseOrders
+        purchaseOrderId,
+        purchaseOrders,
       };
     },
   });
@@ -531,9 +601,8 @@
     @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
   }
   span.select-category {
-
     @apply flex items-center;
-    
+
     & .icon {
       @apply w-5 h-5 mr-2;
     }
@@ -541,7 +610,7 @@
     &:not(.full):not(.aisle) {
       cursor: pointer;
     }
-    
+
     &.aisle {
       @apply text-second-300 text-second-300;
     }
@@ -631,7 +700,7 @@
       }
     }
     .box-id {
-      margin-left: .5rem;
+      margin-left: 0.5rem;
     }
   }
 </style>
