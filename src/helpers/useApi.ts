@@ -11,7 +11,7 @@ export function useApi(endpoint: string) {
   const read = () => {
     const entity = ref([]);
     const { data } = useAxios(endpoint, instance);
-    watch(data, (newValue, oldValue) => {
+    watch(data, (newValue, _) => {
       if (newValue && newValue.data) {
         entity.value = newValue.data;
       }
@@ -19,7 +19,8 @@ export function useApi(endpoint: string) {
     return entity;
   }
   const destroy = (id: number) => {
-    return { isFinished } = useAxios(`${endpoint}/${id}`, { method: 'DELETE' }, instance);
+    const { data } = useAxios(`${endpoint}/${id}`, { method: 'DELETE' }, instance);
+    return data 
   }
   const update = (entity) => {
     const id = entity.id;

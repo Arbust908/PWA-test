@@ -7,7 +7,7 @@
         Orden de trabajo - {{ woID }}
       </h1>
     </header>
-    <section class="bg-second-50 rounded-md shadow-sm">
+    <section class="bg-second-0 rounded-md shadow-sm">
       <nav class="flex justify-between">
         <button
           class="section-tab"
@@ -136,7 +136,7 @@
                 </label>
                 <div class="pit-block relative">
                   <input
-                    v-model="people.rol"
+                    v-model="people.role"
                     :name="`crew-${crew.id}-${people.id}-rol`"
                     type="text"
                     placeholder="Rol"
@@ -212,7 +212,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, watch, computed, toRefs, reactive } from 'vue';
+  import { ref, watch, computed, toRefs, reactive, watchEffect } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { useToggle } from '@vueuse/core';
@@ -277,19 +277,23 @@
       const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
         return wo.id == route.params.id;
       });
-      console.log(currentWorkOrder);
+      const newCWO = reactive({ ...currentWorkOrder });
       const {
         id: woID,
         client,
         serviceCompany,
-        clientId,
-        serviceCompanyId,
+        // clientId,
+        // serviceCompanyId,
         pad,
         pits,
-        operativeCradleId,
-        backupCradleId,
-        operativeForkliftId,
-        backupForkliftId,
+        operativeCradle,
+        backupCradle,
+        operativeForklift,
+        backupForklift,
+        // operativeCradleId,
+        // backupCradleId,
+        // operativeForkliftId,
+        // backupForkliftId,
         traktors,
         pickups,
         crews,
@@ -298,7 +302,16 @@
         generators,
         tower,
         cabin,
-      } = toRefs(reactive({ ...currentWorkOrder }));
+      } = toRefs(newCWO);
+
+      const clientId = ref(Number(client.value));
+      const serviceCompanyId = ref(Number(serviceCompany.value));
+      const operativeCradleId = ref(Number(operativeCradle.value));
+      const backupCradleId = ref(Number(backupCradle.value));
+      const operativeForkliftId = ref(Number(operativeForklift.value));
+      const backupForkliftId = ref(Number(backupForklift.value));
+
+      console.log(crews.value);
 
       // Crew
       const removeResource = (crewId: number, peopleId: number) => {

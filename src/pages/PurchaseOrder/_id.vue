@@ -69,7 +69,7 @@
               <span>Cantidad</span>
               <div class="mt-1 flex rounded shadow-sm">
                 <input
-                  v-model="order.quantity"
+                  v-model="order.amount"
                   type="number"
                   name="sandQuantity"
                   class="
@@ -89,12 +89,6 @@
                   placeholder="Cantidad de Arena"
                   list="sandQuantity"
                 />
-                <datalist id="sandQuantity">
-                  <option value="Doce">12</option>
-                  <option value="22">22</option>
-                  <option value="44">44</option>
-                  <option value="88">88</option>
-                </datalist>
                 <span
                   class="
                     inline-flex
@@ -143,7 +137,7 @@
             :data="transportProviderId"
             @update:data="transportProviderId = $event"
           />
-          <FieldInput
+          <!-- <FieldInput
             class="col-span-6"
             fieldName="transportId"
             placeholder="Patente del Transporte"
@@ -169,7 +163,7 @@
             mask="X*"
             :data="transportProvider.observation"
             @update:data="transportProvider.observation = $event"
-          />
+          /> -->
         </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
@@ -240,7 +234,6 @@
       const instance = axios.create({
         baseURL: api,
       });
-
       const allPurchaseOrders = store.state.purchaseOrder.all;
       console.log(allPurchaseOrders);
       const currentPurchaseOrder = allPurchaseOrders.find((pO) => {
@@ -249,12 +242,13 @@
         return pO.id == route.params.id;
       });
       console.log(currentPurchaseOrder);
-      const {
-        sandProviderId,
-        sandOrders: sandOrder,
-        transportProviderId,
-        transportProvider,
-      } = currentPurchaseOrder;
+      const { sandProviderId, transportProviderId, transportProvider } =
+        currentPurchaseOrder;
+      console.log(
+        'current',
+        'sandProviderId' + sandProviderId,
+        'transportProviderId' + transportProviderId
+      );
       // >> Init
       // :: Proveedores de Sand
       const sandProviders = ref([] as Array<SandProvider>);
@@ -264,34 +258,24 @@
           sandProviders.value = sPData.data;
         }
       });
-      // const sandProviderId: Ref<number> = ref(-1);
-      // >> Proveedores de Sand
-
-      // :: Ordenes de Sand
-      // const sandOrder: Ref<Array<any>> = ref([
-      //   {
-      //     id: 0,
-      //     sandType: {},
-      //     sandTypeId: '',
-      //     quantity: null,
-      //     boxId: '',
-      //   },
-      // ]);
+      const sandOrder = ref([] as Array<SandOrder>);
+      const allSandOrders = ref([] as Array<SandOrder>);
+      const { data: sandOrderData } = useAxios('/sandOrder', instance);
+      watch(sandOrderData, (apiData, prevCount) => {
+        if (apiData && apiData.data) {
+          allSandOrders.value = apiData.data;
+          console.log('Sand Orders', allSandOrders.value);
+          sandOrder.value = allSandOrders.value.filter((sO) => {
+            console.log(sO.purchaseOrderId, currentPurchaseOrder.id);
+            return sO.purchaseOrderId == currentPurchaseOrder.id;
+          });
+          console.log('Sand Order', sandOrder.value);
+        }
+      });
 
       const companyClientId: Ref<number> = ref(-1);
       const pitId: Ref<number> = ref(-1);
 
-      // :: Ordenes de Sand
-      const sandOrders = ref([] as Array<SandOrder>);
-      const { data: sandOrdersData } = useAxios('/sandOrder', instance);
-      watch(sandOrdersData, (sOData, prevCount) => {
-        if (sOData && sOData.data) {
-          sandOrders.value = sOData.data;
-        }
-      });
-      // >> Ordenes de Sand
-
-      // :: Tipos de Sand
       const sandTypes = ref([] as Array<Sand>);
       const { data: sandTypesData } = useAxios('/sand', instance);
       watch(sandTypesData, (sOData, prevCount) => {
@@ -299,9 +283,7 @@
           sandTypes.value = sOData.data;
         }
       });
-
       // >> Tipos de Sand
-
       const removeOrder = (id: number): void => {
         sandOrder.value = sandOrder.value.filter(
           (sandOrder: SandOrder) => sandOrder.id !== id
@@ -312,31 +294,19 @@
         const newId = lastSandOrder.id + 1;
         sandOrder.value.push({
           id: newId,
-          type: {},
-          sandTypeId: '',
-          quantity: null,
+          sandTypeId: -1,
+          amount: null,
           boxId: '',
         });
       };
-
       // :: TransportProvider
-      const transportProviders = ref([] as Array<Sand>);
+      const transportProviders = ref([]);
       const { data: tPData } = useAxios('/transportProvider', instance);
       watch(tPData, (tPData, prevCount) => {
         if (tPData && tPData.data) {
           transportProviders.value = tPData.data;
         }
       });
-
-      // const transportProviderId: Ref<number> = ref(-1);
-      // const transportProvider: TransportProvider = reactive({
-      //   id: 1,
-      //   name: '',
-      //   transportId: '',
-      //   boxQuantity: null,
-      //   observation: '',
-      // });
-      // >> TransportProvider
 
       const isFull: ComputedRef<boolean> = computed(() => {
         return !!(
@@ -346,7 +316,7 @@
           transportProvider.boxQuantity >= 0 &&
           sandProviderId.value > -1 &&
           sandOrder.value.length > 0 &&
-          sandOrder.value.every((sO: SandOrder) => sO.quantity > 0) &&
+          sandOrder.value.every((sO: SandOrder) => sO.amount > 0) &&
           sandOrder.value.every((sO: SandOrder) => sO.type !== '')
         );
       });
@@ -386,7 +356,6 @@
         transportProvider,
         isFull,
         save,
-        sandOrders,
         sandProviders,
         sandTypes,
         transportProviders,

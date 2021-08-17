@@ -21,9 +21,7 @@ export default {
   },
   actions: {
     saveWorkOrder({ commit }, workOrder) {
-      console.log('saveWorkOrder', workOrder);
       const baseWO = {
-        id: 0,
         client: '',
         serviceCompany: '',
         pad: '',

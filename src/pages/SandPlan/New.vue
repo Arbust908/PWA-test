@@ -368,7 +368,6 @@
       // << SAND
 
       const isFull = computed(() => {
-        console.log(currentSandPlan.stages);
         const noZeroSandTypeNull =
           (currentSandPlan.stages[0].sandId1 !== null &&
             currentSandPlan.stages[0].sandId1 !== -1) ||
@@ -391,8 +390,8 @@
       });
       const { saveSandPlan } = useActions(['saveSandPlan']);
       const save = (): void => {
-        console.log(currentSandPlan.stages);
         currentSandPlan.stages.map((stage) => {
+          console.log(stage);
           if (stage.sandId1 === -1) {
             stage.sandId1 = null;
           }
@@ -416,8 +415,23 @@
           { method: 'POST', data: currentSandPlan },
           instance
         );
-        saveSandPlan(currentSandPlan);
-        router.push('/planificacion-de-arena');
+        watch(data, (apiData) => {
+          if (apiData && apiData.data) {
+            const sandPlanId = apiData.data.id;
+            currentSandPlan.stages.map((stage) => {
+              const { id, ...sandStage } = stage;
+              stage.sandPlanId = sandPlanId;
+              stage.action = 'create';
+              const { data } = useAxios(
+                '/sandStage',
+                { method: 'POST', data: sandStage },
+                instance
+              );
+            });
+            saveSandPlan(currentSandPlan);
+            router.push('/planificacion-de-arena');
+          }
+        });
       };
       return {
         currentSandPlan,

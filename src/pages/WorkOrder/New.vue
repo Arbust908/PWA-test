@@ -131,13 +131,13 @@
               class="pt-2 pb-3"
             >
               <div class="">
-                <label :for="`crew-${crew.id}-${people.id}-rol`" class="">
+                <label :for="`crew-${crew.id}-${people.id}-role`" class="">
                   Rol
                 </label>
                 <div class="pit-block relative">
                   <input
-                    v-model="people.rol"
-                    :name="`crew-${crew.id}-${people.id}-rol`"
+                    v-model="people.role"
+                    :name="`crew-${crew.id}-${people.id}-role`"
                     type="text"
                     placeholder="Rol"
                   />
@@ -334,7 +334,7 @@
       const resource: Ref<Array<HumanResource>> = ref([
         {
           id: 0,
-          rol: '',
+          role: '',
           name: '',
         },
       ]);
@@ -356,7 +356,7 @@
         const lastId = selectedCrew.resources.length;
         selectedCrew.resources.push({
           id: lastId,
-          rol: '',
+          role: '',
           name: '',
         } as HumanResource);
       };
@@ -367,7 +367,6 @@
         crews.value = crews.value
           .map((crew: Crew) => removeEmptyResource(crew.id))
           .filter((crew: Crew) => {
-            console.log(crew);
             return !(
               crew.resources.length <= 0 &&
               crew.timeStart === '' &&
@@ -414,7 +413,7 @@
         }
         selectedCrew.resources = selectedCrew.resources.filter(
           (resource: HumanResource) =>
-            resource.rol !== '' && resource.name !== ''
+            resource.role !== '' && resource.name !== ''
         );
         if (!isDraft.value && selectedCrew.resources.length === 0) {
           selectedCrew.resources.push(saveResourse);
@@ -479,6 +478,10 @@
           backupCradleId: backupCradleId.value,
           operativeForkliftId: operativeForkliftId.value,
           backupForkliftId: backupForkliftId.value,
+          operativeCradle: operativeCradleId.value,
+          backupCradle: backupCradleId.value,
+          operativeForklift: operativeForkliftId.value,
+          backupForklift: backupForkliftId.value,
           traktors: traktors.value,
           pickups: pickups.value,
           crews: crews.value,
@@ -504,6 +507,7 @@
               pits.value.forEach((pit: Pit) => {
                 console.log(pit);
                 const { id, ...newPit } = pit;
+                newPit.companyId = newWO.clientId;
                 newPit.workOrderId = workOrderId;
                 console.log('NewPit', newPit);
                 const { data } = useAxios(
@@ -533,7 +537,6 @@
             if (pickups.value.length > 0) {
               const isPickupFinished = ref([]);
               pickups.value.forEach((pickup) => {
-                console.log(pickup);
                 const { id, ...newPickup } = pickup;
                 newPickup.workOrderId = workOrderId;
                 const { data } = useAxios(
@@ -543,7 +546,32 @@
                 );
                 isPickupFinished.value.push(data);
               });
-              console.log(isPickupFinished.value);
+            }
+            if (crews.value.length > 0) {
+              const isCrewsFinished = ref([]);
+              crews.value.forEach((crew) => {
+                const { id, ...newCrew } = crew;
+                newCrew.workOrderId = workOrderId;
+                const { data } = useAxios(
+                  '/crew',
+                  { method: 'POST', data: newCrew },
+                  instance
+                );
+                isCrewsFinished.value.push(data);
+                watch(data, (newVal, _) => {
+                  crew.resources.forEach((resource) => {
+                    const crewId = newVal.data.id;
+                    const { id, ...newResource } = resource;
+                    newResource.crewId = crewId;
+                    const { data: dataRH } = useAxios(
+                      '/humanResource',
+                      { method: 'POST', data: newResource },
+                      instance
+                    );
+                  });
+                });
+              });
+              console.log(isCrewsFinished.value);
             }
             store.dispatch('saveWorkOrder', newVal.data);
             router.push('/orden-de-trabajo');

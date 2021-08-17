@@ -130,8 +130,9 @@
 </template>
 
 <script lang="ts">
-  import { watchEffect, defineComponent, computed } from 'vue';
+  import { watch, watchEffect, defineComponent, computed } from 'vue';
   import { useVModels } from '@vueuse/core';
+  import { useRoute } from 'vue-router';
 
   import Icon from '@/components/icon/TheAllIcon.vue';
 
@@ -144,6 +145,7 @@
 
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import { Pit } from '@/interfaces/sandflow';
+  import { useApi } from '@/helpers/useApi';
 
   export default defineComponent({
     components: {
@@ -207,6 +209,8 @@
       },
     },
     setup(props, { emit }) {
+      const route = useRoute();
+      const id = route.params.id;
       const {
         operativeCradleId,
         backupCradleId,
@@ -221,6 +225,35 @@
         cabin,
         isFull,
       } = useVModels(props, emit);
+
+      const { read: readT } = useApi('/traktor');
+      const allTracktors = readT();
+      watch(allTracktors, (newVal, _) => {
+        traktors.value = newVal.filter((t) => {
+          console.log(t.workOrderId, id);
+          return t.workOrderId === id;
+        });
+        console.log(traktors.value);
+        console.log(traktors.value.length);
+        if (traktors.value.length === 0) {
+          console.log('agregar');
+          addTraktor();
+        }
+      });
+
+      const { read: readP } = useApi('/pickup');
+      const allPickups = readP();
+      watch(allPickups, (newVal, _) => {
+        pickups.value = newVal.filter((p) => {
+          console.log(p.workOrderId, id);
+          return p.workOrderId === id;
+        });
+        console.log(pickups.value);
+        if (pickups.value.length === 0) {
+          addPickup();
+        }
+        console.log(pickups.value);
+      });
 
       const removeTraktor = (traktorId: number) => {
         traktors.value = traktors.value.filter(
@@ -247,16 +280,11 @@
         const newPickupId = lastPickup ? lastPickup.id + 1 : 0;
         pickups.value.push({
           id: newPickupId,
-          pickup_id: '',
+          pickupId: '',
           description: '',
         });
       };
-      if (traktors.value.length === 0) {
-        addTraktor();
-      }
-      if (pickups.value.length === 0) {
-        addPickup();
-      }
+
       const firstTracktorFull = computed(() => {
         const trackto = traktors.value[0];
         return (

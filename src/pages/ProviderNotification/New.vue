@@ -7,7 +7,7 @@
         Notificación a proveedores
       </h1>
     </header>
-    <section class="bg-second-50 rounded-md shadow-sm">
+    <section class="bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Arena</h2>
@@ -76,12 +76,6 @@
                   placeholder="22"
                   list="sandQuantity-list"
                 />
-                <datalist id="sandQuantity-list">
-                  <option value="12">12</option>
-                  <option value="22">22</option>
-                  <option value="44">44</option>
-                  <option value="88">88</option>
-                </datalist>
                 <span
                   class="
                     inline-flex

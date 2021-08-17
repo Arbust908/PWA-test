@@ -20,7 +20,7 @@
       </template>
       <template #body>
         <tr
-          v-for="(wo, woKey) in woDB"
+          v-for="(wo, woKey) in workOrders"
           :key="wo.id"
           :class="woKey % 2 === 0 ? 'even' : 'odd'"
           class="body-row"
@@ -48,9 +48,7 @@
               </span>
             </div>
           </td>
-          <td
-            class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium"
-          >
+          <td>
             <div class="btn-panel">
               <router-link :to="`/orden-de-trabajo/${wo.id}`" class="edit">
                 <Icon icon="PencilAlt" class="w-5 h-5" />
@@ -63,7 +61,7 @@
             </div>
           </td>
         </tr>
-        <tr v-if="woDB.length <= 0">
+        <tr v-if="workOrders.length <= 0">
           <td colspan="5" class="emptyState">
             <p>No hay Ordenes de Trabajo</p>
           </td>
@@ -83,11 +81,10 @@
 
   import '@/assets/table.scss';
 
-  import axios from 'axios';
-  import { useAxios } from '@vueuse/integrations/useAxios';
+  import { useApi } from '@/helpers/useApi';
+
   import { useTitle } from '@vueuse/core';
   import { WorkOrder } from '@/interfaces/WorkOrder';
-  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
     components: {
@@ -98,65 +95,33 @@
     },
     setup() {
       const title = useTitle('Ordenes de Trabajo <> Sandflow');
-      const instance = axios.create({
-        baseURL: api + '/workOrder',
-      });
       const store = useStore();
-      const workOrders = store.state.workOrders.all;
 
-      const { data, isFinished, isLoading, error } = useAxios('/', instance);
-
-      const woDB: Ref<Array<WorkOrder>> = ref([] as Array<WorkOrder>);
-      watch(data, (currentData, prevData) => {
-        if (currentData) {
-          woDB.value = currentData.data;
-          if (woDB.value && woDB.value.length > 0) {
-            if (
-              !workOrders.value ||
-              woDB.value.length > workOrders.value.length
-            ) {
-              if (!workOrders.value || workOrders.value.length === 0) {
-                woDB.value.forEach((wo) => {
-                  store.dispatch('saveWorkOrder', wo);
-                });
-              } else {
-                const newWoDB = woDB.value.filter((woFromApi, key) => {
-                  return (
-                    woFromApi.id &&
-                    workOrders.value[key] &&
-                    woFromApi.id !== workOrders.value[key].id
-                  );
-                });
-                newWoDB.forEach((wo) => {
-                  store.dispatch('saveWorkOrder', wo);
-                });
-              }
-            }
-          }
+      const { read, destroy } = useApi('/workOrder');
+      const workOrders = read();
+      watch(workOrders, (newValue, _) => {
+        if (newValue) {
+          storeToState(newValue);
         }
       });
-
+      const storeToState = (wOs: Array<WorkOrder>) => {
+        return wOs.map((wO) => {
+          store.dispatch('saveWorkOrder', wO);
+        });
+      };
       const deleteWO = (woId) => {
-        const { data, isFinished } = useAxios(
-          `/${woId}`,
-          { method: 'DELETE' },
-          instance
-        );
-        watch(isFinished, (load, prevLoad) => {
+        const data = destroy(woId);
+        watch(data, (_, __) => {
           store.dispatch('deleteWorkOrder', woId);
-          woDB.value = woDB.value.filter((woFromApi) => {
+          workOrders.value = workOrders.value.filter((woFromApi) => {
             return woFromApi.id !== woId;
           });
         });
-        return isFinished;
       };
 
       return {
-        woDB,
+        workOrders,
         deleteWO,
-        isFinished,
-        isLoading,
-        error,
       };
     },
   });

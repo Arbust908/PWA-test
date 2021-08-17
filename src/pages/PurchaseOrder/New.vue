@@ -69,7 +69,7 @@
               <span>Cantidad</span>
               <div class="mt-1 flex rounded shadow-sm">
                 <input
-                  v-model="order.quantity"
+                  v-model="order.amount"
                   type="number"
                   name="sandQuantity"
                   class="
@@ -89,12 +89,6 @@
                   placeholder="Cantidad de Arena"
                   list="sandQuantity"
                 />
-                <datalist id="sandQuantity">
-                  <option value="Doce">12</option>
-                  <option value="22">22</option>
-                  <option value="44">44</option>
-                  <option value="88">88</option>
-                </datalist>
                 <span
                   class="
                     inline-flex
@@ -143,7 +137,7 @@
             :data="transportProviderId"
             @update:data="transportProviderId = $event"
           />
-          <FieldInput
+          <!-- <FieldInput
             class="col-span-6"
             fieldName="transportId"
             placeholder="Patente del Transporte"
@@ -158,8 +152,8 @@
             placeholder="Cantidad de cajas"
             title="Cantidad de cajas"
             mask="##"
-            :data="transportProvider.transportId"
-            @update:data="transportProvider.transportId = Number($event)"
+            :data="transportProvider.boxQuantity"
+            @update:data="transportProvider.boxQuantity = Number($event)"
           />
           <FieldInput
             class="col-span-full"
@@ -169,7 +163,7 @@
             mask="X*"
             :data="transportProvider.observation"
             @update:data="transportProvider.observation = $event"
-          />
+          /> -->
         </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
@@ -192,7 +186,15 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, reactive, computed, ComputedRef, watch } from 'vue';
+  import {
+    ref,
+    Ref,
+    reactive,
+    computed,
+    ComputedRef,
+    watch,
+    watchEffect,
+  } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
@@ -233,8 +235,6 @@
       FieldSelect,
     },
     setup() {
-      // :: Init
-      const store = useStore();
       const router = useRouter();
       const instance = axios.create({
         baseURL: api,
@@ -251,30 +251,18 @@
       const sandProviderId: Ref<number> = ref(-1);
       const companyClientId: Ref<number> = ref(-1);
       const pitId: Ref<number> = ref(-1);
-
       // >> Proveedores de Sand
-
       // :: Ordenes de Sand
       const sandOrder: Ref<Array<any>> = ref([
         {
           id: 0,
-          sandType: {},
           sandTypeId: -1,
-          quantity: null,
+          amount: null,
           boxId: '',
         },
       ]);
-
       // :: Ordenes de Sand
       const sandOrders = ref([] as Array<SandOrder>);
-      const { data: sandOrdersData } = useAxios('/sandOrder', instance);
-      watch(sandOrdersData, (sOData, prevCount) => {
-        if (sOData && sOData.data) {
-          sandOrders.value = sOData.data;
-        }
-      });
-      // >> Ordenes de Sand
-
       // :: Tipos de Sand
       const sandTypes = ref([] as Array<Sand>);
       const { data: sandTypesData } = useAxios('/sand', instance);
@@ -283,9 +271,7 @@
           sandTypes.value = sOData.data;
         }
       });
-
       // >> Tipos de Sand
-
       const removeOrder = (id: number): void => {
         sandOrder.value = sandOrder.value.filter(
           (sandOrder: SandOrder) => sandOrder.id !== id
@@ -296,22 +282,19 @@
         const newId = lastSandOrder.id + 1;
         sandOrder.value.push({
           id: newId,
-          type: {},
           sandTypeId: '',
-          quantity: null,
+          amount: null,
           boxId: '',
         });
       };
-
       // :: TransportProvider
-      const transportProviders = ref([] as Array<Sand>);
+      const transportProviders = ref([]);
       const { data: tPData } = useAxios('/transportProvider', instance);
       watch(tPData, (tPData, prevCount) => {
         if (tPData && tPData.data) {
           transportProviders.value = tPData.data;
         }
       });
-
       const transportProviderId: Ref<number> = ref(-1);
       const transportProvider: TransportProvider = reactive({
         id: 1,
@@ -319,48 +302,64 @@
         transportId: '',
         boxQuantity: null,
         observation: '',
+        amount: null,
       });
       // >> TransportProvider
-
       const isFull: ComputedRef<boolean> = computed(() => {
         return !!(
           transportProviderId.value > -1 &&
-          transportProvider.transportId &&
-          transportProvider.boxQuantity &&
-          transportProvider.boxQuantity >= 0 &&
-          transportProvider.observation &&
+          // transportProvider.transportId &&
+          // transportProvider.boxQuantity &&
+          // transportProvider.boxQuantity >= 0 &&
           sandProviderId.value > -1 &&
           sandOrder.value.length > 0 &&
-          sandOrder.value.every((sO: SandOrder) => sO.quantity > 0) &&
+          sandOrder.value.every((sO: SandOrder) => sO.amount > 0) &&
           sandOrder.value.every((sO: SandOrder) => sO.type !== '')
         );
       });
-      const getTPbyId = (id: number): TransportProvider => {
-        return transportProviders.value.find((tp) => tp.id === id);
-      };
-      const getSPbyId = (id: number): SandProvider => {
-        return sandProviders.value.find((sp) => sp.id === id);
-      };
-
       const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
       const save = (): void => {
         if (isFull.value) {
-          const newTP = getTPbyId(transportProviderId.value);
-          const trueTP = {
-            ...transportProvider,
-            id: newTP.id,
-            name: newTP.name,
-          };
-          const purchaseOrder = {
+          const purchaseOrder: PurchaseOrder = {
             sandProviderId: sandProviderId.value,
-            sandProvider: getSPbyId(sandProviderId.value),
-            sandOrders: [...sandOrder.value],
             transportProviderId: transportProviderId.value,
-            transportProvider: trueTP,
-          } as PurchaseOrder;
+          };
           console.log(purchaseOrder);
-          savePurchaseOrder(purchaseOrder);
-          router.push('/orden-de-pedido');
+          const { data: pODone } = useAxios(
+            '/purchaseOrder',
+            { method: 'POST', data: purchaseOrder },
+            instance
+          );
+          const sOisDone = ref([]);
+          watch(pODone, (newVal, _) => {
+            if (newVal && newVal.data) {
+              console.log(newVal.data);
+              console.log(sandOrder.value);
+              sandOrder.value.map((sO: SandOrder) => {
+                console.log(sO);
+                sO.purchaseOrderId = newVal.data.id;
+                const { data: sODone } = useAxios(
+                  '/sandOrder',
+                  { method: 'POST', data: sO },
+                  instance
+                );
+                watch(sODone, (newVal, _) => {
+                  if (newVal && newVal.data) {
+                    sOisDone.value.push(newVal.data);
+                  }
+                });
+              });
+            }
+          });
+          watchEffect(() => {
+            if (sOisDone.value.length >= sandOrder.value.length) {
+              const ordenDePedido = pODone.value.data;
+              const pedidoDeArena = sOisDone.value;
+              ordenDePedido.sandOrders = pedidoDeArena;
+              savePurchaseOrder(ordenDePedido);
+              router.push('/orden-de-pedido');
+            }
+          });
         }
       };
       return {
