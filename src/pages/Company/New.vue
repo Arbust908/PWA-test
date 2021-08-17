@@ -7,7 +7,6 @@
         Nuevo Cliente
       </h1>
     </header>
-    {{ isFull }}
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <FieldGroup>

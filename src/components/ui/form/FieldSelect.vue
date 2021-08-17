@@ -3,6 +3,7 @@
     <span v-if="title">{{ title }}</span>
     <!-- TODO: Dropdown con Busqueda -->
     <!-- TODO: Options con entrada cheta -->
+    <!-- TODO: StoreLogic -->
     <select
       :id="fieldName"
       class="input"

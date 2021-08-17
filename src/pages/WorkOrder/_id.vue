@@ -296,7 +296,7 @@
         // backupForkliftId,
         traktors,
         pickups,
-        crews,
+        crew: crews,
         rigmats,
         conex,
         generators,
@@ -311,7 +311,7 @@
       const operativeForkliftId = ref(Number(operativeForklift.value));
       const backupForkliftId = ref(Number(backupForklift.value));
 
-      console.log(crews.value);
+      console.log('CREWS', crews.value);
 
       // Crew
       const removeResource = (crewId: number, peopleId: number) => {

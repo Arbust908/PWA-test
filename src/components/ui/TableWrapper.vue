@@ -5,10 +5,18 @@
         <article>
           <table>
             <thead>
-              <slot name="header"></slot>
+              <slot name="header">
+                <tr>
+                  <th scope="col">Header</th>
+                </tr>
+              </slot>
             </thead>
             <tbody>
-              <slot name="body"></slot>
+              <slot name="body">
+                <tr>
+                  <td>Body</td>
+                </tr>
+              </slot>
             </tbody>
           </table>
         </article>

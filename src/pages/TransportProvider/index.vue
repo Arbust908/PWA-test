@@ -12,7 +12,7 @@
       <template #header>
         <tr>
           <th scope="col">Nombre</th>
-          <th scope="col">Observaciones</th>
+          <th scope="col">Observaciónes</th>
           <th scope="col">
             <span>Actions</span>
           </th>
@@ -87,7 +87,7 @@
       const getTP = async () => {
         loading.value = true;
         tpDB.value = await axios
-          .get(`${api}transportProvider`)
+          .get(`${api}/transportProvider`)
           .catch((err) => {
             console.log(err);
           })

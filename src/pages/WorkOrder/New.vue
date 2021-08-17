@@ -552,6 +552,7 @@
               crews.value.forEach((crew) => {
                 const { id, ...newCrew } = crew;
                 newCrew.workOrderId = workOrderId;
+                console.log('crew', newCrew);
                 const { data } = useAxios(
                   '/crew',
                   { method: 'POST', data: newCrew },
