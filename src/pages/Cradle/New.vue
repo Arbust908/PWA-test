@@ -4,38 +4,34 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Grúa - Nuevo
+        Nuevo Cradle
       </h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm">
+    <section class="bg-white rounded-md shadow-sm max-w-2xl">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <label class="col-span-12" for="name">
-            <span>Nombre</span>
-            <input
-              id="name"
-              v-model="name"
-              class="input"
-              type="text"
-              name="name"
-              placeholder="Ej: MXH-123"
-            />
-          </label>
-          <label class="col-span-12" for="observations">
-            <span>Observaciónes</span>
-            <input
-              id="observations"
-              v-model="observations"
-              class="input"
-              type="text"
-              name="observations"
-              placeholder="Observaciones ..."
-            />
-          </label>
-        </fieldset>
+        <FieldGroup>
+          <FieldInput
+            class="col-span-full"
+            fieldName="name"
+            placeholder="Nombre del Cradle"
+            title="Nombre"
+            mask="S*"
+            :data="name"
+            @update:data="name = $event"
+          />
+          <FieldTextArea
+            class="col-span-full"
+            fieldName="observations"
+            placeholder="Observaciones..."
+            title="Observaciones"
+            :rows="5"
+            isOptional
+            :data="observations"
+            @update:data="observations = $event"
+          />
+        </FieldGroup>
       </form>
-      <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-        <section></section>
+      <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
@@ -56,16 +52,19 @@
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
-  import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
   import NoneBtn from '@/components/ui/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
   import axios from 'axios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
-      BookmarkIcon,
-      CheckCircleIcon,
+      FieldGroup,
+      FieldInput,
+      FieldTextArea,
       PrimaryBtn,
       NoneBtn,
       Layout,

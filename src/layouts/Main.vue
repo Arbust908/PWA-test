@@ -317,12 +317,22 @@
         </div>
       </div>
 
-      <main class="flex-1 relative overflow-y-auto focus:outline-none py-6">
-        <div class="py-6">
-          <div class="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-            <slot></slot>
-          </div>
+      <main
+        class="
+          flex-1
+          relative
+          overflow-y-auto
+          focus:outline-none
+          p-4
+          md:p-6
+          lg:p-8
+        "
+      >
+        <!-- <div class="p-6"> -->
+        <div class="max-w-7xl">
+          <slot></slot>
         </div>
+        <!-- </div> -->
       </main>
     </div>
   </div>

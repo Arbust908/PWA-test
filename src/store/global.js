@@ -63,8 +63,8 @@ export default {
             icon: 'ClipboardListIcon',
           },
           {
-            name: 'Montacargas',
-            to: '/montacargas',
+            name: 'Forklift',
+            to: '/forklift',
             icon: 'ClipboardListIcon',
           },
           {
