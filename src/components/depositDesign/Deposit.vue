@@ -12,7 +12,7 @@
       </button>
     </nav>
     <article
-      class="overflow-auto max-w-md md:max-w-lg lg:max-w-2xl p-2 max-h-[400px]"
+      class="max-w-md md:max-w-lg lg:max-w-2xl p-2 max-h-[400px]"
     >
       <div v-if="rows > 0 && cols > 0" ref="depo" class="deposit">
         <template v-for="row in rows" :key="`row-${row}`">
@@ -23,24 +23,10 @@
               :floor="currentFloor"
               :deposit="deposit"
               :selectedBox="selectedBox"
-              :category="category"
               :visibleCategories="visibleCategories"
+              :boxData="getBoxData(row,col,currentFloor)"
               @select-box="selectBox"
             />
-            <!-- <button
-              :class="getCategory(row, col, currentFloor)"
-              class="box"
-              @click.prevent="
-                selectBox({
-                  row,
-                  col,
-                  floor: currentFloor,
-                  category: getCategory(row, col, currentFloor),
-                })
-              "
-            >
-              <span class="text-sm">{{ row }} - {{ col }}</span>
-            </button> -->
           </template>
         </template>
       </div>
@@ -63,7 +49,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, ref, watch, toRefs, reactive } from 'vue';
+  import { defineComponent, ref, watch, toRefs, reactive,computed } from 'vue';
   import { useCssVar } from '@vueuse/core';
   import { Box } from '@/interfaces/sandflow';
   import DepositBox from '@/components/depositDesign/DepositBox.vue';
@@ -100,7 +86,7 @@
       DepositBox,
     },
     setup(props, { emit }) {
-      const { deposit, floor, rows, cols, selectedBox } = toRefs(props);
+      const { floor, rows, cols, selectedBox, deposit } = toRefs(props);
       const depo = ref(null);
       const cssRows = useCssVar('--rows', depo);
       cssRows.value = '' + rows.value;
@@ -119,8 +105,9 @@
       const selectBox = (box: Box) => {
         emit('select-box', box);
       };
-      const getCategory = (row: number, col: number, floor: number) => {
-        return deposit.value[`${floor}|${row}|${col}`] || 'empty';
+
+      const getBoxData = (row: number, col: number, floor: number) => {
+        return deposit.value[`${floor}|${row}|${col}`];
       };
 
       let visibleCategories = ref(props.visibleCategories)
@@ -132,7 +119,7 @@
         cols,
         selectedBox,
         currentFloor,
-        getCategory,
+        getBoxData,
         setFloor,
         selectBox,
         visibleCategories
@@ -145,7 +132,7 @@
   .deposit {
     grid-template-columns: repeat(var(--cols), 3rem);
     grid-template-rows: repeat(var(--rows), 3rem);
-    @apply grid gap-3;
+    @apply grid gap-[17px];
   }
   .floor {
     @apply border-b-4 border-transparent pb-2;

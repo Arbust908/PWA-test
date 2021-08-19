@@ -335,7 +335,7 @@
 
       const addNewCell = (floor: number, row: number, col: number) => {
         if (!deposit.value[`${floor}|${row}|${col}`]) {
-          deposit.value[`${floor}|${row}|${col}`] = '';
+          deposit.value[`${floor}|${row}|${col}`] = {};
         }
       };
       const removeCell = (floor: number, row: number, col: number) => {
@@ -398,7 +398,7 @@
       const setCat = (cat: string) => {
         selectedBox.value.category = cat;
         const box = selectedBox.value;
-        deposit.value[`${box.floor}|${box.row}|${box.col}`] = cat;
+        deposit.value[`${box.floor}|${box.row}|${box.col}`].category = cat;
         // deposit.value[`${box.floor}|${box.row}|${box.col}`] = {
         //   category: box.category,
         //   warehouseId: null,

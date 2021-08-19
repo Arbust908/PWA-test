@@ -168,9 +168,6 @@
           />
         </fieldset>
       </form>
-      <!-- {{ selectedBox }}
-      <hr />
-      {{ deposit }} -->
     </section>
     <footer class="p-4 space-x-8 flex justify-end">
       <GhostBtn
@@ -231,6 +228,8 @@
       const instance = axios.create({
         baseURL: apiUrl,
       });
+
+      let deposit = ref({});
 
       const rows: Ref<number> = ref(0);
       watch(rows, (newV, oldV) => {
@@ -301,7 +300,7 @@
 
       const addNewCell = (floor: number, row: number, col: number) => {
         if (!deposit.value[`${floor}|${row}|${col}`]) {
-          deposit.value[`${floor}|${row}|${col}`] = '';
+          deposit.value[`${floor}|${row}|${col}`] = {};
         }
       };
       const removeCell = (floor: number, row: number, col: number) => {
@@ -356,19 +355,16 @@
         col: 0,
         row: 0,
         category: '',
+        id: ''
       });
       const selectBox = (box: Box) => {
         selectedBox.value = box;
       };
       const setCat = (cat: string) => {
         selectedBox.value.category = cat;
-        const box = selectedBox.value;
-        deposit.value[`${box.floor}|${box.row}|${box.col}`] = box.category;
+        const {floor,row,col} = selectedBox.value
+        deposit.value[`${floor}|${row}|${col}`].category = cat;
       };
-
-      // :: DEPOSIT
-      const deposit = ref({});
-      // << DEPOSIT
 
       const isFull = computed(() => {
         const hasClientAndPit: boolean =

@@ -72,7 +72,7 @@
               :class="['radio-button', choosedBox.id == box.id ? 'active' : '']"
               @click.prevent="setSelectedBox(box.id)"
             ></div>
-            <div class="box-id"># {{ box.id }}</div>
+            <div class="box-id"># {{ box.id }} - {{box.category}}</div>
           </div>
         </fieldset>
         <nav class="flex justify-between">
@@ -201,9 +201,6 @@
           Seleccionar cliente, pozo y orden de pedido para comenzar.
         </div>
       </form>
-      <!-- {{ selectedBox }}
-      <hr />
-      {{ deposit }} -->
     </section>
     <footer class="p-4 space-x-8 flex justify-end">
       <GhostBtn
@@ -275,7 +272,7 @@
       let activeSection = ref('deposit');
       let boxes = ref([
         {
-          id: 1,
+          id: "ID-289",
           warehouseId: 1,
           warehouse: {
             id: 1,
@@ -283,41 +280,40 @@
             pitId: 1,
             pit: {
               id: 1,
-              name: 'Test',
+              name: "Test",
               workOrderId: 1,
             },
-            layout: 'any',
+            layout: "any",
           },
-          category: 'cut',
-          col: 1,
-          floor: 1,
-          row: 1,
-        },
-        {
-          id: 2,
-          warehouseId: 1,
-          warehouse: {
-            id: 1,
-            clientCompanyId: 1,
-            pitId: 1,
-            pit: {
-              id: 1,
-              name: 'Test',
-              workOrderId: 1,
-            },
-            layout: 'any',
-          },
-          category: 'fine',
+          category: "cut",
           col: 2,
           floor: 1,
           row: 2,
+        },
+        {
+          id: "A4%$",
+          warehouseId: 1,
+          warehouse: {
+            id: 1,
+            clientCompanyId: 1,
+            pitId: 1,
+            pit: {
+              id: 1,
+              name: "Test",
+              workOrderId: 1,
+            },
+            layout: "any",
+          },
+          category: "fine",
+          col: 2,
+          floor: 1,
+          row: 1,
         },
       ]);
       const purchaseOrders = ref([]);
       const { data: poData } = useAxios('/purchaseOrder', instance);
       watch(poData, (api) => {
         if (api && api.data) {
-          console.log('purchaseOrders', api.data);
           purchaseOrders.value = api.data;
         }
       });
@@ -346,11 +342,12 @@
         col: 0,
         row: 0,
         category: '',
+        id: ''
       });
 
       const setSelectedBox = (id: Number) => {
         choosedBox.value = boxes.value.filter((box) => {
-          if (box.id === id) {
+          if (box.id == id) {
             if (choosedBox.value.category !== box.category) {
               setVisibleCategories(choosedBox.value.category);
               setVisibleCategories(box.category);
@@ -369,9 +366,12 @@
           choosedBox.value.floor = box.floor;
           choosedBox.value.col = box.col;
           choosedBox.value.row = box.row;
-          warehouse.value.layout[`${selectedBoxPosition}`] =
+          warehouse.value.layout[`${selectedBoxPosition}`].category =
             choosedBox.value.category;
-          warehouse.value.layout[`${prevBoxPosition}`] = 'empty';
+          warehouse.value.layout[`${selectedBoxPosition}`].id =
+            choosedBox.value.id;
+          warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
+          warehouse.value.layout[`${prevBoxPosition}`].id = '';
         }
       };
 
@@ -398,18 +398,18 @@
         clientCompanyId: 7,
         pitId: 1,
         layout: {
-          '1|1|1': 'cut',
-          '1|1|2': 'fine',
-          '1|2|1': 'empty',
-          '1|2|2': 'fine',
-          '2|1|1': 'aisle',
-          '2|1|2': 'fine',
-          '2|2|1': 'aisle',
-          '2|2|2': 'fine',
-          '3|1|1': 'aisle',
-          '3|1|2': 'cut',
-          '3|2|1': 'aisle',
-          '3|2|2': 'cut',
+          '1|1|1': {id: 'ID-222',category: 'cut'},
+          '1|1|2': {id: 'A4%$',category: 'fine'},
+          '1|2|1': {id: '',category: 'empty'},
+          '1|2|2': {id: 'ID-289',category: 'cut'},
+          '2|1|1': {id: '',category: 'empty'},
+          '2|1|2': {id: 'ID-678',category: 'fine'},
+          '2|2|1': {id: '',category: 'empty'},
+          '2|2|2': {id: 'ID-890',category: 'fine'},
+          '3|1|1': {id: '',category: 'empty'},
+          '3|1|2': {id: 'ID-262',category: 'fine'},
+          '3|2|1': {id: '',category: 'empty'},
+          '3|2|2': {id: 'ID-290',category: 'cut'},
         },
         createdAt: '2021-08-06T14:44:26.000Z',
         updatedAt: null,
@@ -544,8 +544,9 @@
       const setCat = (cat: string) => {
         choosedBox.value.category = cat;
         const box = choosedBox.value;
-        deposit.value[`${box.floor}|${box.row}|${box.col}`] = box.category;
+        deposit.value[`${box.floor}|${box.row}|${box.col}`].category = box.category;
       };
+
 
       // :: DEPOSIT
       const deposit = ref({});

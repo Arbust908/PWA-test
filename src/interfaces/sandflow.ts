@@ -9,12 +9,7 @@ export interface User {
   username: string;
   role: Role;
 }
-export interface Box {
-  category: string;
-  col: number;
-  floor: number;
-  row: number;
-}
+
 export enum BoxCategory {
   empty = 'Vacio',
   cut = 'Caja cortada',
@@ -262,12 +257,13 @@ export interface Warehouse {
     pit?: Pit;
     layout: any;
 }
+
 export interface sandCategory {
     id?: number;
     name: string;
     sands?: Sand[];
 }
-export interface Box { // Proximamente
+export interface Box {
   id?: number;
   warehouseId: number | null;
   warehouse?: Warehouse;
