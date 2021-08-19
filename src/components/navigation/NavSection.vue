@@ -1,7 +1,7 @@
 <template>
   <div :class="isSectionOpen ? 'opened' : null" class="section">
     <button class="nav-link group" @click.prevent="toggleSection()">
-      <GenericIcon :icon="icon" class="icon" />
+      <Icon :icon="icon" type="outline" class="icon" />
       <span>
         {{ name }}
       </span>
@@ -30,7 +30,7 @@
   import gsap from 'gsap';
 
   import MobileNavLink from '@/components/navigation/NavLink.vue';
-  import GenericIcon from '@/components/icon/GenericIcon.vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
 
   export default defineComponent({
     props: {
@@ -48,7 +48,7 @@
       },
     },
     components: {
-      GenericIcon,
+      Icon,
       MobileNavLink,
     },
     setup() {

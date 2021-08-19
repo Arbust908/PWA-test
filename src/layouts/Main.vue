@@ -66,7 +66,11 @@
                   @click="sidebarOpen = false"
                 >
                   <span class="sr-only">Close sidebar</span>
-                  <XIcon class="h-6 w-6 text-second-50" aria-hidden="true" />
+                  <Icon
+                    icon="X"
+                    class="h-6 w-6 text-second-50"
+                    aria-hidden="true"
+                  />
                 </button>
               </div>
             </TransitionChild>
@@ -156,7 +160,7 @@
           @click="sidebarOpen = true"
         >
           <span class="sr-only">Open sidebar</span>
-          <MenuAlt2Icon class="h-6 w-6" aria-hidden="true" />
+          <Icon icon="MenuAlt2" class="h-6 w-6" aria-hidden="true" />
         </button>
         <div class="flex-1 px-4 flex justify-between">
           <div class="flex-1 flex">
@@ -302,8 +306,9 @@
                         items-center
                       "
                     >
-                      <component
-                        :is="item.icon"
+                      <Icon
+                        :icon="item.icon"
+                        type="outline"
                         class="mr-3 flex-shrink-0 h-6 w-6 text-second-500"
                         aria-hidden="true"
                       />
@@ -328,18 +333,16 @@
           lg:p-8
         "
       >
-        <!-- <div class="p-6"> -->
         <div class="max-w-7xl">
           <slot></slot>
         </div>
-        <!-- </div> -->
       </main>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, ComputedRef, defineComponent } from 'vue';
+  import { ref, computed, defineComponent } from 'vue';
   import { useStore } from 'vuex';
   import {
     Dialog,
@@ -351,19 +354,7 @@
     TransitionChild,
     TransitionRoot,
   } from '@headlessui/vue';
-  import {
-    BellIcon,
-    HomeIcon,
-    MenuAlt2Icon,
-    UsersIcon,
-    XIcon,
-    AtSymbolIcon,
-    ClipboardListIcon,
-    AdjustmentsIcon,
-    LogoutIcon,
-    ChipIcon,
-  } from '@heroicons/vue/outline';
-  import { SearchIcon } from '@heroicons/vue/solid';
+  import Icon from '@/components/icon/TheAllIcon.vue';
   import Logo from '@/components/Logo.vue';
   import NavWrapper from '@/components/navigation/NavWrapper.vue';
 
@@ -379,17 +370,7 @@
       TransitionRoot,
       Logo,
       NavWrapper,
-      HomeIcon,
-      BellIcon,
-      MenuAlt2Icon,
-      SearchIcon,
-      XIcon,
-      AtSymbolIcon,
-      ClipboardListIcon,
-      AdjustmentsIcon,
-      UsersIcon,
-      LogoutIcon,
-      ChipIcon,
+      Icon,
     },
     setup() {
       const store = useStore();
