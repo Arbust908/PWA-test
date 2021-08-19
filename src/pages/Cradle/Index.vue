@@ -1,7 +1,7 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Grúas</h2>
+      <h2 class="text-2xl font-semibold text-gray-900">Cradle</h2>
       <router-link to="/cradle/nuevo">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
@@ -9,9 +9,8 @@
     <UiTable>
       <template #header>
         <tr>
-          <th scope="col">ID</th>
           <th scope="col">Nombre</th>
-          <th scope="col">Observaciónes</th>
+          <th scope="col">Observaciones</th>
           <th scope="col">
             <span class="sr-only">Actions</span>
           </th>
@@ -24,9 +23,6 @@
           :class="sKey % 2 === 0 ? 'even' : 'odd'"
           class="body-row"
         >
-          <td>
-            {{ cr.id }}
-          </td>
           <td :class="cr.name ? null : 'empty'">
             {{ cr.name || 'Sin definir' }}
           </td>

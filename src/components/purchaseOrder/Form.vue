@@ -174,7 +174,7 @@
       </label>
 
       <label class="col-span-full" for="transportDescription">
-        <span>Observaciónes</span>
+        <span>Observaciones</span>
         <input
           v-model="transportProvider.observation"
           class="input"

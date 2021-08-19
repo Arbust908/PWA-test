@@ -1,6 +1,9 @@
 <template>
   <label :for="fieldName">
-    <span v-if="title">{{ title }}</span>
+    <p v-if="title">
+      {{ title }}
+      <span v-if="isOptional">(Opcional)</span>
+    </p>
     <!-- TODO: Dropdown con Busqueda -->
     <!-- TODO: Options con entrada cheta -->
     <!-- TODO: StoreLogic -->
@@ -21,9 +24,10 @@
 </template>
 
 <script>
-  import { defineComponent, ref, watch } from 'vue';
+  import { defineComponent } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { useApi } from '@/helpers/useApi';
+  import '@/assets/inputs.scss';
   export default defineComponent({
     name: 'FieldInput',
     props: {
@@ -50,6 +54,10 @@
         type: String,
         default: 'name',
       },
+      isOptional: {
+        type: Boolean,
+        default: false,
+      },
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
@@ -64,18 +72,3 @@
     },
   });
 </script>
-
-<style lang="scss" scoped>
-  label {
-    @apply flex flex-col;
-    span {
-      @apply text-sm;
-    }
-  }
-  .input {
-    @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
-  }
-  input:read-only {
-    @apply bg-second-200 border cursor-not-allowed;
-  }
-</style>

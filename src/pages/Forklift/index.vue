@@ -1,8 +1,8 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Montacargas</h2>
-      <router-link to="/montacargas/nuevo">
+      <h2 class="text-2xl font-semibold text-gray-900">Forklift</h2>
+      <router-link to="/forklift/nuevo">
         <UiBtn>Nuevo</UiBtn>
       </router-link>
     </header>
@@ -10,10 +10,10 @@
       <template #header>
         <tr>
           <th scope="col">Nombre</th>
-          <th scope="col">Asignación</th>
+          <!-- <th scope="col">Asignación</th>
           <th scope="col">Nombre dueño</th>
-          <th scope="col">Contacto dueño</th>
-          <th scope="col">Observaciónes</th>
+          <th scope="col">Contacto dueño</th> -->
+          <th scope="col">Observaciones</th>
           <th scope="col">
             <span>Actions</span>
           </th>
@@ -29,7 +29,7 @@
           <td :class="f.name ? null : 'empty'">
             {{ f.name || 'Sin nombre' }}
           </td>
-          <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
+          <!-- <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
             {{ f.owned ? 'Asignado' : 'Sin asignar' || 'Sin asignación' }}
           </td>
           <td :class="f.ownerName ? null : 'empty'">
@@ -37,13 +37,13 @@
           </td>
           <td :class="f.ownerContact ? null : 'empty'">
             {{ f.ownerContact || 'Sin contacto' }}
-          </td>
+          </td> -->
           <td :class="f.observations ? null : 'empty'">
             {{ f.observations || 'Sin observaciones' }}
           </td>
           <td>
             <div class="btn-panel">
-              <router-link :to="`/montacargas/${f.id}`" class="edit">
+              <router-link :to="`/forklift/${f.id}`" class="edit">
                 <Icon icon="PencilAlt" class="w-5 h-5" />
                 <span> Editar </span>
               </router-link>
@@ -102,7 +102,6 @@
             }
             return [];
           });
-
         store.dispatch('setForklifts', fDB.value);
       };
 

@@ -56,7 +56,7 @@
             />
           </label>
           <label class="col-span-12" for="observations">
-            <span>Observaciónes</span>
+            <span>Observaciones</span>
             <input
               id="observations"
               v-model="observations"

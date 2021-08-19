@@ -4,14 +4,15 @@
       {{ title }}
       <span v-if="isOptional">(Opcional)</span>
     </p>
-    <input
+    <textarea
       :id="fieldName"
       class="input"
-      :type="type"
       :name="fieldName"
       :placeholder="placeholder"
       v-model="value"
-    />
+      :rows="rows"
+    >
+    </textarea>
     <!-- TODO: Masking & Validaciones -->
   </label>
 </template>
@@ -28,10 +29,6 @@
       data: {
         default: '',
       },
-      type: {
-        type: String,
-        default: 'text',
-      },
       fieldName: {
         type: String,
         default: 'input',
@@ -44,9 +41,9 @@
         type: [String, null],
         default: null,
       },
-      mask: {
-        type: String,
-        default: '',
+      rows: {
+        type: Number,
+        default: 4,
       },
       isOptional: {
         type: Boolean,

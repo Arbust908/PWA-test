@@ -27,6 +27,24 @@ export enum SandStageStatus {
   in_progress = 1,
   finished = 2,
 }
+// TODO
+export interface StageSheet {
+    id?: number;
+    companyId: number;
+    compnay?: Company;
+    pitId: number;
+    pit?: Pit;
+    warehouseId: number;
+    warehouse?: Warehouse;
+    stages?: SandStage[];
+    // wokrOrderId?: number;
+    // workOrder?: WorkOrder; <.-- 
+    mainCradleId?: number;
+    backupCradleId?: number;
+    // mainCradle?: Cradle;
+    // backupCradle?: Cradle;
+}
+
 
 export interface Pit {
     id?: number;
@@ -65,14 +83,14 @@ export interface Crew {
 
 export interface WorkOrder {
     id?: number;
-    client: string;
-    serviceCompany: string;
+    client: string; // Id
+    serviceCompany: string; // Id
     pad: string;
     pits: Pit[] | number[]; // Nope
-    operativeCradle: string;
-    backupCradle: string;
-    operativeForklift: string;
-    backupForklift: string;
+    operativeCradle: string; // Id
+    backupCradle: string; // Id
+    operativeForklift: string; // Id
+    backupForklift: string; // Id
     traktors: Traktor[];
     pickups: Pickup[];
     crews: Crew[];
@@ -87,7 +105,7 @@ export interface WorkOrder {
 export interface CompanyRepresentative {
     id?: number;
     name: string;
-    legalId: number;
+    // legalId: number;
     email: string;
     phone: string;
 }
@@ -95,10 +113,12 @@ export interface CompanyRepresentative {
 export interface SandProvider {
     id?: number;
     name: string;
-    legalName: string;
+    adress: string; // add
+    // legalName: string; // Sacar
     legalId: number;
-    meshType: string; // Se irian
-    grains: string; // Se irian
+    meshType: string[]; // Se irian
+    // meshType: string; // Se irian
+    // grains: string; // Se irian
     observations?: string;
     companyRepresentativeId: number;
     CompanyRepresentative?: CompanyRepresentative;
@@ -108,6 +128,9 @@ export interface Driver {
     id?: number;
     name: string;
     phone: string;
+    email: string;
+    vehicleType: string;
+    vehicleId: string;
     observations?: string;
 }
 
@@ -121,9 +144,9 @@ export interface Vehicle {
 export interface Sand {
     id?: number;
     type: string;
-    description: string;
-    meshType: string;
-    grainType: string;
+    // description?: string;
+    // meshType: string;
+    // grainType: string;
     observations?: string;
     sandOrders?: SandOrder[];
     categoryId?: number;
@@ -139,17 +162,18 @@ export interface Cradle {
 export interface Forklift {
     id?: number;
     name: string;
-    owned: boolean;
-    ownerName: string;
-    ownerContact: string;
+    owned?: boolean;
+    ownerName?: string;
+    ownerContact?: string;
     observations?: string;
 }
 
 export interface Company {
     id?: number;
     name: string;
-    legalName: string;
+    // legalName: string;
     legalId: number;
+    adress: string;
     isOperator: boolean;
     childId?: number;
     observations?: string;
@@ -201,11 +225,15 @@ export interface SandOrder {
 export interface TransportProvider {
     id?: number;
     name: string;
-    amount: number; // no va
+    legalId: number;
+    adress: string;
     observations?: string;
+    companyRepresentativeId: number;
+    CompanyRepresentative?: CompanyRepresentative;
+    // amount: number; // no va
     providerNotificationId: number; // no se si va aca
-    providerNotification?: ProviderNotification;
-    purchaseOrders?: PurchaseOrder[];
+    providerNotification?: ProviderNotification; // no se si va aca
+    purchaseOrders?: PurchaseOrder[]; // no se si va aca
 }
 
 export interface ProviderNotification { // ??? Dudas

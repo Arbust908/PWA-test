@@ -4,85 +4,36 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Nuevo montacarga
+        Nuevo Forklift
       </h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm">
-      <form
-        method="POST"
-        action="/"
-        class="p-4 w-full flex flex-col lg:flex-row"
-      >
-        <fieldset class="flex flex-col w-full">
-          <div class="input-block p-4">
-            <label for="name" class="">Nombre</label>
-            <div class="mt-1">
-              <input
-                v-model="newForklift.name"
-                class="w-full rounded-md shadow"
-                name="name"
-                type="text"
-                placeholder="Nombre"
-              />
-            </div>
-          </div>
-          <div class="p-4 d-flex">
-            <label for="owned" class="">Asignada</label>
-            <div class="mt-1">
-              <div
-                :class="['switch', newForklift.owned ? 'true' : '']"
-                @click="handleSwitchClick"
-              >
-                <div class="switch-circle"></div>
-              </div>
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="ownerName" class=""> Nombre del dueño </label>
-            <div class="mt-1">
-              <input
-                v-model="newForklift.ownerName"
-                class="w-full rounded-md shadow"
-                name="ownerName"
-                type="text"
-                placeholder="Nombre"
-              />
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="ownerContact" class=""> Contacto del dueño </label>
-            <div class="mt-1">
-              <input
-                v-model="newForklift.ownerContact"
-                class="w-full rounded-md shadow"
-                name="ownerContact"
-                type="text"
-                placeholder="Nombre"
-              />
-            </div>
-          </div>
-          <div class="input-block p-4">
-            <label for="observations" class=""> Observaciones </label>
-            <div class="mt-1">
-              <textarea
-                v-model="newForklift.observations"
-                class="w-full rounded-md shadow px-3 py-2 focus:outline-none"
-                rows="5"
-                name="observations"
-                type="text"
-                placeholder="Observaciones"
-              ></textarea>
-            </div>
-          </div>
-        </fieldset>
+    <section class="bg-white rounded-md shadow-sm max-w-2xl">
+      <form method="POST" action="/" class="p-4 w-full">
+        <FieldGroup>
+          <FieldInput
+            class="col-span-full"
+            fieldName="name"
+            placeholder="Nombre de Forklift"
+            title="Nombre"
+            mask="S*"
+            :data="newForklift.name"
+            @update:data="newForklift.name = $event"
+          />
+          <FieldTextArea
+            class="col-span-full"
+            fieldName="observations"
+            placeholder="Observaciones..."
+            title="Observaciones"
+            :rows="5"
+            isOptional
+            :data="newForklift.observations"
+            @update:data="newForklift.observations = $event"
+          />
+        </FieldGroup>
       </form>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
-          <button @click.prevent="goToIndex">Cancelar</button>
-          <GhostBtn class="btn__draft" @click="save()">
-            <BookmarkIcon class="w-4 h-4" />
-            <span> Guardar Provisorio </span>
-          </GhostBtn>
+          <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
             :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
             @click="isFull && save()"
@@ -97,19 +48,15 @@
 </template>
 
 <script lang="ts">
-  import { ref, onMounted, computed, reactive } from 'vue';
+  import { computed, reactive } from 'vue';
   import { useStore } from 'vuex';
-  import { useRouter, useRoute } from 'vue-router';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
-  import { PlusIcon } from '@heroicons/vue/solid';
+  import { useRouter } from 'vue-router';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
 
   import axios from 'axios';
   import { Forklift } from '@/interfaces/Forklift';
@@ -118,13 +65,11 @@
   export default {
     components: {
       Layout,
-      GhostBtn,
-      BookmarkIcon,
-      TrashIcon,
-      PlusIcon,
-      CheckCircleIcon,
-      CircularBtn,
+      NoneBtn,
       PrimaryBtn,
+      FieldGroup,
+      FieldInput,
+      FieldTextArea,
     },
     setup() {
       const store = useStore();
@@ -144,15 +89,11 @@
       };
 
       const goToIndex = (): void => {
-        router.push('/montacargas');
+        router.push('/forklift');
       };
 
       const isFull = computed(() => {
-        return !!(
-          newForklift.name !== '' &&
-          newForklift.ownerName !== '' &&
-          newForklift.ownerContact !== ''
-        );
+        return !!(newForklift.name !== '');
       });
 
       const save = async () => {
@@ -172,7 +113,7 @@
 
         // Update Transport Provider
         store.dispatch('saveForklift', newForklift);
-        router.push('/montacargas');
+        goToIndex();
       };
 
       return {
