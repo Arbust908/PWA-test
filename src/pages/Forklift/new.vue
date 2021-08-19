@@ -8,11 +8,7 @@
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm max-w-2xl">
-      <form
-        method="POST"
-        action="/"
-        class="p-4 w-full flex flex-col lg:flex-row"
-      >
+      <form method="POST" action="/" class="p-4 w-full">
         <FieldGroup>
           <FieldInput
             class="col-span-full"

@@ -9,11 +9,11 @@
     <UiTable>
       <template #header>
         <tr>
-          <th scope="col">ID</th>
-          <th scope="col">Tipo</th>
-          <th scope="col">Descripción</th>
-          <th scope="col">Malla</th>
-          <th scope="col">Granaje</th>
+          <!-- <th scope="col">ID</th> -->
+          <th scope="col">Tipo de malla</th>
+          <th scope="col">Observaciones</th>
+          <!-- <th scope="col">Malla</th>
+          <th scope="col">Granaje</th> -->
           <th scope="col" colspan="2">
             <span class="sr-only">Actions</span>
           </th>
@@ -26,21 +26,21 @@
           :class="sKey % 2 === 0 ? 'even' : 'odd'"
           class="body-row"
         >
-          <td>
+          <!-- <td>
             {{ st.id }}
-          </td>
+          </td> -->
           <td :class="st.type ? null : 'empty'">
             {{ st.type || 'Sin definir' }}
           </td>
           <td :class="st.description ? null : 'empty'">
             {{ st.description || 'Sin definir' }}
           </td>
-          <td :class="st.meshType ? 'text-green-500' : 'text-blue-500'">
+          <!-- <td :class="st.meshType ? 'text-green-500' : 'text-blue-500'">
             {{ st.meshType || 'Sin definir' }}
           </td>
           <td :class="st.grainType ? 'text-green-500' : 'text-blue-500'">
             {{ st.grainType || 'Sin definir' }}
-          </td>
+          </td> -->
           <td>
             <div class="btn-panel">
               <router-link :to="`/tipos-de-arena/${st.id}`" class="edit">

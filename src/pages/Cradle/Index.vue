@@ -10,7 +10,7 @@
       <template #header>
         <tr>
           <th scope="col">Nombre</th>
-          <th scope="col">Observaciónes</th>
+          <th scope="col">Observaciones</th>
           <th scope="col">
             <span class="sr-only">Actions</span>
           </th>
