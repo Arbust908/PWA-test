@@ -4,18 +4,18 @@
     :class="to === $route.fullPath ? 'selected' : null"
     class="nav-link group"
   >
-    <GenericIcon :icon="icon" class="icon" />
+    <Icon :icon="icon" type="outline" class="icon" />
     {{ name }}
   </router-link>
 </template>
 
 <script lang="ts">
-  import GenericIcon from '@/components/icon/GenericIcon.vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
   import { defineComponent } from 'vue';
 
   export default defineComponent({
     components: {
-      GenericIcon,
+      Icon,
     },
     props: {
       to: {

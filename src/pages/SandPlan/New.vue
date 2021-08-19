@@ -199,7 +199,16 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
+  import {
+    ref,
+    Ref,
+    reactive,
+    computed,
+    ComputedRef,
+    toRaw,
+    watch,
+    watchEffect,
+  } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
@@ -272,6 +281,26 @@
           },
         ],
       });
+      watchEffect(() => {
+        if (currentSandPlan.companyId !== -1) {
+          pits.value = backupPits.value.filter((pit) => {
+            return pit.companyId === currentSandPlan.companyId;
+          });
+        }
+        if (currentSandPlan.pitId !== -1) {
+          const curPit = pits.value.find((pit) => {
+            return pit.id === currentSandPlan.pitId;
+          });
+          if (curPit) {
+            clients.value = backupClients.value.filter((client) => {
+              return client.id === curPit.companyId;
+            });
+            if (clients.value.length === 1) {
+              currentSandPlan.companyId = clients.value[0].id;
+            }
+          }
+        }
+      });
 
       const addStage = () => {
         if (currentSandPlan.stages?.length >= 39) {
@@ -336,19 +365,23 @@
       const toggleFinOp = useToggle(finishedOpened);
       // :: CLIENT
       const clients = ref([] as Array<Company>);
+      const backupClients = ref([] as Array<Company>);
       const { data: companiesData } = useAxios('/company', instance);
       watch(companiesData, (companiesApi, prevCount) => {
         if (companiesApi && companiesApi.data) {
           clients.value = companiesApi.data;
+          backupClients.value = companiesApi.data;
         }
       });
       // << CLIENT
       // :: PITS
       const pits = ref([] as Array<Pit>);
+      const backupPits = ref([] as Array<Pit>);
       const { data: pitsData } = useAxios('/pit', instance);
       watch(pitsData, (pitApi, prevCount) => {
         if (pitApi && pitApi.data) {
           pits.value = pitApi.data;
+          backupPits.value = pitApi.data;
         }
       });
       const selectedPitName = computed(() => {
