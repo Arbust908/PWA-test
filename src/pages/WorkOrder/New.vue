@@ -492,92 +492,96 @@
           cabin: cabin.value,
           draft,
         };
-        const { data: WODone } = useAxios(
-          '/workOrder',
-          { method: 'POST', data: newWO },
-          instance
-        );
-        watch(WODone, (newVal, _) => {
-          console.log('nuevo', newVal);
-          if (newVal && newVal.data && newVal.data.id) {
-            const workOrderId = Number(newVal.data.id);
-            console.log('nuevo id', newVal.data.id);
-            if (pits.value.length > 0) {
-              const isPitsFinished = ref([]);
-              pits.value.forEach((pit: Pit) => {
-                console.log(pit);
-                const { id, ...newPit } = pit;
-                newPit.companyId = newWO.clientId;
-                newPit.workOrderId = workOrderId;
-                console.log('NewPit', newPit);
-                const { data } = useAxios(
-                  '/pit',
-                  { method: 'POST', data: newPit },
-                  instance
-                );
-                isPitsFinished.value.push(data);
-              });
-              console.log(isPitsFinished.value);
-            }
-            if (traktors.value.length > 0) {
-              const isTraktorsFinished = ref([]);
-              traktors.value.forEach((traktor) => {
-                console.log(traktor);
-                const { id, ...newTraktor } = traktor;
-                newTraktor.workOrderId = workOrderId;
-                const { data } = useAxios(
-                  '/traktor',
-                  { method: 'POST', data: newTraktor },
-                  instance
-                );
-                isTraktorsFinished.value.push(data);
-              });
-              console.log(isTraktorsFinished.value);
-            }
-            if (pickups.value.length > 0) {
-              const isPickupFinished = ref([]);
-              pickups.value.forEach((pickup) => {
-                const { id, ...newPickup } = pickup;
-                newPickup.workOrderId = workOrderId;
-                const { data } = useAxios(
-                  '/pickup',
-                  { method: 'POST', data: newPickup },
-                  instance
-                );
-                isPickupFinished.value.push(data);
-              });
-            }
-            if (crews.value.length > 0) {
-              const isCrewsFinished = ref([]);
-              crews.value.forEach((crew) => {
-                const { id, ...newCrew } = crew;
-                newCrew.workOrderId = workOrderId;
-                console.log('crew', newCrew);
-                const { data } = useAxios(
-                  '/crew',
-                  { method: 'POST', data: newCrew },
-                  instance
-                );
-                isCrewsFinished.value.push(data);
-                watch(data, (newVal, _) => {
-                  crew.resources.forEach((resource) => {
-                    const crewId = newVal.data.id;
-                    const { id, ...newResource } = resource;
-                    newResource.crewId = crewId;
-                    const { data: dataRH } = useAxios(
-                      '/humanResource',
-                      { method: 'POST', data: newResource },
-                      instance
-                    );
+        try {
+          const { data: WODone } = useAxios(
+            '/workOrder',
+            { method: 'POST', data: newWO },
+            instance
+          );
+          watch(WODone, (newVal, _) => {
+            console.log('nuevo', newVal);
+            if (newVal && newVal.data && newVal.data.id) {
+              const workOrderId = Number(newVal.data.id);
+              console.log('nuevo id', newVal.data.id);
+              if (pits.value.length > 0) {
+                const isPitsFinished = ref([]);
+                pits.value.forEach((pit: Pit) => {
+                  console.log(pit);
+                  const { id, ...newPit } = pit;
+                  newPit.companyId = newWO.clientId;
+                  newPit.workOrderId = workOrderId;
+                  console.log('NewPit', newPit);
+                  const { data } = useAxios(
+                    '/pit',
+                    { method: 'POST', data: newPit },
+                    instance
+                  );
+                  isPitsFinished.value.push(data);
+                });
+                console.log(isPitsFinished.value);
+              }
+              if (traktors.value.length > 0) {
+                const isTraktorsFinished = ref([]);
+                traktors.value.forEach((traktor) => {
+                  console.log(traktor);
+                  const { id, ...newTraktor } = traktor;
+                  newTraktor.workOrderId = workOrderId;
+                  const { data } = useAxios(
+                    '/traktor',
+                    { method: 'POST', data: newTraktor },
+                    instance
+                  );
+                  isTraktorsFinished.value.push(data);
+                });
+                console.log(isTraktorsFinished.value);
+              }
+              if (pickups.value.length > 0) {
+                const isPickupFinished = ref([]);
+                pickups.value.forEach((pickup) => {
+                  const { id, ...newPickup } = pickup;
+                  newPickup.workOrderId = workOrderId;
+                  const { data } = useAxios(
+                    '/pickup',
+                    { method: 'POST', data: newPickup },
+                    instance
+                  );
+                  isPickupFinished.value.push(data);
+                });
+              }
+              if (crews.value.length > 0) {
+                const isCrewsFinished = ref([]);
+                crews.value.forEach((crew) => {
+                  const { id, ...newCrew } = crew;
+                  newCrew.workOrderId = workOrderId;
+                  console.log('crew', newCrew);
+                  const { data } = useAxios(
+                    '/crew',
+                    { method: 'POST', data: newCrew },
+                    instance
+                  );
+                  isCrewsFinished.value.push(data);
+                  watch(data, (newVal, _) => {
+                    crew.resources.forEach((resource) => {
+                      const crewId = newVal.data.id;
+                      const { id, ...newResource } = resource;
+                      newResource.crewId = crewId;
+                      const { data: dataRH } = useAxios(
+                        '/humanResource',
+                        { method: 'POST', data: newResource },
+                        instance
+                      );
+                    });
                   });
                 });
-              });
-              console.log(isCrewsFinished.value);
+                console.log(isCrewsFinished.value);
+              }
+              store.dispatch('saveWorkOrder', newVal.data);
+              router.push('/orden-de-trabajo');
             }
-            store.dispatch('saveWorkOrder', newVal.data);
-            router.push('/orden-de-trabajo');
-          }
-        });
+          });
+        } catch (error) {
+          console.log(error);
+        }
       };
 
       return {

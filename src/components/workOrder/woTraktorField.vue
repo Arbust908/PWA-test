@@ -33,13 +33,14 @@
     />
     <!-- Span Proxy para que pueda "Contener" el boton -->
     <span
-      v-if="traktorI !== lastTraktorIndex"
+      v-if="traktors.length > 1 && traktorI !== lastTraktorIndex"
+      :class="traktorI === firstTraktorIndex ? 'lg:bottom-6' : 'lg:top-3'"
       class="
         flex
         justify-center
         items-center
         col-span-2
-        lg:absolute lg:-right-12 lg:top-3
+        lg:absolute lg:-right-12
       "
     >
       <CircularBtn class="btn__delete" size="sm" @click="remove(traktor.id)">
@@ -50,7 +51,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, computed } from 'vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
@@ -72,7 +73,9 @@
       },
     },
     setup(props, { emit }) {
-      const lastTraktorIndex = props.traktors.length - 1;
+      const lastTraktorIndex = computed(() => {
+        return props.traktors.length - 1;
+      });
       const firstTraktorIndex = 0;
       const remove = (traktorId: number) => {
         emit('remove', traktorId);

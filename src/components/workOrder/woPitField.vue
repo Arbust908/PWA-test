@@ -10,7 +10,7 @@
     />
     <!-- Span Proxy para que pueda "Contener" el boton -->
     <span
-      v-if="pitI !== lastPitIndex"
+      v-if="pits.length > 1 && pitI !== lastPitIndex"
       class="col-span-2 flex justify-center items-center"
     >
       <CircularBtn class="btn__delete" size="sm" @click="removePit(pit.id)">
@@ -21,7 +21,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, computed } from 'vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
@@ -41,7 +41,9 @@
       },
     },
     setup(props, { emit }) {
-      const lastPitIndex = props.pits.length - 1;
+      const lastPitIndex = computed(() => {
+        return props.pits.length - 1;
+      });
       const firstPitIndex = 0;
       const removePit = (pitId) => {
         emit('removePit', pitId);

@@ -273,10 +273,11 @@
       const workOrders: Array<WorkOrder> = JSON.parse(
         JSON.stringify(store.state.workOrders.all)
       );
-      console.log(workOrders);
+      // console.log(workOrders);
       const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
         return wo.id == route.params.id;
       });
+      // console.log(currentWorkOrder);
       const newCWO = reactive({ ...currentWorkOrder });
       const {
         id: woID,
@@ -353,7 +354,7 @@
           addCrew();
         }
       } else {
-        console.log(crews);
+        console.log('Else crews', crews);
       }
       // Sections
       const WO_section = ref('orden');
@@ -380,9 +381,11 @@
       // Is the RRHH section is full
       const isRRHHFull = computed(() => {
         return !!(
+          crews.value &&
           crews.value.length > 0 &&
           crews.value[0].timeStart &&
           crews.value[0].timeEnd &&
+          crews.value[0].resources &&
           crews.value[0].resources.length > 0 &&
           crews.value[0].resources[0].role !== '' &&
           crews.value[0].resources[0].name !== ''

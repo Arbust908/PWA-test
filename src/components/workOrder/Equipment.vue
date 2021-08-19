@@ -226,35 +226,6 @@
         isFull,
       } = useVModels(props, emit);
 
-      const { read: readT } = useApi('/traktor');
-      const allTracktors = readT();
-      watch(allTracktors, (newVal, _) => {
-        traktors.value = newVal.filter((t) => {
-          console.log(t.workOrderId, id);
-          return t.workOrderId === id;
-        });
-        console.log(traktors.value);
-        console.log(traktors.value.length);
-        if (traktors.value.length === 0) {
-          console.log('agregar');
-          addTraktor();
-        }
-      });
-
-      const { read: readP } = useApi('/pickup');
-      const allPickups = readP();
-      watch(allPickups, (newVal, _) => {
-        pickups.value = newVal.filter((p) => {
-          console.log(p.workOrderId, id);
-          return p.workOrderId === id;
-        });
-        console.log(pickups.value);
-        if (pickups.value.length === 0) {
-          addPickup();
-        }
-        console.log(pickups.value);
-      });
-
       const removeTraktor = (traktorId: number) => {
         traktors.value = traktors.value.filter(
           (traktor: Traktor) => traktor.id !== traktorId
@@ -284,7 +255,6 @@
           description: '',
         });
       };
-
       const firstTracktorFull = computed(() => {
         const trackto = traktors.value[0];
         return (
@@ -296,6 +266,27 @@
       const firstPickupFull = computed(() => {
         const pickup = pickups.value[0];
         return pickup.pickup_id !== '' && pickup.description !== '';
+      });
+      const { read: readT } = useApi('/traktor');
+      const allTracktors = readT();
+      watch(allTracktors, (newVal, _) => {
+        traktors.value = newVal.filter((t) => {
+          return t.workOrderId === id;
+        });
+        if (traktors.value.length === 0) {
+          addTraktor();
+        }
+      });
+
+      const { read: readP } = useApi('/pickup');
+      const allPickups = readP();
+      watch(allPickups, (newVal, _) => {
+        pickups.value = newVal.filter((p) => {
+          return p.workOrderId === id;
+        });
+        if (pickups.value.length === 0) {
+          addPickup();
+        }
       });
       watchEffect(() => {
         isFull.value = !!(

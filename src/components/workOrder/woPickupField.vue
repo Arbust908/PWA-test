@@ -11,7 +11,7 @@
       :title="pickupI === firstIndex ? 'ID Pickup' : null"
       mask="#*"
       :data="pickup.pickupId"
-      @update:data="pickup.pickupId = Number($event)"
+      @update:data="pickup.pickupId = $event"
     />
     <FieldInput
       class="col-span-6"
@@ -23,7 +23,10 @@
       @update:data="pickup.description = $event"
     />
     <!-- Span Proxy para que pueda "Contener" el boton -->
-    <span v-if="pickupI !== lastIndex" class="flex items-center col-span-2">
+    <span
+      v-if="pickups.length > 1 && pickupI !== lastIndex"
+      class="flex items-center col-span-2"
+    >
       <CircularBtn class="btn__delete" size="sm" @click="remove(pickup.id)">
         <Icon icon="Trash" class="w-5 h-5" />
       </CircularBtn>
@@ -32,7 +35,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, computed } from 'vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
@@ -54,7 +57,9 @@
       },
     },
     setup(props, { emit }) {
-      const lastIndex = props.pickups.length - 1;
+      const lastIndex = computed(() => {
+        return props.pickups.length - 1;
+      });
       const firstIndex = 0;
       const remove = (id: number) => {
         emit('remove', id);
