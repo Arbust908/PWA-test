@@ -4,33 +4,20 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Proveedor de arena - {{ id }}
+        Nuevo proveedor de arena
       </h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm">
+    <section class="bg-white rounded-md max-w-2xl shadow-sm">
       <form method="POST" action="/" class="p-4 max-w-lg">
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-full text-xl">Proveedor</h2>
           <label class="col-span-full" for="name">
-            <span>Nombre</span>
+            <span>Nombre y Apellido / Razón Social</span>
             <input
               id="name"
               v-model="newSandProvider.name"
               class="input"
               type="text"
               name="name"
-              placeholder="Nombre del proveedor"
-            />
-          </label>
-          <label class="col-span-full" for="legalName">
-            <span>Razón Social</span>
-            <input
-              id="legalName"
-              v-model="newSandProvider.legalName"
-              class="input"
-              type="text"
-              name="legalName"
-              placeholder="Razón Social"
             />
           </label>
           <label class="col-span-full" for="legalId">
@@ -45,83 +32,61 @@
               placeholder="CUIT / CUIL"
             />
           </label>
-          <label class="col-span-full" for="observations">
-            <span>Observaciones</span>
+          <label class="col-span-full" for="address">
+            <span>Domicilio</span>
             <input
+              id="address"
+              v-model="newSandProvider.address"
+              class="input"
+              type="text"
+              name="address"
+            />
+          </label>
+          <label class="col-span-full" for="meshType">
+            <span>Tipo de malla</span>
+            <div class="mb-4">
+              <div class="flex  items-center" v-for="(singleMeshType,index) in newSandProvider.meshType" :key="index" >
+                <input class="input readonly" type="text" :value="singleMeshType" readonly/>
+                <Icon icon="Trash" type="outline" class="ml-3 w-5 h-5 cursor-pointer" @click="deleteMeshType(singleMeshType)" />
+              </div> 
+            </div>
+            <div class="flex items-center">
+              <input
+              class="input"
+              type="text"
+              name="meshType"
+              v-model="meshType"
+              placeholder="Ingrese tipo de malla"
+              />
+            <Icon icon="Plus" type="outline" class="ml-3 w-5 h-5 cursor-pointer" @click="addMeshType(meshType)" />
+            </div>
+          </label>
+          <label class="col-span-full" for="observations">
+            <span>Observaciones<span class="italic text-gray-400"> (opcional)</span></span>
+            <textarea
               id="observations"
               v-model="newSandProvider.observations"
-              class="input"
+              class="input resize-none"
               type="text"
               name="observations"
               placeholder="Observaciones..."
-            />
+              rows="4"
+            ></textarea>
           </label>
         </fieldset>
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl flex justify-between items-end">
-            <span> Representante </span>
-            <!-- <span>
-              <label class="toggle text-sm" for="is-new-rep">
-                <input
-                  id="is-new-rep"
-                  type="checkbox"
-                  @click="toggleRepStatus"
-                  :checked="isNewRep"
-                  class="form-checkbox bg-transparent rounded-sm"
-                  name="is-new-rep"
-                />
-                <span class="text-second-600">Es nuevo</span>
-              </label>
-            </span> -->
+            <span> Contacto principal </span>
           </h2>
           <label class="col-span-full" for="nr-name">
-            <span>Nombre Legal</span>
+            <span>Nombre y Apellido</span>
             <input
               id="nr-name"
               v-model="companyRepresentative.name"
               class="input"
               type="text"
               name="name"
-              placeholder="Nombre de representante"
-            />
-            <!-- <input
-              v-if="isNewRep"
-              id="nr-name"
-              v-model="companyRepresentative.name"
-              class="input"
-              type="text"
-              name="name"
-              placeholder="Nombre de representante"
-            />
-            <select
-              v-else
-              id="nr-name"
-              name="nr-name"
-              v-model="companyRepresentativeId"
-              class="input"
-            >
-              <option disabled value="-1">Seleccionar Representante</option>
-              <option
-                v-for="corpoRep in companyRepresentatives"
-                :key="corpoRep.id"
-                :value="corpoRep.id"
-              >
-                {{ corpoRep.name }}
-              </option>
-            </select> -->
-          </label>
-
-          <label class="col-span-full" for="nr-legalId">
-            <span>CUIL/CUIT</span>
-            <input
-              id="nr-legalId"
-              :read-only="!isNewRep"
-              v-maska="'###########'"
-              v-model.number="companyRepresentative.legalId"
-              class="input"
-              type="text"
-              name="legalId"
-              placeholder="CUIL / CUIT"
+              placeholder="Nombre y Apellido"
             />
           </label>
           <label class="col-span-full" for="phone">
@@ -173,6 +138,7 @@
   import { ref, reactive, ComputedRef, Ref, computed, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
+  import Icon from '@/components/icon/TheAllIcon.vue';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
@@ -191,6 +157,7 @@
       Layout,
       NoneBtn,
       PrimaryBtn,
+      Icon
     },
     setup() {
       const store = useStore();
@@ -235,14 +202,19 @@
           }
         });
       }
-      // const companyRepresentativeId = ref(-1);
-      // const companyRepresentatives = ref([] as Array<CompanyRepresentative>);
-      // const { data: corpoRepData } = useAxios('/company', instance);
-      // watch(corpoRepData, (corpoRepApi, prevCount) => {
-      //   if (corpoRepApi && corpoRepApi.data) {
-      //     companyRepresentatives.value = corpoRepApi.data;
-      //   }
-      // });
+      
+      let meshType = ref('')
+
+      const addMeshType = (newMeshType: string) => {
+        newSandProvider.meshType.push(newMeshType)
+        meshType.value = ''
+      }
+
+      const deleteMeshType = (meshType: string) => {
+        newSandProvider.meshType = newSandProvider.meshType.filter((element) => {
+          return element !== meshType
+        })
+      }
 
       const providerFull: ComputedRef<boolean> = computed(() => {
         return !!(
@@ -299,9 +271,12 @@
         // companyRepresentativeId,
         companyRepresentative,
         newSandProvider,
-        // companyRepresentatives,
+        Icon,
         isFull,
         save,
+        meshType,
+        addMeshType,
+        deleteMeshType,
       };
     },
   };
