@@ -34,6 +34,9 @@ td {
 .btn-panel {
   @apply flex justify-end space-x-4;
 
+  .add {
+    @apply flex items-center text-emerald-600 hover:text-emerald-800;
+  }
   .edit {
     @apply flex items-center text-indigo-600 hover:text-indigo-800;
   }
@@ -45,4 +48,16 @@ td {
 
 td.emptyState {
   @apply text-center text-xs text-second-300 px-6 py-4;
+}
+
+.centered {
+  :is(th,td) {
+    @apply text-center;
+    & > * {
+      @apply mx-auto;
+    }
+  }
+  .btn-panel {
+    @apply justify-center;
+  }
 }
