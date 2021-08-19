@@ -36,10 +36,8 @@ export default {
       const baseTP = {
         id: 0,
         name: "",
-        legalName: "",
         legalId: 0,
-        meshType: "",
-        grains: "",
+        meshType: [],
         observations: "",
         companyRepresentativeId: 0
       };
