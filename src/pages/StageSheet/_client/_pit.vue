@@ -1,92 +1,46 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4">
-      <h1 class="text-2xl font-semibold text-gray-900">Stage sheets</h1>
-      <router-link to="/stage-sheet/nuevo">
-        <UiBtn>Crear nuevo</UiBtn>
-      </router-link>
-    </header>
-    <section class="mb-9">
-      <h3 class="font-bold text-lg">Filtros</h3>
-      <FieldGroup class="max-w-xl">
-        <FieldSelect
-          v-if="clients.length > 0"
-          class="col-span-6"
-          fieldName="client"
-          placeholder="Seleccionar cliente"
-          title="Cliente"
-          mask="S*"
-          endpoint="/company"
-          :endpointData="clients"
-          :data="filterCompanyId"
-          @update:data="filterCompanyId = $event"
-        />
-        <FieldLoading class="col-span-6" v-else />
-        <FieldSelect
-          v-if="pits.length > 0"
-          class="col-span-6"
-          fieldName="pit"
-          placeholder="Seleccionar pozo"
-          title="Pozo"
-          mask="S*"
-          endpoint="/pit"
-          :endpointData="pits"
-          :data="filterPitId"
-          @update:data="filterPitId = $event"
-        />
-        <FieldLoading class="col-span-6" v-else />
-      </FieldGroup>
-    </section>
-    <UiTable class="centered">
-      <template #header>
-        <tr>
-          <th scope="col">Cliente</th>
-          <th scope="col">Pozo</th>
-          <th scope="col">Etapas creadas</th>
-          <th scope="col">Estado</th>
-          <th scope="col">Actions</th>
-        </tr>
-      </template>
-      <template #body>
-        <tr
-          v-for="(st, Key) in stDB"
-          :key="st.id"
-          :class="Key % 2 === 0 ? 'even' : 'odd'"
-          class="body-row"
+      <h1 class="text-2xl font-semibold text-gray-900">
+        <span> Stage sheets </span>
         >
-          <td scope="col">Cliente</td>
-          <td scope="col">VC01</td>
-          <td scope="col">x - 40</td>
-          <td scope="col">
-            <Pill>
-              Estado
-              <!-- {{ sheet.state }} -->
-            </Pill>
-          </td>
-          <td>
-            <div class="btn-panel centered">
-              <router-link :to="`/tipos-de-arena/${st.id}`" class="add">
-                <Icon icon="PlusCircle" class="w-5 h-5" />
-                <span class="sr-only"> Agregar </span>
-              </router-link>
-              <router-link :to="`/tipos-de-arena/${st.id}`" class="edit">
-                <Icon icon="DocumentText" class="w-5 h-5" />
-                <span class="sr-only"> Ver lista </span>
-              </router-link>
-              <button class="delete" @click="">
-                <Icon icon="Trash" class="w-5 h-5" />
-                <span class="sr-only"> Eliminar </span>
-              </button>
+        <route-link :to="`/stage-sheet/${}`">{{}}</route-link>
+        >
+        <span>{{}}</span>
+      </h1>
+    </header>
+    <section class="panel col-span-full">
+      <form method="POST" action="/" class="p-4 flex flex-col gap-4">
+        <div class="flex flex-col">
+          <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
+            <div
+              class="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8"
+            >
+              <div class="overflow-hidden">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead>
+                    <StageHeader />
+                  </thead>
+                  <tbody class="divide-y">
+                    <SandPlanStage
+                      v-for="(stage, Key) in currentStageSheet.stages"
+                      :key="Key"
+                      :stage="stage"
+                      :editing="editingStage"
+                      :sands="sands"
+                      @editStage="editStage"
+                      @saveStage="saveStage"
+                      @duplicateStage="duplicateStage"
+                      @deleteStage="deleteStage"
+                    />
+                  </tbody>
+                </table>
+              </div>
             </div>
-          </td>
-        </tr>
-        <tr v-if="stDB.length <= 0">
-          <td colspan="5" class="emptyState">
-            <p>No hay arenas cargadas</p>
-          </td>
-        </tr>
-      </template>
-    </UiTable>
+          </div>
+        </div>
+      </form>
+    </section>
   </Layout>
 </template>
 
@@ -101,6 +55,8 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   import FieldLoading from '@/components/ui/form/FieldLoading.vue';
+  import StageHeader from '@/components/sandPlan/StageHeader.vue';
+  import SandPlanStage from '@/components/sandPlan/SandPlanStage.vue';
 
   import '@/assets/table.scss';
 
@@ -116,6 +72,8 @@
       FieldGroup,
       FieldSelect,
       FieldLoading,
+      StageHeader,
+      SandPlanStage,
     },
     setup() {
       const store = useStore();

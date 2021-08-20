@@ -559,6 +559,7 @@
         floor,
         row,
         col,
+        visibleCategories,
       };
     },
   };
