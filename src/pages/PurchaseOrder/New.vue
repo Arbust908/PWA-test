@@ -10,23 +10,11 @@
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <FieldGroup class="max-w-2xl">
-          <FieldSelect
-            class="col-span-6"
-            fieldName="client"
-            title="Cliente"
-            placeholder="Selecciona cliente"
-            endpoint="/company"
-            :data="companyClientId"
-            @update:data="companyClientId = $event"
-          />
-          <FieldSelect
-            class="col-span-6"
-            fieldName="pit"
-            title="Pozo"
-            placeholder="Selecciona pozo"
-            endpoint="/pit"
-            :data="pitId"
-            @update:data="pitId = $event"
+          <ClientPitCombo
+            :clientId="companyClientId"
+            :pitId="pitId"
+            @update:clientId="companyClientId = $event"
+            @update:pitId="pitId = $event"
           />
         </FieldGroup>
         <FieldGroup class="max-w-xl">
@@ -137,33 +125,6 @@
             :data="transportProviderId"
             @update:data="transportProviderId = $event"
           />
-          <!-- <FieldInput
-            class="col-span-6"
-            fieldName="transportId"
-            placeholder="Patente del Transporte"
-            title="Patente"
-            mask="X*"
-            :data="transportProvider.transportId"
-            @update:data="transportProvider.transportId = $event"
-          />
-          <FieldInput
-            class="col-span-6"
-            fieldName="quantityBoxes"
-            placeholder="Cantidad de cajas"
-            title="Cantidad de cajas"
-            mask="##"
-            :data="transportProvider.boxQuantity"
-            @update:data="transportProvider.boxQuantity = Number($event)"
-          />
-          <FieldInput
-            class="col-span-full"
-            fieldName="transportDescription"
-            placeholder="Observaciones..."
-            title="Observaciones"
-            mask="X*"
-            :data="transportProvider.observation"
-            @update:data="transportProvider.observation = $event"
-          /> -->
         </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
@@ -218,6 +179,7 @@
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
   const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
@@ -233,6 +195,7 @@
       FieldLegend,
       FieldInput,
       FieldSelect,
+      ClientPitCombo,
     },
     setup() {
       const router = useRouter();
@@ -321,6 +284,9 @@
       const save = (): void => {
         if (isFull.value) {
           const purchaseOrder: PurchaseOrder = {
+            companyId: companyClientId.value,
+            companyClientId: companyClientId.value,
+            pitId: pitId.value,
             sandProviderId: sandProviderId.value,
             transportProviderId: transportProviderId.value,
           };
@@ -333,7 +299,7 @@
           const sOisDone = ref([]);
           watch(pODone, (newVal, _) => {
             if (newVal && newVal.data) {
-              console.log(newVal.data);
+              console.log('PO data', newVal.data);
               console.log(sandOrder.value);
               sandOrder.value.map((sO: SandOrder) => {
                 console.log(sO);
