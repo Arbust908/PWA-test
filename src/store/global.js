@@ -1,83 +1,81 @@
 export default {
   state: () => ({
     navigation: [
-      { name: 'Panel', to: '/', icon: 'HomeIcon' },
+      { name: 'Panel', to: '/', icon: 'Home' },
       {
         name: 'Planificacion de Arena',
         to: '/planificacion-de-arena',
-        icon: 'ClipboardListIcon',
+        icon: 'ClipboardList',
       },
       {
         name: 'Diseño de Deposito',
         to: '/diseno-de-deposito',
-        icon: 'ViewGridAddIcon',
+        icon: 'ViewGridAdd',
       },
       {
         name: 'Orden de Trabajo',
         to: '/orden-de-trabajo',
-        icon: 'BriefcaseIcon',
+        icon: 'Briefcase',
       },
       {
         name: 'Orden de Pedido',
         to: '/orden-de-pedido',
-        icon: 'TagIcon',
+        icon: 'Tag',
       },
       {
         name: 'Notificaciones',
         to: '/notificaciones-a-proveedores',
-        icon: 'BellIcon',
+        icon: 'Bell',
       },
       {
         name: 'Ingreso de cajas',
         to: '/ingreso-de-cajas',
-        icon: 'ArchiveIcon',
+        icon: 'Archive',
       },
       {
         name: 'Proveedores',
-        icon: 'ChevronRightIcon',
+        icon: 'ChevronRight',
         subNav: [
           {
             name: 'Arena',
             to: '/proveedores-de-arena',
-            icon: 'UserGroupIcon',
+            icon: 'UserGroup',
           },
           {
             name: 'Transporte',
             to: '/proveedores-de-transporte',
-            icon: 'TruckIcon',
+            icon: 'Truck',
           },
         ],
       },
       {
         name: 'Configuracion',
-        icon: 'CogIcon',
+        icon: 'Cog',
         subNav: [
           {
             name: 'Clientes',
             to: '/clientes',
-            icon: 'UserCircleIcon',
+            icon: 'UserCircle',
           },
           {
             name: 'Tipos de Arena',
             to: '/tipos-de-arena',
-            icon: 'ClipboardListIcon',
+            icon: 'ClipboardList',
           },
           {
             name: 'Forklift',
             to: '/forklift',
-            icon: 'ClipboardListIcon',
+            icon: 'ClipboardList',
           },
           {
             name: 'Cradle',
             to: '/cradle',
-            icon: 'ClipboardListIcon',
+            icon: 'ClipboardList',
           },
         ],
       },
     ],
-    user_navigation: [
-      { name: 'Salir', to: '/usuario/salir', icon: 'LogoutIcon' },
-    ],
+    user_navigation: [{ name: 'Salir', to: '/usuario/salir', icon: 'Logout' }],
     areWeConnected: false,
   }),
   getters: {
