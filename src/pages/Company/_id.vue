@@ -4,126 +4,96 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Cliente - {{ id }}
+        Nuevo Cliente
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-full text-xl">Cliente</h2>
-          <label class="col-span-12" for="name">
-            <span>Nombre</span>
-            <input
-              id="name"
-              v-model="name"
-              class="input"
-              type="text"
-              name="name"
-              placeholder="Nombre del cliente"
-            />
-          </label>
-          <label class="col-span-12" for="legalName">
-            <span>Razón Social</span>
-            <input
-              id="legalName"
-              v-model="legalName"
-              class="input"
-              type="text"
-              name="legalName"
-              placeholder="Razón social"
-            />
-          </label>
-          <label class="col-span-12" for="legalId">
-            <span>CUIL/CUIT</span>
-            <input
-              id="legalId"
-              v-model="legalId"
-              class="input"
-              type="text"
-              name="legalId"
-              placeholder="CUIL / CUIT"
-            />
-          </label>
-          <label class="col-span-12" for="isOperator">
-            <span>isOperator</span>
-            <input
-              id="isOperator"
-              v-model="isOperator"
-              class=""
-              type="checkbox"
-              name="isOperator"
-              placeholder="isOperator"
-            />
-          </label>
-          <label class="col-span-12" for="observations">
-            <span>Observaciones</span>
-            <input
-              id="observations"
-              v-model="observations"
-              class="input"
-              type="text"
-              name="observations"
-              placeholder="Observaciones.."
-            />
-          </label>
-        </fieldset>
-
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-full text-xl">Representante</h2>
-
-          <label class="col-span-full" for="nr-name">
-            <span>Nombre</span>
-            <input
-              id="nr-name"
-              v-model="companyRepresentative.name"
-              class="input"
-              type="text"
-              name="name"
-              placeholder="Nombre de representante"
-            />
-          </label>
-
-          <label class="col-span-full" for="nr-legalId">
-            <span>CUIL/CUIT</span>
-            <input
-              id="nr-legalId"
-              v-model="companyRepresentative.legalId"
-              class="input"
-              type="text"
-              name="legalId"
-              placeholder="CUIL / CUIT"
-            />
-          </label>
-          <label class="col-span-full" for="phone">
-            <span>Teléfono</span>
-            <input
-              id="nr-phone"
-              v-model="companyRepresentative.phone"
-              class="input"
-              type="text"
-              name="phone"
-              placeholder="+11 1111 1111"
-            />
-          </label>
-          <label class="col-span-full" for="email">
-            <span>Email</span>
-            <input
-              id="nr-email"
-              v-model="companyRepresentative.email"
-              class="input"
-              type="text"
-              name="email"
-              placeholder="ejemplo@ejemplo.com"
-            />
-          </label>
-        </fieldset>
+        <FieldGroup>
+          <FieldLegend>Cliente</FieldLegend>
+          <FieldInput
+            class="col-span-full"
+            fieldName="name"
+            placeholder="Nombre y apellido / Razón social"
+            mask="S*"
+            title="Nombre y apellido / Razón social"
+            :data="clientToUpdate.name"
+            @update:data="clientToUpdate.name = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="legalId"
+            placeholder="CUIL / CUIT"
+            mask="###########"
+            title="CUIL / CUIT"
+            :data="clientToUpdate.legalId"
+            @update:data="clientToUpdate.legalId = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="adress"
+            placeholder="Domicilio"
+            mask="S*"
+            title="Domicilio"
+            :data="clientToUpdate.adress"
+            @update:data="clientToUpdate.adress = $event"
+          />
+          <toggle label="Es operadora" @handle-toggle-state="handleToggleState" :initialState="clientToUpdate.isOperator"/>
+          <textarea
+            class="col-span-full resize-none rounded-md input"
+            fieldName="observations"
+            rows="4"
+            placeholder="Observaciones..."
+            title="Observaciones"
+            mask="S*"
+            :data="clientToUpdate.observations"
+            @update:data="clientToUpdate.observations = $event"
+          ></textarea>
+        </FieldGroup>
+        <FieldGroup>
+          <FieldLegend>Contacto principal</FieldLegend>
+          <FieldInput
+            class="col-span-full"
+            fieldName="nr-name"
+            placeholder="Nombre de representante"
+            title="Nombre"
+            mask="S*"
+            :data="clientToUpdate.companyRepresentative.name"
+            @update:data="clientToUpdate.companyRepresentative.name = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="nr-phone"
+            placeholder="+11 1111 1111"
+            mask="+##-####-####"
+            title="Teléfono"
+            :data="clientToUpdate.companyRepresentative.phone"
+            @update:data="clientToUpdate.companyRepresentative.phone = $event"
+          />
+          <FieldInput
+            class="col-span-full"
+            fieldName="nr-email"
+            placeholder="empresa@mail.com"
+            mask="X*@X*.X*"
+            title="Email"
+            :data="clientToUpdate.companyRepresentative.email"
+            @update:data="clientToUpdate.companyRepresentative.email = $event"
+          />
+        </FieldGroup>
       </form>
 
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-        <section></section>
-        <section class="space-x-6 flex items-center justify-end">
-          <button @click="goToIndex">Cancelar</button>
-          <PrimaryBtn @click="update"> Finalizar </PrimaryBtn>
+        <section class="w-full space-x-6 flex items-center justify-end">
+          <NoneBtn @click.prevent="$router.push('/clientes')">
+            Cancelar
+          </NoneBtn>
+          <PrimaryBtn
+            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isFull && save()"
+            :disabled="!isFull"
+          >
+            Finalizar
+          </PrimaryBtn>
         </section>
       </footer>
     </section>
@@ -135,12 +105,11 @@
   import { reactive, ref, toRefs } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'vuex';
-  import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import InputPack from '@/components/ui/InputPack.vue';
-  import { Client } from '@/interfaces/Client';
+  import { Company } from '@/interfaces/sandflow';
   import axios from 'axios';
+  import Toggle from '@/components/ui/Toggle.vue'
 
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
@@ -149,22 +118,24 @@
       Layout,
       InputPack,
       PrimaryBtn,
+      Toggle
     },
     setup() {
       const route = useRoute();
       const store = useStore();
       const router = useRouter();
 
-      const clients: Array<Client> = JSON.parse(
+      const clients: Array<Company> = JSON.parse(
         JSON.stringify(store.state.client.all)
       );
-      const currentClient: Client = clients.find((client) => {
+
+      const currentClient: Company = clients.find((client) => {
         return client.id == route.params.id;
       });
 
       const clientToUpdate = reactive({
         name: currentClient.name,
-        legalName: currentClient.legalName,
+        adress: currentClient.adress,
         legalId: currentClient.legalId,
         isOperator: currentClient.isOperator,
         observations: currentClient.observations,
@@ -174,6 +145,10 @@
       const goToIndex = () => {
         router.push('/clientes');
       };
+
+      const handleToggleState = () => {
+        clientToUpdate.isOperator = !clientToUpdate.isOperator
+      }
 
       const update = async () => {
         const loading = ref(true);
@@ -218,6 +193,7 @@
         update,
         goToIndex,
         ...toRefs(clientToUpdate),
+        handleToggleState
       };
     },
   };

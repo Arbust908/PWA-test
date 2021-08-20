@@ -14,20 +14,11 @@
           <FieldInput
             class="col-span-full"
             fieldName="name"
-            placeholder="Nombre de representante"
-            title="Nombre"
+            placeholder="Nombre y apellido / Razón social"
             mask="S*"
+            title="Nombre y apellido / Razón social"
             :data="name"
             @update:data="name = $event"
-          />
-          <FieldInput
-            class="col-span-full"
-            fieldName="legalName"
-            placeholder="Razón social"
-            mask="S*"
-            title="Razón social"
-            :data="legalName"
-            @update:data="legalName = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -38,32 +29,29 @@
             :data="legalId"
             @update:data="legalId = $event"
           />
-          <!-- Armar el Field Check o Toggle -->
-          <label class="col-span-12" for="isOperator">
-            <div>
-              <input
-                id="isOperator"
-                v-model="isOperator"
-                class="form-checkbox mr-2 bg-transparent rounded-sm"
-                type="checkbox"
-                name="isOperator"
-                placeholder="isOperator"
-              />
-              <span>Es Operadora</span>
-            </div>
-          </label>
           <FieldInput
             class="col-span-full"
+            fieldName="adress"
+            placeholder="Domicilio"
+            mask="S*"
+            title="Domicilio"
+            :data="adress"
+            @update:data="adress = $event"
+          />
+          <toggle label="Es operadora" @handle-toggle-state="handleToggleState"/>
+          <textarea
+            class="col-span-full resize-none rounded-md input"
             fieldName="observations"
+            rows="4"
             placeholder="Observaciones..."
             title="Observaciones"
             mask="S*"
             :data="observations"
             @update:data="observations = $event"
-          />
+          ></textarea>
         </FieldGroup>
         <FieldGroup>
-          <FieldLegend>Representante</FieldLegend>
+          <FieldLegend>Contacto principal</FieldLegend>
           <FieldInput
             class="col-span-full"
             fieldName="nr-name"
@@ -72,15 +60,6 @@
             mask="S*"
             :data="companyRepresentative.name"
             @update:data="companyRepresentative.name = $event"
-          />
-          <FieldInput
-            class="col-span-full"
-            fieldName="nr-legalId"
-            placeholder="CUIL / CUIT"
-            mask="###########"
-            title="CUIL / CUIT"
-            :data="companyRepresentative.legalId"
-            @update:data="companyRepresentative.legalId = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -122,7 +101,8 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, computed, defineComponent, watch } from 'vue';
+  import { reactive, toRefs, computed, defineComponent, watch, ref } from 'vue';
+  import Toggle from '@/components/ui/Toggle.vue'
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
@@ -151,6 +131,7 @@
       FieldGroup,
       FieldInput,
       FieldLegend,
+      Toggle
     },
     setup() {
       const router = useRouter();
@@ -163,10 +144,14 @@
         router.push('/clientes');
       };
 
+      const handleToggleState = () => {
+        newClient.isOperator = !newClient.isOperator
+      }
+
       const newClient: Company = reactive({
         id: 0,
         name: '',
-        legalName: '',
+        adress: '',
         legalId: '',
         isOperator: false,
         observations: '',
@@ -178,12 +163,10 @@
         return !!(
           newClient.name !== '' &&
           newClient.name.length > 3 &&
-          newClient.legalName.length > 0 &&
+          newClient.adress.length > 3 &&
           newClient.legalId >= 0 &&
           newClient.companyRepresentative?.name &&
           newClient.companyRepresentative?.name.length > 0 &&
-          newClient.companyRepresentative?.legalId &&
-          newClient.companyRepresentative?.legalId > 0 &&
           newClient.companyRepresentative?.email &&
           newClient.companyRepresentative?.email.length > 0 &&
           newClient.companyRepresentative?.phone &&
@@ -220,6 +203,7 @@
         save,
         ...toRefs(newClient),
         isFull,
+        handleToggleState
       };
     },
   };
