@@ -33,11 +33,11 @@
             <hr v-if="orderKey !== 0" class="col-span-full" />
             <FieldSelect
               :title="orderKey === 0 ? 'Tipo' : ''"
-              class="col-span-4"
+              class="col-span-5"
               fieldName="sandType"
               placeholder="Seleccciona Tipo de Arena"
               endpoint="/sand"
-              enpointKey="type"
+              endpointKey="type"
               :data="order.sandTypeId"
               @update:data="order.sandTypeId = $event"
             />
@@ -84,7 +84,7 @@
               </div>
             </label>
             <FieldInput
-              class="col-span-4"
+              :class="orderKey !== 0 ? 'col-span-3' : 'col-span-4'"
               :title="orderKey === 0 ? 'ID de caja' : ''"
               fieldName="sandBoxId"
               placeholder="Ingrear ID de caja"

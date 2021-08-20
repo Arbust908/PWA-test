@@ -9,32 +9,12 @@
     </header>
     <div class="grid gap-8 grid-cols-2 relative">
       <FieldGroup class="max-w-xl col-span-full !py-0">
-        <FieldSelect
-          v-if="clients.length > 0"
-          class="col-span-6"
-          fieldName="client"
-          placeholder="Seleccionar cliente"
-          title="Cliente"
-          mask="S*"
-          endpoint="/company"
-          :endpointData="clients"
-          :data="currentStageSheet.companyId"
-          @update:data="currentStageSheet.companyId = $event"
+        <ClientPitCombo
+          :clientId="currentStageSheet.companyId"
+          :pitId="currentStageSheet.pitId"
+          @update:clientId="currentStageSheet.companyId = $event"
+          @update:pitId="currentStageSheet.pitId = $event"
         />
-        <FieldLoading class="col-span-6" v-else />
-        <FieldSelect
-          v-if="pits.length > 0"
-          class="col-span-6"
-          fieldName="pit"
-          placeholder="Seleccionar pozo"
-          title="Pozo"
-          mask="S*"
-          endpoint="/pit"
-          :endpointData="pits"
-          :data="currentStageSheet.pitId"
-          @update:data="currentStageSheet.pitId = $event"
-        />
-        <FieldLoading class="col-span-6" v-else />
       </FieldGroup>
       <section class="panel col-span-full">
         <form method="POST" action="/" class="p-4 flex flex-col gap-4">
@@ -97,7 +77,7 @@
                 {{ warehouse.error }}
               </span>
               <span v-else-if="warehouse" class="px-5 py-8 text-center m-4">
-                <DepositGrid
+                <!-- <DepositGrid
                   class="w-full flex flex-col gap-5"
                   :selectedBox="choosedBox"
                   :rows="row"
@@ -106,7 +86,7 @@
                   :deposit="warehouse.layout"
                   :visibleCategories="visibleCategories"
                   @select-box="selectBox"
-                />
+                /> -->
               </span>
               <span
                 v-else
@@ -144,7 +124,19 @@
             />
             <FieldLoading :title="false" class="max-w-[200px]" v-else />
           </div>
-          <div class="py-8 flex justify-center items-center flex-wrap gap-5">
+          <div
+            v-if="currentStageSheet.cradleId == -1"
+            class="py-8 flex justify-center items-center flex-wrap gap-5"
+          >
+            <div class="cradle-slot-ph">1</div>
+            <div class="cradle-slot-ph">2</div>
+            <div class="cradle-slot-ph">3</div>
+            <div class="cradle-slot-ph">4</div>
+          </div>
+          <div
+            v-else
+            class="py-8 flex justify-center items-center flex-wrap gap-5"
+          >
             <div class="cradle-slot">1</div>
             <div class="cradle-slot">2</div>
             <div class="cradle-slot">3</div>
@@ -216,6 +208,7 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   import FieldLoading from '@/components/ui/form/FieldLoading.vue';
+  import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
 
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/NoneBtn.vue';
@@ -255,6 +248,7 @@
       FieldLoading,
       SideTabName,
       DepositGrid,
+      ClientPitCombo,
     },
     setup() {
       // Init
@@ -430,6 +424,7 @@
             currentStageSheet.companyId,
             currentStageSheet.pitId
           );
+          ableCradles(currentStageSheet.companyId, currentStageSheet.pitId);
           console.log(purchaseOrder.value);
         }
       });
@@ -501,12 +496,45 @@
       let visibleCategories = ref([]);
       // :: CRADLES
       const cradles = ref([] as Array<Cradle>);
+      const backupCradles = ref([] as Array<Cradle>);
       const { data: cradlesData } = useAxios('/cradle', instance);
       watch(cradlesData, (cradleApi) => {
         if (cradleApi && cradleApi.data) {
-          cradles.value = cradleApi.data;
+          backupCradles.value = cradleApi.data;
         }
       });
+      const backupWorkorder = ref([] as Array<Cradle>);
+      const { data: woData } = useAxios('/workOrder', instance);
+      watch(woData, (cradleApi) => {
+        if (cradleApi && cradleApi.data) {
+          backupWorkorder.value = cradleApi.data;
+        }
+      });
+
+      const ableCradles = (clientId: number, pitId: number) => {
+        cradles.value = [];
+        console.log(backupWorkorder.value);
+        setTimeout(() => {
+          const lasWO = backupWorkorder.value.find((wo) => {
+            return (
+              (wo.clientId === clientId || wo.client === clientId) &&
+              wo.pits.some((pit) => {
+                return pit.id === pitId;
+              })
+            );
+          });
+          console.log(lasWO);
+          cradles.value = backupCradles.value.filter((cradle) => {
+            return (
+              cradle.id === lasWO.operativeCradle ||
+              cradle.id === lasWO.operativeCradleId ||
+              cradle.id === lasWO.backupCradle ||
+              cradle.id === lasWO.backupCradleId
+            );
+          });
+        }, 100);
+      };
+
       const selectedCradleName = computed(() => {
         return currentStageSheet.cradleId >= 0
           ? cradles.value.find(
@@ -569,8 +597,11 @@
   .panel {
     @apply bg-white rounded-md shadow-sm border;
   }
-  .cradle-slot {
+  .cradle-slot-ph {
     @apply w-[6.25rem] h-[6.25rem] rounded-lg border-2 border-dashed border-second-300 text-4xl font-bold text-second-200 flex justify-center items-center;
+  }
+  .cradle-slot {
+    @apply w-[6.25rem] h-[6.25rem] rounded-lg border-2 border-dashed border-second-400 text-4xl font-bold text-second-300 flex justify-center items-center;
   }
 
   .amountWrapper {

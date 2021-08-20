@@ -93,9 +93,9 @@
             const selectedClientId =
               backupClients.value.find((client: Company) => {
                 return client.id == curPit.companyId;
-              }) || -1;
+              }).id || -1;
             if (selectedClientId >= 0) {
-              clientId.value = selectedClientId || -1;
+              clientId.value = Number(selectedClientId) || -1;
             } else {
               clientId.value = -1;
             }
@@ -104,11 +104,13 @@
       };
       watch(pitId, (newVal) => {
         if (newVal >= 0) {
+          console.log(newVal);
           selectClientByPit(newVal);
         }
       });
       watch(clientId, (newVal) => {
         if (newVal >= 0) {
+          console.log(newVal);
           filterPitsByClient(newVal);
         }
       });
