@@ -3,6 +3,7 @@ label {
 
   p {
     @apply text-sm flex items-baseline;
+
     span {
       @apply italic opacity-75 px-1;
     }
@@ -11,11 +12,18 @@ label {
 
 .input {
   @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
-  &:focus {
-    
-  }
 }
 
 input:read-only {
   @apply bg-second-200 border cursor-not-allowed;
+}
+
+.loading {
+  p {
+    @apply bg-gray-200 rounded-full px-2 w-[12ch] text-gray-200 animate-pulse;
+  }
+
+  .input {
+    @apply bg-gray-100 text-gray-100 border animate-pulse;
+  }
 }

@@ -17,10 +17,10 @@
             @update:pitId="pitId = $event"
           />
         </FieldGroup>
-        <FieldGroup class="max-w-xl">
+        <FieldGroup class="max-w-2xl">
           <FieldLegend>Arena</FieldLegend>
           <FieldSelect
-            class="col-span-8"
+            class="col-span-7"
             fieldName="sandProvider"
             title="Proveedor"
             placeholder="Selecciona proveedor"
@@ -28,11 +28,12 @@
             :data="sandProviderId"
             @update:data="sandProviderId = $event"
           />
+          <div class="col-span-4"></div>
           <template v-for="(order, orderKey) in sandOrder" :key="orderKey">
-            <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
+            <hr v-if="orderKey !== 0" class="col-span-full" />
             <FieldSelect
               :title="orderKey === 0 ? 'Tipo' : ''"
-              class="col-span-10"
+              class="col-span-4"
               fieldName="sandType"
               placeholder="Seleccciona Tipo de Arena"
               endpoint="/sand"
@@ -40,21 +41,9 @@
               :data="order.sandTypeId"
               @update:data="order.sandTypeId = $event"
             />
-            <div
-              v-if="orderKey !== 0"
-              class="col-span-2 flex justify-end items-end"
-            >
-              <CircularBtn
-                class="btn__delete"
-                size="sm"
-                @click="removeOrder(order.id)"
-              >
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
-            </div>
             <!-- TODO: Input con Frente o Fondo fijo ;D -->
-            <label class="col-span-6" for="sandQuantity">
-              <span>Cantidad</span>
+            <label class="col-span-3" for="sandQuantity">
+              <span v-if="orderKey === 0">Cantidad</span>
               <div class="mt-1 flex rounded shadow-sm">
                 <input
                   v-model="order.amount"
@@ -95,17 +84,29 @@
               </div>
             </label>
             <FieldInput
-              class="col-span-6"
+              class="col-span-4"
+              :title="orderKey === 0 ? 'ID de caja' : ''"
               fieldName="sandBoxId"
               placeholder="Ingrear ID de caja"
-              title="ID de caja"
               mask="X*"
               :data="order.boxId"
               @update:data="order.boxId = $event"
             />
+            <div
+              v-if="orderKey !== 0"
+              class="col-span-1 flex justify-end items-end"
+            >
+              <CircularBtn
+                class="btn__delete"
+                size="sm"
+                @click="removeOrder(order.id)"
+              >
+                <TrashIcon class="w-5 h-5" />
+              </CircularBtn>
+            </div>
           </template>
           <button
-            class="col-span-full mt-1 flex items-center"
+            class="col-span-4 mt-1 flex items-center"
             @click.prevent="addOrder"
           >
             <CircularBtn class="btn__add" size="xs">
@@ -245,7 +246,7 @@
         const newId = lastSandOrder.id + 1;
         sandOrder.value.push({
           id: newId,
-          sandTypeId: '',
+          sandTypeId: -1,
           amount: null,
           boxId: '',
         });
