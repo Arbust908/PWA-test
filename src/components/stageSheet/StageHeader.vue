@@ -1,9 +1,9 @@
 <template>
   <tr>
     <th scope="col">Etapa</th>
-    <th scope="col">Tipo de arena A</th>
-    <th scope="col">Tipo de arena B</th>
-    <th scope="col">Tipo de arena C</th>
+    <th scope="col" class="w-52">Tipo de arena A</th>
+    <th scope="col" class="w-52">Tipo de arena B</th>
+    <th scope="col" class="w-52">Tipo de arena C</th>
     <th scope="col">Total</th>
   </tr>
 </template>

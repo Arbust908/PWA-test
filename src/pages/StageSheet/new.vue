@@ -79,7 +79,7 @@
         <article class="p-6">
           <h3 class="font-bold text-xl">Depósito</h3>
           <div>
-            <div class="px-6 py-12 xl:px-16 xl:py-20 text-center">
+            <div class="text-center">
               <span
                 v-if="warehouse && warehouse.error"
                 class="
@@ -89,9 +89,24 @@
                   rounded-lg
                   border-2 border-second-300 border-dashed
                   text-center
+                  mx-6
+                  my-12
+                  xl:mx-16 xl:my-20
                 "
               >
                 {{ warehouse.error }}
+              </span>
+              <span v-else-if="warehouse" class="px-5 py-8 text-center m-4">
+                <DepositGrid
+                  class="w-full flex flex-col gap-5"
+                  :selectedBox="choosedBox"
+                  :rows="row"
+                  :cols="col"
+                  :floor="floor"
+                  :deposit="warehouse.layout"
+                  :visibleCategories="visibleCategories"
+                  @select-box="selectBox"
+                />
               </span>
               <span
                 v-else
@@ -102,6 +117,9 @@
                   rounded-lg
                   border-2 border-second-300 border-dashed
                   text-center
+                  mx-6
+                  my-12
+                  xl:mx-16 xl:my-20
                 "
               >
                 Selecciones cliente y pozo para comenzar
@@ -206,10 +224,18 @@
   import SandPlanStage from '@/components/stageSheet/StageRow.vue';
   import StageEmptyState from '@/components/stageSheet/StageEmptyState.vue';
   import StageHeader from '@/components/stageSheet/StageHeader.vue';
-  import { Pit, Company, SandPlan, StageSheet } from '@/interfaces/sandflow';
+  import DepositGrid from '@/components/depositDesign/Deposit.vue';
+  import {
+    Pit,
+    Company,
+    StageSheet,
+    Sand,
+    Cradle,
+    PurchaseOrder,
+    Box,
+  } from '@/interfaces/sandflow';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  import { useToggle } from '@vueuse/core';
   import SideTabName from '@/components/stageSheet/sideTabName.vue';
   const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -228,6 +254,7 @@
       FieldSelect,
       FieldLoading,
       SideTabName,
+      DepositGrid,
     },
     setup() {
       // Init
@@ -240,6 +267,9 @@
         companyId: -1,
         pitId: -1,
         cradleId: -1,
+        warehouseId: -1,
+        operativeCradleId: -1,
+        backupCradleId: -1,
         stages: [
           {
             id: 0,
@@ -261,12 +291,12 @@
         editingStage.value = stage.id;
       };
       const saveStage = (stage) => {
-        currentSandPlan.stages[stage.id] = stage;
+        currentStageSheet.stages[stage.id] = stage;
         editingStage.value = -1;
       };
       const duplicateStage = (stage) => {
         const lastStage =
-          currentSandPlan.stages[currentSandPlan.stages.length - 1];
+          currentStageSheet.stages[currentStageSheet.stages.length - 1];
         const lastStageId = { id: lastStage.id + 1 };
         const lastStageStage = { stage: lastStage.stage + 1 };
         const newStatus = { status: 0 };
@@ -276,12 +306,12 @@
           ...lastStageStage,
           ...newStatus,
         };
-        currentSandPlan.stages.push(newStage);
+        currentStageSheet.stages.push(newStage);
         editStage(newStage);
       };
       const deleteStage = (stage) => {
         const stageId = stage.id;
-        currentSandPlan.stages = currentSandPlan.stages.filter(
+        currentStageSheet.stages = currentStageSheet.stages.filter(
           (s) => s.id !== stageId
         );
       };
@@ -336,21 +366,92 @@
           backupWarehouses.value = api.data;
         }
       });
+      const choosedBox: Ref<Box> = ref({
+        floor: 1,
+        col: 0,
+        row: 0,
+        category: '',
+      });
+      const selectBox = (box: Box) => {
+        if (box.category == 'aisle') return;
+        if (box.category == 'empty') {
+          let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
+          let selectedBoxPosition = `${box.floor}|${box.row}|${box.col}`;
+
+          choosedBox.value.floor = box.floor;
+          choosedBox.value.col = box.col;
+          choosedBox.value.row = box.row;
+          warehouse.value.layout[`${selectedBoxPosition}`] =
+            choosedBox.value.category;
+          warehouse.value.layout[`${prevBoxPosition}`] = 'empty';
+        }
+      };
+      const formatDeposit = (deposit) => {
+        const dimensions = Object.keys(deposit).reduce(
+          (dims, currentCell) => {
+            const proxy = currentCell.split('|');
+            const [floor, row, col] = proxy;
+            dims.floor = Math.max(dims.floor, floor);
+            dims.row = Math.max(dims.row, row);
+            dims.col = Math.max(dims.col, col);
+            return dims;
+          },
+          { floor: 0, row: 0, col: 0 }
+        );
+        dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
+        return dimensions;
+      };
+      const floor = ref(0);
+      const row = ref(0);
+      const col = ref(0);
       // << WAREHOUSE
+      const purchaseOrder: Ref<PurchaseOrder> = ref({} as PurchaseOrder);
+
+      const getPurchaseOrder = (companyId: number, pitId: number) => {
+        const { data: purchaseOrdersData } = useAxios(
+          '/purchaseOrder',
+          instance
+        );
+        watch(purchaseOrdersData, (api) => {
+          console.log(api);
+          if (api && api.data) {
+            purchaseOrder.value = api.data.filter((po) => {
+              return po.companyId === companyId && po.pitId === pitId;
+            });
+            console.log(purchaseOrder.value);
+          }
+        });
+        return purchaseOrder;
+      };
+      const clientPitComboSelected: Ref<boolean> = ref(false);
+      watch(clientPitComboSelected, (value) => {
+        if (value) {
+          getPurchaseOrder(
+            currentStageSheet.companyId,
+            currentStageSheet.pitId
+          );
+          console.log(purchaseOrder.value);
+        }
+      });
+
+      const filterPitsByClient = (clientId: number) => {
+        pits.value = [];
+        setTimeout(() => {
+          pits.value = backupPits.value.filter((pit: Pit) => {
+            return pit.companyId == clientId;
+          });
+          if (pits.value.length === 1) {
+            currentStageSheet.pitId = pits.value[0].id;
+          } else if (pits.value.length <= 0) {
+            pits.value = [{ name: 'No hay pozos', id: -1 }];
+            currentStageSheet.pitId = -1;
+          }
+        }, 100);
+      };
+
       watchEffect(() => {
         if (currentStageSheet.companyId !== -1) {
-          pits.value = [];
-          setTimeout(() => {
-            pits.value = backupPits.value.filter((pit) => {
-              return pit.companyId == currentStageSheet.companyId;
-            });
-            if (pits.value.length === 1) {
-              currentStageSheet.pitId = pits.value[0].id;
-            } else if (pits.value.length <= 0) {
-              pits.value = [{ name: 'No hay pozos', id: -1 }];
-              currentStageSheet.pitId = -1;
-            }
-          }, 100);
+          filterPitsByClient(currentStageSheet.companyId);
         }
         // if (currentStageSheet.pitId !== -1) {
         //   const curPit = backupPits.value.find((pit) => {
@@ -376,6 +477,7 @@
           currentStageSheet.companyId !== -1 &&
           currentStageSheet.pitId !== -1
         ) {
+          clientPitComboSelected.value = true;
           warehouse.value = backupWarehouses.value.find((warehouse) => {
             return (
               warehouse.pitId == currentStageSheet.pitId &&
@@ -387,11 +489,18 @@
             warehouse.value = {
               error: 'No hay depósito para este cliente y/o pozo',
             };
+          } else {
+            const fDepo = formatDeposit(warehouse.value.layout);
+            console.log(fDepo);
+            floor.value = fDepo.floor;
+            row.value = fDepo.row;
+            col.value = fDepo.col;
           }
         }
       });
+      let visibleCategories = ref([]);
       // :: CRADLES
-      const cradles = ref([] as Array<Cradles>);
+      const cradles = ref([] as Array<Cradle>);
       const { data: cradlesData } = useAxios('/cradle', instance);
       watch(cradlesData, (cradleApi) => {
         if (cradleApi && cradleApi.data) {
@@ -445,6 +554,11 @@
         duplicateStage,
         deleteStage,
         warehouse,
+        choosedBox,
+        selectBox,
+        floor,
+        row,
+        col,
       };
     },
   };

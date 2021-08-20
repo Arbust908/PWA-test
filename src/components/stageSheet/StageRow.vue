@@ -38,7 +38,7 @@
     </td>
     <td
       v-if="editing === stage.id"
-      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
+      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm max-w-[120px]"
     >
       <FieldSelect
         class="col-span-6"
@@ -70,7 +70,7 @@
     </td>
     <td
       v-if="editing === stage.id"
-      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
+      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm max-w-[120px]"
     >
       <FieldSelect
         class="col-span-6"
