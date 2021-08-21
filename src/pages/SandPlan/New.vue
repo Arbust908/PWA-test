@@ -451,17 +451,20 @@
         watch(data, (apiData) => {
           if (apiData && apiData.data) {
             const sandPlanId = apiData.data.id;
+            currentSandPlan.id = sandPlanId;
             currentSandPlan.stages.map((stage) => {
               const { id, ...sandStage } = stage;
-              stage.sandPlanId = sandPlanId;
-              stage.action = 'create';
+              sandStage.sandPlanId = sandPlanId;
+              sandStage.action = 'create';
+              console.log('Sand Stage', sandStage);
               const { data } = useAxios(
                 '/sandStage',
                 { method: 'POST', data: sandStage },
                 instance
               );
             });
-            saveSandPlan(currentSandPlan);
+            console.log(currentSandPlan);
+            saveSandPlan({ ...currentSandPlan });
             router.push('/planificacion-de-arena');
           }
         });

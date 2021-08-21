@@ -111,6 +111,7 @@
       watch(sPData, (sPData, prevCount) => {
         if (sPData && sPData.data) {
           sandPlans.value = sPData.data;
+          console.log('mis sps', sandPlans.value);
           sandPlans.value.map((sp) => {
             storeToVuex(sp);
           });

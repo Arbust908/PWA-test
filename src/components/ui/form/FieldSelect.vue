@@ -17,7 +17,7 @@
         {{ placeholder }}
       </option>
       <option v-for="(res, i) in resources" :key="res.id + i" :value="res.id">
-        {{ res[enpointKey] }}
+        {{ res[endpointKey] }}
       </option>
     </select>
   </label>
@@ -29,18 +29,18 @@
   import { useApi } from '@/helpers/useApi';
   import '@/assets/inputs.scss';
   export default defineComponent({
-    name: 'FieldInput',
+    name: 'FieldSelect',
     props: {
       data: {
         default: '',
       },
       fieldName: {
         type: String,
-        default: 'input',
+        default: 'select',
       },
       placeholder: {
         type: String,
-        default: 'Input',
+        default: 'Ppciones',
       },
       title: {
         type: String,
@@ -50,9 +50,13 @@
         type: String,
         default: '/',
       },
-      enpointKey: {
+      endpointKey: {
         type: String,
         default: 'name',
+      },
+      endpointData: {
+        type: Array,
+        default: null,
       },
       isOptional: {
         type: Boolean,
@@ -61,9 +65,13 @@
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
-      const { read } = useApi(props.endpoint);
-      const resources = read();
-
+      let resources = null;
+      if (props.endpointData !== null) {
+        resources = props.endpointData;
+      } else {
+        const { read } = useApi(props.endpoint);
+        resources = read();
+      }
       return {
         value,
         resources,

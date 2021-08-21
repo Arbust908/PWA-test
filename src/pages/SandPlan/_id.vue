@@ -281,8 +281,9 @@
       });
       //   console.log(vuexSP);
       //   console.log(currentSandPlan);
-      if (!vuexSP) {
-        const { data: spData } = useAxios('/sandPlan', instance);
+      const buckupStages = ref([]);
+      if (!vuexSP || true) {
+        const { data: spData } = useAxios('/sandPlan/' + id, instance);
         watch(spData, (sandplanApi, prevCount) => {
           if (sandplanApi && sandplanApi.data) {
             const sp = { ...currentSandPlan, ...sandplanApi.data };
@@ -291,6 +292,7 @@
             currentSandPlan.pitId = sp.pitId;
             currentSandPlan.stagesAmount = sp.stagesAmount;
             currentSandPlan.stages = sp.stages;
+            buckupStages.value = sp.stages;
             currentSandPlan.id = sp.id;
             console.log('SP API', currentSandPlan);
           }
@@ -327,7 +329,10 @@
           currentSandPlan.stages.filter((stage) => stage.status >= 2) || []
         );
       });
-      const editingStage = ref(-1);
+      const lastStage =
+        currentSandPlan.stages[currentSandPlan.stages.length - 1];
+      const lastStageId = lastStage ? Number(lastStage.id) : -1;
+      const editingStage = ref(lastStageId);
 
       const editStage = (stage) => {
         console.log(stage.id);
@@ -345,7 +350,7 @@
       const duplicateStage = (stage) => {
         const lastStage =
           currentSandPlan.stages[currentSandPlan.stages.length - 1];
-        const lastStageId = { id: lastStage.id + 1 };
+        const lastStageId = { id: Number(lastStage.id) + 1 };
         const lastStageStage = { stage: lastStage.stage + 1 };
         const newStatus = { status: 0 };
         console.log(lastStage, lastStageId, lastStageStage, newStatus);
@@ -356,6 +361,7 @@
           ...newStatus,
         };
         currentSandPlan.stages.push(newStage);
+        editStage(newStage);
       };
       const deleteStage = (stage) => {
         const stageId = stage.id;
@@ -415,13 +421,85 @@
       });
       const { updateSandPlan } = useActions(['updateSandPlan']);
       const save = (): void => {
+        currentSandPlan.stages.map((stage) => {
+          console.log(stage);
+          if (stage.sandId1 === -1) {
+            stage.sandId1 = null;
+          }
+          if (stage.sandId2 === -1) {
+            stage.sandId2 = null;
+          }
+          if (stage.sandId3 === -1) {
+            stage.sandId3 = null;
+          }
+          return stage;
+        });
+        currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
+          const noSandTypeNull =
+            (stage.sandId1 !== null && stage.quantity1 > 0) ||
+            (stage.sandId2 !== null && stage.quantity2 > 0) ||
+            (stage.sandId3 !== null && stage.quantity3 > 0);
+          return noSandTypeNull;
+        });
         const { data } = useAxios(
-          '/sandPlan/' + id,
-          { method: 'PUT', data: currentSandPlan },
+          '/sandPlan/' + currentSandPlan.id,
+          {
+            method: 'PUT',
+            data: {
+              companyId: currentSandPlan.companyId,
+              pitId: currentSandPlan.pitId,
+              id: currentSandPlan.id,
+            },
+          },
           instance
         );
-        updateSandPlan(currentSandPlan);
-        router.push('/planificacion-de-arena');
+        watch(data, (apiData) => {
+          if (apiData && apiData.data) {
+            const sandPlanId = apiData.data.id;
+            currentSandPlan.id = sandPlanId;
+            const deletingStages = buckupStages.value.filter((stage) => {
+              return currentSandPlan.stages.find(
+                (curS) => curS.id === stage.id
+              );
+            });
+            console.log(buckupStages.value);
+            console.log(deletingStages);
+            console.log(currentSandPlan.stages);
+
+            deletingStages.map((stage) => {
+              const { data } = useAxios(
+                '/sandStage/' + stage.id,
+                { method: 'DELETE' },
+                instance
+              );
+            });
+
+            currentSandPlan.stages.map((stage) => {
+              const { ...sandStage } = stage;
+              sandStage.sandPlanId = sandPlanId;
+              console.log('Sand Stage', sandStage);
+              if (sandStage.action === 'create') {
+                sandStage.action = 'update';
+                const { data } = useAxios(
+                  '/sandStage/' + sandStage.id,
+                  { method: 'PUT', data: sandStage },
+                  instance
+                );
+              } else {
+                const { id, ...newStage } = sandStage;
+                newStage.action = 'create';
+                const { data } = useAxios(
+                  '/sandStage',
+                  { method: 'POST', data: newStage },
+                  instance
+                );
+              }
+            });
+            console.log(currentSandPlan);
+            updateSandPlan(currentSandPlan);
+            router.push('/planificacion-de-arena');
+          }
+        });
       };
       return {
         currentSandPlan,

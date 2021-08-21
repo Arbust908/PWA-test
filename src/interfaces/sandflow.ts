@@ -37,12 +37,10 @@ export interface StageSheet {
     warehouseId: number;
     warehouse?: Warehouse;
     stages?: SandStage[];
-    // wokrOrderId?: number;
-    // workOrder?: WorkOrder; <.-- 
-    mainCradleId?: number;
-    backupCradleId?: number;
-    // mainCradle?: Cradle;
-    // backupCradle?: Cradle;
+    operativeCradleId: number;
+    backupCradleId: number;
+    operativeCradle?: Cradle;
+    backupCradle?: Cradle;
 }
 
 
@@ -156,6 +154,7 @@ export interface Sand {
 export interface Cradle {
     id?: number;
     name: string;
+    slots: string[]; // json
     observations?: string;
 }
 
@@ -267,7 +266,7 @@ export interface sandCategory {
     name: string;
     sands?: Sand[];
 }
-export interface Box {
+export interface Box { // Proximamente
   id?: number;
   warehouseId: number | null;
   warehouse?: Warehouse;

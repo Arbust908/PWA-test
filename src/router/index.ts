@@ -237,6 +237,24 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/stage-sheet',
+    name: 'StageSheet',
+    component: () => import('@/pages/StageSheet/index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/stage-sheet/:id',
+    name: 'StageSheetById',
+    component: () => import('@/pages/StageSheet/_id.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/stage-sheet/nuevo',
+    name: 'NewStageSheet',
+    component: () => import('@/pages/StageSheet/new.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/usuario/salir',
     name: 'UserLogout',
     component: () => import('@/pages/User/Logout.vue'),
