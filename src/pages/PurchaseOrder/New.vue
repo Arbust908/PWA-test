@@ -17,104 +17,139 @@
             @update:pitId="pitId = $event"
           />
         </FieldGroup>
-        <FieldGroup class="max-w-2xl">
-          <FieldLegend>Arena</FieldLegend>
-          <FieldSelect
-            class="col-span-7"
-            fieldName="sandProvider"
-            title="Proveedor"
-            placeholder="Selecciona proveedor"
-            endpoint="/sandProvider"
-            :data="sandProviderId"
-            @update:data="sandProviderId = $event"
-          />
-          <div class="col-span-4"></div>
-          <template v-for="(order, orderKey) in sandOrder" :key="orderKey">
-            <hr v-if="orderKey !== 0" class="col-span-full" />
+        <FieldLegend>Arena</FieldLegend>
+        <div
+          v-for="(providerId, sandProvidersKey) in sandProvidersIds"
+          :key="sandProvidersKey"
+          class="border-b pb-6"
+        >
+          <FieldGroup class="grid border-none max-w-full">
             <FieldSelect
-              :title="orderKey === 0 ? 'Tipo' : ''"
-              class="col-span-5"
-              fieldName="sandType"
-              placeholder="Seleccciona Tipo de Arena"
-              endpoint="/sand"
-              endpointKey="type"
-              :data="order.sandTypeId"
-              @update:data="order.sandTypeId = $event"
+              class="col-span-4"
+              fieldName="sandProvider"
+              title="Proveedor"
+              placeholder="Selecciona proveedor"
+              endpoint="/sandProvider"
+              :data="providerId"
+              @update:data="providerId = $event"
             />
-            <!-- TODO: Input con Frente o Fondo fijo ;D -->
-            <label class="col-span-3" for="sandQuantity">
-              <span v-if="orderKey === 0">Cantidad</span>
-              <div class="mt-1 flex rounded shadow-sm">
-                <input
-                  v-model="order.amount"
-                  type="number"
-                  name="sandQuantity"
-                  class="
-                    flex-1
-                    min-w-0
-                    block
-                    w-full
-                    px-3
-                    py-2
-                    rounded-none
-                    border-r-0
-                    rounded-l
-                    focus:ring-indigo-500 focus:border-indigo-500
-                    border-gray-300
-                    sm:text-sm
-                  "
-                  placeholder="Cantidad de Arena"
-                  list="sandQuantity"
-                />
-                <span
-                  class="
-                    inline-flex
-                    items-center
-                    px-3
-                    rounded-r
-                    border border-gray-300
-                    bg-gray-50
-                    text-gray-500
-                    sm:text-sm
-                  "
-                  title="Peso en Toneladas"
-                >
-                  t
-                </span>
-              </div>
-            </label>
-            <FieldInput
-              :class="orderKey !== 0 ? 'col-span-3' : 'col-span-4'"
-              :title="orderKey === 0 ? 'ID de caja' : ''"
-              fieldName="sandBoxId"
-              placeholder="Ingrear ID de caja"
-              mask="X*"
-              :data="order.boxId"
-              @update:data="order.boxId = $event"
-            />
-            <div
-              v-if="orderKey !== 0"
-              class="col-span-1 flex justify-end items-end"
+          </FieldGroup>
+          <FieldGroup class="grid items-center max-w-full">
+            <template
+              v-for="(order, orderKey) in sandOrder"
+              :key="orderKey"
+              class="border-none"
             >
-              <CircularBtn
-                class="btn__delete"
-                size="sm"
+              <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
+              <FieldSelect
+                title="Tipo"
+                class="col-span-4"
+                fieldName="sandType"
+                placeholder="Seleccciona Tipo de Arena"
+                endpoint="/sand"
+                enpointKey="type"
+                :data="order.sandTypeId"
+                @update:data="order.sandTypeId = $event"
+              />
+              <!-- TODO: Input con Frente o Fondo fijo ;D -->
+              <label class="col-span-3" for="sandQuantity">
+                <span>Cantidad</span>
+                <div class="mt-1 flex rounded shadow-sm">
+                  <input
+                    v-model="order.amount"
+                    type="number"
+                    name="sandQuantity"
+                    class="
+                      flex-1
+                      min-w-0
+                      block
+                      w-full
+                      px-3
+                      py-2
+                      rounded-none
+                      border-r-0
+                      rounded-l
+                      focus:ring-indigo-500 focus:border-indigo-500
+                      border-gray-300
+                      sm:text-sm
+                    "
+                    placeholder="Cantidad de Arena"
+                    list="sandQuantity"
+                  />
+                  <span
+                    class="
+                      inline-flex
+                      items-center
+                      px-3
+                      rounded-r
+                      border border-gray-300
+                      bg-gray-50
+                      text-gray-500
+                      sm:text-sm
+                    "
+                    title="Peso en Toneladas"
+                  >
+                    t
+                  </span>
+                </div>
+              </label>
+              <FieldInput
+                class="col-span-3"
+                fieldName="sandBoxId"
+                placeholder="Ingresar ID de caja"
+                title="ID de caja"
+                mask="X*"
+                :data="order.boxId"
+                @update:data="order.boxId = $event"
+              />
+              <Icon
+                v-if="sandOrder.length > 1"
+                icon="Trash"
+                type="outline"
+                class="w-5 mt-5 h-5 items-center cursor-pointer"
                 @click="removeOrder(order.id)"
+              />
+              <Icon
+                icon="Plus"
+                v-if="sandOrder.length - 1 == orderKey"
+                type="outline"
+                class="icon w-5 h-5 mt-5 items-center cursor-pointer"
+                @click.prevent="addOrder"
+              />
+            </template>
+            <div class="flex items-center col-span-12">
+              <div
+                class="icon-button"
+                v-if="sandProvidersIds.length > 1"
+                @click.prevent="removeSandProvider(providerId)"
               >
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
+                <Icon
+                  icon="Trash"
+                  type="outline"
+                  class="w-5 h-5 items-center"
+                />
+                Borrar proveedor
+              </div>
+              <div
+                :class="[
+                  'icon-button',
+                  sandProvidersIds.length - 1 !== sandProvidersKey
+                    ? ''
+                    : 'ml-3',
+                ]"
+                v-if="sandProvidersIds.length - 1 == sandProvidersKey"
+                @click.prevent="addSandProvider"
+              >
+                <Icon
+                  icon="Plus"
+                  type="outline"
+                  class="icon w-5 h-5 items-center"
+                />
+                Agregar proveedor
+              </div>
             </div>
-          </template>
-          <button
-            class="col-span-4 mt-1 flex items-center"
-            @click.prevent="addOrder"
-          >
-            <CircularBtn class="btn__add" size="xs">
-              <PlusIcon class="w-4 h-4" />
-            </CircularBtn>
-            <span class="font-bold text"> Agregar </span>
-          </button>
-        </FieldGroup>
+          </FieldGroup>
+        </div>
         <FieldGroup>
           <FieldLegend>Transporte</FieldLegend>
           <FieldSelect
@@ -160,6 +195,7 @@
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
+  import Icon from '@/components/icon/TheAllIcon.vue';
 
   import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
@@ -197,6 +233,7 @@
       FieldInput,
       FieldSelect,
       ClientPitCombo,
+      Icon,
     },
     setup() {
       const router = useRouter();
@@ -206,7 +243,27 @@
       // >> Init
       // :: Proveedores de Sand
       const sandProviders = ref([] as Array<SandProvider>);
+
+      const sandProvidersIds = ref([
+        {
+          id: -1,
+          sandOrders: [],
+        },
+      ] as Array<Object>);
+
+      const addSandProvider = () => {
+        sandProvidersIds.value.push({
+          id: -1,
+          sandOrders: [],
+        });
+      };
+
+      const removeSandProvider = (providerId: number) => {
+        console.log(providerId);
+      };
+
       const { data: sandProvidersData } = useAxios('/sandProvider', instance);
+
       watch(sandProvidersData, (sPData, prevCount) => {
         if (sPData && sPData.data) {
           sandProviders.value = sPData.data;
@@ -279,6 +336,9 @@
         );
       });
       const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
+
+      // CHEQUEAR QUE NO SE ENVIEN ID -1 DE SAND PROVIDERS ID
+
       const save = (): void => {
         if (isFull.value) {
           const purchaseOrder: PurchaseOrder = {
@@ -341,12 +401,18 @@
         transportProviderId,
         companyClientId,
         pitId,
+        sandProvidersIds,
+        addSandProvider,
+        removeSandProvider,
       };
     },
   };
 </script>
 
 <style lang="scss" scoped>
+  .icon-button {
+    @apply font-bold flex items-center col-span-12 cursor-pointer;
+  }
   .input {
     @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 mt-1 flex shadow-sm;
   }

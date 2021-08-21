@@ -113,10 +113,13 @@ export interface SandProvider {
     name: string;
     address: string;
     legalId: number;
-    meshType: string[]; 
+    meshType: any;
     observations?: string;
     companyRepresentativeId: number;
     CompanyRepresentative?: CompanyRepresentative;
+    ProviderNotifications?: ProviderNotification[];
+    PurhcaseOrders?: PurchaseOrder[];
+    SandOrders?: SandOrder[];
 }
 
 export interface Driver {
@@ -214,6 +217,8 @@ export interface SandOrder {
     amount: number;
     purchaseOrderId: number;
     purchaseOrder?: PurchaseOrder;
+    sandProviderId: number;
+    sandProvider?: SandProvider;
     boxId?: string;
 }
 
