@@ -17,8 +17,8 @@
             placeholder="Nombre y apellido / Razón social"
             mask="S*"
             title="Nombre y apellido / Razón social"
-            :data="clientToUpdate.name"
-            @update:data="clientToUpdate.name = $event"
+            :data="editedCompany.name"
+            @update:data="editedCompany.name = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -26,19 +26,19 @@
             placeholder="CUIL / CUIT"
             mask="###########"
             title="CUIL / CUIT"
-            :data="clientToUpdate.legalId"
-            @update:data="clientToUpdate.legalId = $event"
+            :data="editedCompany.legalId"
+            @update:data="editedCompany.legalId = $event"
           />
           <FieldInput
             class="col-span-full"
-            fieldName="adress"
+            fieldName="address"
             placeholder="Domicilio"
             mask="S*"
             title="Domicilio"
-            :data="clientToUpdate.adress"
-            @update:data="clientToUpdate.adress = $event"
+            :data="editedCompany.address"
+            @update:data="editedCompany.address = $event"
           />
-          <toggle label="Es operadora" @handle-toggle-state="handleToggleState" :initialState="clientToUpdate.isOperator"/>
+          <toggle label="Es operadora" @handle-toggle-state="handleToggleState" :initialState="editedCompany.isOperator"/>
           <textarea
             class="col-span-full resize-none rounded-md input"
             fieldName="observations"
@@ -46,8 +46,7 @@
             placeholder="Observaciones..."
             title="Observaciones"
             mask="S*"
-            :data="clientToUpdate.observations"
-            @update:data="clientToUpdate.observations = $event"
+            v-model="editedCompany.observations"
           ></textarea>
         </FieldGroup>
         <FieldGroup>
@@ -58,8 +57,8 @@
             placeholder="Nombre de representante"
             title="Nombre"
             mask="S*"
-            :data="clientToUpdate.companyRepresentative.name"
-            @update:data="clientToUpdate.companyRepresentative.name = $event"
+            :data="editedCompany.companyRepresentative.name"
+            @update:data="editedCompany.companyRepresentative.name = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -67,8 +66,8 @@
             placeholder="+11 1111 1111"
             mask="+##-####-####"
             title="Teléfono"
-            :data="clientToUpdate.companyRepresentative.phone"
-            @update:data="clientToUpdate.companyRepresentative.phone = $event"
+            :data="editedCompany.companyRepresentative.phone"
+            @update:data="editedCompany.companyRepresentative.phone = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -76,8 +75,8 @@
             placeholder="empresa@mail.com"
             mask="X*@X*.X*"
             title="Email"
-            :data="clientToUpdate.companyRepresentative.email"
-            @update:data="clientToUpdate.companyRepresentative.email = $event"
+            :data="editedCompany.companyRepresentative.email"
+            @update:data="editedCompany.companyRepresentative.email = $event"
           />
         </FieldGroup>
       </form>
@@ -89,7 +88,7 @@
           </NoneBtn>
           <PrimaryBtn
             :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
+            @click="isFull && update()"
             :disabled="!isFull"
           >
             Finalizar
@@ -101,16 +100,21 @@
 </template>
 
 <script lang="ts">
-  import Layout from '@/layouts/Main.vue';
-  import { reactive, ref, toRefs } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'vuex';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import InputPack from '@/components/ui/InputPack.vue';
   import { Company } from '@/interfaces/sandflow';
-  import axios from 'axios';
+  import { ref, computed } from 'vue';
   import Toggle from '@/components/ui/Toggle.vue'
 
+  import Layout from '@/layouts/Main.vue';
+  import InputPack from '@/components/ui/InputPack.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
+  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  // AXIOS
+  import axios from 'axios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default {
@@ -118,43 +122,67 @@
       Layout,
       InputPack,
       PrimaryBtn,
-      Toggle
+      Toggle,
+      NoneBtn,
+      FieldGroup,
+      FieldInput,
+      FieldLegend
     },
     setup() {
       const route = useRoute();
       const store = useStore();
       const router = useRouter();
 
-      const clients: Array<Company> = JSON.parse(
+      const companies: Array<Company> = JSON.parse(
         JSON.stringify(store.state.client.all)
       );
       
-      const currentClient: Company = clients[0]
-      
+      const id = Number(route.params.id);
 
-      console.log("a ver",currentClient)
-
-      const clientToUpdate = reactive({
-        name: currentClient.name,
-        adress: currentClient.adress,
-        legalId: currentClient.legalId,
-        isOperator: currentClient.isOperator,
-        observations: currentClient.observations,
-        companyRepresentative: currentClient.companyRepresentative,
+      const currentCompany: Company = companies.find((company) => {
+        return company.id == id;
       });
+
+      const editedCompany: Company = ref({...currentCompany});
 
       const goToIndex = () => {
         router.push('/clientes');
       };
 
       const handleToggleState = () => {
-        clientToUpdate.isOperator = !clientToUpdate.isOperator
+        editedCompany.value.isOperator = !editedCompany.value.isOperator
       }
+
+      const isFull = computed(() => {
+        return !!(
+          editedCompany.value.name !== '' &&
+          editedCompany.value.name.length > 3 &&
+          editedCompany.value.address.length > 3 &&
+          editedCompany.value.legalId >= 0 &&
+          editedCompany.value.companyRepresentative?.name &&
+          editedCompany.value.companyRepresentative?.name.length > 0 &&
+          editedCompany.value.companyRepresentative?.email &&
+          editedCompany.value.companyRepresentative?.email.length > 0 &&
+          editedCompany.value.companyRepresentative?.phone &&
+          editedCompany.value.companyRepresentative?.phone.length > 0
+        );
+      });
 
       const update = async () => {
         const loading = ref(true);
-        let client = await axios
-          .put(`${apiUrl}/company/${currentClient.id}`, clientToUpdate)
+        let companyData = {
+          id: Number(id),
+          name: editedCompany.value.name,
+          address: editedCompany.value.address,
+          legalId: editedCompany.value.legalId,
+          isOperator: editedCompany.value.isOperator,
+          childId: null,
+          observations: editedCompany.value.observations,
+          companyRepresentativeId: Number(editedCompany.value.companyRepresentativeId)
+        }
+        
+        let company = await axios
+          .put(`${apiUrl}/company/${id}`, companyData)
           .catch((err) => {
             console.log(err);
           })
@@ -170,8 +198,8 @@
 
         let companyRepresentative = await axios
           .put(
-            `${apiUrl}/companyRepresentative/${currentClient.companyRepresentative.id}`,
-            clientToUpdate.companyRepresentative
+            `${apiUrl}/companyRepresentative/${companyData.companyRepresentativeId}`,
+            editedCompany.value.companyRepresentative
           )
           .catch((err) => {
             console.log(err);
@@ -186,15 +214,16 @@
             loading.value = false;
           });
 
-        store.dispatch('updateClient', clientToUpdate);
+        store.dispatch('updateClient', editedCompany.value);
         router.push('/clientes');
       };
 
       return {
         update,
         goToIndex,
-        ...toRefs(clientToUpdate),
-        handleToggleState
+        editedCompany,
+        handleToggleState,
+        isFull
       };
     },
   };

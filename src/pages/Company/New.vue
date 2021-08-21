@@ -17,8 +17,8 @@
             placeholder="Nombre y apellido / Razón social"
             mask="S*"
             title="Nombre y apellido / Razón social"
-            :data="name"
-            @update:data="name = $event"
+            :data="newClient.name"
+            @update:data="newClient.name = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -26,8 +26,8 @@
             placeholder="CUIL / CUIT"
             mask="###########"
             title="CUIL / CUIT"
-            :data="legalId"
-            @update:data="legalId = $event"
+            :data="newClient.legalId"
+            @update:data="newClient.legalId = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -35,8 +35,8 @@
             placeholder="Domicilio"
             mask="S*"
             title="Domicilio"
-            :data="address"
-            @update:data="address = $event"
+            :data="newClient.address"
+            @update:data="newClient.address = $event"
           />
           <toggle label="Es operadora" @handle-toggle-state="handleToggleState"/>
           <textarea
@@ -46,8 +46,7 @@
             placeholder="Observaciones..."
             title="Observaciones"
             mask="S*"
-            :data="observations"
-            @update:data="observations = $event"
+            v-model="newClient.observations"
           ></textarea>
         </FieldGroup>
         <FieldGroup>
@@ -58,8 +57,8 @@
             placeholder="Nombre de representante"
             title="Nombre"
             mask="S*"
-            :data="companyRepresentative.name"
-            @update:data="companyRepresentative.name = $event"
+            :data="newClient.companyRepresentative.name"
+            @update:data="newClient.companyRepresentative.name = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -67,8 +66,8 @@
             placeholder="+11 1111 1111"
             mask="+##-####-####"
             title="Teléfono"
-            :data="companyRepresentative.phone"
-            @update:data="companyRepresentative.phone = $event"
+            :data="newClient.companyRepresentative.phone"
+            @update:data="newClient.companyRepresentative.phone = $event"
           />
           <FieldInput
             class="col-span-full"
@@ -76,8 +75,8 @@
             placeholder="empresa@mail.com"
             mask="X*@X*.X*"
             title="Email"
-            :data="companyRepresentative.email"
-            @update:data="companyRepresentative.email = $event"
+            :data="newClient.companyRepresentative.email"
+            @update:data="newClient.companyRepresentative.email = $event"
           />
         </FieldGroup>
       </form>
@@ -144,11 +143,7 @@
         router.push('/clientes');
       };
 
-      const handleToggleState = () => {
-        newClient.isOperator = !newClient.isOperator
-      }
-
-      const newClient: Company = reactive({
+      const newClient: Company = ref({
         name: '',
         address: '',
         legalId: '',
@@ -162,39 +157,43 @@
         sandPlans: [],
       });
 
+      const handleToggleState = () => {
+        newClient.value.isOperator = !newClient.value.isOperator
+      }
+
       const isFull = computed(() => {
         return !!(
-          newClient.name !== '' &&
-          newClient.name.length > 3 &&
-          newClient.address.length > 3 &&
-          newClient.legalId >= 0 &&
-          newClient.companyRepresentative?.name &&
-          newClient.companyRepresentative?.name.length > 0 &&
-          newClient.companyRepresentative?.email &&
-          newClient.companyRepresentative?.email.length > 0 &&
-          newClient.companyRepresentative?.phone &&
-          newClient.companyRepresentative?.phone.length > 0
+          newClient.value.name !== '' &&
+          newClient.value.name.length > 3 &&
+          newClient.value.address.length > 3 &&
+          newClient.value.legalId >= 0 &&
+          newClient.value.companyRepresentative?.name &&
+          newClient.value.companyRepresentative?.name.length > 0 &&
+          newClient.value.companyRepresentative?.email &&
+          newClient.value.companyRepresentative?.email.length > 0 &&
+          newClient.value.companyRepresentative?.phone &&
+          newClient.value.companyRepresentative?.phone.length > 0
         );
       });
 
       const save = async () => {
         const { data: CRdata } = useAxios(
           '/companyRepresentative',
-          { method: 'POST', data: newClient.companyRepresentative },
+          { method: 'POST', data: newClient.value.companyRepresentative },
           instance
         );
         watch(CRdata, (newVal, _) => {
           if (newVal && newVal.data) {
-            newClient.companyRepresentativeId = newVal.data.id;
-            newClient.companyRepresentative = newVal.data;
+            newClient.value.companyRepresentativeId = newVal.data.id;
+            newClient.value.companyRepresentative = newVal.data;
             const { data: Cdata } = useAxios(
               '/company',
-              { method: 'POST', data: newClient },
+              { method: 'POST', data: newClient.value },
               instance
             );
             watch(Cdata, (newVal, _) => {
               if (newVal && newVal.data) {
-                store.dispatch('saveClient', newClient);
+                store.dispatch('saveClient', newClient.value);
                 router.push('/clientes');
               }
             });
@@ -205,7 +204,7 @@
       return {
         goToIndex,
         save,
-        ...toRefs(newClient),
+        newClient,
         isFull,
         handleToggleState
       };
