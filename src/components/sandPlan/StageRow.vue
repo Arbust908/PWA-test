@@ -5,7 +5,7 @@
     </td>
     <!-- Tipos -->
     <td
-      v-if="editing === stage.id"
+      v-if="editing === Number(stage.id)"
       class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
       :id="`sandType${stage.id}`"
     >
@@ -37,7 +37,7 @@
     <!-- /Tipos -->
     <!-- Tipos -->
     <td
-      v-if="editing === stage.id"
+      v-if="editing === Number(stage.id)"
       class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
     >
       <select id="pit" v-model="stage.sandId2" class="input" name="pit">
@@ -68,7 +68,7 @@
     <!-- /Tipos -->
     <!-- Tipos -->
     <td
-      v-if="editing === stage.id"
+      v-if="editing === Number(stage.id)"
       class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
     >
       <select id="pit" v-model="stage.sandId3" class="input" name="pit">
@@ -134,7 +134,7 @@
           <span class="sr-only">Duplicar</span>
         </button>
         <button
-          v-if="editing !== stage.id"
+          v-if="editing !== Number(stage.id)"
           @click.prevent="editStage"
           :disabled="stage.status > 0"
           class="action edit text-gray-600 hover:text-blue-800 p-2"
