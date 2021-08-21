@@ -218,31 +218,29 @@
       });
 
       const save = async () => {
-        console.log("newSandProvider",newSandProvider)
-        console.log("companyRepresentative",companyRepresentative)
-        // const { data } = useAxios(
-        //   '/companyRepresentative',
-        //   { method: 'POST', data: companyRepresentative },
-        //   instance
-        // );
-        // watch(data, (newData, _) => {
-        //   if (newData && newData.data) {
-        //     const compRep = newData.data;
-        //     companyRepresentative.id = compRep.id;
-        //     newSandProvider.companyRepresentativeId = compRep.id;
-        //     const { data: spData } = useAxios(
-        //       '/sandProvider',
-        //       { method: 'POST', data: newSandProvider },
-        //       instance
-        //     );
-        //     watch(spData, (newData, _) => {
-        //       if (newData && newData.data) {
-        //         store.dispatch('saveSandProvider', newSandProvider);
-        //         router.push('/proveedores-de-arena');
-        //       }
-        //     });
-        //   }
-        // });
+        const { data } = useAxios(
+          '/companyRepresentative',
+          { method: 'POST', data: companyRepresentative },
+          instance
+        );
+        watch(data, (newData, _) => {
+          if (newData && newData.data) {
+            const compRep = newData.data;
+            companyRepresentative.id = compRep.id;
+            newSandProvider.companyRepresentativeId = compRep.id;
+            const { data: spData } = useAxios(
+              '/sandProvider',
+              { method: 'POST', data: newSandProvider },
+              instance
+            );
+            watch(spData, (newData, _) => {
+              if (newData && newData.data) {
+                store.dispatch('saveSandProvider', newSandProvider);
+                router.push('/proveedores-de-arena');
+              }
+            });
+          }
+        });
       };
 
       return {

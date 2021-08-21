@@ -112,7 +112,7 @@ export interface CompanyRepresentative {
 export interface SandProvider {
     id?: number;
     name: string;
-    adress: string;
+    address: string;
     legalId: number;
     meshType: string[]; 
     observations?: string;

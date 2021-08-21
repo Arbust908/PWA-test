@@ -174,8 +174,16 @@
       const currentSandProvider: SandProvider = sandProviders.find((sp) => {
         return sp.id == id;
       });
+
       const newSandProvider: SandProvider = reactive({
-        ...currentSandProvider,
+        address: currentSandProvider.address,
+        companyRepresentative: currentSandProvider.companyRepresentative,
+        companyRepresentativeId: currentSandProvider.companyRepresentativeId,
+        id: currentSandProvider.id,
+        legalId: currentSandProvider.legalId,
+        meshType: currentSandProvider.meshType,
+        name: currentSandProvider.name,
+        observations: currentSandProvider.observations,
       });
 
       const isNewRep: Ref<boolean> = ref(false);
@@ -227,7 +235,6 @@
       const repFull: ComputedRef<boolean> = computed(() => {
         return !!(
           companyRepresentative.name !== '' &&
-          companyRepresentative.legalId >= 0 &&
           companyRepresentative.phone !== '' &&
           companyRepresentative.email !== ''
         );
@@ -249,9 +256,18 @@
             const compRep = newData.data;
             companyRepresentative.id = compRep.id;
             newSandProvider.companyRepresentativeId = compRep.id;
+            let sandProviderData = {
+              address: newSandProvider.address,
+              companyRepresentativeId: newSandProvider.companyRepresentativeId,
+              id: newSandProvider.id,
+              legalId: newSandProvider.legalId,
+              meshType: newSandProvider.meshType,
+              name: newSandProvider.name,
+              observations: newSandProvider.observations,
+            }
             const { data: spData } = useAxios(
-              `/sandProvider/${newSandProvider.id}`,
-              { method: 'PUT', data: newSandProvider },
+              `/sandProvider/${id}`,
+              { method: 'PUT', data: sandProviderData },
               instance
             );
             watch(spData, (newData, _) => {
