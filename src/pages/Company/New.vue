@@ -31,12 +31,12 @@
           />
           <FieldInput
             class="col-span-full"
-            fieldName="adress"
+            fieldName="address"
             placeholder="Domicilio"
             mask="S*"
             title="Domicilio"
-            :data="adress"
-            @update:data="adress = $event"
+            :data="address"
+            @update:data="address = $event"
           />
           <toggle label="Es operadora" @handle-toggle-state="handleToggleState"/>
           <textarea
@@ -149,21 +149,24 @@
       }
 
       const newClient: Company = reactive({
-        id: 0,
         name: '',
-        adress: '',
+        address: '',
         legalId: '',
         isOperator: false,
         observations: '',
-        companyRepresentative: {},
-        sandPlans: {},
+        companyRepresentative: {
+          email: '',
+          name: '',
+          phone: ''
+        },
+        sandPlans: [],
       });
 
       const isFull = computed(() => {
         return !!(
           newClient.name !== '' &&
           newClient.name.length > 3 &&
-          newClient.adress.length > 3 &&
+          newClient.address.length > 3 &&
           newClient.legalId >= 0 &&
           newClient.companyRepresentative?.name &&
           newClient.companyRepresentative?.name.length > 0 &&
@@ -182,6 +185,7 @@
         );
         watch(CRdata, (newVal, _) => {
           if (newVal && newVal.data) {
+            newClient.companyRepresentativeId = newVal.data.id;
             newClient.companyRepresentative = newVal.data;
             const { data: Cdata } = useAxios(
               '/company',

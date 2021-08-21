@@ -128,10 +128,11 @@
       const clients: Array<Company> = JSON.parse(
         JSON.stringify(store.state.client.all)
       );
+      
+      const currentClient: Company = clients[0]
+      
 
-      const currentClient: Company = clients.find((client) => {
-        return client.id == route.params.id;
-      });
+      console.log("a ver",currentClient)
 
       const clientToUpdate = reactive({
         name: currentClient.name,
