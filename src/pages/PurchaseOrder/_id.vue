@@ -211,6 +211,7 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   const api = import.meta.env.VITE_API_URL || '/api';
+  import { useApi } from '@/helpers/useApi';
 
   export default {
     components: {
@@ -231,19 +232,19 @@
       const store = useStore();
       const router = useRouter();
       const route = useRoute();
+      const id = route.params.id;
       const instance = axios.create({
         baseURL: api,
       });
-      const allPurchaseOrders = store.state.purchaseOrder.all;
-      console.log(allPurchaseOrders);
-      const currentPurchaseOrder = allPurchaseOrders.find((pO) => {
-        console.log(pO.id);
-        console.log(route.params.id);
-        return pO.id == route.params.id;
-      });
+
+      const { read } = useApi('/purchaseOrder/' + id);
+      const currentPurchaseOrder = read();
+
       console.log(currentPurchaseOrder);
-      const { sandProviderId, transportProviderId, transportProvider } =
-        currentPurchaseOrder;
+      const sandProviderId = currentPurchaseOrder.value.sandProviderId;
+      const transportProviderId =
+        currentPurchaseOrder.value.transportProviderId;
+      const transportProvider = currentPurchaseOrder.value.transportProvider;
       console.log(
         'current',
         'sandProviderId' + sandProviderId,
@@ -266,8 +267,8 @@
           allSandOrders.value = apiData.data;
           console.log('Sand Orders', allSandOrders.value);
           sandOrder.value = allSandOrders.value.filter((sO) => {
-            console.log(sO.purchaseOrderId, currentPurchaseOrder.id);
-            return sO.purchaseOrderId == currentPurchaseOrder.id;
+            console.log(sO.purchaseOrderId, currentPurchaseOrder.value.id);
+            return sO.purchaseOrderId == currentPurchaseOrder.value.id;
           });
           console.log('Sand Order', sandOrder.value);
         }
