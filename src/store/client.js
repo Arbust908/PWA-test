@@ -1,27 +1,6 @@
 export default {
     state: () => ({
-      all: [
-        // {
-        //     id: 1,
-        //     name: "Cliente1",
-        //     businessName: "YPF",
-        //     socialNumber: "1399546",
-        //     representativeLabor: "Ejemplo",
-        //     representativeData: "mail,telefono",
-        //     representativeContact: "contacto",
-        //     observations: "observacion"
-        // },
-        // {
-        //     id: 2,
-        //     name: "Cliente2",
-        //     businessName: "OTRO",
-        //     socialNumber: "numero",
-        //     representativeLabor: "Ejemplo2",
-        //     representativeData: "mail,telefono",
-        //     representativeContact: "contacto",
-        //     observations: "observacion"
-        // },
-       ]
+      all: []
     }),
     getters: {
       getClientbyId: state => (id) => {
@@ -38,7 +17,7 @@ export default {
       UPDATE_CLIENT(state, payload) {
         state.all.map((client, index) => {
           if (client.id === payload.id) {
-            client.all[index] = payload;
+            state.all[index] = payload;
           }
         });
       },
@@ -48,16 +27,14 @@ export default {
         commit('SET_CLIENTS', clients)
       },
       saveClient({ commit }, client) {
-        console.log('>>Adding Client STORE', client);
-        console.table(client);
         const baseC = {
             id: 0,
             name: "",
-            legalName: "",
+            address: "",
             legalId: "",
             isOperator: false,
             observations: "",
-            companyRepresentativeId: "",
+            companyRepresentativeId: 0,
             companyRepresentative: {},
     };
 

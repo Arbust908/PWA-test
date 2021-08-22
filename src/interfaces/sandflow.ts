@@ -170,9 +170,8 @@ export interface Forklift {
 export interface Company {
     id?: number;
     name: string;
-    // legalName: string;
     legalId: number;
-    adress: string;
+    address: string;
     isOperator: boolean;
     childId?: number;
     observations?: string;

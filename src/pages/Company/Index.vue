@@ -10,8 +10,7 @@
       <template #header>
         <tr>
           <th scope="col">ID</th>
-          <th scope="col">Nombre</th>
-          <th scope="col">Razón social</th>
+          <th scope="col">Nombre y Apellido / Razón Social</th>
           <th scope="col">CUIL/CUIT</th>
           <th scope="col">Observaciones</th>
           <th scope="col">
@@ -31,9 +30,6 @@
           </td>
           <td :class="client.name ? null : 'empty'">
             {{ client.name || 'Sin definir' }}
-          </td>
-          <td :class="client.legalName ? null : 'empty'">
-            {{ client.legalName || 'Sin definir' }}
           </td>
           <td :class="client.legalId ? null : 'empty'">
             {{ client.legalId || 'Sin definir' }}
@@ -90,10 +86,15 @@
       const clStoreDB = useClone(store.state.client.all);
       const loading = ref(false);
 
+      const headers = {
+          'Content-Type': 'Application/JSON'
+      };
+
       const getClients = async () => {
         loading.value = true;
+
         clDB.value = await axios
-          .get(`${apiUrl}/company`)
+          .get(`${apiUrl}/company`, headers)
           .catch((err) => {
             console.log(err);
           })
