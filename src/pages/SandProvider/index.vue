@@ -9,8 +9,8 @@
     <UiTable>
       <template #header>
         <tr>
-          <th scope="col">Nombre</th>
-          <th scope="col">Razón social</th>
+          <th scope="col">Nombre y Apellido / Razón Social</th>
+          <th scope="col">Domicilio</th>
           <th scope="col">CUIL/CUIT</th>
           <th scope="col">
             <span>Actions</span>
@@ -25,10 +25,10 @@
           class="body-row"
         >
           <td :class="sp.name ? null : 'empty'">
-            {{ sp.name || 'Sin cliente' }}
+            {{ sp.name || 'Sin nombre' }}
           </td>
-          <td :class="sp.legalName ? null : 'empty'">
-            {{ sp.legalName || 'Sin cliente' }}
+          <td :class="sp.address ? null : 'empty'">
+            {{ sp.address || 'Sin dirección' }}
           </td>
           <td :class="sp.legalId ? null : 'empty'">
             {{ sp.legalId || 'Sin CUIL/CUIT' }}

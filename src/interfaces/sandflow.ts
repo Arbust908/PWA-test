@@ -103,7 +103,6 @@ export interface WorkOrder {
 export interface CompanyRepresentative {
     id?: number;
     name: string;
-    // legalId: number;
     email: string;
     phone: string;
 }
@@ -111,12 +110,9 @@ export interface CompanyRepresentative {
 export interface SandProvider {
     id?: number;
     name: string;
-    adress: string; // add
-    // legalName: string; // Sacar
+    address: string;
     legalId: number;
-    meshType: string[]; // Se irian
-    // meshType: string; // Se irian
-    // grains: string; // Se irian
+    meshType: string[]; 
     observations?: string;
     companyRepresentativeId: number;
     CompanyRepresentative?: CompanyRepresentative;
