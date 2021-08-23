@@ -29,7 +29,7 @@
             {{ tp.name || 'Sin cliente' }}
           </td>
           <td :class="tp.observations ? null : 'empty'">
-            {{ tp.observations || 'Sin empresa de servicio' }}
+            {{ tp.observations || 'Sin observaciones' }}
           </td>
           <td>
             <div class="btn-panel">
