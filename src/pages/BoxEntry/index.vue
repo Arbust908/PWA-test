@@ -10,7 +10,7 @@
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
         <fieldset class="py-2 w-full grid grid-cols-12 gap-y-4 gap-x-14">
-          <FieldGroup class="grid grid-cols-2 col-span-12">
+          <FieldGroup class="grid col-12 col-span-8">
             <ClientPitCombo
               :clientId="clientId"
               :pitId="pitId"
@@ -48,13 +48,14 @@
               <div
                 :class="[
                   'radio-button',
-                  choosedBox.boxId == box.boxId ? 'active' : '',
+                  choosedBox.id == box.id ? 'active' : '',
                 ]"
-                @click.prevent="setSelectedBox(box.boxId)"
+                @click.prevent="setSelectedBox(box.id)"
               ></div>
-              <div class="box-id">{{ box.boxId }}</div>
+              <div class="box-id"># {{ box.id }}</div>
             </div>
           </div>
+          <div v-else>No hay cajas asociadas.</div>
           <div v-else>No hay cajas asociadas.</div>
         </fieldset>
         <nav class="flex justify-between">
@@ -294,50 +295,33 @@
       ]);
 
       const purchaseOrders = ref([]);
-      const filteredPurchaseOrders = ref([]);
       const clients = ref([] as Array<Company>);
       const pits = ref([] as Array<Pit>);
       const clientId = ref(-1);
       const purchaseOrderId = ref(-1);
       const pitId = ref(-1);
       const warehouses = ref([]);
-      let floor = ref('');
-      let row = ref('');
-      let col = ref('');
-      let dimensions = ref('');
-      let cradles = ref([]);
+      let floor,
+        row,
+        col,
+        dimensions = ref('');
 
       const getPurchaseOrders = async () => {
-        await axios
-          .get(`${apiUrl}/purchaseOrder`)
-          .then((res) => {
-            purchaseOrders.value = res.data.data;
-          })
-          .catch((err) => console.error(err));
+        await axios.get(`${apiUrl}/purchaseOrder`).then((res) => {
+          purchaseOrders.value = res.data.data;
+        });
       };
 
       const getWarehouses = async () => {
-        await axios
-          .get(`${apiUrl}/warehouse`)
-          .then((res) => {
-            warehouses.value = res.data.data;
-          })
-          .catch((err) => console.error(err));
-      };
-
-      const getCradles = async () => {
-        await axios
-          .get(`${apiUrl}/cradle`)
-          .then((res) => {
-            cradles.value = res.data.data;
-          })
-          .catch((err) => console.error(err));
+        await axios.get(`${apiUrl}/warehouse`).then((res) => {
+          warehouses.value = res.data.data;
+        });
       };
 
       onMounted(async () => {
         await getPurchaseOrders();
         await getWarehouses();
-        await getCradles();
+        console.log(warehouses.value);
       });
 
       const formatDeposit = (deposit) => {
@@ -356,37 +340,21 @@
         return dimensions;
       };
 
-      watchEffect(async () => {
+      watchEffect(() => {
         if (purchaseOrders.value.length > 0) {
           if (clientId.value !== -1 && pitId.value !== -1) {
-            filteredPurchaseOrders.value = purchaseOrders.value;
-            filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
+            purchaseOrders.value = purchaseOrders.value.filter((po) => {
               if (
                 parseInt(po.companyId) == clientId.value &&
                 parseInt(po.pitId) == pitId.value
               ) {
+                console.log('purchOrd', po);
                 return po;
               }
             });
           }
           if (purchaseOrderId.value !== -1) {
-            let sandTypes = await axios
-              .get(`${apiUrl}/sand`)
-              .then((res) => {
-                return res.data.data;
-              })
-              .catch((err) => console.error(err));
-            boxes.value =
-              filteredPurchaseOrders.value.length > 0
-                ? filteredPurchaseOrders.value[0].sandOrders
-                : null;
-            boxes.value.map((box) => {
-              let sandType = sandTypes.find(
-                (type) => parseInt(type.id) == parseInt(box.sandTypeId)
-              );
-              box.category = sandType.type.toLowerCase();
-            });
-
+            boxes.value = purchaseOrders.value[0].sandOrders;
             warehouse.value = warehouses.value.filter((singleWarehouse) => {
               if (
                 parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
@@ -394,15 +362,10 @@
               ) {
                 return singleWarehouse;
               }
-            })[0];
-            if (warehouse.value) {
-              floor.value = formatDeposit(warehouse.value.layout).floor;
-              col.value = formatDeposit(warehouse.value.layout).col;
-              dimensions.value = formatDeposit(
-                warehouse.value.layout
-              ).dimensions;
-              row.value = formatDeposit(warehouse.value.layout).row;
-            }
+            });
+            console.log(warehouse.value);
+            // formatDeposit(warehouse.value.layout);
+            // floor, row, col, dimensions = formatDeposit(warehouse.value.layout);
           }
         }
       });
@@ -522,7 +485,6 @@
       };
 
       // :: CLIENT
-
       const selectedClientName = computed(() => {
         return clientId.value >= 0
           ? clients.value.find((pit) => pit.id === clientId.value).name
@@ -530,7 +492,6 @@
       });
       // << CLIENT
       // :: PITS
-
       const selectedPitName = computed(() => {
         return pitId.value >= 0
           ? pits.value.find((pit) => pit.id === pitId.value).name
@@ -554,11 +515,9 @@
         deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
           box.category;
       };
-
       // :: DEPOSIT
       const deposit = ref({});
       // << DEPOSIT
-
       const save = () => {
         // No está funcionando
         // console.log("ORIGINAL", originalWarehouseLayout)
