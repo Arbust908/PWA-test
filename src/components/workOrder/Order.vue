@@ -98,6 +98,7 @@
         props,
         emit
       );
+      console.log(pits.value);
       const removePit = (pitId: number) => {
         pits.value = pits.value.filter((pit: Pit) => {
           return pit.id !== pitId;

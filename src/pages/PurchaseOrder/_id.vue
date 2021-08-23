@@ -48,7 +48,7 @@
               fieldName="sandType"
               placeholder="Seleccciona Tipo de Arena"
               endpoint="/sand"
-              enpointKey="type"
+              endpointKey="type"
               :data="order.sandTypeId"
               @update:data="order.sandTypeId = $event"
             />
@@ -137,33 +137,6 @@
             :data="transportProviderId"
             @update:data="transportProviderId = $event"
           />
-          <!-- <FieldInput
-            class="col-span-6"
-            fieldName="transportId"
-            placeholder="Patente del Transporte"
-            title="Patente"
-            mask="X*"
-            :data="transportProvider.transportId"
-            @update:data="transportProvider.transportId = $event"
-          />
-          <FieldInput
-            class="col-span-6"
-            fieldName="quantityBoxes"
-            placeholder="Cantidad de cajas"
-            title="Cantidad de cajas"
-            mask="##"
-            :data="transportProvider.transportId"
-            @update:data="transportProvider.transportId = Number($event)"
-          />
-          <FieldInput
-            class="col-span-full"
-            fieldName="transportDescription"
-            placeholder="Observaciones..."
-            title="Observaciones"
-            mask="X*"
-            :data="transportProvider.observation"
-            @update:data="transportProvider.observation = $event"
-          /> -->
         </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
@@ -237,19 +210,29 @@
         baseURL: api,
       });
 
-      const { read } = useApi('/purchaseOrder/' + id);
-      const currentPurchaseOrder = read();
-
-      console.log(currentPurchaseOrder);
-      const sandProviderId = currentPurchaseOrder.value.sandProviderId;
-      const transportProviderId =
-        currentPurchaseOrder.value.transportProviderId;
-      const transportProvider = currentPurchaseOrder.value.transportProvider;
-      console.log(
-        'current',
-        'sandProviderId' + sandProviderId,
-        'transportProviderId' + transportProviderId
+      const purchaseOrders: Array<PurchaseOrder> = JSON.parse(
+        JSON.stringify(store.state.purchaseOrder.all)
       );
+      const purchaseOrder: PurchaseOrder = purchaseOrders.find((po) => {
+        return po.id == id;
+      });
+      const currentPurchaseOrder = ref(purchaseOrder);
+      console.log(currentPurchaseOrder);
+      console.log(currentPurchaseOrder.value);
+      const sandProviderId = ref(currentPurchaseOrder.value.sandProviderId);
+      const transportProviderId = ref(
+        currentPurchaseOrder.value.transportProviderId
+      );
+      const transportProvider = ref(
+        currentPurchaseOrder.value.transportProvider
+      );
+      const sandOrder = ref(currentPurchaseOrder.value.sandOrders);
+      const companyClientId: Ref<number> = ref(
+        currentPurchaseOrder.value.companyId
+      );
+      const pitId: Ref<number> = ref(currentPurchaseOrder.value.pitId);
+
+      console.log(sandOrder);
       // >> Init
       // :: Proveedores de Sand
       const sandProviders = ref([] as Array<SandProvider>);
@@ -259,22 +242,6 @@
           sandProviders.value = sPData.data;
         }
       });
-      const sandOrder = ref([] as Array<SandOrder>);
-      const allSandOrders = ref([] as Array<SandOrder>);
-      const { data: sandOrderData } = useAxios('/sandOrder', instance);
-      watch(sandOrderData, (apiData, prevCount) => {
-        if (apiData && apiData.data) {
-          allSandOrders.value = apiData.data;
-          console.log('Sand Orders', allSandOrders.value);
-          sandOrder.value = allSandOrders.value.filter((sO) => {
-            console.log(sO.purchaseOrderId, currentPurchaseOrder.value.id);
-            return sO.purchaseOrderId == currentPurchaseOrder.value.id;
-          });
-          console.log('Sand Order', sandOrder.value);
-        }
-      });
-      const companyClientId: Ref<number> = ref(-1);
-      const pitId: Ref<number> = ref(-1);
 
       const sandTypes = ref([] as Array<Sand>);
       const { data: sandTypesData } = useAxios('/sand', instance);
@@ -309,11 +276,13 @@
       });
 
       const isFull: ComputedRef<boolean> = computed(() => {
+        console.log(transportProviderId.value, transportProviderId.value > -1);
+        console.log(sandProviderId.value, sandProviderId.value > -1);
+        console.log(sandOrder.value.length > 0);
+        console.log(sandOrder.value.every((sO: SandOrder) => sO.amount > 0));
+        console.log(sandOrder.value.every((sO: SandOrder) => sO.type !== ''));
         return !!(
           transportProviderId.value > -1 &&
-          transportProvider.transportId &&
-          transportProvider.boxQuantity &&
-          transportProvider.boxQuantity >= 0 &&
           sandProviderId.value > -1 &&
           sandOrder.value.length > 0 &&
           sandOrder.value.every((sO: SandOrder) => sO.amount > 0) &&

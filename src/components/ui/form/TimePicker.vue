@@ -7,13 +7,13 @@
       :data-a="hour"
     >
       <option v-for="h in hours" :key="`hour-${h}`" :value="h">
-        {{ h }}
+        {{ h >= 10 ? h : `0${h}` }}
       </option>
     </select>
     <span>:</span>
     <select v-model="minute" name="picker-minutes" class="sel selecThor">
       <option v-for="m in minutes" :key="`minutes-${m}`" :value="m">
-        {{ m }}
+        {{ m >= 10 ? m : `0${m}` }}
       </option>
     </select>
     <input type="checkbox" name="picker-time" class="hidden" />
@@ -66,7 +66,7 @@
       hours = hours.map((hour: number) => {
         return hour + 1;
       });
-      let minutes = [...Array(13).keys()];
+      let minutes = [...Array(12).keys()];
       minutes = minutes.map((min: number) => {
         return min * 5;
       });
