@@ -86,13 +86,6 @@ const routes: Array<RouteRecordRaw> = [
   },
   // < ::
   {
-    path: '/ingreso-de-cajas',
-    name: 'BoxEntry',
-    component: () => import('@/pages/BoxEntry/index.vue'),
-    beforeEnter: isLogged,
-  },
-  // < ::
-  {
     path: '/tipos-de-arena',
     name: 'Sand',
     component: () => import('@/pages/Sand/Index.vue'),
