@@ -30,13 +30,13 @@
               title="Proveedor"
               placeholder="Selecciona proveedor"
               endpoint="/sandProvider"
-              :data="providerId"
-              @update:data="providerId = $event"
+              :data="providerId.id"
+              @update:data="providerId.id = $event"
             />
           </FieldGroup>
           <FieldGroup class="grid items-center max-w-full">
             <template
-              v-for="(order, orderKey) in sandOrder"
+              v-for="(order, orderKey) in providerId.sandOrders"
               :key="orderKey"
               class="border-none"
             >
@@ -47,7 +47,7 @@
                 fieldName="sandType"
                 placeholder="Seleccciona Tipo de Arena"
                 endpoint="/sand"
-                enpointKey="type"
+                endpointKey="type"
                 :data="order.sandTypeId"
                 @update:data="order.sandTypeId = $event"
               />
@@ -103,25 +103,25 @@
                 @update:data="order.boxId = $event"
               />
               <Icon
-                v-if="sandOrder.length > 1"
+                v-if="providerId.sandOrders.length > 1"
                 icon="Trash"
                 type="outline"
                 class="w-5 mt-5 h-5 items-center cursor-pointer"
-                @click="removeOrder(order.id)"
+                @click="removeOrder(order.id, providerId.innerId)"
               />
               <Icon
                 icon="Plus"
-                v-if="sandOrder.length - 1 == orderKey"
+                v-if="providerId.sandOrders.length - 1 == orderKey"
                 type="outline"
                 class="icon w-5 h-5 mt-5 items-center cursor-pointer"
-                @click.prevent="addOrder"
+                @click.prevent="addOrder(providerId.innerId)"
               />
             </template>
             <div class="flex items-center col-span-12">
               <div
                 class="icon-button"
                 v-if="sandProvidersIds.length > 1"
-                @click.prevent="removeSandProvider(providerId)"
+                @click.prevent="removeSandProvider(providerId.innerId)"
               >
                 <Icon
                   icon="Trash"
@@ -242,28 +242,52 @@
       });
       // >> Init
       // :: Proveedores de Sand
-      const sandProviders = ref([] as Array<SandProvider>);
-
       const sandProvidersIds = ref([
         {
+          innerId: 0,
           id: -1,
-          sandOrders: [],
+          sandOrders: [
+            {
+              id: 0,
+              sandTypeId: -1,
+              amount: null,
+              boxId: '',
+            },
+          ],
         },
       ] as Array<Object>);
 
       const addSandProvider = () => {
+        const lastSPIndex = sandProvidersIds.value.length - 1;
+        const lastSP = sandProvidersIds.value[lastSPIndex];
+        const lastIndex = lastSP.innerId;
+        const newInnerId = lastIndex >= 0 ? lastIndex + 1 : 0;
         sandProvidersIds.value.push({
+          innerId: newInnerId,
           id: -1,
-          sandOrders: [],
+          sandOrders: [
+            {
+              id: 0,
+              sandTypeId: -1,
+              amount: null,
+              boxId: '',
+            },
+          ],
         });
       };
 
       const removeSandProvider = (providerId: number) => {
         console.log(providerId);
+        console.log(sandProvidersIds.value);
+        sandProvidersIds.value = sandProvidersIds.value.filter(
+          (sandProvider: SandProvider) => {
+            return sandProvider.innerId !== providerId;
+          }
+        );
       };
 
+      const sandProviders = ref([] as Array<SandProvider>);
       const { data: sandProvidersData } = useAxios('/sandProvider', instance);
-
       watch(sandProvidersData, (sPData, prevCount) => {
         if (sPData && sPData.data) {
           sandProviders.value = sPData.data;
@@ -293,20 +317,28 @@
         }
       });
       // >> Tipos de Sand
-      const removeOrder = (id: number): void => {
-        sandOrder.value = sandOrder.value.filter(
-          (sandOrder: SandOrder) => sandOrder.id !== id
+      const removeOrder = (id: number, providerOrderId): void => {
+        const currentSPI = sandProvidersIds.value.find(
+          (spi) => spi.innerId === providerOrderId
+        );
+        currentSPI.sandOrders = currentSPI.sandOrders.filter(
+          (order) => order.id !== id
         );
       };
-      const addOrder = (): void => {
-        const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
+      const addOrder = (providerOrderId: number): void => {
+        const currentSPI = sandProvidersIds.value.find(
+          (spi) => spi.innerId === providerOrderId
+        );
+        const sandOrder = currentSPI.sandOrders;
+        const lastSandOrder = sandOrder[sandOrder.length - 1];
         const newId = lastSandOrder.id + 1;
-        sandOrder.value.push({
+        sandOrder.push({
           id: newId,
           sandTypeId: -1,
           amount: null,
           boxId: '',
         });
+        console.log(sandProvidersIds.value);
       };
       // :: TransportProvider
       const transportProviders = ref([]);
@@ -327,17 +359,33 @@
       });
       // >> TransportProvider
       const isFull: ComputedRef<boolean> = computed(() => {
+        const hasPit = pitId.value >= 0;
+        const hasClient = companyClientId.value >= 0;
+        const validSandProviderIds =
+          sandProvidersIds.value &&
+          sandProvidersIds.value.every((spi) => {
+            return spi.id >= 0;
+          });
+        const validSandOrders =
+          sandProvidersIds.value &&
+          sandProvidersIds.value.every((spi) => {
+            return (
+              spi.sandOrders &&
+              spi.sandOrders.every((so) => {
+                return so.sandTypeId >= 0 && so.amount > 0 && so.boxId !== '';
+              })
+            );
+          });
+        const hasTransport = transportProviderId.value >= 0;
         return !!(
-          transportProviderId.value > -1 &&
-          sandProviderId.value > -1 &&
-          sandOrder.value.length > 0 &&
-          sandOrder.value.every((sO: SandOrder) => sO.amount > 0) &&
-          sandOrder.value.every((sO: SandOrder) => sO.type !== '')
+          hasPit &&
+          hasClient &&
+          validSandProviderIds &&
+          validSandOrders &&
+          hasTransport
         );
       });
       const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
-
-      // CHEQUEAR QUE NO SE ENVIEN ID -1 DE SAND PROVIDERS ID
 
       const save = (): void => {
         if (isFull.value) {
@@ -362,6 +410,7 @@
               sandOrder.value.map((sO: SandOrder) => {
                 console.log(sO);
                 sO.purchaseOrderId = newVal.data.id;
+                sO.sandProviderId = sandProviderId.value;
                 const { data: sODone } = useAxios(
                   '/sandOrder',
                   { method: 'POST', data: sO },
