@@ -149,6 +149,7 @@
                 class="col-span-full"
                 fieldName="driverPhone"
                 placeholder="+11 1234 5678"
+                mask="+11 #### ####"
                 title="Teléfono"
                 :data="newDriver.phone"
                 @update:data="newDriver.phone = $event"
@@ -175,7 +176,7 @@
                 title="Patente"
                 fieldName="driverVehicleId"
                 placeholder="AA 464 XX"
-                :mask="['AA ### AA', 'AAA ###']"
+                :mask="['AA-###-AA', '###', 'AAA', 'XXX-XX']"
                 :data="newDriver.vehicleId"
                 @update:data="newDriver.vehicleId = $event"
               />
