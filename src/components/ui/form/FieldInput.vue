@@ -48,7 +48,7 @@
         default: null,
       },
       mask: {
-        type: String,
+        type: [String, Array],
         default: '',
       },
       isOptional: {

@@ -175,7 +175,7 @@
                 title="Patente"
                 fieldName="driverVehicleId"
                 placeholder="AA 464 XX"
-                mask="AA ### AA"
+                :mask="['AA ### AA', 'AAA ###']"
                 :data="newDriver.vehicleId"
                 @update:data="newDriver.vehicleId = $event"
               />
