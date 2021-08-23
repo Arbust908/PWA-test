@@ -28,55 +28,51 @@
             <span> Transportista </span>
           </button>
         </nav>
-        <section class="bg-white rounded-md max-w-2xl shadow-sm" v-if="activeSection === 'provider'">
+        <section
+          class="bg-white rounded-md max-w-2xl shadow-sm"
+          v-if="activeSection === 'provider'"
+        >
           <form method="POST" action="/" class="p-4 max-w-lg">
-            <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-              <label class="col-span-full" for="name">
-                <span>Nombre / Razón Social</span>
-                <input
-                  id="name"
-                  v-model="newTransportProvider.name"
-                  class="input"
-                  type="text"
-                  name="name"
-                />
-              </label>
-              <label class="col-span-full" for="legalId">
-                <span>CUIT / CUIL</span>
-                <input
-                  id="legalId"
-                  v-model.number="newTransportProvider.legalId"
-                  v-maska="'###########'"
-                  class="input"
-                  type="text"
-                  name="legalId"
-                  placeholder="CUIT / CUIL"
-                />
-              </label>
-              <label class="col-span-full" for="address">
-                <span>Domicilio</span>
-                <input
-                  id="address"
-                  v-model="newTransportProvider.address"
-                  class="input"
-                  type="text"
-                  name="address"
-                />
-              </label>
-              <label class="col-span-full" for="observations">
-                <span>Observaciones<span class="italic text-gray-400"> (opcional)</span></span>
-                <textarea
-                  id="observations"
-                  v-model="newTransportProvider.observations"
-                  class="input resize-none"
-                  type="text"
-                  name="observations"
-                  placeholder="Observaciones..."
-                  rows="4"
-                ></textarea>
-              </label>
-            </fieldset>
-            <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
+            <FieldGroup>
+              <FieldInput
+                class="col-span-full"
+                fieldName="transportName"
+                placeholder="Ingresar Nombre / Razón Social"
+                title="Nombre / Razón Social"
+                :data="newTransportProvider.name"
+                @update:data="newTransportProvider.name = $event"
+              />
+              <FieldInput
+                class="col-span-full"
+                fieldName="transportId"
+                placeholder="Ingresar CUIT / CUIL"
+                title="CUIT / CUIL"
+                :data="newTransportProvider.legalId"
+                @update:data="newTransportProvider.legalId = Number($event)"
+              />
+              <FieldInput
+                class="col-span-full"
+                fieldName="address"
+                placeholder="Ingresar Domicilio"
+                title="Domicilio"
+                :data="newTransportProvider.address"
+                @update:data="newTransportProvider.address = $event"
+              />
+              <FieldTextArea
+                class="col-span-full"
+                fieldName="observations"
+                placeholder="Observaciones..."
+                title="Observaciones"
+                :rows="5"
+                isFixed
+                isOptional
+                :data="newTransportProvider.observations"
+                @update:data="newTransportProvider.observations = $event"
+              />
+            </FieldGroup>
+            <fieldset
+              class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4"
+            >
               <h2 class="col-span-full text-xl flex justify-between items-end">
                 <span> Contacto principal </span>
               </h2>
@@ -118,9 +114,13 @@
               </label>
             </fieldset>
           </form>
-          <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
+          <footer
+            class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between"
+          >
             <section class="space-x-6 flex items-center justify-end">
-              <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')">
+              <NoneBtn
+                @click.prevent="$router.push('/proveedores-de-transporte')"
+              >
                 Cancelar
               </NoneBtn>
               <PrimaryBtn
@@ -133,9 +133,14 @@
             </section>
           </footer>
         </section>
-        <section class="bg-white rounded-md max-w-2xl shadow-sm" v-if="activeSection === 'driver'">
+        <section
+          class="bg-white rounded-md max-w-2xl shadow-sm"
+          v-if="activeSection === 'driver'"
+        >
           <form method="POST" action="/" class="p-4 max-w-lg">
-            <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
+            <fieldset
+              class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4"
+            >
               <label class="col-span-full" for="name">
                 <span>Nombre y apellido</span>
                 <input
@@ -192,7 +197,11 @@
                 />
               </label>
               <label class="col-span-full" for="observations">
-                <span>Observaciones<span class="italic text-gray-400"> (opcional)</span></span>
+                <span
+                  >Observaciones<span class="italic text-gray-400">
+                    (opcional)</span
+                  ></span
+                >
                 <textarea
                   id="observations"
                   v-model="newDriver.observations"
@@ -205,19 +214,25 @@
               </label>
             </fieldset>
             <div
-
-              :class="['flex','items-center','cursor-pointer',
-              driverFull ? null : 'text-gray-200'
-              ]" 
+              :class="[
+                'flex',
+                'items-center',
+                'cursor-pointer',
+                driverFull ? null : 'text-gray-200',
+              ]"
               @click="driverFull && addDriver()"
             >
               <Icon icon="Plus" type="outline" class="w-5 h-5" />
               <h2>Agregar Transportista</h2>
             </div>
           </form>
-          <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
+          <footer
+            class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between"
+          >
             <section class="space-x-6 flex items-center justify-end">
-              <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')">
+              <NoneBtn
+                @click.prevent="$router.push('/proveedores-de-transporte')"
+              >
                 Cancelar
               </NoneBtn>
               <PrimaryBtn
@@ -232,8 +247,8 @@
         </section>
       </section>
       <section class="w-3/12 mt-12 ml-4">
-        <driver-card 
-          v-for="(driver,index) in drivers"
+        <driver-card
+          v-for="(driver, index) in drivers"
           :key="index"
           :name="driver.name"
           :phone="driver.phone"
@@ -268,12 +283,17 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   const api = import.meta.env.VITE_API_URL || '/api';
   // TIPOS
-  import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
+  import {
+    TransportProvider,
+    CompanyRepresentative,
+    Driver,
+  } from '@/interfaces/sandflow';
 
   export default {
     directives: { maska },
@@ -289,7 +309,8 @@
       FieldGroup,
       FieldInput,
       FieldLegend,
-      DriverCard
+      DriverCard,
+      FieldTextArea,
     },
     setup() {
       const store = useStore();
@@ -304,54 +325,54 @@
         return (activeSection.value = option);
       };
 
-      const drivers: Array<Driver> = reactive([])
+      const drivers: Array<Driver> = reactive([]);
 
       let newDriver = reactive({
-        name: '', 
+        name: '',
         phone: '',
         email: '',
         vehicleType: '',
         vehicleId: '',
-        observations: ''
-      })
+        observations: '',
+      });
 
       const addDriver = () => {
-        const driver = {...newDriver}
-        drivers.push(driver)
-        cleanNewDriver()
-      }
+        const driver = { ...newDriver };
+        drivers.push(driver);
+        cleanNewDriver();
+      };
 
       const deleteDriver = (index: number) => {
-        drivers.splice(index)
-      }
+        drivers.splice(index);
+      };
 
       const editDriver = (index: number) => {
-        const driver = {...drivers[index]}
-        deleteDriver(index)
-        
-        newDriver.name = driver.name
-        newDriver.phone = driver.phone
-        newDriver.email = driver.email
-        newDriver.vehicleType = driver.vehicleType
-        newDriver.vehicleId = driver.vehicleId
-        newDriver.observations = driver.observations
-      }
+        const driver = { ...drivers[index] };
+        deleteDriver(index);
+
+        newDriver.name = driver.name;
+        newDriver.phone = driver.phone;
+        newDriver.email = driver.email;
+        newDriver.vehicleType = driver.vehicleType;
+        newDriver.vehicleId = driver.vehicleId;
+        newDriver.observations = driver.observations;
+      };
 
       const cleanNewDriver = () => {
-        newDriver.name = ''
-        newDriver.phone = ''
-        newDriver.email = ''
-        newDriver.vehicleType = ''
-        newDriver.vehicleId = ''
-        newDriver.observations = ''
-      }
+        newDriver.name = '';
+        newDriver.phone = '';
+        newDriver.email = '';
+        newDriver.vehicleType = '';
+        newDriver.vehicleId = '';
+        newDriver.observations = '';
+      };
 
       const newTransportProvider: TransportProvider = reactive({
         name: '',
         legalId: null,
         adress: '',
         observations: '',
-        companyRepresentativeId: -1
+        companyRepresentativeId: -1,
       });
 
       const companyRepresentative: CompanyRepresentative = reactive({
@@ -367,7 +388,7 @@
           newTransportProvider.legalId >= 0
         );
       });
-      
+
       const driverFull: ComputedRef<boolean> = computed(() => {
         return !!(
           newDriver.name !== '' &&
@@ -398,7 +419,11 @@
         );
         watch(data, (newData, _) => {
           if (newData && newData.data) {
-            store.dispatch('saveTransportProvider', newData.data);
+            store.dispatch('saveTransportProvider', {
+              ...newTransportProvider,
+              companyRepresentative,
+              drivers,
+            });
             router.push('/proveedores-de-transporte');
           }
         });
@@ -417,7 +442,7 @@
         newDriver,
         driverFull,
         deleteDriver,
-        editDriver
+        editDriver,
       };
     },
   };

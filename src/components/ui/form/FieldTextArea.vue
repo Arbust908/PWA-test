@@ -6,6 +6,7 @@
     </p>
     <textarea
       :id="fieldName"
+      :class="isFixed ? 'resize-none' : null"
       class="input"
       :name="fieldName"
       :placeholder="placeholder"
@@ -46,6 +47,10 @@
         default: 4,
       },
       isOptional: {
+        type: Boolean,
+        default: false,
+      },
+      isFixed: {
         type: Boolean,
         default: false,
       },
