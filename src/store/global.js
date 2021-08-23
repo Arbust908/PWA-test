@@ -32,11 +32,11 @@ export default {
         to: '/notificaciones-a-proveedores',
         icon: 'Bell',
       },
-      {
-        name: 'Ingreso de cajas',
-        to: '/ingreso-de-cajas',
-        icon: 'Archive',
-      },
+      // {
+      //   name: 'Ingreso de cajas',
+      //   to: '/ingreso-de-cajas',
+      //   icon: 'Archive',
+      // },
       {
         name: 'Proveedores',
         icon: 'ChevronRight',
