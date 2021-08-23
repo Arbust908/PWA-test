@@ -112,14 +112,14 @@
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
               <TimePicker
-                :timetrack="crew.timeStart"
+                :timetrack="Number(crew.timeStart)"
                 @update:timetrack="crew.timeStart = $event"
               />
             </div>
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
               <TimePicker
-                :timetrack="crew.timeEnd"
+                :timetrack="Number(crew.timeEnd)"
                 @update:timetrack="crew.timeEnd = $event"
               />
             </div>
@@ -466,7 +466,8 @@
       // :: SAVE
       const save = async (draft = true) => {
         toggleDraft(draft);
-        removeAllEmptys();
+        console.log(isDraft.value);
+        // removeAllEmptys();
         const newWO = {
           client: clientId.value,
           clientId: clientId.value,
@@ -490,7 +491,7 @@
           generators: generators.value,
           tower: tower.value,
           cabin: cabin.value,
-          draft,
+          draft: isDraft.value,
         };
         try {
           const { data: WODone } = useAxios(

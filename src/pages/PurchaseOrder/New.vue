@@ -272,9 +272,6 @@
       const isFull: ComputedRef<boolean> = computed(() => {
         return !!(
           transportProviderId.value > -1 &&
-          // transportProvider.transportId &&
-          // transportProvider.boxQuantity &&
-          // transportProvider.boxQuantity >= 0 &&
           sandProviderId.value > -1 &&
           sandOrder.value.length > 0 &&
           sandOrder.value.every((sO: SandOrder) => sO.amount > 0) &&

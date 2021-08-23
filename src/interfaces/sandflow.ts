@@ -91,7 +91,8 @@ export interface WorkOrder {
     backupForklift: string; // Id
     traktors: Traktor[];
     pickups: Pickup[];
-    crews: Crew[];
+    crews?: Crew[];
+    crew?: Crew[];
     rigmats: number;
     conex: number;
     generators: number;

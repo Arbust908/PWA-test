@@ -22,11 +22,11 @@ export default {
         to: '/orden-de-pedido',
         icon: 'Tag',
       },
-      {
-        name: 'StageSheet',
-        to: '/stage-sheet',
-        icon: 'DocumentReport',
-      },
+      // {
+      //   name: 'StageSheet',
+      //   to: '/stage-sheet',
+      //   icon: 'DocumentReport',
+      // },
       {
         name: 'Notificaciones',
         to: '/notificaciones-a-proveedores',

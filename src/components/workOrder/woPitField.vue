@@ -25,6 +25,7 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import { useVModel } from '@vueuse/core';
 
   export default defineComponent({
     name: 'woPitField',
@@ -41,6 +42,7 @@
       },
     },
     setup(props, { emit }) {
+      const pits = useVModel(props, 'pits', emit);
       const lastPitIndex = computed(() => {
         return props.pits.length - 1;
       });
@@ -49,6 +51,7 @@
         emit('removePit', pitId);
       };
       return {
+        pits,
         lastPitIndex,
         firstPitIndex,
         removePit,

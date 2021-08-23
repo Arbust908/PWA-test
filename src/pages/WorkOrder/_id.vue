@@ -112,14 +112,14 @@
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
               <TimePicker
-                :timetrack="crew.timeStart"
+                :timetrack="Number(crew.timeStart)"
                 @update:timetrack="crew.timeStart = $event"
               />
             </div>
             <div class="flex flex-col">
               <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
               <TimePicker
-                :timetrack="crew.timeEnd"
+                :timetrack="Number(crew.timeEnd)"
                 @update:timetrack="crew.timeEnd = $event"
               />
             </div>
@@ -212,7 +212,15 @@
 </template>
 
 <script lang="ts">
-  import { ref, watch, computed, toRefs, reactive, watchEffect } from 'vue';
+  import {
+    ref,
+    watch,
+    computed,
+    toRefs,
+    reactive,
+    watchEffect,
+    Ref,
+  } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { useToggle } from '@vueuse/core';
@@ -234,6 +242,7 @@
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
+  import { useApi } from '@/helpers/useApi';
   const api = import.meta.env.VITE_API_URL || '/api';
   // TIPOS
   import {
@@ -265,6 +274,7 @@
       const store = useStore();
       const router = useRouter();
       const route = useRoute();
+      const id = route.params.id;
       const instance = axios.create({
         baseURL: api,
       });
@@ -273,37 +283,30 @@
       const workOrders: Array<WorkOrder> = JSON.parse(
         JSON.stringify(store.state.workOrders.all)
       );
-      // console.log(workOrders);
       const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
-        return wo.id == route.params.id;
+        return wo.id == id;
       });
-      // console.log(currentWorkOrder);
-      const newCWO = reactive({ ...currentWorkOrder });
-      const {
-        id: woID,
-        client,
-        serviceCompany,
-        // clientId,
-        // serviceCompanyId,
-        pad,
-        pits,
-        operativeCradle,
-        backupCradle,
-        operativeForklift,
-        backupForklift,
-        // operativeCradleId,
-        // backupCradleId,
-        // operativeForkliftId,
-        // backupForkliftId,
-        traktors,
-        pickups,
-        crew: crews,
-        rigmats,
-        conex,
-        generators,
-        tower,
-        cabin,
-      } = toRefs(newCWO);
+      console.log(currentWorkOrder);
+      const newCWO = ref(currentWorkOrder);
+
+      const woID = ref(newCWO.value.id);
+      const client = ref(newCWO.value.client);
+      const serviceCompany = ref(newCWO.value.serviceCompany);
+      const pad = ref(newCWO.value.pad);
+      const pits = ref(newCWO.value.pits);
+      console.log(pits.value);
+      const operativeCradle = ref(newCWO.value.operativeCradle);
+      const backupCradle = ref(newCWO.value.backupCradle);
+      const operativeForklift = ref(newCWO.value.operativeForklift);
+      const backupForklift = ref(newCWO.value.backupForklift);
+      const traktors = ref(newCWO.value.traktors);
+      const pickups = ref(newCWO.value.pickups);
+      const crew = ref(newCWO.value.crew);
+      const rigmats = ref(newCWO.value.rigmats);
+      const conex = ref(newCWO.value.conex);
+      const generators = ref(newCWO.value.generators);
+      const tower = ref(newCWO.value.tower);
+      const cabin = ref(newCWO.value.cabin);
 
       const clientId = ref(Number(client.value));
       const serviceCompanyId = ref(Number(serviceCompany.value));
@@ -312,6 +315,9 @@
       const operativeForkliftId = ref(Number(operativeForklift.value));
       const backupForkliftId = ref(Number(backupForklift.value));
 
+      console.log('CREW', crew.value);
+      const crews = crew;
+      console.log('CREWS', crews);
       console.log('CREWS', crews.value);
 
       // Crew
@@ -349,7 +355,7 @@
       const removeCrew = (crewId: number): void => {
         crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
       };
-      if (crews) {
+      if (crews && crews.value) {
         if (crews.value.length === 0) {
           addCrew();
         }

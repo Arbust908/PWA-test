@@ -22,7 +22,7 @@
         <tr
           v-for="(tp, tpKey) in tpDB"
           :key="tp.id"
-          :class="spKey % 2 === 0 ? 'even' : 'odd'"
+          :class="tpKey % 2 === 0 ? 'even' : 'odd'"
           class="body-row"
         >
           <td :class="tp.name ? null : 'empty'">
