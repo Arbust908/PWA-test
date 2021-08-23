@@ -12,7 +12,7 @@
           <th scope="col" title="Numero de Orden">N°</th>
           <th scope="col">Cliente</th>
           <th scope="col">Operadora</th>
-          <th scope="col">Estado</th>
+          <th scope="col">Pozos</th>
           <th scope="col">
             <span class="sr-only">Actions</span>
           </th>
@@ -34,19 +34,8 @@
           <td :class="wo.serviceCompany ? null : 'empty'">
             {{ clientIdToName(wo.serviceCompany) }}
           </td>
-          <td :class="!wo.draft ? 'done' : 'idle'">
-            <div class="flex space-x-2">
-              <Icon
-                icon="ExclamationCircle"
-                v-if="wo.draft === 'error'"
-                class="w-5 h-5"
-              />
-              <Icon icon="CheckCircle" v-if="!wo.draft" class="w-5 h-5" />
-              <Icon icon="InformationCircle" v-else class="w-5 h-5" />
-              <span>
-                {{ !wo.draft ? 'Completado' : 'Pendiente' }}
-              </span>
-            </div>
+          <td>
+            {{ listPits(wo.pits) }}
           </td>
           <td>
             <div class="btn-panel">
@@ -118,6 +107,15 @@
         });
         return client ? client.name : 'Sin cliente';
       };
+      const listPits = (pits: Array<Pit>) => {
+        if (!pits || pits.length <= 0) {
+          return '-';
+        }
+        return pits.reduce((list, pit) => {
+          list += list === '' ? pit.name : `, ${pit.name}`;
+          return list;
+        }, '');
+      };
       const storeToState = (wOs: Array<WorkOrder>) => {
         return wOs.map((wO) => {
           store.dispatch('saveWorkOrder', wO);
@@ -137,6 +135,7 @@
         workOrders,
         deleteWO,
         clientIdToName,
+        listPits,
       };
     },
   });

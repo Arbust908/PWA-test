@@ -58,6 +58,7 @@
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
+      console.log(props.mask);
       return {
         value,
         ...props,
