@@ -3,7 +3,7 @@
     :class="['box', category, isTheSelected ? 'selected' : null, isBlocked() ? 'blocked' : null]"
     @click.prevent="selectBox"
   >
-    <span class="text-sm">{{ row }} - {{ col }}</span>
+    <span class="text-sm">{{id}}</span>
   </button>
 </template>
 
@@ -15,10 +15,6 @@
     name: 'DepositBox',
     props: {
       selectedBox: {
-        type: Object,
-        required: true,
-      },
-      deposit: {
         type: Object,
         required: true,
       },
@@ -37,24 +33,38 @@
       visibleCategories: {
         type: Array,
         required: false
+      },
+      boxData: {
+        type: Object,
+        required: false
       }
     },
     setup(props, { emit }) {
-      let { deposit, floor, row, col, selectedBox } = toRefs(props);
+      let { floor, row, col, selectedBox ,boxData } = toRefs(props);
+
+      const category = computed(() => {
+        return (
+          boxData ? boxData.value.category : 'empty'
+        );
+      });
+
+      const id = computed(() => {
+        return (
+          boxData ? boxData.value.id : ''
+        );
+      });
+
       const selectBox = () => {
         const box: Box = {
           floor: floor.value,
           row: row.value,
           col: col.value,
           category: category.value,
+          id: id.value,
         };
         emit('select-box', box);
       };
-      const category = computed(() => {
-        return (
-          deposit.value[`${floor.value}|${row.value}|${col.value}`] || 'empty'
-        );
-      });
+
       const isTheSelected = computed(() => {
         return (
           selectedBox.value.row === row.value &&
@@ -75,7 +85,6 @@
       }
 
       return {
-        deposit,
         floor,
         row,
         col,
@@ -83,7 +92,8 @@
         category,
         selectBox,
         isTheSelected,
-        isBlocked
+        isBlocked,
+        id
       };
     },
   });
@@ -91,18 +101,18 @@
 
 <style lang="scss" scoped>
   .box {
-    @apply h-12 w-12 rounded bg-second-300;
+    @apply h-[58px] w-[58px] rounded bg-second-300;
     &.aisle {
       @apply bg-second-300 text-second-300;
     }
     &.fine {
-      @apply bg-orange-600 text-orange-600;
+      @apply bg-orange-600 text-orange-800 font-medium;
     }
     &.thick {
-      @apply bg-green-600 text-green-600;
+      @apply bg-green-600 text-green-800 font-medium;
     }
     &.cut {
-      @apply bg-blue-600 text-blue-600;
+      @apply bg-blue-600 text-blue-800 font-medium;
     }
     &.blocked {
       @apply bg-second-800 text-second-800;
