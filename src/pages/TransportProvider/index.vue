@@ -2,7 +2,7 @@
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">
-        Proovedores de transporte
+        Proveedores de transporte
       </h2>
       <router-link to="/proveedores-de-transporte/nuevo">
         <UiBtn>Nuevo</UiBtn>
@@ -12,6 +12,8 @@
       <template #header>
         <tr>
           <th scope="col">Nombre</th>
+          <th scope="col">Direccion</th>
+          <th scope="col">Representante</th>
           <th scope="col">Observaciones</th>
           <th scope="col">
             <span>Actions</span>
@@ -27,6 +29,12 @@
         >
           <td :class="tp.name ? null : 'empty'">
             {{ tp.name || 'Sin cliente' }}
+          </td>
+          <td :class="tp.address ? null : 'empty'">
+            {{ tp.address || 'Sin Direccion' }}
+          </td>
+          <td :class="tp.companyRepresentative !== null ? null : 'empty'">
+            {{ tp.companyRepresentative?.name || 'Sin Representante' }}
           </td>
           <td :class="tp.observations ? null : 'empty'">
             {{ tp.observations || 'Sin observaciones' }}
@@ -97,7 +105,6 @@
             }
             return [];
           });
-
         store.dispatch('setTransportProviders', tpDB.value);
       };
 
@@ -117,7 +124,6 @@
             store.dispatch('deleteTransportProvider', tpID);
             getTP();
           });
-
         return {
           response,
         };

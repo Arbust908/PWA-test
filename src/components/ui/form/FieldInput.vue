@@ -11,6 +11,7 @@
       :name="fieldName"
       :placeholder="placeholder"
       v-model="value"
+      v-maska="mask"
     />
     <!-- TODO: Masking & Validaciones -->
   </label>
@@ -19,10 +20,12 @@
 <script>
   import { defineComponent, computed } from 'vue';
   import { useVModel } from '@vueuse/core';
-  // import { maska, mask } from 'maska';
+  import { maska, mask } from 'maska';
+  // import { mask } from 'vue-the-mask';
   import '@/assets/inputs.scss';
   export default defineComponent({
-    // directives: { maska },
+    directives: { maska },
+    // directives: { mask },
     name: 'FieldInput',
     props: {
       data: {
