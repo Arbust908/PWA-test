@@ -63,7 +63,7 @@
               <CircularBtn class="btn__add" size="xs">
                 <PlusIcon class="w-4 h-4" />
               </CircularBtn>
-              <span class="font-bold"> Agregar pozo </span>
+              <span class="font-bold"> Agregar etapa </span>
             </button>
           </section>
           <section class="flex space-x-4">

@@ -194,7 +194,8 @@
             <BookmarkIcon class="w-4 h-4" />
             <span> Guardar Provisorio </span>
           </GhostBtn>
-          <PrimaryBtn v-if="!isLastSection()" @click="nextSection">
+          <PrimaryBtn v-if="isLoading" disabled> Guardando... </PrimaryBtn>
+          <PrimaryBtn v-else-if="!isLastSection()" @click="nextSection">
             Siguiente
           </PrimaryBtn>
           <PrimaryBtn
@@ -267,6 +268,8 @@
       const instance = axios.create({
         baseURL: api,
       });
+      const isLoading = ref(false);
+      const toggleLoading = useToggle(isLoading);
       const isDraft = ref(true);
       const toggleDraft = useToggle(isDraft);
       // ORDEN
@@ -466,8 +469,9 @@
       };
       // :: SAVE
       const save = async (draft = true) => {
+        toggleLoading(true);
         toggleDraft(draft);
-        console.log(isDraft.value);
+        console.log('isDraft', isDraft.value);
         // removeAllEmptys();
         const newWO = {
           client: clientId.value,
@@ -528,7 +532,7 @@
                   console.log(traktor);
                   const { id, ...newTraktor } = traktor;
                   newTraktor.workOrderId = workOrderId;
-                  const { data } = useAxios(
+                  const { data, isFinished } = useAxios(
                     '/traktor',
                     { method: 'POST', data: newTraktor },
                     instance
@@ -577,8 +581,14 @@
                 });
                 console.log(isCrewsFinished.value);
               }
-              store.dispatch('saveWorkOrder', newVal.data);
-              router.push('/orden-de-trabajo');
+              // store.dispatch('saveWorkOrder', newVal.data);
+              setTimeout(() => {
+                toggleLoading(false);
+                setTimeout(() => {
+                  // Modal de procesasando?
+                  router.push('/orden-de-trabajo');
+                }, 100);
+              }, 1000);
             }
           });
         } catch (error) {
@@ -616,6 +626,7 @@
         addCrew,
         save,
         isAllFull,
+        isLoading,
       };
     },
   };

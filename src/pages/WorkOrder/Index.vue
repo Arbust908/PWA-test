@@ -89,6 +89,7 @@
       const { read, destroy } = useApi('/workOrder');
       const workOrders = read();
       watch(workOrders, (newValue, _) => {
+        console.log('Work Orders', newValue);
         if (newValue) {
           storeToState(newValue);
         }

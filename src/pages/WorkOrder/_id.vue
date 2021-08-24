@@ -271,6 +271,8 @@
       const instance = axios.create({
         baseURL: api,
       });
+      const isLoading = ref(false);
+      const toggleLoading = useToggle(isLoading);
       const isDraft = ref(true);
       const toggleDraft = useToggle(isDraft);
       const workOrders: Array<WorkOrder> = JSON.parse(
@@ -280,6 +282,7 @@
         return wo.id == id;
       });
       const newCWO = ref(currentWorkOrder);
+      console.log('Orden de Trabajo', newCWO);
 
       const woID = ref(newCWO.value.id);
       const client = ref(newCWO.value.client);
@@ -472,8 +475,9 @@
       };
 
       const save = async (draft = true) => {
+        toggleLoading(true);
         toggleDraft(draft);
-        removeAllEmptys();
+        // removeAllEmptys();
         const newWO = {
           id: woID.value,
           client: client.value,
@@ -538,8 +542,14 @@
               });
               console.log(isPickupFinished.value);
             }
-            store.dispatch('updateWorkOrder', newVal.data);
-            router.push('/orden-de-trabajo');
+            // store.dispatch('updateWorkOrder', newVal.data);
+            setTimeout(() => {
+              toggleLoading(false);
+              setTimeout(() => {
+                // Modal de procesasando?
+                router.push('/orden-de-trabajo');
+              }, 100);
+            }, 1000);
           }
         });
       };

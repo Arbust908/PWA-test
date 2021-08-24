@@ -9,7 +9,6 @@
       fieldName="pickupId"
       placeholder="Patente"
       :title="pickupI === firstIndex ? 'ID Pickup' : null"
-      mask="#*"
       :data="pickup.pickupId"
       @update:data="pickup.pickupId = $event"
     />

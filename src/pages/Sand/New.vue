@@ -65,7 +65,6 @@
       PrimaryBtn,
       NoneBtn,
       Layout,
-      NoneBtn,
       FieldGroup,
       FieldInput,
       FieldTextArea,
@@ -88,11 +87,12 @@
 
       const isFull = computed(() => {
         return !!(
-          newSand.type.length > 0 &&
-          newSand.description.length > 0 &&
-          newSand.meshType.length > 0 &&
-          newSand.grainType.length > 0 &&
-          newSand.observations.length > 0
+          (newSand.type.length > 0)
+          // &&
+          // newSand.description.length > 0 &&
+          // newSand.meshType.length > 0 &&
+          // newSand.grainType.length > 0 &&
+          // newSand.observations.length > 0
         );
       });
 
@@ -109,7 +109,9 @@
             }
             return {};
           })
-          .finally(() => {});
+          .finally(() => {
+            router.push('/tipos-de-arena');
+          });
       };
       return {
         goToIndex,

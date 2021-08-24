@@ -69,7 +69,7 @@
               <span>Cantidad</span>
               <div class="mt-1 flex rounded shadow-sm">
                 <input
-                  v-model="order.amount"
+                  v-model.number="order.amount"
                   type="number"
                   name="sandQuantity"
                   class="
@@ -111,7 +111,6 @@
               fieldName="sandBoxId"
               placeholder="Ingrear ID de caja"
               title="ID de caja"
-              mask="X*"
               :data="order.boxId"
               @update:data="order.boxId = $event"
             />
@@ -298,23 +297,65 @@
 
       const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
       const save = (): void => {
+        console.table({
+          companyId: companyClientId.value,
+          companyClientId: companyClientId.value,
+          pitId: pitId.value,
+          sandProviderId: sandProvidersIds.value[0].id,
+          transportProviderId: transportProviderId.value,
+        });
         if (isFull.value) {
-          const newTP = getTPbyId(transportProviderId.value);
-          const trueTP = {
-            ...transportProvider,
-            id: newTP.id,
-            name: newTP.name,
-          };
-          const purchaseOrder = {
-            sandProviderId: sandProviderId.value,
-            sandProvider: getSPbyId(sandProviderId.value),
-            sandOrders: [...sandOrder.value],
+          // Formateamos la orden de pedido
+          const purchaseOrder: PurchaseOrder = {
+            companyId: companyClientId.value,
+            companyClientId: companyClientId.value,
+            pitId: pitId.value,
+            sandProviderId: sandProvidersIds.value[0].id,
             transportProviderId: transportProviderId.value,
-            transportProvider: trueTP,
-          } as PurchaseOrder;
+          };
           console.log(purchaseOrder);
-          savePurchaseOrder(purchaseOrder);
-          router.push('/orden-de-pedido');
+          // Creamos via API la orden de pedido
+          const { data: pODone } = useAxios(
+            '/purchaseOrder',
+            { method: 'POST', data: purchaseOrder },
+            instance
+          );
+          const sOisDone = ref([]);
+          watch(pODone, (newVal, _) => {
+            if (newVal && newVal.data) {
+              console.log('PO data', newVal.data);
+              console.log('SPIs', sandProvidersIds.value);
+              // Recorremos los proveedores de sand
+              sandProvidersIds.value.map((spI) => {
+                console.log('SPI', spI.sandOrders);
+                // Guradamos via api las ordenes de sand
+                spI.sandOrders.map((sO: SandOrder) => {
+                  console.log('SO', sO);
+                  sO.purchaseOrderId = newVal.data.id;
+                  sO.sandProviderId = spI.id;
+                  const { data: sODone } = useAxios(
+                    '/sandOrder',
+                    { method: 'POST', data: sO },
+                    instance
+                  );
+                  watch(sODone, (newVal, _) => {
+                    if (newVal && newVal.data) {
+                      sOisDone.value.push(newVal.data);
+                    }
+                  });
+                });
+              });
+            }
+          });
+          watchEffect(() => {
+            if (sOisDone.value.length >= sandOrder.value.length) {
+              const ordenDePedido = pODone.value.data;
+              const pedidoDeArena = sOisDone.value;
+              ordenDePedido.sandOrders = pedidoDeArena;
+              savePurchaseOrder(ordenDePedido);
+              router.push('/orden-de-pedido');
+            }
+          });
         }
       };
       return {
