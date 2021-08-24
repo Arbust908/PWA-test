@@ -326,7 +326,6 @@
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-  import SelectList from '@/components/ui/SelectList.vue';
   import {
     ProviderNotification,
     SandOrder,
@@ -360,7 +359,6 @@
       PlusIcon,
       PrimaryBtn,
       TrashIcon,
-      SelectList,
       FieldGroup,
       FieldInput,
       FieldLegend,

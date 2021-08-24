@@ -28,90 +28,6 @@
             </select>
           </label>
           {{ sandOrder }}
-          <!-- <template v-for="(sO, Key) in sandOrder" :key="Key">
-            <hr v-if="Key !== 0" class="mt-4 mb-2 col-span-full" />
-            <label
-              :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'"
-              for="sandType"
-            >
-              <span>Tipo</span>
-              <select
-                id="sandProvider"
-                v-model="sO.sandType.id"
-                class="input"
-                name="sandProvider"
-              >
-                <option selected disabled value="">
-                  Seleccionar Tipo de Arena
-                </option>
-                <option v-for="sT in sandTypes" :key="sT.id" :value="sT.id">
-                  {{ toCapitalize(sT.type) }}
-                </option>
-              </select>
-            </label>
-            <label
-              :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'"
-              for="sandQuantity"
-            >
-              <span>Cantidad</span>
-              <div class="mt-1 flex rounded shadow-sm">
-                <input
-                  v-model.number="sO.amount"
-                  type="number"
-                  name="sandQuantity"
-                  class="
-                    flex-1
-                    min-w-0
-                    block
-                    w-full
-                    px-3
-                    py-2
-                    rounded-none
-                    border-r-0
-                    rounded-l
-                    focus:ring-indigo-500 focus:border-indigo-500
-                    border-second-300
-                    sm:text-sm
-                  "
-                  placeholder="22"
-                  list="sandQuantity-list"
-                />
-                <datalist id="sandQuantity-list">
-                  <option value="12">12</option>
-                  <option value="22">22</option>
-                  <option value="44">44</option>
-                  <option value="88">88</option>
-                </datalist>
-                <span
-                  class="
-                    inline-flex
-                    items-center
-                    px-3
-                    rounded-r
-                    border border-second-300
-                    bg-second-50
-                    text-second-500
-                    sm:text-sm
-                  "
-                  title="Peso en Toneladas"
-                >
-                  t
-                </span>
-              </div>
-            </label>
-            <div
-              v-if="sandOrder.length > 1"
-              class="col-span-2 flex justify-end items-end"
-            >
-              <CircularBtn
-                class="btn__delete"
-                size="sm"
-                @click="removeSandOrder(sO.id)"
-              >
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
-            </div>
-          </template> -->
           <div class="col-span-full mt-1 pb-4 mb-4">
             <button class="flex items-center p-1" @click.prevent="addSandOrder">
               <CircularBtn class="btn__add" size="xs">
@@ -364,7 +280,6 @@
   import { useAxios } from '@vueuse/integrations/useAxios';
   import { SandProvider } from '@/interfaces/SandProvider';
   import { Sand } from '@/interfaces/SandType';
-  import SelectList from '@/components/ui/SelectList.vue';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
@@ -377,7 +292,6 @@
       PlusIcon,
       PrimaryBtn,
       TrashIcon,
-      SelectList,
     },
     setup() {
       const router = useRouter();
