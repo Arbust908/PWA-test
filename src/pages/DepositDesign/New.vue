@@ -199,7 +199,7 @@
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import Counter from '@/components/ui/Counter.vue';
   import DepositGrid from '@/components/depositDesign/Deposit.vue';
   import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
@@ -355,14 +355,14 @@
         col: 0,
         row: 0,
         category: '',
-        id: ''
+        id: '',
       });
       const selectBox = (box: Box) => {
         selectedBox.value = box;
       };
       const setCat = (cat: string) => {
         selectedBox.value.category = cat;
-        const {floor,row,col} = selectedBox.value
+        const { floor, row, col } = selectedBox.value;
         deposit.value[`${floor}|${row}|${col}`].category = cat;
       };
 

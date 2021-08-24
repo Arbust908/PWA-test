@@ -56,7 +56,7 @@
   import { onMounted, ref } from 'vue';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/Button.vue';
+  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
 

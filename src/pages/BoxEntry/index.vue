@@ -72,7 +72,7 @@
               :class="['radio-button', choosedBox.id == box.id ? 'active' : '']"
               @click.prevent="setSelectedBox(box.id)"
             ></div>
-            <div class="box-id"># {{ box.id }} - {{box.category}}</div>
+            <div class="box-id"># {{ box.id }} - {{ box.category }}</div>
           </div>
         </fieldset>
         <nav class="flex justify-between">
@@ -235,7 +235,7 @@
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import Counter from '@/components/ui/Counter.vue';
   import DepositGrid from '@/components/depositDesign/Deposit.vue';
   import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
@@ -272,7 +272,7 @@
       let activeSection = ref('deposit');
       let boxes = ref([
         {
-          id: "ID-289",
+          id: 'ID-289',
           warehouseId: 1,
           warehouse: {
             id: 1,
@@ -280,18 +280,18 @@
             pitId: 1,
             pit: {
               id: 1,
-              name: "Test",
+              name: 'Test',
               workOrderId: 1,
             },
-            layout: "any",
+            layout: 'any',
           },
-          category: "cut",
+          category: 'cut',
           col: 2,
           floor: 1,
           row: 2,
         },
         {
-          id: "A4%$",
+          id: 'A4%$',
           warehouseId: 1,
           warehouse: {
             id: 1,
@@ -299,12 +299,12 @@
             pitId: 1,
             pit: {
               id: 1,
-              name: "Test",
+              name: 'Test',
               workOrderId: 1,
             },
-            layout: "any",
+            layout: 'any',
           },
-          category: "fine",
+          category: 'fine',
           col: 2,
           floor: 1,
           row: 1,
@@ -342,7 +342,7 @@
         col: 0,
         row: 0,
         category: '',
-        id: ''
+        id: '',
       });
 
       const setSelectedBox = (id: Number) => {
@@ -398,18 +398,18 @@
         clientCompanyId: 7,
         pitId: 1,
         layout: {
-          '1|1|1': {id: 'ID-222',category: 'cut'},
-          '1|1|2': {id: 'A4%$',category: 'fine'},
-          '1|2|1': {id: '',category: 'empty'},
-          '1|2|2': {id: 'ID-289',category: 'cut'},
-          '2|1|1': {id: '',category: 'empty'},
-          '2|1|2': {id: 'ID-678',category: 'fine'},
-          '2|2|1': {id: '',category: 'empty'},
-          '2|2|2': {id: 'ID-890',category: 'fine'},
-          '3|1|1': {id: '',category: 'empty'},
-          '3|1|2': {id: 'ID-262',category: 'fine'},
-          '3|2|1': {id: '',category: 'empty'},
-          '3|2|2': {id: 'ID-290',category: 'cut'},
+          '1|1|1': { id: 'ID-222', category: 'cut' },
+          '1|1|2': { id: 'A4%$', category: 'fine' },
+          '1|2|1': { id: '', category: 'empty' },
+          '1|2|2': { id: 'ID-289', category: 'cut' },
+          '2|1|1': { id: '', category: 'empty' },
+          '2|1|2': { id: 'ID-678', category: 'fine' },
+          '2|2|1': { id: '', category: 'empty' },
+          '2|2|2': { id: 'ID-890', category: 'fine' },
+          '3|1|1': { id: '', category: 'empty' },
+          '3|1|2': { id: 'ID-262', category: 'fine' },
+          '3|2|1': { id: '', category: 'empty' },
+          '3|2|2': { id: 'ID-290', category: 'cut' },
         },
         createdAt: '2021-08-06T14:44:26.000Z',
         updatedAt: null,
@@ -544,9 +544,9 @@
       const setCat = (cat: string) => {
         choosedBox.value.category = cat;
         const box = choosedBox.value;
-        deposit.value[`${box.floor}|${box.row}|${box.col}`].category = box.category;
+        deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
+          box.category;
       };
-
 
       // :: DEPOSIT
       const deposit = ref({});

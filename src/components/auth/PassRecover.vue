@@ -48,7 +48,7 @@
 
 <script>
   import Logo from '@/components/Logo.vue';
-  import Button from '@/components/ui/Button.vue';
+  import Button from '@/components/ui/buttons/BaseBtn.vue';
   export default {
     components: {
       Logo,

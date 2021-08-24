@@ -228,7 +228,7 @@
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import SandPlanStage from '@/components/sandPlan/StageRow.vue';
   import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
   import StageHeader from '@/components/sandPlan/StageHeader.vue';

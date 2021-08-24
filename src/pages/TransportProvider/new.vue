@@ -145,9 +145,9 @@
   import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
   import DriverCard from '@/components/transportProvider/DriverCard.vue';
   import Layout from '@/layouts/Main.vue';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';

@@ -9,7 +9,7 @@
 
 <script>
   import { CheckCircleIcon } from '@heroicons/vue/solid';
-  import Button from '@/components/ui/Button.vue';
+  import Button from '@/components/ui/buttons/BaseBtn.vue';
   export default {
     components: {
       CheckCircleIcon,

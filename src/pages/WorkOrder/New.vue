@@ -226,10 +226,10 @@
   import OrderSection from '@/components/workOrder/Order.vue';
   import EquipmentSection from '@/components/workOrder/Equipment.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import Layout from '@/layouts/Main.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import TimePicker from '@/components/ui/form/TimePicker.vue';
   // AXIOS
   import axios from 'axios';

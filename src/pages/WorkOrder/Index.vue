@@ -64,7 +64,7 @@
   import { ref, Ref, watch, defineComponent } from 'vue';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
 

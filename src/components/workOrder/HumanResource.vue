@@ -144,7 +144,7 @@
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import GhostBtn from '@/components/ui/GhostBtn.vue';
   import Layout from '@/layouts/Main.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
 
   import {
     Pit,
