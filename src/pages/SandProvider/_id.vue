@@ -188,6 +188,9 @@
               name: newSandProvider.name,
               observations: newSandProvider.observations,
             };
+            if (meshType.value !== '') {
+              newSandProvider.meshType.push(meshType.value);
+            }
             const { data: spData } = useAxios(
               `/sandProvider/${id}`,
               { method: 'PUT', data: sandProviderData },
