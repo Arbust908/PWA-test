@@ -24,7 +24,6 @@
         fieldName="observations"
         placeholder="ej: 12313"
         title="PAD"
-        mask="S*"
         :data="pad"
         @update:data="pad = $event"
       />

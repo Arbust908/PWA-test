@@ -4,7 +4,6 @@
       :class="pitI !== lastPitIndex ? 'col-span-10' : 'col-span-full'"
       fieldName="name"
       placeholder="Nombre de cliente"
-      mask="S*"
       :data="pit.name"
       @update:data="pit.name = $event"
     />

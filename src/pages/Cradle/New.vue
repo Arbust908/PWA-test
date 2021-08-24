@@ -15,7 +15,6 @@
             fieldName="name"
             placeholder="Nombre del Cradle"
             title="Nombre"
-            mask="S*"
             :data="name"
             @update:data="name = $event"
           />

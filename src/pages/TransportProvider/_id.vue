@@ -291,9 +291,12 @@
       });
 
       const update = async () => {
-        const { providerNotificationId, providerNotification, ...newTProv } =
-          currentTransportProvider;
-        newTProv.amount = 0;
+        const {
+          providerNotificationId,
+          providerNotification,
+          drivers,
+          ...newTProv
+        } = currentTransportProvider;
         console.log(newTProv);
         const { data } = useAxios(
           `/transportProvider/${id}`,

@@ -15,7 +15,6 @@
             class="col-span-full"
             fieldName="name"
             placeholder="Nombre y apellido / Razón social"
-            mask="S*"
             title="Nombre y apellido / Razón social"
             :data="newClient.name"
             @update:data="newClient.name = $event"
@@ -33,19 +32,20 @@
             class="col-span-full"
             fieldName="address"
             placeholder="Domicilio"
-            mask="S*"
             title="Domicilio"
             :data="newClient.address"
             @update:data="newClient.address = $event"
           />
-          <toggle label="Es operadora" @handle-toggle-state="handleToggleState"/>
+          <toggle
+            label="Es operadora"
+            @handle-toggle-state="handleToggleState"
+          />
           <textarea
             class="col-span-full resize-none rounded-md input"
             fieldName="observations"
             rows="4"
             placeholder="Observaciones..."
             title="Observaciones"
-            mask="S*"
             v-model="newClient.observations"
           ></textarea>
         </FieldGroup>
@@ -56,7 +56,6 @@
             fieldName="nr-name"
             placeholder="Nombre de representante"
             title="Nombre"
-            mask="S*"
             :data="newClient.companyRepresentative.name"
             @update:data="newClient.companyRepresentative.name = $event"
           />
@@ -101,7 +100,7 @@
 
 <script lang="ts">
   import { reactive, toRefs, computed, defineComponent, watch, ref } from 'vue';
-  import Toggle from '@/components/ui/Toggle.vue'
+  import Toggle from '@/components/ui/Toggle.vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
@@ -130,7 +129,7 @@
       FieldGroup,
       FieldInput,
       FieldLegend,
-      Toggle
+      Toggle,
     },
     setup() {
       const router = useRouter();
@@ -152,14 +151,14 @@
         companyRepresentative: {
           email: '',
           name: '',
-          phone: ''
+          phone: '',
         },
         sandPlans: [],
       });
 
       const handleToggleState = () => {
-        newClient.value.isOperator = !newClient.value.isOperator
-      }
+        newClient.value.isOperator = !newClient.value.isOperator;
+      };
 
       const isFull = computed(() => {
         return !!(
@@ -206,7 +205,7 @@
         save,
         newClient,
         isFull,
-        handleToggleState
+        handleToggleState,
       };
     },
   };
