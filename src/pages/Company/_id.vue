@@ -15,7 +15,6 @@
             class="col-span-full"
             fieldName="name"
             placeholder="Nombre y apellido / Razón social"
-            mask="S*"
             title="Nombre y apellido / Razón social"
             :data="editedCompany.name"
             @update:data="editedCompany.name = $event"
@@ -33,19 +32,21 @@
             class="col-span-full"
             fieldName="address"
             placeholder="Domicilio"
-            mask="S*"
             title="Domicilio"
             :data="editedCompany.address"
             @update:data="editedCompany.address = $event"
           />
-          <toggle label="Es operadora" @handle-toggle-state="handleToggleState" :initialState="editedCompany.isOperator"/>
+          <toggle
+            label="Es operadora"
+            @handle-toggle-state="handleToggleState"
+            :initialState="editedCompany.isOperator"
+          />
           <textarea
             class="col-span-full resize-none rounded-md input"
             fieldName="observations"
             rows="4"
             placeholder="Observaciones..."
             title="Observaciones"
-            mask="S*"
             v-model="editedCompany.observations"
           ></textarea>
         </FieldGroup>
@@ -56,7 +57,6 @@
             fieldName="nr-name"
             placeholder="Nombre de representante"
             title="Nombre"
-            mask="S*"
             :data="editedCompany.companyRepresentative.name"
             @update:data="editedCompany.companyRepresentative.name = $event"
           />
@@ -104,7 +104,7 @@
   import { useStore } from 'vuex';
   import { Company } from '@/interfaces/sandflow';
   import { ref, computed } from 'vue';
-  import Toggle from '@/components/ui/Toggle.vue'
+  import Toggle from '@/components/ui/Toggle.vue';
 
   import Layout from '@/layouts/Main.vue';
   import InputPack from '@/components/ui/InputPack.vue';
@@ -126,7 +126,7 @@
       NoneBtn,
       FieldGroup,
       FieldInput,
-      FieldLegend
+      FieldLegend,
     },
     setup() {
       const route = useRoute();
@@ -136,22 +136,22 @@
       const companies: Array<Company> = JSON.parse(
         JSON.stringify(store.state.client.all)
       );
-      
+
       const id = Number(route.params.id);
 
       const currentCompany: Company = companies.find((company) => {
         return company.id == id;
       });
 
-      const editedCompany: Company = ref({...currentCompany});
+      const editedCompany: Company = ref({ ...currentCompany });
 
       const goToIndex = () => {
         router.push('/clientes');
       };
 
       const handleToggleState = () => {
-        editedCompany.value.isOperator = !editedCompany.value.isOperator
-      }
+        editedCompany.value.isOperator = !editedCompany.value.isOperator;
+      };
 
       const isFull = computed(() => {
         return !!(
@@ -178,9 +178,11 @@
           isOperator: editedCompany.value.isOperator,
           childId: null,
           observations: editedCompany.value.observations,
-          companyRepresentativeId: Number(editedCompany.value.companyRepresentativeId)
-        }
-        
+          companyRepresentativeId: Number(
+            editedCompany.value.companyRepresentativeId
+          ),
+        };
+
         let company = await axios
           .put(`${apiUrl}/company/${id}`, companyData)
           .catch((err) => {
@@ -223,7 +225,7 @@
         goToIndex,
         editedCompany,
         handleToggleState,
-        isFull
+        isFull,
       };
     },
   };

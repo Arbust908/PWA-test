@@ -15,7 +15,6 @@
             fieldName="sandMesh"
             placeholder="Ingrese tipo de malla"
             title="Tipo de malla"
-            mask="S*"
             :data="type"
             @update:data="type = $event"
           />

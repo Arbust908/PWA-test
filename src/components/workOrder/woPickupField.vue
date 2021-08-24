@@ -18,7 +18,6 @@
       fieldName="description"
       placeholder="Descripción de pickup"
       :title="pickupI === firstIndex ? 'Descripción' : null"
-      mask="S*"
       :data="pickup.description"
       @update:data="pickup.description = $event"
     />

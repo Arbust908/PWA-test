@@ -9,7 +9,6 @@
       fieldName="chassis"
       placeholder="Id de tractor"
       :title="traktorI === firstTraktorIndex ? 'ID Tractor/Chasis' : null"
-      mask="S*"
       :data="traktor.chassis"
       @update:data="traktor.chassis = $event"
     />
@@ -18,7 +17,6 @@
       fieldName="supplier"
       placeholder="Proveedor de tractor"
       :title="traktorI === firstTraktorIndex ? 'Proveedor' : null"
-      mask="S*"
       :data="traktor.supplier"
       @update:data="traktor.supplier = $event"
     />
@@ -27,7 +25,6 @@
       fieldName="description"
       placeholder="Descripción de tractor"
       :title="traktorI === firstTraktorIndex ? 'Descripción' : null"
-      mask="S*"
       :data="traktor.description"
       @update:data="traktor.description = $event"
     />

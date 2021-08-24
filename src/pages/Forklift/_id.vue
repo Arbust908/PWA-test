@@ -19,7 +19,6 @@
             fieldName="name"
             placeholder="Nombre de Forklift"
             title="Nombre"
-            mask="S*"
             :data="currentForklift.name"
             @update:data="currentForklift.name = $event"
           />
