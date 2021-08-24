@@ -221,7 +221,7 @@ export interface TransportProvider {
     id?: number;
     name: string;
     legalId: number;
-    adress: string;
+    address: string;
     observations?: string;
     companyRepresentativeId: number;
     CompanyRepresentative?: CompanyRepresentative;

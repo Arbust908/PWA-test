@@ -4,7 +4,7 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Proveedor de transporte - ID {{id}}
+        Proveedor de transporte - ID {{ id }}
       </h1>
     </header>
     <section class="flex">
@@ -28,104 +28,38 @@
             <span> Transportista </span>
           </button>
         </nav>
-        <section class="bg-white rounded-md max-w-2xl shadow-sm" v-if="activeSection === 'provider'">
-          <form method="POST" action="/" class="p-4 max-w-lg">
-            <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-              <label class="col-span-full" for="name">
-                <span>Nombre / Razón Social</span>
-                <input
-                  id="name"
-                  v-model="newTransportProvider.name"
-                  class="input"
-                  type="text"
-                  name="name"
-                />
-              </label>
-              <label class="col-span-full" for="legalId">
-                <span>CUIT / CUIL</span>
-                <input
-                  id="legalId"
-                  v-model.number="newTransportProvider.legalId"
-                  v-maska="'###########'"
-                  class="input"
-                  type="text"
-                  name="legalId"
-                  placeholder="CUIT / CUIL"
-                />
-              </label>
-              <label class="col-span-full" for="address">
-                <span>Domicilio</span>
-                <input
-                  id="address"
-                  v-model="newTransportProvider.address"
-                  class="input"
-                  type="text"
-                  name="address"
-                />
-              </label>
-              <label class="col-span-full" for="observations">
-                <span>Observaciones<span class="italic text-gray-400"> (opcional)</span></span>
-                <textarea
-                  id="observations"
-                  v-model="newTransportProvider.observations"
-                  class="input resize-none"
-                  type="text"
-                  name="observations"
-                  placeholder="Observaciones..."
-                  rows="4"
-                ></textarea>
-              </label>
-            </fieldset>
-            <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-              <h2 class="col-span-full text-xl flex justify-between items-end">
-                <span> Contacto principal </span>
-              </h2>
-              <label class="col-span-full" for="nr-name">
-                <span>Nombre y Apellido</span>
-                <input
-                  id="nr-name"
-                  v-model="companyRepresentative.name"
-                  class="input"
-                  type="text"
-                  name="name"
-                  placeholder="Nombre y Apellido"
-                />
-              </label>
-              <label class="col-span-full" for="phone">
-                <span>Teléfono</span>
-                <input
-                  id="nr-phone"
-                  :read-only="!isNewRep"
-                  v-maska="'##-####-####'"
-                  v-model="companyRepresentative.phone"
-                  class="input"
-                  type="text"
-                  name="phone"
-                  placeholder="+11 1234 5678"
-                />
-              </label>
-              <label class="col-span-full" for="email">
-                <span>Email</span>
-                <input
-                  id="nr-email"
-                  :read-only="!isNewRep"
-                  v-model="companyRepresentative.email"
-                  class="input"
-                  type="text"
-                  name="email"
-                  placeholder="empresa@mail.com"
-                />
-              </label>
-            </fieldset>
-          </form>
-          <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
+        <section
+          class="bg-white rounded-md max-w-2xl shadow-sm"
+          v-if="activeSection === 'provider'"
+        >
+          <TransportProviderFrom
+            :tpName="newTransportProvider.name"
+            :tpId="newTransportProvider.legalId"
+            :tpAddress="newTransportProvider.address"
+            :tpObservations="newTransportProvider.observations"
+            :crName="companyRepresentative.name"
+            :crPhone="companyRepresentative.phone"
+            :crEmail="companyRepresentative.email"
+            @update:tpName="newTransportProvider.name = $event"
+            @update:tpId="newTransportProvider.legalId = $event"
+            @update:tpAddress="newTransportProvider.address = $event"
+            @update:tpObservations="newTransportProvider.observations = $event"
+            @update:crName="companyRepresentative.name = $event"
+            @update:crPhone="companyRepresentative.phone = $event"
+            @update:crEmail="companyRepresentative.email = $event"
+          />
+          <footer
+            class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between"
+          >
             <section class="space-x-6 flex items-center justify-end">
-              <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')">
+              <NoneBtn
+                @click.prevent="$router.push('/proveedores-de-transporte')"
+              >
                 Cancelar
               </NoneBtn>
               <PrimaryBtn
                 :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                @click="isFull && save()"
+                @click="isFull && update()"
                 :disabled="!isFull"
               >
                 Finalizar
@@ -133,91 +67,45 @@
             </section>
           </footer>
         </section>
-        <section class="bg-white rounded-md max-w-2xl shadow-sm" v-if="activeSection === 'driver'">
+        <section
+          class="bg-white rounded-md max-w-2xl shadow-sm"
+          v-if="activeSection === 'driver'"
+        >
           <form method="POST" action="/" class="p-4 max-w-lg">
-            <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-              <label class="col-span-full" for="name">
-                <span>Nombre y apellido</span>
-                <input
-                  id="name"
-                  v-model="newDriver.name"
-                  class="input"
-                  type="text"
-                  name="name"
-                />
-              </label>
-              <label class="col-span-full" for="phone">
-                <span>Teléfono</span>
-                <input
-                  id="nr-phone"
-                  :read-only="!isNewRep"
-                  v-maska="'##-####-####'"
-                  v-model="newDriver.phone"
-                  class="input"
-                  type="text"
-                  name="phone"
-                  placeholder="+11 1234 5678"
-                />
-              </label>
-              <label class="col-span-full" for="email">
-                <span>Email</span>
-                <input
-                  id="nr-email"
-                  :read-only="!isNewRep"
-                  v-model="newDriver.email"
-                  class="input"
-                  type="text"
-                  name="email"
-                  placeholder="empresa@mail.com"
-                />
-              </label>
-              <label class="col-span-full" for="vehicleType">
-                <span>Tipo de transporte</span>
-                <input
-                  id="name"
-                  v-model="newDriver.vehicleType"
-                  class="input"
-                  type="text"
-                  name="vehicleType"
-                />
-              </label>
-              <label class="col-span-full" for="vehicleId">
-                <span>Patente</span>
-                <input
-                  id="name"
-                  v-model="newDriver.vehicleId"
-                  class="input"
-                  type="text"
-                  name="vehicleId"
-                />
-              </label>
-              <label class="col-span-full" for="observations">
-                <span>Observaciones<span class="italic text-gray-400"> (opcional)</span></span>
-                <textarea
-                  id="observations"
-                  v-model="newDriver.observations"
-                  class="input resize-none"
-                  type="text"
-                  name="observations"
-                  placeholder="Observaciones..."
-                  rows="4"
-                ></textarea>
-              </label>
-            </fieldset>
+            <TransportProviderDriverForm
+              :driverName="newDriver.name"
+              :driverPhone="newDriver.phone"
+              :driverEmail="newDriver.email"
+              :driverTType="newDriver.vehicleType"
+              :driverTId="newDriver.vehicleId"
+              :driverObs="newDriver.observations"
+              @update:driverName="newDriver.name = $event"
+              @update:driverPhone="newDriver.phone = $event"
+              @update:driverEmail="newDriver.email = $event"
+              @update:driverTType="newDriver.vehicleType = $event"
+              @update:driverTId="newDriver.vehicleId = $event"
+              @update:driverObs="newDriver.observations = $event"
+            />
             <div
-
-              :class="['flex','items-center','cursor-pointer',
-              driverFull ? null : 'text-gray-200'
-              ]" 
+              :class="[
+                'flex',
+                'items-center',
+                'cursor-pointer',
+                driverFull ? null : 'text-gray-200',
+              ]"
               @click="driverFull && addDriver()"
             >
               <Icon icon="Plus" type="outline" class="w-5 h-5" />
               <h2>Agregar Transportista</h2>
             </div>
           </form>
-          <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
+          <footer
+            class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between"
+          >
             <section class="space-x-6 flex items-center justify-end">
-              <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')">
+              <NoneBtn
+                @click.prevent="$router.push('/proveedores-de-transporte')"
+              >
                 Cancelar
               </NoneBtn>
               <PrimaryBtn
@@ -232,8 +120,8 @@
         </section>
       </section>
       <section class="w-3/12 mt-12 ml-4">
-        <driver-card 
-          v-for="(driver,index) in drivers"
+        <DriverCard
+          v-for="(driver, index) in drivers"
           :key="index"
           :name="driver.name"
           :phone="driver.phone"
@@ -250,55 +138,49 @@
 </template>
 
 <script lang="ts">
-  import { maska } from 'maska';
-  import { computed, reactive, watch, ref } from 'vue';
+  import { computed, reactive, watch, ref, watchEffect } from 'vue';
   import { useStore } from 'vuex';
-  import { useRouter,useRoute } from 'vue-router';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
+  import { useRouter, useRoute } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
   import Icon from '@/components/icon/TheAllIcon.vue';
+  import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
+  import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
   import DriverCard from '@/components/transportProvider/DriverCard.vue';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-  import FieldInput from '@/components/ui/form/FieldInput.vue';
-  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   const api = import.meta.env.VITE_API_URL || '/api';
   // TIPOS
-  import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
+  import {
+    TransportProvider,
+    CompanyRepresentative,
+    Driver,
+  } from '@/interfaces/sandflow';
 
   export default {
-    directives: { maska },
     components: {
+      CircularBtn,
+      DriverCard,
+      Icon,
       Layout,
       NoneBtn,
-      BookmarkIcon,
-      TrashIcon,
-      CheckCircleIcon,
-      CircularBtn,
       PrimaryBtn,
-      FieldGroup,
-      FieldInput,
-      FieldLegend,
-      Icon,
-      DriverCard
+      TransportProviderFrom,
+      TransportProviderDriverForm,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
       const route = useRoute();
+      const id = Number(route.params.id);
+      const title = useTitle(`Proveedor de Transporte ${id} <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });
-      const id = Number(route.params.id);
 
       const transportProviders: Array<TransportProvider> = JSON.parse(
         JSON.stringify(store.state.transportProviders.all)
@@ -309,7 +191,7 @@
           return sp.id == id;
         });
 
-        console.log(currentTransportProvider)
+      console.log(currentTransportProvider);
 
       let activeSection = ref('provider');
 
@@ -317,60 +199,63 @@
         return (activeSection.value = option);
       };
 
-      const drivers: Array<Driver> = reactive([])
+      console.log(currentTransportProvider.drivers);
+      const drivers: Array<Driver> = reactive(currentTransportProvider.drivers);
+      console.log(drivers);
 
       let newDriver = reactive({
-        name: '', 
+        name: '',
         phone: '',
         email: '',
         vehicleType: '',
         vehicleId: '',
-        observations: ''
-      })
+        observations: '',
+      });
 
       const addDriver = () => {
-        const driver = {...newDriver}
-        drivers.push(driver)
-        cleanNewDriver()
-      }
+        const driver = { ...newDriver };
+        drivers.push(driver);
+        cleanNewDriver();
+      };
 
       const deleteDriver = (index: number) => {
-        drivers.splice(index)
-      }
+        drivers.splice(index);
+      };
 
       const editDriver = (index: number) => {
-        const driver = {...drivers[index]}
-        deleteDriver(index)
-        
-        newDriver.name = driver.name
-        newDriver.phone = driver.phone
-        newDriver.email = driver.email
-        newDriver.vehicleType = driver.vehicleType
-        newDriver.vehicleId = driver.vehicleId
-        newDriver.observations = driver.observations
-      }
+        const driver = { ...drivers[index] };
+        deleteDriver(index);
+
+        newDriver.name = driver.name;
+        newDriver.phone = driver.phone;
+        newDriver.email = driver.email;
+        newDriver.vehicleType = driver.vehicleType;
+        newDriver.vehicleId = driver.vehicleId;
+        newDriver.observations = driver.observations;
+      };
 
       const cleanNewDriver = () => {
-        newDriver.name = ''
-        newDriver.phone = ''
-        newDriver.email = ''
-        newDriver.vehicleType = ''
-        newDriver.vehicleId = ''
-        newDriver.observations = ''
-      }
+        newDriver.name = '';
+        newDriver.phone = '';
+        newDriver.email = '';
+        newDriver.vehicleType = '';
+        newDriver.vehicleId = '';
+        newDriver.observations = '';
+      };
 
       const newTransportProvider: TransportProvider = reactive({
-        name: '',
-        legalId: null,
-        adress: '',
-        observations: '',
-        companyRepresentativeId: -1
+        name: currentTransportProvider.name,
+        legalId: currentTransportProvider.legalId,
+        address: currentTransportProvider.address,
+        observations: currentTransportProvider.observations,
+        companyRepresentativeId:
+          currentTransportProvider.companyRepresentativeId,
       });
 
       const companyRepresentative: CompanyRepresentative = reactive({
-        name: '',
-        phone: '',
-        email: '',
+        name: currentTransportProvider.companyRepresentative.name,
+        phone: currentTransportProvider.companyRepresentative.phone,
+        email: currentTransportProvider.companyRepresentative.email,
       });
 
       const transportProviderFull: ComputedRef<boolean> = computed(() => {
@@ -380,7 +265,7 @@
           newTransportProvider.legalId >= 0
         );
       });
-      
+
       const driverFull: ComputedRef<boolean> = computed(() => {
         return !!(
           newDriver.name !== '' &&
@@ -400,12 +285,16 @@
       });
 
       const isFull: ComputedRef<boolean> = computed(() => {
-        return transportProviderFull.value && repFull.value && driverFull.value;
+        return (
+          transportProviderFull.value && repFull.value /*&& driverFull.value*/
+        );
       });
 
       const update = async () => {
         const { providerNotificationId, providerNotification, ...newTProv } =
           currentTransportProvider;
+        newTProv.amount = 0;
+        console.log(newTProv);
         const { data } = useAxios(
           `/transportProvider/${id}`,
           { method: 'PUT', data: newTProv },
@@ -413,8 +302,31 @@
         );
         watch(data, (newData, _) => {
           if (newData && newData.data) {
-            store.dispatch('updateTransportProvider', newData.data);
-            router.push('/proveedores-de-transporte');
+            const tpId = newData.data.id;
+            const tpSave = reactive({ ...newData.data });
+            const driversDone = reactive([]);
+            drivers.forEach((driver) => {
+              const { id, ...newDriver } = driver;
+              console.log(newDriver);
+              newDriver.transportProviderId = tpId;
+              const { data } = useAxios(
+                `/driver/`,
+                { method: 'POST', data: newDriver },
+                instance
+              );
+              watch(data, (newData, _) => {
+                if (newData && newData.data) {
+                  driversDone.push(newData.data);
+                  tpSave.drivers = driversDone;
+                }
+              });
+            });
+            watchEffect(() => {
+              if (driversDone.length === drivers.length) {
+                store.dispatch('updateTransportProvider', tpSave);
+                router.push('/proveedores-de-transporte');
+              }
+            });
           }
         });
       };

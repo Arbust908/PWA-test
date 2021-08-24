@@ -72,6 +72,7 @@
   import Layout from '@/layouts/Main.vue';
   import { useLocalStorage } from '@/helpers/useLocalStorage';
   import { useNProgress } from '@vueuse/integrations/useNProgress';
+  import { useTitle } from '@vueuse/core';
 
   export default {
     components: {
@@ -80,8 +81,13 @@
     setup() {
       const { storage, keys } = useLocalStorage(['user', 'gipi']);
       const { gipi } = storage;
-
       const { progress, isLoading, start, done } = useNProgress();
+      const title = useTitle(`  About <> Sandflow  `);
+
+      setInterval(() => {
+        // Shift title string
+        title.value = title.value.substr(1) + title.value.substr(0, 1);
+      }, 300);
 
       const initProgrss = () => {
         if (progress.value === null) {

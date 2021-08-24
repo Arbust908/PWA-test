@@ -32,86 +32,22 @@
           class="bg-white rounded-md max-w-2xl shadow-sm"
           v-if="activeSection === 'provider'"
         >
-          <form method="POST" action="/" class="p-4 max-w-lg">
-            <FieldGroup>
-              <FieldInput
-                class="col-span-full"
-                fieldName="transportName"
-                placeholder="Ingresar Nombre / Razón Social"
-                title="Nombre / Razón Social"
-                :data="newTransportProvider.name"
-                @update:data="newTransportProvider.name = $event"
-              />
-              <FieldInput
-                class="col-span-full"
-                fieldName="transportId"
-                placeholder="Ingresar CUIT / CUIL"
-                title="CUIT / CUIL"
-                :data="newTransportProvider.legalId"
-                @update:data="newTransportProvider.legalId = Number($event)"
-              />
-              <FieldInput
-                class="col-span-full"
-                fieldName="address"
-                placeholder="Ingresar Domicilio"
-                title="Domicilio"
-                :data="newTransportProvider.address"
-                @update:data="newTransportProvider.address = $event"
-              />
-              <FieldTextArea
-                class="col-span-full"
-                fieldName="observations"
-                placeholder="Observaciones..."
-                title="Observaciones"
-                :rows="5"
-                isFixed
-                isOptional
-                :data="newTransportProvider.observations"
-                @update:data="newTransportProvider.observations = $event"
-              />
-            </FieldGroup>
-            <fieldset
-              class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4"
-            >
-              <h2 class="col-span-full text-xl flex justify-between items-end">
-                <span> Contacto principal </span>
-              </h2>
-              <label class="col-span-full" for="nr-name">
-                <span>Nombre y Apellido</span>
-                <input
-                  id="nr-name"
-                  v-model="companyRepresentative.name"
-                  class="input"
-                  type="text"
-                  name="name"
-                  placeholder="Nombre y Apellido"
-                />
-              </label>
-              <label class="col-span-full" for="phone">
-                <span>Teléfono</span>
-                <input
-                  id="nr-phone"
-                  v-maska="'##-####-####'"
-                  v-model="companyRepresentative.phone"
-                  class="input"
-                  type="text"
-                  name="phone"
-                  placeholder="+11 1234 5678"
-                />
-              </label>
-              <label class="col-span-full" for="email">
-                <span>Email</span>
-                <input
-                  id="nr-email"
-                  v-model="companyRepresentative.email"
-                  class="input"
-                  type="text"
-                  name="email"
-                  placeholder="empresa@mail.com"
-                />
-              </label>
-            </fieldset>
-          </form>
+          <TransportProviderFrom
+            :tpName="newTransportProvider.name"
+            :tpId="newTransportProvider.legalId"
+            :tpAddress="newTransportProvider.address"
+            :tpObservations="newTransportProvider.observations"
+            :crName="companyRepresentative.name"
+            :crPhone="companyRepresentative.phone"
+            :crEmail="companyRepresentative.email"
+            @update:tpName="newTransportProvider.name = $event"
+            @update:tpId="newTransportProvider.legalId = $event"
+            @update:tpAddress="newTransportProvider.address = $event"
+            @update:tpObservations="newTransportProvider.observations = $event"
+            @update:crName="companyRepresentative.name = $event"
+            @update:crPhone="companyRepresentative.phone = $event"
+            @update:crEmail="companyRepresentative.email = $event"
+          />
           <footer
             class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between"
           >
@@ -136,62 +72,20 @@
           v-if="activeSection === 'driver'"
         >
           <form method="POST" action="/" class="p-4 max-w-lg">
-            <FieldGroup>
-              <FieldInput
-                class="col-span-full"
-                fieldName="driverName"
-                placeholder="Ingresar conductor"
-                title="Nombre y apellido"
-                :data="newDriver.name"
-                @update:data="newDriver.name = $event"
-              />
-              <FieldInput
-                class="col-span-full"
-                fieldName="driverPhone"
-                placeholder="+11 1234 5678"
-                mask="+11 #### ####"
-                title="Teléfono"
-                :data="newDriver.phone"
-                @update:data="newDriver.phone = $event"
-              />
-              <FieldInput
-                class="col-span-full"
-                fieldName="driverEmail"
-                placeholder="empresa@mail.com"
-                title="Email"
-                mask="X*@X*.X*"
-                :data="newDriver.email"
-                @update:data="newDriver.email = $event"
-              />
-              <FieldInput
-                class="col-span-full"
-                title="Tipo de transporte"
-                fieldName="driverVehicleType"
-                placeholder="Doble carga"
-                :data="newDriver.vehicleType"
-                @update:data="newDriver.vehicleType = $event"
-              />
-              <FieldInput
-                class="col-span-full"
-                title="Patente"
-                fieldName="driverVehicleId"
-                placeholder="AA 464 XX"
-                :mask="['AA-###-AA', '###', 'AAA', 'XXX-XX']"
-                :data="newDriver.vehicleId"
-                @update:data="newDriver.vehicleId = $event"
-              />
-              <FieldTextArea
-                class="col-span-full"
-                fieldName="observations"
-                placeholder="Observaciones..."
-                title="Observaciones"
-                :rows="5"
-                isFixed
-                isOptional
-                :data="newDriver.observations"
-                @update:data="newDriver.observations = $event"
-              />
-            </FieldGroup>
+            <TransportProviderDriverForm
+              :driverName="newDriver.name"
+              :driverPhone="newDriver.phone"
+              :driverEmail="newDriver.email"
+              :driverTType="newDriver.vehicleType"
+              :driverTId="newDriver.vehicleId"
+              :driverObs="newDriver.observations"
+              @update:driverName="newDriver.name = $event"
+              @update:driverPhone="newDriver.phone = $event"
+              @update:driverEmail="newDriver.email = $event"
+              @update:driverTType="newDriver.vehicleType = $event"
+              @update:driverTId="newDriver.vehicleId = $event"
+              @update:driverObs="newDriver.observations = $event"
+            />
             <button
               :class="[
                 'flex items-center',
@@ -224,7 +118,7 @@
         </section>
       </section>
       <section class="w-3/12 mt-12 ml-4">
-        <driver-card
+        <DriverCard
           v-for="(driver, index) in drivers"
           :key="index"
           :name="driver.name"
@@ -242,25 +136,18 @@
 </template>
 
 <script lang="ts">
-  import { maska } from 'maska';
   import { computed, reactive, watch, ref, watchEffect } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
+  import { useTitle } from '@vueuse/core';
   import Icon from '@/components/icon/TheAllIcon.vue';
+  import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
+  import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
   import DriverCard from '@/components/transportProvider/DriverCard.vue';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-  import FieldInput from '@/components/ui/form/FieldInput.vue';
-  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
-  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -273,25 +160,20 @@
   } from '@/interfaces/sandflow';
 
   export default {
-    directives: { maska },
     components: {
+      CircularBtn,
+      DriverCard,
+      Icon,
       Layout,
       NoneBtn,
-      BookmarkIcon,
-      TrashIcon,
-      Icon,
-      CheckCircleIcon,
-      CircularBtn,
       PrimaryBtn,
-      FieldGroup,
-      FieldInput,
-      FieldLegend,
-      DriverCard,
-      FieldTextArea,
+      TransportProviderFrom,
+      TransportProviderDriverForm,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
+      const title = useTitle(`Nuevo Provedor de Transporte <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });
@@ -347,7 +229,7 @@
       const newTransportProvider: TransportProvider = reactive({
         name: '',
         legalId: null,
-        adress: '',
+        address: '',
         observations: '',
         companyRepresentativeId: -1,
       });
@@ -419,10 +301,27 @@
             watch(data, (newData, _) => {
               console.log(newData);
               if (newData && newData.data) {
+                const tpId = newData.data.id;
+                const tpSave = reactive({ ...newData.data });
+                const driversDone = reactive([]);
+                drivers.forEach((driver) => {
+                  const { id, ...newDriver } = driver;
+                  newDriver.transportProviderId = tpId;
+                  const { data } = useAxios(
+                    `/driver/`,
+                    { method: 'POST', data: newDriver },
+                    instance
+                  );
+                  watch(data, (newData, _) => {
+                    if (newData && newData.data) {
+                      driversDone.push(newData.data);
+                      tpSave.drivers = driversDone;
+                    }
+                  });
+                });
                 store.dispatch('saveTransportProvider', {
-                  ...newTransportProvider,
+                  ...tpSave,
                   companyRepresentative,
-                  drivers,
                 });
                 router.push('/proveedores-de-transporte');
               }

@@ -68,6 +68,7 @@
 <script>
   import { onMounted, ref } from 'vue';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
@@ -85,6 +86,7 @@
       Icon,
     },
     setup() {
+      const title = useTitle('Provedores de Transporte <> Sandflow');
       const tpDB = ref([]);
       const store = useStore();
       const transportProviders = JSON.parse(
@@ -110,15 +112,17 @@
 
       const deleteTP = async (tpID) => {
         let response = await axios
-          .delete(`${api}transportProvider/${tpID}`)
-          .catch((err) => {
-            console.log(err);
-          })
+          .delete(`${api}/transportProvider/${tpID}`)
+
           .then((res) => {
             if (res.status === 200) {
               return res.data.data;
             }
             return [];
+          })
+          .catch((err) => {
+            console.log(err);
+            return;
           })
           .finally(() => {
             store.dispatch('deleteTransportProvider', tpID);

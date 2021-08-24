@@ -212,18 +212,10 @@
 </template>
 
 <script lang="ts">
-  import {
-    ref,
-    watch,
-    computed,
-    toRefs,
-    reactive,
-    watchEffect,
-    Ref,
-  } from 'vue';
+  import { ref, watch, computed } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
-  import { useToggle } from '@vueuse/core';
+  import { useToggle, useTitle } from '@vueuse/core';
   import {
     BookmarkIcon,
     TrashIcon,
@@ -275,6 +267,7 @@
       const router = useRouter();
       const route = useRoute();
       const id = route.params.id;
+      const title = useTitle(`Orden de Trabajo ${id} <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });
@@ -286,7 +279,6 @@
       const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
         return wo.id == id;
       });
-      console.log(currentWorkOrder);
       const newCWO = ref(currentWorkOrder);
 
       const woID = ref(newCWO.value.id);
@@ -294,7 +286,6 @@
       const serviceCompany = ref(newCWO.value.serviceCompany);
       const pad = ref(newCWO.value.pad);
       const pits = ref(newCWO.value.pits);
-      console.log(pits.value);
       const operativeCradle = ref(newCWO.value.operativeCradle);
       const backupCradle = ref(newCWO.value.backupCradle);
       const operativeForklift = ref(newCWO.value.operativeForklift);
@@ -315,10 +306,7 @@
       const operativeForkliftId = ref(Number(operativeForklift.value));
       const backupForkliftId = ref(Number(backupForklift.value));
 
-      console.log('CREW', crew.value);
       const crews = crew;
-      console.log('CREWS', crews);
-      console.log('CREWS', crews.value);
 
       // Crew
       const removeResource = (crewId: number, peopleId: number) => {

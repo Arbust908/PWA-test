@@ -59,6 +59,7 @@
 <script>
   import { onMounted, ref } from 'vue';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import UiBtn from '@/components/ui/Button.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
@@ -78,6 +79,7 @@
     setup() {
       const spDB = ref([]);
       const store = useStore();
+      const title = useTitle(`Proveedores de Arena <> Sandflow`);
       const sandProviders = JSON.parse(
         JSON.stringify(store.state.sandProviders.all)
       );

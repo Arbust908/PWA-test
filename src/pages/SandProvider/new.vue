@@ -9,112 +9,28 @@
     </header>
     <section class="bg-white rounded-md max-w-2xl shadow-sm">
       <form method="POST" action="/" class="p-4 max-w-lg">
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <label class="col-span-full" for="name">
-            <span>Nombre y Apellido / Razón Social</span>
-            <input
-              id="name"
-              v-model="newSandProvider.name"
-              class="input"
-              type="text"
-              name="name"
-            />
-          </label>
-          <label class="col-span-full" for="legalId">
-            <span>CUIT / CUIL</span>
-            <input
-              id="legalId"
-              v-model.number="newSandProvider.legalId"
-              v-maska="'###########'"
-              class="input"
-              type="text"
-              name="legalId"
-              placeholder="CUIT / CUIL"
-            />
-          </label>
-          <label class="col-span-full" for="address">
-            <span>Domicilio</span>
-            <input
-              id="address"
-              v-model="newSandProvider.address"
-              class="input"
-              type="text"
-              name="address"
-            />
-          </label>
-          <label class="col-span-full" for="meshType">
-            <span>Tipo de malla</span>
-            <div class="mb-4">
-              <div class="flex  items-center" v-for="(singleMeshType,index) in newSandProvider.meshType" :key="index" >
-                <input class="input readonly" type="text" :value="singleMeshType" readonly/>
-                <Icon icon="Trash" type="outline" class="ml-3 w-5 h-5 cursor-pointer" @click="deleteMeshType(singleMeshType)" />
-              </div> 
-            </div>
-            <div class="flex items-center">
-              <input
-              class="input"
-              type="text"
-              name="meshType"
-              v-model="meshType"
-              placeholder="Ingrese tipo de malla"
-              />
-            <Icon icon="Plus" type="outline" class="ml-3 w-5 h-5 cursor-pointer" @click="addMeshType(meshType)" />
-            </div>
-          </label>
-          <label class="col-span-full" for="observations">
-            <span>Observaciones<span class="italic text-gray-400"> (opcional)</span></span>
-            <textarea
-              id="observations"
-              v-model="newSandProvider.observations"
-              class="input resize-none"
-              type="text"
-              name="observations"
-              placeholder="Observaciones..."
-              rows="4"
-            ></textarea>
-          </label>
-        </fieldset>
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-full text-xl flex justify-between items-end">
-            <span> Contacto principal </span>
-          </h2>
-          <label class="col-span-full" for="nr-name">
-            <span>Nombre y Apellido</span>
-            <input
-              id="nr-name"
-              v-model="companyRepresentative.name"
-              class="input"
-              type="text"
-              name="name"
-              placeholder="Nombre y Apellido"
-            />
-          </label>
-          <label class="col-span-full" for="phone">
-            <span>Teléfono</span>
-            <input
-              id="nr-phone"
-              :read-only="!isNewRep"
-              v-maska="'##-####-####'"
-              v-model="companyRepresentative.phone"
-              class="input"
-              type="text"
-              name="phone"
-              placeholder="+11 1234 5678"
-            />
-          </label>
-          <label class="col-span-full" for="email">
-            <span>Email</span>
-            <input
-              id="nr-email"
-              :read-only="!isNewRep"
-              v-model="companyRepresentative.email"
-              class="input"
-              type="text"
-              name="email"
-              placeholder="empresa@mail.com"
-            />
-          </label>
-        </fieldset>
+        <SandProviderForm
+          :spName="newSandProvider.name"
+          :spLegalId="newSandProvider.legalId"
+          :spAddress="newSandProvider.address"
+          :spMeshTypes="newSandProvider.meshType"
+          :spObs="newSandProvider.observations"
+          :spMesh="meshType"
+          @update:spName="newSandProvider.name = $event"
+          @update:spLegalId="newSandProvider.legalId = $event"
+          @update:spAddress="newSandProvider.address = $event"
+          @update:spMeshTypes="newSandProvider.meshType = $event"
+          @update:spObs="newSandProvider.observations = $event"
+          @update:spMesh="meshType = $event"
+        />
+        <SandProviderRep
+          :repName="companyRepresentative.name"
+          :repPhone="companyRepresentative.phone"
+          :repEmail="companyRepresentative.email"
+          @update:repName="companyRepresentative.name = $event"
+          @update:repPhone="companyRepresentative.phone = $event"
+          @update:repEmail="companyRepresentative.email = $event"
+        />
       </form>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
@@ -138,12 +54,14 @@
   import { ref, Ref, computed, reactive, watch, ComputedRef } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import NoneBtn from '@/components/ui/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import { useToggle } from '@vueuse/core';
-  import { maska } from 'maska';
+  import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
+  import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -152,16 +70,18 @@
   import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
   export default {
-    directives: { maska },
     components: {
       Layout,
       NoneBtn,
       PrimaryBtn,
-      Icon
+      Icon,
+      SandProviderForm,
+      SandProviderRep,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
+      const title = useTitle(`Nuevo Proveedor de Arena <> Sandflow`);
       const instance = axios.create({
         baseURL: apiUrl,
       });
@@ -180,21 +100,23 @@
         legalId: null,
         meshType: [],
         observations: '',
-        companyRepresentativeId: -1
+        companyRepresentativeId: -1,
       });
 
-      let meshType = ref('')
+      let meshType = ref('');
 
       const addMeshType = (newMeshType: string) => {
-        newSandProvider.meshType.push(newMeshType)
-        meshType.value = ''
-      }
+        newSandProvider.meshType.push(newMeshType);
+        meshType.value = '';
+      };
 
       const deleteMeshType = (meshType: string) => {
-        newSandProvider.meshType = newSandProvider.meshType.filter((element) => {
-          return element !== meshType
-        })
-      }
+        newSandProvider.meshType = newSandProvider.meshType.filter(
+          (element) => {
+            return element !== meshType;
+          }
+        );
+      };
 
       const providerFull: ComputedRef<boolean> = computed(() => {
         return !!(
@@ -255,7 +177,7 @@
         deleteMeshType,
         addMeshType,
         meshType,
-        Icon
+        Icon,
       };
     },
   };
