@@ -123,7 +123,7 @@
           newSandProvider.name !== '' &&
           newSandProvider.address !== '0' &&
           newSandProvider.legalId >= 0 &&
-          newSandProvider.meshType.length > 0
+          // (newSandProvider.meshType.length > 0 || meshType.value !== '')
         );
       });
 
@@ -150,6 +150,9 @@
             const compRep = newData.data;
             companyRepresentative.id = compRep.id;
             newSandProvider.companyRepresentativeId = compRep.id;
+            if (meshType.value !== '') {
+              newSandProvider.meshType.push(meshType.value);
+            }
             const { data: spData } = useAxios(
               '/sandProvider',
               { method: 'POST', data: newSandProvider },
