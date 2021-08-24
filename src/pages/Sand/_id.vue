@@ -79,7 +79,7 @@
         return !!(sandToUpdate.type.length > 0);
       });
 
-      const update = async () => {
+      const save = async () => {
         const loading = ref(true);
         let sandDB = await axios
           .put(`${api}/sand/${currentSand.id}`, sandToUpdate)
@@ -102,7 +102,7 @@
       return {
         goToIndex,
         sands,
-        update,
+        save,
         sandToUpdate,
         isFull,
         ...toRefs(sandToUpdate),
