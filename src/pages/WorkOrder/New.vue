@@ -215,7 +215,7 @@
   import { ref, Ref, computed, ComputedRef, watchEffect, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import { useToggle } from '@vueuse/core';
+  import { useToggle, useTitle } from '@vueuse/core';
   import {
     BookmarkIcon,
     TrashIcon,
@@ -263,6 +263,7 @@
       // Init
       const store = useStore();
       const router = useRouter();
+      const title = useTitle(`Nueva Orden de Trabajo <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });

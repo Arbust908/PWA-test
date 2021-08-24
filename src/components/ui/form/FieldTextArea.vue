@@ -14,17 +14,14 @@
       :rows="rows"
     >
     </textarea>
-    <!-- TODO: Masking & Validaciones -->
   </label>
 </template>
 
 <script>
   import { defineComponent, computed } from 'vue';
   import { useVModel } from '@vueuse/core';
-  // import { maska, mask } from 'maska';
   import '@/assets/inputs.scss';
   export default defineComponent({
-    // directives: { maska },
     name: 'FieldInput',
     props: {
       data: {

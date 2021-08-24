@@ -13,19 +13,17 @@
       v-model="value"
       v-maska="mask"
     />
-    <!-- TODO: Masking & Validaciones -->
+    <!-- TODO: Validaciones -->
   </label>
 </template>
 
 <script>
-  import { defineComponent, computed } from 'vue';
+  import { defineComponent } from 'vue';
   import { useVModel } from '@vueuse/core';
-  import { maska, mask } from 'maska';
-  // import { mask } from 'vue-the-mask';
+  import { maska } from 'maska';
   import '@/assets/inputs.scss';
   export default defineComponent({
     directives: { maska },
-    // directives: { mask },
     name: 'FieldInput',
     props: {
       data: {
@@ -58,7 +56,6 @@
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
-      console.log(props.mask);
       return {
         value,
         ...props,
