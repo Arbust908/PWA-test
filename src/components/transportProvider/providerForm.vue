@@ -14,6 +14,7 @@
         fieldName="transportId"
         placeholder="Ingresar CUIT / CUIL"
         title="CUIT / CUIL"
+        mask="#*"
         :data="tpId"
         @update:data="tpId = $event"
       />
@@ -52,7 +53,7 @@
         title="Teléfono"
         fieldName="repTel"
         placeholder="+11 1234 5678"
-        mask="+11 #### ####"
+        mask="#*"
         :data="crPhone"
         @update:data="crPhone = $event"
       />
@@ -61,7 +62,6 @@
         title="Email"
         fieldName="repEmail"
         placeholder="empresa@mail.com"
-        mask="X*@X*.X*"
         :data="crEmail"
         @update:data="crEmail = $event"
       />

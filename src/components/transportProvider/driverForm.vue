@@ -12,7 +12,7 @@
       class="col-span-full"
       fieldName="driverPhone"
       placeholder="+11 1234 5678"
-      mask="+11 #### ####"
+      mask="#*"
       title="Teléfono"
       :data="driverPhone"
       @update:data="driverPhone = $event"
@@ -22,7 +22,6 @@
       fieldName="driverEmail"
       placeholder="empresa@mail.com"
       title="Email"
-      mask="X*@X*.X*"
       :data="driverEmail"
       @update:data="driverEmail = $event"
     />
@@ -39,7 +38,6 @@
       title="Patente"
       fieldName="driverVehicleId"
       placeholder="AA 464 XX"
-      mask="AA ### AA"
       :data="driverTId"
       @update:data="driverTId = $event"
     />

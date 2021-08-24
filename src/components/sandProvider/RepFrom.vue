@@ -14,7 +14,7 @@
       title="Teléfono"
       fieldName="sandRepPhone"
       placeholder="+11 1234 5678"
-      mask="+11 #### ####"
+      mask="#*"
       :data="repPhone"
       @update:data="repPhone = $event"
     />
@@ -23,7 +23,6 @@
       title="Email"
       fieldName="sandRepEmail"
       placeholder="empresa@mail.com"
-      mask="X*@X*.X*"
       :data="repEmail"
       @update:data="repEmail = $event"
     />

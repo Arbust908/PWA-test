@@ -42,7 +42,7 @@
             >
               <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
               <FieldSelect
-                title="Tipo"
+                :title="orderKey === 0 ? 'Tipo' : ''"
                 class="col-span-4"
                 fieldName="sandType"
                 placeholder="Seleccciona Tipo de Arena"
@@ -53,7 +53,7 @@
               />
               <!-- TODO: Input con Frente o Fondo fijo ;D -->
               <label class="col-span-3" for="sandQuantity">
-                <span>Cantidad</span>
+                <span v-if="orderKey === 0">Cantidad</span>
                 <div class="mt-1 flex rounded shadow-sm">
                   <input
                     v-model="order.amount"
@@ -94,11 +94,10 @@
                 </div>
               </label>
               <FieldInput
+                :title="orderKey === 0 ? 'ID de caja' : ''"
                 class="col-span-3"
                 fieldName="sandBoxId"
                 placeholder="Ingresar ID de caja"
-                title="ID de caja"
-                mask="X*"
                 :data="order.boxId"
                 @update:data="order.boxId = $event"
               />
@@ -293,7 +292,6 @@
           sandProviders.value = sPData.data;
         }
       });
-      const sandProviderId: Ref<number> = ref(-1);
       const companyClientId: Ref<number> = ref(-1);
       const pitId: Ref<number> = ref(-1);
       // >> Proveedores de Sand
@@ -385,18 +383,26 @@
           hasTransport
         );
       });
-      const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
-
+      // const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
       const save = (): void => {
+        console.table({
+          companyId: companyClientId.value,
+          companyClientId: companyClientId.value,
+          pitId: pitId.value,
+          sandProviderId: sandProvidersIds.value[0].id,
+          transportProviderId: transportProviderId.value,
+        });
         if (isFull.value) {
+          // Formateamos la orden de pedido
           const purchaseOrder: PurchaseOrder = {
             companyId: companyClientId.value,
             companyClientId: companyClientId.value,
             pitId: pitId.value,
-            sandProviderId: sandProviderId.value,
+            sandProviderId: sandProvidersIds.value[0].id,
             transportProviderId: transportProviderId.value,
           };
           console.log(purchaseOrder);
+          // Creamos via API la orden de pedido
           const { data: pODone } = useAxios(
             '/purchaseOrder',
             { method: 'POST', data: purchaseOrder },
@@ -406,20 +412,25 @@
           watch(pODone, (newVal, _) => {
             if (newVal && newVal.data) {
               console.log('PO data', newVal.data);
-              console.log(sandOrder.value);
-              sandOrder.value.map((sO: SandOrder) => {
-                console.log(sO);
-                sO.purchaseOrderId = newVal.data.id;
-                sO.sandProviderId = sandProviderId.value;
-                const { data: sODone } = useAxios(
-                  '/sandOrder',
-                  { method: 'POST', data: sO },
-                  instance
-                );
-                watch(sODone, (newVal, _) => {
-                  if (newVal && newVal.data) {
-                    sOisDone.value.push(newVal.data);
-                  }
+              console.log('SPIs', sandProvidersIds.value);
+              // Recorremos los proveedores de sand
+              sandProvidersIds.value.map((spI) => {
+                console.log('SPI', spI.sandOrders);
+                // Guradamos via api las ordenes de sand
+                spI.sandOrders.map((sO: SandOrder) => {
+                  console.log('SO', sO);
+                  sO.purchaseOrderId = newVal.data.id;
+                  sO.sandProviderId = spI.id;
+                  const { data: sODone } = useAxios(
+                    '/sandOrder',
+                    { method: 'POST', data: sO },
+                    instance
+                  );
+                  watch(sODone, (newVal, _) => {
+                    if (newVal && newVal.data) {
+                      sOisDone.value.push(newVal.data);
+                    }
+                  });
                 });
               });
             }
@@ -429,14 +440,13 @@
               const ordenDePedido = pODone.value.data;
               const pedidoDeArena = sOisDone.value;
               ordenDePedido.sandOrders = pedidoDeArena;
-              savePurchaseOrder(ordenDePedido);
+              // savePurchaseOrder(ordenDePedido);
               router.push('/orden-de-pedido');
             }
           });
         }
       };
       return {
-        sandProviderId,
         sandOrder,
         removeOrder,
         addOrder,

@@ -13,7 +13,7 @@
       title="CUIT / CUIL"
       fieldName="sandProvId"
       placeholder="Ingresar CUIT / CUIL"
-      mask="###########"
+      mask="#*"
       :data="spLegalId"
       @update:data="spLegalId = Number($event)"
     />
