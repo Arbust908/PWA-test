@@ -10,9 +10,9 @@
     <section class="bg-white rounded-md shadow-sm max-w-2xl">
       <SandForm
         :type="type"
-        :description="description"
+        :description="observations"
         @update:type="type = $event"
-        @update:description="description = $event"
+        @update:description="observations = $event"
       />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
