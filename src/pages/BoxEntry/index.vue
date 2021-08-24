@@ -10,7 +10,7 @@
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
         <fieldset class="py-2 w-full grid grid-cols-12 gap-y-4 gap-x-14">
-          <FieldGroup class="grid col-12 col-span-8">
+          <FieldGroup class="grid grid-cols-2 col-span-12">
             <ClientPitCombo
               :clientId="clientId"
               :pitId="pitId"
@@ -30,13 +30,13 @@
                 Seleccionar orden de pedido
               </option>
               <option
-                v-for="purchaseOrder in purchaseOrders"
+                v-for="purchaseOrder in filteredPurchaseOrders"
                 :key="purchaseOrder.id"
                 :value="purchaseOrder.id"
               >
                 #{{ purchaseOrder.id }}
               </option>
-              <option v-if="purchaseOrders.length <= 0" value="-1">
+              <option v-if="filteredPurchaseOrders.length <= 0" value="-1">
                 No hay ordenes de pedido para este Pozo y/o cliente
               </option>
             </select>
@@ -48,7 +48,7 @@
               <div
                 :class="[
                   'radio-button',
-                  choosedBox.id == box.boxId ? 'active' : '',
+                  choosedBox.boxId == box.boxId ? 'active' : '',
                 ]"
                 @click.prevent="setSelectedBox(box.boxId)"
               ></div>
@@ -59,18 +59,15 @@
         </fieldset>
         <nav class="flex justify-between">
           <button
-            :class="[
-              'section-tab',
-              activeSection === 'deposit' ? 'active' : '',
-            ]"
-            :selected="activeSection === 'deposit'"
+            :class="['section-tab', activeSection == 'deposit' ? 'active' : '']"
+            :selected="activeSection == 'deposit'"
             @click.prevent="changeSection('deposit')"
           >
             <span> Depósito </span>
           </button>
           <button
-            :class="['section-tab', activeSection === 'cradle' ? 'active' : '']"
-            :selected="activeSection === 'cradle'"
+            :class="['section-tab', activeSection == 'cradle' ? 'active' : '']"
+            :selected="activeSection == 'cradle'"
             @click.prevent="changeSection('cradle')"
           >
             <span> Cradle </span>
@@ -133,6 +130,7 @@
             </section>
             <DepositGrid
               class="w-full flex flex-col gap-5"
+              v-if="warehouse"
               :selectedBox="choosedBox"
               :rows="row"
               :cols="col"
@@ -143,7 +141,7 @@
             />
           </fieldset>
           <fieldset
-            v-if="activeSection === 'cradle'"
+            v-if="activeSection == 'cradle'"
             class="py-2 flex flex-col gap-x-10 2xl:gap-x-40"
           >
             <h2 class="text-xl font-bold">Elegir Cradle para montar</h2>
@@ -296,6 +294,7 @@
       ]);
 
       const purchaseOrders = ref([]);
+      const filteredPurchaseOrders = ref([]);
       const clients = ref([] as Array<Company>);
       const pits = ref([] as Array<Pit>);
       const clientId = ref(-1);
@@ -306,22 +305,39 @@
       let row = ref('');
       let col = ref('');
       let dimensions = ref('');
+      let cradles = ref([]);
 
       const getPurchaseOrders = async () => {
-        await axios.get(`${apiUrl}/purchaseOrder`).then((res) => {
-          purchaseOrders.value = res.data.data;
-        });
+        await axios
+          .get(`${apiUrl}/purchaseOrder`)
+          .then((res) => {
+            purchaseOrders.value = res.data.data;
+          })
+          .catch((err) => console.error(err));
       };
 
       const getWarehouses = async () => {
-        await axios.get(`${apiUrl}/warehouse`).then((res) => {
-          warehouses.value = res.data.data;
-        });
+        await axios
+          .get(`${apiUrl}/warehouse`)
+          .then((res) => {
+            warehouses.value = res.data.data;
+          })
+          .catch((err) => console.error(err));
+      };
+
+      const getCradles = async () => {
+        await axios
+          .get(`${apiUrl}/cradle`)
+          .then((res) => {
+            cradles.value = res.data.data;
+          })
+          .catch((err) => console.error(err));
       };
 
       onMounted(async () => {
         await getPurchaseOrders();
         await getWarehouses();
+        await getCradles();
       });
 
       const formatDeposit = (deposit) => {
@@ -343,7 +359,8 @@
       watchEffect(async () => {
         if (purchaseOrders.value.length > 0) {
           if (clientId.value !== -1 && pitId.value !== -1) {
-            purchaseOrders.value = purchaseOrders.value.filter((po) => {
+            filteredPurchaseOrders.value = purchaseOrders.value;
+            filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
               if (
                 parseInt(po.companyId) == clientId.value &&
                 parseInt(po.pitId) == pitId.value
@@ -359,15 +376,16 @@
                 return res.data.data;
               })
               .catch((err) => console.error(err));
-            boxes.value = purchaseOrders.value[0].sandOrders;
+            boxes.value =
+              filteredPurchaseOrders.value.length > 0
+                ? filteredPurchaseOrders.value[0].sandOrders
+                : null;
             boxes.value.map((box) => {
               let sandType = sandTypes.find(
                 (type) => parseInt(type.id) == parseInt(box.sandTypeId)
               );
               box.category = sandType.type.toLowerCase();
             });
-
-            console.log('cajas', boxes.value);
 
             warehouse.value = warehouses.value.filter((singleWarehouse) => {
               if (
@@ -377,20 +395,14 @@
                 return singleWarehouse;
               }
             })[0];
-            floor.value = formatDeposit(warehouse.value.layout).floor;
-            col.value = formatDeposit(warehouse.value.layout).col;
-            dimensions.value = formatDeposit(warehouse.value.layout).dimensions;
-            row.value = formatDeposit(warehouse.value.layout).row;
-          }
-          if (activeSection.value == 'cradle') {
-            cradles.value = await axios
-              .get(`${apiUrl}/cradle`)
-              .then((res) => {
-                return res.data.data;
-              })
-              .catch((err) => console.error(err));
-
-            console.log(cradles.value);
+            if (warehouse.value) {
+              floor.value = formatDeposit(warehouse.value.layout).floor;
+              col.value = formatDeposit(warehouse.value.layout).col;
+              dimensions.value = formatDeposit(
+                warehouse.value.layout
+              ).dimensions;
+              row.value = formatDeposit(warehouse.value.layout).row;
+            }
           }
         }
       });
@@ -406,14 +418,14 @@
       const setSelectedBox = (id: Number) => {
         choosedBox.value = boxes.value.filter((box) => {
           if (box.boxId == id) {
-            console.log('CAJA', box);
             if (choosedBox.value.category !== box.category) {
               setVisibleCategories(choosedBox.value.category);
               setVisibleCategories(box.category);
             }
             return box;
           }
-        });
+        })[0];
+        console.log(choosedBox.value);
       };
 
       const selectBox = (box: Box) => {
@@ -491,7 +503,6 @@
 
       let originalWarehouseLayout = {};
       let originalWarehouseWasSaved = false;
-
       let visibleCategories = ref([]);
 
       const setVisibleCategories = (category: String) => {
@@ -503,8 +514,6 @@
           visibleCategories.value.push(category);
         }
       };
-
-      let cradles = ref([]);
 
       let selectedCradle = ref(0);
 
@@ -584,6 +593,7 @@
         selectedCradle,
         purchaseOrderId,
         purchaseOrders,
+        filteredPurchaseOrders,
       };
     },
   });
