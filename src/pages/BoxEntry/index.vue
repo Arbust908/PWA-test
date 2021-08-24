@@ -36,7 +36,7 @@
               >
                 #{{ purchaseOrder.id }}
               </option>
-              <option v-if="filteredPurchaseOrders.length <= 0" value="-1">
+              <option v-if="purchaseOrders.length <= 0" value="-1">
                 No hay ordenes de pedido para este Pozo y/o cliente
               </option>
             </select>
@@ -49,12 +49,7 @@
                 :class="[
                   'radio-button',
                   choosedBox.id == box.id ? 'active' : '',
-                ]"
-                @click.prevent="setSelectedBox(box.id)"
-              ></div>
-              <div class="box-id"># {{ box.id }}</div>
             </div>
-          </div>
           <div v-else>No hay cajas asociadas.</div>
           <div v-else>No hay cajas asociadas.</div>
         </fieldset>
@@ -300,11 +295,11 @@
       const clientId = ref(-1);
       const purchaseOrderId = ref(-1);
       const pitId = ref(-1);
-      const warehouses = ref([]);
-      let floor,
-        row,
-        col,
-        dimensions = ref('');
+      const warehouses = ref([])
+      let floor = ref('')
+      let row = ref('')
+      let col = ref('')
+      let dimensions = ref('')
 
       const getPurchaseOrders = async () => {
         await axios.get(`${apiUrl}/purchaseOrder`).then((res) => {
@@ -319,10 +314,9 @@
       };
 
       onMounted(async () => {
-        await getPurchaseOrders();
-        await getWarehouses();
-        console.log(warehouses.value);
-      });
+        await getPurchaseOrders()
+        await getWarehouses()
+      })
 
       const formatDeposit = (deposit) => {
         const dimensions = Object.keys(deposit).reduce(
@@ -340,32 +334,45 @@
         return dimensions;
       };
 
-      watchEffect(() => {
-        if (purchaseOrders.value.length > 0) {
+      watchEffect(async() => {
+        if (
+          purchaseOrders.value.length > 0
+        ) {
           if (clientId.value !== -1 && pitId.value !== -1) {
             purchaseOrders.value = purchaseOrders.value.filter((po) => {
-              if (
-                parseInt(po.companyId) == clientId.value &&
-                parseInt(po.pitId) == pitId.value
-              ) {
-                console.log('purchOrd', po);
-                return po;
+              if(parseInt(po.companyId) == clientId.value && parseInt(po.pitId) == pitId.value) {
+                return po
               }
             });
           }
-          if (purchaseOrderId.value !== -1) {
-            boxes.value = purchaseOrders.value[0].sandOrders;
-            warehouse.value = warehouses.value.filter((singleWarehouse) => {
-              if (
-                parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
-                parseInt(singleWarehouse.pitId) == pitId.value
-              ) {
-                return singleWarehouse;
+          if(purchaseOrderId.value !== -1) {
+            let sandTypes = await axios.get(`${apiUrl}/sand`).then(res => {
+              return res.data.data
+            }).catch(err => console.error(err))
+            boxes.value = purchaseOrders.value[0].sandOrders
+            boxes.value.map(box => {
+              let sandType = sandTypes.find(type => parseInt(type.id) == parseInt(box.sandTypeId))
+              box.category = sandType.type.toLowerCase()
+            })
+
+            console.log("cajas",boxes.value)
+            
+            warehouse.value = warehouses.value.filter(singleWarehouse => {
+              if(parseInt(singleWarehouse.clientCompanyId) == clientId.value && parseInt(singleWarehouse.pitId) == pitId.value) {
+                return singleWarehouse
               }
-            });
-            console.log(warehouse.value);
-            // formatDeposit(warehouse.value.layout);
-            // floor, row, col, dimensions = formatDeposit(warehouse.value.layout);
+            })[0]
+            floor.value = formatDeposit(warehouse.value.layout).floor;
+            col.value = formatDeposit(warehouse.value.layout).col;
+            dimensions.value = formatDeposit(warehouse.value.layout).dimensions;
+            row.value = formatDeposit(warehouse.value.layout).row;
+          }
+          if(activeSection.value == 'cradle') {
+            cradles.value = await axios.get(`${apiUrl}/cradle`)
+            .then(res => {return res.data.data})
+            .catch(err => console.error(err))
+
+            console.log(cradles.value)
           }
         }
       });
@@ -381,14 +388,14 @@
       const setSelectedBox = (id: Number) => {
         choosedBox.value = boxes.value.filter((box) => {
           if (box.boxId == id) {
+            console.log("CAJA",box)
             if (choosedBox.value.category !== box.category) {
               setVisibleCategories(choosedBox.value.category);
               setVisibleCategories(box.category);
             }
             return box;
           }
-        })[0];
-        console.log(choosedBox.value);
+        });
       };
 
       const selectBox = (box: Box) => {
@@ -401,9 +408,9 @@
           choosedBox.value.col = box.col;
           choosedBox.value.row = box.row;
           warehouse.value.layout[`${selectedBoxPosition}`].category =
-            choosedBox.value.category;
+          choosedBox.value.category;
           warehouse.value.layout[`${selectedBoxPosition}`].id =
-            choosedBox.value.id;
+          choosedBox.value.id;
           warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
           warehouse.value.layout[`${prevBoxPosition}`].id = '';
         }
@@ -478,6 +485,8 @@
         }
       };
 
+      let cradles = ref([]);
+
       let selectedCradle = ref(0);
 
       const handleSelectedCradle = (id) => {
@@ -509,7 +518,7 @@
       });
 
       const setCat = (cat: string) => {
-        console.log('ASD', cat);
+        console.log("ASD",cat)
         choosedBox.value.category = cat;
         const box = choosedBox.value;
         deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
