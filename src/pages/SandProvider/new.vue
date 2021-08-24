@@ -120,9 +120,11 @@
 
       const providerFull: ComputedRef<boolean> = computed(() => {
         return !!(
-          newSandProvider.name !== '' &&
-          newSandProvider.address !== '0' &&
-          newSandProvider.legalId >= 0 &&
+          (
+            newSandProvider.name !== '' &&
+            newSandProvider.address !== '0' &&
+            newSandProvider.legalId >= 0
+          ) /*&&*/
           // (newSandProvider.meshType.length > 0 || meshType.value !== '')
         );
       });
