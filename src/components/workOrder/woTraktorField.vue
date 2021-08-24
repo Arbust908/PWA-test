@@ -52,7 +52,8 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+  import { useVModel } from '@vueuse/core';
 
   export default defineComponent({
     name: 'woTraktorField',
@@ -70,6 +71,7 @@
       },
     },
     setup(props, { emit }) {
+      const traktors = useVModel(props, 'traktors', emit);
       const lastTraktorIndex = computed(() => {
         return props.traktors.length - 1;
       });
@@ -80,6 +82,7 @@
       return {
         lastTraktorIndex,
         firstTraktorIndex,
+        traktors,
         remove,
       };
     },

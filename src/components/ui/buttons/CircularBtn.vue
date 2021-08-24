@@ -1,5 +1,5 @@
 <template>
-  <BaseBtn :type="type" :size="size">
+  <BaseBtn class="circular" :type="type" :size="size">
     <slot></slot>
   </BaseBtn>
 </template>
@@ -25,7 +25,10 @@
 
 <style lang="scss" scoped>
   button {
-    @apply inline-flex items-center border rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+    @apply inline-flex items-center border shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+    &.circular {
+      @apply rounded-full;
+    }
   }
   button[size='xs'] {
     @apply p-1;

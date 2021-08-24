@@ -225,9 +225,9 @@
   import { PlusIcon } from '@heroicons/vue/solid';
   import OrderSection from '@/components/workOrder/Order.vue';
   import EquipmentSection from '@/components/workOrder/Equipment.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import TimePicker from '@/components/ui/form/TimePicker.vue';
@@ -297,41 +297,22 @@
       const operativeForkliftId: Ref<number> = ref(-1);
       const backupForkliftId: Ref<number> = ref(-1);
       const traktors: Ref<Array<Traktor>> = ref([]);
+      watch(traktors, (newVal, oldVal) => {
+        if (newVal.length <= oldVal.length) {
+          traktors.value = oldVal;
+        }
+      });
       const pickups: Ref<Array<Pickup>> = ref([]);
+      watch(pickups, (newVal, oldVal) => {
+        if (newVal.length <= oldVal.length) {
+          pickups.value = oldVal;
+        }
+      });
       const rigmats: Ref<number> = ref(0);
       const conex: Ref<number> = ref(0);
       const generators: Ref<number> = ref(0);
       const tower: Ref<number> = ref(0);
       const cabin: Ref<number> = ref(0);
-
-      const removeEmptyTraktors = (): void => {
-        if (!isDraft.value) {
-          const savedTraktor = traktors.value[0];
-        }
-        traktors.value = traktors.value.filter(
-          (traktor: Traktor) =>
-            !(
-              traktor.chassis === '' &&
-              traktor.supplier === '' &&
-              traktor.description === ''
-            )
-        );
-        if (!isDraft.value && traktors.value.length === 0) {
-          traktors.value.push(savedTraktor);
-        }
-      };
-      const removeEmptyPickups = (): void => {
-        if (!isDraft.value) {
-          const savedPickup = pickups.value[0];
-        }
-        pickups.value = pickups.value.filter(
-          (pickup: Pickup) =>
-            pickup.pickup_id !== '' && pickup.description !== ''
-        );
-        if (!isDraft.value && pickups.value.length === 0) {
-          pickups.value.push(savedPickup);
-        }
-      };
 
       // :: >>> Crew
       // :: Human Resource

@@ -200,8 +200,8 @@
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import Counter from '@/components/ui/Counter.vue';
   import DepositGrid from '@/components/depositDesign/Deposit.vue';

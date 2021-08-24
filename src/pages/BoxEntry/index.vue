@@ -233,8 +233,8 @@
   import { PlusIcon, BellIcon, EyeIcon } from '@heroicons/vue/solid';
   import EyeIconOff from './EyeIconOff.vue';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import Counter from '@/components/ui/Counter.vue';
   import DepositGrid from '@/components/depositDesign/Deposit.vue';

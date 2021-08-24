@@ -167,7 +167,7 @@
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';

@@ -226,8 +226,8 @@
   import OrderSection from '@/components/workOrder/Order.vue';
   import EquipmentSection from '@/components/workOrder/Equipment.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import TimePicker from '@/components/ui/form/TimePicker.vue';
 
@@ -294,7 +294,17 @@
       const operativeForklift = ref(newCWO.value.operativeForklift);
       const backupForklift = ref(newCWO.value.backupForklift);
       const traktors = ref(newCWO.value.traktors);
+      watch(traktors, (newVal, oldVal) => {
+        if (newVal.length <= oldVal.length) {
+          traktors.value = oldVal;
+        }
+      });
       const pickups = ref(newCWO.value.pickups);
+      watch(pickups, (newVal, oldVal) => {
+        if (newVal.length <= oldVal.length) {
+          pickups.value = oldVal;
+        }
+      });
       const crew = ref(newCWO.value.crew);
       const rigmats = ref(newCWO.value.rigmats);
       const conex = ref(newCWO.value.conex);
