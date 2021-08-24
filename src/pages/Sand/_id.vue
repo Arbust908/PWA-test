@@ -61,7 +61,6 @@
       const currentSand: Sand = sands.find((sand) => {
         return sand.id == route.params.id;
       });
-
       const router = useRouter();
       const goToIndex = () => {
         router.push('/tipos-de-arena');
