@@ -37,7 +37,7 @@
       class="col-span-full"
       title="Patente"
       fieldName="driverVehicleId"
-      placeholder="AA 464 XX"
+      placeholder="patente"
       :data="driverTId"
       @update:data="driverTId = $event"
     />

@@ -5,7 +5,7 @@
         Proveedores de transporte
       </h2>
       <router-link to="/proveedores-de-transporte/nuevo">
-        <UiBtn>Nuevo</UiBtn>
+        <PrimaryBtn>Nuevo</PrimaryBtn>
       </router-link>
     </header>
     <UiTable>
@@ -70,7 +70,7 @@
   import { useStore } from 'vuex';
   import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import axios from 'axios';
@@ -81,7 +81,7 @@
   export default {
     components: {
       Layout,
-      UiBtn,
+      PrimaryBtn,
       UiTable,
       Icon,
     },

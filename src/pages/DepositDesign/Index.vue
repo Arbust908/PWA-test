@@ -3,7 +3,7 @@
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-second-900">Depositos</h2>
       <router-link to="/diseno-de-deposito/nueva">
-        <UiBtn>Nuevo Deposito</UiBtn>
+        <PrimaryBtn>Nuevo Deposito</PrimaryBtn>
       </router-link>
     </header>
     <UiTable>
@@ -63,7 +63,7 @@
   import { useStore } from 'vuex';
   import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
 
   import '@/assets/table.scss';
@@ -77,7 +77,7 @@
       Layout,
       PencilAltIcon,
       TrashIcon,
-      UiBtn,
+      PrimaryBtn,
       UiTable,
     },
     setup() {

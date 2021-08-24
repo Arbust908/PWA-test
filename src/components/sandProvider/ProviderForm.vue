@@ -117,7 +117,7 @@
       const { spName, spLegalId, spAddress, spMeshTypes, spMesh, spObs } =
         useVModels(props, emit);
       const deleteMeshType = (mesh) => {
-        spMeshTypes.value.filter((m) => {
+        spMeshTypes.value = spMeshTypes.value.filter((m) => {
           return m !== mesh;
         });
       };

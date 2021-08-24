@@ -5,7 +5,7 @@
         Notificaciones a Proveedores
       </h2>
       <router-link to="/notificaciones-a-proveedores/nueva">
-        <UiBtn>Nueva Notificacion</UiBtn>
+        <PrimaryBtn>Nueva Notificacion</PrimaryBtn>
       </router-link>
     </header>
     <UiTable>
@@ -75,7 +75,7 @@
   import { useStore } from 'vuex';
   import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
 
@@ -90,7 +90,7 @@
       Layout,
       PencilAltIcon,
       TrashIcon,
-      UiBtn,
+      PrimaryBtn,
       UiTable,
       Icon,
     },

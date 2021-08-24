@@ -3,7 +3,7 @@
     <header class="flex justify-between items-center mb-4">
       <h1 class="text-2xl font-semibold text-gray-900">Stage sheets</h1>
       <router-link to="/stage-sheet/nuevo">
-        <UiBtn>Crear nuevo</UiBtn>
+        <PrimaryBtn>Crear nuevo</PrimaryBtn>
       </router-link>
     </header>
     <section class="mb-9">
@@ -92,7 +92,7 @@
   import { ref, watchEffect } from 'vue';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import Pill from '@/components/ui/Pill.vue';
@@ -107,7 +107,7 @@
   export default {
     components: {
       Layout,
-      UiBtn,
+      PrimaryBtn,
       UiTable,
       Icon,
       Pill,

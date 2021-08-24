@@ -3,7 +3,7 @@
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">Clientes</h2>
       <router-link to="/clientes/nuevo">
-        <UiBtn>Nuevo</UiBtn>
+        <PrimaryBtn>Nuevo</PrimaryBtn>
       </router-link>
     </header>
     <UiTable>
@@ -63,7 +63,7 @@
 <script>
   import { onMounted, ref } from 'vue';
   import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import { useClone } from '@/helpers/useClone';
@@ -76,7 +76,7 @@
   export default {
     components: {
       Layout,
-      UiBtn,
+      PrimaryBtn,
       UiTable,
       Icon,
     },
