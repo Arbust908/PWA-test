@@ -155,7 +155,7 @@
         </button>
         <button
           @click.prevent="deleteStage"
-          :disabled="stage.status > 0"
+          :disabled="stage.status > 0 || stage.stage === 1"
           class="action delete text-gray-600 hover:text-red-800 p-2"
           title="Borrar"
         >
@@ -193,6 +193,10 @@
         type: Array,
         required: true,
       },
+      pos: {
+        type: Number,
+        required: true,
+      },
     },
     components: {
       DocumentDuplicateIcon,
@@ -203,7 +207,8 @@
       Pill,
     },
     setup(props, { emit }) {
-      const { stage, editing, sands } = toRefs(props);
+      const { stage, editing, sands, pos } = toRefs(props);
+      stage.value.stage = pos.value;
 
       const totalWheight = computed(() => {
         return (
