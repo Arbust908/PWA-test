@@ -103,10 +103,9 @@
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
-  import InputPack from '@/components/ui/InputPack.vue';
   import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
@@ -120,7 +119,6 @@
   export default {
     components: {
       Layout,
-      InputPack,
       BookmarkIcon,
       CheckCircleIcon,
       NoneBtn,

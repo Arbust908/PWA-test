@@ -52,8 +52,8 @@
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'vuex';
   import { Cradle } from '@/interfaces/SandProvider';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';

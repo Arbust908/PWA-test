@@ -1,10 +1,11 @@
 <template>
-  <button :type="type" :size="size">
+  <BaseBtn class="primary" :type="type" :size="size">
     <slot></slot>
-  </button>
+  </BaseBtn>
 </template>
 
 <script>
+  import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
   export default {
     props: {
       type: {
@@ -16,27 +17,29 @@
         default: 'md',
       },
     },
+    components: {
+      BaseBtn,
+    },
   };
 </script>
 
 <style lang="scss" scoped>
-  // border-transparent text-white bg-indigo-600 hover:bg-indigo-700
   button {
-    @apply inline-flex items-center border rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
+    @apply border-transparent text-white bg-main-600 hover:bg-main-700 border shadow-sm;
   }
   button[size='xs'] {
-    @apply p-1;
+    @apply px-2.5 py-1.5;
   }
   button[size='sm'] {
-    @apply p-1.5;
+    @apply px-3 py-2;
   }
   button[size='md'] {
-    @apply p-2;
+    @apply px-4 py-2;
   }
   button[size='lg'] {
-    @apply p-2;
+    @apply px-4 py-2;
   }
   button[size='xl'] {
-    @apply p-3;
+    @apply px-6 py-3;
   }
 </style>

@@ -69,7 +69,7 @@
   const { useState } = createNamespacedHelpers('purchaseOrder');
   import { useActions } from 'vuex-composition-helpers';
   import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/Button.vue';
+  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import { useTitle } from '@vueuse/core';

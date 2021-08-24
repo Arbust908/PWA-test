@@ -23,7 +23,7 @@
   import { defineComponent, computed } from 'vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import { useVModel } from '@vueuse/core';
 
   export default defineComponent({

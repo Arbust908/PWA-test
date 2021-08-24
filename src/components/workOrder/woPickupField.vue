@@ -37,7 +37,8 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+  import { useVModel } from '@vueuse/core';
 
   export default defineComponent({
     name: 'woPickupField',
@@ -55,6 +56,7 @@
       },
     },
     setup(props, { emit }) {
+      const pickups = useVModel(props, 'pickups', emit);
       const lastIndex = computed(() => {
         return props.pickups.length - 1;
       });
@@ -66,6 +68,7 @@
         lastIndex,
         firstIndex,
         remove,
+        pickups,
       };
     },
   });

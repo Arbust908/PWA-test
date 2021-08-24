@@ -8,28 +8,12 @@
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm max-w-2xl">
-      <form method="POST" action="/" class="p-4">
-        <FieldGroup>
-          <FieldInput
-            class="col-span-full"
-            fieldName="sandMesh"
-            placeholder="Ingrese tipo de malla"
-            title="Tipo de malla"
-            :data="type"
-            @update:data="type = $event"
-          />
-          <FieldTextArea
-            class="col-span-full"
-            fieldName="observations"
-            placeholder="Observaciones..."
-            title="Observaciones"
-            :rows="5"
-            isOptional
-            :data="description"
-            @update:data="description = $event"
-          />
-        </FieldGroup>
-      </form>
+      <SandForm
+        :type="type"
+        :description="description"
+        @update:type="type = $event"
+        @update:description="description = $event"
+      />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
@@ -51,23 +35,19 @@
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-  import FieldInput from '@/components/ui/form/FieldInput.vue';
-  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import axios from 'axios';
-
   const api = import.meta.env.VITE_API_URL || '/api';
+
+  import SandForm from '@/components/sand/SandForm.vue';
 
   export default {
     components: {
       PrimaryBtn,
       NoneBtn,
       Layout,
-      FieldGroup,
-      FieldInput,
-      FieldTextArea,
+      SandForm,
     },
     setup() {
       const router = useRouter();
@@ -86,14 +66,7 @@
       });
 
       const isFull = computed(() => {
-        return !!(
-          (newSand.type.length > 0)
-          // &&
-          // newSand.description.length > 0 &&
-          // newSand.meshType.length > 0 &&
-          // newSand.grainType.length > 0 &&
-          // newSand.observations.length > 0
-        );
+        return !!(newSand.type.length > 0);
       });
 
       const save = async () => {
@@ -116,7 +89,6 @@
       return {
         goToIndex,
         save,
-        newSand,
         ...toRefs(newSand),
         isFull,
       };

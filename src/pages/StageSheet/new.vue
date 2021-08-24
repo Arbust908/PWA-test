@@ -211,9 +211,9 @@
   import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
 
   import Layout from '@/layouts/Main.vue';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import SandPlanStage from '@/components/stageSheet/StageRow.vue';
   import StageEmptyState from '@/components/stageSheet/StageEmptyState.vue';
   import StageHeader from '@/components/stageSheet/StageHeader.vue';

@@ -57,8 +57,8 @@
   import { useTitle } from '@vueuse/core';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import Layout from '@/layouts/Main.vue';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import { useToggle } from '@vueuse/core';
   import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
   import SandProviderRep from '@/components/sandProvider/RepFrom.vue';

@@ -141,10 +141,10 @@
     CheckCircleIcon,
   } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+  import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
   import Layout from '@/layouts/Main.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
 
   import {
     Pit,

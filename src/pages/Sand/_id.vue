@@ -4,78 +4,26 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Arena - {{ id }}
+        Arena - {{ type }}
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
-      <form method="POST" action="/" class="p-4 max-w-lg">
-        <fieldset>
-          <div class="input-block">
-            <label for="type" class=""> Tipo </label>
-            <div class="mt-1">
-              <input
-                v-model="type"
-                name="type"
-                type="text"
-                placeholder="Tipo de arena"
-              />
-            </div>
-          </div>
-          <div class="input-block">
-            <label for="description" class=""> Descripción </label>
-            <div class="mt-1">
-              <input
-                v-model="description"
-                name="description"
-                type="text"
-                placeholder="Una descripcion"
-              />
-            </div>
-          </div>
-          <div class="input-block">
-            <label for="meshType" class=""> Tipo de Malla </label>
-            <div class="mt-1">
-              <input
-                v-model="meshType"
-                name="meshType"
-                type="text"
-                placeholder="Ej: 20"
-              />
-            </div>
-          </div>
-          <div class="input-block">
-            <label for="grainType" class=""> Tipo de Grano </label>
-            <div class="mt-1">
-              <input
-                v-model="grainType"
-                name="grainType"
-                type="text"
-                placeholder="Ej: 50"
-              />
-            </div>
-          </div>
-          <div class="input-block">
-            <label for="observations" class=""> Observaciones </label>
-            <div class="mt-1">
-              <input
-                v-model="observations"
-                name="observations"
-                type="text"
-                placeholder="Una observación ..."
-              />
-            </div>
-          </div>
-        </fieldset>
-      </form>
-      <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-        <section></section>
+      <SandForm
+        :type="type"
+        :description="description"
+        @update:type="type = $event"
+        @update:description="description = $event"
+      />
+      <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
-          <button @click="goToIndex">Cancelar</button>
-          <!-- <GhostBtn class="btn__draft">
-                <BookmarkIcon class="w-4 h-4" />
-                <span @click="update"> Guardar Provisorio </span>
-              </GhostBtn> -->
-          <PrimaryBtn @click="update"> Finalizar </PrimaryBtn>
+          <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
+          <PrimaryBtn
+            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isFull && save()"
+            :disabled="!isFull"
+          >
+            Finalizar
+          </PrimaryBtn>
         </section>
       </footer>
     </section>
@@ -83,25 +31,25 @@
 </template>
 
 <script lang="ts">
-  import { reactive, ref, toRefs } from 'vue';
+  import { reactive, ref, toRefs, computed } from 'vue';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
   import { useRouter, useRoute } from 'vue-router';
-  import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import { Sand } from '@/interfaces/SandType';
   import axios from 'axios';
 
   const api = import.meta.env.VITE_API_URL || '/api';
 
+  import SandForm from '@/components/sand/SandForm.vue';
+
   export default {
     components: {
-      BookmarkIcon: BookmarkIcon,
-      CheckCircleIcon: CheckCircleIcon,
-      PrimaryBtn: PrimaryBtn,
-      GhostBtn: GhostBtn,
-      Layout: Layout,
+      PrimaryBtn,
+      NoneBtn,
+      Layout,
+      SandForm,
     },
     setup() {
       const route = useRoute();
@@ -126,6 +74,10 @@
         meshType: currentSand.meshType,
         grainType: currentSand.grainType,
         observations: currentSand.observations,
+      });
+
+      const isFull = computed(() => {
+        return !!(sandToUpdate.type.length > 0);
       });
 
       const update = async () => {
@@ -153,6 +105,7 @@
         sands,
         update,
         sandToUpdate,
+        isFull,
         ...toRefs(sandToUpdate),
       };
     },

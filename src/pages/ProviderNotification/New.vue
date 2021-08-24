@@ -323,10 +323,9 @@
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
-  import SelectList from '@/components/ui/SelectList.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import {
     ProviderNotification,
     SandOrder,
@@ -360,7 +359,6 @@
       PlusIcon,
       PrimaryBtn,
       TrashIcon,
-      SelectList,
       FieldGroup,
       FieldInput,
       FieldLegend,

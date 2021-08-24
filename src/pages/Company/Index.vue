@@ -63,7 +63,7 @@
 <script>
   import { onMounted, ref } from 'vue';
   import Layout from '@/layouts/Main.vue';
-  import UiBtn from '@/components/ui/Button.vue';
+  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import { useClone } from '@/helpers/useClone';
@@ -87,7 +87,7 @@
       const loading = ref(false);
 
       const headers = {
-          'Content-Type': 'Application/JSON'
+        'Content-Type': 'Application/JSON',
       };
 
       const getClients = async () => {

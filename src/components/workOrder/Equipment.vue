@@ -143,7 +143,7 @@
   import TracktoField from '@/components/workOrder/woTraktorField.vue';
   import PickupField from '@/components/workOrder/woPickupField.vue';
 
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import { Pit } from '@/interfaces/sandflow';
   import { useApi } from '@/helpers/useApi';
 
@@ -240,6 +240,7 @@
           supplier: '',
           description: '',
         });
+        console.log(traktors.value);
       };
       const removePickup = (pickupId: number) => {
         pickups.value = pickups.value.filter(

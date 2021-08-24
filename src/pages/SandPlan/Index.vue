@@ -76,7 +76,7 @@
     ExclamationCircleIcon,
     CheckCircleIcon,
   } from '@heroicons/vue/solid';
-  import UiBtn from '@/components/ui/Button.vue';
+  import UiBtn from '@/components/ui/buttons/BaseBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
 

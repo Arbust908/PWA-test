@@ -57,7 +57,7 @@
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
   import PitFields from '@/components/workOrder/woPitField.vue';
 
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import { Pit } from '@/interfaces/sandflow';
 
   export default defineComponent({
