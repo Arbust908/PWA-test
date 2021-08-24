@@ -102,6 +102,7 @@
                     <SandPlanStage
                       v-for="(stage, Key) in inProgressStages"
                       :key="Key"
+                      :pos="Key + 1"
                       :stage="stage"
                       :editing="editingStage"
                       :sands="sands"
