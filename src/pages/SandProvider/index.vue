@@ -13,7 +13,7 @@
           <th scope="col">Domicilio</th>
           <th scope="col">CUIL/CUIT</th>
           <th scope="col">
-            <span>Actions</span>
+            <span>Acciones</span>
           </th>
         </tr>
       </template>

@@ -16,7 +16,7 @@
           <th scope="col">Etapas</th>
           <th scope="col">Total</th>
           <th scope="col">
-            <span class="sr-only">Actions</span>
+            <span class="sr-only">Acciones</span>
           </th>
         </tr>
       </template>

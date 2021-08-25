@@ -16,7 +16,7 @@
           <th scope="col">Representante</th>
           <th scope="col">Observaciones</th>
           <th scope="col">
-            <span>Actions</span>
+            <span class="sr-only">Acciones</span>
           </th>
         </tr>
       </template>

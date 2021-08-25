@@ -14,7 +14,7 @@
           <th scope="col">Proveedor de transporte</th>
           <!-- <th scope="col">Estado</th> -->
           <th scope="col">
-            <span class="sr-only">Actions</span>
+            <span class="sr-only">Acciones</span>
           </th>
         </tr>
       </template>

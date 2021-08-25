@@ -42,7 +42,9 @@
           <th scope="col">Pozo</th>
           <th scope="col">Etapas creadas</th>
           <th scope="col">Estado</th>
-          <th scope="col">Actions</th>
+          <th scope="col">
+            <span class="sr-only"> Acciones </span>
+          </th>
         </tr>
       </template>
       <template #body>

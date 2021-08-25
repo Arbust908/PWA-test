@@ -14,7 +14,7 @@
           <th scope="col">Pisos</th>
           <th scope="col">Dimensiónes</th>
           <th scope="col">
-            <span class="sr-only">Actions</span>
+            <span class="sr-only">Acciones</span>
           </th>
         </tr>
       </template>

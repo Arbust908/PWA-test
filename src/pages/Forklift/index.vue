@@ -15,7 +15,7 @@
           <th scope="col">Contacto dueño</th> -->
           <th scope="col">Observaciones</th>
           <th scope="col">
-            <span>Actions</span>
+            <span class="sr-olny">Acciones</span>
           </th>
         </tr>
       </template>

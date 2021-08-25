@@ -17,7 +17,7 @@
           <th scope="col">Transportes</th>
           <th scope="col">C° de Camiones</th>
           <!-- <th scope="col">
-            <span class="sr-only">Actions</span>
+            <span class="sr-only">Acciones</span>
           </th> -->
         </tr>
       </template>

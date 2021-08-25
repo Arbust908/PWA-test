@@ -15,7 +15,7 @@
           <!-- <th scope="col">Malla</th>
           <th scope="col">Granaje</th> -->
           <th scope="col" colspan="2">
-            <span class="sr-only">Actions</span>
+            <span class="sr-only">Acciones</span>
           </th>
         </tr>
       </template>

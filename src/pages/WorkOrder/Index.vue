@@ -14,7 +14,7 @@
           <th scope="col">Operadora</th>
           <th scope="col">Pozos</th>
           <th scope="col">
-            <span class="sr-only">Actions</span>
+            <span class="sr-only">Acciones</span>
           </th>
         </tr>
       </template>
