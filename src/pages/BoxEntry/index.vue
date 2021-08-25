@@ -236,7 +236,10 @@
         EyeIcon,
         EyeIconOff,
         ClientPitCombo,
+  <<<<<<< HEAD
         CradleRow
+  =======
+  >>>>>>> Feat::Warehouse PUT2
       },
       setup() {
         const router = useRouter();
@@ -285,45 +288,54 @@
           //    floor: 1,
           //    row: 1,
           //  },
-         ]);
+        ]);
 
         const purchaseOrders = ref([]);
-        const filteredPurchaseOrders = ref([])
+        const filteredPurchaseOrders = ref([]);
         const clients = ref([] as Array<Company>);
         const pits = ref([] as Array<Pit>);
         const clientId = ref(-1);
         const purchaseOrderId = ref(-1);
         const pitId = ref(-1);
-        const warehouses = ref([])
-        let floor = ref('')
-        let row = ref('')
-        let col = ref('')
-        let dimensions = ref('')
+        const warehouses = ref([]);
+        let floor = ref('');
+        let row = ref('');
+        let col = ref('');
+        let dimensions = ref('');
+        let cradles = ref([]);
 
         const getPurchaseOrders = async () => {
-          await axios.get(`${apiUrl}/purchaseOrder`)
-          .then(res => {
-            purchaseOrders.value = res.data.data
-          }).catch(err => console.error(err))
-        }
+          await axios
+            .get(`${apiUrl}/purchaseOrder`)
+            .then((res) => {
+              purchaseOrders.value = res.data.data;
+            })
+            .catch((err) => console.error(err));
+        };
 
         const getWarehouses = async () => {
-          await axios.get(`${apiUrl}/warehouse`)
-          .then(res => {
-            warehouses.value = res.data.data
-          }).catch(err => console.error(err))
-        }
+          await axios
+            .get(`${apiUrl}/warehouse`)
+            .then((res) => {
+              warehouses.value = res.data.data;
+            })
+            .catch((err) => console.error(err));
+        };
 
-        const getWarehouses = async () => {
-          await axios.get(`${apiUrl}/warehouse`).then((res) => {
-            warehouses.value = res.data.data;
-          });
+        const getCradles = async () => {
+          await axios
+            .get(`${apiUrl}/cradle`)
+            .then((res) => {
+              cradles.value = res.data.data;
+            })
+            .catch((err) => console.error(err));
         };
 
         onMounted(async () => {
-          await getPurchaseOrders()
-          await getWarehouses()
-        })
+          await getPurchaseOrders();
+          await getWarehouses();
+          await getCradles();
+        });
 
         const formatDeposit = (deposit) => {
           const dimensions = Object.keys(deposit).reduce(
@@ -341,48 +353,53 @@
           return dimensions;
         };
 
-        watchEffect(async() => {
-          if (
-            purchaseOrders.value.length > 0
-          ) {
+        watchEffect(async () => {
+          if (purchaseOrders.value.length > 0) {
             if (clientId.value !== -1 && pitId.value !== -1) {
-              purchaseOrders.value = purchaseOrders.value.filter((po) => {
-                if(parseInt(po.companyId) == clientId.value && parseInt(po.pitId) == pitId.value) {
-                  return po
+              filteredPurchaseOrders.value = purchaseOrders.value;
+              filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
+                if (
+                  parseInt(po.companyId) == clientId.value &&
+                  parseInt(po.pitId) == pitId.value
+                ) {
+                  return po;
                 }
               });
             }
-            if(purchaseOrderId.value !== -1) {
-              let sandTypes = await axios.get(`${apiUrl}/sand`).then(res => {
-                return res.data.data
-              }).catch(err => console.error(err))
-              boxes.value = purchaseOrders.value[0].sandOrders
-              boxes.value.map(box => {
-                let sandType = sandTypes.find(type => parseInt(type.id) == parseInt(box.sandTypeId))
-                box.category = sandType.type.toLowerCase()
-              })
+            if (purchaseOrderId.value !== -1) {
+              let sandTypes = await axios
+                .get(`${apiUrl}/sand`)
+                .then((res) => {
+                  return res.data.data;
+                })
+                .catch((err) => console.error(err));
+              boxes.value =
+                filteredPurchaseOrders.value.length > 0
+                  ? filteredPurchaseOrders.value[0].sandOrders
+                  : null;
+              boxes.value.map((box) => {
+                let sandType = sandTypes.find(
+                  (type) => parseInt(type.id) == parseInt(box.sandTypeId)
+                );
+                box.category = sandType.type.toLowerCase();
+              });
 
-  <<<<<<< HEAD
-              console.log("cajas",boxes.value)
-
-  =======
-  >>>>>>> Feat::Warehouse PUT
-              warehouse.value = warehouses.value.filter(singleWarehouse => {
-                if(parseInt(singleWarehouse.clientCompanyId) == clientId.value && parseInt(singleWarehouse.pitId) == pitId.value) {
-                  return singleWarehouse
+              warehouse.value = warehouses.value.filter((singleWarehouse) => {
+                if (
+                  parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
+                  parseInt(singleWarehouse.pitId) == pitId.value
+                ) {
+                  return singleWarehouse;
                 }
-              })[0]
-              floor.value = formatDeposit(warehouse.value.layout).floor;
-              col.value = formatDeposit(warehouse.value.layout).col;
-              dimensions.value = formatDeposit(warehouse.value.layout).dimensions;
-              row.value = formatDeposit(warehouse.value.layout).row;
-            }
-            if(activeSection.value == 'cradle') {
-              cradles.value = await axios.get(`${apiUrl}/cradle`)
-              .then(res => {return res.data.data})
-              .catch(err => console.error(err))
-
-              console.log(cradles.value)
+              })[0];
+              if (warehouse.value) {
+                floor.value = formatDeposit(warehouse.value.layout).floor;
+                col.value = formatDeposit(warehouse.value.layout).col;
+                dimensions.value = formatDeposit(
+                  warehouse.value.layout
+                ).dimensions;
+                row.value = formatDeposit(warehouse.value.layout).row;
+              }
             }
           }
         });
@@ -398,7 +415,6 @@
         const setSelectedBox = (id: Number) => {
           choosedBox.value = boxes.value.filter((box) => {
             if (box.boxId == id) {
-              console.log("CAJA",box)
               if (choosedBox.value.category !== box.category) {
                 setVisibleCategories(choosedBox.value.category);
                 setVisibleCategories(box.category);
@@ -406,6 +422,7 @@
               return box;
             }
           })[0];
+          console.log(choosedBox.value);
         };
 
         const selectBox = (box: Box) => {
@@ -417,9 +434,9 @@
             choosedBox.value.col = box.col;
             choosedBox.value.row = box.row;
             warehouse.value.layout[`${selectedBoxPosition}`].category =
-            choosedBox.value.category;
+              choosedBox.value.category;
             warehouse.value.layout[`${selectedBoxPosition}`].id =
-            choosedBox.value.id;
+              choosedBox.value.id;
             warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
             warehouse.value.layout[`${prevBoxPosition}`].id = '';
           }
@@ -494,8 +511,6 @@
           }
         };
 
-        let cradles = ref([]);
-
         let selectedCradle = ref(0);
 
         const handleSelectedCradle = (id) => {
@@ -503,10 +518,6 @@
         };
 
         // :: CLIENT
-  <<<<<<< HEAD
-  =======
-
-  >>>>>>> Feat::Warehouse PUT
         const selectedClientName = computed(() => {
           return clientId.value >= 0
             ? clients.value.find((pit) => pit.id === clientId.value).name
@@ -531,7 +542,7 @@
         });
 
         const setCat = (cat: string) => {
-          console.log("ASD",cat)
+          console.log('ASD', cat);
           choosedBox.value.category = cat;
           const box = choosedBox.value;
           deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
@@ -543,12 +554,16 @@
 
         const save = async () => {
           const warehouseDone = ref(false);
-          await axios.put(`${apiUrl}/warehouse`, { warehouse })
-            .then(res => {
+          await axios
+            .put(`${apiUrl}/warehouse`, { warehouse })
+            .then((res) => {
               console.log(res);
-              warehouseDone.value = !!(res.data.data)
+              warehouseDone.value = !!res.data.data;
             })
-            .catch(err => console.error(err)
+            .catch((err) => console.error(err))
+            .finally(() => {
+              console.log('Final!');
+            });
           // No está funcionando
           // console.log("ORIGINAL", originalWarehouseLayout)
           // console.log("MODIF", warehouse.value.layout)
