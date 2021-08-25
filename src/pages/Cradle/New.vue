@@ -79,7 +79,22 @@
       const newCradle = reactive({
         name: '',
         observations: '',
+        slots: [
+          {
+            boxId: null
+          },
+          {
+            boxId: null
+          },
+          {
+            boxId: null
+          },
+          {
+            boxId: null
+          }
+        ]
       });
+      
       const isFull = computed(() => {
         return !!(newCradle.name && newCradle.name.length > 3);
       });
