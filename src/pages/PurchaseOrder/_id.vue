@@ -150,7 +150,7 @@
           :disabled="!isFull"
           @click.prevent="isFull && save()"
         >
-          Crear Orden
+          Guardar Orden
         </PrimaryBtn>
       </footer>
     </section>
@@ -158,7 +158,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, reactive, computed, ComputedRef, watch } from 'vue';
+  import { ref, Ref, watchEffect, computed, ComputedRef, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
@@ -208,7 +208,6 @@
       const instance = axios.create({
         baseURL: api,
       });
-
       const purchaseOrders: Array<PurchaseOrder> = JSON.parse(
         JSON.stringify(store.state.purchaseOrder.all)
       );
@@ -216,8 +215,6 @@
         return po.id == id;
       });
       const currentPurchaseOrder = ref(purchaseOrder);
-      console.log(currentPurchaseOrder);
-      console.log(currentPurchaseOrder.value);
       const sandProviderId = ref(currentPurchaseOrder.value.sandProviderId);
       const transportProviderId = ref(
         currentPurchaseOrder.value.transportProviderId
@@ -230,8 +227,32 @@
         currentPurchaseOrder.value.companyId
       );
       const pitId: Ref<number> = ref(currentPurchaseOrder.value.pitId);
-
-      console.log(sandOrder);
+      const sandProvidersIds = ref(
+        currentPurchaseOrder.value.sandOrders.reduce((sPIs, so, i) => {
+          const currentSPI = sPIs.find((spi) => {
+            return spi.id == so.sandProviderId;
+          });
+          const newSO = {
+            id: i,
+            sandTypeId: so.sandTypeId,
+            amount: so.amount,
+            boxId: so.boxId,
+          };
+          if (currentSPI) {
+            currentSPI.sandOrders.push(newSO);
+          } else {
+            const newSPI = {
+              innerID: i,
+              id: so.sandProviderId,
+              sandOrders: [],
+            };
+            newSPI.sandOrders.push(newSO);
+            sPIs.push(newSPI);
+          }
+          return sPIs;
+        }, [])
+      );
+      console.log('SPI', sandProvidersIds);
       // >> Init
       // :: Proveedores de Sand
       const sandProviders = ref([] as Array<SandProvider>);
@@ -275,11 +296,6 @@
       });
 
       const isFull: ComputedRef<boolean> = computed(() => {
-        console.log(transportProviderId.value, transportProviderId.value > -1);
-        console.log(sandProviderId.value, sandProviderId.value > -1);
-        console.log(sandOrder.value.length > 0);
-        console.log(sandOrder.value.every((sO: SandOrder) => sO.amount > 0));
-        console.log(sandOrder.value.every((sO: SandOrder) => sO.type !== ''));
         return !!(
           transportProviderId.value > -1 &&
           sandProviderId.value > -1 &&
@@ -297,13 +313,6 @@
 
       const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
       const save = (): void => {
-        console.table({
-          companyId: companyClientId.value,
-          companyClientId: companyClientId.value,
-          pitId: pitId.value,
-          sandProviderId: sandProvidersIds.value[0].id,
-          transportProviderId: transportProviderId.value,
-        });
         if (isFull.value) {
           // Formateamos la orden de pedido
           const purchaseOrder: PurchaseOrder = {
@@ -316,8 +325,8 @@
           console.log(purchaseOrder);
           // Creamos via API la orden de pedido
           const { data: pODone } = useAxios(
-            '/purchaseOrder',
-            { method: 'POST', data: purchaseOrder },
+            `/purchaseOrder/${id}`,
+            { method: 'PUT', data: purchaseOrder },
             instance
           );
           const sOisDone = ref([]);
@@ -347,15 +356,13 @@
               });
             }
           });
-          watchEffect(() => {
-            if (sOisDone.value.length >= sandOrder.value.length) {
-              const ordenDePedido = pODone.value.data;
-              const pedidoDeArena = sOisDone.value;
-              ordenDePedido.sandOrders = pedidoDeArena;
-              savePurchaseOrder(ordenDePedido);
-              router.push('/orden-de-pedido');
-            }
-          });
+          setTimeout(() => {
+            const ordenDePedido = pODone.value.data;
+            const pedidoDeArena = sOisDone.value;
+            ordenDePedido.sandOrders = pedidoDeArena;
+            savePurchaseOrder(ordenDePedido);
+            router.push('/orden-de-pedido');
+          }, 1000);
         }
       };
       return {
