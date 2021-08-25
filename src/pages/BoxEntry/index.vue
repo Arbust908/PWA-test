@@ -433,7 +433,7 @@
           warehouse.value.layout[`${selectedBoxPosition}`].category =
             choosedBox.value.category;
           warehouse.value.layout[`${selectedBoxPosition}`].id =
-            choosedBox.value.id;
+            choosedBox.value.boxId;
           warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
           warehouse.value.layout[`${prevBoxPosition}`].id = '';
         }

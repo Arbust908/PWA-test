@@ -9,6 +9,7 @@
     <CradleSlots 
       :cradle="cradle" 
       :box="choosedBox"
+      v-if="selected"
     />
   </div>
 </template>
@@ -17,7 +18,7 @@
 import CradleCard from '@/components/depositDesign/CradleCard.vue';
 import CradleSlots from '@/components/depositDesign/CradleSlots.vue';
 
-import {toRef,ref, watch} from 'vue'
+import {toRef,ref, watch, watchEffect} from 'vue'
 
 export default {
   props: {
@@ -51,6 +52,11 @@ export default {
     const handleSelectedCradle = () => {
       emit('handle-selected-cradle')
     }
+
+    watchEffect(() => {
+      choosedBox.value = props.choosedBox
+      selected.value = props.selected
+    })
     
     return {
       selected,

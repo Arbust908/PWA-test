@@ -3,21 +3,21 @@
     <div
       v-for="(slot, index) in cradle.slots"
       :key="index"
-      class="single-slot"
-      @click="handleSlotClick"
+      :class="['single-slot', slot.category, !slot.category ? 'border-dashed border-2 border-second-500' : '']"
+      @click="handleSlotClick(index)"
     >
       <div v-if="slot.boxId == null" class="index-wrapper">
         <span class="index">{{ index + 1 }}</span>
       </div>
       <div v-else>
-        {{ slot.boxId }}
+        <div class="box-id">{{ slot.boxId }}</div>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-  import { ref } from 'vue';
+  import { ref, watchEffect } from 'vue';
 
   export default {
     props: {
@@ -34,9 +34,23 @@
       const cradle = ref(props.cradle);
       const box = ref(props.box);
 
-      const handleSlotClick = () => {
-        console.log(box.value.id);
+      const handleSlotClick = (index) => {
+        const id = box.value.boxId
+        cradle.value.slots = cradle.value.slots.map((slot) => {
+          if(slot.boxId == id) {
+            slot = {
+              boxId: null
+            }
+          }
+          return slot
+        })
+        cradle.value.slots[index] = box.value
       };
+
+      watchEffect(() => {
+        box.value = props.box
+        cradle.value = props.cradle
+      })
 
       return {
         cradle,
@@ -58,6 +72,36 @@
     @apply text-4xl text-second-300;
   }
   .single-slot {
-    @apply w-[100px] h-[100px] border-dashed border-2 border-second-500 justify-center items-center flex m-2 cursor-pointer  rounded;
+    @apply w-[100px] h-[100px] justify-center items-center flex m-2 cursor-pointer  rounded;
+  }
+  .aisle {
+    @apply bg-second-300;
+    & .box-id {
+      @apply text-second-400;
+    }
+  }
+  .fine {
+    @apply bg-orange-600;
+    & .box-id {
+      @apply text-orange-700;
+    }
+  }
+  .thick {
+    @apply bg-green-600;
+    & .box-id {
+      @apply text-green-700;
+    }
+  }
+  .cut {
+    @apply bg-blue-600;
+    & .box-id {
+      @apply text-blue-700;
+    }
+  }
+  .empty {
+    @apply bg-second-200 text-second-500;
+    & .box-id {
+      @apply text-second-300;
+    }
   }
 </style>
