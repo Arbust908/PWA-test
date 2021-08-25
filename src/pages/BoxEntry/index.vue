@@ -542,8 +542,17 @@
 
       const save = async () => {
         const warehouseDone = ref(false);
+        const warehouseId = warehouse.value.id;
+        const wareData = { warehouse: warehouse.value };
+        const cradleDone = ref(false);
+        const cradleId = selectedCradle.value;
+        const cradleData = {
+          cradle: cradles.value.find((c) => {
+            return c.id === cradleId;
+          }),
+        };
         await axios
-          .put(`${apiUrl}/warehouse`, { warehouse: warehouse.value })
+          .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
           .then((res) => {
             console.log(res);
             warehouseDone.value = !!res.data.data;
@@ -552,9 +561,21 @@
           .finally(() => {
             console.log('Final!');
           });
-        // No está funcionando
-        // console.log("ORIGINAL", originalWarehouseLayout)
-        // console.log("MODIF", warehouse.value.layout)
+        await axios
+          .put(`${apiUrl}/cradle/${cradleId}`, cradleData)
+          .then((res) => {
+            console.log(res);
+            cradleDone.value = !!res.data.data;
+          })
+          .catch((err) => console.error(err))
+          .finally(() => {
+            console.log('Final!');
+          });
+        watchEffect(() => {
+          if (warehouseDone.value && cradleDone.value) {
+            router.push('/');
+          }
+        });
       };
 
       return {
