@@ -9,15 +9,15 @@
     </header>
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
-        <fieldset class="py-2 w-full grid grid-cols-12 gap-y-4 gap-x-14">
-          <FieldGroup class="grid col-12 col-span-8">
+        <FieldGroup class="grid grid-cols-12 gap-4">
+          <span class="col-span-8 grid grid-cols-12 gap-4">
             <ClientPitCombo
               :clientId="clientId"
               :pitId="pitId"
               @update:clientId="clientId = $event"
               @update:pitId="pitId = $event"
             />
-          </FieldGroup>
+          </span>
           <label class="col-span-4" for="purchaseOrder">
             <span>Orden de pedido</span>
             <select
@@ -41,7 +41,7 @@
               </option>
             </select>
           </label>
-        </fieldset>
+        </FieldGroup>
         <fieldset v-if="selectionsAreDone" class="w-full py-5 px-2">
           <div v-if="boxes.length > 0">
             <div v-for="box in boxes" :key="box.id" class="available-box">
@@ -190,417 +190,417 @@
 </template>
 
 <script lang="ts">
-    import {
-      ref,
-      Ref,
-      computed,
-      defineComponent,
-      watch,
-      onMounted,
-      watchEffect,
-    } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
+  import {
+    ref,
+    Ref,
+    computed,
+    defineComponent,
+    watch,
+    onMounted,
+    watchEffect,
+  } from 'vue';
+  import { useStore } from 'vuex';
+  import { useRouter } from 'vue-router';
 
-    import { TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon, BellIcon, EyeIcon } from '@heroicons/vue/solid';
-    import EyeIconOff from './EyeIconOff.vue';
-    import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import Counter from '@/components/ui/Counter.vue';
-    import DepositGrid from '@/components/depositDesign/Deposit.vue';
-    import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
-    import CradleRow from './CradleRow.vue'
+  import { TrashIcon } from '@heroicons/vue/outline';
+  import { PlusIcon, BellIcon, EyeIcon } from '@heroicons/vue/solid';
+  import EyeIconOff from './EyeIconOff.vue';
+  import Layout from '@/layouts/Main.vue';
+  import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+  import Counter from '@/components/ui/Counter.vue';
+  import DepositGrid from '@/components/depositDesign/Deposit.vue';
+  import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
+  import CradleRow from './CradleRow.vue';
 
-    import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
-    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+  import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
+  import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
 
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+  import axios from 'axios';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-    export default defineComponent({
-      components: {
-        BellIcon,
-        CircularBtn,
-        Counter,
-        GhostBtn,
-        Layout,
-        PlusIcon,
-        PrimaryBtn,
-        TrashIcon,
-        DepositGrid,
-        BoxCard,
-        EyeIcon,
-        EyeIconOff,
-        ClientPitCombo,
-  <<<<<<< HEAD
-        CradleRow
-  =======
-  >>>>>>> Feat::Warehouse PUT2
-      },
-      setup() {
-        const router = useRouter();
-        const store = useStore();
-        const instance = axios.create({
-          baseURL: apiUrl,
-        });
+  export default defineComponent({
+    components: {
+      BellIcon,
+      CircularBtn,
+      Counter,
+      GhostBtn,
+      Layout,
+      PlusIcon,
+      PrimaryBtn,
+      TrashIcon,
+      DepositGrid,
+      BoxCard,
+      EyeIcon,
+      EyeIconOff,
+      ClientPitCombo,
+      CradleRow,
+    },
+    setup() {
+      const router = useRouter();
+      const store = useStore();
+      const instance = axios.create({
+        baseURL: apiUrl,
+      });
 
-        let activeSection = ref('deposit');
-        let boxes = ref([
-          //  {
-          //    id: "ID-289",
-          //    warehouseId: 1,
-          //    warehouse: {
-          //      id: 1,
-          //      clientCompanyId: 1,
-          //      pitId: 1,
-          //      pit: {
-          //        id: 1,
-          //        name: "Test",
-          //        workOrderId: 1,
-          //      },
-          //      layout: "any",
-          //    },
-          //    category: "cut",
-          //    col: 2,
-          //    floor: 1,
-          //    row: 2,
-          //  },
-          //  {
-          //    id: "A4%$",
-          //    warehouseId: 1,
-          //    warehouse: {
-          //      id: 1,
-          //      clientCompanyId: 1,
-          //      pitId: 1,
-          //      pit: {
-          //        id: 1,
-          //        name: "Test",
-          //        workOrderId: 1,
-          //      },
-          //      layout: "any",
-          //    },
-          //    category: "fine",
-          //    col: 2,
-          //    floor: 1,
-          //    row: 1,
-          //  },
-        ]);
+      let activeSection = ref('deposit');
+      let boxes = ref([
+        //  {
+        //    id: "ID-289",
+        //    warehouseId: 1,
+        //    warehouse: {
+        //      id: 1,
+        //      clientCompanyId: 1,
+        //      pitId: 1,
+        //      pit: {
+        //        id: 1,
+        //        name: "Test",
+        //        workOrderId: 1,
+        //      },
+        //      layout: "any",
+        //    },
+        //    category: "cut",
+        //    col: 2,
+        //    floor: 1,
+        //    row: 2,
+        //  },
+        //  {
+        //    id: "A4%$",
+        //    warehouseId: 1,
+        //    warehouse: {
+        //      id: 1,
+        //      clientCompanyId: 1,
+        //      pitId: 1,
+        //      pit: {
+        //        id: 1,
+        //        name: "Test",
+        //        workOrderId: 1,
+        //      },
+        //      layout: "any",
+        //    },
+        //    category: "fine",
+        //    col: 2,
+        //    floor: 1,
+        //    row: 1,
+        //  },
+      ]);
 
-        const purchaseOrders = ref([]);
-        const filteredPurchaseOrders = ref([]);
-        const clients = ref([] as Array<Company>);
-        const pits = ref([] as Array<Pit>);
-        const clientId = ref(-1);
-        const purchaseOrderId = ref(-1);
-        const pitId = ref(-1);
-        const warehouses = ref([]);
-        let floor = ref('');
-        let row = ref('');
-        let col = ref('');
-        let dimensions = ref('');
-        let cradles = ref([]);
+      const purchaseOrders = ref([]);
+      const filteredPurchaseOrders = ref([]);
+      const clients = ref([] as Array<Company>);
+      const pits = ref([] as Array<Pit>);
+      const clientId = ref(-1);
+      const purchaseOrderId = ref(-1);
+      const pitId = ref(-1);
+      const warehouses = ref([]);
+      let floor = ref('');
+      let row = ref('');
+      let col = ref('');
+      let dimensions = ref('');
+      let cradles = ref([]);
 
-        const getPurchaseOrders = async () => {
-          await axios
-            .get(`${apiUrl}/purchaseOrder`)
-            .then((res) => {
-              purchaseOrders.value = res.data.data;
-            })
-            .catch((err) => console.error(err));
-        };
+      const getPurchaseOrders = async () => {
+        await axios
+          .get(`${apiUrl}/purchaseOrder`)
+          .then((res) => {
+            purchaseOrders.value = res.data.data;
+          })
+          .catch((err) => console.error(err));
+      };
 
-        const getWarehouses = async () => {
-          await axios
-            .get(`${apiUrl}/warehouse`)
-            .then((res) => {
-              warehouses.value = res.data.data;
-            })
-            .catch((err) => console.error(err));
-        };
+      const getWarehouses = async () => {
+        await axios
+          .get(`${apiUrl}/warehouse`)
+          .then((res) => {
+            warehouses.value = res.data.data;
+          })
+          .catch((err) => console.error(err));
+      };
 
-        const getCradles = async () => {
-          await axios
-            .get(`${apiUrl}/cradle`)
-            .then((res) => {
-              cradles.value = res.data.data;
-            })
-            .catch((err) => console.error(err));
-        };
+      const getCradles = async () => {
+        await axios
+          .get(`${apiUrl}/cradle`)
+          .then((res) => {
+            cradles.value = res.data.data;
+          })
+          .catch((err) => console.error(err));
+      };
 
-        onMounted(async () => {
-          await getPurchaseOrders();
-          await getWarehouses();
-          await getCradles();
-        });
+      onMounted(async () => {
+        await getPurchaseOrders();
+        await getWarehouses();
+        await getCradles();
+      });
 
-        const formatDeposit = (deposit) => {
-          const dimensions = Object.keys(deposit).reduce(
-            (dims, currentCell) => {
-              const proxy = currentCell.split('|');
-              const [floor, row, col] = proxy;
-              dims.floor = Math.max(dims.floor, floor);
-              dims.row = Math.max(dims.row, row);
-              dims.col = Math.max(dims.col, col);
-              return dims;
-            },
-            { floor: 0, row: 0, col: 0 }
-          );
-          dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
-          return dimensions;
-        };
+      const formatDeposit = (deposit) => {
+        const dimensions = Object.keys(deposit).reduce(
+          (dims, currentCell) => {
+            const proxy = currentCell.split('|');
+            const [floor, row, col] = proxy;
+            dims.floor = Math.max(dims.floor, floor);
+            dims.row = Math.max(dims.row, row);
+            dims.col = Math.max(dims.col, col);
+            return dims;
+          },
+          { floor: 0, row: 0, col: 0 }
+        );
+        dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
+        return dimensions;
+      };
 
-        watchEffect(async () => {
-          if (purchaseOrders.value.length > 0) {
-            if (clientId.value !== -1 && pitId.value !== -1) {
-              filteredPurchaseOrders.value = purchaseOrders.value;
-              filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
-                if (
-                  parseInt(po.companyId) == clientId.value &&
-                  parseInt(po.pitId) == pitId.value
-                ) {
-                  return po;
-                }
-              });
-            }
-            if (purchaseOrderId.value !== -1) {
-              let sandTypes = await axios
-                .get(`${apiUrl}/sand`)
-                .then((res) => {
-                  return res.data.data;
-                })
-                .catch((err) => console.error(err));
-              boxes.value =
-                filteredPurchaseOrders.value.length > 0
-                  ? filteredPurchaseOrders.value[0].sandOrders
-                  : null;
-              boxes.value.map((box) => {
-                let sandType = sandTypes.find(
-                  (type) => parseInt(type.id) == parseInt(box.sandTypeId)
-                );
-                box.category = sandType.type.toLowerCase();
-              });
-
-              warehouse.value = warehouses.value.filter((singleWarehouse) => {
-                if (
-                  parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
-                  parseInt(singleWarehouse.pitId) == pitId.value
-                ) {
-                  return singleWarehouse;
-                }
-              })[0];
-              if (warehouse.value) {
-                floor.value = formatDeposit(warehouse.value.layout).floor;
-                col.value = formatDeposit(warehouse.value.layout).col;
-                dimensions.value = formatDeposit(
-                  warehouse.value.layout
-                ).dimensions;
-                row.value = formatDeposit(warehouse.value.layout).row;
+      watchEffect(async () => {
+        if (purchaseOrders.value.length > 0) {
+          if (clientId.value !== -1 && pitId.value !== -1) {
+            filteredPurchaseOrders.value = purchaseOrders.value;
+            filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
+              if (
+                parseInt(po.companyId) == clientId.value &&
+                parseInt(po.pitId) == pitId.value
+              ) {
+                return po;
               }
-            }
-          }
-        });
-
-        const choosedBox: Ref<Box> = ref({
-          floor: 1,
-          col: 0,
-          row: 0,
-          category: '',
-          id: '',
-        });
-
-        const setSelectedBox = (id: Number) => {
-          choosedBox.value = boxes.value.filter((box) => {
-            if (box.boxId == id) {
-              if (choosedBox.value.category !== box.category) {
-                setVisibleCategories(choosedBox.value.category);
-                setVisibleCategories(box.category);
-              }
-              return box;
-            }
-          })[0];
-          console.log(choosedBox.value);
-        };
-
-        const selectBox = (box: Box) => {
-          if (box.category == 'aisle') return;
-          if (box.category == 'empty') {
-            let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
-            let selectedBoxPosition = `${box.floor}|${box.row}|${box.col}`;
-            choosedBox.value.floor = box.floor;
-            choosedBox.value.col = box.col;
-            choosedBox.value.row = box.row;
-            warehouse.value.layout[`${selectedBoxPosition}`].category =
-              choosedBox.value.category;
-            warehouse.value.layout[`${selectedBoxPosition}`].id =
-              choosedBox.value.id;
-            warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
-            warehouse.value.layout[`${prevBoxPosition}`].id = '';
-          }
-        };
-
-        const changeSection = (option: String) => {
-          return (activeSection.value = option);
-        };
-
-        const selectionsAreDone = computed(() => {
-          if (
-            clientId.value !== -1 &&
-            pitId.value !== -1 &&
-            purchaseOrderId.value !== -1
-          ) {
-            if (originalWarehouseWasSaved == false) {
-              originalWarehouseWasSaved = true;
-              originalWarehouseLayout = warehouse.value.layout;
-            }
-            return true;
-          }
-        });
-
-        const warehouse = ref({
-          // id: 2,
-          // clientCompanyId: 7,
-          // pitId: 1,
-          // layout: {
-          //   '1|1|1': {id: 'ID-222',category: 'cut'},
-          //   '1|1|2': {id: 'A4%$',category: 'fine'},
-          //   '1|2|1': {id: '',category: 'empty'},
-          //   '1|2|2': {id: 'ID-289',category: 'cut'},
-          //   '2|1|1': {id: '',category: 'empty'},
-          //   '2|1|2': {id: 'ID-678',category: 'fine'},
-          //   '2|2|1': {id: '',category: 'empty'},
-          //   '2|2|2': {id: 'ID-890',category: 'fine'},
-          //   '3|1|1': {id: '',category: 'empty'},
-          //   '3|1|2': {id: 'ID-262',category: 'fine'},
-          //   '3|2|1': {id: '',category: 'empty'},
-          //   '3|2|2': {id: 'ID-290',category: 'cut'},
-          // },
-          // createdAt: '2021-08-06T14:44:26.000Z',
-          // updatedAt: null,
-          // deletedAt: null,
-          // pit: {
-          //   id: 1,
-          //   name: 'pit 1',
-          // },
-          // clientCompany: {
-          //   id: 7,
-          //   name: 'OtroCliente',
-          //   legalName: 'asd',
-          //   legalId: 789,
-          //   isOperator: false,
-          //   childId: null,
-          //   observations: 'asd',
-          //   companyRepresentativeId: 8,
-          // },
-        });
-
-        let originalWarehouseLayout = {};
-        let originalWarehouseWasSaved = false;
-        let visibleCategories = ref([]);
-
-        const setVisibleCategories = (category: String) => {
-          if (visibleCategories.value.includes(category)) {
-            visibleCategories.value.splice(
-              visibleCategories.value.indexOf(category)
-            );
-          } else {
-            visibleCategories.value.push(category);
-          }
-        };
-
-        let selectedCradle = ref(0);
-
-        const handleSelectedCradle = (id) => {
-          selectedCradle.value = id;
-        };
-
-        // :: CLIENT
-        const selectedClientName = computed(() => {
-          return clientId.value >= 0
-            ? clients.value.find((pit) => pit.id === clientId.value).name
-            : '';
-        });
-        // << CLIENT
-        // :: PITS
-        const selectedPitName = computed(() => {
-          return pitId.value >= 0
-            ? pits.value.find((pit) => pit.id === pitId.value).name
-            : '';
-        });
-        // << PITS
-        const designName = computed(() => {
-          return selectedClientName.value !== '' && selectedPitName.value !== ''
-            ? `${selectedPitName.value} - ${selectedClientName.value}`
-            : selectedClientName.value !== ''
-            ? selectedClientName.value
-            : selectedPitName.value !== ''
-            ? selectedPitName.value
-            : '';
-        });
-
-        const setCat = (cat: string) => {
-          console.log('ASD', cat);
-          choosedBox.value.category = cat;
-          const box = choosedBox.value;
-          deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
-            box.category;
-        };
-        // :: DEPOSIT
-        const deposit = ref({});
-        // << DEPOSIT
-
-        const save = async () => {
-          const warehouseDone = ref(false);
-          await axios
-            .put(`${apiUrl}/warehouse`, { warehouse })
-            .then((res) => {
-              console.log(res);
-              warehouseDone.value = !!res.data.data;
-            })
-            .catch((err) => console.error(err))
-            .finally(() => {
-              console.log('Final!');
             });
-          // No está funcionando
-          // console.log("ORIGINAL", originalWarehouseLayout)
-          // console.log("MODIF", warehouse.value.layout)
-        };
+          }
+          if (purchaseOrderId.value !== -1) {
+            let sandTypes = await axios
+              .get(`${apiUrl}/sand`)
+              .then((res) => {
+                return res.data.data;
+              })
+              .catch((err) => console.error(err));
+            boxes.value =
+              filteredPurchaseOrders.value.length > 0
+                ? filteredPurchaseOrders.value[0].sandOrders
+                : null;
+            boxes.value.map((box) => {
+              let sandType = sandTypes.find(
+                (type) => parseInt(type.id) == parseInt(box.sandTypeId)
+              );
+              box.category = sandType.type.toLowerCase();
+            });
 
-        return {
-          activeSection,
-          clients,
-          pits,
-          choosedBox,
-          selectBox,
-          setCat,
-          clientId,
-          pitId,
-          designName,
-          deposit,
-          save,
-          changeSection,
-          selectionsAreDone,
-          boxes,
-          setSelectedBox,
-          warehouse,
-          floor,
-          row,
-          col,
-          dimensions,
-          visibleCategories,
-          setVisibleCategories,
-          handleSelectedCradle,
-          cradles,
-          selectedCradle,
-          purchaseOrderId,
-          purchaseOrders,
-          filteredPurchaseOrders,
-        };
-      },
-    });
+            warehouse.value = warehouses.value.filter((singleWarehouse) => {
+              if (
+                parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
+                parseInt(singleWarehouse.pitId) == pitId.value
+              ) {
+                return singleWarehouse;
+              }
+            })[0];
+            if (warehouse.value) {
+              floor.value = formatDeposit(warehouse.value.layout).floor;
+              col.value = formatDeposit(warehouse.value.layout).col;
+              dimensions.value = formatDeposit(
+                warehouse.value.layout
+              ).dimensions;
+              row.value = formatDeposit(warehouse.value.layout).row;
+            }
+          }
+        }
+      });
+
+      const choosedBox: Ref<Box> = ref({
+        floor: 1,
+        col: 0,
+        row: 0,
+        category: '',
+        id: '',
+      });
+
+      const setSelectedBox = (id: Number) => {
+        choosedBox.value = boxes.value.filter((box) => {
+          if (box.boxId == id) {
+            if (choosedBox.value.category !== box.category) {
+              setVisibleCategories(choosedBox.value.category);
+              setVisibleCategories(box.category);
+            }
+            return box;
+          }
+        })[0];
+        console.log(choosedBox.value);
+      };
+
+      const selectBox = (box: Box) => {
+        if (box.category == 'aisle') return;
+        if (box.category == 'empty') {
+          let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
+          let selectedBoxPosition = `${box.floor}|${box.row}|${box.col}`;
+          choosedBox.value.floor = box.floor;
+          choosedBox.value.col = box.col;
+          choosedBox.value.row = box.row;
+          warehouse.value.layout[`${selectedBoxPosition}`].category =
+            choosedBox.value.category;
+          warehouse.value.layout[`${selectedBoxPosition}`].id =
+            choosedBox.value.id;
+          warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
+          warehouse.value.layout[`${prevBoxPosition}`].id = '';
+        }
+      };
+
+      const changeSection = (option: String) => {
+        return (activeSection.value = option);
+      };
+
+      const selectionsAreDone = computed(() => {
+        if (
+          clientId.value !== -1 &&
+          pitId.value !== -1 &&
+          purchaseOrderId.value !== -1
+        ) {
+          if (originalWarehouseWasSaved == false) {
+            originalWarehouseWasSaved = true;
+            originalWarehouseLayout = warehouse.value.layout;
+          }
+          return true;
+        }
+      });
+
+      const warehouse = ref({
+        // id: 2,
+        // clientCompanyId: 7,
+        // pitId: 1,
+        // layout: {
+        //   '1|1|1': {id: 'ID-222',category: 'cut'},
+        //   '1|1|2': {id: 'A4%$',category: 'fine'},
+        //   '1|2|1': {id: '',category: 'empty'},
+        //   '1|2|2': {id: 'ID-289',category: 'cut'},
+        //   '2|1|1': {id: '',category: 'empty'},
+        //   '2|1|2': {id: 'ID-678',category: 'fine'},
+        //   '2|2|1': {id: '',category: 'empty'},
+        //   '2|2|2': {id: 'ID-890',category: 'fine'},
+        //   '3|1|1': {id: '',category: 'empty'},
+        //   '3|1|2': {id: 'ID-262',category: 'fine'},
+        //   '3|2|1': {id: '',category: 'empty'},
+        //   '3|2|2': {id: 'ID-290',category: 'cut'},
+        // },
+        // createdAt: '2021-08-06T14:44:26.000Z',
+        // updatedAt: null,
+        // deletedAt: null,
+        // pit: {
+        //   id: 1,
+        //   name: 'pit 1',
+        // },
+        // clientCompany: {
+        //   id: 7,
+        //   name: 'OtroCliente',
+        //   legalName: 'asd',
+        //   legalId: 789,
+        //   isOperator: false,
+        //   childId: null,
+        //   observations: 'asd',
+        //   companyRepresentativeId: 8,
+        // },
+      });
+
+      let originalWarehouseLayout = {};
+      let originalWarehouseWasSaved = false;
+      let visibleCategories = ref([]);
+
+      const setVisibleCategories = (category: String) => {
+        if (visibleCategories.value.includes(category)) {
+          visibleCategories.value.splice(
+            visibleCategories.value.indexOf(category)
+          );
+        } else {
+          visibleCategories.value.push(category);
+        }
+      };
+
+      let selectedCradle = ref(0);
+
+      const handleSelectedCradle = (id) => {
+        selectedCradle.value = id;
+      };
+
+      // :: CLIENT
+
+      const selectedClientName = computed(() => {
+        return clientId.value >= 0
+          ? clients.value.find((pit) => pit.id === clientId.value).name
+          : '';
+      });
+      // << CLIENT
+      // :: PITS
+
+      const selectedPitName = computed(() => {
+        return pitId.value >= 0
+          ? pits.value.find((pit) => pit.id === pitId.value).name
+          : '';
+      });
+      // << PITS
+      const designName = computed(() => {
+        return selectedClientName.value !== '' && selectedPitName.value !== ''
+          ? `${selectedPitName.value} - ${selectedClientName.value}`
+          : selectedClientName.value !== ''
+          ? selectedClientName.value
+          : selectedPitName.value !== ''
+          ? selectedPitName.value
+          : '';
+      });
+
+      const setCat = (cat: string) => {
+        console.log('ASD', cat);
+        choosedBox.value.category = cat;
+        const box = choosedBox.value;
+        deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
+          box.category;
+      };
+
+      // :: DEPOSIT
+      const deposit = ref({});
+      // << DEPOSIT
+
+      const save = async () => {
+        const warehouseDone = ref(false);
+        await axios
+          .put(`${apiUrl}/warehouse`, { warehouse })
+          .then((res) => {
+            console.log(res);
+            warehouseDone.value = !!res.data.data;
+          })
+          .catch((err) => console.error(err))
+          .finally(() => {
+            console.log('Final!');
+          });
+        // No está funcionando
+        // console.log("ORIGINAL", originalWarehouseLayout)
+        // console.log("MODIF", warehouse.value.layout)
+      };
+
+      return {
+        activeSection,
+        clients,
+        pits,
+        choosedBox,
+        selectBox,
+        setCat,
+        clientId,
+        pitId,
+        designName,
+        deposit,
+        save,
+        changeSection,
+        selectionsAreDone,
+        boxes,
+        setSelectedBox,
+        warehouse,
+        floor,
+        row,
+        col,
+        dimensions,
+        visibleCategories,
+        setVisibleCategories,
+        handleSelectedCradle,
+        cradles,
+        selectedCradle,
+        purchaseOrderId,
+        purchaseOrders,
+        filteredPurchaseOrders,
+      };
+    },
+  });
 </script>
 
 <style lang="scss" scoped>
