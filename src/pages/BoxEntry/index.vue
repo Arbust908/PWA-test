@@ -540,7 +540,7 @@
       const save = async () => {
         const warehouseDone = ref(false);
         await axios
-          .put(`${apiUrl}/warehouse`, { warehouse })
+          .put(`${apiUrl}/warehouse`, { warehouse: warehouse.value })
           .then((res) => {
             console.log(res);
             warehouseDone.value = !!res.data.data;
