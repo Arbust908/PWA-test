@@ -9,7 +9,7 @@
     </header>
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
-        <FieldGroup class="grid grid-cols-12 gap-4">
+        <FieldGroup class="grid grid-cols-12 gap-4 max-w-4xl">
           <span class="col-span-8 grid grid-cols-12 gap-4">
             <ClientPitCombo
               :clientId="clientId"
@@ -217,6 +217,7 @@
 
   import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
   import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
 
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -238,6 +239,7 @@
       EyeIconOff,
       ClientPitCombo,
       CradleRow,
+      FieldGroup,
     },
     setup() {
       const router = useRouter();
