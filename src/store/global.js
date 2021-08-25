@@ -1,42 +1,44 @@
 export default {
   state: () => ({
     navigation: [
-      { name: 'Panel', to: '/', icon: 'Home' },
-      {
-        name: 'Planificacion de Arena',
-        to: '/planificacion-de-arena',
-        icon: 'ClipboardList',
-      },
-      {
-        name: 'Diseño de Deposito',
-        to: '/diseno-de-deposito',
-        icon: 'ViewGridAdd',
-      },
       {
         name: 'Orden de Trabajo',
         to: '/orden-de-trabajo',
         icon: 'Briefcase',
       },
       {
-        name: 'Orden de Pedido',
-        to: '/orden-de-pedido',
-        icon: 'Tag',
+        name: 'Planificacion',
+        to: '/planificacion-de-arena',
+        icon: 'ClipboardList',
       },
-      // {
-      //   name: 'StageSheet',
-      //   to: '/stage-sheet',
-      //   icon: 'DocumentReport',
-      // },
       {
         name: 'Notificaciones',
         to: '/notificaciones-a-proveedores',
         icon: 'Bell',
+      },
+      {
+        name: 'Orden de Pedido',
+        to: '/orden-de-pedido',
+        icon: 'Tag',
+      },
+      {
+        name: 'Diseño de Deposito',
+        to: '/diseno-de-deposito',
+        icon: 'ViewGridAdd',
       },
       // {
       //   name: 'Ingreso de cajas',
       //   to: '/ingreso-de-cajas',
       //   icon: 'Archive',
       // },
+      // {
+      //   name: 'StageSheet',
+      //   to: '/stage-sheet',
+      //   icon: 'DocumentReport',
+      // },
+      {
+        name: 'LINE',
+      },
       {
         name: 'Proveedores',
         icon: 'ChevronRight',
@@ -54,16 +56,16 @@ export default {
         ],
       },
       {
+        name: 'Clientes',
+        to: '/clientes',
+        icon: 'UserCircle',
+      },
+      {
         name: 'Configuracion',
         icon: 'Cog',
         subNav: [
           {
-            name: 'Clientes',
-            to: '/clientes',
-            icon: 'UserCircle',
-          },
-          {
-            name: 'Tipos de Arena',
+            name: 'Arena',
             to: '/tipos-de-arena',
             icon: 'ClipboardList',
           },
