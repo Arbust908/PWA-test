@@ -283,11 +283,14 @@
           .catch((err) => console.error(err));
       };
 
+      // Los Cradles deberian venir de la Orden de Trabajo
+      // Ver con @Back tema api
       const getCradles = async () => {
         await axios
           .get(`${apiUrl}/cradle`)
           .then((res) => {
             cradles.value = res.data.data;
+            console.log('Cradles_', cradles.value);
           })
           .catch((err) => console.error(err));
       };
