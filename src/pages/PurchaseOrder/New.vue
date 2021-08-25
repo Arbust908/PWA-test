@@ -418,22 +418,18 @@
                     { method: 'POST', data: sO },
                     instance
                   );
-                  watch(sODone, (newVal, _) => {
+                  watch(sODone, async (newVal, _) => {
                     if (newVal && newVal.data) {
-                      sOisDone.value.push(newVal.data);
+                      await sOisDone.value.push(newVal.data);
+                      const ordenDePedido = pODone.value.data;
+                      const pedidoDeArena = sOisDone.value;
+                      ordenDePedido.sandOrders = pedidoDeArena;
+                      console.log("salimo")
+                      router.push('/orden-de-pedido');
                     }
                   });
                 });
               });
-            }
-          });
-          watchEffect(() => {
-            if (sOisDone.value.length >= sandOrder.value.length) {
-              const ordenDePedido = pODone.value.data;
-              const pedidoDeArena = sOisDone.value;
-              ordenDePedido.sandOrders = pedidoDeArena;
-              // savePurchaseOrder(ordenDePedido);
-              router.push('/orden-de-pedido');
             }
           });
         }
