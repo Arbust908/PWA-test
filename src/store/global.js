@@ -26,11 +26,11 @@ export default {
         to: '/diseno-de-deposito',
         icon: 'ViewGridAdd',
       },
-      // {
-      //   name: 'Ingreso de cajas',
-      //   to: '/ingreso-de-cajas',
-      //   icon: 'Archive',
-      // },
+      {
+        name: 'Ingreso de cajas',
+        to: '/ingreso-de-cajas',
+        icon: 'Archive',
+      },
       // {
       //   name: 'StageSheet',
       //   to: '/stage-sheet',

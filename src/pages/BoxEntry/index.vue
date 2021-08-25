@@ -9,86 +9,65 @@
     </header>
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
-        <fieldset class="py-2 w-full grid grid-cols-12 gap-y-4 gap-x-14">
-          <label class="col-span-4" for="depositClient">
-            <span>Cliente</span>
-            <select
-              id="depositClient"
-              v-model="clientId"
-              class="input"
-              name="depositClient"
-            >
-              <option selected disabled value="-1">Seleccionar cliente</option>
-              <option
-                v-for="client in clients"
-                :key="client.id"
-                :value="client.id"
-              >
-                {{ client.name }}
-              </option>
-            </select>
-          </label>
-          <label class="col-span-4" for="depositPit">
-            <span>Pozo</span>
-            <select
-              id="depositPit"
-              v-model="pitId"
-              class="input"
-              name="depositPit"
-            >
-              <option selected disabled value="-1">Seleccionar pozo</option>
-              <option v-for="pit in pits" :key="pit.id" :value="pit.id">
-                {{ pit.name }}
-              </option>
-            </select>
-          </label>
-          <label class="col-span-4" for="depositPit">
+        <FieldGroup class="grid grid-cols-12 gap-4 max-w-4xl">
+          <span class="col-span-8 grid grid-cols-12 gap-4">
+            <ClientPitCombo
+              :clientId="clientId"
+              :pitId="pitId"
+              @update:clientId="clientId = $event"
+              @update:pitId="pitId = $event"
+            />
+          </span>
+          <label class="col-span-4" for="purchaseOrder">
             <span>Orden de pedido</span>
             <select
-              id="depositPit"
+              id="purchaseOrder"
               v-model="purchaseOrderId"
               class="input"
-              name="depositPit"
+              name="purchaseOrder"
             >
               <option selected disabled value="-1">
                 Seleccionar orden de pedido
               </option>
               <option
-                v-for="purchaseOrder in purchaseOrders"
+                v-for="purchaseOrder in filteredPurchaseOrders"
                 :key="purchaseOrder.id"
                 :value="purchaseOrder.id"
               >
                 #{{ purchaseOrder.id }}
               </option>
               <option v-if="purchaseOrders.length <= 0" value="-1">
-                No hay ordenes de piedido para este Pozo y/o cliente
+                No hay ordenes de pedido para este Pozo y/o cliente
               </option>
             </select>
           </label>
-        </fieldset>
+        </FieldGroup>
         <fieldset v-if="selectionsAreDone" class="w-full py-5 px-2">
-          <div v-for="box in boxes" :key="box.id" class="available-box">
-            <div
-              :class="['radio-button', choosedBox.id == box.id ? 'active' : '']"
-              @click.prevent="setSelectedBox(box.id)"
-            ></div>
-            <div class="box-id"># {{ box.id }} - {{ box.category }}</div>
+          <div v-if="boxes.length > 0">
+            <div v-for="box in boxes" :key="box.id" class="available-box">
+              <div
+                :class="[
+                  'radio-button',
+                  choosedBox.boxId == box.boxId ? 'active' : '',
+                ]"
+                @click.prevent="setSelectedBox(box.boxId)"
+              ></div>
+              <div class="box-id">{{ box.boxId }}</div>
+            </div>
           </div>
+          <div v-else>No hay cajas asociadas.</div>
         </fieldset>
         <nav class="flex justify-between">
           <button
-            :class="[
-              'section-tab',
-              activeSection === 'deposit' ? 'active' : '',
-            ]"
-            :selected="activeSection === 'deposit'"
+            :class="['section-tab', activeSection == 'deposit' ? 'active' : '']"
+            :selected="activeSection == 'deposit'"
             @click.prevent="changeSection('deposit')"
           >
             <span> Depósito </span>
           </button>
           <button
-            :class="['section-tab', activeSection === 'cradle' ? 'active' : '']"
-            :selected="activeSection === 'cradle'"
+            :class="['section-tab', activeSection == 'cradle' ? 'active' : '']"
+            :selected="activeSection == 'cradle'"
             @click.prevent="changeSection('cradle')"
           >
             <span> Cradle </span>
@@ -151,6 +130,7 @@
             </section>
             <DepositGrid
               class="w-full flex flex-col gap-5"
+              v-if="warehouse"
               :selectedBox="choosedBox"
               :rows="row"
               :cols="col"
@@ -161,27 +141,21 @@
             />
           </fieldset>
           <fieldset
-            v-if="activeSection === 'cradle'"
+            v-if="activeSection == 'cradle'"
             class="py-2 flex flex-col gap-x-10 2xl:gap-x-40"
           >
             <h2 class="text-xl font-bold">Elegir Cradle para montar</h2>
-            <div
-              class="
-                mt-4
-                w-full
-                max-w-[170px]
-                lg:max-w-[260px]
-                flex flex-col
-                gap-6
-                md:gap-8
-              "
-            >
-              <CradleCard
-                :id="cradle.id"
-                :selected="selectedCradle == cradle.id"
+            <div class="mt-4 w-full flex flex-col gap-6 md:gap-8">
+              <CradleRow
+                class="cradle-row-wrapper flex flex-row"
                 v-for="cradle in cradles"
                 :key="cradle.id"
-                @click="handleSelectedCradle(cradle.id)"
+                :id="cradle.id"
+                :cradle="cradle"
+                :selected="selectedCradle == cradle.id"
+                :choosedBox="choosedBox"
+                @handle-selected-cradle="handleSelectedCradle(cradle.id)"
+                @clear-box-in-deposit="clearBoxInDeposit"
               />
             </div>
           </fieldset>
@@ -239,8 +213,11 @@
   import Counter from '@/components/ui/Counter.vue';
   import DepositGrid from '@/components/depositDesign/Deposit.vue';
   import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
-  import CradleCard from '@/components/depositDesign/CradleCard.vue';
+  import CradleRow from './CradleRow.vue';
+
   import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
+  import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
 
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -258,9 +235,11 @@
       TrashIcon,
       DepositGrid,
       BoxCard,
-      CradleCard,
       EyeIcon,
       EyeIconOff,
+      ClientPitCombo,
+      CradleRow,
+      FieldGroup,
     },
     setup() {
       const router = useRouter();
@@ -270,72 +249,145 @@
       });
 
       let activeSection = ref('deposit');
-      let boxes = ref([
-        {
-          id: 'ID-289',
-          warehouseId: 1,
-          warehouse: {
-            id: 1,
-            clientCompanyId: 1,
-            pitId: 1,
-            pit: {
-              id: 1,
-              name: 'Test',
-              workOrderId: 1,
-            },
-            layout: 'any',
-          },
-          category: 'cut',
-          col: 2,
-          floor: 1,
-          row: 2,
-        },
-        {
-          id: 'A4%$',
-          warehouseId: 1,
-          warehouse: {
-            id: 1,
-            clientCompanyId: 1,
-            pitId: 1,
-            pit: {
-              id: 1,
-              name: 'Test',
-              workOrderId: 1,
-            },
-            layout: 'any',
-          },
-          category: 'fine',
-          col: 2,
-          floor: 1,
-          row: 1,
-        },
-      ]);
+      let boxes = ref([]);
+
       const purchaseOrders = ref([]);
-      const { data: poData } = useAxios('/purchaseOrder', instance);
-      watch(poData, (api) => {
-        if (api && api.data) {
-          purchaseOrders.value = api.data;
-        }
-      });
-      watchEffect(() => {
-        if (
-          purchaseOrders.value.length > 0 &&
-          clients.value.length > 0 &&
-          pits.value.length
-        ) {
-          if (clientId.value !== -1) {
-            purchaseOrders.value = purchaseOrders.value.filter(
-              (po) => po.clientCompanyId === clientId.value
-            );
-          }
-          if (pitId.value !== -1) {
-            purchaseOrders.value = purchaseOrders.value.filter(
-              (po) => po.pitId === pitId.value
-            );
-          }
-        }
-      });
+      const filteredPurchaseOrders = ref([]);
+      const clients = ref([] as Array<Company>);
+      const pits = ref([] as Array<Pit>);
+      const clientId = ref(-1);
       const purchaseOrderId = ref(-1);
+      const pitId = ref(-1);
+      const warehouses = ref([]);
+      let floor = ref('');
+      let row = ref('');
+      let col = ref('');
+      let dimensions = ref('');
+      let cradles = ref([]);
+
+      const getPurchaseOrders = async () => {
+        await axios
+          .get(`${apiUrl}/purchaseOrder`)
+          .then((res) => {
+            purchaseOrders.value = res.data.data;
+          })
+          .catch((err) => console.error(err));
+      };
+
+      const getWarehouses = async () => {
+        await axios
+          .get(`${apiUrl}/warehouse`)
+          .then((res) => {
+            warehouses.value = res.data.data;
+          })
+          .catch((err) => console.error(err));
+      };
+
+      // Los Cradles deberian venir de la Orden de Trabajo
+      // Ver con @Back tema api
+      const getCradles = async () => {
+        await axios
+          .get(`${apiUrl}/cradle`)
+          .then((res) => {
+            cradles.value = res.data.data;
+            console.log('Cradles_', cradles.value);
+          })
+          .catch((err) => console.error(err));
+      };
+
+      onMounted(async () => {
+        await getPurchaseOrders();
+        await getWarehouses();
+        await getCradles();
+      });
+
+      const formatDeposit = (deposit) => {
+        const dimensions = Object.keys(deposit).reduce(
+          (dims, currentCell) => {
+            const proxy = currentCell.split('|');
+            const [floor, row, col] = proxy;
+            dims.floor = Math.max(dims.floor, floor);
+            dims.row = Math.max(dims.row, row);
+            dims.col = Math.max(dims.col, col);
+            return dims;
+          },
+          { floor: 0, row: 0, col: 0 }
+        );
+        dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
+        return dimensions;
+      };
+
+      const clearBoxInDeposit = (id) => {
+        Object.entries(warehouse.value.layout).forEach((cell) => {
+          if (cell[1].id == id) {
+            (cell[1].category = 'empty'), delete cell[1][id];
+          }
+        });
+      };
+
+      const clearBoxInCradleSlots = (id) => {
+        cradles.value.forEach((cradle) => {
+          cradle.slots = cradle.slots.map((slot) => {
+            if (slot.boxId == id) {
+              slot = {
+                boxId: null,
+              };
+            }
+            return slot;
+          });
+        });
+      };
+
+      watchEffect(async () => {
+        if (purchaseOrders.value.length > 0) {
+          if (clientId.value !== -1 && pitId.value !== -1) {
+            filteredPurchaseOrders.value = purchaseOrders.value;
+            filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
+              if (
+                parseInt(po.companyId) == clientId.value &&
+                parseInt(po.pitId) == pitId.value
+              ) {
+                return po;
+              }
+            });
+          }
+          if (purchaseOrderId.value !== -1) {
+            let sandTypes = await axios
+              .get(`${apiUrl}/sand`)
+              .then((res) => {
+                return res.data.data;
+              })
+              .catch((err) => console.error(err));
+            boxes.value =
+              filteredPurchaseOrders.value.length > 0
+                ? filteredPurchaseOrders.value[0].sandOrders
+                : null;
+            boxes.value.map((box) => {
+              let sandType = sandTypes.find(
+                (type) => parseInt(type.id) == parseInt(box.sandTypeId)
+              );
+              box.category = sandType.type.toLowerCase();
+            });
+
+            warehouse.value = warehouses.value.filter((singleWarehouse) => {
+              if (
+                parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
+                parseInt(singleWarehouse.pitId) == pitId.value
+              ) {
+                return singleWarehouse;
+              }
+            })[0];
+            if (warehouse.value) {
+              floor.value = formatDeposit(warehouse.value.layout).floor;
+              col.value = formatDeposit(warehouse.value.layout).col;
+              dimensions.value = formatDeposit(
+                warehouse.value.layout
+              ).dimensions;
+              row.value = formatDeposit(warehouse.value.layout).row;
+            }
+          }
+        }
+      });
 
       const choosedBox: Ref<Box> = ref({
         floor: 1,
@@ -347,7 +399,7 @@
 
       const setSelectedBox = (id: Number) => {
         choosedBox.value = boxes.value.filter((box) => {
-          if (box.id == id) {
+          if (box.boxId == id) {
             if (choosedBox.value.category !== box.category) {
               setVisibleCategories(choosedBox.value.category);
               setVisibleCategories(box.category);
@@ -358,18 +410,18 @@
       };
 
       const selectBox = (box: Box) => {
+        clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
         if (box.category == 'empty') {
           let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
           let selectedBoxPosition = `${box.floor}|${box.row}|${box.col}`;
-
           choosedBox.value.floor = box.floor;
           choosedBox.value.col = box.col;
           choosedBox.value.row = box.row;
           warehouse.value.layout[`${selectedBoxPosition}`].category =
             choosedBox.value.category;
           warehouse.value.layout[`${selectedBoxPosition}`].id =
-            choosedBox.value.id;
+            choosedBox.value.boxId;
           warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
           warehouse.value.layout[`${prevBoxPosition}`].id = '';
         }
@@ -394,67 +446,44 @@
       });
 
       const warehouse = ref({
-        id: 2,
-        clientCompanyId: 7,
-        pitId: 1,
-        layout: {
-          '1|1|1': { id: 'ID-222', category: 'cut' },
-          '1|1|2': { id: 'A4%$', category: 'fine' },
-          '1|2|1': { id: '', category: 'empty' },
-          '1|2|2': { id: 'ID-289', category: 'cut' },
-          '2|1|1': { id: '', category: 'empty' },
-          '2|1|2': { id: 'ID-678', category: 'fine' },
-          '2|2|1': { id: '', category: 'empty' },
-          '2|2|2': { id: 'ID-890', category: 'fine' },
-          '3|1|1': { id: '', category: 'empty' },
-          '3|1|2': { id: 'ID-262', category: 'fine' },
-          '3|2|1': { id: '', category: 'empty' },
-          '3|2|2': { id: 'ID-290', category: 'cut' },
-        },
-        createdAt: '2021-08-06T14:44:26.000Z',
-        updatedAt: null,
-        deletedAt: null,
-        pit: {
-          id: 1,
-          name: 'pit 1',
-        },
-        clientCompany: {
-          id: 7,
-          name: 'OtroCliente',
-          legalName: 'asd',
-          legalId: 789,
-          isOperator: false,
-          childId: null,
-          observations: 'asd',
-          companyRepresentativeId: 8,
-        },
+        // id: 2,
+        // clientCompanyId: 7,
+        // pitId: 1,
+        // layout: {
+        //   '1|1|1': {id: 'ID-222',category: 'cut'},
+        //   '1|1|2': {id: 'A4%$',category: 'fine'},
+        //   '1|2|1': {id: '',category: 'empty'},
+        //   '1|2|2': {id: 'ID-289',category: 'cut'},
+        //   '2|1|1': {id: '',category: 'empty'},
+        //   '2|1|2': {id: 'ID-678',category: 'fine'},
+        //   '2|2|1': {id: '',category: 'empty'},
+        //   '2|2|2': {id: 'ID-890',category: 'fine'},
+        //   '3|1|1': {id: '',category: 'empty'},
+        //   '3|1|2': {id: 'ID-262',category: 'fine'},
+        //   '3|2|1': {id: '',category: 'empty'},
+        //   '3|2|2': {id: 'ID-290',category: 'cut'},
+        // },
+        // createdAt: '2021-08-06T14:44:26.000Z',
+        // updatedAt: null,
+        // deletedAt: null,
+        // pit: {
+        //   id: 1,
+        //   name: 'pit 1',
+        // },
+        // clientCompany: {
+        //   id: 7,
+        //   name: 'OtroCliente',
+        //   legalName: 'asd',
+        //   legalId: 789,
+        //   isOperator: false,
+        //   childId: null,
+        //   observations: 'asd',
+        //   companyRepresentativeId: 8,
+        // },
       });
 
       let originalWarehouseLayout = {};
       let originalWarehouseWasSaved = false;
-
-      const formatDeposit = (deposit) => {
-        const dimensions = Object.keys(deposit).reduce(
-          (dims, currentCell) => {
-            const proxy = currentCell.split('|');
-            const [floor, row, col] = proxy;
-            dims.floor = Math.max(dims.floor, floor);
-            dims.row = Math.max(dims.row, row);
-            dims.col = Math.max(dims.col, col);
-            return dims;
-          },
-          { floor: 0, row: 0, col: 0 }
-        );
-        dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
-        return dimensions;
-      };
-
-      formatDeposit(warehouse.value.layout);
-
-      let { floor, row, col, dimensions } = formatDeposit(
-        warehouse.value.layout
-      );
-
       let visibleCategories = ref([]);
 
       const setVisibleCategories = (category: String) => {
@@ -467,34 +496,6 @@
         }
       };
 
-      let cradles = ref([
-        {
-          id: '1',
-          name: 'MXH123',
-          observations: '',
-        },
-        {
-          id: '3',
-          name: 'AB0012',
-          observations: 'No funciona',
-        },
-        {
-          id: '4',
-          name: 'SBC123',
-          observations: 'No funciona',
-        },
-        {
-          id: '5',
-          name: 'Gruita',
-          observations: 'Es Camufalada ... FUaa',
-        },
-        {
-          id: '6',
-          name: 'Pancho ',
-          observations: '',
-        },
-      ]);
-
       let selectedCradle = ref(0);
 
       const handleSelectedCradle = (id) => {
@@ -502,14 +503,6 @@
       };
 
       // :: CLIENT
-      const clientId = ref(-1);
-      const clients = ref([] as Array<Company>);
-      const { data: companiesData } = useAxios('/company', instance);
-      watch(companiesData, (companiesApi, prevCount) => {
-        if (companiesApi && companiesApi.data) {
-          clients.value = companiesApi.data;
-        }
-      });
       const selectedClientName = computed(() => {
         return clientId.value >= 0
           ? clients.value.find((pit) => pit.id === clientId.value).name
@@ -517,14 +510,6 @@
       });
       // << CLIENT
       // :: PITS
-      const pitId = ref(-1);
-      const pits = ref([] as Array<Pit>);
-      const { data: pitsData } = useAxios('/pit', instance);
-      watch(pitsData, (pitApi, prevCount) => {
-        if (pitApi && pitApi.data) {
-          pits.value = pitApi.data;
-        }
-      });
       const selectedPitName = computed(() => {
         return pitId.value >= 0
           ? pits.value.find((pit) => pit.id === pitId.value).name
@@ -540,22 +525,57 @@
           ? selectedPitName.value
           : '';
       });
-
+      //
       const setCat = (cat: string) => {
         choosedBox.value.category = cat;
         const box = choosedBox.value;
         deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
           box.category;
       };
-
       // :: DEPOSIT
       const deposit = ref({});
       // << DEPOSIT
-
-      const save = () => {
-        // No está funcionando
-        // console.log("ORIGINAL", originalWarehouseLayout)
-        // console.log("MODIF", warehouse.value.layout)
+      const save = async () => {
+        const warehouseDone = ref(false);
+        const warehouseId = warehouse.value.id;
+        const {
+          createdAt,
+          deletedAt,
+          updatedAt,
+          pit,
+          clientCompany,
+          ...wareData
+        } = warehouse.value;
+        const cradleDone = ref(false);
+        const cradleId = selectedCradle.value;
+        const cradleData = cradles.value.find((c) => {
+          return c.id === cradleId;
+        });
+        await axios
+          .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
+          .then((res) => {
+            console.log(res);
+            warehouseDone.value = !!res.data.data;
+          })
+          .catch((err) => console.error(err))
+          .finally(() => {
+            console.log('Final!');
+          });
+        await axios
+          .put(`${apiUrl}/cradle/${cradleId}`, cradleData)
+          .then((res) => {
+            console.log(res);
+            cradleDone.value = !!res.data.data;
+          })
+          .catch((err) => console.error(err))
+          .finally(() => {
+            console.log('Final!');
+          });
+        watchEffect(() => {
+          if (warehouseDone.value && cradleDone.value) {
+            router.push('/');
+          }
+        });
       };
 
       return {
@@ -586,6 +606,8 @@
         selectedCradle,
         purchaseOrderId,
         purchaseOrders,
+        filteredPurchaseOrders,
+        clearBoxInDeposit,
       };
     },
   });
