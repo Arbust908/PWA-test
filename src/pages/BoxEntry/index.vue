@@ -145,19 +145,20 @@
               class="
                 mt-4
                 w-full
-                max-w-[170px]
-                lg:max-w-[260px]
                 flex flex-col
                 gap-6
                 md:gap-8
               "
             >
-              <CradleCard
-                :id="cradle.id"
-                :selected="selectedCradle == cradle.id"
+              <CradleRow 
+                class="cradle-row-wrapper flex flex-row" 
                 v-for="cradle in cradles"
                 :key="cradle.id"
-                @click="handleSelectedCradle(cradle.id)"
+                :id="cradle.id"
+                :cradle="cradle" 
+                :selected="selectedCradle == cradle.id"
+                :choosedBox="choosedBox"
+                @handle-selected-cradle="handleSelectedCradle(cradle.id)"  
               />
             </div>
           </fieldset>
@@ -215,7 +216,8 @@
   import Counter from '@/components/ui/Counter.vue';
   import DepositGrid from '@/components/depositDesign/Deposit.vue';
   import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
-  import CradleCard from '@/components/depositDesign/CradleCard.vue';
+  import CradleRow from './CradleRow.vue'
+
   import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
   import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
 
@@ -235,10 +237,10 @@
       TrashIcon,
       DepositGrid,
       BoxCard,
-      CradleCard,
       EyeIcon,
       EyeIconOff,
       ClientPitCombo,
+      CradleRow
     },
     setup() {
       const router = useRouter();
@@ -396,7 +398,7 @@
             }
             return box;
           }
-        });
+        })[0];
       };
 
       const selectBox = (box: Box) => {
