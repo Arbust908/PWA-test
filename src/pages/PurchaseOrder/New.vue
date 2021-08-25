@@ -196,8 +196,6 @@
   import { useActions } from 'vuex-composition-helpers';
   import Icon from '@/components/icon/TheAllIcon.vue';
 
-  import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
-  import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
@@ -276,8 +274,6 @@
       };
 
       const removeSandProvider = (providerId: number) => {
-        console.log(providerId);
-        console.log(sandProvidersIds.value);
         sandProvidersIds.value = sandProvidersIds.value.filter(
           (sandProvider: SandProvider) => {
             return sandProvider.innerId !== providerId;
