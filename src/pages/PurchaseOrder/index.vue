@@ -42,10 +42,10 @@
           </td>
           <td>
             <div class="btn-panel">
-              <router-link :to="`/orden-de-pedido/${pO.id}`" class="edit">
+              <!-- <router-link :to="`/orden-de-pedido/${pO.id}`" class="edit">
                 <Icon icon="PencilAlt" class="w-5 h-5" />
                 <span> Editar </span>
-              </router-link>
+              </router-link> -->
               <button class="delete" @click="deletePO(pO.id)">
                 <Icon icon="Trash" class="w-5 h-5" />
                 <span> Eliminar </span>

@@ -195,7 +195,6 @@
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
   import Icon from '@/components/icon/TheAllIcon.vue';
-
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
@@ -220,9 +219,6 @@
     components: {
       Layout,
       NoneBtn,
-      BookmarkIcon,
-      TrashIcon,
-      PlusIcon,
       CircularBtn,
       PrimaryBtn,
       FieldGroup,

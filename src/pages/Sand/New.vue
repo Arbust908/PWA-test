@@ -59,9 +59,9 @@
 
       const newSand = reactive({
         type: '',
-        description: '',
-        meshType: '',
-        grainType: '',
+        // description: '',
+        // meshType: '',
+        // grainType: '',
         observations: '',
       });
 
