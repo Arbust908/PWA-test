@@ -10,6 +10,7 @@
       :cradle="cradle" 
       :box="choosedBox"
       v-if="selected"
+      @clear-box-in-deposit="clearBoxInDeposit"
     />
   </div>
 </template>
@@ -53,17 +54,22 @@ export default {
       emit('handle-selected-cradle')
     }
 
+    const clearBoxInDeposit = (id) => {
+      emit('clear-box-in-deposit', id)
+    }
+
     watchEffect(() => {
       choosedBox.value = props.choosedBox
       selected.value = props.selected
     })
-    
+
     return {
       selected,
       choosedBox,
       cradle,
       id,
-      handleSelectedCradle
+      handleSelectedCradle,
+      clearBoxInDeposit
     }
   }
 }

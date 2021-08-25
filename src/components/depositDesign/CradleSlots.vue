@@ -30,7 +30,7 @@
         required: true,
       },
     },
-    setup(props) {
+    setup(props, {emit}) {
       const cradle = ref(props.cradle);
       const box = ref(props.box);
 
@@ -44,6 +44,7 @@
           }
           return slot
         })
+        emit('clear-box-in-deposit', id)
         cradle.value.slots[index] = box.value
       };
 

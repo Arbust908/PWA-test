@@ -155,6 +155,7 @@
                 :selected="selectedCradle == cradle.id"
                 :choosedBox="choosedBox"
                 @handle-selected-cradle="handleSelectedCradle(cradle.id)"
+                @clear-box-in-deposit="clearBoxInDeposit"
               />
             </div>
           </fieldset>
@@ -350,6 +351,15 @@
         return dimensions;
       };
 
+      const clearBoxInDeposit = (id) => {
+        Object.entries(warehouse.value.layout).forEach(cell => {
+          if(cell[1].id == id) {
+            cell[1].category = "empty",
+            delete cell[1][id]; 
+          }
+        })
+      }
+
       watchEffect(async () => {
         if (purchaseOrders.value.length > 0) {
           if (clientId.value !== -1 && pitId.value !== -1) {
@@ -419,7 +429,6 @@
             return box;
           }
         })[0];
-        console.log(choosedBox.value);
       };
 
       const selectBox = (box: Box) => {
@@ -431,9 +440,9 @@
           choosedBox.value.col = box.col;
           choosedBox.value.row = box.row;
           warehouse.value.layout[`${selectedBoxPosition}`].category =
-            choosedBox.value.category;
+          choosedBox.value.category;
           warehouse.value.layout[`${selectedBoxPosition}`].id =
-            choosedBox.value.boxId;
+          choosedBox.value.boxId;
           warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
           warehouse.value.layout[`${prevBoxPosition}`].id = '';
         }
@@ -598,6 +607,7 @@
         purchaseOrderId,
         purchaseOrders,
         filteredPurchaseOrders,
+        clearBoxInDeposit
       };
     },
   });
