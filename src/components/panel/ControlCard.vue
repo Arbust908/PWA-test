@@ -5,19 +5,19 @@
     class="nav__card"
   >
     <h3>{{ name }}</h3>
-    <GenericIcon :icon="icon" class="nav__pic" />
-    <GenericIcon :icon="icon" class="nav__pic--bg" />
+    <Icon :icon="icon" class="nav__pic" />
+    <Icon :icon="icon" class="nav__pic--bg" />
     <button v-if="to !== ''">ir</button>
   </component>
 </template>
 
 <script lang="ts">
-  import GenericIcon from '@/components/icon/GenericIcon.vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
   import { defineComponent, toRefs } from 'vue';
   export default defineComponent({
     name: 'PanelControlCard',
     components: {
-      GenericIcon,
+      Icon,
     },
     props: {
       name: {

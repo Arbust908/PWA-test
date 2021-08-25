@@ -26,7 +26,9 @@
       const title = useTitle('Home <> Sandflow');
       const store = useStore();
       const navigation = computed(() => {
-        return store.state.global.navigation;
+        return store.state.global.navigation.filter((nav) => {
+          return nav.name !== 'LINE' && nav.to !== undefined;
+        });
       });
       return {
         navigation,
