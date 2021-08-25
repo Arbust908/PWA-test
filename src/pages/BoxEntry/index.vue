@@ -247,46 +247,7 @@
       });
 
       let activeSection = ref('deposit');
-      let boxes = ref([
-        //  {
-        //    id: "ID-289",
-        //    warehouseId: 1,
-        //    warehouse: {
-        //      id: 1,
-        //      clientCompanyId: 1,
-        //      pitId: 1,
-        //      pit: {
-        //        id: 1,
-        //        name: "Test",
-        //        workOrderId: 1,
-        //      },
-        //      layout: "any",
-        //    },
-        //    category: "cut",
-        //    col: 2,
-        //    floor: 1,
-        //    row: 2,
-        //  },
-        //  {
-        //    id: "A4%$",
-        //    warehouseId: 1,
-        //    warehouse: {
-        //      id: 1,
-        //      clientCompanyId: 1,
-        //      pitId: 1,
-        //      pit: {
-        //        id: 1,
-        //        name: "Test",
-        //        workOrderId: 1,
-        //      },
-        //      layout: "any",
-        //    },
-        //    category: "fine",
-        //    col: 2,
-        //    floor: 1,
-        //    row: 1,
-        //  },
-      ]);
+      let boxes = ref([]);
 
       const purchaseOrders = ref([]);
       const filteredPurchaseOrders = ref([]);
@@ -358,6 +319,19 @@
             delete cell[1][id]; 
           }
         })
+      }
+
+      const clearBoxInCradleSlots = (id) => {
+        cradles.value.forEach(cradle => {
+          cradle.slots = cradle.slots.map((slot) => {
+          if(slot.boxId == id) {
+            slot = {
+              boxId: null
+            }
+          }
+          return slot
+        })
+        });
       }
 
       watchEffect(async () => {
@@ -432,6 +406,7 @@
       };
 
       const selectBox = (box: Box) => {
+        clearBoxInCradleSlots(choosedBox.value.boxId)
         if (box.category == 'aisle') return;
         if (box.category == 'empty') {
           let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
@@ -550,7 +525,6 @@
       });
 
       const setCat = (cat: string) => {
-        console.log('ASD', cat);
         choosedBox.value.category = cat;
         const box = choosedBox.value;
         deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
