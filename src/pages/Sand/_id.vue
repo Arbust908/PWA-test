@@ -69,9 +69,9 @@
       const sandToUpdate = reactive({
         id: currentSand.id,
         type: currentSand.type,
-        description: currentSand.description,
-        meshType: currentSand.meshType,
-        grainType: currentSand.grainType,
+        // description: currentSand.description,
+        // meshType: currentSand.meshType,
+        // grainType: currentSand.grainType,
         observations: currentSand.observations,
       });
 

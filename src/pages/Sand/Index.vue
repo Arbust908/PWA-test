@@ -32,8 +32,8 @@
           <td :class="st.type ? null : 'empty'">
             {{ st.type || 'Sin definir' }}
           </td>
-          <td :class="st.description ? null : 'empty'">
-            {{ st.description || 'Sin definir' }}
+          <td :class="st.observations ? null : 'empty'">
+            {{ st.observations || 'Sin definir' }}
           </td>
           <!-- <td :class="st.meshType ? 'text-green-500' : 'text-blue-500'">
             {{ st.meshType || 'Sin definir' }}
