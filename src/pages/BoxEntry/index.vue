@@ -290,6 +290,7 @@
       ]);
 
       const purchaseOrders = ref([]);
+      const filteredPurchaseOrders = ref([])
       const clients = ref([] as Array<Company>);
       const pits = ref([] as Array<Pit>);
       const clientId = ref(-1);
