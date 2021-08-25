@@ -318,26 +318,25 @@
       };
 
       const clearBoxInDeposit = (id) => {
-        Object.entries(warehouse.value.layout).forEach(cell => {
-          if(cell[1].id == id) {
-            cell[1].category = "empty",
-            delete cell[1][id]; 
+        Object.entries(warehouse.value.layout).forEach((cell) => {
+          if (cell[1].id == id) {
+            (cell[1].category = 'empty'), delete cell[1][id];
           }
-        })
-      }
+        });
+      };
 
       const clearBoxInCradleSlots = (id) => {
-        cradles.value.forEach(cradle => {
+        cradles.value.forEach((cradle) => {
           cradle.slots = cradle.slots.map((slot) => {
-          if(slot.boxId == id) {
-            slot = {
-              boxId: null
+            if (slot.boxId == id) {
+              slot = {
+                boxId: null,
+              };
             }
-          }
-          return slot
-        })
+            return slot;
+          });
         });
-      }
+      };
 
       watchEffect(async () => {
         if (purchaseOrders.value.length > 0) {
@@ -411,7 +410,7 @@
       };
 
       const selectBox = (box: Box) => {
-        clearBoxInCradleSlots(choosedBox.value.boxId)
+        clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
         if (box.category == 'empty') {
           let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
@@ -420,9 +419,9 @@
           choosedBox.value.col = box.col;
           choosedBox.value.row = box.row;
           warehouse.value.layout[`${selectedBoxPosition}`].category =
-          choosedBox.value.category;
+            choosedBox.value.category;
           warehouse.value.layout[`${selectedBoxPosition}`].id =
-          choosedBox.value.boxId;
+            choosedBox.value.boxId;
           warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
           warehouse.value.layout[`${prevBoxPosition}`].id = '';
         }
@@ -543,14 +542,19 @@
       const save = async () => {
         const warehouseDone = ref(false);
         const warehouseId = warehouse.value.id;
-        const wareData = { warehouse: warehouse.value };
+        const {
+          createdAt,
+          deletedAt,
+          updatedAt,
+          pit,
+          clientCompany,
+          ...wareData
+        } = warehouse.value;
         const cradleDone = ref(false);
         const cradleId = selectedCradle.value;
-        const cradleData = {
-          cradle: cradles.value.find((c) => {
-            return c.id === cradleId;
-          }),
-        };
+        const cradleData = cradles.value.find((c) => {
+          return c.id === cradleId;
+        });
         await axios
           .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
           .then((res) => {
@@ -607,7 +611,7 @@
         purchaseOrderId,
         purchaseOrders,
         filteredPurchaseOrders,
-        clearBoxInDeposit
+        clearBoxInDeposit,
       };
     },
   });
