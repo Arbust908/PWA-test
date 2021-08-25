@@ -503,7 +503,6 @@
       };
 
       // :: CLIENT
-
       const selectedClientName = computed(() => {
         return clientId.value >= 0
           ? clients.value.find((pit) => pit.id === clientId.value).name
@@ -511,7 +510,6 @@
       });
       // << CLIENT
       // :: PITS
-
       const selectedPitName = computed(() => {
         return pitId.value >= 0
           ? pits.value.find((pit) => pit.id === pitId.value).name
@@ -527,18 +525,16 @@
           ? selectedPitName.value
           : '';
       });
-
+      //
       const setCat = (cat: string) => {
         choosedBox.value.category = cat;
         const box = choosedBox.value;
         deposit.value[`${box.floor}|${box.row}|${box.col}`].category =
           box.category;
       };
-
       // :: DEPOSIT
       const deposit = ref({});
       // << DEPOSIT
-
       const save = async () => {
         const warehouseDone = ref(false);
         const warehouseId = warehouse.value.id;
