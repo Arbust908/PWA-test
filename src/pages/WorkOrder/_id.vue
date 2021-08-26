@@ -294,17 +294,9 @@
       const operativeForklift = ref(newCWO.value.operativeForklift);
       const backupForklift = ref(newCWO.value.backupForklift);
       const traktors = ref(newCWO.value.traktors);
-      watch(traktors, (newVal, oldVal) => {
-        if (newVal.length <= oldVal.length) {
-          traktors.value = oldVal;
-        }
-      });
+
       const pickups = ref(newCWO.value.pickups);
-      watch(pickups, (newVal, oldVal) => {
-        if (newVal.length <= oldVal.length) {
-          pickups.value = oldVal;
-        }
-      });
+
       const crew = ref(newCWO.value.crew);
       const rigmats = ref(newCWO.value.rigmats);
       const conex = ref(newCWO.value.conex);
