@@ -34,7 +34,7 @@
                 :key="purchaseOrder.id"
                 :value="purchaseOrder.id"
               >
-                #{{ purchaseOrder.id }}
+                # {{ purchaseOrder.id }}
               </option>
               <option v-if="purchaseOrders.length <= 0" value="-1">
                 No hay ordenes de pedido para este Pozo y/o cliente
@@ -358,10 +358,12 @@
                 return res.data.data;
               })
               .catch((err) => console.error(err));
+            console.log(filteredPurchaseOrders.value);
             boxes.value =
               filteredPurchaseOrders.value.length > 0
                 ? filteredPurchaseOrders.value[0].sandOrders
                 : null;
+            console.log('change BOxes', boxes.value);
             boxes.value.map((box) => {
               let sandType = sandTypes.find(
                 (type) => parseInt(type.id) == parseInt(box.sandTypeId)

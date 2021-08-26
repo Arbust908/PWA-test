@@ -208,7 +208,6 @@
       const editDriver = (index: number) => {
         const driver = { ...drivers[index] };
         deleteDriver(index);
-
         newDriver.name = driver.name;
         newDriver.phone = driver.phone;
         newDriver.email = driver.email;
@@ -248,14 +247,26 @@
         );
       });
 
-      const driverFull: ComputedRef<boolean> = computed(() => {
+      const hasFullNewDriver = computed(() => {
         return !!(
           newDriver.name !== '' &&
-          newDriver.phone !== '0' &&
+          newDriver.phone !== '' &&
           newDriver.email !== '' &&
           newDriver.vehicleType !== '' &&
           newDriver.vehicleId !== ''
         );
+      });
+
+      const driverFull: ComputedRef<boolean> = computed(() => {
+        const hasFullDriverCards = drivers.every(
+          (driver: Driver) =>
+            driver.name !== '' &&
+            driver.phone !== '' &&
+            driver.email !== '' &&
+            driver.vehicleType !== '' &&
+            driver.vehicleId !== ''
+        );
+        return !!(hasFullDriverCards || hasFullNewDriver);
       });
 
       const repFull: ComputedRef<boolean> = computed(() => {
@@ -273,6 +284,9 @@
       const save = async () => {
         const representanteDone = ref(false);
         const transportProviderDone = ref(false);
+        if (hasFullNewDriver) {
+          drivers.push(newDriver);
+        }
         //
         const { data: compRepData, isFinished: compRepDone } = useAxios(
           '/companyRepresentative',
