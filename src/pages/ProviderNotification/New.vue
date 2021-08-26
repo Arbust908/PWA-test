@@ -8,106 +8,19 @@
       </h1>
     </header>
     <section class="bg-second-0 rounded-md shadow-sm">
+      <!-- <FieldWithSides
+              class="col-span-6"
+              title="Cantidad"
+              fieldName="sandQuantity"
+              :data="sO.amount"
+              @update:data="sO.amount = $event"
+              :post="{ value: 't', title: 'Peso en Toneladas' }"
+            /> -->
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <FieldGroup>
-          <FieldLegend>Arena</FieldLegend>
-          <FieldSelect
-            class="col-span-full"
-            fieldName="sandProvider"
-            placeholder="Selecciona un proveedor"
-            title="Proveedor"
-            endpoint="/sandProvider"
-            :data="sandProviderId"
-            @update:data="sandProviderId = $event"
-          />
-          <template v-for="(sO, Key) in sandOrder" :key="Key">
-            <hr v-if="Key !== 0" class="mt-4 mb-2 col-span-full" />
-            <label
-              :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'"
-              for="sandType"
-            >
-              <span>Tipo</span>
-              <select
-                id="sandProvider"
-                v-model="sO.sandTypeId"
-                class="input"
-                name="sandProvider"
-                @change="fillSandType(sO.id)"
-              >
-                <option selected disabled value="-1">
-                  Seleccionar Tipo de Arena
-                </option>
-                <option v-for="sT in sandTypes" :key="sT.id" :value="sT.id">
-                  {{ toCapitalize(sT.type) }}
-                </option>
-              </select>
-            </label>
-            <label
-              :class="sandOrder.length > 1 ? 'col-span-5' : 'col-span-6'"
-              for="sandQuantity"
-            >
-              <span>Cantidad</span>
-              <div class="mt-1 flex rounded shadow-sm">
-                <input
-                  v-model.number="sO.amount"
-                  type="number"
-                  name="sandQuantity"
-                  class="
-                    flex-1
-                    min-w-0
-                    block
-                    w-full
-                    px-3
-                    py-2
-                    rounded-none
-                    border-r-0
-                    rounded-l
-                    focus:ring-indigo-500 focus:border-indigo-500
-                    border-second-300
-                    sm:text-sm
-                  "
-                  placeholder="22"
-                  list="sandQuantity-list"
-                />
-                <span
-                  class="
-                    inline-flex
-                    items-center
-                    px-3
-                    rounded-r
-                    border border-second-300
-                    bg-second-50
-                    text-second-500
-                    sm:text-sm
-                  "
-                  title="Peso en Toneladas"
-                >
-                  t
-                </span>
-              </div>
-            </label>
-            <div
-              v-if="sandOrder.length > 1"
-              class="col-span-2 flex justify-end items-end"
-            >
-              <CircularBtn
-                class="btn__delete"
-                size="sm"
-                @click="removeSandOrder(sO.id)"
-              >
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
-            </div>
-          </template>
-          <div class="col-span-full mt-1 pb-4 mb-4">
-            <button class="flex items-center p-1" @click.prevent="addSandOrder">
-              <CircularBtn class="btn__add" size="xs">
-                <PlusIcon class="w-4 h-4" />
-              </CircularBtn>
-              <span class="font-bold text"> Agregar arena </span>
-            </button>
-          </div>
-        </FieldGroup>
+        <SandProviderPack
+          :sandProviders="sandProviderIds"
+          @update:sandProviders="sandProviderIds = $event"
+        />
         <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Transporte</h2>
           <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
@@ -159,7 +72,6 @@
                 placeholder="Cantidad de camiones"
               />
             </label>
-
             <label class="col-span-full" :for="'transportObservations' + tO.id">
               <span>Observaciones</span>
               <input
@@ -215,15 +127,18 @@
         <div class="divide-y text-left">
           <section v-if="isSandFull" class="py-2 space-y-2">
             <h3 class="text-xl">Arena</h3>
-            <article class="text-sm text-indigo-500">
+            <article
+              class="text-sm text-indigo-500"
+              v-for="spi in sandProviderIds"
+              :key="spi.innerId"
+            >
               <header class="flex items-center gap-2">
                 <BellIcon class="w-4 h-4" />
-                <span>Notificación para {{ sandProvider.name }}</span>
+                <span>Notificación para {{ getSPName(spi.id) }}</span>
               </header>
               <ul class="list-disc pl-6 ml-2">
-                <li v-for="sOli in sandOrder" :key="sOli.id">
-                  Tipo: {{ sOli.sandType.type }}, {{ sOli.amount }}t
-                  <!-- Tipo: {{ sOli.sandType.type }}, {{ sOli.amount }} tonelada(s) -->
+                <li v-for="sOli in spi.SandOrders" :key="sOli.id">
+                  Tipo: {{ getSTName(sOli.sandTypeId) }}, {{ sOli.amount }}t
                 </li>
               </ul>
             </article>
@@ -339,6 +254,9 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
+  import SandProviderPack from '@/components/notifications/sandProviderPack.vue';
+  import '@/assets/button.scss';
 
   const Modal = defineAsyncComponent(
     () => import('@/components/modal/General.vue')
@@ -346,7 +264,7 @@
 
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
-  import { log } from 'console';
+  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
@@ -363,6 +281,8 @@
       FieldInput,
       FieldLegend,
       FieldSelect,
+      FieldWithSides,
+      SandProviderPack,
     },
     setup() {
       const router = useRouter();
@@ -380,6 +300,13 @@
           sandProviders.value = sPData.data;
         }
       });
+      const getSPName = (spId: number) => {
+        const sp = sandProviders.value.find((sp) => {
+          return sp.id == spId;
+        });
+        return sp ? sp.name : '';
+      };
+
       const sandTypes = ref([] as Array<Sand>);
       const { data: sData } = useAxios('/sand', instance);
       watch(sData, (sData) => {
@@ -387,18 +314,21 @@
           sandTypes.value = sData.data;
         }
       });
-      const sandProviderId: Ref<number> = ref(-1);
-      const sandProvider = ref({});
-      watch(sandProviderId, (sPId) => {
-        if (sPId > -1) {
-          const currentSP = sandProviders.value.find(
-            (sp) => Number(sp.id) === sPId
-          );
-          if (currentSP) {
-            sandProvider.value = currentSP;
-          }
-        }
-      });
+
+      const getSTName = (stId: number) => {
+        const st = sandTypes.value.find((st) => {
+          return st.id == stId;
+        });
+        return st ? st.type : '';
+      };
+
+      interface sandProviderId {
+        innerId: number;
+        id?: number;
+        sandOrders?: Array<SandOrder>;
+      }
+      const sandProviderIds: Ref<Array<sandProviderId>> = ref([]);
+
       const sandOrder: Ref<Array<SandOrder>> = ref([]);
       const fillSandType = (soId) => {
         const currSO = sandOrder.value.find((so) => so.id === soId);
@@ -408,24 +338,6 @@
         console.log(currST);
         currSO.sandType = currST;
       };
-      const defaultSandOrder: SandOrder = {
-        sandTypeId: -1,
-        amount: null,
-      };
-
-      const addSandOrder = () => {
-        const lastSandOrder = sandOrder.value[sandOrder.value.length - 1];
-        const lastSandOrderId = lastSandOrder ? lastSandOrder.id : -1;
-        const newSandOrder = { ...defaultSandOrder };
-        newSandOrder.id = lastSandOrderId + 1;
-        sandOrder.value.push(newSandOrder);
-      };
-      const removeSandOrder = (soId: number) => {
-        sandOrder.value = sandOrder.value.filter((so) => so.id !== soId);
-      };
-      if (sandOrder.value.length === 0) {
-        addSandOrder();
-      }
 
       const transportProviders = ref([]);
       const { data: tPData } = useAxios('/transportProvider', instance);
@@ -470,7 +382,7 @@
 
       const isSandFull = computed(() => {
         return !!(
-          sandProviderId.value >= 0 &&
+          sandProviderIds.value.length > 0 &&
           sandOrder.value &&
           sandOrder.value.every((so) => so.amount && so.amount > 0) &&
           sandOrder.value.every((so) => so.sandType && so.sandType.id > 0)
@@ -492,10 +404,8 @@
       };
       const confirm = async () => {
         pN.value = {
-          sandProviderId: Number(sandProviderId.value),
-          sandProvider: sandProvider.value,
-          sandOrderId: sandOrder.value[0].id,
-          sandOrder: sandOrder.value,
+          sandProviderIds: Number(sandProviderIds.value[0].id),
+          sandOrderId: sandProviderIds.value[0].sandOrders[0].id,
           transportProviderId: Number(transportOrder.value[0].id),
         };
         const { data } = useAxios(
@@ -513,11 +423,11 @@
       };
 
       return {
-        sandProviderId,
+        // sandProviderId,
         sandOrder,
         transportProviders,
-        addSandOrder,
-        removeSandOrder,
+        // addSandOrder,
+        // removeSandOrder,
         addTransportProvider,
         removeTransportProvider,
         fillTransportType,
@@ -531,8 +441,11 @@
         toCapitalize,
         sandTypes,
         transportOrder,
-        sandProvider,
+        // sandProvider,
         fillSandType,
+        sandProviderIds,
+        getSPName,
+        getSTName,
       };
     },
   });
