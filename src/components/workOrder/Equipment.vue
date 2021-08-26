@@ -44,40 +44,8 @@
         />
       </FieldGroup>
     </div>
-    <FieldGroup class="max-w-2xl">
-      <FieldLegend>Tractor / Chasis</FieldLegend>
-      <TracktoField
-        :traktors="traktors"
-        @update:traktors="traktors = $event"
-        @remove="removeTraktor"
-      />
-      <button
-        class="mt-1 flex items-center col-span-6"
-        @click.prevent="addTraktor"
-      >
-        <CircularBtn class="btn__add" size="xs">
-          <Icon icon="Plus" class="w-5 h-5" />
-        </CircularBtn>
-        <span class="font-bold"> Agregar tractor/chasis </span>
-      </button>
-    </FieldGroup>
-    <FieldGroup class="max-w-lg">
-      <FieldLegend>Pickup</FieldLegend>
-      <PickupField
-        :pickups="pickups"
-        @update:pickups="pickups = $event"
-        @remove="removePickup"
-      />
-      <button
-        class="mt-1 flex items-center col-span-6"
-        @click.prevent="addPickup"
-      >
-        <CircularBtn class="btn__add" size="xs">
-          <Icon icon="Plus" class="w-5 h-5" />
-        </CircularBtn>
-        <span class="font-bold"> Agregar pickup </span>
-      </button>
-    </FieldGroup>
+    <TracktoField :traktors="traktors" @update:traktors="traktors = $event" />
+    <PickupField :pickups="pickups" @update:pickups="pickups = $event" />
     <FieldGroup class="max-w-lg">
       <FieldLegend>Equipamento</FieldLegend>
       <FieldInput
@@ -130,7 +98,7 @@
 </template>
 
 <script lang="ts">
-  import { watch, watchEffect, defineComponent, computed } from 'vue';
+  import { ref, watchEffect, defineComponent, computed } from 'vue';
   import { useVModels } from '@vueuse/core';
   import { useRoute } from 'vue-router';
 
@@ -146,6 +114,8 @@
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import { Pit } from '@/interfaces/sandflow';
   import { useApi } from '@/helpers/useApi';
+
+  import '@/assets/button.scss';
 
   export default defineComponent({
     components: {
@@ -209,8 +179,6 @@
       },
     },
     setup(props, { emit }) {
-      const route = useRoute();
-      const id = route.params.id;
       const {
         operativeCradleId,
         backupCradleId,
@@ -226,36 +194,6 @@
         isFull,
       } = useVModels(props, emit);
 
-      const removeTraktor = (traktorId: number) => {
-        traktors.value = traktors.value.filter(
-          (traktor: Traktor) => traktor.id !== traktorId
-        );
-      };
-      const addTraktor = (): void => {
-        const lastTraktor = traktors.value[traktors.value.length - 1];
-        const newTraktorId = lastTraktor ? lastTraktor.id + 1 : 0;
-        traktors.value.push({
-          id: newTraktorId,
-          chassis: '',
-          supplier: '',
-          description: '',
-        });
-        console.log(traktors.value);
-      };
-      const removePickup = (pickupId: number) => {
-        pickups.value = pickups.value.filter(
-          (pickup: Pickup) => pickup.id !== pickupId
-        );
-      };
-      const addPickup = (): void => {
-        const lastPickup = pickups.value[pickups.value.length - 1];
-        const newPickupId = lastPickup ? lastPickup.id + 1 : 0;
-        pickups.value.push({
-          id: newPickupId,
-          pickupId: '',
-          description: '',
-        });
-      };
       const firstTracktorFull = computed(() => {
         const trackto = traktors.value[0];
         return (
@@ -268,27 +206,7 @@
         const pickup = pickups.value[0];
         return pickup.pickup_id !== '' && pickup.description !== '';
       });
-      const { read: readT } = useApi('/traktor');
-      const allTracktors = readT();
-      watch(allTracktors, (newVal, _) => {
-        traktors.value = newVal.filter((t) => {
-          return t.workOrderId === id;
-        });
-        if (traktors.value.length === 0) {
-          addTraktor();
-        }
-      });
 
-      const { read: readP } = useApi('/pickup');
-      const allPickups = readP();
-      watch(allPickups, (newVal, _) => {
-        pickups.value = newVal.filter((p) => {
-          return p.workOrderId === id;
-        });
-        if (pickups.value.length === 0) {
-          addPickup();
-        }
-      });
       watchEffect(() => {
         isFull.value = !!(
           operativeCradleId.value >= 0 &&
@@ -317,10 +235,6 @@
         generators,
         tower,
         cabin,
-        removeTraktor,
-        addTraktor,
-        removePickup,
-        addPickup,
       };
     },
   });
