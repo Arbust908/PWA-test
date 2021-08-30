@@ -5,7 +5,7 @@
     class="nav-link group"
   >
     <Icon :icon="icon" type="outline" class="icon" />
-    {{ name }}
+    <span class="hidden lg:inline">{{ name }}</span>
   </router-link>
 </template>
 

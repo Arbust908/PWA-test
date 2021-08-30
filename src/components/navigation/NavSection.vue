@@ -2,9 +2,7 @@
   <div :class="isSectionOpen ? 'opened' : null" class="section">
     <button class="nav-link group" @click.prevent="toggleSection()">
       <Icon :icon="icon" type="outline" class="icon" />
-      <span>
-        {{ name }}
-      </span>
+      <span class="hidden lg:inline">{{ name }}</span>
     </button>
     <transition-group
       v-if="isSectionOpen"

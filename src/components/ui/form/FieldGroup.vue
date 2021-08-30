@@ -6,7 +6,7 @@
 
 <style lang="scss" scoped>
   fieldset {
-    @apply py-2 grid-cols-12 gap-4 md:gap-6;
+    @apply py-2 grid-cols-12 gap-4;
   }
   fieldset:not(:last-of-type) {
     @apply border-b pb-6;

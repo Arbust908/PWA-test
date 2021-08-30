@@ -1,9 +1,6 @@
 <template>
   <label :for="fieldName">
-    <p v-if="title">
-      {{ title }}
-      <span v-if="isOptional">(Opcional)</span>
-    </p>
+    <FieldTitle v-if="title" :title="title" />
     <textarea
       :id="fieldName"
       :class="isFixed ? 'resize-none' : null"
@@ -20,9 +17,12 @@
 <script>
   import { defineComponent, computed } from 'vue';
   import { useVModel } from '@vueuse/core';
-  import '@/assets/inputs.scss';
+  import FieldTitle from '@/components/ui/form/FieldTitle.vue';
   export default defineComponent({
     name: 'FieldInput',
+    components: {
+      FieldTitle,
+    },
     props: {
       data: {
         default: '',
@@ -61,3 +61,7 @@
     },
   });
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/inputs.scss';
+</style>

@@ -66,8 +66,6 @@
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
 
-  import '@/assets/table.scss';
-
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -133,28 +131,5 @@
 </script>
 
 <style lang="scss" scoped>
-  th {
-    @apply px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider;
-  }
-  .body-row {
-    @apply hover:bg-second-200;
-    &.odd {
-      @apply bg-second-50;
-    }
-    &.even {
-      @apply bg-second-100;
-    }
-  }
-  td {
-    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-second-900;
-    &.empty {
-      @apply text-gray-400 italic;
-    }
-  }
-  .btn-panel {
-    @apply flex justify-end space-x-4;
-  }
-  td.emptyState {
-    @apply text-center text-xs text-second-300 px-6 py-4;
-  }
+  @import '@/assets/table.scss';
 </style>

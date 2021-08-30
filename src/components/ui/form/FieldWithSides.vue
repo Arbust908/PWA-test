@@ -1,9 +1,6 @@
 <template>
   <label :for="fieldName">
-    <p v-if="title">
-      {{ title }}
-      <span v-if="isOptional">(Opcional)</span>
-    </p>
+    <FieldTitle v-if="title" :title="title" />
     <div class="input_side">
       <span v-if="pre" class="pre" :title="pre.title">{{ pre.value }}</span>
       <input
@@ -25,10 +22,11 @@
   import { defineComponent } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { maska } from 'maska';
-  import '@/assets/inputs.scss';
+  import FieldTitle from '@/components/ui/form/FieldTitle.vue';
   export default defineComponent({
     directives: { maska },
     name: 'FieldInput',
+    components: { FieldTitle },
     props: {
       data: {
         default: '',
@@ -75,3 +73,7 @@
     },
   });
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/inputs.scss';
+</style>

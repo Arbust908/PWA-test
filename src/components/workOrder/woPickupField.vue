@@ -26,20 +26,14 @@
         v-if="pickups.length > 1 && pickupI !== lastIndex"
         class="flex items-center col-span-2"
       >
-        <CircularBtn
-          class="btn__delete"
-          size="sm"
-          @click="remove(pickup.innerId)"
-        >
-          <Icon icon="Trash" class="w-5 h-5" />
+        <CircularBtn class="btn__delete" @click="remove(pickup.innerId)">
+          <Icon icon="Trash" class="w-6 h-6" />
         </CircularBtn>
         {{ pickup.innerId }}
       </span>
     </FieldGroup>
     <button class="mt-1 flex items-center col-span-6" @click.prevent="add">
-      <CircularBtn class="btn__add" size="xs">
-        <Icon icon="Plus" class="w-5 h-5" />
-      </CircularBtn>
+      <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
       <span class="font-bold"> Agregar pickup </span>
     </button>
   </FieldGroup>
@@ -96,6 +90,9 @@
           description: '',
         });
       };
+      if (pickups?.value?.length === 0) {
+        add();
+      }
       return {
         lastIndex,
         firstIndex,

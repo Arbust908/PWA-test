@@ -4,7 +4,7 @@
       <FieldSelect
         class="col-span-full"
         fieldName="name"
-        placeholder="Nombre de cliente"
+        placeholder="Seleccionar cliente"
         title="Cliente"
         endpoint="/company"
         :data="clientId"
@@ -13,9 +13,10 @@
       <FieldSelect
         class="col-span-full"
         fieldName="serviceCompany"
-        placeholder="Nombre de Operadora"
+        placeholder="Seleccionar operadora"
         title="Operadora / Empresa de Servicios"
         endpoint="/company"
+        isOptional
         :data="serviceCompanyId"
         @update:data="serviceCompanyId = $event"
       />
@@ -36,9 +37,7 @@
         @removePit="removePit"
       />
       <button class="mt-1 flex items-center col-span-6" @click.prevent="addPit">
-        <CircularBtn class="btn__add" size="xs">
-          <Icon icon="Plus" class="w-5 h-5" />
-        </CircularBtn>
+        <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
         <span class="font-bold"> Agregar pozo </span>
       </button>
     </FieldGroup>

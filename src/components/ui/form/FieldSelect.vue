@@ -1,9 +1,6 @@
 <template>
   <label :for="fieldName">
-    <p v-if="title">
-      {{ title }}
-      <span v-if="isOptional">(Opcional)</span>
-    </p>
+    <FieldTitle v-if="title" :title="title" :isOptional="isOptional" />
     <!-- TODO: Dropdown con Busqueda -->
     <!-- TODO: Options con entrada cheta -->
     <!-- TODO: StoreLogic -->
@@ -27,9 +24,12 @@
   import { defineComponent } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { useApi } from '@/helpers/useApi';
-  import '@/assets/inputs.scss';
+  import FieldTitle from '@/components/ui/form/FieldTitle.vue';
   export default defineComponent({
     name: 'FieldSelect',
+    components: {
+      FieldTitle,
+    },
     props: {
       data: {
         default: '',
@@ -80,3 +80,7 @@
     },
   });
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/inputs.scss';
+</style>

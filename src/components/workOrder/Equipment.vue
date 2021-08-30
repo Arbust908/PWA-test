@@ -49,46 +49,46 @@
     <FieldGroup class="max-w-lg">
       <FieldLegend>Equipamento</FieldLegend>
       <FieldInput
-        class="col-span-4"
+        class="col-span-6 sm:col-span-4"
+        title="Rigmats"
         fieldName="rigmats"
         placeholder="Rigmats"
-        title="Rigmats"
         mask="#*"
         :data="rigmats"
         @update:data="rigmats = Number($event)"
       />
       <FieldInput
-        class="col-span-4"
+        class="col-span-6 sm:col-span-4"
+        title="Conex"
         fieldName="conex"
         placeholder="Conex"
-        title="Conex"
         mask="#*"
         :data="conex"
         @update:data="conex = Number($event)"
       />
       <FieldInput
-        class="col-span-4"
+        class="col-span-6 sm:col-span-4"
+        title="Generador de apoyo"
         fieldName="generators"
         placeholder="Generador de apoyo"
-        title="Generador de apoyo"
         mask="#*"
         :data="generators"
         @update:data="generators = Number($event)"
       />
       <FieldInput
-        class="col-span-4"
+        class="col-span-6 sm:col-span-4"
+        title="Torre de iluminación"
         fieldName="tower"
         placeholder="Torre de iluminación"
-        title="Torre de iluminación"
         mask="#*"
         :data="tower"
         @update:data="tower = Number($event)"
       />
       <FieldInput
-        class="col-span-4"
+        class="col-span-full sm:col-span-4"
+        title="Cabina de operador"
         fieldName="cabin"
         placeholder="Cabina de operador"
-        title="Cabina de operador"
         mask="#*"
         :data="cabin"
         @update:data="cabin = Number($event)"
@@ -114,8 +114,6 @@
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import { Pit } from '@/interfaces/sandflow';
   import { useApi } from '@/helpers/useApi';
-
-  import '@/assets/button.scss';
 
   export default defineComponent({
     components: {
@@ -241,27 +239,7 @@
 </script>
 
 <style lang="scss" scoped>
-  .btn {
-    &__draft {
-      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-    }
-    &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-    }
-    &__add {
-      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-    }
-    &__add--special {
-      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-    }
-    &__mobile-only {
-      @apply lg:hidden;
-    }
-    &__desktop-only {
-      @apply hidden lg:inline-flex;
-    }
-  }
+  @import '@/assets/button.scss';
   .input-block select,
   .input-block input {
     @apply w-full rounded mb-3 p-2;

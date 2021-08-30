@@ -80,8 +80,6 @@
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
 
-  import '@/assets/table.scss';
-
   import { useApi } from '@/helpers/useApi';
 
   import { useTitle } from '@vueuse/core';
@@ -148,3 +146,7 @@
     },
   };
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/table.scss';
+</style>

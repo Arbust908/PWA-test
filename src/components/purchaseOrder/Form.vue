@@ -3,7 +3,7 @@
     <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
       <legend class="col-span-12 text-xl">Arena</legend>
       <label class="col-span-12" for="sandProvider">
-        <span>Proveedor</span>
+        <span>Pepe</span>
         <input
           v-model="sandProvider.name"
           class="input"

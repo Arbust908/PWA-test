@@ -7,7 +7,6 @@
 
 <script>
   import { defineComponent } from 'vue';
-  import '@/assets/inputs.scss';
   export default defineComponent({
     name: 'FieldLoading',
     props: {
@@ -23,3 +22,7 @@
     },
   });
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/inputs.scss';
+</style>

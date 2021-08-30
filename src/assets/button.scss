@@ -1,25 +1,25 @@
-  .btn {
-    &__draft {
-      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-    }
-
-    &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-    }
-
-    &__add {
-      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-    }
-
-    &__add--special {
-      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-    }
-
-    &__mobile-only {
-      @apply lg:hidden;
-    }
-
-    &__desktop-only {
-      @apply hidden lg:inline-flex;
-    }
+.btn {
+  &__draft {
+    @apply border-[#117E49] text-[#117E49] bg-transparent hover:bg-[#117E49] hover:bg-opacity-25 hover:shadow-lg;
   }
+
+  &__delete {
+    @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
+  }
+
+  &__add {
+    @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
+  }
+
+  &__add--special {
+    @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
+  }
+
+  &__mobile-only {
+    @apply lg:hidden;
+  }
+
+  &__desktop-only {
+    @apply hidden lg:inline-flex;
+  }
+}

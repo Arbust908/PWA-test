@@ -7,13 +7,12 @@
       :data="pit.name"
       @update:data="pit.name = $event"
     />
-    <!-- Span Proxy para que pueda "Contener" el boton -->
     <span
       v-if="pits.length > 1 && pitI !== lastPitIndex"
-      class="col-span-2 flex justify-center items-center"
+      class="col-span-2 flex justify-center items-end"
     >
-      <CircularBtn class="btn__delete" size="sm" @click="removePit(pit.id)">
-        <Icon icon="Trash" class="w-5 h-5" />
+      <CircularBtn class="btn__delete" @click="removePit(pit.id)">
+        <Icon icon="Trash" class="w-6 h-6" />
       </CircularBtn>
     </span>
   </template>

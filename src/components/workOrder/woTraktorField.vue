@@ -7,7 +7,7 @@
       class="relative col-span-full max-w-2xl"
     >
       <FieldInput
-        class="col-span-6 lg:col-span-3"
+        class="col-span-full sm:col-span-6 lg:col-span-3"
         fieldName="chassis"
         placeholder="Id de tractor"
         :title="traktorI === firstTraktorIndex ? 'ID Tractor/Chasis' : null"
@@ -15,7 +15,7 @@
         @update:data="traktor.chassis = $event"
       />
       <FieldInput
-        class="col-span-7 lg:col-span-6"
+        class="col-span-full sm:col-span-6 lg:col-span-5"
         fieldName="supplier"
         placeholder="Proveedor de tractor"
         :title="traktorI === firstTraktorIndex ? 'Proveedor' : null"
@@ -23,14 +23,14 @@
         @update:data="traktor.supplier = $event"
       />
       <FieldInput
-        class="col-span-6 lg:col-span-3"
+        class="col-span-full sm:col-span-6 lg:col-span-4"
+        :title="traktorI === firstTraktorIndex ? 'Descripción' : null"
         fieldName="description"
         placeholder="Descripción de tractor"
-        :title="traktorI === firstTraktorIndex ? 'Descripción' : null"
+        isOptional
         :data="traktor.description"
         @update:data="traktor.description = $event"
       />
-      <!-- Span Proxy para que pueda "Contener" el boton -->
       <span
         v-if="traktors.length > 1 && traktorI !== lastTraktorIndex"
         :class="traktorI === firstTraktorIndex ? 'lg:bottom-6' : 'lg:top-3'"
@@ -39,23 +39,19 @@
           justify-center
           items-center
           col-span-2
-          lg:absolute lg:-right-12
+          lg:absolute lg:-right-16
         "
       >
-        <CircularBtn
-          class="btn__delete"
-          size="sm"
-          @click="remove(traktor.innerId)"
-        >
-          <Icon icon="Trash" class="w-5 h-5" />
+        <CircularBtn class="btn__delete" @click="remove(traktor.innerId)">
+          <Icon icon="Trash" class="w-6 h-6" />
         </CircularBtn>
-        {{ traktor.innerId }}
       </span>
     </FieldGroup>
-    <button class="mt-1 flex items-center col-span-6" @click.prevent="add">
-      <CircularBtn class="btn__add" size="xs">
-        <Icon icon="Plus" class="w-5 h-5" />
-      </CircularBtn>
+    <button
+      class="mt-1 flex items-center col-span-full sm:col-span-6"
+      @click.prevent="add"
+    >
+      <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
       <span class="font-bold"> Agregar tractor/chasis </span>
     </button>
   </FieldGroup>
@@ -113,6 +109,9 @@
           description: '',
         });
       };
+      if (traktors?.value?.length === 0) {
+        add();
+      }
       return {
         lastTraktorIndex,
         firstTraktorIndex,

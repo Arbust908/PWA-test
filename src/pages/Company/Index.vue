@@ -67,7 +67,6 @@
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import { useClone } from '@/helpers/useClone';
-  import '@/assets/table.scss';
 
   import { useStore } from 'vuex';
   import axios from 'axios';
@@ -139,32 +138,6 @@
   };
 </script>
 
-<!-- <style lang="scss" scoped>
-  th {
-    @apply px-6 py-3 text-left text-xs font-medium text-second-500 uppercase tracking-wider;
-  }
-  .body-row {
-    @apply hover:bg-second-200;
-    &.odd {
-      @apply bg-second-50;
-    }
-    &.even {
-      @apply bg-second-100;
-    }
-  }
-  td {
-    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-second-700;
-    &.empty {
-      @apply text-second-400 italic;
-    }
-  }
-  .btn-panel {
-    @apply flex justify-end space-x-4;
-    .edit {
-      @apply flex items-center text-indigo-600 hover:text-indigo-800;
-    }
-    .delete {
-      @apply flex items-center text-red-600 hover:text-red-800;
-    }
-  }
-</style> -->
+<style lang="scss" scoped>
+  @import '@/assets/table.scss';
+</style>

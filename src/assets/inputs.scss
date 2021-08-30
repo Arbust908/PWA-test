@@ -11,7 +11,7 @@ label {
 }
 
 .input {
-  @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
+  @apply w-full px-3 py-2.5 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
 }
 .input_side {
   @apply w-full rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
@@ -26,10 +26,10 @@ label {
   }
 }
 .pre {
-@apply inline-flex items-center px-3 rounded-l border border-second-300 bg-second-50 text-second-500
+  @apply inline-flex items-center px-3 rounded-l border border-second-300 bg-second-50 text-second-500;
 }
 .post {
-  @apply inline-flex items-center px-3 rounded-r border border-second-300 bg-second-50 text-second-500
+  @apply inline-flex items-center px-3 rounded-r border border-second-300 bg-second-50 text-second-500;
 }
 
 input:read-only {

@@ -79,8 +79,6 @@
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
 
-  import '@/assets/table.scss';
-
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -144,3 +142,7 @@
     },
   };
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/table.scss';
+</style>

@@ -31,7 +31,7 @@
           @click="changeSection('rrhh')"
         >
           <span> RRHH </span>
-          <CheckCircleIcon v-if="isRRHHFull" class="w-5 h-5" />
+          <!-- <CheckCircleIcon v-if="isRRHHFull" class="w-5 h-5" /> -->
         </button>
       </nav>
       <OrderSection
@@ -74,134 +74,58 @@
         @update:cabin="cabin = $event"
         @update:isFull="isEquipmentFull = $event"
       />
-      <form
+      <RRHHSection
         v-else-if="WO_section === 'rrhh'"
-        method="POST"
-        action="/"
-        class="p-4 md:flex md:flex-wrap md:gap-24 2xl:gap-32"
-      >
-        <fieldset
-          v-for="(crew, key) in crews"
-          :key="crew.id"
-          class="max-w-sm w-full"
-        >
-          <h2
-            class="
-              flex
-              justify-between
-              items-center
-              font-bold
-              text-2xl
-              pb-4
-              border-b
-              mb-3
-              w-full
-            "
-          >
-            <span>{{ crew.title }}</span>
-            <CircularBtn
-              v-if="key !== 0"
-              class="btn__delete"
-              size="xs"
-              @click="removeCrew(crew.id)"
-            >
-              <TrashIcon class="w-5 h-5" />
-            </CircularBtn>
-          </h2>
-          <section class="flex gap-2 flex-col xl:flex-row items-start mb-4">
-            <div class="flex flex-col">
-              <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
-              <TimePicker
-                :timetrack="Number(crew.timeStart)"
-                @update:timetrack="crew.timeStart = $event"
-              />
-            </div>
-            <div class="flex flex-col">
-              <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
-              <TimePicker
-                :timetrack="Number(crew.timeEnd)"
-                @update:timetrack="crew.timeEnd = $event"
-              />
-            </div>
-          </section>
-          <section class="divide-y">
-            <article
-              v-for="(people, peopleI) in crew.resources"
-              :key="people.id"
-              class="pt-2 pb-3"
-            >
-              <div class="">
-                <label :for="`crew-${crew.id}-${people.id}-role`" class="">
-                  Rol
-                </label>
-                <div class="pit-block relative">
-                  <input
-                    v-model="people.role"
-                    :name="`crew-${crew.id}-${people.id}-role`"
-                    type="text"
-                    placeholder="Rol"
-                  />
-                  <CircularBtn
-                    v-if="peopleI !== 0"
-                    class="btn__delete md:absolute md:right-[-3rem]"
-                    size="sm"
-                    @click="removeResource(crew.id, people.id)"
-                  >
-                    <TrashIcon class="w-5 h-5" />
-                  </CircularBtn>
-                </div>
-              </div>
-              <div class="input-block">
-                <div class="mt-1">
-                  <label :for="`crew-${crew.id}-${people.id}-name`">
-                    <input
-                      v-model="people.name"
-                      :name="`crew-${crew.id}-${people.id}-name`"
-                      type="text"
-                      placeholder="Empleado"
-                    />
-                  </label>
-                </div>
-              </div>
-            </article>
-          </section>
-          <button
-            class="mt-1 flex items-center"
-            @click.prevent="addResource(crew.id)"
-          >
-            <CircularBtn class="btn__add" size="xs">
-              <PlusIcon class="w-4 h-4" />
-            </CircularBtn>
-            <span class="font-bold text-lg"> Agregar otro </span>
-          </button>
-        </fieldset>
-      </form>
+        :crews="crews"
+        :isFull="isRRHHFull"
+        @update:crews="crews = $event"
+      />
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section>
           <GhostBtn
             v-if="isLastSection()"
             class="btn__draft"
+            size="lg"
             @click.prevent="addCrew"
           >
             Agregar Crew
           </GhostBtn>
         </section>
-        <section class="space-x-6 flex items-center justify-end">
-          <NoneBtn @click.prevent="$router.push('/orden-de-trabajo')">
+        <section
+          class="
+            gap-6
+            flex flex-wrap
+            items-center
+            justify-center
+            sm:justify-end
+          "
+        >
+          <NoneBtn
+            class="order-last sm:order-none"
+            size="lg"
+            @click.prevent="$router.push('/orden-de-trabajo')"
+          >
             Cancelar
           </NoneBtn>
-          <GhostBtn class="btn__draft" @click="save()">
+          <GhostBtn size="lg" class="btn__draft" @click="save()">
             <BookmarkIcon class="w-4 h-4" />
             <span> Guardar Provisorio </span>
           </GhostBtn>
-          <PrimaryBtn v-if="isLoading" disabled> Guardando... </PrimaryBtn>
-          <PrimaryBtn v-else-if="!isLastSection()" @click="nextSection">
+          <PrimaryBtn v-if="isLoading" size="lg" disabled>
+            Guardando...
+          </PrimaryBtn>
+          <PrimaryBtn
+            v-else-if="!isLastSection()"
+            size="lg"
+            @click="nextSection"
+          >
             Siguiente
           </PrimaryBtn>
           <PrimaryBtn
             v-else
             :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
             :disabled="!isAllFull"
+            size="lg"
             @click="isAllFull && save(false)"
           >
             Finalizar
@@ -225,6 +149,7 @@
   import { PlusIcon } from '@heroicons/vue/solid';
   import OrderSection from '@/components/workOrder/Order.vue';
   import EquipmentSection from '@/components/workOrder/Equipment.vue';
+  import RRHHSection from '@/components/workOrder/HumanResource.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
@@ -259,6 +184,7 @@
       NoneBtn,
       OrderSection,
       EquipmentSection,
+      RRHHSection,
     },
     setup() {
       // Init
@@ -297,17 +223,17 @@
       const operativeForkliftId: Ref<number> = ref(-1);
       const backupForkliftId: Ref<number> = ref(-1);
       const traktors: Ref<Array<Traktor>> = ref([]);
-      watch(traktors, (newVal, oldVal) => {
-        if (newVal.length <= oldVal.length) {
-          traktors.value = oldVal;
-        }
-      });
+      // watch(traktors, (newVal, oldVal) => {
+      //   if (newVal.length <= oldVal.length) {
+      //     traktors.value = oldVal;
+      //   }
+      // });
       const pickups: Ref<Array<Pickup>> = ref([]);
-      watch(pickups, (newVal, oldVal) => {
-        if (newVal.length <= oldVal.length) {
-          pickups.value = oldVal;
-        }
-      });
+      // watch(pickups, (newVal, oldVal) => {
+      //   if (newVal.length <= oldVal.length) {
+      //     pickups.value = oldVal;
+      //   }
+      // });
       const rigmats: Ref<number> = ref(0);
       const conex: Ref<number> = ref(0);
       const generators: Ref<number> = ref(0);
@@ -614,29 +540,9 @@
 </script>
 
 <style lang="scss" scoped>
-  .btn {
-    &__draft {
-      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-    }
-    &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-    }
-    &__add {
-      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-    }
-    &__add--special {
-      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-    }
-    &__mobile-only {
-      @apply lg:hidden;
-    }
-    &__desktop-only {
-      @apply hidden lg:inline-flex;
-    }
-  }
+  @import '@/assets/button.scss';
   .section-tab {
-    @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
+    @apply pb-2 pt-4 border-b-4 w-full font-medium text-gray-400 flex justify-center items-center gap-2;
   }
   .section-tab[selected='true'] {
     @apply border-main-500 text-main-500;

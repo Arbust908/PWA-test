@@ -72,9 +72,8 @@
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
-  import { useTitle } from '@vueuse/core';
+  import { useTitle, useMagicKeys, whenever } from '@vueuse/core';
 
-  import '@/assets/table.scss';
   import { PurchaseOrder } from '@/interfaces/sandflow.Types';
   import { useApi } from '@/helpers/useApi';
 
@@ -86,7 +85,13 @@
       Icon,
     },
     setup() {
-      const title = useTitle('Ordenes de Pedido <> Sandflow');
+      useTitle('Ordenes de Pedido <> Sandflow');
+
+      const { Ctrl_C } = useMagicKeys();
+      whenever(Ctrl_C, () => {
+        console.log('Crear Nuevo!');
+      });
+
       const { deletePurchaseOrder, savePurchaseOrder } = useActions([
         'deletePurchaseOrder',
         'savePurchaseOrder',
@@ -119,3 +124,7 @@
     },
   };
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/table.scss';
+</style>

@@ -1,150 +1,98 @@
 <template>
-  <form
-    method="POST"
-    action="/"
-    class="p-4 md:flex md:flex-wrap md:gap-24 2xl:gap-32"
-  >
-    <fieldset
+  <form method="POST" action="/" class="p-4 md:flex md:flex-wrap md:gap-20">
+    <FieldGroup
       v-for="(crew, key) in crews"
       :key="crew.id"
       class="max-w-sm w-full"
     >
-      <legend
-        class="
-          flex
-          justify-between
-          items-center
-          font-bold
-          text-2xl
-          pb-4
-          border-b
-          mb-3
-          w-full
-        "
-      >
+      <FieldLegend>
         <span>{{ crew.title }}</span>
         <CircularBtn
           v-if="key !== 0"
           class="btn__delete"
-          size="xs"
           @click="removeCrew(crew.id)"
         >
           <TrashIcon class="w-5 h-5" />
         </CircularBtn>
-      </legend>
-      <section class="flex gap-6">
+      </FieldLegend>
+      <section
+        class="flex gap-2 flex-col sm:flex-row items-start mb-4 col-span-full"
+      >
         <div class="flex flex-col">
           <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
-          <input
-            v-model="crew.start_time"
-            class="rounded max-w-[8rem]"
-            :name="`crew-${crew.id}-start-time`"
-            type="text"
-            placeholder="00:00"
+          <TimePicker
+            :timetrack="Number(crew.timeStart)"
+            @update:timetrack="crew.timeStart = $event"
           />
-          <!-- <select class="rounded" :name="`crew-${crew.id}-start-time`" v-model="crew.start_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
         </div>
         <div class="flex flex-col">
           <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
-          <input
-            v-model="crew.end_time"
-            class="rounded max-w-[8rem]"
-            :name="`crew-${crew.id}-end-time`"
-            type="text"
-            placeholder="00:00"
+          <TimePicker
+            :timetrack="Number(crew.timeEnd)"
+            @update:timetrack="crew.timeEnd = $event"
           />
-          <!-- <select class="rounded" :name="`crew-${crew.id}-end-time`" v-model="crew.end_time">
-                <option selected disabled value="">ej 5:30 AM</option>
-                <option value="7">7:00 PM</option>
-                <option value="8">8:00 PM</option>
-                <option value="9">9:00 PM</option>
-              </select> -->
         </div>
       </section>
-      <section class="divide-y">
-        <article
-          v-for="people in crew.resources"
+      <section class="col-span-full">
+        <FieldGroup
+          v-for="(people, peopleI) in crew.resources"
           :key="people.id"
           class="pt-2 pb-3"
         >
-          <div class="">
-            <label :for="`crew-${crew.id}-${people.id}-rol`" class="">
-              Rol
-            </label>
-            <div class="pit-block relative">
-              <input
-                v-model="people.rol"
-                :name="`crew-${crew.id}-${people.id}-rol`"
-                type="text"
-                placeholder="Rol"
-              />
-              <!-- <select v-model="people.rol" :name="`crew-${crew.id}-${people.id}-rol`">
-                    <option selected disabled value="">Lead Operator</option>
-                    <option value="7">7:00 PM</option>
-                    <option value="8">8:00 PM</option>
-                    <option value="9">9:00 PM</option>
-                  </select> -->
-              <CircularBtn
-                class="btn__delete md:absolute md:right-[-3rem]"
-                size="sm"
-                @click="removeResource(crew.id, people.id)"
-              >
-                <TrashIcon class="w-5 h-5" />
-              </CircularBtn>
-            </div>
-          </div>
-          <div class="input-block">
-            <div class="mt-1">
-              <label :for="`crew-${crew.id}-${people.id}-name`">
-                <input
-                  v-model="people.name"
-                  :name="`crew-${crew.id}-${people.id}-name`"
-                  type="text"
-                  placeholder="Empleado"
-                />
-                <!-- <select v-model="people.name" :name="`crew-${crew.id}-${people.id}-name`">
-                      <option selected disabled value="">Selecciona Empleado</option>
-                      <option value="7">7:00 PM</option>
-                      <option value="8">8:00 PM</option>
-                      <option value="9">9:00 PM</option>
-                    </select> -->
-              </label>
-            </div>
-          </div>
-        </article>
+          <!-- TODO: Pasaria a FiledSelect si tuvieramos ABM de roles y Usuarios -->
+          <FieldInput
+            class="col-span-full"
+            :title="peopleI === 0 ? 'Rol' : null"
+            :fieldName="`crew-${crew.id}-${people.id}-role`"
+            placeholder="Rol"
+            :data="people.role"
+            @update:data="people.role = $event"
+          />
+          <span v-if="notLast(peopleI, people) && notOnly(people)">
+            <CircularBtn
+              v-if="peopleI !== 0"
+              class="btn__delete md:absolute md:right-[-3rem]"
+              size="sm"
+              @click="removeResource(crew.id, people.id)"
+            >
+              <Icon icon="Trash" class="w-5 h-5" />
+            </CircularBtn>
+          </span>
+          <FieldInput
+            class="col-span-full"
+            :fieldName="`crew-${crew.id}-${people.id}-name`"
+            placeholder="Empleado"
+            :data="people.name"
+            @update:data="people.name = $event"
+          />
+        </FieldGroup>
       </section>
-      <button
-        class="mt-1 flex items-center"
-        @click.prevent="addResource(crew.id)"
-      >
-        <CircularBtn class="btn__add" size="xs">
-          <PlusIcon class="w-4 h-4" />
-        </CircularBtn>
-        <span class="font-bold text-lg"> Agregar otro </span>
-      </button>
-    </fieldset>
+      <span class="col-span-12">
+        <button
+          class="mt-1 flex items-center"
+          @click.prevent="addResource(crew.id)"
+        >
+          <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
+          <span class="font-bold text-lg"> Agregar otro </span>
+        </button>
+      </span>
+    </FieldGroup>
   </form>
 </template>
 
 <script lang="ts">
   import { ref, Ref, computed } from 'vue';
-  import { useStore } from 'vuex';
-  import { useRouter } from 'vue-router';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
-  import { PlusIcon } from '@heroicons/vue/solid';
+  import Icon from '@/components/icon/TheAllIcon.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+
+  import TimePicker from '@/components/ui/form/TimePicker.vue';
+
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
 
   import {
     Pit,
@@ -160,14 +108,15 @@
 
   export default {
     components: {
-      BookmarkIcon,
-      CheckCircleIcon,
+      FieldGroup,
+      FieldInput,
+      FieldLegend,
       CircularBtn,
       GhostBtn,
       Layout,
-      PlusIcon,
       PrimaryBtn,
-      TrashIcon,
+      Icon,
+      TimePicker,
     },
     setup() {
       // ::
@@ -248,6 +197,13 @@
         return selectedCrew;
       };
 
+      const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
+        return;
+      };
+      const notOnly = (crewList: Array<HumanResource>) => {
+        return crewList.length > 1;
+      };
+
       // Is the RRHH section is full
       const isRRHHFull = computed(() => {
         return !!(
@@ -264,6 +220,8 @@
         crews,
         removeCrew,
         addCrew,
+        notLast,
+        notOnly,
       };
     },
   };

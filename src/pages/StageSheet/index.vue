@@ -102,8 +102,6 @@
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   import FieldLoading from '@/components/ui/form/FieldLoading.vue';
 
-  import '@/assets/table.scss';
-
   import { useApi } from '@/helpers/useApi';
 
   export default {
@@ -176,3 +174,7 @@
     },
   };
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/table.scss';
+</style>

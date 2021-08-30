@@ -76,8 +76,6 @@
   import axios from 'axios';
   const api = import.meta.env.VITE_API_URL || '/api';
 
-  import '@/assets/table.scss';
-
   export default {
     components: {
       Layout,
@@ -146,3 +144,7 @@
     },
   };
 </script>
+
+<style lang="scss" scoped>
+  @import '@/assets/table.scss';
+</style>
