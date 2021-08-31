@@ -16,7 +16,7 @@
         class="col-span-2 flex items-end"
       >
         <CircularBtn
-          class="btn__delete"
+          class="btn__delete  flex items-center justify-center"
           size="sm"
           @click="removeSandProvider(sPov.innerId)"
         >
@@ -29,7 +29,7 @@
         class="relative grid grid-cols-12 col-span-full gap-4"
       >
         <FieldSelect
-          class="col-span-6"
+          class="col-span-5"
           :title="Key === 0 ? 'Tipo' : null"
           fieldName="sandType"
           placeholder="Seleccionar Arena"
@@ -39,14 +39,14 @@
           @update:data="so.sandTypeId = $event"
         />
         <AmountInput
-          class="col-span-6"
+          class="col-span-5"
           :title="Key === 0"
           :amount="so.amount"
           @update:amount="so.amount = $event"
         />
-        <div class="absolute left-full ml-2 bottom-0 space-x-2 w-[fit-content]">
+        <div class="flex col-span-2 ml-2 bottom-0 items-end mb-1">
           <CircularBtn
-            class="btn__add"
+            class="btn__add flex items-center justify-center"
             size="sm"
             @click.prevent="addSandOrder(sPov.innerId)"
           >
@@ -56,7 +56,7 @@
             v-if="
               sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length - 1
             "
-            class="btn__delete"
+            class="btn__delete flex items-center justify-center"
             size="sm"
             @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
           >

@@ -8,14 +8,6 @@
       </h1>
     </header>
     <section class="bg-second-0 rounded-md shadow-sm">
-      <!-- <FieldWithSides
-              class="col-span-6"
-              title="Cantidad"
-              fieldName="sandQuantity"
-              :data="sO.amount"
-              @update:data="sO.amount = $event"
-              :post="{ value: 't', title: 'Peso en Toneladas' }"
-            /> -->
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <SandProviderPack
           :sandProviders="sandProviderIds"
@@ -58,7 +50,7 @@
                 size="sm"
                 @click="removeTransportProvider(tO.id)"
               >
-                <TrashIcon class="w-5 h-5" />
+                <TrashIcon class="w-4 h-4" />
               </CircularBtn>
             </div>
             <label class="col-span-full" :for="'transportAmount' + tO.id">
@@ -98,9 +90,9 @@
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
-        <NoneBtn @click.prevent="$router.push('/notificaciones-a-proveedores')">
-          Cancelar
-        </NoneBtn>
+        <router-link to="/">
+          <NoneBtn> Cancelar </NoneBtn>
+        </router-link>
         <PrimaryBtn
           type="submit"
           size="sm"
@@ -117,104 +109,68 @@
         </PrimaryBtn>
       </footer>
     </section>
-    <Modal
-      title="Notificación a Proveedores"
-      type="off"
-      :open="showModal"
-      @close="toggleModal"
-    >
+    <Modal type="off" :open="showModal" @close="toggleModal">
       <template #body>
-        <div class="divide-y text-left">
-          <section v-if="isSandFull" class="py-2 space-y-2">
-            <h3 class="text-xl">Arena</h3>
-            <article
-              class="text-sm text-indigo-500"
-              v-for="spi in sandProviderIds"
-              :key="spi.innerId"
-            >
-              <header class="flex items-center gap-2">
-                <BellIcon class="w-4 h-4" />
-                <span>Notificación para {{ getSPName(spi.id) }}</span>
-              </header>
-              <ul class="list-disc pl-6 ml-2">
-                <li v-for="sOli in spi.SandOrders" :key="sOli.id">
-                  Tipo: {{ getSTName(sOli.sandTypeId) }}, {{ sOli.amount }}t
-                </li>
-              </ul>
-            </article>
-          </section>
-          <section v-if="isTransportFull" class="py-2 space-y-2">
-            <h3 class="text-xl">Transporte</h3>
-            <template v-for="tPNot in transportOrder" :key="tPNot.id">
-              <article class="text-sm text-indigo-500">
-                <header class="flex items-center gap-2">
-                  <BellIcon class="w-4 h-4" />
-                  <span>Notificación para {{ tPNot.name }}</span>
-                </header>
-                <ul class="list-disc pl-6 ml-2">
-                  <li v-for="tPNot in transportOrder" :key="tPNot.id">
-                    Cantidad de camiones: {{ tPNot.amount }},
-                    {{ tPNot.observation }}
-                  </li>
-                </ul>
-              </article>
-            </template>
-          </section>
+        <div
+          class="
+            divide-y
+            text-center
+            flex flex-col
+            justify-center
+            text-xl
+            items-center
+          "
+          v-if="hasSaveSuccess"
+        >
+          <Icon
+            :icon="checkCircle"
+            class="h-[54px] w-[54px] mb-4 text-green-400"
+          />
+          <span class="text-center text-base border-none text-gray-900"
+            >¡La notificación fue enviada con éxito!</span
+          >
+        </div>
+        <div
+          class="
+            divide-y
+            text-center
+            flex flex-col
+            justify-center
+            text-xl
+            items-center
+          "
+          v-else
+        >
+          <Icon
+            icon="exclamationCircle"
+            class="h-[54px] w-[54px] mb-4 text-red-400"
+          />
+          <span class="text-center text-base border-none text-gray-900"
+            >Hubo un problema con el envío de la notificación. <br />Por favor,
+            intenta nuevamente</span
+          >
         </div>
       </template>
       <template #btn>
-        <div class="flex gap-4">
+        <div class="flex gap-4" v-if="hasSaveSuccess">
+          <router-link to="/" class="modal-close-button">
+            <button type="button">Cerrar</button>
+          </router-link>
           <button
             type="button"
-            class="
-              inline-flex
-              justify-center
-              w-full
-              rounded-md
-              border border-transparent
-              shadow-sm
-              px-4
-              py-2
-              bg-transparent
-              text-base
-              font-medium
-              text-second-400
-              hover:bg-gray-100
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-red-500
-              sm:text-sm
-            "
+            class="modal-create-new-button"
+            @click.prevent="createNew"
+          >
+            Crear nueva
+          </button>
+        </div>
+        <div class="flex gap-4" v-else>
+          <button
+            type="button"
+            class="modal-close-button"
             @click.prevent="toggleModal"
           >
             Volver
-          </button>
-          <button
-            type="button"
-            class="
-              inline-flex
-              justify-center
-              w-full
-              rounded-md
-              border border-transparent
-              shadow-sm
-              px-4
-              py-2
-              bg-main-600
-              text-base
-              font-medium
-              text-second-50
-              hover:bg-main-700
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-main-500
-              sm:text-sm
-            "
-            @click.prevent="confirm"
-          >
-            Confirmar
           </button>
         </div>
       </template>
@@ -234,7 +190,7 @@
   } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-
+  import Icon from '@/components/icon/TheAllIcon.vue';
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
@@ -249,7 +205,6 @@
     Sand,
   } from '@/interfaces/sandflow';
   import { useToggle } from '@vueuse/core';
-  //
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
@@ -282,6 +237,7 @@
       FieldSelect,
       FieldWithSides,
       SandProviderPack,
+      Icon,
     },
     setup() {
       const router = useRouter();
@@ -397,24 +353,46 @@
 
       const showModal = ref(false);
       const toggleModal = useToggle(showModal);
+      const hasSaveSuccess = ref(false);
+
       const save = async () => {
-        console.log('jump');
-        toggleModal(true);
-      };
-      const confirm = async () => {
         pN.value = {
           sandProviderIds: Number(sandProviderIds.value[0].id),
-          sandOrderId: sandProviderIds.value[0].sandOrders[0].id,
+          sandOrderId: sandProviderIds.value[0].SandOrders[0].id,
           transportProviderId: Number(transportOrder.value[0].id),
         };
-        const { data } = useAxios(
-          '/ProviderNotification',
-          { method: 'POST', data: pN.value },
-          instance
-        );
+        const response = await axios
+          .post(`${apiUrl}/ProviderNotification`, pN.value)
+          .then((res) => {
+            return res;
+          })
+          .catch((err) => console.error(err));
+
+        if (response.status == 200) {
+          hasSaveSuccess.value = true;
+          store.dispatch('saveProviderNotification', pN.value);
+        }
+
+        toggleModal(true);
+      };
+
+      const createNew = () => {
+        transportOrder.value = [];
+        transportOrder.value[0] = defaultTransportProvider;
+        sandProviderIds.value = [];
+        sandProviderIds.value[0] = {
+          innerId: 0,
+          id: -1,
+          SandOrders: [
+            {
+              innerId: 0,
+              sandTypeId: -1,
+              amount: null,
+            },
+          ],
+        };
+
         toggleModal(false);
-        store.dispatch('saveProviderNotification', pN.value);
-        router.push('/notificaciones-a-proveedores');
       };
 
       const toCapitalize = (str: string) => {
@@ -435,7 +413,6 @@
         toggleModal,
         isSandFull,
         isTransportFull,
-        confirm,
         sandProviders,
         toCapitalize,
         sandTypes,
@@ -445,6 +422,9 @@
         sandProviderIds,
         getSPName,
         getSTName,
+        hasSaveSuccess,
+        createNew,
+        router,
       };
     },
   });
@@ -452,6 +432,12 @@
 
 <style lang="scss" scoped>
   @import '@/assets/button.scss';
+  .modal-close-button {
+    @apply flex justify-center items-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-white text-base font-medium text-second-400 hover:bg-gray-100 sm:text-sm;
+  }
+  .modal-create-new-button {
+    @apply inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-main-600 text-base font-medium text-second-50 hover:bg-main-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500 sm:text-sm;
+  }
   .input {
     @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
   }
@@ -469,28 +455,5 @@
   }
   .toggle {
     @apply flex space-x-3 items-center;
-  }
-  .btn {
-    &__draft {
-      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-    }
-    &__delete {
-      @apply border-transparent text-second-800 bg-transparent hover:bg-red-600 hover:text-second-50 mx-2 p-2 transition duration-150 ease-out;
-    }
-    &__options {
-      @apply border-transparent text-second-800 bg-transparent hover:bg-second-300 hover:text-indigo-800 mx-2 p-2 transition duration-150 ease-out;
-    }
-    &__add {
-      @apply border-transparent text-second-50 bg-green-500 hover:bg-green-600 mr-2;
-    }
-    &__add--special {
-      @apply border-2 border-second-400 text-second-400 bg-transparent group-hover:bg-second-200 group-hover:text-second-600 group-hover:border-second-600;
-    }
-    &__mobile-only {
-      @apply lg:hidden;
-    }
-    &__desktop-only {
-      @apply hidden lg:inline-flex;
-    }
   }
 </style>
