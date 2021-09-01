@@ -12,26 +12,26 @@
           class="btn__delete"
           @click="removeCrew(crew.id)"
         >
-          <TrashIcon class="w-5 h-5" />
+          <Icon icon="Trash" class="w-5 h-5" />
         </CircularBtn>
       </FieldLegend>
       <section
         class="flex gap-2 flex-col sm:flex-row items-start mb-4 col-span-full"
       >
-        <div class="flex flex-col">
-          <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
+        <label class="flex flex-col" :for="`crew-${crew.id}-start-time`">
+          <p>Hora de Inicio</p>
           <TimePicker
             :timetrack="Number(crew.timeStart)"
             @update:timetrack="crew.timeStart = $event"
           />
-        </div>
-        <div class="flex flex-col">
-          <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
+        </label>
+        <label class="flex flex-col" :for="`crew-${crew.id}-end-time`">
+          <p>Hora de Fin</p>
           <TimePicker
             :timetrack="Number(crew.timeEnd)"
             @update:timetrack="crew.timeEnd = $event"
           />
-        </div>
+        </label>
       </section>
       <section class="col-span-full">
         <FieldGroup
@@ -94,17 +94,9 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
 
-  import {
-    Pit,
-    Traktor,
-    Pickup,
-    HumanResource,
-    Crew,
-    WorkOrder,
-  } from '@/interfaces/WorkOrder';
+  import { useVModels } from '@vueuse/core';
 
-  import axios from 'axios';
-  const api = import.meta.env.VITE_API_URL || '/api';
+  import { HumanResource, Crew } from '@/interfaces/sandflow';
 
   export default {
     components: {
@@ -118,26 +110,23 @@
       Icon,
       TimePicker,
     },
-    setup() {
-      // ::
-      // Crew
-      // ::
-      const resource: Ref<Array<HumanResource>> = ref([
-        {
-          id: 0,
-          rol: '',
-          name: '',
-        },
-      ]);
-      const crews: Ref<Array<Crew>> = ref([
-        {
-          id: 1,
-          start_time: '',
-          end_time: '',
-          title: 'Crew A',
-          resources: resource,
-        },
-      ]);
+    props: {
+      crews: {
+        type: Array,
+        default: () => [],
+      },
+      isFull: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props, { emit }) {
+      const { crews, isFull } = useVModels(props, emit);
+      const defaultResource = {
+        id: 0,
+        name: '',
+        role: '',
+      };
       const removeResource = (crewId: number, peopleId: number) => {
         const selectedCrew = crews.value.find(
           (crew: Crew) => crew.id === crewId
@@ -152,10 +141,9 @@
         );
         const lastId = selectedCrew.resources.length;
         selectedCrew.resources.push({
+          ...defaultResource,
           id: lastId,
-          rol: '',
-          name: '',
-        } as HumanResource);
+        });
       };
       const addCrew = (): void => {
         const lastId = crews.value.length + 1;
@@ -172,30 +160,18 @@
       const removeCrew = (crewId: number): void => {
         crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
       };
-      // Remove empty Crews
-      const removeEmptyCrews = (): void => {
-        crews.value = crews.value
-          .map((crew: Crew) => removeEmptyResource(crew.id))
-          .filter(
-            (crew: Crew) =>
-              !(
-                crew.resources.length <= 0 &&
-                crew.start_time === '' &&
-                crew.end_time === ''
-              )
-          );
-      };
-      // Remove Empty Resource
-      const removeEmptyResource = (crewId: number): void => {
-        const selectedCrew = crews.value.find(
-          (crew: Crew) => crew.id === crewId
-        );
-        selectedCrew.resources = selectedCrew.resources.filter(
-          (resource: HumanResource) =>
-            resource.rol !== '' && resource.name !== ''
-        );
-        return selectedCrew;
-      };
+
+      if (crews?.value?.length === 0) {
+        addCrew();
+      } else if (
+        crews?.value?.some((crew: Crew) => crew.resources.length === 0)
+      ) {
+        crews.value.forEach((crew: Crew) => {
+          if (crew.resources.length === 0) {
+            addResource(crew.id);
+          }
+        });
+      }
 
       const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
         return;
@@ -228,44 +204,5 @@
 </script>
 
 <style lang="scss" scoped>
-  .btn {
-    &__draft {
-      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-    }
-    &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-    }
-    &__add {
-      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-    }
-    &__add--special {
-      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-    }
-    &__mobile-only {
-      @apply lg:hidden;
-    }
-    &__desktop-only {
-      @apply hidden lg:inline-flex;
-    }
-  }
-  .input-block select,
-  .input-block input {
-    @apply w-full rounded mb-3 p-2;
-  }
-
-  .pit-block {
-    @apply flex mt-1 items-center w-full mb-3;
-    & select,
-    & input {
-      @apply rounded p-2 max-w-md inline-block w-full;
-    }
-  }
-
-  fieldset {
-    @apply mb-6;
-  }
-  label {
-    @apply text-sm;
-  }
+  @import '@/assets/button.scss';
 </style>

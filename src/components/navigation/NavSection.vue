@@ -2,11 +2,14 @@
   <div :class="isSectionOpen ? 'opened' : null" class="section">
     <button class="nav-link group" @click.prevent="toggleSection()">
       <Icon :icon="icon" type="outline" class="icon" />
-      <span class="hidden lg:inline">{{ name }}</span>
+      <span :class="mode === 'desk' ? 'hidden lg:inline' : null">{{
+        name
+      }}</span>
     </button>
     <transition-group
       v-if="isSectionOpen"
       appear
+      :class="mode === 'desk' ? 'small' : null"
       class="sub-section"
       tag="div"
       @before-enter="beforeEnter"
@@ -17,6 +20,7 @@
         :key="item.to"
         v-bind="item"
         :data-stagger-index="index"
+        :mode="mode"
       />
     </transition-group>
   </div>
@@ -43,6 +47,10 @@
       subNav: {
         type: Array,
         required: true,
+      },
+      mode: {
+        type: String,
+        default: '',
       },
     },
     components: {
@@ -90,7 +98,7 @@
     @apply w-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-main-600;
   }
   .nav-link {
-    @apply flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer;
+    @apply flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer space-x-4;
     &.selected {
       @apply bg-gray-100 text-gray-900;
       & > .icon {
@@ -105,9 +113,12 @@
     }
   }
   .icon {
-    @apply mr-4 flex-shrink-0 h-6 w-6 transition transform duration-200 ease-in-out;
+    @apply flex-shrink-0 h-8 lg:h-6 w-8 lg:w-6 transition transform duration-200 ease-in-out;
   }
   .sub-section {
-    @apply ml-3 pr-1 space-y-1;
+    @apply lg:ml-3 lg:pr-1 space-y-1;
+  }
+  .sub-section:not(.small) {
+    @apply ml-3;
   }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <p>
     {{ title }}
-    <span v-if="isOptional">(Opcional)</span>
+    <span v-if="isOptional" class="optional">(Opcional)</span>
   </p>
 </template>
 
@@ -21,3 +21,9 @@
     },
   });
 </script>
+
+<style lang="scss" scoped>
+  .optional {
+    @apply opacity-75 ml-1 italic;
+  }
+</style>

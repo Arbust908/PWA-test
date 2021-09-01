@@ -1,7 +1,7 @@
 <template>
   <NavLine v-if="isLine" v-bind="item" />
-  <NavLink v-else-if="isNotSection" v-bind="item" />
-  <NavSection v-else v-bind="item" />
+  <NavLink v-else-if="isNotSection" v-bind="item" :mode="mode" />
+  <NavSection v-else v-bind="item" :mode="mode" />
 </template>
 <script lang="ts">
   import { defineComponent } from 'vue';
@@ -31,6 +31,10 @@
       subNav: {
         type: Array,
         default: null,
+      },
+      mode: {
+        type: String,
+        default: '',
       },
     },
     setup(props) {

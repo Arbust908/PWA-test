@@ -5,7 +5,7 @@
     class="nav-link group"
   >
     <Icon :icon="icon" type="outline" class="icon" />
-    <span class="hidden lg:inline">{{ name }}</span>
+    <span :class="mode === 'desk' ? 'hidden lg:inline' : null">{{ name }}</span>
   </router-link>
 </template>
 
@@ -30,13 +30,17 @@
         type: String,
         required: true,
       },
+      mode: {
+        type: String,
+        default: '',
+      },
     },
   });
 </script>
 
 <style lang="scss" scoped>
   .nav-link {
-    @apply flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer;
+    @apply flex items-center px-2 py-2 text-base font-medium rounded-md cursor-pointer space-x-4;
     &.selected {
       @apply bg-gray-100 text-gray-900;
       & > .icon {
@@ -50,7 +54,7 @@
       }
     }
     & > .icon {
-      @apply mr-4 flex-shrink-0 h-6 w-6;
+      @apply flex-shrink-0 h-8 lg:h-6 w-8 lg:w-6;
     }
   }
 </style>

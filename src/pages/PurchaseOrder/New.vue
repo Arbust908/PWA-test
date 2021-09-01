@@ -424,7 +424,7 @@
                       const ordenDePedido = pODone.value.data;
                       const pedidoDeArena = sOisDone.value;
                       ordenDePedido.sandOrders = pedidoDeArena;
-                      console.log("salimo")
+                      console.log('salimo');
                       router.push('/orden-de-pedido');
                     }
                   });

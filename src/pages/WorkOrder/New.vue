@@ -79,12 +79,18 @@
         :crews="crews"
         :isFull="isRRHHFull"
         @update:crews="crews = $event"
+        @update:isFull="isRRHHFull = $event"
       />
-      <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-        <section>
+      <footer
+        :class="isLastSection() ? 'justify-between' : 'justify-end'"
+        class="p-4 gap-3 flex flex-col md:flex-row"
+      >
+        <section
+          v-if="isLastSection()"
+          class="pb-4 mb-2 border-b md:pb-0 md:mb-0 md:border-none"
+        >
           <GhostBtn
-            v-if="isLastSection()"
-            class="btn__draft"
+            class="btn__draft w-full md:w-auto justify-center"
             size="lg"
             @click.prevent="addCrew"
           >

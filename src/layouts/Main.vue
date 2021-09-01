@@ -96,7 +96,7 @@
 
     <!-- Static sidebar for desktop -->
     <div class="hidden md:flex md:flex-shrink-0">
-      <div class="flex flex-col w-64">
+      <div class="flex flex-col lg:w-64">
         <!-- Sidebar component, swap this element with another sidebar if you like -->
         <div
           class="
@@ -109,7 +109,7 @@
           "
         >
           <div class="flex items-center flex-shrink-0 px-4">
-            <Logo class="h-8 w-auto" />
+            <Logo class="hidden lg:block h-8 w-auto" />
           </div>
           <div class="mt-5 flex-grow flex flex-col">
             <nav class="flex-1 px-2 bg-second-50 space-y-1">
@@ -117,6 +117,7 @@
                 v-for="item in navigation"
                 :key="item.to"
                 v-bind="item"
+                mode="desk"
               />
               <!-- <router-link
                 v-for="item in navigation"

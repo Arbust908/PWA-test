@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-2 items-center p-1 rounded border border-gray-500">
+  <div class="flex gap-2 items-center p-1 rounded border border-second-300">
     <select
       v-model="hour"
       name="picker-hour"
