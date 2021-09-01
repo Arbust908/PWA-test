@@ -32,7 +32,7 @@
         <fieldset v-if="selectionsAreDone" class="w-full py-5 px-2">
           <div v-if="boxes.length > 0">
             <div v-for="box in boxes" :key="box.id" class="available-box">
-              <div
+              <button
                 :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
                 class="radio-button"
                 @click.prevent="setSelectedBox(box.boxId)"
