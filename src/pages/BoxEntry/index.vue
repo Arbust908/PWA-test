@@ -33,19 +33,17 @@
           <div v-if="boxes.length > 0">
             <div v-for="box in boxes" :key="box.id" class="available-box">
               <div
-                :class="[
-                  'radio-button',
-                  choosedBox.boxId == box.boxId ? 'active' : '',
-                ]"
+                :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
+                class="radio-button"
                 @click.prevent="setSelectedBox(box.boxId)"
-              ></div>
+              />
               <div class="box-id">
                 <span> {{ box.category }} - {{ box.amount }}t - </span>
-                <FieldInput
-                  fieldName="boxId"
-                  placeholder="S0001"
-                  :data="box.boxId"
-                  @update:data="box.boxId = $event"
+                <input
+                  v-model="box.boxId"
+                  :name="`boxId-${box.id}`"
+                  type="text"
+                  placeholder="S-0001"
                 />
               </div>
             </div>
@@ -694,37 +692,35 @@
   }
 
   .available-box {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
+    @apply flex items-center mb-2;
 
     .radio-button {
-      border: 1px solid black;
-      border-radius: 100%;
-      height: 20px;
-      width: 20px;
-      cursor: pointer;
-
+      @apply border border-gray-800 w-5 h-5 cursor-pointer rounded-full;
       &.active {
-        position: relative;
-
+        @apply relative;
         &::after {
-          position: absolute;
           content: '';
-          width: 10px;
-          height: 10px;
-          background: black;
-          border-radius: 100%;
-          margin: auto;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          @apply absolute inset-0 w-3 h-3 rounded-full m-auto bg-gray-900;
+          animation: pop_in 150ms ease-out;
         }
       }
     }
     .box-id {
-      margin-left: 0.5rem;
+      @apply mx-2 flex items-center;
+      & > input {
+        @apply border-none inline p-0.5 rounded w-20 hover:bg-gray-200 focus:ring-main-500 focus:border-main-500;
+      }
+    }
+  }
+  @keyframes pop_in {
+    from {
+      @apply transform scale-0;
+    }
+    90% {
+      @apply transform scale-110;
+    }
+    to {
+      @apply transform scale-100;
     }
   }
 </style>
