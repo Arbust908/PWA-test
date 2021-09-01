@@ -8,47 +8,15 @@
       </h1>
     </header>
     <section>
-      <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <fieldset
-          class="
-            py-2
-            w-full
-            max-w-xl
-            grid grid-cols-1
-            md:grid-cols-2
-            gap-3
-            md:gap-4
-          "
-        >
-          <label class="col-span-1" for="client">
-            <span>Cliente</span>
-            <select
-              id="client"
-              v-model="currentSandPlan.companyId"
-              class="input"
-              name="client"
-            >
-              <option selected disabled value="-1">Selecionar Cliente</option>
-              <option v-for="c in clients" :key="c.id" :value="c.id">
-                {{ c.name }}
-              </option>
-            </select>
-          </label>
-          <label class="col-span-1" for="pit">
-            <span>Pozo</span>
-            <select
-              id="pit"
-              v-model="currentSandPlan.pitId"
-              class="input"
-              name="pit"
-            >
-              <option disabled selected value="-1">Seleccionar Pozo</option>
-              <option v-for="pit in pits" :key="pit.id" :value="pit.id">
-                {{ pit.name }}
-              </option>
-            </select>
-          </label>
-        </fieldset>
+      <form method="POST" action="/" class="py-4">
+        <FieldGroup class="gap-x-8 max-w-xl">
+          <ClientPitCombo
+            :clientId="currentSandPlan.companyId"
+            :pitId="currentSandPlan.pitId"
+            @update:clientId="currentSandPlan.companyId = $event"
+            @update:pitId="currentSandPlan.pitId = $event"
+          />
+        </FieldGroup>
       </form>
     </section>
     <section class="bg-white rounded-md shadow-sm mb-14">
@@ -60,9 +28,7 @@
               <span>{{ selectedPitName }}</span>
             </h2>
             <button class="flex items-center" @click.prevent="addStage">
-              <CircularBtn class="btn__add" size="xs">
-                <PlusIcon class="w-4 h-4" />
-              </CircularBtn>
+              <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
               <span class="font-bold"> Agregar etapa </span>
             </button>
           </section>
@@ -71,7 +37,9 @@
               @click.prevent="toggleCurOp()"
               :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
             >
-              <ChevronUpIcon
+              <Icon
+                icon="ChevronUp"
+                outline
                 :opened="currentOpened"
                 :class="currentOpened ? 'rotate-180' : null"
                 class="
@@ -133,7 +101,9 @@
               @click.prevent="toggleFinOp()"
               :title="finishedOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
             >
-              <ChevronUpIcon
+              <Icon
+                icon="ChevronUp"
+                outline
                 :opened="finishedOpened"
                 :class="finishedOpened ? 'rotate-180' : null"
                 class="
@@ -182,9 +152,9 @@
       </form>
     </section>
     <footer class="p-4 space-x-8 flex justify-end">
-      <button @click.prevent="$router.push('/planificacion-de-arena')">
+      <NoneBtn @click.prevent="$router.push('/planificacion-de-arena')">
         Cancelar
-      </button>
+      </NoneBtn>
       <PrimaryBtn
         type="submit"
         size="sm"
@@ -214,17 +184,6 @@
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
 
-  import {
-    BookmarkIcon,
-    DotsVerticalIcon,
-    ChevronUpIcon,
-  } from '@heroicons/vue/outline';
-  import {
-    PlusIcon,
-    DocumentDuplicateIcon,
-    PencilAltIcon,
-    TrashIcon,
-  } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
@@ -236,24 +195,26 @@
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
   import { useToggle } from '@vueuse/core';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+
   const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
       Layout,
       GhostBtn,
-      BookmarkIcon,
-      PlusIcon,
       CircularBtn,
       PrimaryBtn,
-      DotsVerticalIcon,
-      ChevronUpIcon,
-      DocumentDuplicateIcon,
-      PencilAltIcon,
-      TrashIcon,
+      NoneBtn,
+      Icon,
       SandPlanStage,
       StageEmptyState,
       StageHeader,
+      FieldGroup,
+      ClientPitCombo,
     },
     setup() {
       // Init

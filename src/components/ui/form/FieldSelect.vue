@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { defineComponent } from 'vue';
+  import { defineComponent, computed } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { useApi } from '@/helpers/useApi';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
@@ -64,14 +64,17 @@
       },
     },
     setup(props, { emit }) {
+      const endpointData = useVModel(props, 'endpointData', emit);
       const value = useVModel(props, 'data', emit);
-      let resources = null;
-      if (props.endpointData !== null) {
-        resources = props.endpointData;
-      } else {
-        const { read } = useApi(props.endpoint);
-        resources = read();
-      }
+      const resources = computed(() => {
+        if (endpointData.value !== null) {
+          console.log(props.title + ' value', endpointData.value);
+          return endpointData.value;
+        } else {
+          const { read } = useApi(props.endpoint);
+          return read();
+        }
+      });
       return {
         value,
         resources,

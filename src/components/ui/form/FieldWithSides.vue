@@ -5,7 +5,6 @@
       <span v-if="pre" class="pre" :title="pre.title">{{ pre.value }}</span>
       <input
         :class="[pre ? null : 'n-pre', post ? null : 'n-post']"
-        class=""
         :id="fieldName"
         :type="type"
         :name="fieldName"

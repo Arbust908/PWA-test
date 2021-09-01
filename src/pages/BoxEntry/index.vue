@@ -18,29 +18,16 @@
               @update:pitId="pitId = $event"
             />
           </span>
-          <label class="col-span-4" for="purchaseOrder">
-            <span>Orden de pedido</span>
-            <select
-              id="purchaseOrder"
-              v-model="purchaseOrderId"
-              class="input"
-              name="purchaseOrder"
-            >
-              <option selected disabled value="-1">
-                Seleccionar orden de pedido
-              </option>
-              <option
-                v-for="purchaseOrder in filteredPurchaseOrders"
-                :key="purchaseOrder.id"
-                :value="purchaseOrder.id"
-              >
-                # {{ purchaseOrder.id }}
-              </option>
-              <option v-if="purchaseOrders.length <= 0" value="-1">
-                No hay ordenes de pedido para este Pozo y/o cliente
-              </option>
-            </select>
-          </label>
+          <FieldSelect
+            class="col-span-4"
+            title="Orden de pedido"
+            fieldName="sandType3"
+            placeholder="Seleccionar orden de pedido"
+            endpointKey="id"
+            :endpointData="filteredPurchaseOrders"
+            :data="purchaseOrderId"
+            @update:data="purchaseOrderId = $event"
+          />
         </FieldGroup>
         <fieldset v-if="selectionsAreDone" class="w-full py-5 px-2">
           <div v-if="boxes.length > 0">
@@ -52,7 +39,15 @@
                 ]"
                 @click.prevent="setSelectedBox(box.boxId)"
               ></div>
-              <div class="box-id">{{ box.boxId }}</div>
+              <div class="box-id">
+                <span> {{ box.category }} - {{ box.amount }}t - </span>
+                <FieldInput
+                  fieldName="boxId"
+                  placeholder="S0001"
+                  :data="box.boxId"
+                  @update:data="box.boxId = $event"
+                />
+              </div>
             </div>
           </div>
           <div v-else>No hay cajas asociadas.</div>
@@ -218,6 +213,8 @@
   import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
   import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
 
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -240,6 +237,8 @@
       ClientPitCombo,
       CradleRow,
       FieldGroup,
+      FieldSelect,
+      FieldInput,
     },
     setup() {
       const router = useRouter();

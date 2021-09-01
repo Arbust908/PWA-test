@@ -3,96 +3,106 @@
     <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-lg">
       {{ stage.stage }} - 40
     </td>
-    <td
-      v-if="editing === stage.id"
-      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
-      :id="`sandType${stage.id}`"
-    >
-      <FieldSelect
-        class="col-span-6"
-        fieldName="sandType1"
-        placeholder="Seleccionar"
-        endpoint="/sand"
-        endpointKey="type"
-        :data="stage.sandId1"
-        @update:data="stage.sandId1 = $event"
-      />
-      <div class="amountWrapper">
-        <input
-          v-model.number="stage.quantity1"
-          type="number"
-          name="sandQuantity"
-          class="amountInput"
-          placeholder="Cantidad de Arena"
-          list="sandQuantity"
+    <template v-if="editing === Number(stage.id)">
+      <td
+        class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
+        :id="`sandType${stage.id}`"
+      >
+        <FieldSelect
+          fieldName="sandType1"
+          placeholder="Seleccionar"
+          endpoint="/sand"
+          endpointKey="type"
+          :data="stage.sandId1"
+          @update:data="stage.sandId1 = $event"
         />
-        <span class="amountInput__unit" title="Peso en Toneladas"> t </span>
-      </div>
-    </td>
-    <td v-else class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length > 0 && stage.sandId1 >= 0">
-        {{ getSand(stage.sandId1)?.type }}
-      </p>
-      <p v-else></p>
-      <p v-if="stage.quantity1 > 0">{{ stage.quantity1 }}t</p>
-    </td>
-    <td
-      v-if="editing === stage.id"
-      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm max-w-[120px]"
-    >
-      <FieldSelect
-        class="col-span-6"
-        fieldName="sandType2"
-        placeholder="Seleccionar"
-        endpoint="/sand"
-        endpointKey="type"
-        :data="stage.sandId2"
-        @update:data="stage.sandId2 = $event"
-      />
-      <div class="amountWrapper">
-        <input
-          v-model.number="stage.quantity2"
-          type="number"
-          name="sandQuantity"
-          class="amountInput"
+        <FieldWithSides
+          fieldName="sandQuantity1"
           placeholder="Cantidad de Arena"
-          list="sandQuantity"
-        />
-        <span class="amountInput__unit" title="Peso en Toneladas"> t </span>
-      </div>
-    </td>
-    <td v-else class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length > 0 && stage.sandId2 > 0">
-        {{ getSand(stage.sandId2)?.type }}
-      </p>
-      <p v-else></p>
-      <p v-if="stage.quantity2 > 0">{{ stage.quantity2 }}t</p>
-    </td>
-    <td
-      v-if="editing === stage.id"
-      class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm max-w-[120px]"
-    >
-      <FieldSelect
-        class="col-span-6"
-        fieldName="sandType3"
-        placeholder="Seleccionar"
-        endpoint="/sand"
-        endpointKey="type"
-        :data="stage.sandId3"
-        @update:data="stage.sandId3 = $event"
-      />
-      <div class="amountWrapper">
-        <input
-          v-model.number="stage.quantity3"
           type="number"
-          name="sandQuantity"
-          class="amountInput"
-          placeholder="Cantidad de Arena"
-          list="sandQuantity"
+          :post="{ title: 'Peso en Toneladas', value: 't' }"
+          :data="stage.quantity1"
+          @update="stage.quantity1 = $event"
         />
-        <span class="amountInput__unit" title="Peso en Toneladas"> t </span>
-      </div>
-    </td>
+      </td>
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+        <FieldSelect
+          fieldName="sandType2"
+          placeholder="Seleccionar"
+          endpoint="/sand"
+          endpointKey="type"
+          :data="stage.sandId2"
+          @update:data="stage.sandId2 = $event"
+        />
+        <FieldWithSides
+          fieldName="sandQuantity2"
+          placeholder="Cantidad de Arena"
+          type="number"
+          :post="{ title: 'Peso en Toneladas', value: 't' }"
+          :data="stage.quantity2"
+          @update="stage.quantity2 = $event"
+        />
+      </td>
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+        <FieldSelect
+          fieldName="sandType3"
+          placeholder="Seleccionar"
+          endpoint="/sand"
+          endpointKey="type"
+          :data="stage.sandId3"
+          @update:data="stage.sandId3 = $event"
+        />
+        <FieldWithSides
+          fieldName="sandQuantity3"
+          placeholder="Cantidad de Arena"
+          type="number"
+          :post="{ title: 'Peso en Toneladas', value: 't' }"
+          :data="stage.quantity3"
+          @update="stage.quantity3 = $event"
+        />
+      </td>
+    </template>
+    <template v-else>
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+        <template
+          v-if="(sands.length > 0 && stage.sandId1 >= 0) || stage.quantity1 > 0"
+        >
+          <p v-if="sands.length > 0 && stage.sandId1 >= 0">
+            {{ getSand(stage.sandId1)?.type }}
+          </p>
+          <p v-if="stage.quantity1 > 0">{{ stage.quantity1 }}t</p>
+        </template>
+        <template v-else>
+          <p>No hay arena</p>
+        </template>
+      </td>
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+        <template
+          v-if="(sands.length > 0 && stage.sandId2 >= 0) || stage.quantity2 > 0"
+        >
+          <p v-if="sands.length > 0 && stage.sandId2 >= 0">
+            {{ getSand(stage.sandId2)?.type }}
+          </p>
+          <p v-if="stage.quantity2 > 0">{{ stage.quantity2 }}t</p>
+        </template>
+        <template v-else>
+          <p>No hay arena</p>
+        </template>
+      </td>
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+        <template
+          v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0"
+        >
+          <p v-if="sands.length > 0 && stage.sandId3 >= 0">
+            {{ getSand(stage.sandId3)?.type }}
+          </p>
+          <p v-if="stage.quantity3 > 0">{{ stage.quantity3 }}t</p>
+        </template>
+        <template v-else>
+          <p>No hay arena</p>
+        </template>
+      </td>
+    </template>
     <td v-else class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
       <p v-if="sands.length > 0 && stage.sandId3 > 0">
         {{ getSand(stage.sandId3)?.type }}
