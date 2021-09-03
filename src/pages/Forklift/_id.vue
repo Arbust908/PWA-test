@@ -47,6 +47,16 @@
         </section>
       </footer>
     </section>
+    <Modal
+      type="off"
+      :open="notificationModalvisible"
+      @close="toggleNotificationModal"
+    >
+    <template #body>
+      <p>{{errorMessage}}</p>
+      <button @click.prevent="toggleNotificationModal" class="closeButton">Cerrar</button>
+    </template>
+    </Modal>
   </Layout>
 </template>
 
@@ -61,29 +71,26 @@
   } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-  import FieldInput from '@/components/ui/form/FieldInput.vue';
-  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
-
+  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import CircularBtn from '@/components/ui/CircularBtn.vue';
+  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import Modal from '@/components/modal/General.vue';
   import { Forklift } from '@/interfaces/Forklift';
+  import {useStoreLogic} from '@/helpers/useStoreLogic'
 
-  import axios from 'axios';
   const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
     components: {
-      Layout,
-      BookmarkIcon,
-      TrashIcon,
-      PlusIcon,
-      CheckCircleIcon,
-      NoneBtn,
-      FieldGroup,
-      FieldInput,
-      FieldTextArea,
-      PrimaryBtn,
+      Layout: Layout,
+      GhostBtn: GhostBtn,
+      BookmarkIcon: BookmarkIcon,
+      TrashIcon: TrashIcon,
+      PlusIcon: PlusIcon,
+      CheckCircleIcon: CheckCircleIcon,
+      CircularBtn: CircularBtn,
+      PrimaryBtn: PrimaryBtn,
+      Modal
     },
     setup() {
       const store = useStore();
@@ -93,6 +100,9 @@
       const forklifts: Array<Forklift> = JSON.parse(
         JSON.stringify(store.state.forklifts.all)
       );
+      const notificationModalvisible = ref(false)
+      const toggleNotificationModal = () => notificationModalvisible.value = !notificationModalvisible.value
+      const errorMessage = ref("")
 
       const currentForklift: Forklift = forklifts.find((forklift) => {
         return forklift.id == route.params.id;
@@ -107,7 +117,7 @@
       onMounted(async () => {
         id.value = currentForklift.id;
         name.value = currentForklift.name;
-        owned.value = currentForklift.owned;
+        owned.value = currentForklift.owned || false;
         ownerName.value = currentForklift.ownerName;
         ownerContact.value = currentForklift.ownerContact;
         observations.value = currentForklift.observations;
@@ -131,20 +141,14 @@
           observations: currentForklift.observations,
         };
 
-        let fDB = await axios
-          .put(`${api}/forklift/${updatedForklift.id}`, updatedForklift)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data;
-            }
-            return {};
-          });
-        // Update Work Order
-        store.dispatch('updateForklift', updatedForklift);
-        goToIndex();
+        await useStoreLogic(router, store, 'forklift','update',updatedForklift)
+        .then((res) => {
+          if(res.type == 'failed') {
+            errorMessage.value = res.message
+            toggleNotificationModal();
+          }
+          if(res.type == 'success') return res
+        })
       };
 
       const handleSwitchClick = () => {
@@ -158,12 +162,18 @@
         goToIndex,
         update,
         handleSwitchClick,
+        notificationModalvisible,
+        toggleNotificationModal,
+        errorMessage
       };
     },
   };
 </script>
 
 <style lang="scss" scoped>
+  .closeButton {
+    @apply inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-200 sm:bg-transparent text-base font-medium text-second-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm mt-3;
+  }
   .btn {
     &__draft {
       @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
