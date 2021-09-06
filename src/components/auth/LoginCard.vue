@@ -130,9 +130,9 @@
   import { ref, Ref, defineAsyncComponent, defineComponent } from 'vue';
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
-  import { Role } from '@/interfaces/User';
+  import { Role } from '@/interfaces/sandflow';
   import Logo from '@/components/Logo.vue';
-  import Button from '@/components/ui/buttons/BaseBtn.vue';
+  import Button from '@/components/ui/buttons/PrimaryBtn.vue';
 
   const Modal = defineAsyncComponent(
     () => import('@/components/modal/General.vue')

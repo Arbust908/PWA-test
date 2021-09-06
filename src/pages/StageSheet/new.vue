@@ -8,7 +8,7 @@
       </h1>
     </header>
     <div class="grid gap-8 grid-cols-2 relative">
-      <FieldGroup class="max-w-xl col-span-full !py-0">
+      <FieldGroup class="max-w-xl col-span-full gap-x-6 py-0">
         <ClientPitCombo
           :clientId="currentStageSheet.companyId"
           :pitId="currentStageSheet.pitId"
@@ -17,43 +17,24 @@
         />
       </FieldGroup>
       <section class="panel col-span-full">
-        <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-          <div class="flex flex-col">
-            <div class="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-              <div
-                class="
-                  py-2
-                  align-middle
-                  inline-block
-                  min-w-full
-                  sm:px-6
-                  lg:px-8
-                "
-              >
-                <div class="overflow-hidden">
-                  <table class="min-w-full divide-y divide-gray-200">
-                    <thead>
-                      <StageHeader />
-                    </thead>
-                    <tbody class="divide-y">
-                      <SandPlanStage
-                        v-for="(stage, Key) in currentStageSheet.stages"
-                        :key="Key"
-                        :stage="stage"
-                        :editing="editingStage"
-                        :sands="sands"
-                        @editStage="editStage"
-                        @saveStage="saveStage"
-                        @duplicateStage="duplicateStage"
-                        @deleteStage="deleteStage"
-                      />
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div>
-        </form>
+        <StageTable>
+          <template #head>
+            <StageHeader />
+          </template>
+          <template #body>
+            <SandPlanStage
+              v-for="(stage, Key) in currentStageSheet.stages"
+              :key="Key"
+              :pos="Key + 1"
+              :stage="stage"
+              :editing="editingStage"
+              @editStage="editStage"
+              @saveStage="saveStage"
+              @duplicateStage="duplicateStage"
+              @deleteStage="deleteStage"
+            />
+          </template>
+        </StageTable>
       </section>
       <section class="panel col-span-1">
         <article class="p-6">
@@ -77,7 +58,7 @@
                 {{ warehouse.error }}
               </span>
               <span v-else-if="warehouse" class="px-5 py-8 text-center m-4">
-                <!-- <DepositGrid
+                <DepositGrid
                   class="w-full flex flex-col gap-5"
                   :selectedBox="choosedBox"
                   :rows="row"
@@ -86,7 +67,7 @@
                   :deposit="warehouse.layout"
                   :visibleCategories="visibleCategories"
                   @select-box="selectBox"
-                /> -->
+                />
               </span>
               <span
                 v-else
@@ -124,14 +105,11 @@
             />
             <FieldLoading :title="false" class="max-w-[200px]" v-else />
           </div>
-          <div
-            v-if="currentStageSheet.cradleId == -1"
-            class="py-8 flex justify-center items-center flex-wrap gap-5"
-          >
-            <div class="cradle-slot-ph">1</div>
-            <div class="cradle-slot-ph">2</div>
-            <div class="cradle-slot-ph">3</div>
-            <div class="cradle-slot-ph">4</div>
+          <div v-if="currentStageSheet.cradleId == -1" class="cradle-grid">
+            <div class="cradle-slot ph">1</div>
+            <div class="cradle-slot ph">2</div>
+            <div class="cradle-slot ph">3</div>
+            <div class="cradle-slot ph">4</div>
           </div>
           <div
             v-else
@@ -217,6 +195,7 @@
   import SandPlanStage from '@/components/stageSheet/StageRow.vue';
   import StageEmptyState from '@/components/stageSheet/StageEmptyState.vue';
   import StageHeader from '@/components/stageSheet/StageHeader.vue';
+  import StageTable from '@/components/stageSheet/StageTable.vue';
   import DepositGrid from '@/components/depositDesign/Deposit.vue';
   import {
     Pit,
@@ -249,6 +228,7 @@
       SideTabName,
       DepositGrid,
       ClientPitCombo,
+      StageTable,
     },
     setup() {
       // Init
@@ -309,48 +289,6 @@
           (s) => s.id !== stageId
         );
       };
-      const sands = ref([] as Array<Sand>);
-      const { data: sandsData } = useAxios('/sand', instance);
-      watch(sandsData, (api) => {
-        if (api && api.data) {
-          sands.value = api.data;
-          console.log(sands.value);
-        }
-      });
-      // :: CLIENT
-      const clients = ref([] as Array<Company>);
-      const backupClients = ref([]);
-      const { data: companiesData } = useAxios('/company', instance);
-      watch(companiesData, (companiesApi, prevCount) => {
-        if (companiesApi && companiesApi.data) {
-          clients.value = companiesApi.data;
-          backupClients.value = companiesApi.data;
-        }
-      });
-      const selectedClientName = computed(() => {
-        return currentStageSheet.companyId >= 0
-          ? clients.value.find(
-              (client) => client.id === currentStageSheet.companyId
-            ).name
-          : '';
-      });
-      // << CLIENT
-      // :: PITS
-      const pits = ref([] as Array<Pit>);
-      const backupPits = ref([]);
-      const { data: pitsData } = useAxios('/pit', instance);
-      watch(pitsData, (pitApi, prevCount) => {
-        if (pitApi && pitApi.data) {
-          pits.value = pitApi.data;
-          backupPits.value = pitApi.data;
-        }
-      });
-      const selectedPitName = computed(() => {
-        return currentStageSheet.pitId >= 0
-          ? pits.value.find((pit) => pit.id === currentStageSheet.pitId).name
-          : '';
-      });
-      // << PITS
       // :: WAREHOUSE
       const warehouse = ref();
       const backupWarehouses = ref([]);
@@ -429,45 +367,7 @@
         }
       });
 
-      const filterPitsByClient = (clientId: number) => {
-        pits.value = [];
-        setTimeout(() => {
-          pits.value = backupPits.value.filter((pit: Pit) => {
-            return pit.companyId == clientId;
-          });
-          if (pits.value.length === 1) {
-            currentStageSheet.pitId = pits.value[0].id;
-          } else if (pits.value.length <= 0) {
-            pits.value = [{ name: 'No hay pozos', id: -1 }];
-            currentStageSheet.pitId = -1;
-          }
-        }, 100);
-      };
-
       watchEffect(() => {
-        if (currentStageSheet.companyId !== -1) {
-          filterPitsByClient(currentStageSheet.companyId);
-        }
-        // if (currentStageSheet.pitId !== -1) {
-        //   const curPit = backupPits.value.find((pit) => {
-        //     return pit.id == currentStageSheet.pitId;
-        //   });
-        //   console.log(curPit);
-        //   if (curPit) {
-        //     clients.value = [];
-        //     setTimeout(() => {
-        //       clients.value = backupClients.value.filter((client) => {
-        //         return client.id == curPit.companyId;
-        //       });
-        //       if (clients.value.length === 1) {
-        //         currentStageSheet.companyId = clients.value[0].id;
-        //       } else if (clients.value.length <= 0) {
-        //         clients.value = [{ name: 'No hay clientes', id: -1 }];
-        //         currentStageSheet.companyId = -1;
-        //       }
-        //     }, 100);
-        //   }
-        // }
         if (
           currentStageSheet.companyId !== -1 &&
           currentStageSheet.pitId !== -1
@@ -513,26 +413,36 @@
 
       const ableCradles = (clientId: number, pitId: number) => {
         cradles.value = [];
-        console.log(backupWorkorder.value);
-        setTimeout(() => {
-          const lasWO = backupWorkorder.value.find((wo) => {
-            return (
-              (wo.clientId === clientId || wo.client === clientId) &&
-              wo.pits.some((pit) => {
-                return pit.id === pitId;
-              })
-            );
-          });
-          console.log(lasWO);
-          cradles.value = backupCradles.value.filter((cradle) => {
-            return (
-              cradle.id === lasWO.operativeCradle ||
-              cradle.id === lasWO.operativeCradleId ||
-              cradle.id === lasWO.backupCradle ||
-              cradle.id === lasWO.backupCradleId
-            );
-          });
-        }, 100);
+        console.log('client :_ ' + clientId, 'pit :_ ' + pitId);
+        console.log('BWO', backupWorkorder.value);
+        const lasWO = backupWorkorder.value.find((wo) => {
+          return (
+            (wo.clientId == clientId || wo.client == clientId) &&
+            wo.pits.some((pit) => {
+              return pit.id == pitId;
+            })
+          );
+        });
+        console.log('Last Work Order', lasWO);
+        console.log(
+          lasWO.operativeCradle,
+          lasWO.operativeCradleId,
+          lasWO.backupCradle,
+          lasWO.backupCradleId
+        );
+        console.log(cradles.value);
+        cradles.value = backupCradles.value.filter((cradle) => {
+          return (
+            cradle.id == lasWO.operativeCradle ||
+            cradle.id == lasWO.operativeCradleId ||
+            cradle.id == lasWO.backupCradle ||
+            cradle.id == lasWO.backupCradleId
+          );
+        });
+        if (cradles.value.length === 0) {
+          cradles.value = [{ id: -1, name: 'No hay cradles' }];
+        }
+        console.log(cradles.value);
       };
 
       const selectedCradleName = computed(() => {
@@ -569,10 +479,6 @@
       const save = (): void => {};
       return {
         currentStageSheet,
-        clients,
-        pits,
-        selectedPitName,
-        sands,
         save,
         isFull,
         cradles,
@@ -594,14 +500,20 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '@/assets/button.scss';
+
   .panel {
     @apply bg-white rounded-md shadow-sm border;
   }
-  .cradle-slot-ph {
-    @apply w-[6.25rem] h-[6.25rem] rounded-lg border-2 border-dashed border-second-300 text-4xl font-bold text-second-200 flex justify-center items-center;
+  .cradle-grid {
+    grid-template-columns: repeat(auto-fit, 6.25rem);
+    @apply py-8 grid flex-wrap gap-4;
   }
   .cradle-slot {
     @apply w-[6.25rem] h-[6.25rem] rounded-lg border-2 border-dashed border-second-400 text-4xl font-bold text-second-300 flex justify-center items-center;
+    &.ph {
+      @apply border-second-300 text-second-200;
+    }
   }
 
   .amountWrapper {
@@ -612,29 +524,5 @@
   }
   .amountInput__unit {
     @apply inline-flex items-center px-3 rounded-r border border-gray-300 bg-gray-50 text-gray-500 sm:text-sm;
-  }
-  // Quizas hay que armar algo externo para los estilos de boton
-  .btn {
-    &__draft {
-      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-    }
-    &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-    }
-    &__options {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-gray-300 hover:text-indigo-800 mx-2 p-2 transition duration-150 ease-out;
-    }
-    &__add {
-      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-    }
-    &__add--special {
-      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-    }
-    &__mobile-only {
-      @apply lg:hidden;
-    }
-    &__desktop-only {
-      @apply hidden lg:inline-flex;
-    }
   }
 </style>

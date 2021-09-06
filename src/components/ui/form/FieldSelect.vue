@@ -13,7 +13,7 @@
       <option disabled value="-1">
         {{ placeholder }}
       </option>
-      <option v-for="(res, i) in resources" :key="res.id + i" :value="res.id">
+      <option v-for="(res, i) in resources" :key="res?.id + i" :value="res?.id">
         {{ res[endpointKey] }}
       </option>
     </select>
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-  import { defineComponent, computed } from 'vue';
+  import { defineComponent, onMounted, ref } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { useApi } from '@/helpers/useApi';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
@@ -40,7 +40,7 @@
       },
       placeholder: {
         type: String,
-        default: 'Ppciones',
+        default: 'Seleccione',
       },
       title: {
         type: String,
@@ -66,15 +66,18 @@
     setup(props, { emit }) {
       const endpointData = useVModel(props, 'endpointData', emit);
       const value = useVModel(props, 'data', emit);
-      const resources = computed(() => {
-        if (endpointData.value !== null) {
-          console.log(props.title + ' value', endpointData.value);
-          return endpointData.value;
-        } else {
-          const { read } = useApi(props.endpoint);
-          return read();
-        }
-      });
+      const getApiVal = () => {
+        const { read } = useApi(props.endpoint);
+        return read();
+      };
+      let resources = ref([]);
+      if (endpointData.value !== null) {
+        resources.value = endpointData.value;
+      } else if (props.endpoint !== null) {
+        resources = getApiVal();
+      } else {
+        resources.value = [{ id: -1, name: 'No hay datos' }];
+      }
       return {
         value,
         resources,

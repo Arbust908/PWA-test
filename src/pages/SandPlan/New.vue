@@ -243,26 +243,6 @@
           },
         ],
       });
-      watchEffect(() => {
-        if (currentSandPlan.companyId !== -1) {
-          pits.value = backupPits.value.filter((pit) => {
-            return pit.companyId === currentSandPlan.companyId;
-          });
-        }
-        if (currentSandPlan.pitId !== -1) {
-          const curPit = pits.value.find((pit) => {
-            return pit.id === currentSandPlan.pitId;
-          });
-          if (curPit) {
-            clients.value = backupClients.value.filter((client) => {
-              return client.id === curPit.companyId;
-            });
-            if (clients.value.length === 1) {
-              currentSandPlan.companyId = clients.value[0].id;
-            }
-          }
-        }
-      });
 
       const addStage = () => {
         if (currentSandPlan.stages?.length >= 39) {
@@ -347,8 +327,13 @@
         }
       });
       const selectedPitName = computed(() => {
+        console.groupCollapsed('selectedPitName');
+        console.log(currentSandPlan.pitId);
+        console.log(pits.value);
+        console.log(pits.value.find((pit) => pit.id == currentSandPlan.pitId));
+        console.groupEnd();
         return currentSandPlan.pitId >= 0
-          ? pits.value.find((pit) => pit.id === currentSandPlan.pitId).name
+          ? pits.value.find((pit) => pit.id == currentSandPlan.pitId).name
           : '';
       });
       // << PITS

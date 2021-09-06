@@ -1,66 +1,30 @@
 <template>
   <tr>
     <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-lg">
-      {{ stage.stage }} - 40
+      {{ pos }} - 40
     </td>
-    <template v-if="editing === Number(stage.id)">
-      <td
-        class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
-        :id="`sandType${stage.id}`"
-      >
-        <FieldSelect
-          fieldName="sandType1"
-          placeholder="Seleccionar"
-          endpoint="/sand"
-          endpointKey="type"
-          :data="stage.sandId1"
-          @update:data="stage.sandId1 = $event"
-        />
-        <FieldWithSides
-          fieldName="sandQuantity1"
-          placeholder="Cantidad de Arena"
-          type="number"
-          :post="{ title: 'Peso en Toneladas', value: 't' }"
-          :data="stage.quantity1"
-          @update="stage.quantity1 = $event"
-        />
-      </td>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
-        <FieldSelect
-          fieldName="sandType2"
-          placeholder="Seleccionar"
-          endpoint="/sand"
-          endpointKey="type"
-          :data="stage.sandId2"
-          @update:data="stage.sandId2 = $event"
-        />
-        <FieldWithSides
-          fieldName="sandQuantity2"
-          placeholder="Cantidad de Arena"
-          type="number"
-          :post="{ title: 'Peso en Toneladas', value: 't' }"
-          :data="stage.quantity2"
-          @update="stage.quantity2 = $event"
-        />
-      </td>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
-        <FieldSelect
-          fieldName="sandType3"
-          placeholder="Seleccionar"
-          endpoint="/sand"
-          endpointKey="type"
-          :data="stage.sandId3"
-          @update:data="stage.sandId3 = $event"
-        />
-        <FieldWithSides
-          fieldName="sandQuantity3"
-          placeholder="Cantidad de Arena"
-          type="number"
-          :post="{ title: 'Peso en Toneladas', value: 't' }"
-          :data="stage.quantity3"
-          @update="stage.quantity3 = $event"
-        />
-      </td>
+    <template v-if="editing === Number(stage.id)" :key="stage.id">
+      <SandTypeAmount
+        :sandId="stage.sandId1"
+        :quantity="stage.quantity1"
+        mod="1"
+        @update:sandId="stage.sandId1 = $event"
+        @update:quantity="stage.quantity1 = $event"
+      />
+      <SandTypeAmount
+        :sandId="stage.sandId2"
+        :quantity="stage.quantity2"
+        mod="2"
+        @update:sandId="stage.sandId2 = $event"
+        @update:quantity="stage.quantity2 = $event"
+      />
+      <SandTypeAmount
+        :sandId="stage.sandId3"
+        :quantity="stage.quantity3"
+        mod="3"
+        @update:sandId="stage.sandId3 = $event"
+        @update:quantity="stage.quantity3 = $event"
+      />
     </template>
     <template v-else>
       <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
@@ -117,10 +81,14 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, toRefs, reactive, computed } from 'vue';
+  import { defineComponent, toRefs, reactive, computed, ref, watch } from 'vue';
   import Pill from '@/components/ui/Pill.vue';
   import { Sand } from '@/interfaces/sandflow';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import SandTypeAmount from '@/components/ui/SandTypeAmount.vue';
+  import axios from 'axios';
+  import { useAxios } from '@vueuse/integrations/useAxios';
+  const api = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
     props: {
@@ -132,18 +100,28 @@
         type: Number,
         required: true,
       },
-      sands: {
-        type: Array,
-        required: true,
+      pos: {
+        type: Number,
+        default: 0,
       },
     },
     components: {
       Pill,
       FieldSelect,
+      SandTypeAmount,
     },
     setup(props, { emit }) {
-      const { stage, editing, sands } = toRefs(props);
-      console.log(sands);
+      const instance = axios.create({
+        baseURL: api,
+      });
+      const { stage, editing } = toRefs(props);
+      const sands = ref([]);
+      const { data } = useAxios('/sand', instance);
+      watch(data, (api) => {
+        if (api && api.data) {
+          sands.value = api.data;
+        }
+      });
 
       const totalWheight = computed(() => {
         return (
@@ -156,45 +134,9 @@
         return (
           sands.value.find((sand: Sand) => {
             return sand.id === sandId;
-          }) || { tpye: '' }
+          }) || { type: '' }
         );
       };
-
-      const editStage = () => {
-        emit('editStage', stage.value);
-      };
-      const saveStage = () => {
-        emit('saveStage', stage.value);
-      };
-      const duplicateStage = () => {
-        emit('duplicateStage', stage.value);
-      };
-      const deleteStage = () => {
-        emit('deleteStage', stage.value);
-      };
-      const upgrade = () => {
-        if (stage.value.status >= 2) {
-          console.error('Reset status');
-          stage.value.status = 0;
-          return;
-        }
-        stage.value.status++;
-      };
-
-      const pill = reactive({
-        status:
-          stage.value.status === 2
-            ? 'finished'
-            : stage.value.status === 1
-            ? 'idle'
-            : 'empty',
-        name:
-          stage.value.status === 2
-            ? 'Finalizada'
-            : stage.value.status === 1
-            ? 'En Progreso'
-            : 'Creada',
-      });
 
       return {
         stage,
@@ -202,12 +144,6 @@
         sands,
         totalWheight,
         getSand,
-        duplicateStage,
-        deleteStage,
-        editStage,
-        saveStage,
-        upgrade,
-        pill,
       };
     },
   });

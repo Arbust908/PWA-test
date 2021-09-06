@@ -272,3 +272,18 @@ export interface Box {
   floor: number;
   row: number;
 }
+
+export interface StageSheet {
+    id?: number;
+    companyId: number;
+    company?: Company;
+    pitId: number;
+    pit?: Pit;
+    warehouseId: number;
+    warehouse?: Warehouse;
+    stages?: SandStage[];
+    operativeCradleId: number;
+    backupCradleId: number;
+    operativeCradle?: Cradle;
+    backupCradle?: Cradle;
+}

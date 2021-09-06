@@ -1,13 +1,10 @@
 <template>
-  <fieldset class="max-w-md grid w-full">
+  <fieldset class="max-w-md grid w-full py-2 grid-cols-12 gap-4">
     <slot>Campos!</slot>
   </fieldset>
 </template>
 
 <style lang="scss" scoped>
-  fieldset {
-    @apply py-2 grid-cols-12 gap-4;
-  }
   fieldset:not(:last-of-type) {
     @apply border-b pb-6;
   }
