@@ -8,32 +8,7 @@
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
-      <form
-        method="POST"
-        action="/"
-        class="p-4 w-full flex flex-col lg:flex-row"
-      >
-        <FieldGroup>
-          <FieldInput
-            class="col-span-full"
-            fieldName="name"
-            placeholder="Nombre de Forklift"
-            title="Nombre"
-            :data="newForklift.name"
-            @update:data="newForklift.name = $event"
-          />
-          <FieldTextArea
-            class="col-span-full"
-            fieldName="observations"
-            placeholder="Observaciones..."
-            title="Observaciones"
-            :rows="5"
-            isOptional
-            :data="newForklift.observations"
-            @update:data="newForklift.observations = $event"
-          />
-        </FieldGroup>
-      </form>
+      <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
@@ -63,16 +38,13 @@
 </template>
 
 <script lang="ts">
-  import { computed, ref } from 'vue';
+  import { computed, reactive, ref } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import Layout from '@/layouts/Main.vue';
+  import ForkliftForm from '@/components/forklift/Form.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-  import FieldInput from '@/components/ui/form/FieldInput.vue';
-  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
   import Modal from '@/components/modal/General.vue';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
 
@@ -81,42 +53,35 @@
       Layout,
       NoneBtn,
       PrimaryBtn,
-      FieldGroup,
-      FieldInput,
-      FieldTextArea,
+      ForkliftForm,
       Modal,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
 
-      const name = ref('');
-      const owned = ref(false);
-      const ownerName = ref('');
-      const ownerContact = ref('');
-      const observations = ref('');
+      const forklift = reactive({
+        name: '',
+        owned: '',
+        ownerName: '',
+        ownerContact: '',
+        observations: '',
+      });
 
       const goToIndex = (): void => {
         router.push('/forklift');
       };
 
       const notificationModalvisible = ref(false);
+      const errorMessage = ref('');
       const toggleNotificationModal = () =>
         (notificationModalvisible.value = !notificationModalvisible.value);
-      const errorMessage = ref('');
 
       const isFull = computed(() => {
-        return !!(name.value !== '');
+        return !!(forklift.name !== '');
       });
 
       const save = async () => {
-        const forklift = {
-          name: name.value,
-          owned: owned.value,
-          ownerName: ownerName.value,
-          ownerContact: ownerContact.value,
-          observations: observations.value,
-        };
         await useStoreLogic(router, store, 'forklift', 'create', forklift).then(
           (res) => {
             if (res.type == 'failed') {
@@ -129,11 +94,7 @@
       };
 
       return {
-        name,
-        owned,
-        ownerName,
-        ownerContact,
-        observations,
+        forklift,
         goToIndex,
         save,
         isFull,

@@ -4,36 +4,11 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
-        Forklift - {{ id }}
+        Forklift - {{ forklift.id }}
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm max-w-2xl">
-      <form
-        method="POST"
-        action="/"
-        class="p-4 w-full flex flex-col lg:flex-row"
-      >
-        <FieldGroup>
-          <FieldInput
-            class="col-span-full"
-            fieldName="name"
-            placeholder="Nombre de Forklift"
-            title="Nombre"
-            :data="currentForklift.name"
-            @update:data="currentForklift.name = $event"
-          />
-          <FieldTextArea
-            class="col-span-full"
-            fieldName="observations"
-            placeholder="Observaciones..."
-            title="Observaciones"
-            :rows="5"
-            isOptional
-            :data="currentForklift.observations"
-            @update:data="currentForklift.observations = $event"
-          />
-        </FieldGroup>
-      </form>
+      <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
@@ -52,10 +27,12 @@
       :open="notificationModalvisible"
       @close="toggleNotificationModal"
     >
-    <template #body>
-      <p>{{errorMessage}}</p>
-      <button @click.prevent="toggleNotificationModal" class="closeButton">Cerrar</button>
-    </template>
+      <template #body>
+        <p>{{ errorMessage }}</p>
+        <button @click.prevent="toggleNotificationModal" class="closeButton">
+          Cerrar
+        </button>
+      </template>
     </Modal>
   </Layout>
 </template>
@@ -64,33 +41,23 @@
   import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
-  import {
-    BookmarkIcon,
-    TrashIcon,
-    CheckCircleIcon,
-  } from '@heroicons/vue/outline';
-  import { PlusIcon } from '@heroicons/vue/solid';
   import Layout from '@/layouts/Main.vue';
-  import GhostBtn from '@/components/ui/GhostBtn.vue';
+  import ForkliftForm from '@/components/forklift/Form.vue';
+  import NoneBtn from '@/components/ui/NoneBtn.vue';
   import CircularBtn from '@/components/ui/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
   import Modal from '@/components/modal/General.vue';
-  import { Forklift } from '@/interfaces/Forklift';
-  import {useStoreLogic} from '@/helpers/useStoreLogic'
-
-  const api = import.meta.env.VITE_API_URL || '/api';
+  import { Forklift } from '@/interfaces/sandflow';
+  import { useStoreLogic } from '@/helpers/useStoreLogic';
 
   export default {
     components: {
-      Layout: Layout,
-      GhostBtn: GhostBtn,
-      BookmarkIcon: BookmarkIcon,
-      TrashIcon: TrashIcon,
-      PlusIcon: PlusIcon,
-      CheckCircleIcon: CheckCircleIcon,
-      CircularBtn: CircularBtn,
-      PrimaryBtn: PrimaryBtn,
-      Modal
+      Layout,
+      NoneBtn,
+      CircularBtn,
+      PrimaryBtn,
+      ForkliftForm,
+      Modal,
     },
     setup() {
       const store = useStore();
@@ -100,27 +67,30 @@
       const forklifts: Array<Forklift> = JSON.parse(
         JSON.stringify(store.state.forklifts.all)
       );
-      const notificationModalvisible = ref(false)
-      const toggleNotificationModal = () => notificationModalvisible.value = !notificationModalvisible.value
-      const errorMessage = ref("")
+      const notificationModalvisible = ref(false);
+      const toggleNotificationModal = () =>
+        (notificationModalvisible.value = !notificationModalvisible.value);
+      const errorMessage = ref('');
 
       const currentForklift: Forklift = forklifts.find((forklift) => {
         return forklift.id == route.params.id;
       });
 
-      let name = ref('');
-      let owned = ref(false);
-      let ownerName = ref('');
-      let ownerContact = ref('');
-      let observations = ref('');
+      const forklift: Forklift = reactive({
+        name: '',
+        owned: '',
+        ownerName: '',
+        ownerContact: '',
+        observations: '',
+      });
 
       onMounted(async () => {
-        id.value = currentForklift.id;
-        name.value = currentForklift.name;
-        owned.value = currentForklift.owned || false;
-        ownerName.value = currentForklift.ownerName;
-        ownerContact.value = currentForklift.ownerContact;
-        observations.value = currentForklift.observations;
+        forklift.id = currentForklift.id;
+        forklift.name = currentForklift.name;
+        forklift.owned = currentForklift.owned || false;
+        forklift.ownerName = currentForklift.ownerName;
+        forklift.ownerContact = currentForklift.ownerContact;
+        forklift.observations = currentForklift.observations;
       });
 
       const goToIndex = (): void => {
@@ -128,43 +98,30 @@
       };
 
       const isFull = computed(() => {
-        return !!(currentForklift.name !== '');
+        return !!(forklift.name !== '');
       });
 
       const update = async () => {
-        const updatedForklift = {
-          id,
-          name: currentForklift.name,
-          owned: currentForklift.owned,
-          ownerName: currentForklift.ownerName,
-          ownerContact: currentForklift.ownerContact,
-          observations: currentForklift.observations,
-        };
-
-        await useStoreLogic(router, store, 'forklift','update',updatedForklift)
-        .then((res) => {
-          if(res.type == 'failed') {
-            errorMessage.value = res.message
-            toggleNotificationModal();
+        await useStoreLogic(router, store, 'forklift', 'update', forklift).then(
+          (res) => {
+            if (res.type == 'failed') {
+              errorMessage.value = res.message;
+              toggleNotificationModal();
+            }
+            if (res.type == 'success') return goToIndex();
           }
-          if(res.type == 'success') return res
-        })
-      };
-
-      const handleSwitchClick = () => {
-        owned.value = !owned.value;
+        );
       };
 
       return {
         id,
-        currentForklift,
+        forklift,
         isFull,
         goToIndex,
         update,
-        handleSwitchClick,
         notificationModalvisible,
         toggleNotificationModal,
-        errorMessage
+        errorMessage,
       };
     },
   };
