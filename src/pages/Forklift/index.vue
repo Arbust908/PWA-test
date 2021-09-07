@@ -16,7 +16,6 @@
           </th>
         </tr>
       </template>
-
       <template #body>
         <tr
           v-for="(f, fKey) in fDB"
@@ -79,7 +78,6 @@
   export default {
     components: {
       Layout,
-      UiBtn,
       Modal,
       PrimaryBtn,
       UiTable,
@@ -132,6 +130,7 @@
 </script>
 
 <style lang="scss" scoped>
+  @import '@/assets/table.scss';
   .closeButton {
     @apply inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-200 sm:bg-transparent text-base font-medium text-second-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm mt-3;
   }

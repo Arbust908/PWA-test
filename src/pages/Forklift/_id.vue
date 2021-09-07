@@ -43,9 +43,8 @@
   import { useRouter, useRoute } from 'vue-router';
   import Layout from '@/layouts/Main.vue';
   import ForkliftForm from '@/components/forklift/Form.vue';
-  import NoneBtn from '@/components/ui/NoneBtn.vue';
-  import CircularBtn from '@/components/ui/CircularBtn.vue';
-  import PrimaryBtn from '@/components/ui/PrimaryBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import Modal from '@/components/modal/General.vue';
   import { Forklift } from '@/interfaces/sandflow';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
@@ -54,7 +53,6 @@
     components: {
       Layout,
       NoneBtn,
-      CircularBtn,
       PrimaryBtn,
       ForkliftForm,
       Modal,
