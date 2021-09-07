@@ -411,11 +411,12 @@
                 // Guradamos via api las ordenes de sand
                 spI.sandOrders.map((sO: SandOrder) => {
                   console.log('SO', sO);
-                  sO.purchaseOrderId = newVal.data.id;
-                  sO.sandProviderId = spI.id;
+                  const { id, ...newSO } = sO;
+                  newSO.purchaseOrderId = newVal.data.id;
+                  newSO.sandProviderId = spI.id;
                   const { data: sODone } = useAxios(
                     '/sandOrder',
-                    { method: 'POST', data: sO },
+                    { method: 'POST', data: newSO },
                     instance
                   );
                   watch(sODone, async (newVal, _) => {
