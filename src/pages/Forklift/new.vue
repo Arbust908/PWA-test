@@ -7,29 +7,8 @@
         Nuevo Forklift
       </h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm max-w-2xl">
-      <form method="POST" action="/" class="p-4 w-full">
-        <FieldGroup>
-          <FieldInput
-            class="col-span-full"
-            fieldName="name"
-            placeholder="Nombre de Forklift"
-            title="Nombre"
-            :data="newForklift.name"
-            @update:data="newForklift.name = $event"
-          />
-          <FieldTextArea
-            class="col-span-full"
-            fieldName="observations"
-            placeholder="Observaciones..."
-            title="Observaciones"
-            :rows="5"
-            isOptional
-            :data="newForklift.observations"
-            @update:data="newForklift.observations = $event"
-          />
-        </FieldGroup>
-      </form>
+    <section class="bg-white rounded-md shadow-sm">
+      <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
@@ -42,111 +21,95 @@
           </PrimaryBtn>
         </section>
       </footer>
+      <Modal
+        type="off"
+        :open="notificationModalvisible"
+        @close="toggleNotificationModal"
+      >
+        <template #body>
+          <p>{{ errorMessage }}</p>
+          <button @click.prevent="toggleNotificationModal" class="closeButton">
+            Cerrar
+          </button>
+        </template>
+      </Modal>
     </section>
   </Layout>
 </template>
 
 <script lang="ts">
-  import { computed, reactive } from 'vue';
+  import { computed, reactive, ref } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import Layout from '@/layouts/Main.vue';
+  import ForkliftForm from '@/components/forklift/Form.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-  import FieldInput from '@/components/ui/form/FieldInput.vue';
-  import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
-
-  import axios from 'axios';
-  import { Forklift } from '@/interfaces/Forklift';
-  const apiUrl = import.meta.env.VITE_API_URL || '/api';
+  import Modal from '@/components/modal/General.vue';
+  import { useStoreLogic } from '@/helpers/useStoreLogic';
 
   export default {
     components: {
       Layout,
       NoneBtn,
       PrimaryBtn,
-      FieldGroup,
-      FieldInput,
-      FieldTextArea,
+      ForkliftForm,
+      Modal,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
 
-      const newForklift: Forklift = reactive({
-        id: 0,
+      const forklift = reactive({
         name: '',
-        owned: false,
+        owned: '',
         ownerName: '',
         ownerContact: '',
         observations: '',
       });
 
-      const handleSwitchClick = () => {
-        newForklift.owned = !newForklift.owned;
-      };
-
       const goToIndex = (): void => {
         router.push('/forklift');
       };
 
+      const notificationModalvisible = ref(false);
+      const errorMessage = ref('');
+      const toggleNotificationModal = () =>
+        (notificationModalvisible.value = !notificationModalvisible.value);
+
       const isFull = computed(() => {
-        return !!(newForklift.name !== '');
+        return !!(forklift.name !== '');
       });
 
       const save = async () => {
-        let tpDB = await axios
-          .post(`${apiUrl}/forklift`, newForklift)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              newForklift.id = res.data.data.id;
-              return res.data;
+        await useStoreLogic(router, store, 'forklift', 'create', forklift).then(
+          (res) => {
+            if (res.type == 'failed') {
+              errorMessage.value = res.message;
+              toggleNotificationModal();
             }
-            return {};
-          })
-          .finally(() => {});
-
-        // Update Transport Provider
-        store.dispatch('saveForklift', newForklift);
-        goToIndex();
+            if (res.type == 'success') goToIndex();
+          }
+        );
       };
 
       return {
-        newForklift,
+        forklift,
         goToIndex,
         save,
         isFull,
-        handleSwitchClick,
+        notificationModalvisible,
+        toggleNotificationModal,
+        errorMessage,
       };
     },
   };
 </script>
 
 <style lang="scss" scoped>
-  .btn {
-    &__draft {
-      @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-    }
-    &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-      /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-    }
-    &__add {
-      @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-    }
-    &__add--special {
-      @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-    }
-    &__mobile-only {
-      @apply lg:hidden;
-    }
-    &__desktop-only {
-      @apply hidden lg:inline-flex;
-    }
+  @import '@/assets/button.scss';
+  .closeButton {
+    @apply inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-200 sm:bg-transparent text-base font-medium text-second-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm mt-3;
   }
   .section-tab {
     @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;

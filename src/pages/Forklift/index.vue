@@ -10,9 +10,6 @@
       <template #header>
         <tr>
           <th scope="col">Nombre</th>
-          <!-- <th scope="col">Asignación</th>
-          <th scope="col">Nombre dueño</th>
-          <th scope="col">Contacto dueño</th> -->
           <th scope="col">Observaciones</th>
           <th scope="col">
             <span class="sr-olny">Acciones</span>
@@ -29,15 +26,6 @@
           <td :class="f.name ? null : 'empty'">
             {{ f.name || 'Sin nombre' }}
           </td>
-          <!-- <td class="text-gray-500 px-6 py-4 whitespace-nowrap text-sm">
-            {{ f.owned ? 'Asignado' : 'Sin asignar' || 'Sin asignación' }}
-          </td>
-          <td :class="f.ownerName ? null : 'empty'">
-            {{ f.ownerName || 'Sin dueño' }}
-          </td>
-          <td :class="f.ownerContact ? null : 'empty'">
-            {{ f.ownerContact || 'Sin contacto' }}
-          </td> -->
           <td :class="f.observations ? null : 'empty'">
             {{ f.observations || 'Sin observaciones' }}
           </td>
@@ -61,6 +49,18 @@
         </tr>
       </template>
     </UiTable>
+    <Modal
+      type="off"
+      :open="notificationModalvisible"
+      @close="toggleNotificationModal"
+    >
+      <template #body>
+        <p>{{ errorMessage }}</p>
+        <button @click.prevent="toggleNotificationModal" class="closeButton">
+          Cerrar
+        </button>
+      </template>
+    </Modal>
   </Layout>
 </template>
 
@@ -71,13 +71,14 @@
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
+  import { useStoreLogic } from '@/helpers/useStoreLogic';
+  import { useRouter } from 'vue-router';
+  import Modal from '@/components/modal/General.vue';
 
-  import axios from 'axios';
-
-  const apiUrl = import.meta.env.VITE_API_URL || '/api';
   export default {
     components: {
       Layout,
+      Modal,
       PrimaryBtn,
       UiTable,
       Icon,
@@ -85,55 +86,44 @@
     setup() {
       const fDB = ref([]);
       const store = useStore();
+      const router = useRouter();
       const loading = ref(false);
-
-      const getForklifts = async () => {
-        loading.value = true;
-        fDB.value = await axios
-          .get(`${apiUrl}/forklift`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data.data;
-            }
-            return [];
-          });
-        store.dispatch('setForklifts', fDB.value);
-      };
+      const notificationModalvisible = ref(false);
+      const toggleNotificationModal = () =>
+        (notificationModalvisible.value = !notificationModalvisible.value);
+      const errorMessage = ref('');
 
       const deleteTP = async (tpID) => {
-        let response = await axios
-          .delete(`${apiUrl}/forklift/${tpID}`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data.data;
+        await useStoreLogic(router, store, 'forklift', 'delete', tpID).then(
+          (res) => {
+            if (res.type == 'failed') {
+              errorMessage.value = res.message;
+              toggleNotificationModal();
             }
-            return [];
-          })
-          .finally(() => {
-            store.dispatch('deleteForklift', tpID);
-            getForklifts();
-          });
-
-        return {
-          response,
-        };
+            if (res.type == 'success')
+              fDB.value = store.getters['getForklifts'];
+          }
+        );
       };
 
       onMounted(async () => {
         loading.value = true;
-        await getForklifts();
+        await useStoreLogic(router, store, 'forklift', 'getAll').then((res) => {
+          if (res.type == 'failed') {
+            errorMessage.value = res.message;
+            toggleNotificationModal();
+          }
+          if (res.type == 'success') fDB.value = res.res;
+        });
         loading.value = false;
       });
       return {
         fDB,
         deleteTP,
         loading,
+        notificationModalvisible,
+        toggleNotificationModal,
+        errorMessage,
       };
     },
   };
@@ -141,4 +131,7 @@
 
 <style lang="scss" scoped>
   @import '@/assets/table.scss';
+  .closeButton {
+    @apply inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-200 sm:bg-transparent text-base font-medium text-second-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm mt-3;
+  }
 </style>
