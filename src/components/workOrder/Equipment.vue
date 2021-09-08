@@ -194,15 +194,11 @@
 
       const firstTracktorFull = computed(() => {
         const trackto = traktors.value[0];
-        return (
-          trackto.chassis !== '' &&
-          trackto.supplier !== '' &&
-          trackto.description !== ''
-        );
+        return trackto.chassis !== '' && trackto.supplier !== '';
       });
       const firstPickupFull = computed(() => {
         const pickup = pickups.value[0];
-        return pickup.pickup_id !== '' && pickup.description !== '';
+        return pickup.pickup_id !== '';
       });
 
       watchEffect(() => {

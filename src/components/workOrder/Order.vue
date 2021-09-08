@@ -112,8 +112,7 @@
       watchEffect(() => {
         isFull.value = !!(
           clientId.value >= 0 &&
-          serviceCompanyId.value >= 0 &&
-          pad.value.length > 2 &&
+          pad.value.length > 0 &&
           pits.value.length > 0 &&
           pits.value[0].name.length > 0
         );
