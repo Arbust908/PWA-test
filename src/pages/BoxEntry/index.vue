@@ -12,10 +12,10 @@
         <FieldGroup class="grid grid-cols-12 gap-4 max-w-4xl">
           <span class="col-span-8 grid grid-cols-12 gap-4">
             <ClientPitCombo
-              :clientId="clientId"
-              :pitId="pitId"
-              @update:clientId="clientId = $event"
-              @update:pitId="pitId = $event"
+              :clientId="Number(clientId)"
+              :pitId="Number(pitId)"
+              @update:clientId="clientId = Number($event)"
+              @update:pitId="pitId = Number($event)"
             />
           </span>
           <FieldSelect
@@ -340,13 +340,11 @@
           if (clientId.value !== -1 && pitId.value !== -1) {
             filteredPurchaseOrders.value = purchaseOrders.value;
             filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
-              if (
-                parseInt(po.companyId) == clientId.value &&
-                parseInt(po.pitId) == pitId.value
-              ) {
+              if (po.companyId == clientId.value && po.pitId == pitId.value) {
                 return po;
               }
             });
+            console.log('MY Purchase Orders', filteredPurchaseOrders.value);
           }
           if (purchaseOrderId.value !== -1) {
             let sandTypes = await axios

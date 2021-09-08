@@ -16,12 +16,15 @@
       <option v-for="(res, i) in resources" :key="res?.id + i" :value="res?.id">
         {{ res[endpointKey] }}
       </option>
+      <option v-for="(res, i) in epData" :key="res?.id + i" :value="res?.id">
+        {{ res[endpointKey] }}
+      </option>
     </select>
   </label>
 </template>
 
 <script>
-  import { defineComponent, onMounted, ref } from 'vue';
+  import { defineComponent, computed, ref } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { useApi } from '@/helpers/useApi';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
@@ -71,16 +74,16 @@
         return read();
       };
       let resources = ref([]);
-      if (endpointData.value !== null) {
-        resources.value = endpointData.value;
-      } else if (props.endpoint !== null) {
+      const epData = computed(() => {
+        return props.endpoint === '/' ? endpointData.value : null;
+      });
+      if (props.endpoint !== '/' && props.endpoint !== null) {
         resources = getApiVal();
-      } else {
-        resources.value = [{ id: -1, name: 'No hay datos' }];
       }
       return {
         value,
         resources,
+        epData,
         ...props,
       };
     },

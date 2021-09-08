@@ -4,10 +4,7 @@
       {{ pos }} - 40
     </td>
     <template v-if="editing === Number(stage.id)">
-      <td
-        class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm"
-        :id="`sandType${stage.id}`"
-      >
+      <td class="typeWrap" :id="`sandType${stage.id}`">
         <FieldSelect
           fieldName="sandType1"
           placeholder="Seleccionar"
@@ -18,14 +15,14 @@
         />
         <FieldWithSides
           fieldName="sandQuantity1"
-          placeholder="Cantidad de Arena"
+          placeholder="0 t"
           type="number"
           :post="{ title: 'Peso en Toneladas', value: 't' }"
           :data="stage.quantity1"
           @update="stage.quantity1 = $event"
         />
       </td>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+      <td class="typeWrap">
         <FieldSelect
           fieldName="sandType2"
           placeholder="Seleccionar"
@@ -36,14 +33,14 @@
         />
         <FieldWithSides
           fieldName="sandQuantity2"
-          placeholder="Cantidad de Arena"
+          placeholder="0 t"
           type="number"
           :post="{ title: 'Peso en Toneladas', value: 't' }"
           :data="stage.quantity2"
           @update="stage.quantity2 = $event"
         />
       </td>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
+      <td class="typeWrap">
         <FieldSelect
           fieldName="sandType3"
           placeholder="Seleccionar"
@@ -54,7 +51,7 @@
         />
         <FieldWithSides
           fieldName="sandQuantity3"
-          placeholder="Cantidad de Arena"
+          placeholder="0 t"
           type="number"
           :post="{ title: 'Peso en Toneladas', value: 't' }"
           :data="stage.quantity3"
@@ -263,17 +260,8 @@
 </script>
 
 <style lang="scss" scoped>
-  .input {
-    @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 mt-1 flex shadow-sm;
-  }
-  .amountWrapper {
-    @apply mt-1 flex rounded shadow-sm;
-  }
-  .amountInput {
-    @apply flex-1 min-w-0 block w-full px-3 py-2 rounded-none border-r-0 rounded-l focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 sm:text-sm;
-  }
-  .amountInput__unit {
-    @apply inline-flex items-center px-3 rounded-r border border-gray-300 bg-gray-50 text-gray-500 sm:text-sm;
+  .typeWrap {
+    @apply text-gray-500 px-3 py-4 whitespace-nowrap text-sm max-w-[10rem];
   }
   .action {
     @apply text-gray-600 p-2;

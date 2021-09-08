@@ -98,7 +98,6 @@
               class="max-w-[200px]"
               fieldName="cradle"
               placeholder="Seleccionar cradle"
-              endpoint="/cradle"
               :endpointData="cradles"
               :data="currentStageSheet.cradleId"
               @update:data="currentStageSheet.cradleId = $event"

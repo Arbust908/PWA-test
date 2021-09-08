@@ -29,9 +29,9 @@
   section {
     @apply flex flex-col;
     & > div {
-      @apply -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8;
+      @apply overflow-x-auto;
       & > div {
-        @apply py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8;
+        @apply align-middle inline-block min-w-full;
         & > article {
           @apply shadow overflow-hidden border-b border-second-200 sm:rounded-lg;
         }
