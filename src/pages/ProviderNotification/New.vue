@@ -357,7 +357,7 @@
 
       const save = async () => {
         pN.value = {
-          sandProviderIds: Number(sandProviderIds.value[0].id),
+          sandProviderId: Number(sandProviderIds.value[0].id),
           sandOrderId: sandProviderIds.value[0].SandOrders[0].id,
           transportProviderId: Number(transportOrder.value[0].id),
         };
