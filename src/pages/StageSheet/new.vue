@@ -3,7 +3,7 @@
     <header
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+      <h1>
         Stage sheet
       </h1>
     </header>
@@ -516,7 +516,9 @@
 
 <style lang="scss" scoped>
   @import '@/assets/button.scss';
-
+  h1 {
+    @apply font-bold text-gray-900 text-xl self-start mb-3 md:mb-0;
+  }
   .panel {
     @apply bg-white rounded-md shadow-sm border;
   }
