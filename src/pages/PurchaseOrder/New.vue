@@ -23,7 +23,7 @@
           :key="sandProvidersKey"
           class="border-b pb-6"
         >
-          <FieldGroup class="grid border-none max-w-full">
+          <FieldGroup class="sm:grid border-none max-w-full">
             <FieldSelect
               class="col-span-4"
               fieldName="sandProvider"
@@ -34,7 +34,7 @@
               @update:data="providerId.id = $event"
             />
           </FieldGroup>
-          <FieldGroup class="grid items-center max-w-full">
+          <FieldGroup class="sm:grid items-center">
             <template
               v-for="(order, orderKey) in providerId.sandOrders"
               :key="orderKey"
@@ -43,9 +43,9 @@
               <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
               <FieldSelect
                 :title="orderKey === 0 ? 'Tipo' : ''"
-                class="col-span-4"
+                class="sm:col-span-4 mt-3"
                 fieldName="sandType"
-                placeholder="Seleccciona Tipo de Arena"
+                placeholder="Tipo de Arena"
                 endpoint="/sand"
                 endpointKey="type"
                 :data="order.sandTypeId"
@@ -53,51 +53,22 @@
               />
               <!-- TODO: Input con Frente o Fondo fijo ;D -->
               <label class="col-span-3" for="sandQuantity">
-                <span v-if="orderKey === 0">Cantidad</span>
-                <div class="mt-1 flex rounded shadow-sm">
-                  <input
-                    v-model="order.amount"
-                    type="number"
-                    name="sandQuantity"
-                    class="
-                      flex-1
-                      min-w-0
-                      block
-                      w-full
-                      px-3
-                      py-2
-                      rounded-none
-                      border-r-0
-                      rounded-l
-                      focus:ring-indigo-500 focus:border-indigo-500
-                      border-gray-300
-                      sm:text-sm
-                    "
-                    placeholder="Cantidad de Arena"
-                    list="sandQuantity"
-                  />
-                  <span
-                    class="
-                      inline-flex
-                      items-center
-                      px-3
-                      rounded-r
-                      border border-gray-300
-                      bg-gray-50
-                      text-gray-500
-                      sm:text-sm
-                    "
-                    title="Peso en Toneladas"
-                  >
-                    t
-                  </span>
-                </div>
+                <FieldWithSides
+                  :title="orderKey === 0 ? 'Cantidad' : ''"
+                  class="sm:col-span-4 mt-3"
+                  fieldName="sandQuantity"
+                  placeholder="Arena"
+                  type="number"
+                  :post="{ title: '0', value: 't' }"
+                  :data="order.amount"
+                  @update:data="order.amount = $event"
+                />
               </label>
               <FieldInput
                 :title="orderKey === 0 ? 'ID de caja' : ''"
-                class="col-span-3"
+                class="sm:col-span-3 mt-3"
                 fieldName="sandBoxId"
-                placeholder="Ingresar ID de caja"
+                placeholder="Ingresar ID"
                 :data="order.boxId"
                 @update:data="order.boxId = $event"
               />
@@ -105,14 +76,13 @@
                 v-if="providerId.sandOrders.length > 1"
                 icon="Trash"
                 type="outline"
-                class="w-5 mt-5 h-5 items-center cursor-pointer"
+                class="w-5 mt-5 h-5 cursor-pointer"
                 @click="removeOrder(order.id, providerId.innerId)"
               />
               <Icon
-                icon="Plus"
+                icon="PlusCircle"
                 v-if="providerId.sandOrders.length - 1 == orderKey"
-                type="outline"
-                class="icon w-5 h-5 mt-5 items-center cursor-pointer"
+                class="icon w-6 h-6 mt-5 sm:mt-5 text-green-500 cursor-pointer"
                 @click.prevent="addOrder(providerId.innerId)"
               />
             </template>
@@ -139,12 +109,6 @@
                 v-if="sandProvidersIds.length - 1 == sandProvidersKey"
                 @click.prevent="addSandProvider"
               >
-                <Icon
-                  icon="Plus"
-                  type="outline"
-                  class="icon w-5 h-5 items-center"
-                />
-                Agregar proveedor
               </div>
             </div>
           </FieldGroup>
@@ -152,7 +116,7 @@
         <FieldGroup>
           <FieldLegend>Transporte</FieldLegend>
           <FieldSelect
-            class="col-span-full"
+            class="col-span-full mt-3 pl-1"
             fieldName="transportProvider"
             title="Proveedor"
             placeholder="Selecciona proveedor"
@@ -212,6 +176,7 @@
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
   import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
   const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -225,6 +190,7 @@
       FieldLegend,
       FieldInput,
       FieldSelect,
+      FieldWithSides,
       ClientPitCombo,
       Icon,
     },

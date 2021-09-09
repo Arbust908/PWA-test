@@ -19,7 +19,7 @@
         </FieldGroup>
       </form>
     </section>
-    <section class="bg-white rounded-md shadow-sm mb-14">
+    <section v-if="windowWidth > 426" class="bg-white rounded-md shadow-sm mb-14">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <header class="flex justify-between">
           <section class="flex space-x-4">
@@ -86,7 +86,59 @@
         </div>
       </form>
     </section>
-    <section class="bg-white rounded-md shadow-sm">
+    <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm">
+      <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
+        <header class="flex justify-between px-3 pb-3 pt-4 border-b-1 border-solid border-black">
+          <section class="flex space-x-4">
+            <h2 class="font-semibold">
+              <span class="pl-6">Pozo</span>
+              <span>{{ selectedPitName }}</span>
+            </h2>
+          </section>
+          <section class="flex space-x-4">
+            <button class="flex items-right" @click.prevent="addStage">
+              <Icon icon="PlusCircle" class="w-7 h-7 m-auto text-green-500 mr-1" />
+            </button>
+            <button
+              @click.prevent="toggleCurOp()"
+              :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
+            >
+              <Icon
+                icon="ChevronUp"
+                outline
+                :opened="currentOpened"
+                :class="currentOpened ? 'rotate-180' : null"
+                class="
+                  w-8
+                  h-8
+                  text-gray-600
+                  transition
+                  transform
+                  duration-300
+                  ease-out
+                  cursor-pointer
+                "
+              />
+            </button>
+          </section>
+        </header>
+        <div class="flex flex-col p-4" v-show="currentOpened">
+          <ResposiveTableSandPlan
+            v-for="(stage, Key) in inProgressStages"
+            :key="Key"
+            :pos="Key + 1"
+            :stage="stage"
+            :editing="editingStage"
+            :sands="sands"
+            @editStage="editStage"
+            @saveStage="saveStage"
+            @duplicateStage="duplicateStage"
+            @deleteStage="deleteStage"
+          />
+        </div>
+      </form>
+    </section>
+    <section v-if="windowWidth > 426" class="bg-white rounded-md shadow-sm mt-4">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <header class="flex justify-between">
           <section class="flex space-x-4">
@@ -147,6 +199,55 @@
         </div>
       </form>
     </section>
+    <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm mt-4">
+      <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
+        <header class="flex justify-between px-3 pb-3 pt-4 border-b-1 border-solid border-black">
+          <section class="flex space-x-4">
+            <h2 class="font-semibold">
+              <span class="pl-6">Etapas Finalizadas</span>
+            </h2>
+          </section>
+          <section class="flex space-x-4">
+            <button
+              @click.prevent="toggleFinOp()"
+              :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
+            >
+              <Icon
+                icon="ChevronUp"
+                outline
+                :opened="finishedOpened"
+                :class="finishedOpened ? 'rotate-180' : null"
+                class="
+                  w-8
+                  h-8
+                  text-gray-600
+                  transition
+                  transform
+                  duration-300
+                  ease-out
+                  cursor-pointer
+                "
+              />
+            </button>
+          </section>
+        </header>
+        <div class="flex flex-col p-4" v-show="finishedOpened">
+          <ResposiveTableSandPlan
+            v-for="(stage, Key) in finishedStages"
+            :key="Key"
+            :pos="Key + 1"
+            :stage="stage"
+            :editing="editingStage"
+            :sands="sands"
+            @editStage="editStage"
+            @saveStage="saveStage"
+            @duplicateStage="duplicateStage"
+            @deleteStage="deleteStage"
+          />
+          <StageEmptyState v-if="finishedStages.length <= 0" />
+        </div>
+      </form>
+    </section>
     <footer class="p-4 space-x-8 flex justify-end">
       <NoneBtn @click.prevent="$router.push('/planificacion-de-arena')">
         Cancelar
@@ -187,6 +288,7 @@
   import SandPlanStage from '@/components/sandPlan/StageRow.vue';
   import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
   import StageHeader from '@/components/sandPlan/StageHeader.vue';
+  import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
   import { Pit, Company, SandPlan } from '@/interfaces/sandflow';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -211,9 +313,11 @@
       StageHeader,
       FieldGroup,
       ClientPitCombo,
+      ResposiveTableSandPlan
     },
     setup() {
       // Init
+      const windowWidth = window.innerWidth;
       const store = useStore();
       const router = useRouter();
       const instance = axios.create({
@@ -432,6 +536,7 @@
         save,
         isFull,
         addStage,
+        windowWidth
       };
     },
   };

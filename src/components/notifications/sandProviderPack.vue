@@ -3,7 +3,7 @@
     <FieldLegend>Arena</FieldLegend>
     <template v-for="(sPov, i) in sandProviders" :key="i">
       <FieldSelect
-        class="col-span-8"
+        class="col-span-10"
         fieldName="sandProvider"
         placeholder="Selecciona un proveedor"
         title="Proveedor"
@@ -16,7 +16,7 @@
         class="col-span-2 flex items-end"
       >
         <CircularBtn
-          class="btn__delete  flex items-center justify-center"
+          class="btn__delete  flex items-center justify-center ml-2"
           size="sm"
           @click="removeSandProvider(sPov.innerId)"
         >
@@ -26,13 +26,13 @@
       <div
         v-for="(so, Key) in sPov.SandOrders"
         :key="Key"
-        class="relative grid grid-cols-12 col-span-full gap-4"
+        class="relative grid grid-cols-12 col-span-full gap-4 mt-2"
       >
         <FieldSelect
           class="col-span-5"
           :title="Key === 0 ? 'Tipo' : null"
           fieldName="sandType"
-          placeholder="Seleccionar Arena"
+          placeholder="Arena"
           endpoint="/sand"
           endpointKey="type"
           :data="so.sandTypeId"
@@ -44,29 +44,22 @@
           :amount="so.amount"
           @update:amount="so.amount = $event"
         />
-        <div class="flex col-span-2 ml-2 bottom-0 items-end mb-1">
-          <CircularBtn
-            class="btn__add flex items-center justify-center"
-            size="sm"
-            @click.prevent="addSandOrder(sPov.innerId)"
-          >
-            <Icon icon="Plus" outline class="w-5 h-5" />
-          </CircularBtn>
-          <CircularBtn
-            v-if="
-              sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length - 1
-            "
-            class="btn__delete flex items-center justify-center"
-            size="sm"
+        <div class="flex col-span-2 ml-2 my-auto">
+          <Icon v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length - 1" 
+            icon="Trash" outline 
+            class="w-5 h-5 mt-4" 
             @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
-          >
-            <Icon icon="Trash" outline class="w-5 h-5" />
-          </CircularBtn>
+          />
         </div>
+          <Icon 
+            icon="PlusCircle" outline 
+            class="w-7 h-7 text-green-500"
+            @click.prevent="addSandOrder(sPov.innerId)"
+          />
       </div>
     </template>
     <div class="col-span-full mt-1">
-      <button
+      <!-- <button
         class="flex items-center space-x-2"
         @click.prevent="addSandProvider"
       >
@@ -74,7 +67,7 @@
           <Icon icon="Plus" outline class="w-4 h-4" />
         </CircularBtn>
         <span class="font-bold text"> Agregar proveedor </span>
-      </button>
+      </button> -->
     </div>
   </FieldGroup>
 </template>

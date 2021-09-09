@@ -17,7 +17,7 @@
           fieldName="sandQuantity1"
           placeholder="0 t"
           type="number"
-          :post="{ title: 'Peso en Toneladas', value: 't' }"
+          :post="{ title: '0', value: 't' }"
           :data="stage.quantity1"
           @update="stage.quantity1 = $event"
         />
@@ -35,7 +35,7 @@
           fieldName="sandQuantity2"
           placeholder="0 t"
           type="number"
-          :post="{ title: 'Peso en Toneladas', value: 't' }"
+          :post="{ title: '0', value: 't' }"
           :data="stage.quantity2"
           @update="stage.quantity2 = $event"
         />
@@ -53,7 +53,7 @@
           fieldName="sandQuantity3"
           placeholder="0 t"
           type="number"
-          :post="{ title: 'Peso en Toneladas', value: 't' }"
+          :post="{ title: '0', value: 't' }"
           :data="stage.quantity3"
           @update="stage.quantity3 = $event"
         />
