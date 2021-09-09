@@ -140,6 +140,12 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isLogged,
   },
   {
+    path: '/operacion-en-cradle',
+    name: 'CradleOperation',
+    component: () => import('@/pages/CradleOperation/index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
     path: '/proveedores-de-arena',
     name: 'SandProvider',
     component: () => import('@/pages/SandProvider/index.vue'),
