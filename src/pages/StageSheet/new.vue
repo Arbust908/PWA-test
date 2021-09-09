@@ -105,22 +105,24 @@
             <FieldLoading :title="false" class="max-w-[200px]" v-else />
           </div>
           <div v-if="currentStageSheet.cradleId == -1" class="cradle-grid">
-            <div class="cradle-slot ph">1</div>
-            <div class="cradle-slot ph">2</div>
-            <div class="cradle-slot ph">3</div>
-            <div class="cradle-slot ph">4</div>
+            <div v-for="pos in 4" :key="pos" class="cradle-slot ph">
+              {{ pos }}
+            </div>
           </div>
-          <div
-            v-else
-            class="py-8 flex justify-center items-center flex-wrap gap-5"
-          >
-            <div class="cradle-slot">1</div>
-            <div class="cradle-slot">2</div>
-            <div class="cradle-slot">3</div>
-            <div class="cradle-slot">4</div>
+          <div v-else class="cradle-grid">
+            <div
+              v-for="(slot, pos) in selectedCradle.slots"
+              :key="pos"
+              :class="slot.category ?? null"
+              class="cradle-slot"
+              @click="setBox(pos)"
+            >
+              {{ slot.boxId ?? pos + 1 }}
+            </div>
           </div>
         </article>
       </section>
+      {{ stage }}
     </div>
 
     <footer class="p-4 space-x-8 flex justify-end">
@@ -258,6 +260,19 @@
           },
         ],
       });
+      watch(currentStageSheet, (newVal) => {
+        if (newVal && newVal.cradleId && newVal.cradleId !== -1) {
+          console.log('NEW CRADLE', newVal.cradleId);
+          console.log('selected Cradle', selectedCradle.value);
+          console.log('cradles', cradles.value);
+          selectedCradle.value = cradles.value.find(
+            (cradle) => cradle.id == newVal.cradleId
+          );
+          console.log('NEW CRADLE', selectedCradle.value);
+        }
+      });
+      const selectedCradle = ref(null);
+
       const editingStage = ref(0);
 
       const editStage = (stage) => {
@@ -304,17 +319,21 @@
         category: '',
       });
       const selectBox = (box: Box) => {
-        if (box.category == 'aisle') return;
-        if (box.category == 'empty') {
-          let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
-          let selectedBoxPosition = `${box.floor}|${box.row}|${box.col}`;
-
-          choosedBox.value.floor = box.floor;
-          choosedBox.value.col = box.col;
-          choosedBox.value.row = box.row;
-          warehouse.value.layout[`${selectedBoxPosition}`] =
+        choosedBox.value = box;
+      };
+      const setBox = (slotPos: number) => {
+        console.log(slotPos);
+        if (selectedCradle.value) {
+          selectedCradle.value.slots.map((slot) => {
+            if (slot.boxId == choosedBox.value.id) {
+              slot.boxId = null;
+              slot.category = null;
+            }
+          });
+          console.log(selectedCradle.value.slots);
+          selectedCradle.value.slots[slotPos].category =
             choosedBox.value.category;
-          warehouse.value.layout[`${prevBoxPosition}`] = 'empty';
+          selectedCradle.value.slots[slotPos].boxId = choosedBox.value.id;
         }
       };
       const formatDeposit = (deposit) => {
@@ -392,7 +411,7 @@
           }
         }
       });
-      let visibleCategories = ref([]);
+      let visibleCategories = ref();
       // :: CRADLES
       const cradles = ref([] as Array<Cradle>);
       const backupCradles = ref([] as Array<Cradle>);
@@ -443,14 +462,6 @@
         }
         console.log(cradles.value);
       };
-
-      const selectedCradleName = computed(() => {
-        return currentStageSheet.cradleId >= 0
-          ? cradles.value.find(
-              (cradle) => cradle.id === currentStageSheet.cradleId
-            ).name
-          : '';
-      });
       // << CRADLES
 
       const isFull = computed(() => {
@@ -465,11 +476,14 @@
           currentStageSheet.stages[0].quantity1 !== 0 ||
           currentStageSheet.stages[0].quantity2 !== 0 ||
           currentStageSheet.stages[0].quantity3 !== 0;
+
+        console.log('stNull', noZeroSandTypeNull);
+        console.log('amount 0', noZeroSandTypeZero);
+        console.log('company Id', currentStageSheet.companyId);
+        console.log('pit Id', currentStageSheet.pitId);
         return !!(
           currentStageSheet.companyId >= 0 &&
           currentStageSheet.pitId >= 0 &&
-          currentStageSheet.stages.length > 0 &&
-          currentStageSheet.stages.length <= 40 &&
           noZeroSandTypeNull &&
           noZeroSandTypeZero
         );
@@ -493,6 +507,8 @@
         row,
         col,
         visibleCategories,
+        setBox,
+        selectedCradle,
       };
     },
   };
@@ -512,6 +528,23 @@
     @apply w-[6.25rem] h-[6.25rem] rounded-lg border-2 border-dashed border-second-400 text-4xl font-bold text-second-300 flex justify-center items-center;
     &.ph {
       @apply border-second-300 text-second-200;
+    }
+    &.thick,
+    &.thin,
+    &.cut {
+      @apply text-2xl border-none shadow;
+    }
+    &.aisle {
+      @apply bg-second-300 text-second-300;
+    }
+    &.fine {
+      @apply bg-orange-600 text-orange-800;
+    }
+    &.thick {
+      @apply bg-green-600 text-green-800;
+    }
+    &.cut {
+      @apply bg-blue-600 text-blue-800;
     }
   }
 

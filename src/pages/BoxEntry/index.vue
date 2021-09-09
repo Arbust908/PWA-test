@@ -36,7 +36,7 @@
                 :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
                 class="radio-button"
                 @click.prevent="setSelectedBox(box.boxId)"
-              />
+              ></button>
               <div class="box-id">
                 <span> {{ box.category }} - {{ box.amount }}t - </span>
                 <input
@@ -395,8 +395,11 @@
       });
 
       const setSelectedBox = (id: Number) => {
+        console.log('id', id);
         choosedBox.value = boxes.value.filter((box) => {
+          console.log('box', box.boxId, '==', id);
           if (box.boxId == id) {
+            console.log('box', box);
             if (choosedBox.value.category !== box.category) {
               setVisibleCategories(choosedBox.value.category);
               setVisibleCategories(box.category);
@@ -407,20 +410,33 @@
       };
 
       const selectBox = (box: Box) => {
+        console.log('box', box);
+        console.log('choosedBox', choosedBox.value);
         clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
-        if (box.category == 'empty') {
-          let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
-          let selectedBoxPosition = `${box.floor}|${box.row}|${box.col}`;
+        // if (box.category == 'empty' || box.category != 'aisle') {
+        if (visibleCategories.value.includes(box.category)) {
+          const hasPos = [
+            choosedBox.value.floor,
+            choosedBox.value.row,
+            choosedBox.value.col,
+          ].some(Boolean);
+          console.log(hasPos);
+          if (hasPos) {
+            let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
+            console.log('prevBoxPosition', prevBoxPosition);
+            // warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
+            warehouse.value.layout[`${prevBoxPosition}`].id = '';
+          }
+          const newBPos = `${box.floor}|${box.row}|${box.col}`;
           choosedBox.value.floor = box.floor;
           choosedBox.value.col = box.col;
           choosedBox.value.row = box.row;
-          warehouse.value.layout[`${selectedBoxPosition}`].category =
+          warehouse.value.layout[`${newBPos}`].category =
             choosedBox.value.category;
-          warehouse.value.layout[`${selectedBoxPosition}`].id =
-            choosedBox.value.boxId;
-          warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
-          warehouse.value.layout[`${prevBoxPosition}`].id = '';
+          warehouse.value.layout[`${newBPos}`].id = choosedBox.value.boxId;
+          console.log('warehouse', warehouse.value);
+          console.log('warehouse BOx', warehouse.value.layout[`${newBPos}`]);
         }
       };
 

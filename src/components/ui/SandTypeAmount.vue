@@ -10,7 +10,7 @@
     />
     <FieldWithSides
       :fieldName="`sandQuantity${mod}`"
-      placeholder="Cantidad de Arena"
+      placeholder="X t"
       type="number"
       :post="{ title: 'Peso en Toneladas', value: 't' }"
       :data="quantity"
@@ -58,6 +58,6 @@
 
 <style lang="scss" scoped>
   td {
-    @apply text-gray-500 px-3 py-4 whitespace-nowrap text-sm;
+    @apply text-gray-500 px-3 py-4 whitespace-nowrap text-sm max-w-[8rem];
   }
 </style>

@@ -82,6 +82,7 @@
 
 <script lang="ts">
   import { defineComponent, toRefs, reactive, computed, ref, watch } from 'vue';
+  import { useVModels } from '@vueuse/core';
   import Pill from '@/components/ui/Pill.vue';
   import { Sand } from '@/interfaces/sandflow';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -114,7 +115,7 @@
       const instance = axios.create({
         baseURL: api,
       });
-      const { stage, editing } = toRefs(props);
+      const { stage, editing } = useVModels(props, emit);
       const sands = ref([]);
       const { data } = useAxios('/sand', instance);
       watch(data, (api) => {

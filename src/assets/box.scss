@@ -1,0 +1,21 @@
+&.aisle {
+  @apply bg-second-300 text-second-300;
+}
+&.fine {
+  @apply bg-orange-600 text-orange-800 font-medium;
+}
+&.thick {
+  @apply bg-green-600 text-green-800 font-medium;
+}
+&.cut {
+  @apply bg-blue-600 text-blue-800 font-medium;
+}
+&.blocked {
+  @apply bg-second-800 text-second-800;
+}
+&.empty {
+  @apply bg-second-200 text-second-200;
+}
+&.selected {
+  @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
+}
