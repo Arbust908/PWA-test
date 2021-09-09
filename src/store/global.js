@@ -22,6 +22,11 @@ export default {
         icon: 'Tag',
       },
       {
+        name: 'Operación en Cradle',
+        to: '/operacion-en-cradle',
+        icon: 'Tag',
+      },
+      {
         name: 'Diseño de Deposito',
         to: '/diseno-de-deposito',
         icon: 'ViewGridAdd',
