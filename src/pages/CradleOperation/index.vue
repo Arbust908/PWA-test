@@ -45,20 +45,49 @@
         </div>
       </section>
       <section v-else class="cradle-slots">
-        <div v-for="(slot, index) in cradleSlots" :key="index" >
+        <div v-for="(slot, index) in filteredCradles" :key="index" >
           <div class="slot">
             <span class="station-title">Estación {{index+1}} - S000{{index+1}}</span>
             <div class="cradle-status-wrapper">
-              <span class="cradle-status">En ejecución</span>
-              <span class="cradle-status">Pausa</span>
-              <span class="cradle-status">Vacía</span>
-              <span class="cradle-status">No disponible</span>
+              <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '1')">
+                <div class="icon-wrapper check" :class="[slot.status == '1' ? 'active' : '']">
+                  <Icon icon="Check" class="icon" v-if="slot.status == '1'"/>
+                </div>
+                En ejecución
+              </span>
+              <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '3')">
+                <div class="icon-wrapper pause" :class="[slot.status == '3' ? 'active' : '']">
+                  <Icon icon="Pause" type="outline" class="icon" v-if="slot.status == '3'"/>
+                </div>
+                Pausa
+              </span>
+              <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '4')">
+                <div class="icon-wrapper empty" :class="[slot.status == '4' ? 'active' : '']">
+                  <Icon icon="Minus" class="icon" v-if="slot.status == '4'"/>
+                </div>
+                Vacía
+              </span>
+              <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '0')">
+                <div class="icon-wrapper unavailable" :class="[slot.status == '0' ? 'active' : '']">
+                  <Icon icon="X" class="icon" v-if="slot.status == '0'"/>
+                </div>
+                No disponible
+              </span>
             </div>
             <hr>
             <div class="cradle-data-wrapper">
-              <span class="cradle-data">15T peso remito</span>
-              <span class="cradle-data">15T peso actual</span>
-              <span class="cradle-data">Arena 123</span>
+              <span class="cradle-data">
+                <Icon icon="InformationCircle" class="icon"/>
+                15T peso remito
+              </span>
+              <span class="cradle-data">
+                <Icon icon="InformationCircle" class="icon"/>
+                15T peso actual
+              </span>
+              <span class="cradle-data">
+                <Icon icon="InformationCircle" class="icon"/>
+                Arena 123
+              </span>
             </div>
           </div>
           <button class="calibrate">Calibrar E{{index+1}}</button>
@@ -78,7 +107,7 @@
       class="modal"
     >
       <template #body>
-        <Icon :icon="check" class="mx-auto mb-4 w-16 h-16 text-green-400" />
+        <Icon icon="check" class="mx-auto mb-4 w-16 h-16 text-green-400" />
         <p class="mb-4 text-lg text-gray-600">{{ modalMessage }}</p>
         <button @click.prevent="toggleModal" class="confirm-button mt-4 px-4 py-2 rounded-sm">
           {{modalButtonText}}
@@ -155,6 +184,10 @@
       const modalButtonText = ref("")
       const isModalVisible = ref(false)
 
+      const changeCradleSlotStatus = (slotIndex: Number, newStatus: String) => {
+        return filteredCradles.value[slotIndex].status = newStatus
+      }
+
       const toggleModal = () => {
         return isModalVisible.value = !isModalVisible.value
       }
@@ -206,7 +239,7 @@
         //     });
         //   }
         // })
-        return filteredCradles.value = [{},{},{},{}]
+        return filteredCradles.value = [{status: "3"},{},{},{}]
       }
 
       watchEffect(async () => {
@@ -276,7 +309,8 @@
         modalButtonText,
         modalMessage,
         toggleModal,
-        isModalVisible
+        isModalVisible,
+        changeCradleSlotStatus
       };
     },
   });
@@ -293,12 +327,59 @@
     @apply mt-4;
   }
   .cradle-status {
+    @apply flex;
+
+    & .icon-wrapper {
+      border-radius: 100%;
+      @apply mr-1 w-5 h-5 flex items-center justify-center;
+
+      & .icon {
+        @apply w-5 h-5;
+      }
+
+      &.check {
+        @apply text-green-600 border-green-600 border-2;
+      }
+
+      &.pause {
+        @apply mr-1;
+
+        &.active {
+          transform: translate(-2px,-2px);
+          @apply text-yellow-600 w-6 h-6 mr-0;
+          
+          & .icon {
+            @apply w-6 h-6;
+          }
+        }
+      }
+
+      &.empty {
+        @apply text-gray-600 border-gray-600 border-2;
+      }
+
+      &.unavailable {
+        @apply text-red-600 border-red-600 border-2;
+      }
+
+      &:not(.active) {
+        @apply border-gray-600 border-2;
+      }
+
+    }
+
+  
     &:not(:first-child) {
       @apply mt-2;
     }
   }
   .cradle-data {
-    @apply text-purple-600;
+    @apply text-purple-600 flex items-center;
+
+    & .icon {
+      @apply mr-1 w-6 h-6 text-purple-600;
+    }
+
     &:not(:first-child) {
       @apply mt-2;
     }
@@ -318,7 +399,7 @@
       @apply border-dashed border-2 border-second-300 rounded-lg p-4 cursor-pointer flex flex-col text-center;
 
       &:not(.empty) {
-        @apply justify-between;
+        @apply justify-between bg-gray-100 border-none;
       }
 
       .station-title {
