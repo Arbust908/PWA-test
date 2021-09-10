@@ -1,8 +1,6 @@
 <template>
   <Layout class="relative">
-    <header
-      class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
-    >
+    <header>
       <h1>
         Stage sheet
       </h1>
@@ -22,16 +20,13 @@
             <StageHeader />
           </template>
           <template #body>
-            <SandPlanStage
+            <StageSheetStage
               v-for="(stage, Key) in currentStageSheet.stages"
               :key="Key"
               :pos="Key + 1"
               :stage="stage"
               :editing="editingStage"
-              @editStage="editStage"
-              @saveStage="saveStage"
-              @duplicateStage="duplicateStage"
-              @deleteStage="deleteStage"
+              @update:stage="stage = $event"
             />
           </template>
         </StageTable>
@@ -122,7 +117,6 @@
           </div>
         </article>
       </section>
-      {{ stage }}
     </div>
 
     <footer class="p-4 space-x-8 flex justify-end">
@@ -193,7 +187,7 @@
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-  import SandPlanStage from '@/components/stageSheet/StageRow.vue';
+  import StageSheetStage from '@/components/stageSheet/StageRow.vue';
   import StageEmptyState from '@/components/stageSheet/StageEmptyState.vue';
   import StageHeader from '@/components/stageSheet/StageHeader.vue';
   import StageTable from '@/components/stageSheet/StageTable.vue';
@@ -218,7 +212,7 @@
       NoneBtn,
       CircularBtn,
       PrimaryBtn,
-      SandPlanStage,
+      StageSheetStage,
       StageEmptyState,
       StageHeader,
       Icon,
@@ -238,17 +232,16 @@
       const instance = axios.create({
         baseURL: api,
       });
-      const currentStageSheet: StageSheet = reactive({
+      const currentStageSheet = reactive({
         companyId: -1,
         pitId: -1,
         cradleId: -1,
         warehouseId: -1,
-        operativeCradleId: -1,
-        backupCradleId: -1,
+        operativeCradleId: null,
+        backupCradleId: null,
         stages: [
           {
             id: 0,
-            stage: 1,
             sandId1: -1,
             quantity1: 0,
             sandId2: -1,
@@ -324,16 +317,22 @@
       const setBox = (slotPos: number) => {
         console.log(slotPos);
         if (selectedCradle.value) {
+          // Reset los slots
           selectedCradle.value.slots.map((slot) => {
             if (slot.boxId == choosedBox.value.id) {
               slot.boxId = null;
               slot.category = null;
             }
           });
-          console.log(selectedCradle.value.slots);
-          selectedCradle.value.slots[slotPos].category =
-            choosedBox.value.category;
-          selectedCradle.value.slots[slotPos].boxId = choosedBox.value.id;
+          // Si hay box lo ponemos
+          if (choosedBox.value.id) {
+            selectedCradle.value.slots[slotPos].category =
+              choosedBox.value.category;
+            selectedCradle.value.slots[slotPos].boxId = choosedBox.value.id;
+          } else  {
+            // Tiramos un modal (?)
+            console.log('No box selected');
+          }
         }
       };
       const formatDeposit = (deposit) => {
@@ -403,6 +402,7 @@
               error: 'No hay depósito para este cliente y/o pozo',
             };
           } else {
+            currentStageSheet.warehouseId = warehouse.value.id;
             const fDepo = formatDeposit(warehouse.value.layout);
             console.log(fDepo);
             floor.value = fDepo.floor;
@@ -476,20 +476,46 @@
           currentStageSheet.stages[0].quantity1 !== 0 ||
           currentStageSheet.stages[0].quantity2 !== 0 ||
           currentStageSheet.stages[0].quantity3 !== 0;
-
-        console.log('stNull', noZeroSandTypeNull);
-        console.log('amount 0', noZeroSandTypeZero);
-        console.log('company Id', currentStageSheet.companyId);
-        console.log('pit Id', currentStageSheet.pitId);
         return !!(
           currentStageSheet.companyId >= 0 &&
           currentStageSheet.pitId >= 0 &&
+          currentStageSheet.cradleId >= 0 &&
           noZeroSandTypeNull &&
           noZeroSandTypeZero
         );
       });
       const { saveSandPlan } = useActions(['saveSandPlan']);
-      const save = (): void => {};
+      const save = (): void => {
+        console.groupCollapsed('SAVE');
+        const { stages, ...newStageSheet} = currentStageSheet;
+        const stage = stages[0];
+        console.log('New Stage Sheet', newStageSheet);
+        console.log('Stage', stage);
+        const { data } = useAxios(
+          '/stageSheet',
+          { method: 'POST', data: newStageSheet },
+          instance
+        );
+        watch(data, (newVal) => {
+          if (newVal && newVal.data) {
+            console.log('New Stage Sheet', newVal.data);
+            const StSHId = newVal.data.id;
+            stage.StageSheetId = StSHId;
+            console.log('New Stage', stage);
+            const { data } = useAxios(
+              '/sandStage',
+              { method: 'POST', data: stage },
+              instance
+            );
+            watch(data, (newVal) => {
+              if (newVal && newVal.data) {
+                console.log('New Stage', newVal.data);
+                router.push('/stage-sheet');
+              }
+            });
+          }
+        });
+      };
       return {
         currentStageSheet,
         save,
@@ -516,6 +542,9 @@
 
 <style lang="scss" scoped>
   @import '@/assets/button.scss';
+  header {
+    @apply flex flex-col md:flex-row md:justify-between items-center md:mb-4;
+  }
   h1 {
     @apply font-bold text-gray-900 text-xl self-start mb-3 md:mb-0;
   }
@@ -530,6 +559,9 @@
     @apply w-[6.25rem] h-[6.25rem] rounded-lg border-2 border-dashed border-second-400 text-4xl font-bold text-second-300 flex justify-center items-center;
     &.ph {
       @apply border-second-300 text-second-200;
+    }
+    &:not(.ph) {
+      @apply cursor-pointer;
     }
     &.thick,
     &.thin,

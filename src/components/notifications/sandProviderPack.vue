@@ -30,7 +30,7 @@
       >
         <FieldSelect
           class="col-span-5"
-          :title="Key === 0 ? 'Tipo' : null"
+          :title="Key === 0 ? 'Tipo' : ''"
           fieldName="sandType"
           placeholder="Seleccionar Arena"
           endpoint="/sand"
@@ -38,11 +38,15 @@
           :data="so.sandTypeId"
           @update:data="so.sandTypeId = $event"
         />
-        <AmountInput
+        <FieldWithSides
+          :title="Key === 0 ? 'Cantidad' : ''"
+          :fieldName="`sandQuantity${Key}`"
           class="col-span-5"
-          :title="Key === 0"
-          :amount="so.amount"
-          @update:amount="so.amount = $event"
+          placeholder="0 t"
+          type="number"
+          :post="{ title: 'Peso en Toneladas', value: 't' }"
+          :data="so.amount"
+          @update="so.amount = $event"
         />
         <div class="flex col-span-2 ml-2 bottom-0 items-end mb-1">
           <CircularBtn
@@ -87,7 +91,7 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-  import AmountInput from '@/components/notifications/AmountInput.vue';
+  import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
   import { useVModel } from '@vueuse/core';
   import { SandProvider, SandOrder } from '@/interfaces/sandflow';
   const defaultSandOrder: SandOrder = {
@@ -107,7 +111,7 @@
       FieldInput,
       FieldLegend,
       FieldSelect,
-      AmountInput,
+      FieldWithSides,
       Icon,
     },
     props: {

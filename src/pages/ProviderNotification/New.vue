@@ -17,30 +17,15 @@
           <h2 class="col-span-full text-xl">Transporte</h2>
           <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
             <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
-            <label
+            <FieldSelect
               :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full'"
-              :for="'transportProvider' + tO.id"
-            >
-              <span>Proveedor</span>
-              <select
-                :id="'transportProvider' + tO.id"
-                v-model="tO.transportProviderId"
-                class="input"
-                :name="'transportProvider' + tO.id"
-                @change="fillTransportType(tO.id)"
-              >
-                <option selected disabled value="-1">
-                  Proveedor de Transporte
-                </option>
-                <option
-                  v-for="(tP, tPKey) in transportProviders"
-                  :key="tPKey"
-                  :value="tP.id"
-                >
-                  {{ tP.name }}
-                </option>
-              </select>
-            </label>
+              title="Proveedor"
+              :fieldName="`transportProvider${tO.id}`"
+              placeholder="Seleccionar"
+              endpoint="/transportProvider"
+              :data="tO.transportProviderId"
+              @update:data="tO.transportProviderId = $event"
+            />
             <div
               v-if="tOKey !== 0"
               class="col-span-2 flex justify-end items-end"
@@ -50,31 +35,25 @@
                 size="sm"
                 @click="removeTransportProvider(tO.id)"
               >
-                <TrashIcon class="w-4 h-4" />
+                <Icon icon="Trash" class="w-4 h-4" />
               </CircularBtn>
             </div>
-            <label class="col-span-full" :for="'transportAmount' + tO.id">
-              <span>Cantidad de camiones</span>
-              <input
-                :id="'transportAmount' + tO.id"
-                v-model.number="tO.amount"
-                class="input"
-                type="text"
-                :name="'transportAmount' + tO.id"
-                placeholder="Cantidad de camiones"
-              />
-            </label>
-            <label class="col-span-full" :for="'transportObservations' + tO.id">
-              <span>Observaciones</span>
-              <input
-                :id="'transportObservations' + tO.id"
-                v-model="tO.observation"
-                class="input"
-                type="text"
-                :name="'transportObservations' + tO.id"
-                placeholder="Observaciones"
-              />
-            </label>
+            <FieldInput
+              class="col-span-full"
+              :fieldName="`transportAmount${tO.id}`"
+              placeholder="Camiones"
+              title="Cantidad de camiones"
+              :data="tO.amount"
+              @update:data="tO.amount = $event"
+            />
+            <FieldInput
+              class="col-span-full"
+              :fieldName="`transportObservations${tO.id}`"
+              placeholder="Observaciones"
+              title="Observaciones"
+              :data="tO.observation"
+              @update:data="tO.observation = $event"
+            />
           </template>
           <div class="col-span-full mt-1 pb-4 mb-4">
             <button

@@ -127,8 +127,8 @@
       const totalWheight = computed(() => {
         return (
           stage.value.quantity1 +
-            stage.value.quantity2 +
-            stage.value.quantity3 || 0
+          stage.value.quantity2 +
+          stage.value.quantity3 || 0
         );
       });
       const getSand = (sandId: number) => {

@@ -14,7 +14,7 @@
       type="number"
       :post="{ title: 'Peso en Toneladas', value: 't' }"
       :data="quantity"
-      @update="quantity = $event"
+      @update:data="quantity = $event"
     />
   </td>
 </template>
