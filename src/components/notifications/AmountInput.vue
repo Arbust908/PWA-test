@@ -45,7 +45,7 @@
     @apply text-sm;
   }
   input {
-    @apply flex-1 min-w-0 block w-full px-3 py-2 rounded-none border-r-0 rounded-l focus:ring-indigo-500 focus:border-indigo-500 border-second-300 sm:text-sm;
+    @apply flex-1 min-w-0 block w-full px-3 py-4 rounded-none border-r-0 rounded-l focus:ring-indigo-500 focus:border-indigo-500 border-second-300 sm:text-sm;
   }
   .post {
     @apply inline-flex items-center px-3 rounded-r border border-second-300 bg-second-50 text-second-500 sm:text-sm;

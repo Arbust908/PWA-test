@@ -35,7 +35,7 @@
               inset-0
               bg-gray-600 bg-opacity-50
               transition-opacity
-              backdrop-filter backdrop-blur-md
+              
             "
           />
         </TransitionChild>

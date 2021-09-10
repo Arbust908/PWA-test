@@ -64,13 +64,13 @@
                       block
                       w-full
                       px-3
-                      py-2
+                      py-6
                       rounded-none
                       border-r-0
                       rounded-l
                       focus:ring-indigo-500 focus:border-indigo-500
                       border-gray-300
-                      sm:text-sm
+                      
                     "
                     placeholder="Cantidad de Arena"
                     list="sandQuantity"
@@ -205,6 +205,7 @@
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
   import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   const api = import.meta.env.VITE_API_URL || '/api';
@@ -222,6 +223,7 @@
       FieldGroup,
       FieldLegend,
       FieldInput,
+      FieldWithSides,
       FieldSelect,
       ClientPitCombo,
       Icon,

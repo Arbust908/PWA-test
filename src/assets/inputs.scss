@@ -11,15 +11,15 @@ label {
 }
 .input,
 .input_side {
-  @apply w-full rounded focus:ring-indigo-500 focus:border-indigo-500 border-second-300 mt-1 flex shadow-sm;
+  @apply w-full rounded focus:ring-indigo-500 focus:border-indigo-500 border-second-300 mt-2 flex shadow-sm ;
 }
 
 .input {
-  @apply px-3 py-2.5;
+  @apply px-3 pt-3 pb-2.5;
 }
 .input_side {
   & > input {
-    @apply border-0 border-t border-b border-second-300 py-2.5;
+    @apply border-0 border-t border-b border-second-300 pt-3 pb-2.5;
     &.n-pre {
       @apply border-l rounded-l w-10/12;
     }
@@ -36,10 +36,14 @@ label {
   @apply inline-flex items-center px-3 border border-second-300 bg-second-50 text-second-500 w-2/12;
 }
 .pre {
-  @apply rounded-l;
+  @apply w-full rounded-l;
 }
 .post {
-  @apply rounded-r;
+  @apply ml-auto rounded-r;
+}
+
+.n-pre {
+  @apply w-full;
 }
 
 input:read-only {

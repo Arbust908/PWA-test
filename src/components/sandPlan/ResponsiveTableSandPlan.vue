@@ -1,0 +1,300 @@
+<template>
+	<table>
+    <tr>
+      <th class="text-left px-6 py-3 w-3/6">
+        <span>Etapa </span>
+        <span>{{ pos }} - 40</span>
+      </th>
+      <td class="w-3/6">
+        <div class="flex justify-around w-28 ml-auto my-0">
+          <button
+            @click.prevent="duplicateStage"
+            class="action duplicate"
+            title="Duplicar"
+          >
+            <Icon icon="DocumentDuplicate" class="w-6 h-6" />
+            <span class="sr-only">Duplicar</span>
+          </button>
+          <button
+            v-if="editing !== Number(stage.id)"
+            @click.prevent="editStage"
+            :disabled="stage.status > 0"
+            class="action edit text-gray-600 hover:text-blue-800 p-2"
+            title="Editar"
+          >
+            <Icon icon="PencilAlt" class="w-6 h-6" />
+            <span class="sr-only">Editar</span>
+          </button>
+          <button
+            v-else
+            @click.prevent="saveStage"
+            :disabled="stage.status > 0"
+            class="action edit text-gray-600 hover:text-blue-800 p-2"
+            title="Guardar"
+          >
+            <Icon icon="Save" class="w-6 h-6" />
+            <span class="sr-only">Guardar</span>
+          </button>
+          <button
+            @click.prevent="deleteStage"
+            :disabled="stage.status > 0 || stage.stage === 1"
+            class="action delete text-gray-600 hover:text-blue-800 p-1"
+            title="Borrar"
+          >
+            <Icon icon="Trash" class="w-6 h-6" />
+            <span class="sr-only">Borrar</span>
+          </button>
+        </div>
+      </td>
+    </tr>
+
+		<tr v-if="editing === Number(stage.id)">
+			<th class="head">Arena A</th>
+			<td>
+        <FieldSelect
+          fieldName="sandType1"
+          placeholder="Seleccionar"
+          endpoint="/sand"
+          endpointKey="type"
+          :data="stage.sandId1"
+          @update:data="stage.sandId1 = $event"
+        />
+      </td>
+		</tr>
+    <tr v-else>
+      <th class="head">Arena A</th>
+      <td class="td"  v-if="(sands.length > 0 && stage.sandId1 >= 0) || stage.quantity1 > 0">
+         {{ getSand(stage.sandId1)?.type }} / {{ stage.quantity1 }}t
+      </td>
+      <td v-else class="td">No hay arena</td>
+    </tr>
+    <tr v-if="editing === Number(stage.id)">
+      <th class="head">Cantidad</th>
+      <td>
+        <FieldWithSides
+          fieldName="sandQuantity1"
+          placeholder="0 t"
+          type="number"
+          :post="{ title: '0', value: 't' }"
+          :data="stage.quantity1"
+          @update="stage.quantity1 = $event"
+        />
+      </td>
+    </tr>
+
+    <div class="separador ml-6 mt-6 mb-6" v-if="editing === Number(stage.id)"/>
+
+    <tr v-if="editing === Number(stage.id)">
+			<th class="head">Arena B</th>
+			<td>
+        <FieldSelect
+          fieldName="sandType2"
+          placeholder="Seleccionar"
+          endpoint="/sand"
+          endpointKey="type"
+          :data="stage.sandId2"
+          @update:data="stage.sandId2 = $event"
+        />
+      </td>
+		</tr>
+    <tr v-else>
+      <th class="head">Arena B</th>
+      <td class="td"  v-if="(sands.length > 0 && stage.sandId2 >= 0) || stage.quantity2 > 0">
+         {{ getSand(stage.sandId2)?.type }} / {{ stage.quantity2 }}t
+      </td>
+      <td v-else class="td">No hay arena</td>
+    </tr>
+    <tr v-if="editing === Number(stage.id)">
+      <th class="head">Cantidad</th>
+      <td>
+        <FieldWithSides
+          fieldName="sandQuantity2"
+          placeholder="0 t"
+          type="number"
+          :post="{ title: '0', value: 't' }"
+          :data="stage.quantity2"
+          @update="stage.quantity2 = $event"
+        />
+      </td>
+    </tr>
+
+    <div class="separador ml-6 mt-6 mb-6" v-if="editing === Number(stage.id)"/>
+
+    <tr v-if="editing === Number(stage.id)">
+      <th class="head">Arena C</th>
+      <td>
+        <FieldSelect
+          fieldName="sandType3"
+          placeholder="Seleccionar"
+          endpoint="/sand"
+          endpointKey="type"
+          :data="stage.sandId3"
+          @update:data="stage.sandId3 = $event"
+        />
+      </td>
+    </tr>
+    <tr v-else>
+      <th class="head">Arena C</th>
+      <td class="td"  v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0">
+         {{ getSand(stage.sandId3)?.type }} / {{ stage.quantity3 }}t
+      </td>
+      <td v-else class="td">No hay arena</td>
+    </tr>
+    <tr v-if="editing === Number(stage.id)">
+      <th class="head">Cantidad</th>
+      <td >
+        <FieldWithSides
+          fieldName="sandQuantity3"
+          placeholder="0 t"
+          type="number"
+          :post="{ title: '0', value: 't' }"
+          :data="stage.quantity3"
+          @update="stage.quantity3 = $event"
+        />
+      </td>
+    </tr>
+
+    <div class="separador ml-6 mt-6 mb-6" v-if="editing === Number(stage.id)"/>
+
+    <tr>
+      <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider flex-1">Cantidad Total</th>
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-center">
+        {{ totalWheight }}t
+      </td>
+    </tr>
+    <tr>
+      <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider flex-1 text-center">Estado</th>
+      <td>
+        <Pill :type="pill.status" class="m-auto"> {{ pill.name }} </Pill>
+      </td>
+    </tr>
+    <div class="separador-final ml-6 mt-6 mb-6"/>
+	</table>
+</template>
+
+<script lang='ts'>
+import { toRefs, reactive, computed } from 'vue';
+import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
+import Pill from '@/components/ui/Pill.vue';
+import Icon from '@/components/icon/TheAllIcon.vue';
+import { Sand } from '@/interfaces/sandflow';
+
+export default {
+    props: {
+      stage: {
+        type: Object,
+        required: true,
+      },
+      editing: {
+        type: Number,
+        required: true,
+      },
+      sands: {
+        type: Array,
+        required: true,
+      },
+      pos: {
+        type: Number,
+        required: true,
+      },
+    },
+    components: {
+        FieldSelect,
+        FieldWithSides,
+        Icon,
+        Pill
+    },
+    setup(props, { emit }) {
+      const { stage, editing, sands, pos } = toRefs(props);
+      stage.value.stage = pos.value;
+
+      const totalWheight = computed(() => {
+        return (
+          stage.value.quantity1 +
+            stage.value.quantity2 +
+            stage.value.quantity3 || 0
+        );
+      });
+      const getSand = (sandId: number) => {
+        return (
+          sands.value.find((sand: Sand) => {
+            return sand.id === sandId;
+          }) || { tpye: '' }
+        );
+      };
+
+      const editStage = () => {
+        emit('editStage', stage.value);
+      };
+      const saveStage = () => {
+        emit('saveStage', stage.value);
+      };
+      const duplicateStage = () => {
+        emit('duplicateStage', stage.value);
+      };
+      const deleteStage = () => {
+        emit('deleteStage', stage.value);
+      };
+      const upgrade = () => {
+        if (stage.value.status >= 2) {
+          console.error('Reset status');
+          stage.value.status = 0;
+          return;
+        }
+        stage.value.status++;
+      };
+
+      const pill = reactive({
+        status:
+          stage.value.status === 2
+            ? 'finished'
+            : stage.value.status === 1
+            ? 'idle'
+            : 'empty',
+        name:
+          stage.value.status === 2
+            ? 'Finalizada'
+            : stage.value.status === 1
+            ? 'En Progreso'
+            : 'Creada',
+      });
+
+      return {
+        stage,
+        editing,
+        sands,
+        totalWheight,
+        getSand,
+        duplicateStage,
+        deleteStage,
+        editStage,
+        saveStage,
+        upgrade,
+        pill,
+      };
+    },
+};
+</script>
+
+<style lang="scss" scoped>
+.head {
+  @apply px-6 py-3 text-left text-sm font-medium text-black uppercase tracking-wider flex-1;
+}
+
+.td {
+  @apply px-6 py-3 text-center text-sm font-medium text-gray-500 tracking-wider flex-1;
+}
+
+.separador {
+  width: 80%;
+  height: 1px;
+  background-color: gray;
+}
+
+.separador-final {
+  width: 160%;
+  height: 1px;
+  background-color: gray;
+}
+</style>
