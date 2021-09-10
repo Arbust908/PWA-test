@@ -35,7 +35,7 @@
           />
         </fieldset>
       </form>
-      <section v-if="filteredCradles.length == 0" class="cradle-slots">
+      <section v-if="cradleId < 0" class="cradle-slots">
         <div v-for="(slot, index) in cradleSlots" :key="index" >
           <div class="slot empty">
             <span class="station-title">Estación {{index+1}}</span>
@@ -47,7 +47,7 @@
       <section v-else class="cradle-slots">
         <div v-for="(slot, index) in cradleSlots" :key="index" >
           <div class="slot">
-            <span class="station-title">Estación {{index+1}} - S000{{index+1}}</span>
+            <span class="station-title">Estación {{index+1}} - {{slot.boxId}}</span>
             <div class="cradle-status-wrapper">
               <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '1')">
                 <div class="icon-wrapper check" :class="[slot.status == '1' ? 'active' : '']">
@@ -78,15 +78,15 @@
             <div class="cradle-data-wrapper">
               <span class="cradle-data">
                 <Icon icon="InformationCircle" class="icon"/>
-                15T peso remito
+                {{slot.amount}}T peso remito
               </span>
-              <span class="cradle-data">
+              <!-- <span class="cradle-data">
                 <Icon icon="InformationCircle" class="icon"/>
                 15T peso actual
-              </span>
+              </span> -->
               <span class="cradle-data">
                 <Icon icon="InformationCircle" class="icon"/>
-                Arena 123
+                Arena: {{slot.sandType}}
               </span>
             </div>
           </div>
@@ -174,16 +174,18 @@
       const pits = ref([] as Array<Pit>);
       const clientId = ref(-1);
       const pitId = ref(-1);
-      const cradleId = ref(-1)
       const cradles = ref([]);
+      const cradleId = ref(-1);
       const filteredCradles = ref([])
-      const cradleSlots = ref([{status: "1"},{status: "2"},{status: "3"},{status: "0"}])
+      const cradleSlots = ref([{},{},{},{}])
       const modalMessage = ref("")
       const modalButtonText = ref("")
       const isModalVisible = ref(false)
+      const selectedCradle = ref({})
+      const sandTypes = ref([])
 
       const changeCradleSlotStatus = async(slotIndex: Number, newStatus: String) => {
-        // await axios.put(`${apiUrl}/cradle/${cradleId.value}`, {
+        // await axios.put(`${apiUrl}/cradle/${selectedCradle.value.id}`, {
         //   slots: cradleSlots.value
         // })
         // .then(res => console.log(res)).catch(err => console.error(err))
@@ -215,47 +217,59 @@
           .catch((err) => console.error(err));
       };
 
+      const getSandTypes = async() => {
+        await axios.get(`${apiUrl}/sand`)
+        .then(res => {
+          sandTypes.value = res.data.data
+        }).catch(err => {console.error(err)})
+      }
+
       onMounted(async () => {
         await getWorkOrders();
         await getCradles();
+        await getSandTypes();
       });
-
-      const clearBoxInDeposit = (id) => {
-        Object.entries(warehouse.value.layout).forEach((cell) => {
-          if (cell[1].id == id) {
-            (cell[1].category = 'empty'), delete cell[1][id];
-          }
-        });
-      };
 
       const selectionsAreDone = computed(() => {
         if(clientId.value >= 0 && pitId.value >= 0) { return true;}
       });
 
       const getFilteredCradles = () => {
-        // return filteredCradles.value = workOrders.value.filter(workOrder => {
-        //   if(workOrder.client == clientId.value) {
-        //     workOrder.pits.forEach(pit => {
-        //       return workOrder
-        //       if(pit.id == pitId.value) {
-        //       }
-        //     });
-        //   }
-        // })
-        return filteredCradles.value = [{slots: cradleSlots.value}]
+        workOrders.value.forEach(workOrder => {
+          if(workOrder.client == clientId.value) {
+            workOrder.pits.forEach(pit => {
+              if(pit.id == pitId.value) {
+                let cradleId = workOrder.operativeCradle
+                let backupCradleId = workOrder.backupCradle
+
+                filteredCradles.value = cradles.value.filter(cradle => {
+                  if(cradle.id == backupCradleId) return cradle
+                })
+                
+              }
+            });
+          }
+        })
       }
 
       watchEffect(async () => {
+        if(cradleId.value !== -1) {
+          selectedCradle.value = cradles.value.filter(cradle => {
+            return cradle.id == cradleId.value
+          })[0]
+          cradleSlots.value = selectedCradle.value.slots
+          cradleSlots.value.forEach(slot => {
+            const {sandTypeId} = slot
+            let sandType = sandTypes.value.filter(sandType => {
+              if(sandType.id == sandTypeId) return sandType
+            })[0].type
+            slot.sandType = sandType
+          })
+        }
         if(cradles.value.length > 0 && clientId.value >= 0 && pitId.value >= 0) {
           await getFilteredCradles()
         }
       });
-
-      let selectedCradle = ref(0);
-
-      const handleSelectedCradle = (id) => {
-        selectedCradle.value = id;
-      };
 
       // :: CLIENT
       const selectedClientName = computed(() => {
@@ -297,16 +311,14 @@
         clients,
         pits,
         clientId,
+        cradleId,
         pitId,
         designName,
         requestEmptyBoxHandle,
         completeStageHandle,
         selectionsAreDone,
-        handleSelectedCradle,
         cradles,
-        selectedCradle,
         workOrders,
-        clearBoxInDeposit,
         filteredCradles,
         cradleSlots,
         modalButtonText,
