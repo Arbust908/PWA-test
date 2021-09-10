@@ -67,91 +67,115 @@
           </button>
         </nav>
         <div v-if="selectionsAreDone">
-          <fieldset
-            v-if="activeSection === 'deposit'"
-            class="py-2 flex gap-x-10 2xl:gap-x-40"
-          >
-            <section
-              class="
-                w-full
-                max-w-[170px]
-                lg:max-w-[260px]
-                flex flex-col
-                gap-6
-                md:gap-8
-              "
+          <div v-if="warehouse">
+            <fieldset
+              v-if="activeSection === 'deposit'"
+              class="py-2 flex gap-x-10 2xl:gap-x-40"
             >
-              <BoxCard v-if="choosedBox.category !== ''" v-bind="choosedBox" />
-              <h2 class="col-span-full text-xl font-bold">Referencias</h2>
-              <div class="flex flex-col gap-5 ml-4">
-                <span
-                  class="select-category fine"
-                  @click="setVisibleCategories('fine')"
-                >
-                  <EyeIcon
-                    class="icon"
-                    v-if="visibleCategories.includes('fine')"
-                  />
-                  <EyeIconOff class="icon" v-else />
-                  Arena fina</span
-                >
-                <span
-                  class="select-category thick"
-                  @click="setVisibleCategories('thick')"
-                >
-                  <EyeIcon
-                    class="icon"
-                    v-if="visibleCategories.includes('thick')"
-                  />
-                  <EyeIconOff class="icon" v-else />
-                  Arena gruesa</span
-                >
-                <span
-                  class="select-category cut"
-                  @click="setVisibleCategories('cut')"
-                >
-                  <EyeIcon
-                    class="icon"
-                    v-if="visibleCategories.includes('cut')"
-                  />
-                  <EyeIconOff class="icon" v-else />
-                  Caja cortada</span
-                >
-                <span class="select-category aisle">Pasillo</span>
-                <span class="select-category full">Ocupado</span>
-              </div>
-            </section>
-            <DepositGrid
-              class="w-full flex flex-col gap-5"
-              v-if="warehouse"
-              :selectedBox="choosedBox"
-              :rows="row"
-              :cols="col"
-              :floor="floor"
-              :deposit="warehouse.layout"
-              :visibleCategories="visibleCategories"
-              @select-box="selectBox"
-            />
-          </fieldset>
-          <fieldset
-            v-if="activeSection == 'cradle'"
-            class="py-2 flex flex-col gap-x-10 2xl:gap-x-40"
-          >
-            <h2 class="text-xl font-bold">Elegir Cradle para montar</h2>
-            <div class="mt-4 w-full flex flex-col gap-6 md:gap-8">
-              <CradleRow
-                class="cradle-row-wrapper flex flex-row"
-                v-for="cradle in cradles"
-                :key="cradle.id"
-                :id="cradle.id"
-                :cradle="cradle"
-                :selected="selectedCradle == cradle.id"
-                :choosedBox="choosedBox"
-                @handle-selected-cradle="handleSelectedCradle(cradle.id)"
-                @clear-box-in-deposit="clearBoxInDeposit"
+              <section
+                class="
+                  w-full
+                  max-w-[170px]
+                  lg:max-w-[260px]
+                  flex flex-col
+                  gap-6
+                  md:gap-8
+                "
+              >
+                <div>
+                  <BoxCard v-if="choosedBox.category !== ''" v-bind="choosedBox" />
+                <h2 class="col-span-full text-xl font-bold">Referencias</h2>
+                <div class="flex flex-col gap-5 ml-4">
+                  <span
+                    class="select-category fine"
+                    @click="setVisibleCategories('fine')"
+                  >
+                    <EyeIcon
+                      class="icon"
+                      v-if="visibleCategories.includes('fine')"
+                    />
+                    <EyeIconOff class="icon" v-else />
+                    Arena fina</span
+                  >
+                  <span
+                    class="select-category thick"
+                    @click="setVisibleCategories('thick')"
+                  >
+                    <EyeIcon
+                      class="icon"
+                      v-if="visibleCategories.includes('thick')"
+                    />
+                    <EyeIconOff class="icon" v-else />
+                    Arena gruesa</span
+                  >
+                  <span
+                    class="select-category cut"
+                    @click="setVisibleCategories('cut')"
+                  >
+                    <EyeIcon
+                      class="icon"
+                      v-if="visibleCategories.includes('cut')"
+                    />
+                    <EyeIconOff class="icon" v-else />
+                    Caja cortada</span
+                  >
+                  <span class="select-category aisle">Pasillo</span>
+                  <span class="select-category full">Ocupado</span>
+                </div>
+                </div>
+              </section>
+              <DepositGrid
+                class="w-full flex flex-col gap-5"
+                v-if="warehouse"
+                :selectedBox="choosedBox"
+                :rows="row"
+                :cols="col"
+                :floor="floor"
+                :deposit="warehouse.layout"
+                :visibleCategories="visibleCategories"
+                @select-box="selectBox"
               />
-            </div>
-          </fieldset>
+            </fieldset>
+            <fieldset
+              v-if="activeSection == 'cradle'"
+              class="py-2 flex flex-col gap-x-10 2xl:gap-x-40"
+            >
+              <h2 class="text-xl font-bold">Elegir Cradle para montar</h2>
+              <div class="mt-4 w-full flex flex-col gap-6 md:gap-8">
+                <CradleRow
+                  class="cradle-row-wrapper flex flex-row"
+                  v-for="cradle in cradles"
+                  :key="cradle.id"
+                  :id="cradle.id"
+                  :cradle="cradle"
+                  :selected="selectedCradle == cradle.id"
+                  :choosedBox="choosedBox"
+                  @handle-selected-cradle="handleSelectedCradle(cradle.id)"
+                  @clear-box-in-deposit="clearBoxInDeposit"
+                />
+              </div>
+            </fieldset>
+          </div>
+          <div
+            v-else
+            class="
+              w-full
+              max-w-sm
+              border border-dashed border-
+              rounded-xl
+              p-5
+              my-3
+              mx-auto
+              flex
+              items-center
+              justify-center
+              flex-col
+            "
+            @click.prevent="$router.push('/diseno-de-deposito')"
+          >
+            Necesitás diseñar un depósito para continuar
+            <button class="mt-4 bg-green-700 text-white rounded-md p-4 text-center">Ir a diseño de depósito</button>
+          </div>
         </div>
         <div
           v-else
@@ -315,6 +339,7 @@
       };
 
       const clearBoxInDeposit = (id) => {
+        console.log("el guare",warehouse.value)
         Object.entries(warehouse.value.layout).forEach((cell) => {
           if (cell[1].id == id) {
             (cell[1].category = 'empty'), delete cell[1][id];
@@ -458,42 +483,7 @@
         }
       });
 
-      const warehouse = ref({
-        // id: 2,
-        // clientCompanyId: 7,
-        // pitId: 1,
-        // layout: {
-        //   '1|1|1': {id: 'ID-222',category: 'cut'},
-        //   '1|1|2': {id: 'A4%$',category: 'fine'},
-        //   '1|2|1': {id: '',category: 'empty'},
-        //   '1|2|2': {id: 'ID-289',category: 'cut'},
-        //   '2|1|1': {id: '',category: 'empty'},
-        //   '2|1|2': {id: 'ID-678',category: 'fine'},
-        //   '2|2|1': {id: '',category: 'empty'},
-        //   '2|2|2': {id: 'ID-890',category: 'fine'},
-        //   '3|1|1': {id: '',category: 'empty'},
-        //   '3|1|2': {id: 'ID-262',category: 'fine'},
-        //   '3|2|1': {id: '',category: 'empty'},
-        //   '3|2|2': {id: 'ID-290',category: 'cut'},
-        // },
-        // createdAt: '2021-08-06T14:44:26.000Z',
-        // updatedAt: null,
-        // deletedAt: null,
-        // pit: {
-        //   id: 1,
-        //   name: 'pit 1',
-        // },
-        // clientCompany: {
-        //   id: 7,
-        //   name: 'OtroCliente',
-        //   legalName: 'asd',
-        //   legalId: 789,
-        //   isOperator: false,
-        //   childId: null,
-        //   observations: 'asd',
-        //   companyRepresentativeId: 8,
-        // },
-      });
+      const warehouse = ref({});
 
       let originalWarehouseLayout = {};
       let originalWarehouseWasSaved = false;
