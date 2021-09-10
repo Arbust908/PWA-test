@@ -1,6 +1,6 @@
 <template>
   <tr>
-    <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-lg">
+    <td class="text-gray-500 px-3 text-center py-4 whitespace-nowrap text-lg">
       {{ pos }} - 40
     </td>
     <template v-if="editing === Number(stage.id)">
@@ -19,7 +19,7 @@
           type="number"
           :post="{ title: '0', value: 't' }"
           :data="stage.quantity1"
-          @update="stage.quantity1 = $event"
+          @update:data="stage.quantity1 = $event"
         />
       </td>
       <td class="typeWrap">
@@ -37,7 +37,7 @@
           type="number"
           :post="{ title: '0', value: 't' }"
           :data="stage.quantity2"
-          @update="stage.quantity2 = $event"
+          @update:data="stage.quantity2 = $event"
         />
       </td>
       <td class="typeWrap">
@@ -55,63 +55,63 @@
           type="number"
           :post="{ title: '0', value: 't' }"
           :data="stage.quantity3"
-          @update="stage.quantity3 = $event"
+          @update:data="stage.quantity3 = $event"
         />
       </td>
     </template>
     <template v-else>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
-        <template
-          v-if="(sands.length > 0 && stage.sandId1 >= 0) || stage.quantity1 > 0"
-        >
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-center">
+        <template v-if="(sands.length > 0 && stage.sandId1 > 0) || stage.quantity1 > 0">
           <p v-if="sands.length > 0 && stage.sandId1 >= 0">
             {{ getSand(stage.sandId1)?.type }}
           </p>
+          <p v-else>Tipo sin seleccionar</p>
           <p v-if="stage.quantity1 > 0">{{ stage.quantity1 }}t</p>
+          <p v-else>0 t</p>
         </template>
         <template v-else>
           <p>No hay arena</p>
         </template>
       </td>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
-        <template
-          v-if="(sands.length > 0 && stage.sandId2 >= 0) || stage.quantity2 > 0"
-        >
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-left">
+        <template v-if="(sands.length > 0 && stage.sandId2 >= 0) || stage.quantity2 > 0">
           <p v-if="sands.length > 0 && stage.sandId2 >= 0">
             {{ getSand(stage.sandId2)?.type }}
           </p>
+          <p v-else>Tipo sin seleccionar</p>
           <p v-if="stage.quantity2 > 0">{{ stage.quantity2 }}t</p>
+          <p v-else>0 t</p>
         </template>
         <template v-else>
           <p>No hay arena</p>
         </template>
       </td>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
-        <template
-          v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0"
-        >
-          <p v-if="sands.length > 0 && stage.sandId3 >= 0">
-            {{ getSand(stage.sandId3)?.type }}
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-left">
+        <template v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0">
+          <p v-if="sands.length > 0 && stage.sandId3 >= 0" class="text-left">
+            {{ getSand(stage.sandId2)?.type }}
           </p>
+          <p v-else>Tipo sin seleccionar</p>
           <p v-if="stage.quantity3 > 0">{{ stage.quantity3 }}t</p>
+          <p v-else>0 t</p>
         </template>
         <template v-else>
           <p>No hay arena</p>
         </template>
       </td>
     </template>
-    <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-center">
+    <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-left">
       {{ totalWheight }}t
       <!-- Mecanica de x/total para ir agregando / descontando -->
     </td>
 
     <td class="px-1 py-4 whitespace-nowrap text-sm">
-      <Pill :type="pill.status">
+      <Pill :type="pill.status" class="mx-auto">
         {{ pill.name }}
       </Pill>
     </td>
     <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
-      <div>
+      <div class="text-center">
         <button
           @click.prevent="duplicateStage"
           class="action duplicate"
@@ -193,16 +193,16 @@
 
       const totalWheight = computed(() => {
         return (
-          stage.value.quantity1 +
-            stage.value.quantity2 +
-            stage.value.quantity3 || 0
+          Number(stage.value.quantity1) +
+            Number(stage.value.quantity2) +
+            Number(stage.value.quantity3) || 0
         );
       });
       const getSand = (sandId: number) => {
         return (
           sands.value.find((sand: Sand) => {
-            return sand.id === sandId;
-          }) || { tpye: '' }
+            return Number(sand.id) === sandId;
+          }) || { type: '' }
         );
       };
 

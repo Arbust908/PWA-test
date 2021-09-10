@@ -2,15 +2,16 @@
   <FieldGroup>
     <FieldLegend>Arena</FieldLegend>
     <template v-for="(sPov, i) in sandProviders" :key="i">
-      <FieldSelect
-        class="col-span-10"
-        fieldName="sandProvider"
-        placeholder="Selecciona un proveedor"
-        title="Proveedor"
-        endpoint="/sandProvider"
-        :data="sPov.id"
-        @update:data="sPov.id = $event"
-      />
+      <div class="col-span-12 sm:col-span-6">
+        <FieldSelect
+          fieldName="sandProvider"
+          placeholder="Selecciona un proveedor"
+          title="Proveedor"
+          endpoint="/sandProvider"
+          :data="sPov.id"
+          @update:data="sPov.id = $event"
+        />
+      </div>
       <div
         v-if="sandProviders.length > 1 && i !== lastSandProviderInner"
         class="col-span-2 flex items-end"
@@ -29,8 +30,8 @@
         class="relative grid grid-cols-12 col-span-full gap-4 mt-2"
       >
         <FieldSelect
-          class="col-span-5"
-          :title="Key === 0 ? 'Tipo' : ''"
+          class="col-span-6"
+          :title="Key === 0 ? 'Tipo' : null"
           fieldName="sandType"
           placeholder="Arena"
           endpoint="/sand"
@@ -47,32 +48,34 @@
           :post="{ title: 'Peso en Toneladas', value: 't' }"
           :data="so.amount"
           @update="so.amount = $event"
+          />
+        <AmountInput
+          :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
+          :title="Key === 0"
+          :amount="so.amount"
+          @update:amount="so.amount = $event"
         />
         <div class="flex col-span-2 ml-2 my-auto">
-          <Icon v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length - 1" 
+          <Icon v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length " 
             icon="Trash" outline 
             class="w-5 h-5 mt-4" 
             @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
           />
         </div>
-          <Icon 
-            icon="PlusCircle" outline 
-            class="w-7 h-7 text-green-500"
-            @click.prevent="addSandOrder(sPov.innerId)"
-          />
+      </div>
+      <div class="col-span-full mt-2 pb-4 mb-4">
+        <button
+          class="flex items-center p-1"
+          @click.prevent="addSandOrder(sPov.innerId)"
+        >
+        <Icon 
+          icon="PlusCircle" outline 
+          class="w-6 h-6 text-green-500"
+        />
+          <span class="font-semibold text pl-1">Agregar</span>
+        </button>
       </div>
     </template>
-    <div class="col-span-full mt-1">
-      <!-- <button
-        class="flex items-center space-x-2"
-        @click.prevent="addSandProvider"
-      >
-        <CircularBtn class="btn__add" size="xs">
-          <Icon icon="Plus" outline class="w-4 h-4" />
-        </CircularBtn>
-        <span class="font-bold text"> Agregar proveedor </span>
-      </button> -->
-    </div>
   </FieldGroup>
 </template>
 

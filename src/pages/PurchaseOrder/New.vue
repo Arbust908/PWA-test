@@ -9,7 +9,7 @@
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <FieldGroup class="max-w-2xl">
+        <FieldGroup class="grid-cols-6 md:grid-cols-12">
           <ClientPitCombo
             :clientId="companyClientId"
             :pitId="pitId"
@@ -25,7 +25,7 @@
         >
           <FieldGroup class="sm:grid border-none max-w-full">
             <FieldSelect
-              class="col-span-4"
+              class="col-span-12 sm:col-span-6"
               fieldName="sandProvider"
               title="Proveedor"
               placeholder="Selecciona proveedor"
@@ -43,7 +43,7 @@
               <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
               <FieldSelect
                 :title="orderKey === 0 ? 'Tipo' : ''"
-                class="sm:col-span-4 mt-3"
+                class="col-span-12 sm:col-span-4 mt-3"
                 fieldName="sandType"
                 placeholder="Tipo de Arena"
                 endpoint="/sand"
@@ -52,10 +52,10 @@
                 @update:data="order.sandTypeId = $event"
               />
               <!-- TODO: Input con Frente o Fondo fijo ;D -->
-              <label class="col-span-3" for="sandQuantity">
+              <label class="col-span-6 sm:col-span-3" for="sandQuantity">
                 <FieldWithSides
                   :title="orderKey === 0 ? 'Cantidad' : ''"
-                  class="sm:col-span-4 mt-3"
+                  class="mt-3"
                   fieldName="sandQuantity"
                   placeholder="Arena"
                   type="number"
@@ -66,9 +66,9 @@
               </label>
               <FieldInput
                 :title="orderKey === 0 ? 'ID de caja' : ''"
-                class="sm:col-span-3 mt-3"
+                :class="providerId.sandOrders.length > 1 ? 'col-span-4 sm:col-span-3 mt-3' : 'col-span-6 sm:col-span-3 mt-3'"
                 fieldName="sandBoxId"
-                placeholder="Ingresar ID"
+                placeholder="ID"
                 :data="order.boxId"
                 @update:data="order.boxId = $event"
               />
@@ -78,12 +78,6 @@
                 type="outline"
                 class="w-5 mt-5 h-5 cursor-pointer"
                 @click="removeOrder(order.id, providerId.innerId)"
-              />
-              <Icon
-                icon="PlusCircle"
-                v-if="providerId.sandOrders.length - 1 == orderKey"
-                class="icon w-6 h-6 mt-5 sm:mt-5 text-green-500 cursor-pointer"
-                @click.prevent="addOrder(providerId.innerId)"
               />
             </template>
             <div class="flex items-center col-span-12">
@@ -112,6 +106,24 @@
               </div>
             </div>
           </FieldGroup>
+          <template v-for="(order, orderKey) in providerId.sandOrders" 
+            :key="orderKey"
+            class="border-none"
+          >
+            <div class="col-span-full mt-2 pb-4 mb-4"
+            v-if="providerId.sandOrders.length - 1 == orderKey">
+              <button
+                class="flex items-center p-1"
+                @click.prevent="addOrder(providerId.innerId)"
+              >
+              <Icon 
+                icon="PlusCircle" outline 
+                class="w-6 h-6 text-green-500"
+              />
+                <span class="font-semibold text pl-1">Agregar</span>
+              </button>
+            </div>
+          </template>
         </div>
         <FieldGroup>
           <FieldLegend>Transporte</FieldLegend>

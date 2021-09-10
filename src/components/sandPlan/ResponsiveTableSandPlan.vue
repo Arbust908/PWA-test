@@ -77,7 +77,7 @@
           type="number"
           :post="{ title: '0', value: 't' }"
           :data="stage.quantity1"
-          @update="stage.quantity1 = $event"
+          @update:data="stage.quantity1 = $event"
         />
       </td>
     </tr>
@@ -113,7 +113,7 @@
           type="number"
           :post="{ title: '0', value: 't' }"
           :data="stage.quantity2"
-          @update="stage.quantity2 = $event"
+          @update:data="stage.quantity2 = $event"
         />
       </td>
     </tr>
@@ -149,7 +149,7 @@
           type="number"
           :post="{ title: '0', value: 't' }"
           :data="stage.quantity3"
-          @update="stage.quantity3 = $event"
+          @update:data="stage.quantity3 = $event"
         />
       </td>
     </tr>
@@ -211,15 +211,15 @@ export default {
 
       const totalWheight = computed(() => {
         return (
-          stage.value.quantity1 +
-            stage.value.quantity2 +
-            stage.value.quantity3 || 0
+          Number(stage.value.quantity1) +
+          Number(stage.value.quantity2) +
+          Number(stage.value.quantity3) || 0
         );
       });
       const getSand = (sandId: number) => {
         return (
           sands.value.find((sand: Sand) => {
-            return sand.id === sandId;
+            return Number(sand.id) === sandId;
           }) || { tpye: '' }
         );
       };
