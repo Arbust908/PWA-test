@@ -45,7 +45,7 @@
         </div>
       </section>
       <section v-else class="cradle-slots">
-        <div v-for="(slot, index) in filteredCradles" :key="index" >
+        <div v-for="(slot, index) in cradleSlots" :key="index" >
           <div class="slot">
             <span class="station-title">Estación {{index+1}} - S000{{index+1}}</span>
             <div class="cradle-status-wrapper">
@@ -55,15 +55,15 @@
                 </div>
                 En ejecución
               </span>
-              <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '3')">
-                <div class="icon-wrapper pause" :class="[slot.status == '3' ? 'active' : '']">
-                  <Icon icon="Pause" type="outline" class="icon" v-if="slot.status == '3'"/>
+              <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '2')">
+                <div class="icon-wrapper pause" :class="[slot.status == '2' ? 'active' : '']">
+                  <Icon icon="Pause" type="outline" class="icon" v-if="slot.status == '2'"/>
                 </div>
                 Pausa
               </span>
-              <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '4')">
-                <div class="icon-wrapper empty" :class="[slot.status == '4' ? 'active' : '']">
-                  <Icon icon="Minus" class="icon" v-if="slot.status == '4'"/>
+              <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '3')">
+                <div class="icon-wrapper empty" :class="[slot.status == '3' ? 'active' : '']">
+                  <Icon icon="Minus" class="icon" v-if="slot.status == '3'"/>
                 </div>
                 Vacía
               </span>
@@ -120,10 +120,8 @@
 <script lang="ts">
   import {
     ref,
-    Ref,
     computed,
     defineComponent,
-    watch,
     onMounted,
     watchEffect,
   } from 'vue';
@@ -146,7 +144,6 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
 
   import axios from 'axios';
-  import { useAxios } from '@vueuse/integrations/useAxios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
@@ -177,15 +174,21 @@
       const pits = ref([] as Array<Pit>);
       const clientId = ref(-1);
       const pitId = ref(-1);
+      const cradleId = ref(-1)
       const cradles = ref([]);
       const filteredCradles = ref([])
-      const cradleSlots = ref([{},{},{},{}])
+      const cradleSlots = ref([{status: "1"},{status: "2"},{status: "3"},{status: "0"}])
       const modalMessage = ref("")
       const modalButtonText = ref("")
       const isModalVisible = ref(false)
 
-      const changeCradleSlotStatus = (slotIndex: Number, newStatus: String) => {
-        return filteredCradles.value[slotIndex].status = newStatus
+      const changeCradleSlotStatus = async(slotIndex: Number, newStatus: String) => {
+        // await axios.put(`${apiUrl}/cradle/${cradleId.value}`, {
+        //   slots: cradleSlots.value
+        // })
+        // .then(res => console.log(res)).catch(err => console.error(err))
+
+        return cradleSlots.value[slotIndex].status = newStatus
       }
 
       const toggleModal = () => {
@@ -239,7 +242,7 @@
         //     });
         //   }
         // })
-        return filteredCradles.value = [{status: "3"},{},{},{}]
+        return filteredCradles.value = [{slots: cradleSlots.value}]
       }
 
       watchEffect(async () => {
