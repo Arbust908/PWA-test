@@ -89,7 +89,7 @@
       <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-left">
         <template v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0">
           <p v-if="sands.length > 0 && stage.sandId3 >= 0" class="text-left">
-            {{ getSand(stage.sandId2)?.type }}
+            {{ getSand(stage.sandId3)?.type }}
           </p>
           <p v-else>Tipo sin seleccionar</p>
           <p v-if="stage.quantity3 > 0">{{ stage.quantity3 }}t</p>

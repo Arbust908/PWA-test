@@ -2,8 +2,8 @@
   <FieldGroup>
     <FieldLegend>Arena</FieldLegend>
     <template v-for="(sPov, i) in sandProviders" :key="i">
-      <div class="col-span-12 sm:col-span-6">
         <FieldSelect
+          class="col-span-12 sm:col-span-6"
           fieldName="sandProvider"
           placeholder="Selecciona un proveedor"
           title="Proveedor"
@@ -11,7 +11,6 @@
           :data="sPov.id"
           @update:data="sPov.id = $event"
         />
-      </div>
       <div
         v-if="sandProviders.length > 1 && i !== lastSandProviderInner"
         class="col-span-2 flex items-end"
@@ -31,7 +30,7 @@
       >
         <FieldSelect
           class="col-span-6"
-          :title="Key === 0 ? 'Tipo' : null"
+          :title="Key === 0 ? 'Tipo' : '' "
           fieldName="sandType"
           placeholder="Arena"
           endpoint="/sand"
