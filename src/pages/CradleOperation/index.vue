@@ -10,7 +10,7 @@
     <section class="bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
         <FieldGroup class="grid grid-cols-12 gap-4 max-w-4xl">
-          <span class="col-span-8 grid grid-cols-12 gap-4">
+          <span class="col-span-12 md:col-span-8 grid grid-cols-12 gap-4">
             <ClientPitCombo
               :clientId="Number(clientId)"
               :pitId="Number(pitId)"
@@ -20,11 +20,11 @@
           </span>
         </FieldGroup>
         <fieldset
-          class="py-2 flex flex-col gap-x-10 2xl:gap-x-40"
+          class="py-2 col-span-6 flex flex-col gap-x-10 2xl:gap-x-40"
         >
           <h2 class="text-xl font-bold mb-4">Estaciones</h2>
           <FieldSelect
-            class="col-span-2"
+            class="cradle-col"
             title="Cradle"
             fieldName="cradle"
             placeholder="Seleccionar cradle"
@@ -185,10 +185,8 @@
       const sandTypes = ref([])
 
       const changeCradleSlotStatus = async(slotIndex: Number, newStatus: String) => {
-        // await axios.put(`${apiUrl}/cradle/${selectedCradle.value.id}`, {
-        //   slots: cradleSlots.value
-        // })
-        // .then(res => console.log(res)).catch(err => console.error(err))
+        await axios.put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
+        .catch(err => console.error(err))
 
         return cradleSlots.value[slotIndex].status = newStatus
       }
@@ -206,8 +204,6 @@
           .catch((err) => console.error(err));
       };
 
-      // Los Cradles deberian venir de la Orden de Trabajo
-      // Ver con @Back tema api
       const getCradles = async () => {
         await axios
           .get(`${apiUrl}/cradle`)
@@ -301,10 +297,15 @@
         toggleModal()
       }
 
-      const completeStageHandle = () => {
-        modalMessage.value = "¡Etapa finalizada con éxito!"
-        modalButtonText.value = "Próximo stage"
-        toggleModal()
+      const completeStageHandle = async() => {
+        await axios.put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
+        .then(res => {
+          if(res.request.status == 200) {
+            modalMessage.value = "¡Etapa finalizada con éxito!"
+            modalButtonText.value = "Próximo stage"
+            toggleModal()
+          }
+        }).catch(err => console.error(err))
       }
 
       return {
@@ -332,6 +333,12 @@
 </script>
 
 <style lang="scss" scoped>
+  .cradle-col {
+    @screen lg {
+      width: 32%;
+      max-width: 18rem;
+    }
+  }
   .cradle-data-wrapper, .cradle-status-wrapper {
     @apply flex flex-col text-left justify-between;
   }
@@ -407,7 +414,11 @@
       }
   }
   .cradle-slots {
-    @apply pl-12 pr-12 pb-12 grid grid-cols-4 gap-4 justify-between items-center;
+    @apply pl-12 pr-12 pb-12 grid grid-cols-1 gap-4 justify-between items-center;
+
+    @screen lg {
+      @apply grid-cols-4;
+    }
 
     .slot {
       min-height: 400px;
