@@ -17,7 +17,7 @@
           <h2 class="col-span-full text-xl">Transporte</h2>
           <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
             <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
-            <FieldSelect
+            <!-- <FieldSelect
               :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full'"
               title="Proveedor"
               :fieldName="`transportProvider${tO.id}`"
@@ -25,7 +25,7 @@
               endpoint="/transportProvider"
               :data="tO.transportProviderId"
               @update:data="tO.transportProviderId = $event"
-            />
+            /> -->
             <label
               :class="transportOrder.length > 1 ? 'col-span-10' : 'col-span-full'"
               :for="'transportProvider' + tO.id"

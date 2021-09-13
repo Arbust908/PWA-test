@@ -40,22 +40,22 @@
           @update:data="so.sandTypeId = $event"
         />
         <FieldWithSides
+          :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
           :title="Key === 0 ? 'Cantidad' : ''"
           :fieldName="`sandQuantity${Key}`"
-          class="col-span-5"
           placeholder="0 t"
           type="number"
           :post="{ title: 'Peso en Toneladas', value: 't' }"
           :data="so.amount"
           @update="so.amount = $event"
           />
-        <AmountInput
+        <!-- <AmountInput
           :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
           :title="Key === 0"
           :amount="so.amount"
           @update:amount="so.amount = $event"
-        />
-        <div class="flex col-span-2 ml-2 my-auto">
+        /> -->
+        <div class="col-span-2 ml-2 my-auto">
           <Icon v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length " 
             icon="Trash" outline 
             class="w-5 h-5 mt-4" 
