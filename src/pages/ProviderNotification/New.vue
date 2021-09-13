@@ -17,7 +17,7 @@
           <h2 class="col-span-full text-xl">Transporte</h2>
           <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
             <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
-            <FieldSelect
+            <!-- <FieldSelect
               :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full'"
               title="Proveedor"
               :fieldName="`transportProvider${tO.id}`"
@@ -25,18 +25,38 @@
               endpoint="/transportProvider"
               :data="tO.transportProviderId"
               @update:data="tO.transportProviderId = $event"
-            />
-            <div
-              v-if="tOKey !== 0"
-              class="col-span-2 flex justify-end items-end"
+            /> -->
+            <label
+              :class="transportOrder.length > 1 ? 'col-span-10' : 'col-span-full'"
+              :for="'transportProvider' + tO.id"
             >
-              <CircularBtn
-                class="btn__delete"
-                size="sm"
-                @click="removeTransportProvider(tO.id)"
+              <span>Proveedor</span>
+              <select
+                :id="'transportProvider' + tO.id"
+                v-model="tO.transportProviderId"
+                class="input"
+                :name="'transportProvider' + tO.id"
+                @change="fillTransportType(tO.id)"
               >
-                <Icon icon="Trash" class="w-4 h-4" />
-              </CircularBtn>
+                <option selected disabled value="-1">
+                  Proveedor de Transporte
+                </option>
+                <option
+                  v-for="(tP, tPKey) in transportProviders"
+                  :key="tPKey"
+                  :value="tP.id"
+                >
+                  {{ tP.name }}
+                </option>
+              </select>
+            </label>
+            <div
+              v-if="transportOrder.length > 1"
+              class="col-span-2 flex mx-auto items-end pb-2"
+            >    
+              <Icon icon="Trash" outline class="w-5 h-5" 
+                @click="removeTransportProvider(tO.id)"
+              />
             </div>
             <FieldInput
               class="col-span-full"
@@ -60,10 +80,11 @@
               class="flex items-center p-1"
               @click.prevent="addTransportProvider"
             >
-              <CircularBtn class="btn__add" size="xs">
-                <PlusIcon class="w-4 h-4" />
-              </CircularBtn>
-              <span class="font-bold text"> Agregar transporte </span>
+            <Icon 
+              icon="PlusCircle" outline 
+              class="w-6 h-6 text-green-500"
+            />
+              <span class="font-semibold text pl-1">Agregar</span>
             </button>
           </div>
         </fieldset>
@@ -88,7 +109,20 @@
         </PrimaryBtn>
       </footer>
     </section>
-    <Modal type="off" :open="showModal" @close="toggleModal">
+    <!-- <Modal type="off" :open="showModal" @close="togglemodal">
+      <template #body>
+        <div class="flex flex-col">
+          <h1 class="font-bold text-second-900 text-xl self-start mb-3">
+            Notificación a proveedores
+          </h1>
+          <span class="text-left font-bold">Arena</span>
+          <template v-for="">
+            <span>{{sPov.value}}</span>
+          </template>
+        </div>
+      </template>
+    </Modal> -->
+    <Modal type="off" :open="showModal" @close="togglemodal">
       <template #body>
         <div
           class="

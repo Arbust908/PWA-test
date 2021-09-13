@@ -9,7 +9,7 @@
     </header>
     <section>
       <form method="POST" action="/" class="py-4">
-        <FieldGroup class="gap-x-8 max-w-xl">
+        <FieldGroup class="grid-cols-6 md:grid-cols-12">
           <ClientPitCombo
             :clientId="currentSandPlan.companyId"
             :pitId="currentSandPlan.pitId"
