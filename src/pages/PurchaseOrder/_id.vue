@@ -51,46 +51,17 @@
                 :data="order.sandTypeId"
                 @update:data="order.sandTypeId = $event"
               />
-              <label class="col-span-3" for="sandQuantity">
-                <span v-if="orderKey === 0">Cantidad</span>
-                <div class="mt-1 flex rounded shadow-sm">
-                  <input
-                    v-model="order.amount"
-                    type="number"
-                    name="sandQuantity"
-                    class="
-                      flex-1
-                      min-w-0
-                      block
-                      w-full
-                      px-3
-                      py-6
-                      rounded-none
-                      border-r-0
-                      rounded-l
-                      focus:ring-indigo-500 focus:border-indigo-500
-                      border-gray-300
-                      
-                    "
-                    placeholder="Cantidad de Arena"
-                    list="sandQuantity"
-                  />
-                  <span
-                    class="
-                      inline-flex
-                      items-center
-                      px-3
-                      rounded-r
-                      border border-gray-300
-                      bg-gray-50
-                      text-gray-500
-                      sm:text-sm
-                    "
-                    title="Peso en Toneladas"
-                  >
-                    t
-                  </span>
-                </div>
+              <label class="col-span-6 sm:col-span-3" for="sandQuantity">
+              <FieldWithSides
+                  :title="orderKey === 0 ? 'Cantidad' : ''"
+                  class="mt-3"
+                  fieldName="sandQuantity"
+                  placeholder="Arena"
+                  type="number"
+                  :post="{ title: '0', value: 't' }"
+                  :data="order.amount"
+                  @update:data="order.amount = $event"
+                />
               </label>
               <FieldInput
                 :title="orderKey === 0 ? 'ID de caja' : ''"
