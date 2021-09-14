@@ -264,11 +264,6 @@
     },
     setup() {
       const router = useRouter();
-      const store = useStore();
-      const instance = axios.create({
-        baseURL: apiUrl,
-      });
-
       let activeSection = ref('deposit');
       let boxes = ref([]);
 
@@ -311,7 +306,6 @@
           .get(`${apiUrl}/cradle`)
           .then((res) => {
             cradles.value = res.data.data;
-            console.log('Cradles_', cradles.value);
           })
           .catch((err) => console.error(err));
       };
@@ -339,7 +333,6 @@
       };
 
       const clearBoxInDeposit = (id) => {
-        console.log("el guare",warehouse.value)
         Object.entries(warehouse.value.layout).forEach((cell) => {
           if (cell[1].id == id) {
             (cell[1].category = 'empty'), delete cell[1][id];
@@ -363,13 +356,11 @@
       watchEffect(async () => {
         if (purchaseOrders.value.length > 0) {
           if (clientId.value !== -1 && pitId.value !== -1) {
-            filteredPurchaseOrders.value = purchaseOrders.value;
             filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
               if (po.companyId == clientId.value && po.pitId == pitId.value) {
                 return po;
               }
             });
-            console.log('MY Purchase Orders', filteredPurchaseOrders.value);
           }
           if (purchaseOrderId.value !== -1) {
             let sandTypes = await axios
@@ -378,12 +369,12 @@
                 return res.data.data;
               })
               .catch((err) => console.error(err));
-            console.log(filteredPurchaseOrders.value);
-            boxes.value =
+            
               filteredPurchaseOrders.value.length > 0
-                ? filteredPurchaseOrders.value[0].sandOrders
-                : null;
-            console.log('change BOxes', boxes.value);
+                ? boxes.value = filteredPurchaseOrders.value[filteredPurchaseOrders.value.findIndex(po => po.id == purchaseOrderId.value)].sandOrders
+                : boxes.value = [];
+              
+            console.log("CAJAS", filteredPurchaseOrders.value)
             boxes.value.map((box) => {
               let sandType = sandTypes.find(
                 (type) => parseInt(type.id) == parseInt(box.sandTypeId)
@@ -420,11 +411,8 @@
       });
 
       const setSelectedBox = (id: Number) => {
-        console.log('id', id);
         choosedBox.value = boxes.value.filter((box) => {
-          console.log('box', box.boxId, '==', id);
           if (box.boxId == id) {
-            console.log('box', box);
             if (choosedBox.value.category !== box.category) {
               setVisibleCategories(choosedBox.value.category);
               setVisibleCategories(box.category);
@@ -435,8 +423,6 @@
       };
 
       const selectBox = (box: Box) => {
-        console.log('box', box);
-        console.log('choosedBox', choosedBox.value);
         clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
         // if (box.category == 'empty' || box.category != 'aisle') {
@@ -446,10 +432,8 @@
             choosedBox.value.row,
             choosedBox.value.col,
           ].some(Boolean);
-          console.log(hasPos);
           if (hasPos) {
             let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
-            console.log('prevBoxPosition', prevBoxPosition);
             // warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
             warehouse.value.layout[`${prevBoxPosition}`].id = '';
           }
@@ -460,8 +444,6 @@
           warehouse.value.layout[`${newBPos}`].category =
             choosedBox.value.category;
           warehouse.value.layout[`${newBPos}`].id = choosedBox.value.boxId;
-          console.log('warehouse', warehouse.value);
-          console.log('warehouse BOx', warehouse.value.layout[`${newBPos}`]);
         }
       };
 
@@ -557,23 +539,15 @@
         await axios
           .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
           .then((res) => {
-            console.log(res);
             warehouseDone.value = !!res.data.data;
           })
           .catch((err) => console.error(err))
-          .finally(() => {
-            console.log('Final!');
-          });
         await axios
           .put(`${apiUrl}/cradle/${cradleId}`, cradleData)
           .then((res) => {
-            console.log(res);
             cradleDone.value = !!res.data.data;
           })
           .catch((err) => console.error(err))
-          .finally(() => {
-            console.log('Final!');
-          });
         watchEffect(() => {
           if (warehouseDone.value && cradleDone.value) {
             router.push('/');
