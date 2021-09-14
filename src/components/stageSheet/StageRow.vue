@@ -3,23 +3,23 @@
     <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-lg">
       {{ pos }} - 40
     </td>
-    <template v-if="editing === Number(stage.id)" :key="stage.id">
+    <template v-if="editing == Number(stage.id)" :key="stage.id">
       <SandTypeAmount
-        :sandId="stage.sandId1"
+        :sandId="stage.sandId1 || -1"
         :quantity="stage.quantity1"
         mod="1"
         @update:sandId="stage.sandId1 = $event"
         @update:quantity="stage.quantity1 = $event"
       />
       <SandTypeAmount
-        :sandId="stage.sandId2"
+        :sandId="stage.sandId2 || -1"
         :quantity="stage.quantity2"
         mod="2"
         @update:sandId="stage.sandId2 = $event"
         @update:quantity="stage.quantity2 = $event"
       />
       <SandTypeAmount
-        :sandId="stage.sandId3"
+        :sandId="stage.sandId3 || -1"
         :quantity="stage.quantity3"
         mod="3"
         @update:sandId="stage.sandId3 = $event"
@@ -67,13 +67,6 @@
         </template>
       </td>
     </template>
-    <td v-else class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm">
-      <p v-if="sands.length > 0 && stage.sandId3 > 0">
-        {{ getSand(stage.sandId3)?.type }}
-      </p>
-      <p v-else></p>
-      <p v-if="stage.quantity3 > 0">{{ stage.quantity3 }}t</p>
-    </td>
     <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-center">
       {{ totalWheight }}t
     </td>

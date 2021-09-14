@@ -117,10 +117,11 @@
       const currentStageSheet = getStageSheet();
       watch( currentStageSheet, (newVal) => {
         if (newVal) {
+          const lastStage = newVal.stages[newVal.stages.length - 1];
+          editingStage.value = lastStage.id;
           selectedCradle.value = newVal.operativeCradle;
           setLayoutDimensions(newVal.warehouse)
           warehouse.value = newVal.warehouse;
-          editingStage.value = newVal.stages.length;
         }
       });
 
@@ -128,7 +129,6 @@
 
       const selectedCradle = ref(null);
       const warehouse = ref();
-
 
       const chosenBox: Ref<Box> = ref({
         floor: 1,
@@ -216,17 +216,20 @@
 
       const isFull = computed(() => {
         const noZeroSandTypeNull =
-          (currentStage.sandId1 !== null &&
-            currentStage.sandId1 !== -1) ||
-          (currentStage.sandId2 !== null &&
-            currentStage.sandId2 !== -1) ||
-          (currentStage.sandId3 !== null &&
-            currentStage.sandId3 !== -1);
+        currentStageSheet.value.stages && 
+          (currentStageSheet.value.stages[0].sandId1 !== null &&
+            currentStageSheet.value.stages[0].sandId1 !== -1) ||
+          (currentStageSheet.value.stages[0].sandId2 !== null &&
+            currentStageSheet.value.stages[0].sandId2 !== -1) ||
+          (currentStageSheet.value.stages[0].sandId3 !== null &&
+            currentStageSheet.value.stages[0].sandId3 !== -1);
         const noZeroSandTypeZero =
-          currentStage.quantity1 !== 0 ||
-          currentStage.quantity2 !== 0 ||
-          currentStage.quantity3 !== 0;
+        currentStageSheet.value.stages &&
+          currentStageSheet.value.stages[0].quantity1 !== 0 ||
+          currentStageSheet.value.stages[0].quantity2 !== 0 ||
+          currentStageSheet.value.stages[0].quantity3 !== 0;
         return !!(
+          currentStageSheet.value &&
           noZeroSandTypeNull &&
           noZeroSandTypeZero
         );
@@ -267,6 +270,7 @@
       };
       return {
         currentStageSheet,
+        editingStage,
         save,
         isFull,
         warehouse,
