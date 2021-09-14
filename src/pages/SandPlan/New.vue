@@ -33,10 +33,6 @@
             </button>
           </section>
           <section class="flex space-x-4">
-            <button
-              @click.prevent="toggleCurOp()"
-              :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
-            >
               <Icon
                 icon="ChevronUp"
                 outline
@@ -52,8 +48,8 @@
                   ease-out
                   cursor-pointer
                 "
-              />
-            </button>
+                @click.prevent="toggleCurOp"
+              />        
           </section>
         </header>
         <div class="flex flex-col">
@@ -100,7 +96,7 @@
               <Icon icon="PlusCircle" class="w-7 h-7 m-auto text-green-500 mr-1" />
             </button>
             <button
-              @click.prevent="toggleCurOp()"
+              @click.prevent="toggleCurOp"
               :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
             >
               <Icon
@@ -147,27 +143,23 @@
             </h2>
           </section>
           <section class="flex space-x-4">
-            <button
-              @click.prevent="toggleFinOp()"
-              :title="finishedOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
-            >
-              <Icon
-                icon="ChevronUp"
-                outline
-                :opened="finishedOpened"
-                :class="finishedOpened ? 'rotate-180' : null"
-                class="
-                  w-8
-                  h-8
-                  text-gray-600
-                  transition
-                  transform
-                  duration-300
-                  ease-out
-                  cursor-pointer
-                "
-              />
-            </button>
+            <Icon
+              icon="ChevronUp"
+              outline
+              :opened="finishedOpened"
+              :class="finishedOpened ? 'rotate-180' : null"
+              class="
+                w-8
+                h-8
+                text-gray-600
+                transition
+                transform
+                duration-300
+                ease-out
+                cursor-pointer
+              "
+              @click.prevent="toggleFinOp"
+            />
           </section>
         </header>
         <div class="flex flex-col">
@@ -208,27 +200,23 @@
             </h2>
           </section>
           <section class="flex space-x-4">
-            <button
-              @click.prevent="toggleFinOp()"
-              :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
-            >
-              <Icon
-                icon="ChevronUp"
-                outline
-                :opened="finishedOpened"
-                :class="finishedOpened ? 'rotate-180' : null"
-                class="
-                  w-8
-                  h-8
-                  text-gray-600
-                  transition
-                  transform
-                  duration-300
-                  ease-out
-                  cursor-pointer
-                "
-              />
-            </button>
+            <Icon
+              icon="ChevronUp"
+              outline
+              :opened="finishedOpened"
+              :class="finishedOpened ? 'rotate-180' : null"
+              class="
+                w-8
+                h-8
+                text-gray-600
+                transition
+                transform
+                duration-300
+                ease-out
+                cursor-pointer
+              "
+              @click.prevent="toggleFinOp"
+            />
           </section>
         </header>
         <div class="flex flex-col p-4" v-show="finishedOpened">

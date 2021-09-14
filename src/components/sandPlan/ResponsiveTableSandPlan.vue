@@ -50,7 +50,7 @@
 
 		<tr v-if="editing === Number(stage.id)">
 			<th class="head">Arena A</th>
-			<td>
+			<td class="typeWrap">
         <FieldSelect
           fieldName="sandType1"
           placeholder="Seleccionar"
@@ -64,7 +64,7 @@
     <tr v-else>
       <th class="head">Arena A</th>
       <td class="td"  v-if="(sands.length > 0 && stage.sandId1 >= 0) || stage.quantity1 > 0">
-         {{ getSand(stage.sandId1)?.type }} / {{ stage.quantity1 }}t
+         {{ getSand(Number(stage.sandId1))?.type }} / {{ stage.quantity1 }}t
       </td>
       <td v-else class="td">No hay arena</td>
     </tr>
@@ -100,7 +100,7 @@
     <tr v-else>
       <th class="head">Arena B</th>
       <td class="td"  v-if="(sands.length > 0 && stage.sandId2 >= 0) || stage.quantity2 > 0">
-         {{ getSand(stage.sandId2)?.type }} / {{ stage.quantity2 }}t
+         {{ getSand(Number(stage.sandId2))?.type }} / {{ stage.quantity2 }}t
       </td>
       <td v-else class="td">No hay arena</td>
     </tr>
@@ -136,7 +136,7 @@
     <tr v-else>
       <th class="head">Arena C</th>
       <td class="td"  v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0">
-         {{ getSand(stage.sandId3)?.type }} / {{ stage.quantity3 }}t
+         {{ getSand(Number(stage.sandId3))?.type }} / {{ stage.quantity3 }}t
       </td>
       <td v-else class="td">No hay arena</td>
     </tr>
@@ -173,14 +173,14 @@
 </template>
 
 <script lang='ts'>
-import { toRefs, reactive, computed } from 'vue';
+import { defineComponent, toRefs, reactive, computed } from 'vue';
 import FieldSelect from '@/components/ui/form/FieldSelect.vue';
 import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
 import Pill from '@/components/ui/Pill.vue';
 import Icon from '@/components/icon/TheAllIcon.vue';
 import { Sand } from '@/interfaces/sandflow';
 
-export default {
+export default defineComponent ({
     props: {
       stage: {
         type: Object,
@@ -200,10 +200,10 @@ export default {
       },
     },
     components: {
+        Icon,
+        Pill,
         FieldSelect,
         FieldWithSides,
-        Icon,
-        Pill
     },
     setup(props, { emit }) {
       const { stage, editing, sands, pos } = toRefs(props);
@@ -274,7 +274,7 @@ export default {
         pill,
       };
     },
-};
+});
 </script>
 
 <style lang="scss" scoped>
