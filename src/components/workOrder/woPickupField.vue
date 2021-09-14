@@ -15,7 +15,7 @@
         @update:data="pickup.pickupId = $event"
       />
       <FieldInput
-        class="col-span-6"
+        class="col-span-5"
         fieldName="description"
         placeholder="Descripción de pickup"
         :title="pickupI === firstIndex ? 'Descripción' : null"
@@ -24,11 +24,10 @@
       />
       <span
         v-if="pickups.length > 1 && pickupI !== lastIndex"
-        class="flex items-center col-span-2"
+        class="flex items-center col-span-1"
+        :class="pickupI == 0 ? 'mt-6' : 'mt-2'"
       >
-        <CircularBtn class="btn__delete" @click="remove(pickup.innerId)">
-          <Icon icon="Trash" class="w-6 h-6" />
-        </CircularBtn>
+        <Icon icon="Trash" class="w-6 h-6 btn__delete" @click="remove(pickup.id)"/>
         {{ pickup.innerId }}
       </span>
     </FieldGroup>
@@ -77,9 +76,9 @@
         return pickup;
       });
       const remove = (id: number) => {
-        pickups.value = pickups.value.filter(
-          (pickup: Pickup) => pickup.innerId !== id
-        );
+        pickups.value = pickups.value.filter(pickup => {
+          if(pickup.id !== id) return pickup
+        })
       };
       const add = (): void => {
         pickupInnerId.value++;
@@ -89,6 +88,7 @@
           pickupId: '',
           description: '',
         });
+        console.log(pickups.value)
       };
       if (pickups?.value?.length === 0) {
         add();
@@ -107,7 +107,7 @@
 <style lang="scss" scoped>
   .btn {
     &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 transition duration-150 ease-out;
+      @apply border-transparent text-gray-800 bg-transparent hover:text-red-600 mx-2 transition duration-150 ease-out ml-0 mr-0 cursor-pointer;
     }
   }
 </style>
