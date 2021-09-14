@@ -63,7 +63,7 @@
       <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-center">
         <template v-if="(sands.length > 0 && stage.sandId1 > 0) || stage.quantity1 > 0">
           <p v-if="sands.length > 0 && stage.sandId1 >= 0">
-            {{ getSand(stage.sandId1)?.type }}
+            {{ getSand(Number(stage.sandId1))?.type }}
           </p>
           <p v-else>Tipo sin seleccionar</p>
           <p v-if="stage.quantity1 > 0">{{ stage.quantity1 }}t</p>
@@ -73,10 +73,10 @@
           <p>No hay arena</p>
         </template>
       </td>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-left">
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-center">
         <template v-if="(sands.length > 0 && stage.sandId2 >= 0) || stage.quantity2 > 0">
           <p v-if="sands.length > 0 && stage.sandId2 >= 0">
-            {{ getSand(stage.sandId2)?.type }}
+            {{ getSand(Number(stage.sandId2))?.type }}
           </p>
           <p v-else>Tipo sin seleccionar</p>
           <p v-if="stage.quantity2 > 0">{{ stage.quantity2 }}t</p>
@@ -86,10 +86,10 @@
           <p>No hay arena</p>
         </template>
       </td>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-left">
+      <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-center">
         <template v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0">
-          <p v-if="sands.length > 0 && stage.sandId3 >= 0" class="text-left">
-            {{ getSand(stage.sandId3)?.type }}
+          <p v-if="sands.length > 0 && stage.sandId3 >= 0">
+            {{ getSand(Number(stage.sandId3))?.type }}
           </p>
           <p v-else>Tipo sin seleccionar</p>
           <p v-if="stage.quantity3 > 0">{{ stage.quantity3 }}t</p>
@@ -194,8 +194,8 @@
       const totalWheight = computed(() => {
         return (
           Number(stage.value.quantity1) +
-            Number(stage.value.quantity2) +
-            Number(stage.value.quantity3) || 0
+          Number(stage.value.quantity2) +
+          Number(stage.value.quantity3) || 0
         );
       });
       const getSand = (sandId: number) => {
