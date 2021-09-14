@@ -3,13 +3,13 @@
     <header
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+      <h1 class="font-bold text-gray-900 text-[24px] self-start mb-3 md:mb-0">
         Orden de Pedido
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <FieldGroup class="grid-cols-6 md:grid-cols-12">
+        <FieldGroup class="grid-cols-6 md:grid-cols-12 gap-6">
           <ClientPitCombo
             :clientId="companyClientId"
             :pitId="pitId"
@@ -52,7 +52,7 @@
                 @update:data="order.sandTypeId = $event"
               />
               <!-- TODO: Input con Frente o Fondo fijo ;D -->
-              <label class="col-span-6 sm:col-span-3" for="sandQuantity">
+              <label class="col-span-6 sm:col-span-2" for="sandQuantity">
                 <FieldWithSides
                   :title="orderKey === 0 ? 'Cantidad' : ''"
                   class="mt-3"
@@ -76,7 +76,7 @@
                 v-if="providerId.sandOrders.length > 1"
                 icon="Trash"
                 type="outline"
-                class="w-5 mt-5 h-5 cursor-pointer"
+                class="w-6 mt-7 h-6 cursor-pointer"
                 @click="removeOrder(order.id, providerId.innerId)"
               />
             </template>
@@ -120,7 +120,7 @@
                 icon="PlusCircle" outline 
                 class="w-6 h-6 text-green-500"
               />
-                <span class="font-semibold text pl-1">Agregar</span>
+                <span class="font-semibold text pl-1">Agregar Proveedor</span>
               </button>
             </div>
           </template>
@@ -128,7 +128,7 @@
         <FieldGroup>
           <FieldLegend>Transporte</FieldLegend>
           <FieldSelect
-            class="col-span-full mt-3 pl-1"
+            class="col-span-12 mt-3 pl-1 md:col-span-6"
             fieldName="transportProvider"
             title="Proveedor"
             placeholder="Selecciona proveedor"
@@ -144,13 +144,13 @@
         </NoneBtn>
         <PrimaryBtn
           type="submit"
-          size="sm"
-          class="p-4"
+          size="md"
+          class="p-6 bg-gray-400"
           :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
           :disabled="!isFull"
           @click.prevent="isFull && save()"
         >
-          Crear Orden
+          Crear Orden 
         </PrimaryBtn>
       </footer>
     </section>
