@@ -1087,6 +1087,11 @@
     "@nodelib/fs.scandir" "2.1.5"
     "fastq" "^1.6.0"
 
+"@popperjs/core@^2.9.2":
+  "integrity" "sha512-HnUhk1Sy9IuKrxEMdIRCxpIqPw6BFsbYSEUO9p/hNw5sMld/+3OLMWQP80F8/db9qsv3qUjs7ZR5bS/R+iinXw=="
+  "resolved" "https://registry.npmjs.org/@popperjs/core/-/core-2.10.1.tgz"
+  "version" "2.10.1"
+
 "@rollup/plugin-babel@^5.2.0":
   "integrity" "sha512-9uIC8HZOnVLrLHxayq/PTzw+uS25E14KPUBh5ktF+18Mjo5yK0ToMMx6epY0uEgkjwJw0aBW4x2horYXh8juWw=="
   "resolved" "https://registry.npmjs.org/@rollup/plugin-babel/-/plugin-babel-5.3.0.tgz"
@@ -2103,6 +2108,11 @@
   "integrity" "sha1-sgOOhG3DO6pXlhKNCAS0VbjB4h0="
   "resolved" "https://registry.npmjs.org/de-indent/-/de-indent-1.0.2.tgz"
   "version" "1.0.2"
+
+"debounce@^1.2.1":
+  "integrity" "sha512-XRRe6Glud4rd/ZGQfiV1ruXSfbvfJedlV9Y6zOlP+2K04vBYiJEte6stfFkCP03aMnY5tsipamumUjL14fofug=="
+  "resolved" "https://registry.npmjs.org/debounce/-/debounce-1.2.1.tgz"
+  "version" "1.2.1"
 
 "debug@^4.0.1", "debug@^4.1.0", "debug@^4.1.1", "debug@^4.3.1", "debug@^4.3.2", "debug@4":
   "integrity" "sha512-mOp8wKcvj7XxC78zLgw/ZA+6TSgkoE2C/ienthhRD298T7UNwAg9diBpLRxC0mOezLl4B0xV7M0cCO6P/O0Xhw=="
@@ -4093,7 +4103,7 @@
   dependencies:
     "@vue/devtools-api" "^6.0.0-beta.14"
 
-"vue@^3.2.8":
+"vue@^3.2.1", "vue@^3.2.8":
   "integrity" "sha512-x7lwdnOSkceHQUXRVVHBaZzcp6v7M2CYtSZH75zZaT1mTjB4plC4KZHKP/5jAvdqOLBHZGwDSMkWXm3YbAufrA=="
   "resolved" "https://registry.npmjs.org/vue/-/vue-3.2.8.tgz"
   "version" "3.2.8"
@@ -4101,6 +4111,14 @@
     "@vue/compiler-dom" "3.2.8"
     "@vue/runtime-dom" "3.2.8"
     "@vue/shared" "3.2.8"
+
+"vue3-popper@^1.2.1":
+  "integrity" "sha512-5dNp/ZBWOpPs+4/XulmKVQdlCvQkJD4ePRXJY6kd60TIwDgruEgDgGApdmO6s+M+QGjENV0mABbDLK1qCIoxgw=="
+  "resolved" "https://registry.npmjs.org/vue3-popper/-/vue3-popper-1.2.1.tgz"
+  "version" "1.2.1"
+  dependencies:
+    "@popperjs/core" "^2.9.2"
+    "debounce" "^1.2.1"
 
 "vuex-composition-helpers@^2.0.0":
   "integrity" "sha512-zzAUlWe05zaOaFul0epBJ3hG+6Zua+0sscme5SLKyL7vyM9DHLrhisJTngazF4r+XAuHOOk8ezfidn4zML5qZQ=="

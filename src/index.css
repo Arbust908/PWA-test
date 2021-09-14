@@ -25,6 +25,14 @@
   --second-700: hsl(217, 19%, 27%);
   --second-800: hsl(215, 28%, 17%);
   --second-900: hsl(221, 39%, 11%);
+  --popper-theme-background-color: #333333;
+  --popper-theme-background-color-hover: #333333;
+  --popper-theme-text-color: #ffffff;
+  --popper-theme-border-width: 0px;
+  --popper-theme-border-style: solid;
+  --popper-theme-border-radius: 0.5rem;
+  --popper-theme-padding: 0.25rem 0.5rem;
+  --popper-theme-box-shadow: 0 6px 30px -6px rgba(0, 0, 0, 0.25);
 }
 .dark {
   --primary-50: hsl(151, 65%, 5%);

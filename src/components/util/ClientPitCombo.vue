@@ -1,7 +1,7 @@
 <template >
   <FieldSelect
     v-if="clients.length > 0"
-    class="col-span-6"
+    class="col-span-full md:col-span-6"
     fieldName="client"
     placeholder="Seleccionar cliente"
     title="Cliente"
@@ -12,7 +12,7 @@
   <FieldLoading class="col-span-6" v-else />
   <FieldSelect
     v-if="pits.length > 0"
-    class="col-span-6"
+    class="col-span-full md:col-span-6"
     fieldName="pit"
     placeholder="Seleccionar pozo"
     title="Pozo"

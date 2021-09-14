@@ -6,7 +6,7 @@
       </h1>
     </header>
     <div class="grid gap-8 grid-cols-2 relative">
-      <FieldGroup class="max-w-xl col-span-full gap-x-6 py-0">
+      <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
         <ClientPitCombo
           :clientId="currentStageSheet.companyId"
           :pitId="currentStageSheet.pitId"
@@ -193,10 +193,6 @@
   import StageTable from '@/components/stageSheet/StageTable.vue';
   import DepositGrid from '@/components/depositDesign/Deposit.vue';
   import {
-    Pit,
-    Company,
-    StageSheet,
-    Sand,
     Cradle,
     PurchaseOrder,
     Box,
@@ -242,13 +238,14 @@
         stages: [
           {
             id: 0,
+            stage: 1,
             sandId1: -1,
             quantity1: 0,
             sandId2: -1,
             quantity2: 0,
             sandId3: -1,
             quantity3: 0,
-            sandPlanId: 0,
+            sandPlanId: null,
             status: 0,
           },
         ],
@@ -314,6 +311,9 @@
       const selectBox = (box: Box) => {
         choosedBox.value = box;
       };
+      const moveBox = (box: Box) => {
+        const myBox = warehouse.value.layout[`${box.floor}|${box.col}|${box.row}`].id = "";
+      }
       const setBox = (slotPos: number) => {
         console.log(slotPos);
         if (selectedCradle.value) {
@@ -329,6 +329,7 @@
             selectedCradle.value.slots[slotPos].category =
               choosedBox.value.category;
             selectedCradle.value.slots[slotPos].boxId = choosedBox.value.id;
+            moveBox(choosedBox.value);
           } else  {
             // Tiramos un modal (?)
             console.log('No box selected');
@@ -484,11 +485,11 @@
           noZeroSandTypeZero
         );
       });
-      const { saveSandPlan } = useActions(['saveSandPlan']);
       const save = (): void => {
         console.groupCollapsed('SAVE');
         const { stages, ...newStageSheet} = currentStageSheet;
         const stage = stages[0];
+        newStageSheet.operativeCradleId = newStageSheet.cradleId;
         console.log('New Stage Sheet', newStageSheet);
         console.log('Stage', stage);
         const { data } = useAxios(
@@ -496,11 +497,30 @@
           { method: 'POST', data: newStageSheet },
           instance
         );
+        // post new workshop
+        const { clientCompany, pit, ...newWarehouse} = warehouse.value;
+        console.log('New Warehouse', newWarehouse);
+        const { isFinished: wEnd } = useAxios(
+          `/warehouse/${newWarehouse.id}`,
+          { method: 'PUT', data: newWarehouse },
+          instance
+        );
+        const newCradle = selectedCradle.value;
+        console.log('New Cradle', newCradle);
+        const { isFinished: cEnd } = useAxios(
+          `/cradle/${newCradle.id}`,
+          { method: 'PUT', data: newCradle },
+          instance
+        );
         watch(data, (newVal) => {
           if (newVal && newVal.data) {
-            console.log('New Stage Sheet', newVal.data);
+            console.log('Saved Stage Sheet', newVal.data);
             const StSHId = newVal.data.id;
-            stage.StageSheetId = StSHId;
+            console.log('Saved StSheet Id', newVal.data.id);
+            stage.stageSheetId = StSHId;
+            stage.sandId1 = stage.sandId1 === -1 ? null : stage.sandId1;
+            stage.sandId2 = stage.sandId2 === -1 ? null : stage.sandId2;
+            stage.sandId3 = stage.sandId3 === -1 ? null : stage.sandId3;
             console.log('New Stage', stage);
             const { data } = useAxios(
               '/sandStage',
@@ -509,8 +529,12 @@
             );
             watch(data, (newVal) => {
               if (newVal && newVal.data) {
-                console.log('New Stage', newVal.data);
-                router.push('/stage-sheet');
+                console.log('Saved Stage', newVal.data);
+                setTimeout(() => {
+                  console.groupEnd();
+                  router.push('/stage-sheet');
+                  return;
+                }, 500);
               }
             });
           }

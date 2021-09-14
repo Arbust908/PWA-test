@@ -239,7 +239,13 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/stage-sheet/:id',
     name: 'StageSheetById',
-    component: () => import('@/pages/StageSheet/_id.vue'),
+    component: () => import('@/pages/StageSheet/_id/index.vue'),
+    beforeEnter: isLogged,
+  },
+  {
+    path: '/stage-sheet/:id/nueva',
+    name: 'StageSheetNewStage',
+    component: () => import('@/pages/StageSheet/_id/new.vue'),
     beforeEnter: isLogged,
   },
   {

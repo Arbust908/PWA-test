@@ -21,7 +21,8 @@
 
 <style lang="scss" scoped>
   .pill {
-    @apply flex justify-center rounded-full text-white px-1 w-28;
+    // w-28
+    @apply inline-flex justify-center rounded-full text-white px-3;
     &.empty {
       @apply bg-gray-500;
     }
