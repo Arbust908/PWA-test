@@ -10,7 +10,7 @@
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
         <fieldset
-          class="py-2 w-full max-w-2xl grid grid-cols-12 gap-y-4 gap-x-14"
+          class="py-2 w-full grid grid-cols-12 gap-y-4 gap-x-14"
         >
           <h2 class="col-span-full text-3xl font-bold">
             Pozo {{ designName }}
@@ -41,22 +41,30 @@
               class="input"
               name="depositPit"
             >
-              <option selected disabled value="-1">Seleccionar pozo</option>
+            <option selected disabled value="-1">Seleccionar pozo</option>
               <option v-for="pit in pits" :key="pit.id" :value="pit.id">
                 {{ pit.name }}
               </option>
             </select>
           </label>
+          <!-- <FieldGroup class="grid-cols-12 col-span-12 md:grid-cols-12">
+            <ClientPitCombo
+              :clientId="clientId"
+              :pitId="pitId"
+              @update:clientId="clientId = $event"
+              @update:pitId="pitId = $event"
+            />
+          </FieldGroup> -->
           <div class="col-span-2"></div>
-          <div class="col-span-3 flex flex-col items-center gap-4">
+          <div class="col-span-2 flex flex-col items-center gap-4">
             <h3 class="text-xs">Cantidad de filas</h3>
             <Counter :amount="rows" @update:amount="rows = $event" />
           </div>
-          <div class="col-span-3 flex flex-col items-center gap-4">
+          <div class="col-span-2 flex flex-col items-center gap-4">
             <h3 class="text-xs">Cantidad de columnas</h3>
             <Counter :amount="cols" @update:amount="cols = $event" />
           </div>
-          <div class="col-span-3 flex flex-col items-center gap-4">
+          <div class="col-span-2 flex flex-col items-center gap-4">
             <h3 class="text-xs">Cantidad de pisos</h3>
             <Counter :amount="floors" @update:amount="floors = $event" />
           </div>
@@ -204,6 +212,8 @@
   import DepositGrid from '@/components/depositDesign/Deposit.vue';
   import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
   import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
 
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -221,6 +231,8 @@
       TrashIcon,
       DepositGrid,
       BoxCard,
+      FieldGroup,
+      ClientPitCombo,
     },
     setup() {
       const router = useRouter();

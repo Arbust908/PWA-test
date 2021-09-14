@@ -74,7 +74,14 @@
         @update:cabin="cabin = $event"
         @update:isFull="isEquipmentFull = $event"
       />
-      <form
+      <RRHHSection
+        v-else-if="WO_section === 'rrhh'"
+        :crews="crews"
+        :isFull="isRRHHFull"
+        @update:crews="crews = $event"
+        @update:isFull="isRRHHFull = $event"
+      />
+      <!-- <form
         v-else-if="WO_section === 'rrhh'"
         method="POST"
         action="/"
@@ -175,7 +182,7 @@
             <span class="font-bold text-lg"> Agregar otro </span>
           </button>
         </fieldset>
-      </form>
+      </form> -->
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section>
           <GhostBtn
@@ -225,6 +232,7 @@
   import Layout from '@/layouts/Main.vue';
   import OrderSection from '@/components/workOrder/Order.vue';
   import EquipmentSection from '@/components/workOrder/Equipment.vue';
+  import RRHHSection from '@/components/workOrder/HumanResource.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
@@ -260,6 +268,7 @@
       EquipmentSection,
       NoneBtn,
       TimePicker,
+      RRHHSection
     },
     setup() {
       // Init

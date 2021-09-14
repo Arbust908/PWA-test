@@ -280,6 +280,12 @@
   import { useAxios } from '@vueuse/integrations/useAxios';
   import { SandProvider } from '@/interfaces/SandProvider';
   import { Sand } from '@/interfaces/SandType';
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+  import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
+  import SandProviderPack from '@/components/notifications/sandProviderPack.vue';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
@@ -292,6 +298,12 @@
       PlusIcon,
       PrimaryBtn,
       TrashIcon,
+      FieldGroup,
+      FieldInput,
+      FieldLegend,
+      FieldSelect,
+      FieldWithSides,
+      SandProviderPack,
     },
     setup() {
       const router = useRouter();

@@ -1,4 +1,4 @@
-<template>
+<template class="gap-2">
   <FieldSelect
     v-if="clients.length > 0"
     class="col-span-full md:col-span-6"
