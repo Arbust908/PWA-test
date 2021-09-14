@@ -12,7 +12,7 @@
         v-model="value"
         v-maska="mask"
       />
-      <span v-if="post" class="post" :title="post.title">{{ post.value }}</span>
+      <span v-if="post" class="post text-center" :title="post.title">{{ post.value }}</span>
     </div>
   </label>
 </template>

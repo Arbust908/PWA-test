@@ -1,5 +1,5 @@
 <template>
-  <fieldset class="grid w-full py-2 grid-cols-12 gap-4">
+  <fieldset class="w-full py-2 grid grid-cols-12 gap-4">
     <slot>Campos!</slot>
   </fieldset>
 </template>
