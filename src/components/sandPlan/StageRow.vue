@@ -14,6 +14,7 @@
           @update:data="stage.sandId1 = $event"
         />
         <FieldWithSides
+          class="mt-2"
           fieldName="sandQuantity1"
           placeholder="0 t"
           type="number"
@@ -32,6 +33,7 @@
           @update:data="stage.sandId2 = $event"
         />
         <FieldWithSides
+          class="mt-2"
           fieldName="sandQuantity2"
           placeholder="0 t"
           type="number"
@@ -50,6 +52,7 @@
           @update:data="stage.sandId3 = $event"
         />
         <FieldWithSides
+          class="mt-2"
           fieldName="sandQuantity3"
           placeholder="0 t"
           type="number"
@@ -100,13 +103,13 @@
         </template>
       </td>
     </template>
-    <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-left">
+    <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-center">
       {{ totalWheight }}t
       <!-- Mecanica de x/total para ir agregando / descontando -->
     </td>
 
     <td class="px-1 py-4 whitespace-nowrap text-sm">
-      <Pill :type="pill.status" class="mx-auto">
+      <Pill :type="pill.status" class="mx-auto uppercase p-1">
         {{ pill.name }}
       </Pill>
     </td>
@@ -124,7 +127,7 @@
           v-if="editing !== Number(stage.id)"
           @click.prevent="editStage"
           :disabled="stage.status > 0"
-          class="action edit text-gray-600 hover:text-blue-800 p-2"
+          class="action edit text-gray-600 hover:text-green-800 p-2"
           title="Editar"
         >
           <Icon icon="PencilAlt" class="w-6 h-6" />
@@ -134,7 +137,7 @@
           v-else
           @click.prevent="saveStage"
           :disabled="stage.status > 0"
-          class="action edit text-gray-600 hover:text-blue-800 p-2"
+          class="action edit text-gray-600 hover:text-green-800 p-2"
           title="Guardar"
         >
           <Icon icon="Save" class="w-6 h-6" />

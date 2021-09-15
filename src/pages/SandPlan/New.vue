@@ -113,12 +113,13 @@
                   duration-300
                   ease-out
                   cursor-pointer
+                  mr-1
                 "
               />
             </button>
           </section>
         </header>
-        <div class="flex flex-col p-4" v-show="currentOpened">
+        <div class="flex flex-col p-4 mr-1" v-show="currentOpened">
           <ResposiveTableSandPlan
             v-for="(stage, Key) in inProgressStages"
             :key="Key"

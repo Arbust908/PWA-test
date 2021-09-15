@@ -84,7 +84,7 @@
               icon="PlusCircle" outline 
               class="w-6 h-6 text-green-500"
             />
-              <span class="font-semibold text pl-1">Agregar</span>
+              <span class="font-semibold text pl-1">Agregar transporte</span>
             </button>
           </div>
         </fieldset>

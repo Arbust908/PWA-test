@@ -6,7 +6,7 @@
         <span>{{ pos }} - 40</span>
       </th>
       <td class="w-3/6">
-        <div class="flex justify-around w-28 ml-auto my-0">
+        <div class="flex justify-end w-28 ml-auto my-0">
           <button
             @click.prevent="duplicateStage"
             class="action duplicate"
@@ -38,7 +38,7 @@
           <button
             @click.prevent="deleteStage"
             :disabled="stage.status > 0 || stage.stage === 1"
-            class="action delete text-gray-600 hover:text-blue-800 p-1"
+            class="action delete text-gray-600 hover:text-blue-800 py-1 pl-1"
             title="Borrar"
           >
             <Icon icon="Trash" class="w-6 h-6" />
@@ -165,7 +165,7 @@
     <tr>
       <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider flex-1 text-center">Estado</th>
       <td>
-        <Pill :type="pill.status" class="m-auto"> {{ pill.name }} </Pill>
+        <Pill :type="pill.status" class="m-auto uppercase p-1"> {{ pill.name }} </Pill>
       </td>
     </tr>
     <div class="separador-final ml-6 mt-6 mb-6"/>
