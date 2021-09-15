@@ -49,7 +49,7 @@
                   cursor-pointer
                 "
                 @click.prevent="toggleCurOp"
-              />        
+              />
           </section>
         </header>
         <div class="flex flex-col">

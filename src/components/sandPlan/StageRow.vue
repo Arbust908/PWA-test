@@ -115,43 +115,49 @@
     </td>
     <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
       <div class="text-center">
-        <button
-          @click.prevent="duplicateStage"
-          class="action duplicate"
-          title="Duplicar"
-        >
-          <Icon icon="DocumentDuplicate" class="w-6 h-6" />
-          <span class="sr-only">Duplicar</span>
-        </button>
-        <button
-          v-if="editing !== Number(stage.id)"
-          @click.prevent="editStage"
-          :disabled="stage.status > 0"
-          class="action edit text-gray-600 hover:text-green-800 p-2"
-          title="Editar"
-        >
-          <Icon icon="PencilAlt" class="w-6 h-6" />
-          <span class="sr-only">Editar</span>
-        </button>
-        <button
-          v-else
-          @click.prevent="saveStage"
-          :disabled="stage.status > 0"
-          class="action edit text-gray-600 hover:text-green-800 p-2"
-          title="Guardar"
-        >
-          <Icon icon="Save" class="w-6 h-6" />
-          <span class="sr-only">Guardar</span>
-        </button>
-        <button
-          @click.prevent="deleteStage"
-          :disabled="stage.status > 0 || stage.stage === 1"
-          class="action delete text-gray-600 hover:text-red-800 p-2"
-          title="Borrar"
-        >
-          <Icon icon="Trash" class="w-6 h-6" />
-          <span class="sr-only">Borrar</span>
-        </button>
+        <Popper hover content="Duplicar etapa">
+          <button
+            @click.prevent="duplicateStage"
+            class="action duplicate"
+            title="Duplicar"
+          >
+            <Icon icon="DocumentDuplicate" class="w-6 h-6" />
+            <span class="sr-only">Duplicar</span>
+          </button>
+        </Popper>
+        <Popper hover :content="editing !== Number(stage.id) ? 'Editar etapa' : '-'">
+          <button
+            v-if="editing !== Number(stage.id)"
+            @click.prevent="editStage"
+            :disabled="stage.status > 0"
+            class="action edit text-gray-600 hover:text-blue-800 p-2"
+            title="Editar"
+          >
+            <Icon icon="PencilAlt" class="w-6 h-6" />
+            <span class="sr-only">Editar</span>
+          </button>
+          <button
+            v-else
+            @click.prevent="saveStage"
+            :disabled="stage.status > 0"
+            class="action edit text-gray-600 hover:text-blue-800 p-2"
+            title="Guardar"
+          >
+            <Icon icon="Save" class="w-6 h-6" />
+            <span class="sr-only">Guardar</span>
+          </button>
+        </Popper>
+        <Popper hover content="Borrar etapa">
+          <button
+            @click.prevent="deleteStage"
+            :disabled="stage.status > 0 || stage.stage === 1"
+            class="action delete text-gray-600 hover:text-red-800 p-2"
+            title="Borrar"
+          >
+            <Icon icon="Trash" class="w-6 h-6" />
+            <span class="sr-only">Borrar</span>
+          </button>
+        </Popper>
       </div>
     </td>
   </tr>
@@ -159,6 +165,7 @@
 
 <script lang="ts">
   import { defineComponent, toRefs, reactive, computed } from 'vue';
+  import Popper from "vue3-popper";
   import Pill from '@/components/ui/Pill.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -189,6 +196,7 @@
       Pill,
       FieldSelect,
       FieldWithSides,
+      Popper,
     },
     setup(props, { emit }) {
       const { stage, editing, sands, pos } = toRefs(props);
