@@ -121,9 +121,15 @@
       };
 
       const sumQty = (sandStages) => {
-        return sandStages.reduce((totalSum, ss) => {
-          return totalSum + ss.quantity;
-        }, 0);
+        let total = 0
+        sandStages.forEach(sandStage => {
+          Object.entries(sandStage).filter(each => {
+            if(each[0].startsWith('quantity')) {
+              total = total + each[1]
+            }
+          })
+        })
+        return total
       };
       const deleteSP = (id) => {
         const loading = ref(true);

@@ -4,7 +4,7 @@
     <FieldGroup
       v-for="(traktor, traktorI) in traktors"
       :key="traktorI"
-      class="relative col-span-full max-w-2xl"
+      class="relative col-span-full max-w-2xl items-center flex"
     >
       <FieldInput
         class="col-span-full sm:col-span-6 lg:col-span-3"
@@ -15,7 +15,7 @@
         @update:data="traktor.chassis = $event"
       />
       <FieldInput
-        class="col-span-full sm:col-span-6 lg:col-span-5"
+        class="col-span-full sm:col-span-6 lg:col-span-4"
         fieldName="supplier"
         placeholder="Proveedor de tractor"
         :title="traktorI === firstTraktorIndex ? 'Proveedor' : null"
@@ -33,18 +33,18 @@
       />
       <span
         v-if="traktors.length > 1 && traktorI !== lastTraktorIndex"
-        :class="traktorI === firstTraktorIndex ? 'lg:bottom-6' : 'lg:top-3'"
+        
         class="
           flex
           justify-center
           items-center
-          col-span-2
-          lg:absolute lg:-right-16
+          col-span-1
+          cursor-pointer
         "
+
+        :class="traktorI == 0 ? 'mt-6' : 'mt-2'"
       >
-        <CircularBtn class="btn__delete" @click="remove(traktor.innerId)">
-          <Icon icon="Trash" class="w-6 h-6" />
-        </CircularBtn>
+        <Icon icon="Trash" class="w-6 h-6 btn__delete" @click="remove(traktor.innerId)" />
       </span>
     </FieldGroup>
     <button
@@ -126,7 +126,7 @@
 <style lang="scss" scoped>
   .btn {
     &__delete {
-      @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 transition duration-150 ease-out;
+      @apply border-transparent text-gray-800 bg-transparent hover:text-red-600 mx-2 transition duration-150 ease-out;
     }
   }
 </style>

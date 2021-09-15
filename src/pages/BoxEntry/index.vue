@@ -85,7 +85,7 @@
                 <div>
                   <BoxCard v-if="choosedBox.category !== ''" v-bind="choosedBox" />
                 <h2 class="col-span-full text-xl font-bold">Referencias</h2>
-                <div class="flex flex-col gap-5 ml-4">
+                <div class="flex flex-col gap-5 mt-4">
                   <span
                     class="select-category fine"
                     @click="setVisibleCategories('fine')"
