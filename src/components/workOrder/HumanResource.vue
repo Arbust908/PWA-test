@@ -3,7 +3,7 @@
     <FieldGroup
       v-for="(crew, key) in crews"
       :key="crew.id"
-      class="max-w-sm w-full"
+      class="max-w-sm w-full content-start"
     >
       <FieldLegend>
         <span>{{ crew.title }}</span>
@@ -12,7 +12,10 @@
           class="btn__delete"
           @click="removeCrew(crew.id)"
         >
-          <Icon icon="Trash" class="w-5 h-5" />
+          <Icon icon="Trash" class="icon" />
+        </CircularBtn>
+        <CircularBtn v-else class="ghost">
+          <Icon icon="Trash" class="icon" />
         </CircularBtn>
       </FieldLegend>
       <section
@@ -37,7 +40,7 @@
         <FieldGroup
           v-for="(people, peopleI) in crew.resources"
           :key="people.id"
-          class="pt-2 pb-3"
+          class="pt-2 pb-3 relative"
         >
           <!-- TODO: Pasaria a FiledSelect si tuvieramos ABM de roles y Usuarios -->
           <FieldInput
@@ -48,10 +51,12 @@
             :data="people.role"
             @update:data="people.role = $event"
           />
-          <span v-if="notLast(peopleI, people) && notOnly(people)">
+          <span
+            v-if="notLast(peopleI, crew.resources) && notOnly(crew.resources)"
+            :class="peopleI === 0 ? 'md:top-12' : 'md:top-8' "
+            class="md:absolute md:-right-12">
             <CircularBtn
-              v-if="peopleI !== 0"
-              class="btn__delete md:absolute md:right-[-3rem]"
+              class="btn__delete"
               size="sm"
               @click="removeResource(crew.id, people.id)"
             >
@@ -174,7 +179,17 @@
       }
 
       const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
-        return;
+        // get last crew
+        if (crewList.length === 0) {
+          return false;
+        }
+        console.log(crewList);
+        const lastCrew = crewList[crewList.length - 1];
+        console.log(crewList[crewList.length - 1]);
+        console.log(lastCrew);
+        console.log(crewInnerId);
+        console.log(crewInnerId !== lastCrew.id ? 'not last' : 'last');
+        return crewInnerId !== lastCrew.id;
       };
       const notOnly = (crewList: Array<HumanResource>) => {
         return crewList.length > 1;
@@ -205,4 +220,13 @@
 
 <style lang="scss" scoped>
   @import '@/assets/button.scss';
+  .icon {
+    @apply w-5 h-5;
+  }
+  .ghost {
+     @apply border-none shadow-none;
+     & > .icon {
+       @apply text-transparent;
+     }
+  }
 </style>
