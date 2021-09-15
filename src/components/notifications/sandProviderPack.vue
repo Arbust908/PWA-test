@@ -62,7 +62,7 @@
           />
         </div>
       </div>
-      <div class="col-span-full mt-2 pb-4 mb-4">
+      <div class="col-span-full mt-2">
         <button
           class="flex items-center p-1"
           @click.prevent="addSandOrder(sPov.innerId)"
@@ -71,7 +71,7 @@
           icon="PlusCircle" outline 
           class="w-6 h-6 text-green-500"
         />
-          <span class="font-semibold text pl-1">Agregar</span>
+          <span class="font-semibold text pl-1">Agregar arena</span>
         </button>
       </div>
     </template>
