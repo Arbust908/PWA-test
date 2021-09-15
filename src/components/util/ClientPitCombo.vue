@@ -61,6 +61,8 @@
 
       const { read: getPits } = useApi('/pit');
       const backupPits = getPits();
+      console.log(getPits());
+      console.log(backupPits.value);
       const pits = ref([] as Array<Pit>);
       watch(backupPits, (newVal) => {
         if (newVal) {
@@ -71,15 +73,25 @@
       const filterPitsByClient = (clientId: number) => {
         pits.value = [];
         setTimeout(() => {
-          pits.value = backupPits.value.filter((pit: Pit) => {
-            return pit.companyId == clientId;
-          });
-          if (pits.value.length === 1) {
-            pitId.value = pits.value[0].id || 0;
-          } else if (pits.value.length <= 0) {
-            pits.value = [{ name: 'No hay pozos', id: -1 }];
-            pitId.value = -1;
-          }
+          const proxyPitId = pitId.value ? pitId.value : 0;
+          const waiter = setInterval(() => {
+            if (backupPits.value) {
+              pits.value = backupPits.value.filter((pit: Pit) => {
+                console.log(pit.companyId, clientId);
+                return pit.companyId == clientId;
+              });
+              if (pits.value.length === 1) {
+                pitId.value = pits.value[0].id || -1;
+              } else if (pits.value.length <= 0) {
+                pits.value = [{ name: 'No hay pozos', id: -1 }];
+                pitId.value = -1;
+              } else {
+                pitId.value = proxyPitId;
+              }
+              clearInterval(waiter);
+              console.log('passed waiter');
+            }
+          }, 1000);
         }, 100);
       };
       const selectClientByPit = (pitId: number) => {
@@ -93,8 +105,10 @@
                 return client.id == curPit.companyId;
               }).id || -1;
             if (selectedClientId >= 0) {
+              console.log('Slected Client')
               clientId.value = Number(selectedClientId) || -1;
             } else {
+              console.log('No Client');
               clientId.value = -1;
             }
           }, 100);
@@ -102,13 +116,13 @@
       };
       watch(pitId, (newVal) => {
         if (newVal >= 0) {
-          console.log(newVal);
+          console.log('New pit ID', newVal);
           selectClientByPit(newVal);
         }
       });
       watch(clientId, (newVal) => {
         if (newVal >= 0) {
-          console.log(newVal);
+          console.log('New client ID', newVal);
           filterPitsByClient(newVal);
         }
       });

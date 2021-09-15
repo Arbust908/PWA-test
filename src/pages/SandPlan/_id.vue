@@ -351,9 +351,6 @@
             currentSandPlan.stages = sp.stages;
             buckupStages.value = sp.stages;
             currentSandPlan.stages[0].id = Number(sp.stages[0].id);
-            
-            // console.log('pitId', currentSandPlan.pitId);
-            // console.log('sp.pitId', sp.pitId);
           }
          
         });
