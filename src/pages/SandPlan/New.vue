@@ -84,14 +84,14 @@
     </section>
     <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
-        <header class="flex justify-between px-3 pb-3 pt-4 border-b-1 border-solid border-black">
-          <section class="flex space-x-4">
+        <header class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded border-b-1 border-solid border-black bg-gray-200">
+          <section class="flex space-x-4 pr-3">
             <h2 class="font-semibold">
               <span class="pl-6">Pozo</span>
               <span>{{ selectedPitName }}</span>
             </h2>
           </section>
-          <section class="flex space-x-4">
+          <section class="flex space-x-4 pr-3">
             <button class="flex items-right" @click.prevent="addStage">
               <Icon icon="PlusCircle" class="w-7 h-7 m-auto text-green-500 mr-1" />
             </button>
@@ -119,7 +119,7 @@
             </button>
           </section>
         </header>
-        <div class="flex flex-col p-4 mr-1" v-show="currentOpened">
+        <div class="pr-8 pl-2" v-show="currentOpened">
           <ResposiveTableSandPlan
             v-for="(stage, Key) in inProgressStages"
             :key="Key"
@@ -194,13 +194,13 @@
     </section>
     <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm mt-4">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
-        <header class="flex justify-between px-3 pb-3 pt-4 border-b-1 border-solid border-black">
-          <section class="flex space-x-4">
+        <header class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded border-b-1 border-solid border-black bg-gray-200">
+          <section class="flex space-x-4 pr-3">
             <h2 class="font-semibold">
               <span class="pl-6">Etapas Finalizadas</span>
             </h2>
           </section>
-          <section class="flex space-x-4">
+          <section class="flex space-x-4 pr-3">
             <Icon
               icon="ChevronUp"
               outline
@@ -392,7 +392,7 @@
 
       const currentOpened: Ref<boolean> = ref(true);
       const toggleCurOp = useToggle(currentOpened);
-      const finishedOpened: Ref<boolean> = ref(false);
+      const finishedOpened: Ref<boolean> = ref(true);
       const toggleFinOp = useToggle(finishedOpened);
       // :: CLIENT
       const clients = ref([] as Array<Company>);

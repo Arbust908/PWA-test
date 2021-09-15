@@ -1,14 +1,14 @@
 <template>
   <template v-for="(pit, pitI) in pits" :key="pitI">
     <FieldInput
-      :class="pitI !== lastPitIndex ? 'col-span-10' : 'col-span-full'"
+      :class="pits.length > 1 ? 'col-span-10' : 'col-span-12'"
       fieldName="name"
       placeholder="Nombre de cliente"
       :data="pit.name"
       @update:data="pit.name = $event"
     />
     <span
-      v-if="pits.length > 1 && pitI !== lastPitIndex"
+      v-if="pits.length > 1"
       class="col-span-2 flex justify-center items-end"
     >
       <CircularBtn class="btn__delete" @click="removePit(pit.id)">

@@ -163,7 +163,7 @@
       </td>
     </tr>
     <tr>
-      <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider flex-1 text-center">Estado</th>
+      <th scope="col" class="px-6 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider flex-1 text-center">Estado</th>
       <td>
         <Pill :type="pill.status" class="m-auto uppercase p-1"> {{ pill.name }} </Pill>
       </td>
