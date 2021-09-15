@@ -114,7 +114,7 @@
       </Pill>
     </td>
     <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
-      <div class="text-center">
+      <div class="flex justify-end gap-x-2">
         <Popper hover content="Duplicar etapa">
           <button
             @click.prevent="duplicateStage"
@@ -125,7 +125,7 @@
             <span class="sr-only">Duplicar</span>
           </button>
         </Popper>
-        <Popper hover :content="editing !== Number(stage.id) ? 'Editar etapa' : '-'">
+        <Popper hover :content="editing !== Number(stage.id) ? 'Editar etapa' : 'dejar de editar'">
           <button
             v-if="editing !== Number(stage.id)"
             @click.prevent="editStage"
