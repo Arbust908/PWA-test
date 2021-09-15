@@ -7,6 +7,7 @@
       :type="type"
       :name="fieldName"
       :placeholder="placeholder"
+      :readonly="isReadonly"
       v-model="value"
       v-maska="mask"
     />
@@ -50,6 +51,10 @@
         default: '',
       },
       isOptional: {
+        type: Boolean,
+        default: false,
+      },
+      isReadonly: {
         type: Boolean,
         default: false,
       },
