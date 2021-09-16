@@ -18,6 +18,7 @@
 
 <script lang="ts">
   import { ref, watchEffect } from 'vue';
+  import { useToast } from 'vue-toastification'
 
   export default {
     props: {
@@ -33,8 +34,13 @@
     setup(props, {emit}) {
       const cradle = ref(props.cradle);
       const box = ref(props.box);
+      const toast = useToast()
 
       const handleSlotClick = (index) => {
+        if(isBoxInCradle()) {
+          toast.error("La caja ya está ingresada")
+          return
+        }
         const id = box.value.boxId
         cradle.value.slots = cradle.value.slots.map((slot) => {
           if(slot.boxId == id) {
@@ -47,6 +53,14 @@
         emit('clear-box-in-deposit', id)
         cradle.value.slots[index] = box.value
       };
+
+      const isBoxInCradle = () => {
+        let response = false
+        cradle.value.slots.forEach(slot => {
+          if(slot.boxId == box.value.boxId) response = true
+        })
+        return response
+      }
 
       watchEffect(() => {
         box.value = props.box
