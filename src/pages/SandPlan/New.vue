@@ -196,7 +196,7 @@
     </section>
     <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm mt-4">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
-        <header class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded-t-lg border-b-1 border-solid border-black bg-gray-100">
+        <header class="flex justify-between px-3 pb-3 pt-4 pr-4 rounded-t-lg border-b-1 border-solid border-black bg-gray-100">
           <section class="flex space-x-4 pr-3 mt-2">
             <h2 class="font-semibold">
               <span class="pl-6">Etapas Finalizadas</span>
