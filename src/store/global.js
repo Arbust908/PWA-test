@@ -36,11 +36,11 @@ export default {
         to: '/ingreso-de-cajas',
         icon: 'Archive',
       },
-      // {
-      //   name: 'StageSheet',
-      //   to: '/stage-sheet',
-      //   icon: 'DocumentReport',
-      // },
+      {
+        name: 'StageSheet',
+        to: '/stage-sheet',
+        icon: 'DocumentReport',
+      },
       {
         name: 'LINE',
       },
