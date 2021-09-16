@@ -33,26 +33,35 @@
           v-for="(mesh, i) in spMeshTypes"
           :key="i"
         >
-          <input class="input readonly" type="text" :value="mesh" readonly />
+          <FieldInput
+            class="col-span-7"
+            fieldName="mesh"
+            placeholder="Malla"
+            isReadonly
+            :data="mesh"
+          />
           <Icon
             icon="Trash"
             type="outline"
+            size="lg"
             class="ml-3 w-5 h-5 cursor-pointer"
             @click="deleteMeshType(mesh)"
           />
         </div>
       </div>
       <div class="flex items-center">
-        <input
-          class="input"
-          type="text"
-          name="meshType"
-          v-model="spMesh"
-          placeholder="Ingrese tipo de malla"
+        <FieldSelect
+          fieldName="sandType1"
+          placeholder="Seleccionar"
+          endpoint="/sand"
+          endpointKey="type"
+          :data="spMesh"
+          @update:data="spMesh = $event"
         />
         <Icon
           icon="Plus"
           type="outline"
+          size="lg"
           class="ml-3 w-5 h-5 cursor-pointer"
           @click="addMeshType(spMesh)"
         />
@@ -77,6 +86,7 @@
   import { useVModels } from '@vueuse/core';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
 
@@ -84,6 +94,7 @@
     components: {
       FieldGroup,
       FieldInput,
+      FieldSelect,
       FieldTextArea,
       Icon,
     },
