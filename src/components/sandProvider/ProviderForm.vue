@@ -132,7 +132,7 @@
           return m !== mesh;
         });
       };
-      const addMeshType = (mesh) => {
+      const addMeshType = (mesh: string) => {
         spMeshTypes.value.push(mesh);
         spMesh.value = '';
       };
