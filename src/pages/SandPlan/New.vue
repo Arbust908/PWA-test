@@ -1,9 +1,10 @@
 <template>
-  <Layout>
+  <Layout :class="windowWidth < 427 ? 'bg-white' : ''">
     <header
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+      <h1 :class="windowWidth < 427 ? 'mt-4' : ''"
+      class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
         Planificación de arenas
       </h1>
     </header>
@@ -84,7 +85,7 @@
     </section>
     <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
-        <header class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded border-b-1 border-solid border-black bg-gray-200">
+        <header class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded-t-lg border-b-1 border-solid border-black bg-gray-100">
           <section class="flex space-x-4 pr-3">
             <h2 class="font-semibold">
               <span class="pl-6">Pozo</span>
@@ -119,8 +120,9 @@
             </button>
           </section>
         </header>
-        <div class="pr-8 pl-2" v-show="currentOpened">
+        <div class="pr-8 pl-2 border-2 border-solid" v-show="currentOpened">
           <ResposiveTableSandPlan
+            class='mt-2'
             v-for="(stage, Key) in inProgressStages"
             :key="Key"
             :pos="Key + 1"
@@ -194,8 +196,8 @@
     </section>
     <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm mt-4">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
-        <header class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded border-b-1 border-solid border-black bg-gray-200">
-          <section class="flex space-x-4 pr-3">
+        <header class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded-t-lg border-b-1 border-solid border-black bg-gray-100">
+          <section class="flex space-x-4 pr-3 mt-2">
             <h2 class="font-semibold">
               <span class="pl-6">Etapas Finalizadas</span>
             </h2>
@@ -220,7 +222,7 @@
             />
           </section>
         </header>
-        <div class="flex flex-col p-4" v-show="finishedOpened">
+        <div class="flex flex-col p-4 border-2 border-solid" v-show="finishedOpened">
           <ResposiveTableSandPlan
             v-for="(stage, Key) in finishedStages"
             :key="Key"

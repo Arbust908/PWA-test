@@ -1,7 +1,7 @@
 <template>
 	<table>
     <tr>
-      <th class="text-left px-6 py-3 w-3/6">
+      <th class="text-left px-6 py-4 w-3/6">
         <span>Etapa </span>
         <span>{{ pos }} - 40</span>
       </th>
@@ -9,7 +9,7 @@
         <div class="flex justify-end w-28 ml-auto my-0">
           <button
             @click.prevent="duplicateStage"
-            class="action duplicate"
+            class="action duplicate text-gray-600 hover:text-blue-800 p-2"
             title="Duplicar"
           >
             <Icon icon="DocumentDuplicate" class="w-6 h-6" />
@@ -158,7 +158,7 @@
 
     <tr>
       <th scope="col" class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider flex-1">Cantidad Total</th>
-      <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-center">
+      <td class="text-gray-500 pl-3 py-4 whitespace-nowrap font-bold text-right">
         {{ totalWheight }}t
       </td>
     </tr>
@@ -283,7 +283,7 @@ export default defineComponent ({
 }
 
 .td {
-  @apply px-6 py-3 text-center text-sm font-medium text-gray-500 tracking-wider flex-1;
+  @apply pl-6 py-3 text-right text-sm font-medium text-gray-500 tracking-wider flex-1;
 }
 
 .separador {
