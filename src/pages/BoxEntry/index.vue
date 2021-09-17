@@ -309,6 +309,29 @@
           })
           .catch((err) => console.error(err));
       };
+      
+      const getFilteredCradles = async () => {
+        let cradlesToFilter = []
+        let workOrders = await axios
+          .get(`${apiUrl}/workOrder`)
+          .then((res) => {
+            return res.data.data;
+          })
+          .catch((err) => console.error(err));
+
+        await workOrders.forEach(workOrder => {
+          workOrder.pits.forEach(pit => {
+            if(pit.id == pitId.value) {
+              if(workOrder.operativeCradle !== "-1") cradlesToFilter.push(workOrder.operativeCradle)
+              if(workOrder.backupCradle !== "-1") cradlesToFilter.push(workOrder.backupCradle)
+            }
+          })
+        });
+
+        cradles.value = await cradles.value.filter(cradle => {
+          if(cradlesToFilter.includes(cradle.id.toString())) return cradle
+        })
+      };
 
       onMounted(async () => {
         await getPurchaseOrders();
@@ -363,6 +386,7 @@
             });
           }
           if (purchaseOrderId.value !== -1) {
+            await getFilteredCradles()
             let sandTypes = await axios
               .get(`${apiUrl}/sand`)
               .then((res) => {
@@ -374,7 +398,6 @@
                 ? boxes.value = filteredPurchaseOrders.value[filteredPurchaseOrders.value.findIndex(po => po.id == purchaseOrderId.value)].sandOrders
                 : boxes.value = [];
               
-            console.log("CAJAS", filteredPurchaseOrders.value)
             boxes.value.map((box) => {
               let sandType = sandTypes.find(
                 (type) => parseInt(type.id) == parseInt(box.sandTypeId)
@@ -423,7 +446,7 @@
       };
 
       const selectBox = (box: Box) => {
-        clearBoxInCradleSlots(choosedBox.value.boxId);
+        // clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
         // if (box.category == 'empty' || box.category != 'aisle') {
         if (visibleCategories.value.includes(box.category)) {
