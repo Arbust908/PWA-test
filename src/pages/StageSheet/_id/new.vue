@@ -393,21 +393,21 @@
     &:not(.ph) {
       @apply cursor-pointer;
     }
-    &.thick,
-    &.thin,
-    &.cut {
+    &.gruesa,
+    &.fina,
+    &.cortada {
       @apply text-2xl border-none shadow;
     }
     &.aisle {
       @apply bg-second-300 text-second-300;
     }
-    &.fine {
+    &.fina {
       @apply bg-orange-600 text-orange-800;
     }
-    &.thick {
+    &.gruesa {
       @apply bg-green-600 text-green-800;
     }
-    &.cut {
+    &.cortada {
       @apply bg-blue-600 text-blue-800;
     }
   }

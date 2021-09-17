@@ -60,36 +60,36 @@
                 />
                 <span>Pasillo</span>
               </label>
-              <label class="type-select" for="fine">
+              <label class="type-select" for="fina">
                 <input
-                  id="fine"
-                  :checked="selectedBox.category === 'fine'"
+                  id="fina"
+                  :checked="selectedBox.category === 'fina'"
                   type="radio"
                   name="boxCat"
-                  @click="setCat('fine')"
-                  class="form-checkbox fine"
+                  @click="setCat('fina')"
+                  class="form-checkbox fina"
                 />
                 <span>Arena fina</span>
               </label>
-              <label class="type-select" for="thick">
+              <label class="type-select" for="gruesa">
                 <input
-                  id="thick"
-                  :checked="selectedBox.category === 'thick'"
+                  id="gruesa"
+                  :checked="selectedBox.category === 'gruesa'"
                   type="radio"
                   name="boxCat"
-                  @click="setCat('thick')"
-                  class="form-checkbox thick"
+                  @click="setCat('gruesa')"
+                  class="form-checkbox gruesa"
                 />
                 <span>Arena gruesa</span>
               </label>
-              <label class="type-select" for="cut">
+              <label class="type-select" for="cortada">
                 <input
-                  id="cut"
-                  :checked="selectedBox.category === 'cut'"
+                  id="cortada"
+                  :checked="selectedBox.category === 'cortada'"
                   type="radio"
                   name="boxCat"
-                  @click="setCat('cut')"
-                  class="form-checkbox cut"
+                  @click="setCat('cortada')"
+                  class="form-checkbox cortada"
                 />
                 <span>Caja cortada</span>
               </label>
@@ -398,13 +398,13 @@
     &.aisle {
       @apply border-second-300 text-second-300;
     }
-    &.fine {
+    &.fina {
       @apply border-orange-600 text-orange-600;
     }
-    &.thick {
+    &.gruesa {
       @apply border-green-600 text-green-600;
     }
-    &.cut {
+    &.cortada {
       @apply border-blue-600 text-blue-600;
     }
     &.blocked {

@@ -70,19 +70,19 @@
         @apply text-second-400;
       }
     }
-    &.fine {
+    &.fina {
       @apply bg-orange-600;
       & .icon {
         @apply text-orange-700;
       }
     }
-    &.thick {
+    &.gruesa {
       @apply bg-green-600;
       & .icon {
         @apply text-green-700;
       }
     }
-    &.cut {
+    &.cortada {
       @apply bg-blue-600;
       & .icon {
         @apply text-blue-700;

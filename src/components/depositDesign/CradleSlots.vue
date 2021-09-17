@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, watchEffect } from 'vue';
+  import { onMounted, ref, watchEffect } from 'vue';
 
   export default {
     props: {
@@ -33,8 +33,15 @@
     setup(props, {emit}) {
       const cradle = ref(props.cradle);
       const box = ref(props.box);
+      const wasBoxInCradle = ref(false)
 
       const handleSlotClick = (index) => {
+        if(box.value.wasOriginallyOnDeposit) return
+        if(box.value.wasOriginallyOnCradle) return
+        if(wasBoxInCradle.value) {
+          // toast.error("La caja ya está ingresada")
+          return
+        }
         const id = box.value.boxId
         cradle.value.slots = cradle.value.slots.map((slot) => {
           if(slot.boxId == id) {
@@ -81,19 +88,19 @@
       @apply text-second-400;
     }
   }
-  .fine {
+  .fina {
     @apply bg-orange-600;
     & .box-id {
       @apply text-orange-700;
     }
   }
-  .thick {
+  .gruesa {
     @apply bg-green-600;
     & .box-id {
       @apply text-green-700;
     }
   }
-  .cut {
+  .cortada {
     @apply bg-blue-600;
     & .box-id {
       @apply text-blue-700;

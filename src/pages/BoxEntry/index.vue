@@ -87,34 +87,34 @@
                 <h2 class="col-span-full text-xl font-bold">Referencias</h2>
                 <div class="flex flex-col gap-5 mt-4">
                   <span
-                    class="select-category fine"
-                    @click="setVisibleCategories('fine')"
+                    class="select-category fina"
+                    @click="setVisibleCategories('fina')"
                   >
                     <EyeIcon
                       class="icon"
-                      v-if="visibleCategories.includes('fine')"
+                      v-if="visibleCategories.includes('fina')"
                     />
                     <EyeIconOff class="icon" v-else />
                     Arena fina</span
                   >
                   <span
-                    class="select-category thick"
-                    @click="setVisibleCategories('thick')"
+                    class="select-category gruesa"
+                    @click="setVisibleCategories('gruesa')"
                   >
                     <EyeIcon
                       class="icon"
-                      v-if="visibleCategories.includes('thick')"
+                      v-if="visibleCategories.includes('gruesa')"
                     />
                     <EyeIconOff class="icon" v-else />
                     Arena gruesa</span
                   >
                   <span
-                    class="select-category cut"
-                    @click="setVisibleCategories('cut')"
+                    class="select-category cortada"
+                    @click="setVisibleCategories('cortada')"
                   >
                     <EyeIcon
                       class="icon"
-                      v-if="visibleCategories.includes('cut')"
+                      v-if="visibleCategories.includes('cortada')"
                     />
                     <EyeIconOff class="icon" v-else />
                     Caja cortada</span
@@ -311,6 +311,29 @@
           })
           .catch((err) => console.error(err));
       };
+      
+      const getFilteredCradles = async () => {
+        let cradlesToFilter = []
+        let workOrders = await axios
+          .get(`${apiUrl}/workOrder`)
+          .then((res) => {
+            return res.data.data;
+          })
+          .catch((err) => console.error(err));
+
+        await workOrders.forEach(workOrder => {
+          workOrder.pits.forEach(pit => {
+            if(pit.id == pitId.value) {
+              if(workOrder.operativeCradle !== "-1") cradlesToFilter.push(workOrder.operativeCradle)
+              if(workOrder.backupCradle !== "-1") cradlesToFilter.push(workOrder.backupCradle)
+            }
+          })
+        });
+
+        cradles.value = await cradles.value.filter(cradle => {
+          if(cradlesToFilter.includes(cradle.id.toString())) return cradle
+        })
+      };
 
       onMounted(async () => {
         await getPurchaseOrders();
@@ -335,6 +358,7 @@
       };
 
       const clearBoxInDeposit = (id) => {
+        
         Object.entries(warehouse.value.layout).forEach((cell) => {
           if (cell[1].id == id) {
             (cell[1].category = 'empty'), delete cell[1][id];
@@ -365,6 +389,7 @@
             });
           }
           if (purchaseOrderId.value !== -1) {
+            await getFilteredCradles()
             let sandTypes = await axios
               .get(`${apiUrl}/sand`)
               .then((res) => {
@@ -376,7 +401,6 @@
                 ? boxes.value = filteredPurchaseOrders.value[filteredPurchaseOrders.value.findIndex(po => po.id == purchaseOrderId.value)].sandOrders
                 : boxes.value = [];
               
-            console.log("CAJAS", filteredPurchaseOrders.value)
             boxes.value.map((box) => {
               let sandType = sandTypes.find(
                 (type) => parseInt(type.id) == parseInt(box.sandTypeId)
@@ -384,7 +408,7 @@
               box.category = sandType.type.toLowerCase();
             });
 
-            warehouse.value = warehouses.value.filter((singleWarehouse) => {
+            warehouse.value = await warehouses.value.filter((singleWarehouse) => {
               if (
                 parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
                 parseInt(singleWarehouse.pitId) == pitId.value
@@ -392,6 +416,9 @@
                 return singleWarehouse;
               }
             })[0];
+
+            originalWarehouseLayout.value = warehouse.value.layout
+
             if (warehouse.value) {
               floor.value = formatDeposit(warehouse.value.layout).floor;
               col.value = formatDeposit(warehouse.value.layout).col;
@@ -410,7 +437,27 @@
         row: 0,
         category: '',
         id: '',
+        wasOriginallyOnDeposit: false,
+        wasOriginallyOnCradle: false
       });
+
+      const checkIfWasBoxInOriginalDeposit = (boxId) => {
+        let response = false
+        Object.entries(originalWarehouseLayout.value).forEach(cell => {
+          if(cell[1].id == boxId) response = true
+        })
+        return response
+      }
+
+      const checkIfWasBoxInOriginalCradle = (boxId) => {
+        let response = false
+        cradles.value.forEach(cradle => {
+          cradle.slots.forEach(slot => {
+            if(slot.boxId == boxId) response = true
+          })
+        })
+        return response
+      }
 
       const setSelectedBox = (id: Number) => {
         choosedBox.value = boxes.value.filter((box) => {
@@ -422,13 +469,19 @@
             return box;
           }
         })[0];
+        choosedBox.value.wasOriginallyOnDeposit = checkIfWasBoxInOriginalDeposit(id)
+        choosedBox.value.wasOriginallyOnCradle = checkIfWasBoxInOriginalCradle(id)
       };
 
       const selectBox = (box: Box) => {
+        if(choosedBox.value.wasOriginallyOnDeposit) return
+        if(choosedBox.value.wasOriginallyOnCradle) return
+        
         clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
-        // if (box.category == 'empty' || box.category != 'aisle') {
-        if (visibleCategories.value.includes(box.category)) {
+        if (box.category == 'empty' || box.category !== 'aisle') {
+        // if (visibleCategories.value.includes(box.category)) {
+          wasWarehouseModificated.value = true
           const hasPos = [
             choosedBox.value.floor,
             choosedBox.value.row,
@@ -436,7 +489,7 @@
           ].some(Boolean);
           if (hasPos) {
             let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
-            // warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
+            warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
             warehouse.value.layout[`${prevBoxPosition}`].id = '';
           }
           const newBPos = `${box.floor}|${box.row}|${box.col}`;
@@ -459,18 +512,12 @@
           pitId.value !== -1 &&
           purchaseOrderId.value !== -1
         ) {
-          if (originalWarehouseWasSaved == false) {
-            originalWarehouseWasSaved = true;
-            originalWarehouseLayout = warehouse.value.layout;
-          }
           return true;
         }
       });
 
       const warehouse = ref({});
-
-      let originalWarehouseLayout = {};
-      let originalWarehouseWasSaved = false;
+      const originalWarehouseLayout = ref({});
       let visibleCategories = ref([]);
 
       const setVisibleCategories = (category: String) => {
@@ -484,6 +531,8 @@
       };
 
       let selectedCradle = ref(0);
+      let wasCradleModificated = ref(false)
+      let wasWarehouseModificated = ref(false)
 
       const handleSelectedCradle = (id) => {
         selectedCradle.value = id;
@@ -538,22 +587,30 @@
         const cradleData = cradles.value.find((c) => {
           return c.id === cradleId;
         });
-        await axios
+        if(cradleId !== 0) wasCradleModificated.value = true
+
+        if(wasWarehouseModificated.value) {
+          await axios
           .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
           .then((res) => {
             warehouseDone.value = !!res.data.data;
           })
           .catch((err) => console.error(err))
-        await axios
+        }
+
+        if(wasCradleModificated.value) {
+          await axios
           .put(`${apiUrl}/cradle/${cradleId}`, cradleData)
           .then((res) => {
             cradleDone.value = !!res.data.data;
           })
           .catch((err) => console.error(err))
+        }
+
         watchEffect(() => {
-          if (warehouseDone.value && cradleDone.value) {
-            router.push('/');
-          }
+          if(warehouseDone.value && cradleDone.value) router.push('/');
+          if(warehouseDone.value && wasCradleModificated.value == false) router.push('/');
+          if(cradleDone.value && wasWarehouseModificated.value == false) router.push('/');
         });
       };
 
@@ -616,13 +673,13 @@
     &.aisle {
       @apply text-second-300 text-second-300;
     }
-    &.fine {
+    &.fina {
       @apply text-orange-600 text-orange-600;
     }
-    &.thick {
+    &.gruesa {
       @apply text-green-600 text-green-600;
     }
-    &.cut {
+    &.cortada {
       @apply text-blue-600 text-blue-600;
     }
     &.blocked {

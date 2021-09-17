@@ -12,9 +12,9 @@ export interface User {
 
 export enum BoxCategory {
   empty = 'Vacio',
-  cut = 'Caja cortada',
-  thick = 'Arena gruesa',
-  fine = 'Arena fina',
+  cut = 'Cortada',
+  thick = 'Gruesa',
+  fine = 'Fina',
   aisle = 'Pasillo',
 }
 export enum SandStageStatus {
