@@ -76,7 +76,6 @@
       let visibleCategories = ref(props.visibleCategories)
 
       const isBlocked = () => {
-        console.log(visibleCategories.value)
         if(!visibleCategories.value) return false
         if(category.value == 'aisle') return true
         else {return false}

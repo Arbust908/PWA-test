@@ -38,6 +38,8 @@
       const wasBoxInCradle = ref(false)
 
       const handleSlotClick = (index) => {
+        if(box.value.wasOriginallyOnDeposit) return
+        if(box.value.wasOriginallyOnCradle) return
         if(wasBoxInCradle.value) {
           toast.error("La caja ya está ingresada")
           return
@@ -55,21 +57,9 @@
         cradle.value.slots[index] = box.value
       };
 
-      const checkIfWasBoxPreviouslyInCradle = () => {
-        let response = false
-        cradle.value.slots.forEach(slot => {
-          if(slot.boxId == box.value.boxId) response = true
-        })
-        return wasBoxInCradle.value = response
-      }
-
       watchEffect(() => {
         box.value = props.box
         cradle.value = props.cradle
-      })
-
-      onMounted(async() => {
-        await checkIfWasBoxPreviouslyInCradle()
       })
 
       return {

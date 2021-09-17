@@ -356,6 +356,7 @@
       };
 
       const clearBoxInDeposit = (id) => {
+        
         Object.entries(warehouse.value.layout).forEach((cell) => {
           if (cell[1].id == id) {
             (cell[1].category = 'empty'), delete cell[1][id];
@@ -434,7 +435,27 @@
         row: 0,
         category: '',
         id: '',
+        wasOriginallyOnDeposit: false,
+        wasOriginallyOnCradle: false
       });
+
+      const checkIfWasBoxInOriginalDeposit = (boxId) => {
+        let response = false
+        Object.entries(originalWarehouseLayout.value).forEach(cell => {
+          if(cell[1].id == boxId) response = true
+        })
+        return response
+      }
+
+      const checkIfWasBoxInOriginalCradle = (boxId) => {
+        let response = false
+        cradles.value.forEach(cradle => {
+          cradle.slots.forEach(slot => {
+            if(slot.boxId == boxId) response = true
+          })
+        })
+        return response
+      }
 
       const setSelectedBox = (id: Number) => {
         choosedBox.value = boxes.value.filter((box) => {
@@ -446,18 +467,14 @@
             return box;
           }
         })[0];
+        choosedBox.value.wasOriginallyOnDeposit = checkIfWasBoxInOriginalDeposit(id)
+        choosedBox.value.wasOriginallyOnCradle = checkIfWasBoxInOriginalCradle(id)
       };
 
-      const wasBoxInOriginalDeposit = (boxId) => {
-        let response = false
-        Object.entries(originalWarehouseLayout.value).forEach(cell => {
-          if(cell[1].id == boxId) response = true
-        })
-        return response
-      }
-
       const selectBox = (box: Box) => {
-        if(wasBoxInOriginalDeposit(choosedBox.value.boxId)) return
+        if(choosedBox.value.wasOriginallyOnDeposit) return
+        if(choosedBox.value.wasOriginallyOnCradle) return
+        
         clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
         if (box.category == 'empty' || box.category !== 'aisle') {
