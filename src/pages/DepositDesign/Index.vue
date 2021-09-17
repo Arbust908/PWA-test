@@ -26,9 +26,9 @@
           class="body-row"
         >
           <td>
-            {{ depo.clientCompany.name }}
+            {{ depo?.clientCompany?.name || 'Sin Cliente' }}
           </td>
-          <td>{{ depo.pit.name }}</td>
+          <td>{{ depo?.pit?.name || 'Sin Pozo' }}</td>
           <td>
             {{ formatedDeposit(depo.layout).floor }}
           </td>

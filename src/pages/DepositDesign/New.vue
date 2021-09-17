@@ -9,62 +9,25 @@
     </header>
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
-        <fieldset
-          class="py-2 w-full grid grid-cols-12 gap-y-4 gap-x-14"
-        >
-          <h2 class="col-span-full text-3xl font-bold">
+       <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
+         <h2 class="col-span-full text-3xl font-bold">
             Pozo {{ designName }}
           </h2>
-          <label class="col-span-5" for="depositClient">
-            <span>Cliente</span>
-            <select
-              id="depositClient"
-              v-model="clientId"
-              class="input"
-              name="depositClient"
-            >
-              <option selected disabled value="-1">Seleccionar cliente</option>
-              <option
-                v-for="client in clients"
-                :key="client.id"
-                :value="client.id"
-              >
-                {{ client.name }}
-              </option>
-            </select>
-          </label>
-          <label class="col-span-4" for="depositPit">
-            <span>Pozo</span>
-            <select
-              id="depositPit"
-              v-model="pitId"
-              class="input"
-              name="depositPit"
-            >
-            <option selected disabled value="-1">Seleccionar pozo</option>
-              <option v-for="pit in pits" :key="pit.id" :value="pit.id">
-                {{ pit.name }}
-              </option>
-            </select>
-          </label>
-          <!-- <FieldGroup class="grid-cols-12 col-span-12 md:grid-cols-12">
-            <ClientPitCombo
-              :clientId="clientId"
-              :pitId="pitId"
-              @update:clientId="clientId = $event"
-              @update:pitId="pitId = $event"
-            />
-          </FieldGroup> -->
-          <div class="col-span-2"></div>
-          <div class="col-span-2 flex flex-col items-center gap-4">
+          <ClientPitCombo
+            :clientId="clientId"
+            :pitId="pitId"
+            @update:clientId="clientId = $event"
+            @update:pitId="pitId = $event"
+          />
+          <div class="col-span-6  md:col-span-4 flex flex-col items-center gap-4">
             <h3 class="text-xs">Cantidad de filas</h3>
             <Counter :amount="rows" @update:amount="rows = $event" />
           </div>
-          <div class="col-span-2 flex flex-col items-center gap-4">
+          <div class="col-span-6  md:col-span-4 flex flex-col items-center gap-4">
             <h3 class="text-xs">Cantidad de columnas</h3>
             <Counter :amount="cols" @update:amount="cols = $event" />
           </div>
-          <div class="col-span-2 flex flex-col items-center gap-4">
+          <div class="col-span-6  md:col-span-4 flex flex-col items-center gap-4">
             <h3 class="text-xs">Cantidad de pisos</h3>
             <Counter :amount="floors" @update:amount="floors = $event" />
           </div>
@@ -72,7 +35,7 @@
             <h3 class="text-xs">Cantidad de ubicación</h3>
             <Counter />
           </div> -->
-        </fieldset>
+      </FieldGroup>
         <fieldset class="py-2 flex gap-x-10 2xl:gap-x-40">
           <section
             class="
