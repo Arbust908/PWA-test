@@ -101,8 +101,9 @@
 <script lang="ts">
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'vuex';
-  import { Company } from '@/interfaces/sandflow';
   import { ref, computed } from 'vue';
+  import { useTitle } from '@vueuse/core';
+  import { Company } from '@/interfaces/sandflow';
   import Toggle from '@/components/ui/Toggle.vue';
 
   import Layout from '@/layouts/Main.vue';
@@ -135,6 +136,7 @@
       );
 
       const id = Number(route.params.id);
+      useTitle(`Cliente ${id} <> Sandflow`);
 
       const currentCompany: Company = companies.find((company) => {
         return company.id == id;

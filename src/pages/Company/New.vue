@@ -102,6 +102,7 @@
   import Toggle from '@/components/ui/Toggle.vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
@@ -129,6 +130,7 @@
       Toggle,
     },
     setup() {
+      useTitle('Nuevo Cliente <> Sandflow');
       const router = useRouter();
       const store = useStore();
       const instance = axios.create({

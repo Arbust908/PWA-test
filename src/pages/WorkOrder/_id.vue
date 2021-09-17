@@ -276,7 +276,7 @@
       const router = useRouter();
       const route = useRoute();
       const id = route.params.id;
-      const title = useTitle(`Orden de Trabajo ${id} <> Sandflow`);
+      useTitle(`Orden de Trabajo ${id} <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });

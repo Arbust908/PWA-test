@@ -62,7 +62,8 @@
 
 <script>
   import { onMounted, ref } from 'vue';
-  import Layout from '@/layouts/Main.vue';
+  import { useTitle } from '@vueuse/core';
+    import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
@@ -80,6 +81,7 @@
       Icon,
     },
     setup() {
+      useTitle('Clientes <> Sandflow');
       const store = useStore();
       const clDB = ref([]);
       const clStoreDB = useClone(store.state.client.all);

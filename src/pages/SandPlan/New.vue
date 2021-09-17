@@ -269,6 +269,7 @@
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
+  import { useTitle } from '@vueuse/core';
 
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
@@ -305,6 +306,7 @@
       ResposiveTableSandPlan
     },
     setup() {
+      useTitle('Nuevo Plan de arena <> Sandflow');
       // Init
       const windowWidth = window.innerWidth;
       const store = useStore();

@@ -55,6 +55,7 @@
 <script>
   import { onMounted, ref } from 'vue';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
@@ -71,6 +72,7 @@
       UiTable,
     },
     setup() {
+      useTitle('Cradles <> Sandflow');
       const store = useStore();
       const crDB = ref([]);
       const cradleDB = JSON.parse(JSON.stringify(store.state.cradle.all));

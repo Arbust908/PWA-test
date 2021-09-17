@@ -97,7 +97,7 @@
       Icon,
     },
     setup() {
-      const title = useTitle('Planificacíon de Arena <> Sandflow');
+      useTitle('Planificacíones de Arena <> Sandflow');
       const instance = axios.create({
         baseURL: api,
       });

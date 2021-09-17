@@ -196,7 +196,7 @@
       // Init
       const store = useStore();
       const router = useRouter();
-      const title = useTitle(`Nueva Orden de Trabajo <> Sandflow`);
+      useTitle(`Nueva Orden de Trabajo <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });

@@ -81,7 +81,7 @@
       Icon,
     },
     setup() {
-      const title = useTitle('Ordenes de Trabajo <> Sandflow');
+      useTitle('Ordenes de Trabajo <> Sandflow');
       const store = useStore();
 
       const { read, destroy } = useApi('/workOrder');

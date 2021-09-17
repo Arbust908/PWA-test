@@ -169,7 +169,7 @@
   } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import { useActions } from 'vuex-composition-helpers';
+  import { useTitle } from '@vueuse/core';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
@@ -207,6 +207,7 @@
       Icon,
     },
     setup() {
+      useTitle('Nueva orden de pedido <> Sandflow');
       const router = useRouter();
       const instance = axios.create({
         baseURL: api,

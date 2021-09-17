@@ -33,6 +33,7 @@
 <script lang="ts">
   import { reactive, ref, toRefs, computed } from 'vue';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import { useRouter, useRoute } from 'vue-router';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
@@ -61,6 +62,7 @@
       const currentSand: Sand = sands.find((sand) => {
         return sand.id == route.params.id;
       });
+      useTitle(`Arena ${currentSand.type} <> Sandflow`);
       const router = useRouter();
       const goToIndex = () => {
         router.push('/tipos-de-arena');

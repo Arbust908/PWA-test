@@ -54,8 +54,7 @@
       Error,
     },
     setup() {
-      // const templateTitle = '<> Sandflow';
-      const title = useTitle('Login <> Sandflow');
+      useTitle('Login <> Sandflow');
       const selected_card = ref('login');
       const selectedCard = (card) => {
         selected_card.value = card;

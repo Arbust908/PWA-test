@@ -133,6 +133,7 @@
   } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
 
   import Icon from '@/components/icon/TheAllIcon.vue';
   import Pill from '@/components/ui/Pill.vue';
@@ -183,6 +184,7 @@
       const router = useRouter();
       const route = useRoute();
       const id = route.params.id;
+      useTitle(`Nueva etapa de Stage Sheet ${id} <> Sandflow`);
 
       const { read: getStageSheet } = useApi(`/stageSheet/${id}`);
       const currentStageSheet = getStageSheet();

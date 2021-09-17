@@ -263,6 +263,7 @@
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { useState, useActions } from 'vuex-composition-helpers';
+  import { useTitle } from '@vueuse/core';
 
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
@@ -312,6 +313,7 @@
       const router = useRouter();
       const route = useRoute();
       const id = route.params.id;
+      useTitle(`Panificacion de Arena ${id} <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });

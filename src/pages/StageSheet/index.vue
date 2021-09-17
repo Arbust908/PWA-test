@@ -97,6 +97,7 @@
 <script>
   import { ref, watch, computed } from 'vue';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
@@ -127,8 +128,8 @@
       NoneBtn,
     },
     setup() {
+      useTitle('Stage Sheets <> Sandflow');
       const store = useStore();
-
       const { read: getClients } = useApi('/company');
       const clients = getClients();
       const { read: getPits } = useApi('/pit');

@@ -179,6 +179,7 @@
   } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
@@ -229,6 +230,7 @@
       Icon,
     },
     setup() {
+      useTitle('Notificacion a Proveedores <> Sandflow');
       const router = useRouter();
       const store = useStore();
       const instance = axios.create({

@@ -51,6 +51,7 @@
   import { reactive, ref, toRefs, computed } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import { Cradle } from '@/interfaces/SandProvider';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
@@ -81,6 +82,7 @@
       const currentCradle: Cradle = cradles.find((cradle) => {
         return cradle.id == route.params.id;
       });
+      useTitle(`Cradle ${currentCradle.name} <> Sandflow`);
 
       const cradleToUpdate = reactive({
         id: currentCradle.id,

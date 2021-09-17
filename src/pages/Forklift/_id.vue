@@ -41,6 +41,7 @@
   import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import ForkliftForm from '@/components/forklift/Form.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
@@ -62,6 +63,7 @@
       const router = useRouter();
       const route = useRoute();
       const id = route.params.id;
+      useTitle(`Forklift ${id} <> Sandflow`);
       const forklifts: Array<Forklift> = JSON.parse(
         JSON.stringify(store.state.forklifts.all)
       );
