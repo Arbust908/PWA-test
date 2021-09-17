@@ -4,7 +4,7 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-second-900 text-xl self-start mb-3 md:mb-0">
-        Nuevo ingreso de caja
+        Operación en cradle
       </h1>
     </header>
     <section class="bg-second-0 rounded-md shadow-sm">
@@ -46,7 +46,7 @@
       </section>
       <section v-else class="cradle-slots">
         <div v-for="(slot, index) in cradleSlots" :key="index" >
-          <div class="slot">
+          <div class="slot" v-if="slot.boxId">
             <span class="station-title">Estación {{index+1}} - {{slot.boxId}}</span>
             <div class="cradle-status-wrapper">
               <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '1')">
@@ -89,6 +89,9 @@
                 Arena: {{slot.sandType}}
               </span>
             </div>
+          </div>
+          <div class="slot without-box" v-else>
+            <span class="station-title">Estación {{index+1}} - Sin caja</span>
           </div>
           <button class="calibrate">Calibrar E{{index+1}}</button>
         </div>
@@ -213,6 +216,8 @@
           .catch((err) => console.error(err));
       };
 
+      
+
       const getSandTypes = async() => {
         await axios.get(`${apiUrl}/sand`)
         .then(res => {
@@ -231,22 +236,21 @@
       });
 
       const getFilteredCradles = () => {
-        workOrders.value.forEach(workOrder => {
-          if(workOrder.client == clientId.value) {
-            workOrder.pits.forEach(pit => {
-              if(pit.id == pitId.value) {
-                let cradleId = workOrder.operativeCradle
-                let backupCradleId = workOrder.backupCradle
+        let cradlesToFilter = []
 
-                filteredCradles.value = cradles.value.filter(cradle => {
-                  if(cradle.id == backupCradleId) return cradle
-                })
-                
-              }
-            });
-          }
+        workOrders.value.forEach(workOrder => {
+          workOrder.pits.forEach(pit => {
+            if(pit.id == pitId.value) {
+              if(workOrder.operativeCradle !== "-1") cradlesToFilter.push(workOrder.operativeCradle)
+              if(workOrder.backupCradle !== "-1") cradlesToFilter.push(workOrder.backupCradle)
+            }
+          })
+        });
+
+        filteredCradles.value = cradles.value.filter(cradle => {
+          if(cradlesToFilter.includes(cradle.id.toString())) return cradle
         })
-      }
+      };
 
       watchEffect(async () => {
         if(cradleId.value !== -1) {
@@ -426,6 +430,14 @@
 
       &:not(.empty) {
         @apply justify-between bg-gray-100 border-none;
+      }
+
+      &.without-box {
+        @apply text-gray-100 bg-white justify-center items-center border-dashed border-2 border-second-300 cursor-default;
+
+        .station-title {
+          @apply pb-0 pt-0;
+        }
       }
 
       .station-title {
