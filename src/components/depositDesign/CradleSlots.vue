@@ -18,7 +18,6 @@
 
 <script lang="ts">
   import { onMounted, ref, watchEffect } from 'vue';
-  import { useToast } from 'vue-toastification'
 
   export default {
     props: {
@@ -34,14 +33,13 @@
     setup(props, {emit}) {
       const cradle = ref(props.cradle);
       const box = ref(props.box);
-      const toast = useToast()
       const wasBoxInCradle = ref(false)
 
       const handleSlotClick = (index) => {
         if(box.value.wasOriginallyOnDeposit) return
         if(box.value.wasOriginallyOnCradle) return
         if(wasBoxInCradle.value) {
-          toast.error("La caja ya est√° ingresada")
+          // toast.error("La caja ya est· ingresada")
           return
         }
         const id = box.value.boxId
