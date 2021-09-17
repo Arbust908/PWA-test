@@ -156,6 +156,7 @@
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { useActions } from 'vuex-composition-helpers';
+  import { useTitle } from '@vueuse/core';
 
   import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon } from '@heroicons/vue/solid';
@@ -205,6 +206,7 @@
       const router = useRouter();
       const route = useRoute();
       const id = route.params.id;
+      useTitle(`Orden de Pedido ${id} <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });

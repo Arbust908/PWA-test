@@ -196,6 +196,7 @@
   import { ref, Ref, computed, defineComponent, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
 
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
@@ -233,6 +234,7 @@
         baseURL: apiUrl,
       });
       const id = route.params.id;
+      useTitle(`Depostio ${id} <> Sandflow`);
       const Deposit = ref([]);
 
       const rows: Ref<number> = ref(0);

@@ -201,6 +201,7 @@
   import { ref, Ref, computed, defineComponent, watch } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
 
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
@@ -235,6 +236,7 @@
       ClientPitCombo,
     },
     setup() {
+      useTitle('Nuevo Deposito <> Sandflow');
       const router = useRouter();
       const store = useStore();
       const instance = axios.create({

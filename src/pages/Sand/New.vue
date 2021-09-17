@@ -34,6 +34,7 @@
   import { reactive, toRefs, computed } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -50,6 +51,7 @@
       SandForm,
     },
     setup() {
+      useTitle('Nuevo tipo de arena <> Sandflow');
       const router = useRouter();
       const store = useStore();
 

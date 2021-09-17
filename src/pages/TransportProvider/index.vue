@@ -84,7 +84,7 @@
       Icon,
     },
     setup() {
-      const title = useTitle('Provedores de Transporte <> Sandflow');
+      useTitle('Provedores de Transporte <> Sandflow');
       const tpDB = ref([]);
       const store = useStore();
       const transportProviders = JSON.parse(

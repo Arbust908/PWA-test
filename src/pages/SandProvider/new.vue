@@ -79,9 +79,9 @@
       SandProviderRep,
     },
     setup() {
+      useTitle(`Nuevo Proveedor de Arena <> Sandflow`);
       const store = useStore();
       const router = useRouter();
-      const title = useTitle(`Nuevo Proveedor de Arena <> Sandflow`);
       const instance = axios.create({
         baseURL: apiUrl,
       });

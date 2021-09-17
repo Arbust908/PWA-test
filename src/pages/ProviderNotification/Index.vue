@@ -74,6 +74,7 @@
   import { ref, watch } from 'vue';
   import { useStore } from 'vuex';
   import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
@@ -93,6 +94,7 @@
       Icon,
     },
     setup() {
+      useTitle('Notificaciones a Proveedores <> Sandflow');
       const store = useStore();
       const instance = axios.create({
         baseURL: apiUrl,

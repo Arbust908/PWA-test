@@ -174,7 +174,7 @@
   } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
-  import { useActions } from 'vuex-composition-helpers';
+  import { useTitle } from '@vueuse/core';
 
   import Icon from '@/components/icon/TheAllIcon.vue';
   import Pill from '@/components/ui/Pill.vue';
@@ -228,6 +228,7 @@
       const instance = axios.create({
         baseURL: api,
       });
+      useTitle('Nueva Stage Sheet <> Sandflow');
       const currentStageSheet = reactive({
         companyId: -1,
         pitId: -1,

@@ -75,9 +75,9 @@
       Icon,
     },
     setup() {
+      useTitle(`Proveedores de Arena <> Sandflow`);
       const spDB = ref([]);
       const store = useStore();
-      const title = useTitle(`Proveedores de Arena <> Sandflow`);
       const sandProviders = JSON.parse(
         JSON.stringify(store.state.sandProviders.all)
       );

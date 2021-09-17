@@ -219,6 +219,7 @@
   } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
 
   import { TrashIcon } from '@heroicons/vue/outline';
   import { PlusIcon, BellIcon, EyeIcon } from '@heroicons/vue/solid';
@@ -263,6 +264,7 @@
       FieldInput,
     },
     setup() {
+      useTitle('Ingreso de Cajas <> Sandflow');
       const router = useRouter();
       let activeSection = ref('deposit');
       let boxes = ref([]);

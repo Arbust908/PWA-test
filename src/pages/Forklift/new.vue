@@ -41,6 +41,7 @@
   import { computed, reactive, ref } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import ForkliftForm from '@/components/forklift/Form.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
@@ -57,6 +58,7 @@
       Modal,
     },
     setup() {
+      useTitle('Forklift <> Sandflow');
       const store = useStore();
       const router = useRouter();
 
