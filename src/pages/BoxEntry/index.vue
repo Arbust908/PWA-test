@@ -405,7 +405,7 @@
               box.category = sandType.type.toLowerCase();
             });
 
-            warehouse.value = warehouses.value.filter((singleWarehouse) => {
+            warehouse.value = await warehouses.value.filter((singleWarehouse) => {
               if (
                 parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
                 parseInt(singleWarehouse.pitId) == pitId.value
@@ -413,6 +413,9 @@
                 return singleWarehouse;
               }
             })[0];
+
+            originalWarehouseLayout.value = warehouse.value.layout
+
             if (warehouse.value) {
               floor.value = formatDeposit(warehouse.value.layout).floor;
               col.value = formatDeposit(warehouse.value.layout).col;
@@ -445,11 +448,21 @@
         })[0];
       };
 
+      const wasBoxInOriginalDeposit = (boxId) => {
+        let response = false
+        Object.entries(originalWarehouseLayout.value).forEach(cell => {
+          if(cell[1].id == boxId) response = true
+        })
+        return response
+      }
+
       const selectBox = (box: Box) => {
+        if(wasBoxInOriginalDeposit(choosedBox.value.boxId)) return
         clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
         if (box.category == 'empty' || box.category !== 'aisle') {
         // if (visibleCategories.value.includes(box.category)) {
+          wasWarehouseModificated.value = true
           const hasPos = [
             choosedBox.value.floor,
             choosedBox.value.row,
@@ -480,18 +493,12 @@
           pitId.value !== -1 &&
           purchaseOrderId.value !== -1
         ) {
-          if (originalWarehouseWasSaved == false) {
-            originalWarehouseWasSaved = true;
-            originalWarehouseLayout = warehouse.value.layout;
-          }
           return true;
         }
       });
 
       const warehouse = ref({});
-
-      let originalWarehouseLayout = {};
-      let originalWarehouseWasSaved = false;
+      const originalWarehouseLayout = ref({});
       let visibleCategories = ref([]);
 
       const setVisibleCategories = (category: String) => {
@@ -505,6 +512,8 @@
       };
 
       let selectedCradle = ref(0);
+      let wasCradleModificated = ref(false)
+      let wasWarehouseModificated = ref(false)
 
       const handleSelectedCradle = (id) => {
         selectedCradle.value = id;
@@ -559,22 +568,30 @@
         const cradleData = cradles.value.find((c) => {
           return c.id === cradleId;
         });
-        await axios
+        if(cradleId !== 0) wasCradleModificated.value = true
+
+        if(wasWarehouseModificated.value) {
+          await axios
           .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
           .then((res) => {
             warehouseDone.value = !!res.data.data;
           })
           .catch((err) => console.error(err))
-        await axios
+        }
+
+        if(wasCradleModificated.value) {
+          await axios
           .put(`${apiUrl}/cradle/${cradleId}`, cradleData)
           .then((res) => {
             cradleDone.value = !!res.data.data;
           })
           .catch((err) => console.error(err))
+        }
+
         watchEffect(() => {
-          if (warehouseDone.value && cradleDone.value) {
-            router.push('/');
-          }
+          if(warehouseDone.value && cradleDone.value) router.push('/');
+          if(warehouseDone.value && wasCradleModificated.value == false) router.push('/');
+          if(cradleDone.value && wasWarehouseModificated.value == false) router.push('/');
         });
       };
 
