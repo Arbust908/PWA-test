@@ -81,7 +81,7 @@ export default {
       };
 
       return await axios
-      .post(`${api}/forkliftasda`, forklift)
+      .post(`${api}/forklift`, forklift)
       .then((res) => {
         if (res.status === 200) {
           forklift.id = res.data.data.id;

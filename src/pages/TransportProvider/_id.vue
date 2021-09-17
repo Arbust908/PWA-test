@@ -77,13 +77,13 @@
               :driverPhone="newDriver.phone"
               :driverEmail="newDriver.email"
               :driverTType="newDriver.vehicleType"
-              :driverTId="newDriver.vehicleId"
+              :driverTId="newDriver.transportId"
               :driverObs="newDriver.observations"
               @update:driverName="newDriver.name = $event"
               @update:driverPhone="newDriver.phone = $event"
               @update:driverEmail="newDriver.email = $event"
               @update:driverTType="newDriver.vehicleType = $event"
-              @update:driverTId="newDriver.vehicleId = $event"
+              @update:driverTId="newDriver.transportId = $event"
               @update:driverObs="newDriver.observations = $event"
             />
             <div
@@ -127,7 +127,7 @@
           :phone="driver.phone"
           :email="driver.email"
           :vehicleType="driver.vehicleType"
-          :vehicleId="driver.vehicleId"
+          :transportId="driver.transportId"
           :observations="driver.observations"
           @delete-driver="deleteDriver(index)"
           @edit-driver="editDriver(index)"
@@ -191,7 +191,7 @@
           return sp.id == id;
         });
 
-      console.log(currentTransportProvider);
+      console.log('ctp', currentTransportProvider);
 
       let activeSection = ref('provider');
 
@@ -208,18 +208,39 @@
         phone: '',
         email: '',
         vehicleType: '',
-        vehicleId: '',
+        transportId: '',
         observations: '',
       });
 
       const addDriver = () => {
         const driver = { ...newDriver };
-        drivers.push(driver);
+        if(driverFull){
+          drivers.push(driver);
+        }
         cleanNewDriver();
       };
 
-      const deleteDriver = (index: number) => {
-        drivers.splice(index);
+      const deleteDriver = async (index: number) => {
+        console.log(drivers[index].id);
+        let response = await axios
+          .delete(`${api}/driver/${drivers[index].id}`)
+
+          .then((res) => {
+            if (res.status === 200) {
+              return res.data.data;
+            }
+            return [];
+          })
+          .catch((err) => {
+            console.log(err);
+            return;
+          })
+          .finally(() => {
+            drivers.splice(index, 1);
+          });
+        return {
+          response,
+        };
       };
 
       const editDriver = (index: number) => {
@@ -230,7 +251,7 @@
         newDriver.phone = driver.phone;
         newDriver.email = driver.email;
         newDriver.vehicleType = driver.vehicleType;
-        newDriver.vehicleId = driver.vehicleId;
+        newDriver.transportId = driver.transportId;
         newDriver.observations = driver.observations;
       };
 
@@ -239,7 +260,7 @@
         newDriver.phone = '';
         newDriver.email = '';
         newDriver.vehicleType = '';
-        newDriver.vehicleId = '';
+        newDriver.transportId = '';
         newDriver.observations = '';
       };
 
@@ -248,9 +269,9 @@
         legalId: currentTransportProvider.legalId,
         address: currentTransportProvider.address,
         observations: currentTransportProvider.observations,
-        companyRepresentativeId:
-          currentTransportProvider.companyRepresentativeId,
+        companyRepresentativeId: currentTransportProvider.companyRepresentativeId,
       });
+      console.log(newTransportProvider.legalId);
 
       const companyRepresentative: CompanyRepresentative = reactive({
         name: currentTransportProvider.companyRepresentative.name,
@@ -272,7 +293,7 @@
           newDriver.phone !== '0' &&
           newDriver.email !== '' &&
           newDriver.vehicleType !== '' &&
-          newDriver.vehicleId !== ''
+          newDriver.transportId !== ''
         );
       });
 
@@ -297,39 +318,63 @@
           drivers,
           ...newTProv
         } = currentTransportProvider;
-        console.log(newTProv);
-        const { data } = useAxios(
+        console.log('newTProv', companyRepresentative);
+
+        const { data: tpData } = useAxios(
           `/transportProvider/${id}`,
-          { method: 'PUT', data: newTProv },
+          { method: 'PUT', data: newTransportProvider },
           instance
         );
-        watch(data, (newData, _) => {
+
+         const { data: rep } = useAxios(
+          `/companyRepresentative/${currentTransportProvider.companyRepresentativeId}`,
+          { method: 'PUT', data: companyRepresentative },
+          instance
+        );
+
+        // const { data } = useAxios(
+        //   `/transportProvider/${id}`,
+        //   { method: 'PUT', data: newTransportProvider },
+        //   instance
+        // );
+        watch(tpData, (newData, _) => {
           if (newData && newData.data) {
             const tpId = newData.data.id;
             const tpSave = reactive({ ...newData.data });
+            console.log('tpSave', tpSave);
             const driversDone = reactive([]);
+
             drivers.forEach((driver) => {
               const { id, ...newDriver } = driver;
-              console.log(newDriver);
               newDriver.transportProviderId = tpId;
-              const { data } = useAxios(
-                `/driver/`,
-                { method: 'POST', data: newDriver },
-                instance
-              );
-              watch(data, (newData, _) => {
-                if (newData && newData.data) {
-                  driversDone.push(newData.data);
-                  tpSave.drivers = driversDone;
+
+              if(driver.id) {
+                console.log('driver tiene ID')
+              } else {
+                if(driverFull){
+                  const { data } = useAxios(
+                      `/driver/`,
+                      { method: 'POST', data: newDriver },
+                      instance
+                    );
+                    watch(data, (newData, _) => {
+                      if (newData && newData.data) {
+                        driversDone.push(newData.data);
+                        tpSave.drivers = driversDone;
+                      }
+                    });
+                  }
                 }
               });
-            });
+              
             watchEffect(() => {
               if (driversDone.length === drivers.length) {
                 store.dispatch('updateTransportProvider', tpSave);
                 router.push('/proveedores-de-transporte');
               }
             });
+            // store.dispatch('updateTransportProvider', tpSave);
+            router.push('/proveedores-de-transporte');
           }
         });
       };

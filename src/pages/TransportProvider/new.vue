@@ -83,7 +83,7 @@
               @update:driverPhone="newDriver.phone = $event"
               @update:driverEmail="newDriver.email = $event"
               @update:driverTType="newDriver.vehicleType = $event"
-              @update:driverTId="newDriver.vehicleId = $event"
+              @update:driverTId="newDriver.transportId = $event"
               @update:driverObs="newDriver.observations = $event"
             />
             <button
@@ -125,7 +125,7 @@
           :phone="driver.phone"
           :email="driver.email"
           :vehicleType="driver.vehicleType"
-          :vehicleId="driver.vehicleId"
+          :transportId="driver.transportId"
           :observations="driver.observations"
           @delete-driver="deleteDriver(index)"
           @edit-driver="editDriver(index)"
@@ -191,7 +191,7 @@
         phone: '',
         email: '',
         vehicleType: '',
-        vehicleId: '',
+        transportId: '',
         observations: '',
       });
 
@@ -212,7 +212,7 @@
         newDriver.phone = driver.phone;
         newDriver.email = driver.email;
         newDriver.vehicleType = driver.vehicleType;
-        newDriver.vehicleId = driver.vehicleId;
+        newDriver.transportId = driver.transportId;
         newDriver.observations = driver.observations;
       };
 
@@ -221,7 +221,7 @@
         newDriver.phone = '';
         newDriver.email = '';
         newDriver.vehicleType = '';
-        newDriver.vehicleId = '';
+        newDriver.transportId = '';
         newDriver.observations = '';
       };
 
@@ -253,7 +253,7 @@
           newDriver.phone !== '' &&
           newDriver.email !== '' &&
           newDriver.vehicleType !== '' &&
-          newDriver.vehicleId !== ''
+          newDriver.transportId !== ''
         );
       });
 
@@ -284,8 +284,10 @@
       const save = async () => {
         const representanteDone = ref(false);
         const transportProviderDone = ref(false);
+  
         if (hasFullNewDriver) {
           drivers.push(newDriver);
+          addDriver();
         }
         //
         const { data: compRepData, isFinished: compRepDone } = useAxios(
@@ -321,6 +323,8 @@
                 drivers.forEach((driver) => {
                   const { id, ...newDriver } = driver;
                   newDriver.transportProviderId = tpId;
+                  console.log('newDriver.transportProviderId', newDriver.transportProviderId)
+                  console.log('new Driver', newDriver)
                   const { data } = useAxios(
                     `/driver/`,
                     { method: 'POST', data: newDriver },

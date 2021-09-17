@@ -41,7 +41,7 @@
       :data="driverTId"
       @update:data="driverTId = $event"
     />
-    <FieldTextArea
+    <!-- <FieldTextArea
       class="col-span-full"
       fieldName="observations"
       placeholder="Observaciones..."
@@ -51,7 +51,7 @@
       isOptional
       :data="driverObs"
       @update:data="driverObs = $event"
-    />
+    /> -->
   </FieldGroup>
 </template>
 

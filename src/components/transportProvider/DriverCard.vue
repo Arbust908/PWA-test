@@ -10,7 +10,7 @@
     <div><span class="font-bold">Teléfono:</span> {{phone}}</div>
     <div><span class="font-bold">Mail:</span> {{email}}</div>
     <div><span class="font-bold">Tipo de transporte:</span> {{vehicleType}}</div>
-    <div><span class="font-bold">Patente:</span> {{vehicleId}}</div>
+    <div><span class="font-bold">Patente:</span> {{transportId}}</div>
     <div><span class="font-bold">Observaciones:</span> {{observations}}</div>
   </div>
 </template>
@@ -37,7 +37,7 @@
         type: String,
         required: true
       },
-      vehicleId: {
+      transportId: {
         type: String,
         required: true
       },

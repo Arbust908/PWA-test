@@ -229,6 +229,7 @@ export interface TransportProvider {
     providerNotificationId: number; // no se si va aca
     providerNotification?: ProviderNotification; // no se si va aca
     purchaseOrders?: PurchaseOrder[]; // no se si va aca
+    drivers?: Driver[];
 }
 
 export interface ProviderNotification { // ??? Dudas
