@@ -1,5 +1,5 @@
 <template>
-  <BaseBtn :type="type" :size="size">
+  <BaseBtn btn="none" :type="type" :size="size">
     <slot> Nada </slot>
   </BaseBtn>
 </template>
@@ -24,24 +24,5 @@
 </script>
 
 <style lang="scss" scoped>
-  button {
-    &:hover {
-      @apply bg-second-100 bg-opacity-50;
-    }
-  }
-  button[size='xs'] {
-    @apply px-2.5 py-1.5;
-  }
-  button[size='sm'] {
-    @apply px-3 py-2;
-  }
-  button[size='md'] {
-    @apply px-4 py-2;
-  }
-  button[size='lg'] {
-    @apply px-4 py-2;
-  }
-  button[size='xl'] {
-    @apply px-6 py-3;
-  }
+  @import '@/assets/button.scss';
 </style>

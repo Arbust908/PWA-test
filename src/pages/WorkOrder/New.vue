@@ -90,8 +90,7 @@
           class="pb-4 mb-2 border-b md:pb-0 md:mb-0 md:border-none"
         >
           <GhostBtn
-            class="btn__draft w-full md:w-auto justify-center"
-            size="lg"
+            class="w-full md:w-auto justify-center"
             @click.prevent="addCrew"
           >
             Agregar Crew
@@ -108,21 +107,21 @@
         >
           <NoneBtn
             class="order-last sm:order-none"
-            size="lg"
+            
             @click.prevent="$router.push('/orden-de-trabajo')"
           >
             Cancelar
           </NoneBtn>
-          <GhostBtn size="lg" class="btn__draft" @click="save()">
+          <GhostBtn  @click="save()">
             <BookmarkIcon class="w-4 h-4" />
             <span> Guardar Provisorio </span>
           </GhostBtn>
-          <PrimaryBtn v-if="isLoading" size="lg" disabled>
+          <PrimaryBtn v-if="isLoading"  disabled>
             Guardando...
           </PrimaryBtn>
           <PrimaryBtn
             v-else-if="!isLastSection()"
-            size="lg"
+            
             @click="nextSection"
           >
             Siguiente
@@ -131,7 +130,6 @@
             v-else
             :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
             :disabled="!isAllFull"
-            size="lg"
             @click="isAllFull && save(false)"
           >
             Finalizar
