@@ -464,13 +464,13 @@
     &.aisle {
       @apply text-second-300 text-second-300;
     }
-    &.fine {
+    &.fina {
       @apply text-orange-600 text-orange-600;
     }
-    &.thick {
+    &.gruesa {
       @apply text-green-600 text-green-600;
     }
-    &.cut {
+    &.cortada {
       @apply text-blue-600 text-blue-600;
     }
     &.blocked {

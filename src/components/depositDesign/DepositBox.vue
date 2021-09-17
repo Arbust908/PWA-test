@@ -76,12 +76,10 @@
       let visibleCategories = ref(props.visibleCategories)
 
       const isBlocked = () => {
+        console.log(visibleCategories.value)
         if(!visibleCategories.value) return false
-        if(visibleCategories.value.includes(category.value) || category.value == 'aisle') {
-          return false
-        } else {
-          return true
-        }
+        if(category.value == 'aisle') return true
+        else {return false}
       }
 
       return {
@@ -105,13 +103,13 @@
     &.aisle {
       @apply bg-second-300 text-second-300;
     }
-    &.fine {
+    &.fina {
       @apply bg-orange-600 text-orange-800 font-medium;
     }
-    &.thick {
+    &.gruesa {
       @apply bg-green-600 text-green-800 font-medium;
     }
-    &.cut {
+    &.cortada {
       @apply bg-blue-600 text-blue-800 font-medium;
     }
     &.blocked {

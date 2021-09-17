@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, watchEffect } from 'vue';
+  import { onMounted, ref, watchEffect } from 'vue';
   import { useToast } from 'vue-toastification'
 
   export default {
@@ -35,9 +35,10 @@
       const cradle = ref(props.cradle);
       const box = ref(props.box);
       const toast = useToast()
+      const wasBoxInCradle = ref(false)
 
       const handleSlotClick = (index) => {
-        if(isBoxInCradle()) {
+        if(wasBoxInCradle.value) {
           toast.error("La caja ya está ingresada")
           return
         }
@@ -54,17 +55,21 @@
         cradle.value.slots[index] = box.value
       };
 
-      const isBoxInCradle = () => {
+      const checkIfWasBoxPreviouslyInCradle = () => {
         let response = false
         cradle.value.slots.forEach(slot => {
           if(slot.boxId == box.value.boxId) response = true
         })
-        return response
+        return wasBoxInCradle.value = response
       }
 
       watchEffect(() => {
         box.value = props.box
         cradle.value = props.cradle
+      })
+
+      onMounted(async() => {
+        await checkIfWasBoxPreviouslyInCradle()
       })
 
       return {
@@ -95,19 +100,19 @@
       @apply text-second-400;
     }
   }
-  .fine {
+  .fina {
     @apply bg-orange-600;
     & .box-id {
       @apply text-orange-700;
     }
   }
-  .thick {
+  .gruesa {
     @apply bg-green-600;
     & .box-id {
       @apply text-green-700;
     }
   }
-  .cut {
+  .cortada {
     @apply bg-blue-600;
     & .box-id {
       @apply text-blue-700;

@@ -87,34 +87,34 @@
                 <h2 class="col-span-full text-xl font-bold">Referencias</h2>
                 <div class="flex flex-col gap-5 ml-4">
                   <span
-                    class="select-category fine"
-                    @click="setVisibleCategories('fine')"
+                    class="select-category fina"
+                    @click="setVisibleCategories('fina')"
                   >
                     <EyeIcon
                       class="icon"
-                      v-if="visibleCategories.includes('fine')"
+                      v-if="visibleCategories.includes('fina')"
                     />
                     <EyeIconOff class="icon" v-else />
                     Arena fina</span
                   >
                   <span
-                    class="select-category thick"
-                    @click="setVisibleCategories('thick')"
+                    class="select-category gruesa"
+                    @click="setVisibleCategories('gruesa')"
                   >
                     <EyeIcon
                       class="icon"
-                      v-if="visibleCategories.includes('thick')"
+                      v-if="visibleCategories.includes('gruesa')"
                     />
                     <EyeIconOff class="icon" v-else />
                     Arena gruesa</span
                   >
                   <span
-                    class="select-category cut"
-                    @click="setVisibleCategories('cut')"
+                    class="select-category cortada"
+                    @click="setVisibleCategories('cortada')"
                   >
                     <EyeIcon
                       class="icon"
-                      v-if="visibleCategories.includes('cut')"
+                      v-if="visibleCategories.includes('cortada')"
                     />
                     <EyeIconOff class="icon" v-else />
                     Caja cortada</span
@@ -446,10 +446,10 @@
       };
 
       const selectBox = (box: Box) => {
-        // clearBoxInCradleSlots(choosedBox.value.boxId);
+        clearBoxInCradleSlots(choosedBox.value.boxId);
         if (box.category == 'aisle') return;
-        // if (box.category == 'empty' || box.category != 'aisle') {
-        if (visibleCategories.value.includes(box.category)) {
+        if (box.category == 'empty' || box.category !== 'aisle') {
+        // if (visibleCategories.value.includes(box.category)) {
           const hasPos = [
             choosedBox.value.floor,
             choosedBox.value.row,
@@ -457,7 +457,7 @@
           ].some(Boolean);
           if (hasPos) {
             let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
-            // warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
+            warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
             warehouse.value.layout[`${prevBoxPosition}`].id = '';
           }
           const newBPos = `${box.floor}|${box.row}|${box.col}`;
@@ -637,13 +637,13 @@
     &.aisle {
       @apply text-second-300 text-second-300;
     }
-    &.fine {
+    &.fina {
       @apply text-orange-600 text-orange-600;
     }
-    &.thick {
+    &.gruesa {
       @apply text-green-600 text-green-600;
     }
-    &.cut {
+    &.cortada {
       @apply text-blue-600 text-blue-600;
     }
     &.blocked {
