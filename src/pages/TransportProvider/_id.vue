@@ -247,11 +247,15 @@
         const driver = { ...drivers[index] };
         deleteDriver(index);
 
+        if(activeSection.value === 'provider') {
+          changeSection('driver')
+        }
+
         newDriver.name = driver.name;
         newDriver.phone = driver.phone;
         newDriver.email = driver.email;
         newDriver.vehicleType = driver.vehicleType;
-        newDriver.transportId = driver.transportId;
+        newDriver.transportId = driver.vehicleId;
         newDriver.observations = driver.observations;
       };
 
