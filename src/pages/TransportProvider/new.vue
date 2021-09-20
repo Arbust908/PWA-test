@@ -173,7 +173,7 @@
     setup() {
       const store = useStore();
       const router = useRouter();
-      useTitle(`Nuevo Provedor de Transporte <> Sandflow`);
+      useTitle(`Nuevo Proveedor de Transporte <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });
