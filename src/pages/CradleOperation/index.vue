@@ -99,7 +99,7 @@
     </section>
     <footer class="p-4 space-x-8 flex justify-end items-center">
       <span class="mr-2 cursor-pointer" @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</span>
-      <PrimaryBtn type="submit" size="lg" @click.prevent="completeStageHandle">
+      <PrimaryBtn type="submit" @click.prevent="completeStageHandle">
         Finalizar
       </PrimaryBtn>
     </footer>

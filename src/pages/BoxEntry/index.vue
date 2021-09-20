@@ -200,7 +200,7 @@
       >
         Cancelar
       </GhostBtn>
-      <PrimaryBtn type="submit" size="lg" @click.prevent="save()">
+      <PrimaryBtn type="submit" @click.prevent="save()">
         Guardar
       </PrimaryBtn>
     </footer>

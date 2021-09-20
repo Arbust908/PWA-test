@@ -149,7 +149,6 @@
       </GhostBtn>
       <PrimaryBtn
         type="submit"
-        size="lg"
         :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
         :disabled="!isFull"
         @click.prevent="isFull && save()"
