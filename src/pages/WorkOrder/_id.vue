@@ -81,113 +81,10 @@
         @update:crews="crews = $event"
         @update:isFull="isRRHHFull = $event"
       />
-      <!-- <form
-        v-else-if="WO_section === 'rrhh'"
-        method="POST"
-        action="/"
-        class="p-4 md:flex md:flex-wrap md:gap-24 2xl:gap-32"
-      >
-        <fieldset
-          v-for="(crew, key) in crews"
-          :key="crew.id"
-          class="max-w-sm w-full"
-        >
-          <h2
-            class="
-              flex
-              justify-between
-              items-center
-              font-bold
-              text-2xl
-              pb-4
-              border-b
-              mb-3
-              w-full
-            "
-          >
-            <span>{{ crew.title }}</span>
-            <CircularBtn
-              v-if="key !== 0"
-              class="btn__delete"
-              size="xs"
-              @click="removeCrew(crew.id)"
-            >
-              <TrashIcon class="w-5 h-5" />
-            </CircularBtn>
-          </h2>
-          <section class="flex gap-2 flex-col xl:flex-row items-start mb-4">
-            <div class="flex flex-col">
-              <label :for="`crew-${crew.id}-start-time`">Hora de Inicio</label>
-              <TimePicker
-                :timetrack="Number(crew.timeStart)"
-                @update:timetrack="crew.timeStart = $event"
-              />
-            </div>
-            <div class="flex flex-col">
-              <label :for="`crew-${crew.id}-end-time`">Hora de Fin</label>
-              <TimePicker
-                :timetrack="Number(crew.timeEnd)"
-                @update:timetrack="crew.timeEnd = $event"
-              />
-            </div>
-          </section>
-          <section class="divide-y">
-            <article
-              v-for="(people, peopleI) in crew.resources"
-              :key="people.id"
-              class="pt-2 pb-3"
-            >
-              <div class="">
-                <label :for="`crew-${crew.id}-${people.id}-rol`" class="">
-                  Rol
-                </label>
-                <div class="pit-block relative">
-                  <input
-                    v-model="people.role"
-                    :name="`crew-${crew.id}-${people.id}-rol`"
-                    type="text"
-                    placeholder="Rol"
-                  />
-                  <CircularBtn
-                    v-if="peopleI !== 0"
-                    class="btn__delete md:absolute md:right-[-3rem]"
-                    size="sm"
-                    @click="removeResource(crew.id, people.id)"
-                  >
-                    <TrashIcon class="w-5 h-5" />
-                  </CircularBtn>
-                </div>
-              </div>
-              <div class="input-block">
-                <div class="mt-1">
-                  <label :for="`crew-${crew.id}-${people.id}-name`">
-                    <input
-                      v-model="people.name"
-                      :name="`crew-${crew.id}-${people.id}-name`"
-                      type="text"
-                      placeholder="Empleado"
-                    />
-                  </label>
-                </div>
-              </div>
-            </article>
-          </section>
-          <button
-            class="mt-1 flex items-center"
-            @click.prevent="addResource(crew.id)"
-          >
-            <CircularBtn class="btn__add" size="xs">
-              <PlusIcon class="w-4 h-4" />
-            </CircularBtn>
-            <span class="font-bold text-lg"> Agregar otro </span>
-          </button>
-        </fieldset>
-      </form> -->
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section>
           <GhostBtn
             v-if="isLastSection()"
-            class="btn__draft"
             @click.prevent="addCrew"
           >
             Agregar Crew
@@ -197,7 +94,7 @@
           <NoneBtn @click.prevent="$router.push('/orden-de-trabajo')">
             Cancelar
           </NoneBtn>
-          <GhostBtn class="btn__draft" @click="save()">
+          <GhostBtn @click="save()">
             <BookmarkIcon class="w-4 h-4" />
             <span> Guardar Provisorio </span>
           </GhostBtn>

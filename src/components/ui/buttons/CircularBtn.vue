@@ -1,7 +1,7 @@
 <template>
-  <BaseBtn class="circular" :type="type" :size="size">
+  <button class="circular" :type="type" :size="size">
     <slot></slot>
-  </BaseBtn>
+  </button>
 </template>
 
 <script>
@@ -24,25 +24,31 @@
 </script>
 
 <style lang="scss" scoped>
-  button {
-    @apply inline-flex items-center border shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500;
-    &.circular {
-      @apply rounded-full;
+    .circular {
+      @apply inline-flex items-center border shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-out;
+        @apply rounded-full;
     }
+  .circular[size='xs'] {
+    @apply text-xs p-1;
   }
-  button[size='xs'] {
-    @apply p-1;
+  .circular[size='sm'],
+  .circular[size='md'] {
+    @apply text-sm leading-4 font-semibold;
   }
-  button[size='sm'] {
+  .circular[size='sm'] {
     @apply p-1.5;
   }
-  button[size='md'] {
+  .circular[size='md'] {
     @apply p-2;
   }
-  button[size='lg'] {
+  .circular[size='lg'],
+  .circular[size='xl'] {
+    @apply text-base leading-6 font-medium;
+  }
+  .circular[size='lg'] {
     @apply p-2;
   }
-  button[size='xl'] {
+  .circular[size='xl'] {
     @apply p-3;
   }
 </style>

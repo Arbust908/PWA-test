@@ -1,4 +1,5 @@
 .btn {
+  @apply border-transparent inline-flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500 space-x-2 transition duration-150 ease-out;
   &__draft {
     @apply border-[#117E49] text-[#117E49] bg-transparent hover:bg-[#117E49] hover:bg-opacity-25 hover:shadow-lg;
   }
@@ -21,5 +22,32 @@
 
   &__desktop-only {
     @apply hidden lg:inline-flex;
+  }
+  &[size='xs'] {
+    @apply text-xs rounded px-2.5 py-1.5;
+  }
+  &[size='sm'] {
+    @apply text-sm leading-4 font-semibold rounded-md px-3 py-2;
+  }
+  &[size='md'] {
+    @apply text-base leading-4 font-medium rounded-md px-4 py-3;
+  }
+  &[size='lg'] {
+    @apply text-base leading-6 font-medium rounded-lg px-6 py-4;
+  }
+  &[size='xl'] {
+    @apply text-lg leading-6 font-light rounded-xl px-8 py-4;
+  }
+  &.main {
+    @apply text-white bg-main-600 hover:bg-main-700 border shadow-sm hover:shadow-lg;
+  }
+  &.secondary {
+    @apply text-main-700 bg-main-500 hover:bg-main-700 hover:text-white border shadow-sm hover:shadow-lg;
+  }
+  &.ghost {
+    @apply text-main-600 border shadow-sm hover:text-main-400 hover:shadow-lg;
+  }
+  &.none:hover {
+    @apply bg-second-100 bg-opacity-50;
   }
 }
