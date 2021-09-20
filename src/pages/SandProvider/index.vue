@@ -19,40 +19,52 @@
       </template>
       <template #body>
         <tr
-          v-for="(sp, spKey) in spDB"
-          :key="sp.id"
+          v-for="(sandProvider, spKey) in sandProviders"
+          :key="sandProvider.id"
           :class="spKey % 2 === 0 ? 'even' : 'odd'"
           class="body-row"
         >
-          <td :class="sp.name ? null : 'empty'">
-            {{ sp.name || 'Sin nombre' }}
+          <td :class="sandProvider.name ? null : 'empty'">
+            {{ sandProvider.name || 'Sin nombre' }}
           </td>
-          <td :class="sp.address ? null : 'empty'">
-            {{ sp.address || 'Sin dirección' }}
+          <td :class="sandProvider.address ? null : 'empty'">
+            {{ sandProvider.address || 'Sin dirección' }}
           </td>
-          <td :class="sp.legalId ? null : 'empty'">
-            {{ sp.legalId || 'Sin CUIL/CUIT' }}
+          <td :class="sandProvider.legalId ? null : 'empty'">
+            {{ sandProvider.legalId || 'Sin CUIL/CUIT' }}
           </td>
           <td>
             <div class="btn-panel">
-              <router-link :to="`/proveedores-de-arena/${sp.id}`" class="edit">
+              <router-link :to="`/proveedores-de-arena/${sandProvider.id}`" class="edit">
                 <Icon icon="PencilAlt" class="w-5 h-5" />
                 <span> Editar </span>
               </router-link>
-              <button class="delete" @click="deleteSP(sp.id)">
+              <button class="delete" @click="deleteSandProvider(sandProvider.id)">
                 <Icon icon="Trash" class="w-5 h-5" />
                 <span> Eliminar </span>
               </button>
             </div>
           </td>
         </tr>
-        <tr v-if="spDB.length <= 0">
+        <tr v-if="sandProviders.length <= 0">
           <td colspan="5" class="emptyState">
             <p>No hay proveedores de arena</p>
           </td>
         </tr>
       </template>
     </UiTable>
+    <Modal
+      type="off"
+      :open="notificationModalvisible"
+      @close="toggleNotificationModal"
+    >
+      <template #body>
+        <p>{{ errorMessage }}</p>
+        <button @click.prevent="toggleNotificationModal" class="closeButton">
+          Cerrar
+        </button>
+      </template>
+    </Modal>
   </Layout>
 </template>
 
@@ -64,8 +76,9 @@
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
-  import axios from 'axios';
-  const api = import.meta.env.VITE_API_URL || '/api';
+  import { useStoreLogic } from '@/helpers/useStoreLogic';
+  import Modal from '@/components/modal/General.vue';
+  import { useRouter } from 'vue-router';
 
   export default {
     components: {
@@ -73,65 +86,47 @@
       PrimaryBtn,
       UiTable,
       Icon,
+      Modal
     },
-    setup() {
+    setup() { 
       useTitle(`Proveedores de Arena <> Sandflow`);
-      const spDB = ref([]);
+      const sandProviders = ref([]);
       const store = useStore();
-      const sandProviders = JSON.parse(
-        JSON.stringify(store.state.sandProviders.all)
-      );
+      const router = useRouter();
       const loading = ref(false);
+      const notificationModalvisible = ref(false);
+      const toggleNotificationModal = () =>
+        (notificationModalvisible.value = !notificationModalvisible.value);
+      const errorMessage = ref('');
 
-      const getSP = async () => {
-        loading.value = true;
-        spDB.value = await axios
-          .get(`${api}/sandProvider`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data.data;
-            }
-            return [];
-          });
-
-        store.dispatch('setSandProviders', spDB.value);
-      };
-
-      const deleteSP = async (spID) => {
-        let response = await axios
-          .delete(`${api}/sandProvider/${spID}`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              console.log(res);
-              return res.data.data;
-            }
-            return [];
-          })
-          .finally(() => {
-            store.dispatch('deleteSandProvider', spID);
-            getSP();
-          });
-
-        return {
-          response,
-        };
+      const deleteSandProvider = async (spID) => {
+        await useStoreLogic(router, store, 'sandProvider', 'delete', spID).then((res) => {
+          if (res.type == 'failed') {
+            errorMessage.value = res.message;
+            toggleNotificationModal();
+          }
+          if (res.type == 'success') sandProviders.value = store.getters['getSandProviders'];
+        });
       };
 
       onMounted(async () => {
         loading.value = true;
-        await getSP();
+        await useStoreLogic(router, store, 'sandProvider', 'getAll').then((res) => {
+          if (res.type == 'failed') {
+            errorMessage.value = res.message;
+            toggleNotificationModal();
+          }
+          if (res.type == 'success') sandProviders.value = store.getters['getSandProviders'];
+        });
         loading.value = false;
       });
       return {
-        spDB,
-        deleteSP,
+        sandProviders,
+        deleteSandProvider,
         loading,
+        notificationModalvisible,
+        toggleNotificationModal,
+        errorMessage
       };
     },
   };
