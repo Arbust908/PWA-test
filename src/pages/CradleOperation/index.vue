@@ -130,6 +130,7 @@
   } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
+  import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
@@ -166,6 +167,7 @@
       Icon
     },
     setup() {
+      useTitle('Operación en cradle <> Sandflow')
       const router = useRouter();
       const store = useStore();
       const instance = axios.create({

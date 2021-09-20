@@ -37,7 +37,7 @@ export default {
         icon: 'Archive',
       },
       {
-        name: 'StageSheet',
+        name: 'Stage Sheet',
         to: '/stage-sheet',
         icon: 'DocumentReport',
       },
