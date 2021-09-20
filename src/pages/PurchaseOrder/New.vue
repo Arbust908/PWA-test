@@ -144,8 +144,6 @@
         </NoneBtn>
         <PrimaryBtn
           type="submit"
-          size="md"
-          class="p-6 bg-gray-400"
           :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
           :disabled="!isFull"
           @click.prevent="isFull && save()"
