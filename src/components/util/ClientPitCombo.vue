@@ -116,13 +116,13 @@
       };
       watch(pitId, (newVal) => {
         if (newVal >= 0) {
-          console.log('New pit ID', newVal);
+          // console.log(newVal);
           selectClientByPit(newVal);
         }
       });
       watch(clientId, (newVal) => {
         if (newVal >= 0) {
-          console.log('New client ID', newVal);
+          // console.log(newVal);
           filterPitsByClient(newVal);
         }
       });

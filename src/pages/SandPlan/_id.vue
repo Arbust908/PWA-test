@@ -366,7 +366,6 @@
         currentSandPlan.id = sp.id;
         console.log('SP Vuex', currentSandPlan);
       }
-      //   console.log(currentSandPlan);
 
       const addStage = () => {
         const defaultStage = {
@@ -459,6 +458,7 @@
         }
       });
       const selectedPitName = computed(() => {
+        console.log('computed-pitId', currentSandPlan.pitId);
         return Number(currentSandPlan.pitId) >= 0
           ? pits.value.find((pit) => pit.id == currentSandPlan.pitId)?.name ||
               'Pit'
@@ -521,9 +521,6 @@
                 (curS) => curS.id === stage.id
               );
             });
-            console.log(buckupStages.value);
-            console.log(deletingStages);
-            console.log(currentSandPlan.stages);
 
             deletingStages.map((stage) => {
               const { data } = useAxios(
