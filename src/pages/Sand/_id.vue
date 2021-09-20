@@ -7,7 +7,7 @@
         Arena - {{ type }}
       </h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm">
+    <section class="bg-white rounded-md shadow-sm max-w-2xl">
       <SandForm
         :type="type"
         :description="observations"

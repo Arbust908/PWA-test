@@ -7,7 +7,7 @@
         Nuevo Forklift
       </h1>
     </header>
-    <section class="bg-white rounded-md shadow-sm">
+    <section class="bg-white rounded-md shadow-sm max-w-2xl">
       <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
