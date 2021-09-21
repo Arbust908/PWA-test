@@ -9,7 +9,6 @@
     <UiTable>
       <template #header>
         <tr>
-          <th scope="col">ID</th>
           <th scope="col">Nombre y Apellido / Razón Social</th>
           <th scope="col">CUIL/CUIT</th>
           <th scope="col">Observaciones</th>
@@ -25,9 +24,6 @@
           :class="cKey % 2 === 0 ? 'even' : 'odd'"
           class="body-row"
         >
-          <td class="">
-            {{ client.id }}
-          </td>
           <td :class="client.name ? null : 'empty'">
             {{ client.name || 'Sin definir' }}
           </td>
