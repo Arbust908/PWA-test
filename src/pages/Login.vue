@@ -56,18 +56,14 @@
     setup() {
       useTitle('Login <> Sandflow');
       const selected_card = ref('login');
-      const selectedCard = (card) => {
+      const selectedCard = (card: string) => {
         selected_card.value = card;
         // Implementar cambio de titulo
       };
-      // const useCapitalize = (str) => {
-      //   return str.charAt(0).toUpperCase() + str.slice(1);
-      // };
 
       return {
         selected_card,
         selectedCard,
-        title,
       };
     },
   });

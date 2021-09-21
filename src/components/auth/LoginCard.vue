@@ -73,12 +73,12 @@
         </div>
 
         <div>
-          <Button
-            class="mx-auto px-6 bg-main-500"
+          <PrimaryBtn
+            class="mx-auto"
             @click.prevent="formValidation"
           >
             Iniciar sesión
-          </Button>
+          </PrimaryBtn>
         </div>
       </form>
     </article>
@@ -132,7 +132,7 @@
   import { useActions } from 'vuex-composition-helpers';
   import { Role } from '@/interfaces/sandflow';
   import Logo from '@/components/Logo.vue';
-  import Button from '@/components/ui/buttons/PrimaryBtn.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
 
   const Modal = defineAsyncComponent(
     () => import('@/components/modal/General.vue')
@@ -143,7 +143,7 @@
   export default defineComponent({
     components: {
       Logo,
-      Button,
+      PrimaryBtn,
       Modal,
     },
     setup() {
