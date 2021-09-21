@@ -64,9 +64,6 @@
 
       const forklift = reactive({
         name: '',
-        owned: '',
-        ownerName: '',
-        ownerContact: '',
         observations: '',
       });
 

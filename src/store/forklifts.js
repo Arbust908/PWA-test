@@ -73,10 +73,7 @@ export default {
     },
     create: async ({ commit }, payload) => {
       let forklift = {
-        name: payload.name || "",
-        owned: payload.owned || "",
-        ownerName: payload.ownerName || 0,
-        ownerContact: payload.ownerContact || "",
+        name: payload.name,
         observations: payload.observations || ""
       };
 
