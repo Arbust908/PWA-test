@@ -135,7 +135,7 @@
       );
 
       const id = Number(route.params.id);
-      useTitle(` max-w-2xlCliente ${id} <> Sandflow` max-w-2xl);
+      useTitle(`Cliente ${id} <> Sandflow`);
 
       const currentCompany: Company = companies.find((company) => {
         return company.id == id;
