@@ -23,6 +23,7 @@
           @update:spObs="currentSandProvider.observations = $event"
           @update:spMesh="meshType = $event"
           @add-mesh-type="addMeshType"
+          @delete-mesh-type="deleteMeshType"
         />
         <SandProviderRep
           :repName="companyRepresentative.name"
@@ -79,6 +80,8 @@
   import { useStoreLogic } from '@/helpers/useStoreLogic';
   // TIPOS
   import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
+  import axios from 'axios'
+import indexVue from './index.vue';
 
   export default {
     components: {
@@ -101,6 +104,8 @@
       const toggleNotificationModal = () =>
         (notificationModalvisible.value = !notificationModalvisible.value);
       const errorMessage = ref('');
+      const meshTypes = ref([])
+      const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
       const currentSandProvider: SandProvider = ref({})
       const isNewRep: Ref<boolean> = ref(false);
@@ -110,17 +115,14 @@
       let meshType = ref('');
 
       const addMeshType = (newMeshType: string) => {
-        console.log("agrega", newMeshType)
-        currentSandProvider.value.meshType.push(newMeshType);
-        meshType.value = '';
+        let mesh = meshTypes.value.filter(mesh => {
+          if(mesh.id == newMeshType) return mesh
+        })[0]
+        currentSandProvider.value.meshType.push(mesh);
       };
 
-      const deleteMeshType = (meshType: string) => {
-        currentSandProvider.value.meshType = currentSandProvider.value.meshType.filter(
-          (element) => {
-            return element !== meshType;
-          }
-        );
+      const deleteMeshType = (index: Object) => {
+        currentSandProvider.value.meshType.splice(index)
       };
 
       const providerFull: ComputedRef<boolean> = computed(() => {
@@ -158,19 +160,23 @@
       onMounted(async () => {
         loading.value = true;
         id.value = route.params.id
-        await useStoreLogic(router, store, 'sandProvider', 'getAll', id.value).then((res) => {
-          if (res.type == 'failed') {
-            errorMessage.value = res.message;
-            toggleNotificationModal();
-          }
-          if (res.type == 'success') {
-            const sandProviders = store.getters['getSandProviders']
-            currentSandProvider.value = sandProviders.filter(sandProvider => {
-              return sandProvider.id == id.value
-            })[0]
-            companyRepresentative.value = currentSandProvider.value.companyRepresentative
-          }
-        });
+
+        await axios.get(`${apiUrl}/sand`)
+        .then(res => {
+          meshTypes.value = res.data.data.map(sand => {
+            return {
+              id: sand.id,
+              type: sand.type
+            }
+          })
+        })
+
+        await axios.get(`${apiUrl}/sandProvider/${id.value}`)
+        .then(res => {
+          currentSandProvider.value = res.data.data
+          companyRepresentative.value = currentSandProvider.value.companyRepresentative
+        })
+
         loading.value = false;
       });
 
@@ -187,7 +193,8 @@
         deleteMeshType,
         notificationModalvisible,
         toggleNotificationModal,
-        errorMessage
+        errorMessage,
+        meshTypes
       };
     },
   };

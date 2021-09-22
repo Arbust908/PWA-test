@@ -22,6 +22,8 @@
           @update:spMeshTypes="sandProvider.meshType = $event"
           @update:spObs="sandProvider.observations = $event"
           @update:spMesh="meshType = $event"
+          @add-mesh-type="addMeshType"
+          @delete-mesh-type="deleteMeshType"
         />
         <SandProviderRep
           :repName="companyRepresentative.name"
@@ -63,7 +65,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, reactive, watch, ComputedRef } from 'vue';
+  import { ref, Ref, computed, ComputedRef, onMounted } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
@@ -76,12 +78,8 @@
   import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
   import Modal from '@/components/modal/General.vue';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
-
-  // AXIOS
   import axios from 'axios';
-  import { useAxios } from '@vueuse/integrations/useAxios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
-  // TIPOS
   import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
   export default {
@@ -101,6 +99,7 @@
       const instance = axios.create({
         baseURL: apiUrl,
       });
+      const meshTypes = ref([])
 
       const notificationModalvisible = ref(false);
       const toggleNotificationModal = () =>
@@ -128,26 +127,25 @@
       let meshType = ref('');
 
       const addMeshType = (newMeshType: string) => {
-        sandProvider.value.meshType.push(newMeshType);
-        meshType.value = '';
+        let mesh = meshTypes.value.filter(mesh => {
+          if(mesh.id == newMeshType) return mesh
+        })[0]
+        sandProvider.value.meshType.push(mesh);
       };
 
-      const deleteMeshType = (meshType: string) => {
-        sandProvider.value.meshType = sandProvider.value.meshType.filter(
-          (element) => {
-            return element !== meshType;
-          }
-        );
+      const deleteMeshType = (index: Object) => {
+        sandProvider.value.meshType.splice(index)
       };
+
 
       const providerFull: ComputedRef<boolean> = computed(() => {
         return !!(
           (
             sandProvider.value.name !== '' &&
             sandProvider.value.address !== '0' &&
-            sandProvider.value.legalId >= 0
-          ) /*&&*/
-          // (sandProvider.meshType.length > 0 || meshType.value !== '')
+            sandProvider.value.legalId >= 0 &&
+            sandProvider.value.meshType.length > 0
+          )
         );
       });
 
@@ -176,42 +174,23 @@
         );
       };
 
-      // const save = async () => {
-      //   const { data } = useAxios(
-      //     '/companyRepresentative',
-      //     { method: 'POST', data: companyRepresentative },
-      //     instance
-      //   );
-      //   watch(data, (newData, _) => {
-      //     if (newData && newData.data) {
-      //       const compRep = newData.data;
-      //       companyRepresentative.id = compRep.id;
-      //       sandProvider.companyRepresentativeId = compRep.id;
-      //       if (meshType.value !== '') {
-      //         sandProvider.meshType.push(meshType.value);
-      //       }
-      //       const { data: spData } = useAxios(
-      //         '/sandProvider',
-      //         { method: 'POST', data: sandProvider },
-      //         instance
-      //       );
-      //       watch(spData, (newData, _) => {
-      //         if (newData && newData.data) {
-      //           store.dispatch('saveSandProvider', sandProvider);
-      //           router.push('/proveedores-de-arena');
-      //         }
-      //       });
-      //     }
-      //   });
-      // };
+      onMounted(async () => {
+        await axios.get(`${apiUrl}/sand`)
+        .then(res => {
+          meshTypes.value = res.data.data.map(sand => {
+            return {
+              id: sand.id,
+              type: sand.type
+            }
+          })
+        })
+      })
 
       return {
         isNewRep,
         toggleRepStatus,
-        // companyRepresentativeId,
         companyRepresentative,
         sandProvider,
-        // companyRepresentatives,
         isFull,
         save,
         deleteMeshType,

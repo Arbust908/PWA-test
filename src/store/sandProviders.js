@@ -46,7 +46,6 @@ export default {
       await dispatch('verifyInternetConnection')
       if(!getters.getInternetConnection) return response.err = "Sin internet"
       let response = await dispatch(method, payload)
-      console.log("RESPONSEEEE",response)
 
       return response
     },

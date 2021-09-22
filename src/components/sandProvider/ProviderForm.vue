@@ -38,14 +38,14 @@
             fieldName="mesh"
             placeholder="Malla"
             isReadonly
-            :data="mesh"
+            :data="mesh.type"
           />
           <Icon
             icon="Trash"
             type="outline"
             size="lg"
             class="ml-3 w-5 h-5 cursor-pointer"
-            @click="deleteMeshType(mesh)"
+            @click="deleteMeshType(i)"
           />
         </div>
       </div>
@@ -82,7 +82,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, onMounted, watchEffect } from 'vue';
   import { useVModels } from '@vueuse/core';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
@@ -127,15 +127,14 @@
     setup(props, { emit }) {
       const { spName, spLegalId, spAddress, spMeshTypes, spMesh, spObs } =
         useVModels(props, emit);
-      const deleteMeshType = (mesh) => {
-        spMeshTypes.value = spMeshTypes.value.filter((m) => {
-          return m !== mesh;
-        });
+
+      const deleteMeshType = (index: Number) => {
+        emit('delete-mesh-type',index)
       };
-      const addMeshType = (mesh: string) => {
-        spMeshTypes.value.push(mesh);
-        spMesh.value = '';
+      const addMeshType = (mesh: Object) => {
+        emit('add-mesh-type',mesh)
       };
+
       return {
         deleteMeshType,
         addMeshType,
