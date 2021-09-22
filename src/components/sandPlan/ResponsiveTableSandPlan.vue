@@ -163,9 +163,9 @@
       </td>
     </tr>
     <tr>
-      <th scope="col" class="px-6 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider flex-1 text-center">Estado</th>
+      <th scope="col" class="px-6 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider flex-1 text-left">Estado</th>
       <td>
-        <Pill :type="pill.status" class="m-auto uppercase p-1"> {{ pill.name }} </Pill>
+        <Pill :type="pill.status" class="uppercase p-1 float-right"> {{ pill.name }} </Pill>
       </td>
     </tr>
     <div class="separador-final ml-6 mt-6 mb-6"/>

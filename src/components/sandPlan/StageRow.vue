@@ -108,13 +108,13 @@
       <!-- Mecanica de x/total para ir agregando / descontando -->
     </td>
 
-    <td class="px-1 py-4 whitespace-nowrap text-sm">
-      <Pill :type="pill.status" class="mx-auto uppercase p-1">
+    <td class="px-1 py-4 whitespace-nowrap text-center text-sm">
+      <Pill :type="pill.status" class="uppercase p-1">
         {{ pill.name }}
       </Pill>
     </td>
     <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
-      <div class="flex justify-end gap-x-2">
+      <div class="flex justify-center gap-x-2">
         <Popper hover content="Duplicar etapa">
           <button
             @click.prevent="duplicateStage"
