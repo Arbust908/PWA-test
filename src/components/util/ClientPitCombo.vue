@@ -77,7 +77,6 @@
           const waiter = setInterval(() => {
             if (backupPits.value) {
               pits.value = backupPits.value.filter((pit: Pit) => {
-                console.log(pit.companyId, clientId);
                 return pit.companyId == clientId;
               });
               if (pits.value.length === 1) {
@@ -89,7 +88,6 @@
                 pitId.value = proxyPitId;
               }
               clearInterval(waiter);
-              console.log('passed waiter');
             }
           }, 1000);
         }, 100);
@@ -105,10 +103,8 @@
                 return client.id == curPit.companyId;
               }).id || -1;
             if (selectedClientId >= 0) {
-              console.log('Slected Client')
               clientId.value = Number(selectedClientId) || -1;
             } else {
-              console.log('No Client');
               clientId.value = -1;
             }
           }, 100);
@@ -116,13 +112,11 @@
       };
       watch(pitId, (newVal) => {
         if (newVal >= 0) {
-          // console.log(newVal);
           selectClientByPit(newVal);
         }
       });
       watch(clientId, (newVal) => {
         if (newVal >= 0) {
-          // console.log(newVal);
           filterPitsByClient(newVal);
         }
       });

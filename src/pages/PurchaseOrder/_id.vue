@@ -217,42 +217,43 @@
         return po.id == id;
       });
       const currentPurchaseOrder = ref(purchaseOrder);
-      const sandProviderId = ref(currentPurchaseOrder.value.sandProviderId);
+      const sandProviderId = ref(currentPurchaseOrder?.value?.sandProviderId ?? 0);
       const transportProviderId = ref(
-        currentPurchaseOrder.value.transportProviderId
+        currentPurchaseOrder?.value?.transportProviderId ?? 0
       );
       const transportProvider = ref(
-        currentPurchaseOrder.value.transportProvider
+        currentPurchaseOrder?.value?.transportProvider ?? 0
       );
-      const sandOrder = ref(currentPurchaseOrder.value.sandOrders);
+      const sandOrder = ref(currentPurchaseOrder?.value?.sandOrders ?? 0);
       const companyClientId: Ref<number> = ref(
-        currentPurchaseOrder.value.companyId
+        currentPurchaseOrder?.value?.companyId ?? 0
       );
-      const pitId: Ref<number> = ref(currentPurchaseOrder.value.pitId);
+      const pitId: Ref<number> = ref(currentPurchaseOrder?.value?.pitId ?? 0);
       const sandProvidersIds = ref(
-        currentPurchaseOrder.value.sandOrders.reduce((sPIs, so, i) => {
-          const currentSPI = sPIs.find((spi) => {
-            return spi.id == so.sandProviderId;
-          });
-          const newSO = {
-            id: i,
-            sandTypeId: so.sandTypeId,
-            amount: so.amount,
-            boxId: so.boxId,
-          };
-          if (currentSPI) {
-            currentSPI.sandOrders.push(newSO);
-          } else {
-            const newSPI = {
-              innerID: i,
-              id: so.sandProviderId,
-              sandOrders: [],
-            };
-            newSPI.sandOrders.push(newSO);
-            sPIs.push(newSPI);
-          }
-          return sPIs;
-        }, [])
+        // currentPurchaseOrder.value.sandOrders.reduce((sPIs, so, i) => {
+        //   const currentSPI = sPIs.find((spi) => {
+        //     return spi.id == so.sandProviderId;
+        //   });
+        //   const newSO = {
+        //     id: i,
+        //     sandTypeId: so.sandTypeId,
+        //     amount: so.amount,
+        //     boxId: so.boxId,
+        //   };
+        //   if (currentSPI) {
+        //     currentSPI.sandOrders.push(newSO);
+        //   } else {
+        //     const newSPI = {
+        //       innerID: i,
+        //       id: so.sandProviderId,
+        //       sandOrders: [],
+        //     };
+        //     newSPI.sandOrders.push(newSO);
+        //     sPIs.push(newSPI);
+        //   }
+        //   return sPIs;
+        // }, [])
+        []
       );
       console.log('SPI', sandProvidersIds);
       // >> Init

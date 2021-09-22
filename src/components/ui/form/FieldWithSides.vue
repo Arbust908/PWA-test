@@ -19,7 +19,7 @@
 
 <script>
   import { defineComponent, watch } from 'vue';
-  import { useVModel } from '@vueuse/core';
+  import { useVModel, useCssVar } from '@vueuse/core';
   import { maska } from 'maska';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
   export default defineComponent({
@@ -65,6 +65,14 @@
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
+      const cssPre = useCssVar('--pre', 0);
+      const cssPost = useCssVar('--post', 0);
+      if (props.pre) {
+        cssPre.value = props.pre.width ?? '20%';
+      }
+      if (props.post) {
+        cssPost.value = props.post.width ?? '20%';
+      }
       return {
         value,
         ...props,

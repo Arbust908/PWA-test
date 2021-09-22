@@ -9,7 +9,7 @@
     </header>
     <section class="bg-white rounded-md shadow-sm">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-        <FieldGroup class="grid-cols-6 md:grid-cols-12 gap-6">
+        <FieldGroup class="max-w-2xl border-none">
           <ClientPitCombo
             :clientId="companyClientId"
             :pitId="pitId"
@@ -18,12 +18,11 @@
           />
         </FieldGroup>
         <FieldLegend>Arena</FieldLegend>
-        <div
+        <template
           v-for="(providerId, sandProvidersKey) in sandProvidersIds"
           :key="sandProvidersKey"
-          class="border-b pb-6"
         >
-          <FieldGroup class="sm:grid border-none max-w-full">
+          <FieldGroup class="max-w-2xl border-none">
             <FieldSelect
               class="col-span-12 sm:col-span-6"
               fieldName="sandProvider"
@@ -34,16 +33,14 @@
               @update:data="providerId.id = $event"
             />
           </FieldGroup>
-          <FieldGroup class="sm:grid items-center">
-            <template
+          <FieldGroup 
               v-for="(order, orderKey) in providerId.sandOrders"
               :key="orderKey"
-              class="border-none"
+              class="max-w-3xl relative"
             >
-              <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
               <FieldSelect
                 :title="orderKey === 0 ? 'Tipo' : ''"
-                class="col-span-12 sm:col-span-4 mt-3"
+                class="col-span-12 sm:col-span-5 mt-3"
                 fieldName="sandType"
                 placeholder="Tipo de Arena"
                 endpoint="/sand"
@@ -51,80 +48,44 @@
                 :data="order.sandTypeId"
                 @update:data="order.sandTypeId = $event"
               />
-              <!-- TODO: Input con Frente o Fondo fijo ;D -->
-              <label class="col-span-6 sm:col-span-2" for="sandQuantity">
-                <FieldWithSides
-                  :title="orderKey === 0 ? 'Cantidad' : ''"
-                  class="mt-3"
-                  fieldName="sandQuantity"
-                  placeholder="Arena"
-                  type="number"
-                  :post="{ title: '0', value: 't' }"
-                  :data="order.amount"
-                  @update:data="order.amount = $event"
-                />
-              </label>
+              <FieldWithSides
+                :title="orderKey === 0 ? 'Cantidad' : ''"
+                class="col-span-4 sm:col-span-3 mt-3"
+                fieldName="sandQuantity"
+                placeholder="Arena"
+                type="number"
+                :post="{ title: '0', value: 't', width: '3rem' }"
+                :data="order.amount"
+                @update:data="order.amount = $event"
+              />
               <FieldInput
                 :title="orderKey === 0 ? 'ID de caja' : ''"
-                :class="providerId.sandOrders.length > 1 ? 'col-span-4 sm:col-span-3 mt-3' : 'col-span-6 sm:col-span-3 mt-3'"
+                class="col-span-6 sm:col-span-4 mt-3"
                 fieldName="sandBoxId"
                 placeholder="ID"
+                isOptional
                 :data="order.boxId"
                 @update:data="order.boxId = $event"
               />
-              <Icon
-                v-if="providerId.sandOrders.length > 1"
-                icon="Trash"
-                type="outline"
-                class="w-6 mt-7 h-6 cursor-pointer"
-                @click="removeOrder(order.id, providerId.innerId)"
-              />
-            </template>
-            <div class="flex items-center col-span-12">
-              <div
-                class="icon-button"
-                v-if="sandProvidersIds.length > 1"
-                @click.prevent="removeSandProvider(providerId.innerId)"
-              >
-                <Icon
-                  icon="Trash"
-                  type="outline"
-                  class="w-5 h-5 items-center"
-                />
-                Borrar proveedor
+              <div class="absolute bottom-6 left-full ml-2 flex gap-2">
+                <CircularBtn v-if="providerId.sandOrders.length > 1" size="md" btnClass="p-1">
+                  <Icon
+                    icon="Trash"
+                    type="outline"
+                    class="w-6 h-6"
+                    @click="removeOrder(order.id, providerId.innerId)"
+                  />
+                </CircularBtn>
+                <CircularBtn size="md" btnClass="bg-green-500">
+                  <Icon 
+                    icon="Plus"
+                    class="w-8 h-8 text-white"
+                     @click.prevent="addOrder(providerId.innerId)"
+                  />
+                </CircularBtn>
               </div>
-              <div
-                :class="[
-                  'icon-button',
-                  sandProvidersIds.length - 1 !== sandProvidersKey
-                    ? ''
-                    : 'ml-3',
-                ]"
-                v-if="sandProvidersIds.length - 1 == sandProvidersKey"
-                @click.prevent="addSandProvider"
-              >
-              </div>
-            </div>
           </FieldGroup>
-          <template v-for="(order, orderKey) in providerId.sandOrders" 
-            :key="orderKey"
-            class="border-none"
-          >
-            <div class="col-span-full mt-2 pb-4 mb-4"
-            v-if="providerId.sandOrders.length - 1 == orderKey">
-              <button
-                class="flex items-center p-1"
-                @click.prevent="addOrder(providerId.innerId)"
-              >
-              <Icon 
-                icon="PlusCircle" outline 
-                class="w-6 h-6 text-green-500"
-              />
-                <span class="font-semibold text pl-1">Agregar Proveedor</span>
-              </button>
-            </div>
-          </template>
-        </div>
+        </template>
         <FieldGroup>
           <FieldLegend>Transporte</FieldLegend>
           <FieldSelect
@@ -143,15 +104,20 @@
           Cancelar
         </NoneBtn>
         <PrimaryBtn
-          type="submit"
           :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
           :disabled="!isFull"
-          @click.prevent="isFull && save()"
+          @click.prevent="isFull && confirm()"
         >
           Crear Orden 
         </PrimaryBtn>
       </footer>
     </section>
+    <OrderModal
+      :showModal="showModal"
+      :po="po"
+      @close="showModal = false"
+      @confirm="save()"
+    />
   </Layout>
 </template>
 
@@ -188,6 +154,7 @@
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
   import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+  import OrderModal from '@/components/purchaseOrder/Modal.vue';
   const api = import.meta.env.VITE_API_URL || '/api';
 
   export default {
@@ -203,6 +170,7 @@
       FieldWithSides,
       ClientPitCombo,
       Icon,
+      OrderModal,
     },
     setup() {
       useTitle('Nueva orden de pedido <> Sandflow');
@@ -210,8 +178,7 @@
       const instance = axios.create({
         baseURL: api,
       });
-      // >> Init
-      // :: Proveedores de Sand
+      const showModal = ref(false);
       const sandProvidersIds = ref([
         {
           innerId: 0,
@@ -339,7 +306,7 @@
             return (
               spi.sandOrders &&
               spi.sandOrders.every((so) => {
-                return so.sandTypeId >= 0 && so.amount > 0 && so.boxId !== '';
+                return so.sandTypeId >= 0 && so.amount > 0 ;
               })
             );
           });
@@ -352,15 +319,26 @@
           hasTransport
         );
       });
-      // const { savePurchaseOrder } = useActions(['savePurchaseOrder']);
-      const save = (): void => {
-        console.table({
-          companyId: companyClientId.value,
-          companyClientId: companyClientId.value,
-          pitId: pitId.value,
-          sandProviderId: sandProvidersIds.value[0].id,
-          transportProviderId: transportProviderId.value,
+      const po = ref(null);
+      const confirm = () => {
+        const sp = sandProviders.value.find((sandP) => {
+          return sandP.id === sandProvidersIds.value[0].id;
         });
+        const tp = transportProviders.value.find((transportP) => {
+          return transportP.id === transportProviderId.value;
+        });
+        const currentOrder = sandProvidersIds.value[0].sandOrders[0];
+        const sand = sandTypes.value.find((sT) => {
+          return currentOrder.sandTypeId === sT.id;
+        })
+        po.value = {
+          sandProvider: { ...sp },
+          sandOrder: { ...currentOrder, ...sand },
+          transportProvider: { ...tp},
+        }
+        showModal.value = true;
+      }
+      const save = (): void => {
         if (isFull.value) {
           // Formateamos la orden de pedido
           const purchaseOrder: PurchaseOrder = {
@@ -429,6 +407,9 @@
         sandProvidersIds,
         addSandProvider,
         removeSandProvider,
+        confirm,
+        showModal,
+        po,
       };
     },
   };

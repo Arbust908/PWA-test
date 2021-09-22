@@ -1,6 +1,8 @@
 <template>
-  <button class="circular" :type="type" :size="size">
-    <slot></slot>
+  <button :type="type" :size="size">
+    <div :class="btnClass" class="circular">
+      <slot></slot>
+    </div>
   </button>
 </template>
 
@@ -16,6 +18,10 @@
         type: String,
         default: 'md',
       },
+      btnClass: {
+        type: String,
+        default: '',
+      }
     },
     components: {
       BaseBtn,
@@ -24,31 +30,31 @@
 </script>
 
 <style lang="scss" scoped>
-    .circular {
-      @apply inline-flex items-center border shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-out;
-        @apply rounded-full;
+  .circular {
+    @apply inline-flex justify-center items-center transition duration-150 ease-out rounded-full m-auto;
+    &:hover {
+      @apply bg-opacity-75 shadow-lg
     }
-  .circular[size='xs'] {
-    @apply text-xs p-1;
   }
-  .circular[size='sm'],
-  .circular[size='md'] {
-    @apply text-sm leading-4 font-semibold;
+  button {
+    @apply inline-flex justify-center items-center rounded-full focus:outline-none transition duration-150 ease-out;
+    &:focus .circular {
+      @apply outline-none ring-2 ring-offset-2 ring-indigo-500
+    }
   }
-  .circular[size='sm'] {
-    @apply p-1.5;
+  button[size='xs'] {
+    @apply w-8 h-8;
   }
-  .circular[size='md'] {
-    @apply p-2;
+  button[size='sm'] {
+    @apply w-10 h-10;
   }
-  .circular[size='lg'],
-  .circular[size='xl'] {
-    @apply text-base leading-6 font-medium;
+  button[size='md'] {
+    @apply w-12 h-12;
   }
-  .circular[size='lg'] {
-    @apply p-2;
+  button[size='lg'] {
+    @apply w-14 h-14;
   }
-  .circular[size='xl'] {
-    @apply p-3;
+  button[size='xl'] {
+    @apply w-16 h-16;
   }
 </style>

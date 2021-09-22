@@ -19,27 +19,27 @@ label {
 }
 .input_side {
   & > input {
+    // width: calc(100% - calc(var(--pre, 0) + var(--post, 0)));
     @apply border-0 border-t border-b border-second-300 pt-3 pb-2.5;
     &.n-pre {
-      @apply border-l rounded-l w-10/12;
+      @apply border-l rounded-l;
     }
     &.n-post {
-      @apply border-r rounded-r w-10/12;
-    }
-    &.n-pre.n-post {
-      @apply w-8/12
+      @apply border-r rounded-r;
     }
   }
 }
 .pre,
 .post {
-  @apply inline-flex items-center px-3 border border-second-300 bg-second-50 text-second-500 w-2/12;
+  @apply inline-flex items-center justify-center border border-second-300 bg-second-50 text-second-500 text-center;
 }
 .pre {
-  @apply w-full rounded-l;
+  width: var(--pre, 0);
+  @apply rounded-l;
 }
 .post {
-  @apply mx-auto rounded-r text-center;
+  width: var(--post, 0);
+  @apply rounded-r;
 }
 
 .n-pre {
