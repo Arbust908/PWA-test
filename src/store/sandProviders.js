@@ -46,6 +46,7 @@ export default {
       await dispatch('verifyInternetConnection')
       if(!getters.getInternetConnection) return response.err = "Sin internet"
       let response = await dispatch(method, payload)
+      console.log("RESPONSEEEE",response)
 
       return response
     },
@@ -73,24 +74,38 @@ export default {
     create: async ({ commit }, payload) => {
       let sandProvider = {
         name: payload.name || "",
-        legalName: payload.legalName || "",
+        address: payload.address || "",
         legalId: payload.legalId || 0,
-        meshType: payload.meshType || "",
-        grains: payload.grains || "",
+        meshType: payload.meshType || [],
         observations: payload.observations || "",
-        companyRepresentativeId: payload.companyRepresentativeId || null
+        companyRepresentativeId: payload.companyRepresentativeId || null,
+        companyRepresentative: {
+          email: payload.companyRepresentative.email || "",
+          name: payload.companyRepresentative.name || "",
+          phone: payload.companyRepresentative.phone || "",
+        }
       };
 
       return await axios
-      .post(`${api}/sandProvider`, sandProvider)
-      .then((res) => {
+      .post(`${api}/companyRepresentative`, payload.companyRepresentative)
+      .then(async(res) => {
         if (res.status === 200) {
-          sandProvider.id = res.data.data.id;
-          commit('ADD_SANDPROVIDER', sandProvider);
-          return res.data.data
+          sandProvider.companyRepresentativeId = res.data.data.id
+          return await axios
+          .post(`${api}/sandProvider`, sandProvider)
+          .then((res) => {
+            if (res.data.data.id) {
+              sandProvider.id = res.data.data.id
+              commit('UPDATE_SANDPROVIDER', sandProvider);
+              return res.data.data
+            }
+          })
+          .catch((err) => {
+            return {status: "failed"}
+          })
         }
       })
-      .catch((err) => { 
+      .catch((err) => {
         return {status: "failed"}
       })
     },

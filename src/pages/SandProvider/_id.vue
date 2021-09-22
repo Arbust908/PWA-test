@@ -153,42 +153,6 @@
             if (res.type == 'success') return {res}
           }
         );
-        // const repId = currentSandProvider.companyRepresentativeId;
-        // const { data } = useAxios(
-        //   `/companyRepresentative/${repId}`,
-        //   { method: 'PUT', data: companyRepresentative },
-        //   instance
-        // );
-        // watch(data, (newData, _) => {
-        //   if (newData && newData.data) {
-        //     const compRep = newData.data;
-        //     companyRepresentative.id = compRep.id;
-        //     currentSandProvider.companyRepresentativeId = compRep.id;
-        //     let sandProviderData = {
-        //       address: currentSandProvider.address,
-        //       companyRepresentativeId: currentSandProvider.companyRepresentativeId,
-        //       id: currentSandProvider.id,
-        //       legalId: currentSandProvider.legalId,
-        //       meshType: currentSandProvider.meshType,
-        //       name: currentSandProvider.name,
-        //       observations: currentSandProvider.observations,
-        //     };
-        //     if (meshType.value !== '') {
-        //       currentSandProvider.meshType.push(meshType.value);
-        //     }
-        //     const { data: spData } = useAxios(
-        //       `/sandProvider/${id}`,
-        //       { method: 'PUT', data: sandProviderData },
-        //       instance
-        //     );
-        //     watch(spData, (newData, _) => {
-        //       if (newData && newData.data) {
-        //         store.dispatch('updateSandProvider', currentSandProvider);
-        //         router.push('/proveedores-de-arena');
-        //       }
-        //     });
-        //   }
-        // });
       };
 
       onMounted(async () => {
@@ -216,7 +180,6 @@
         toggleRepStatus,
         companyRepresentative,
         currentSandProvider,
-        Icon,
         isFull,
         save,
         meshType,
