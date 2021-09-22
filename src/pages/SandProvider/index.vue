@@ -1,7 +1,7 @@
 <template>
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Proovedores de arena</h2>
+      <h2 class="text-2xl font-semibold text-gray-900">Proveedores de arena</h2>
       <router-link to="/proveedores-de-arena/nuevo">
         <PrimaryBtn>Nuevo</PrimaryBtn>
       </router-link>
