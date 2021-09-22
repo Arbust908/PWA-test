@@ -10,18 +10,20 @@
     <section class="bg-white rounded-md max-w-2xl shadow-sm">
       <form method="POST" action="/" class="p-4 max-w-lg">
         <SandProviderForm
-          :spName="newSandProvider.name"
-          :spLegalId="newSandProvider.legalId"
-          :spAddress="newSandProvider.address"
-          :spMeshTypes="newSandProvider.meshType"
-          :spObs="newSandProvider.observations"
+          :spName="sandProvider.name"
+          :spLegalId="sandProvider.legalId"
+          :spAddress="sandProvider.address"
+          :spMeshTypes="sandProvider.meshType"
+          :spObs="sandProvider.observations"
           :spMesh="meshType"
-          @update:spName="newSandProvider.name = $event"
-          @update:spLegalId="newSandProvider.legalId = $event"
-          @update:spAddress="newSandProvider.address = $event"
-          @update:spMeshTypes="newSandProvider.meshType = $event"
-          @update:spObs="newSandProvider.observations = $event"
+          @update:spName="sandProvider.name = $event"
+          @update:spLegalId="sandProvider.legalId = $event"
+          @update:spAddress="sandProvider.address = $event"
+          @update:spMeshTypes="sandProvider.meshType = $event"
+          @update:spObs="sandProvider.observations = $event"
           @update:spMesh="meshType = $event"
+          @add-mesh-type="addMeshType"
+          @delete-mesh-type="deleteMeshType"
         />
         <SandProviderRep
           :repName="companyRepresentative.name"
@@ -47,11 +49,23 @@
         </section>
       </footer>
     </section>
+    <Modal
+      type="off"
+      :open="notificationModalvisible"
+      @close="toggleNotificationModal"
+    >
+      <template #body>
+        <p>{{ errorMessage }}</p>
+        <button @click.prevent="toggleNotificationModal" class="closeButton">
+          Cerrar
+        </button>
+      </template>
+    </Modal>
   </Layout>
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, reactive, watch, ComputedRef } from 'vue';
+  import { ref, Ref, computed, ComputedRef, onMounted } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
@@ -62,11 +76,10 @@
   import { useToggle } from '@vueuse/core';
   import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
   import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
-  // AXIOS
+  import Modal from '@/components/modal/General.vue';
+  import { useStoreLogic } from '@/helpers/useStoreLogic';
   import axios from 'axios';
-  import { useAxios } from '@vueuse/integrations/useAxios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
-  // TIPOS
   import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
   export default {
@@ -77,6 +90,7 @@
       Icon,
       SandProviderForm,
       SandProviderRep,
+      Modal
     },
     setup() {
       useTitle(`Nuevo Proveedor de Arena <> Sandflow`);
@@ -85,16 +99,23 @@
       const instance = axios.create({
         baseURL: apiUrl,
       });
+      const meshTypes = ref([])
+
+      const notificationModalvisible = ref(false);
+      const toggleNotificationModal = () =>
+        (notificationModalvisible.value = !notificationModalvisible.value);
+      const errorMessage = ref('');
 
       const isNewRep: Ref<boolean> = ref(false);
       const toggleRepStatus = useToggle(isNewRep);
-      const companyRepresentative: CompanyRepresentative = reactive({
+
+      const companyRepresentative: CompanyRepresentative = ref({
         name: '',
         phone: '',
         email: '',
       });
 
-      const newSandProvider: SandProvider = reactive({
+      const sandProvider: SandProvider = ref({
         name: '',
         address: '',
         legalId: null,
@@ -106,34 +127,33 @@
       let meshType = ref('');
 
       const addMeshType = (newMeshType: string) => {
-        newSandProvider.meshType.push(newMeshType);
-        meshType.value = '';
+        let mesh = meshTypes.value.filter(mesh => {
+          if(mesh.id == newMeshType) return mesh
+        })[0]
+        sandProvider.value.meshType.push(mesh);
       };
 
-      const deleteMeshType = (meshType: string) => {
-        newSandProvider.meshType = newSandProvider.meshType.filter(
-          (element) => {
-            return element !== meshType;
-          }
-        );
+      const deleteMeshType = (index: Object) => {
+        sandProvider.value.meshType.splice(index)
       };
+
 
       const providerFull: ComputedRef<boolean> = computed(() => {
         return !!(
           (
-            newSandProvider.name !== '' &&
-            newSandProvider.address !== '0' &&
-            newSandProvider.legalId >= 0
-          ) /*&&*/
-          // (newSandProvider.meshType.length > 0 || meshType.value !== '')
+            sandProvider.value.name !== '' &&
+            sandProvider.value.address !== '0' &&
+            sandProvider.value.legalId >= 0 &&
+            sandProvider.value.meshType.length > 0
+          )
         );
       });
 
       const repFull: ComputedRef<boolean> = computed(() => {
         return !!(
-          companyRepresentative.name !== '' &&
-          companyRepresentative.phone !== '' &&
-          companyRepresentative.email !== ''
+          companyRepresentative.value.name !== '' &&
+          companyRepresentative.value.phone !== '' &&
+          companyRepresentative.value.email !== ''
         );
       });
 
@@ -142,47 +162,43 @@
       });
 
       const save = async () => {
-        const { data } = useAxios(
-          '/companyRepresentative',
-          { method: 'POST', data: companyRepresentative },
-          instance
-        );
-        watch(data, (newData, _) => {
-          if (newData && newData.data) {
-            const compRep = newData.data;
-            companyRepresentative.id = compRep.id;
-            newSandProvider.companyRepresentativeId = compRep.id;
-            if (meshType.value !== '') {
-              newSandProvider.meshType.push(meshType.value);
+        sandProvider.value.companyRepresentative = companyRepresentative.value
+        await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value).then(
+          (res) => {
+            if (res.type == 'failed') {
+              errorMessage.value = res.message;
+              toggleNotificationModal();
             }
-            const { data: spData } = useAxios(
-              '/sandProvider',
-              { method: 'POST', data: newSandProvider },
-              instance
-            );
-            watch(spData, (newData, _) => {
-              if (newData && newData.data) {
-                store.dispatch('saveSandProvider', newSandProvider);
-                router.push('/proveedores-de-arena');
-              }
-            });
+            if (res.type == 'success') return {res}
           }
-        });
+        );
       };
+
+      onMounted(async () => {
+        await axios.get(`${apiUrl}/sand`)
+        .then(res => {
+          meshTypes.value = res.data.data.map(sand => {
+            return {
+              id: sand.id,
+              type: sand.type
+            }
+          })
+        })
+      })
 
       return {
         isNewRep,
         toggleRepStatus,
-        // companyRepresentativeId,
         companyRepresentative,
-        newSandProvider,
-        // companyRepresentatives,
+        sandProvider,
         isFull,
         save,
         deleteMeshType,
         addMeshType,
         meshType,
-        Icon,
+        notificationModalvisible,
+        toggleNotificationModal,
+        errorMessage
       };
     },
   };

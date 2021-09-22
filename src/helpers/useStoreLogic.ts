@@ -6,7 +6,7 @@ export async function useStoreLogic (router: Object, store: Object, entity: Stri
     }
     let routeName = entity.capitalize() 
     
-    if(res.createdAt && method == 'create') {
+    if(res && method == 'create') {
       router.push({name: routeName})
       return { type: "success", res }
     }
