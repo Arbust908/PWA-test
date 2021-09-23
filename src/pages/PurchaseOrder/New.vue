@@ -77,7 +77,7 @@
                   />
                 </CircularBtn>
                 <CircularBtn size="md" btnClass="bg-green-500">
-                  <Icon 
+                  <Icon
                     icon="Plus"
                     class="w-8 h-8 text-white"
                      @click.prevent="addOrder(providerId.innerId)"
@@ -97,6 +97,68 @@
             :data="transportProviderId"
             @update:data="transportProviderId = $event"
           />
+        <FieldGroup 
+              v-for="(to, toKey) in TransportOrders"
+              :key="toKey"
+              class="col-span-full max-w-xl relative"
+            >
+              <FieldInput
+                :title="useOnFirst(toKey, 'Patente')"
+                class="col-span-6 sm:col-span-3"
+                fieldName="trasportPatent"
+                placeholder="AA123AA"
+                endpoint="/sand"
+                endpointKey="type"
+                :data="to.licensePlate"
+                @update:data="to.licensePlate = $event"
+              />
+              <FieldInput
+                :title="useOnFirst(toKey, 'Cantidad')"
+                class="col-span-6 sm:col-span-3"
+                fieldName="boxAmount"
+                placeholder="0"
+                type="number"
+                :data="to.boxAmount"
+                @update:data="to.boxAmount = $event"
+              />
+              <FieldInput
+                :title="useOnFirst(toKey, 'Observaciones')"
+                class="col-span-8 sm:col-span-6"
+                fieldName="observations"
+                placeholder="Chasis shico"
+                isOptional
+                :data="to.observations"
+                @update:data="to.observations = $event"
+              />
+              <div
+                :class="isNotLastAndNotLonly(toKey, TransportOrders) ? 'bottom-6' : 'bottom-2'"
+                class="absolute left-full ml-2 flex gap-2"
+              >
+                <CircularBtn
+                  v-if="useIfNotLonly(TransportOrders)"
+                  size="md"
+                  btnClass="p-1"
+                  @click="removeTransportOrder(to.innerId)"
+                >
+                  <Icon
+                    icon="Trash"
+                    type="outline"
+                    class="w-6 h-6"
+                  />
+                </CircularBtn>
+                <!-- <CircularBtn
+                  v-if="isLast(toKey, TransportOrders)"
+                  size="md"
+                  btnClass="bg-green-500"
+                  @click.prevent="addTransportOrder()"
+                >
+                  <Icon 
+                    icon="Plus"
+                    class="w-8 h-8 text-white"
+                  />
+                </CircularBtn> -->
+              </div>
+          </FieldGroup>
         </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
@@ -113,6 +175,7 @@
       </footer>
     </section>
     <OrderModal
+      v-if="showModal"
       :showModal="showModal"
       :po="po"
       @close="showModal = false"
@@ -141,12 +204,14 @@
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
+  import { useOnFirst, useIfNotLonly, isFirst, isLast, isNotLastAndNotLonly } from '@/helpers/iteretionHelpers';
   import {
     Sand,
     SandOrder,
     SandProvider,
     PurchaseOrder,
     TransportProvider,
+    TransportOrder,
   } from '@/interfaces/sandflow';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
@@ -193,6 +258,32 @@
           ],
         },
       ] as Array<Object>);
+
+      const defaultTransportOrder = {
+          innerId: 0,
+          boxAmount: 0,
+          licensePlate: '',
+          observations: '',
+          purchaseOrderId: -1,
+          drvierId: null,
+        };
+
+      const TransportOrders: Ref<Array<TransportOrder>> = ref([
+        {
+          ...defaultTransportOrder,
+        }
+      ]);
+
+      const removeTransportOrder = (id: number) => {
+        TransportOrders.value = TransportOrders.value.filter(
+          (order) => order.innerId !== id
+        );
+      };
+
+      const addTransportOrder = () => {
+        const last = TransportOrders.value[TransportOrders.value.length - 1];
+        TransportOrders.value.push({ ...defaultTransportOrder, innerId: last.innerId + 1 });
+      };
 
       const addSandProvider = () => {
         const lastSPIndex = sandProvidersIds.value.length - 1;
@@ -272,7 +363,6 @@
           amount: null,
           boxId: '',
         });
-        console.log(sandProvidersIds.value);
       };
       // :: TransportProvider
       const transportProviders = ref([]);
@@ -311,12 +401,18 @@
             );
           });
         const hasTransport = transportProviderId.value >= 0;
+        const hasTransportOrders = !!(TransportOrders.value.length > 0 &&
+        TransportOrders.value.every((to) => { return to.boxAmount > 0; }) &&
+        TransportOrders.value.every((to) => { return to.licensePlate !== '' && to.licensePlate.length > 0; })
+        );
+
         return !!(
           hasPit &&
           hasClient &&
           validSandProviderIds &&
           validSandOrders &&
-          hasTransport
+          hasTransport &&
+          hasTransportOrders
         );
       });
       const po = ref(null);
@@ -327,19 +423,18 @@
         const tp = transportProviders.value.find((transportP) => {
           return transportP.id === transportProviderId.value;
         });
-        const currentOrder = sandProvidersIds.value[0].sandOrders[0];
-        const sand = sandTypes.value.find((sT) => {
-          return currentOrder.sandTypeId === sT.id;
-        })
         po.value = {
           sandProvider: { ...sp },
-          sandOrder: { ...currentOrder, ...sand },
+          sandOrders: [...sandProvidersIds.value[0].sandOrders],
+          sands: [...sandTypes.value],
           transportProvider: { ...tp},
+          transportOrders: TransportOrders.value,
         }
         showModal.value = true;
       }
       const save = (): void => {
         if (isFull.value) {
+          const currentTransportOrder = TransportOrders.value[0];
           // Formateamos la orden de pedido
           const purchaseOrder: PurchaseOrder = {
             companyId: companyClientId.value,
@@ -347,6 +442,7 @@
             pitId: pitId.value,
             sandProviderId: sandProvidersIds.value[0].id,
             transportProviderId: transportProviderId.value,
+            ...currentTransportOrder,
           };
           console.log(purchaseOrder);
           // Creamos via API la orden de pedido
@@ -358,14 +454,10 @@
           const sOisDone = ref([]);
           watch(pODone, (newVal, _) => {
             if (newVal && newVal.data) {
-              console.log('PO data', newVal.data);
-              console.log('SPIs', sandProvidersIds.value);
               // Recorremos los proveedores de sand
               sandProvidersIds.value.map((spI) => {
-                console.log('SPI', spI.sandOrders);
                 // Guradamos via api las ordenes de sand
                 spI.sandOrders.map((sO: SandOrder) => {
-                  console.log('SO', sO);
                   const { id, ...newSO } = sO;
                   newSO.purchaseOrderId = newVal.data.id;
                   newSO.sandProviderId = spI.id;
@@ -380,7 +472,6 @@
                       const ordenDePedido = pODone.value.data;
                       const pedidoDeArena = sOisDone.value;
                       ordenDePedido.sandOrders = pedidoDeArena;
-                      console.log('salimo');
                       router.push('/orden-de-pedido');
                     }
                   });
@@ -410,6 +501,14 @@
         confirm,
         showModal,
         po,
+        TransportOrders,
+        useOnFirst,
+        useIfNotLonly,
+        removeTransportOrder,
+        addTransportOrder,
+        isFirst,
+        isLast,
+        isNotLastAndNotLonly,
       };
     },
   };

@@ -9,7 +9,7 @@
     <UiTable>
       <template #header>
         <tr>
-          <th scope="col" title="Numero de Pedido">N°</th>
+          <!-- <th scope="col" title="Numero de Pedido">N°</th> -->
           <th scope="col">Proveedor de arena</th>
           <th scope="col">Proveedor de transporte</th>
           <!-- <th scope="col">Estado</th> -->
@@ -25,9 +25,9 @@
           :class="poKey % 2 === 0 ? 'even' : 'odd'"
           class="body-row"
         >
-          <td>
+          <!-- <td>
             {{ pO.id }}
-          </td>
+          </td> -->
           <td :class="pO.sandProvider ? null : 'empty'">
             {{ (pO.sandProvider && pO.sandProvider.name) || 'Sin proveedor' }}
           </td>
