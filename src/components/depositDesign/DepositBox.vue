@@ -77,6 +77,7 @@
 
       const isBlocked = () => {
         if(!visibleCategories.value) return false
+        if(!visibleCategories.value.includes(category.value)) return true
         if(category.value == 'aisle') return true
         else {return false}
       }

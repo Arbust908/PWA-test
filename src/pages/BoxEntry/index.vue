@@ -83,7 +83,7 @@
                 "
               >
                 <div>
-                  <BoxCard v-if="choosedBox.category !== ''" v-bind="choosedBox" />
+                  
                 <h2 class="col-span-full text-xl font-bold">Referencias</h2>
                 <div class="flex flex-col gap-5 mt-4">
                   <span
@@ -122,6 +122,14 @@
                   <span class="select-category aisle">Pasillo</span>
                   <span class="select-category full">Ocupado</span>
                 </div>
+                <BoxCard 
+                  v-if="choosedBox.category !== ''" 
+                  :floor="choosedBox.floor" 
+                  :row="choosedBox.row" 
+                  :col="choosedBox.col" 
+                  :category="choosedBox.category"
+                  :choosedBox="choosedBox"
+                />
                 </div>
               </section>
               <DepositGrid
@@ -217,7 +225,6 @@
     onMounted,
     watchEffect,
   } from 'vue';
-  import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
 
@@ -240,7 +247,6 @@
   import FieldInput from '@/components/ui/form/FieldInput.vue';
 
   import axios from 'axios';
-  import { useAxios } from '@vueuse/integrations/useAxios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
   export default defineComponent({
@@ -459,16 +465,21 @@
         return response
       }
 
-      const setSelectedBox = (id: Number) => {
-        choosedBox.value = boxes.value.filter((box) => {
-          if (box.boxId == id) {
-            if (choosedBox.value.category !== box.category) {
-              setVisibleCategories(choosedBox.value.category);
-              setVisibleCategories(box.category);
-            }
-            return box;
-          }
+      const setSelectedBox = async (id: Number) => {
+        choosedBox.value = await boxes.value.filter((box) => {
+          if (box.boxId == id) return box;
         })[0];
+        if(checkIfWasBoxInOriginalDeposit(id)) {
+          Object.entries(warehouse.value.layout).forEach(cell => {
+          if(cell[1].id == id) {
+            const proxy = cell[0].split('|');
+            const [floor, row, col] = proxy;
+            choosedBox.value.floor = parseInt(floor)
+            choosedBox.value.row = parseInt(row)
+            choosedBox.value.col = parseInt(col)
+          }
+        })
+        }
         choosedBox.value.wasOriginallyOnDeposit = checkIfWasBoxInOriginalDeposit(id)
         choosedBox.value.wasOriginallyOnCradle = checkIfWasBoxInOriginalCradle(id)
       };
@@ -518,12 +529,12 @@
 
       const warehouse = ref({});
       const originalWarehouseLayout = ref({});
-      let visibleCategories = ref([]);
+      let visibleCategories = ref(['fina', 'gruesa', 'cortada']);
 
       const setVisibleCategories = (category: String) => {
         if (visibleCategories.value.includes(category)) {
           visibleCategories.value.splice(
-            visibleCategories.value.indexOf(category)
+            visibleCategories.value.indexOf(category), 1
           );
         } else {
           visibleCategories.value.push(category);
@@ -607,11 +618,10 @@
           .catch((err) => console.error(err))
         }
 
-        watchEffect(() => {
-          if(warehouseDone.value && cradleDone.value) router.push('/');
-          if(warehouseDone.value && wasCradleModificated.value == false) router.push('/');
-          if(cradleDone.value && wasWarehouseModificated.value == false) router.push('/');
-        });
+        if(warehouseDone.value && cradleDone.value) router.push('/');
+        if(warehouseDone.value && wasCradleModificated.value == false) router.push('/');
+        if(cradleDone.value && wasWarehouseModificated.value == false) router.push('/');
+
       };
 
       return {

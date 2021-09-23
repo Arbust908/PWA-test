@@ -1,6 +1,9 @@
 <template>
   <article :class="category" class="card">
-    <BoxCardIcon class="icon" :category="category" />
+    <div class="box-card-and-id flex flex-col items-center">
+      <BoxCardIcon class="icon" :category="category" />
+      <p v-if="choosedBox" class="text-sm font-bold mt-1">ID {{choosedBox.boxId}}</p>
+    </div>
     <div class="flex flex-col justify-between">
       <div>
         <p class="text-sm font-bold leading-tight">Piso: {{ floor }}</p>
@@ -8,12 +11,16 @@
         <p class="text-sm font-bold leading-tight">Fila: {{ row }}</p>
       </div>
       <p class="text-sm">{{ makeValue }}</p>
+      <div class="extra-data mt-4" v-if="choosedBox">
+        <p class="text-sm">Arena {{choosedBox.category}}</p>
+        <p class="text-sm">Cantidad {{choosedBox.amount}}t</p>
+      </div>
     </div>
   </article>
 </template>
 
 <script lang="ts">
-  import { defineComponent, defineAsyncComponent, toRefs, computed } from 'vue';
+  import { defineComponent, toRefs, computed } from 'vue';
   import { BoxCategory } from '@/interfaces/sandflow';
   import BoxCardIcon from '@/components/depositDesign/BoxCardIcon.vue';
 
@@ -36,22 +43,26 @@
         type: String,
         required: true,
       },
+      choosedBox: {
+        type: Object,
+        required: false
+      }
     },
     components: {
       BoxCardIcon,
     },
     setup(props) {
-      const { floor, row, col, category } = toRefs(props);
+      const { floor, row, col, category, choosedBox } = toRefs(props);
       const makeValue = computed(() => {
         return BoxCategory[category.value];
       });
-
       return {
         floor,
         row,
         col,
         category,
         makeValue,
+        choosedBox
       };
     },
   });
@@ -59,7 +70,7 @@
 
 <style lang="scss" scoped>
   .card {
-    @apply p-4 rounded-2xl flex gap-6 bg-second-400 text-second-0;
+    @apply p-4 rounded-2xl flex gap-6 bg-second-400 text-second-0 mt-12;
     & .icon {
       @apply w-20 h-20;
     }
