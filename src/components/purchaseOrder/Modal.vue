@@ -1,18 +1,26 @@
 <template>
   <Modal type="off" :open="showModal" @close="$emit('close')">
       <template #body>
-        <div class="w-full max-w-sm text-left text-gray-800">
-            <h2 class="text-lg mb-6 font-semibold">Orden de pedido</h2>
-            <h3 class="mb-2 font-semibold">{{ po.sandProvider.name }}</h3>
-            <p>Pedido:</p>
-            <p>
-                {{ po.sandOrder.amount }}t - 
-                {{ po.sandOrder.type }} -
-                {{ po.sandOrder.boxId !== '' ? po.sandOrder.boxId : 'Sin ID de caja'}}
-            </p>
-            <hr class="my-2" />
-            <h3 class="mb-2 font-semibold">{{ po.transportProvider.name }}</h3>
-            <div class="w-full h-2"></div>
+        <h2 class="text-lg mb-6 font-semibold text-left text-gray-800">Orden de pedido</h2>
+        <div class="w-full max-w-sm text-left text-gray-800 divide-y">
+            <div class="space-y-2 pb-4">
+                <h3 class="font-semibold">{{ po.sandProvider.name }}</h3>
+                <p>Pedido:</p>
+                <template v-for="so in po.sandOrders">
+                    <p>
+                        {{ so.amount }}t - 
+                        {{ getSandType(so?.sandTypeId) }} -
+                        {{ so.boxId !== '' ? so.boxId : 'Sin ID de caja'}}
+                    </p>
+                </template>
+            </div>
+            <div class="space-y-2 py-4">
+                <h3 class="font-semibold">{{ po.transportProvider.name }}</h3>
+                <template v-for="tp in po.transportOrders">
+                   <p>Patente: {{ tp.licensePlate }}{{ tp.observations !== '' ? ' - ' + tp.observations : null }}</p>
+                    <p>Cantidad: {{ tp.boxAmount }} caja{{ tp.boxAmount > 1 ? 's' : null }}</p>
+                </template>
+            </div>
         </div>
       </template>
       <template #btn>
@@ -53,9 +61,13 @@
                 required: true,
             },
         },
-        setup(){
+        setup(props){
+            const getSandType = (sandTypeId: number) => {
+                const sandType = props.po.sands.find(st => st.id === sandTypeId);
+                return sandType ? sandType.type : 'Sin tipo de arena';
+            }
             return {
-                
+                getSandType,
             }
         }
     });
