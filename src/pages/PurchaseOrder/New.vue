@@ -97,11 +97,10 @@
             :data="transportProviderId"
             @update:data="transportProviderId = $event"
           />
-        </FieldGroup>
         <FieldGroup 
               v-for="(to, toKey) in TransportOrders"
               :key="toKey"
-              class="max-w-xl relative"
+              class="col-span-full max-w-xl relative"
             >
               <FieldInput
                 :title="useOnFirst(toKey, 'Patente')"
@@ -160,6 +159,7 @@
                 </CircularBtn> -->
               </div>
           </FieldGroup>
+        </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
         <NoneBtn @click.prevent="$router.push('/orden-de-pedido')">
