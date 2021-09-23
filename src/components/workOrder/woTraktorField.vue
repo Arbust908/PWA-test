@@ -32,19 +32,18 @@
         @update:data="traktor.description = $event"
       />
       <span
-        v-if="traktors.length > 1 && traktorI !== lastTraktorIndex"
-        
-        class="
-          flex
-          justify-center
-          items-center
-          col-span-1
-          cursor-pointer
-        "
-
+        v-if="traktors.length > 1"
+        class="flex justify-center items-center col-span-1 cursor-pointer"
         :class="traktorI == 0 ? 'mt-6' : 'mt-2'"
       >
-        <Icon icon="Trash" class="w-6 h-6 btn__delete" @click="remove(traktor.innerId)" />
+        <CircularBtn size="md" class="btn__delete">
+          <Icon
+            icon="Trash"
+            type="outline"
+            class="w-6 h-6"
+            @click="remove(traktor.innerId)"
+          />
+        </CircularBtn>
       </span>
     </FieldGroup>
     <button
@@ -87,6 +86,17 @@
       const lastTraktorIndex = computed(() => {
         return props.traktors.length - 1;
       });
+
+      const defaultTraktor = {
+          innerId: 0,
+          chassis: '',
+          supplier: '',
+          description: '',
+      }
+      if(traktors.value.length === 0) {
+        traktors.value.push(defaultTraktor);
+      }
+      
       const firstTraktorIndex = 0;
       const tracktorInnerId = ref(0);
       traktors.value = traktors.value.map((traktor) => {
