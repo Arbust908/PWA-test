@@ -83,8 +83,8 @@
         default: '',
       },
       tpId: {
-        type: Number,
-        default: 12345678901,
+        type: [String, Number],
+        default: '12345678901',
       },
       tpAddress: {
         type: String,

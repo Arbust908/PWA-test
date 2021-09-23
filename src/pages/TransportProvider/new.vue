@@ -8,7 +8,7 @@
       </h1>
     </header>
     <section class="flex">
-      <section class="w-7/12">
+      <section class="w-8/12">
         <nav class="flex justify-between max-w-2xl bg-white">
           <button
             :class="[
@@ -108,7 +108,7 @@
               </NoneBtn>
               <PrimaryBtn
                 :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                @click="isFull && save()"
+                @click="hasFullNewDriver && addDriver(); isFull && save()"
                 :disabled="!isFull"
               >
                 Finalizar
@@ -117,7 +117,7 @@
           </footer>
         </section>
       </section>
-      <section class="w-3/12 mt-12 ml-4">
+      <section class="w-4/12 mt-12 ml-4 flex flex-col gap-y-4">
         <DriverCard
           v-for="(driver, index) in drivers"
           :key="index"
@@ -197,7 +197,9 @@
 
       const addDriver = () => {
         const driver = { ...newDriver };
-        drivers.push(driver);
+        if(hasFullNewDriver){
+          drivers.push(driver);
+        }
         cleanNewDriver();
       };
 
@@ -286,7 +288,6 @@
         const transportProviderDone = ref(false);
   
         if (hasFullNewDriver) {
-          drivers.push(newDriver);
           addDriver();
         }
         //
