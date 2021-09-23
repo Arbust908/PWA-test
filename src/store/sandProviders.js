@@ -42,7 +42,8 @@ export default {
   },
   actions: {
     sandProviderDataHandler: async({dispatch, getters}, methodAndPayload) => {
-      const {method,payload} = methodAndPayload
+      let {method,payload} = methodAndPayload
+      method = `sandProvider_${method}`
       await dispatch('verifyInternetConnection')
       if(!getters.getInternetConnection) return response.err = "Sin internet"
       let response = await dispatch(method, payload)
@@ -52,7 +53,7 @@ export default {
     setSandProviders({commit}, sandProviders) {
       commit('SET_SANDPROVIDERS', sandProviders)
     },
-    getAll: async({commit}) => {
+    sandProvider_getAll: async({commit}) => {
       return await axios.get(`${api}/sandProvider`)
       .then((res) => {
         if(res.status == 200) {
@@ -64,13 +65,13 @@ export default {
         return {status: "failed"}
       })
     },
-    get: async(payload) => {
+    sandProvider_get: async(payload) => {
       return await axios.get(`${api}/sandProvider/${payload}`)
       .then((res) => {if(res.status == 200) return res.data.data
       })
       .catch((err) => {return err})
     },
-    create: async ({ commit }, payload) => {
+    sandProvider_create: async ({ commit }, payload) => {
       let sandProvider = {
         name: payload.name || "",
         address: payload.address || "",
@@ -108,7 +109,7 @@ export default {
         return {status: "failed"}
       })
     },
-    update: async ({ commit }, payload) => {
+    sandProvider_update: async ({ commit }, payload) => {
       return await axios
       .put(`${api}/companyRepresentative/${payload.companyRepresentativeId}`, payload.companyRepresentative)
       .then(async(res) => {
@@ -130,7 +131,7 @@ export default {
         return {status: "failed"}
       })
     },
-    delete: async({ commit }, payload) => {
+    sandProvider_delete: async({ commit }, payload) => {
       return await axios
       .delete(`${api}/sandProvider/${payload}`)
       .then((res) => {
