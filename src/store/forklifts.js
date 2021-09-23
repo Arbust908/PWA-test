@@ -42,7 +42,8 @@ export default {
   },
   actions: {
     forkliftDataHandler: async({dispatch, getters}, methodAndPayload) => {
-      const {method,payload} = methodAndPayload
+      let {method,payload} = methodAndPayload
+      method = `forklift_${method}`
       await dispatch('verifyInternetConnection')
       if(!getters.getInternetConnection) return response.err = "Sin internet"
       let response = await dispatch(method, payload)
@@ -52,7 +53,7 @@ export default {
     setForklifts({commit}, forklifts) {
       commit('SET_FORKLIFTS', forklifts)
     },
-    getAll: async({commit}) => {
+    forklift_getAll: async({commit}) => {
       return await axios.get(`${api}/forklift`)
       .then((res) => {
         if(res.status == 200) {
@@ -64,14 +65,14 @@ export default {
         return {status: "failed"}
       })
     },
-    get: async(payload) => {
+    forklift_get: async(payload) => {
       return await axios.get(`${api}/forklift/${payload}`)
       .then((res) => {if(res.status == 200) return response.data = res.data.data
       })
       .catch((err) => {return response = err})
       // Traer de la API o del Store? 
     },
-    create: async ({ commit }, payload) => {
+    forklift_create: async ({ commit }, payload) => {
       let forklift = {
         name: payload.name,
         observations: payload.observations || ""
@@ -90,7 +91,7 @@ export default {
         return {status: "failed"}
       })
     },
-    update: async ({ commit }, payload) => {
+    forklift_update: async ({ commit }, payload) => {
       return await axios
       .put(`${api}/forklift/${payload.id}`, payload)
       .then((res) => {
@@ -103,7 +104,7 @@ export default {
         return {status: "failed"}
       })
     },
-    delete: async({ commit }, payload) => {
+    forklift_delete: async({ commit }, payload) => {
       return await axios
       .delete(`${api}/forklift/${payload}`)
       .then((res) => {
