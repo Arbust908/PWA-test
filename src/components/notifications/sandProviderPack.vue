@@ -39,14 +39,14 @@
           @update:data="so.sandTypeId = $event"
         />
         <FieldWithSides
-          :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
+          :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-4 sm:col-span-3' "
           :title="Key === 0 ? 'Cantidad' : ''"
           :fieldName="`sandQuantity${Key}`"
           placeholder="0 t"
           type="number"
           :post="{ title: 'Peso en Toneladas', value: 't' }"
           :data="so.amount"
-          @update="so.amount = $event"
+          @update:data="so.amount = $event"
           />
         <!-- <AmountInput
           :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
@@ -54,15 +54,23 @@
           :amount="so.amount"
           @update:amount="so.amount = $event"
         /> -->
-        <div class="col-span-2 ml-2 my-auto">
+        <div class="col-span-1 my-auto mx-auto" v-if="sPov.SandOrders.length > 0 && Key +1 === sPov.SandOrders.length ">
+          <Icon 
+            icon="PlusCircle" outline 
+            class="w-6 h-6 mt-3 text-green-500"
+            :class="Key +1 === sPov.SandOrders.length ? 'mt-4' : null" 
+            @click.prevent="addSandOrder(sPov.innerId)"
+          />
+        </div>
+        <div class="col-span-1 ml-2 my-auto">
           <Icon v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length " 
             icon="Trash" outline 
-            class="w-5 h-5 mt-4" 
+            class="w-5 h-5 mt-4 " 
             @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
           />
         </div>
       </div>
-      <div class="col-span-full mt-2">
+      <!-- <div class="col-span-full mt-2">
         <button
           class="flex items-center p-1"
           @click.prevent="addSandOrder(sPov.innerId)"
@@ -73,7 +81,7 @@
         />
           <span class="font-semibold text pl-1">Agregar arena</span>
         </button>
-      </div>
+      </div> -->
     </template>
   </FieldGroup>
 </template>
