@@ -238,7 +238,8 @@ export interface ProviderNotification { // ??? Dudas
     sandProvider?: SandProvider;
     sandOrderId: number;
     sandOrder?: SandOrder;
-    transportProviders?: TransportProvider[];
+    transportProviderId: number;
+    transportProviders?: TransportProvider;
 }
 
 export interface PurchaseOrder {

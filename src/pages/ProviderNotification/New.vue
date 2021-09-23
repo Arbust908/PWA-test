@@ -35,7 +35,7 @@
               />
             </div>
             <FieldInput
-              class="col-span-full"
+              class="col-span-6"
               :fieldName="`transportAmount${tO.id}`"
               placeholder="Camiones"
               title="Cantidad de camiones"
@@ -43,7 +43,7 @@
               @update:data="tO.amount = $event"
             />
             <FieldInput
-              class="col-span-full"
+              class="col-span-6"
               :fieldName="`transportObservations${tO.id}`"
               placeholder="Observaciones"
               title="Observaciones"
@@ -51,7 +51,7 @@
               @update:data="tO.observation = $event"
             />
           </template>
-          <div class="col-span-full mt-1 pb-4 mb-4">
+          <!-- <div class="col-span-full mt-1 pb-4 mb-4">
             <button
               class="flex items-center p-1"
               @click.prevent="addTransportProvider"
@@ -62,7 +62,7 @@
             />
               <span class="font-semibold text pl-1">Agregar transporte</span>
             </button>
-          </div>
+          </div> -->
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
@@ -71,8 +71,6 @@
         </router-link>
         <PrimaryBtn
           type="submit"
-          size="sm"
-          class="p-4"
           :class="
             isSandFull || isTransportFull
               ? null
@@ -347,11 +345,37 @@
       const hasSaveSuccess = ref(false);
 
       const save = async () => {
-        pN.value = {
-          sandProviderId: Number(sandProviderIds.value[0].id),
-          sandOrderId: sandProviderIds.value[0].SandOrders[0].id,
-          transportProviderId: Number(transportOrder.value[0].id),
-        };
+        if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId < 0){
+          pN.value = {
+            sandProviderId: Number(sandProviderIds.value[0].id),
+            sandOrders: sandProviderIds.value[0].SandOrders,
+          }
+        }
+        if (transportOrder.value[0].transportProviderId > 0 && sandProviderIds.value[0].id < 0){
+          pN.value = {
+            transportProviderId: Number(transportOrder.value[0].transportProviderId),
+            cantidadCamiones: Number(transportOrder.value[0].amount),
+            observations: transportOrder.value[0].observation,
+          }
+        }
+        if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId > 0){
+          pN.value = {
+            textArena:'Arena',
+            sandProviderId: Number(sandProviderIds.value[0].id),
+            sandOrders: sandProviderIds.value[0].SandOrders,
+            textTransporte:'Transporte',
+            transportProviderId: Number(transportOrder.value[0].transportProviderId),
+            cantidadCamiones: Number(transportOrder.value[0].amount),
+            observations: transportOrder.value[0].observation,
+          };
+          console.log('Notificacion a ambos')
+        }
+        // pN.value = {
+        //   sandProviderId: Number(sandProviderIds.value[0].id),
+        //   sandOrderId: sandProviderIds.value[0].SandOrders[0].id,
+        //   transportProviderId: Number(transportOrder.value[0].transportProviderId),
+        // };
+        // console.log(transportOrder.value[0].transportProviderId);
         const response = await axios
           .post(`${apiUrl}/ProviderNotification`, pN.value)
           .then((res) => {
