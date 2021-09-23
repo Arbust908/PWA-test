@@ -1,6 +1,6 @@
 <template>
   <label :for="fieldName">
-    <FieldTitle v-if="title" :title="title" />
+    <FieldTitle v-if="title" :title="title" :isOptional="isOptional" />
     <textarea
       :id="fieldName"
       :class="isFixed ? 'resize-none' : null"

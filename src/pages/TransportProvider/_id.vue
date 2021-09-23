@@ -8,7 +8,7 @@
       </h1>
     </header>
     <section class="flex">
-      <section class="w-7/12">
+      <section class="w-8/12">
         <nav class="flex justify-between max-w-2xl bg-white">
           <button
             :class="[
@@ -91,9 +91,9 @@
                 'flex',
                 'items-center',
                 'cursor-pointer',
-                driverFull ? null : 'text-gray-200',
+                hasFullNewDriver ? null : 'text-gray-200',
               ]"
-              @click="driverFull && addDriver()"
+              @click="hasFullNewDriver && addDriver()"
             >
               <Icon icon="Plus" type="outline" class="w-5 h-5" />
               <h2>Agregar Transportista</h2>
@@ -119,7 +119,7 @@
           </footer>
         </section>
       </section>
-      <section class="w-3/12 mt-12 ml-4">
+      <section class="w-4/12 mt-12 ml-4 flex flex-col gap-y-4">
         <DriverCard
           v-for="(driver, index) in drivers"
           :key="index"
@@ -185,12 +185,10 @@
       const transportProviders: Array<TransportProvider> = JSON.parse(
         JSON.stringify(store.state.transportProviders.all)
       );
-
       const currentTransportProvider: TransportProvider =
         transportProviders.find((sp) => {
           return sp.id == id;
         });
-
       console.log('ctp', currentTransportProvider);
 
       let activeSection = ref('provider');
@@ -214,7 +212,7 @@
 
       const addDriver = () => {
         const driver = { ...newDriver };
-        if(driverFull){
+        if(hasFullNewDriver){
           drivers.push(driver);
         }
         cleanNewDriver();
@@ -224,7 +222,6 @@
         console.log(drivers[index].id);
         let response = await axios
           .delete(`${api}/driver/${drivers[index].id}`)
-
           .then((res) => {
             if (res.status === 200) {
               return res.data.data;
@@ -291,7 +288,7 @@
         );
       });
 
-      const driverFull: ComputedRef<boolean> = computed(() => {
+      const hasFullNewDriver: ComputedRef<boolean> = computed(() => {
         return !!(
           newDriver.name !== '' &&
           newDriver.phone !== '0' &&
@@ -311,76 +308,54 @@
 
       const isFull: ComputedRef<boolean> = computed(() => {
         return (
-          transportProviderFull.value && repFull.value /*&& driverFull.value*/
+          transportProviderFull.value && repFull.value
         );
       });
 
       const update = async () => {
+        if (hasFullNewDriver) {
+          addDriver();
+        }
         const {
-          providerNotificationId,
-          providerNotification,
           drivers,
           ...newTProv
         } = currentTransportProvider;
-        console.log('newTProv', companyRepresentative);
+
+        console.log('newTraPro', newTransportProvider);
+        console.log('newComRep', companyRepresentative);
 
         const { data: tpData } = useAxios(
           `/transportProvider/${id}`,
           { method: 'PUT', data: newTransportProvider },
           instance
         );
-
-         const { data: rep } = useAxios(
+        const { data: rep } = useAxios(
           `/companyRepresentative/${currentTransportProvider.companyRepresentativeId}`,
           { method: 'PUT', data: companyRepresentative },
           instance
         );
-
-        // const { data } = useAxios(
-        //   `/transportProvider/${id}`,
-        //   { method: 'PUT', data: newTransportProvider },
-        //   instance
-        // );
-        watch(tpData, (newData, _) => {
-          if (newData && newData.data) {
-            const tpId = newData.data.id;
-            const tpSave = reactive({ ...newData.data });
-            console.log('tpSave', tpSave);
-            const driversDone = reactive([]);
-
-            drivers.forEach((driver) => {
-              const { id, ...newDriver } = driver;
-              newDriver.transportProviderId = tpId;
-
-              if(driver.id) {
-                console.log('driver tiene ID')
-              } else {
-                if(driverFull){
-                  const { data } = useAxios(
-                      `/driver/`,
-                      { method: 'POST', data: newDriver },
-                      instance
-                    );
-                    watch(data, (newData, _) => {
-                      if (newData && newData.data) {
-                        driversDone.push(newData.data);
-                        tpSave.drivers = driversDone;
-                      }
-                    });
-                  }
-                }
-              });
-              
-            watchEffect(() => {
-              if (driversDone.length === drivers.length) {
-                store.dispatch('updateTransportProvider', tpSave);
-                router.push('/proveedores-de-transporte');
-              }
-            });
-            // store.dispatch('updateTransportProvider', tpSave);
-            router.push('/proveedores-de-transporte');
+        drivers.forEach((driver) => {
+          if(driver.id) {
+            console.log('driver tiene ID, y aexiste')
+            useAxios(
+              `/driver/${driver.id}`,
+              { method: 'PUT', data: driver },
+              instance
+            );
+          } else {
+            const { id, ...newDriver } = driver;
+            newDriver.transportProviderId = currentTransportProvider.id;
+            console.log('newDriver', newDriver);
+            const { data } = useAxios(
+              `/driver/`,
+              { method: 'POST', data: newDriver },
+              instance
+            );
           }
         });
+        setTimeout(() => {
+          router.push('/proveedores-de-transporte');
+        }, 1000);
       };
 
       return {
@@ -393,7 +368,7 @@
         Icon,
         addDriver,
         newDriver,
-        driverFull,
+        hasFullNewDriver,
         deleteDriver,
         editDriver,
         id,

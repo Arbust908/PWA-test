@@ -1,6 +1,6 @@
 <template>
   <label :for="fieldName">
-    <FieldTitle v-if="title" :title="title" />
+    <FieldTitle v-if="title" :title="title" :isOptional="isOptional" />
     <div class="input_side">
       <span v-if="pre" class="pre" :title="pre.title">{{ pre.value }}</span>
       <input
