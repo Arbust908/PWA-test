@@ -19,7 +19,7 @@
         </FieldGroup>
       </form>
     </section>
-    <section v-if="windowWidth > 426" class="bg-white rounded-md shadow-sm mb-14">
+    <section class="bg-white rounded-md shadow-sm mb-14 hidden sm:block">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <header class="flex justify-between">
           <section class="flex space-x-4">
@@ -83,7 +83,7 @@
         </div>
       </form>
     </section>
-    <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm">
+    <section class="bg-white rounded-md shadow-sm block sm:hidden">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
         <header class="flex justify-between px-3 pb-3 pt-4 border-b-1 border-solid border-black">
           <section class="flex space-x-4">
@@ -136,7 +136,7 @@
         </div>
       </form>
     </section>
-    <section v-if="windowWidth > 426" class="bg-white rounded-md shadow-sm">
+    <section class="bg-white rounded-md shadow-sm hidden sm:block">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <header class="flex justify-between">
           <section class="flex space-x-4">
@@ -194,7 +194,7 @@
         </div>
       </form>
     </section>
-    <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm mt-4">
+    <section class="bg-white rounded-md shadow-sm mt-4 block sm:hidden">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
         <header class="flex justify-between px-3 pb-3 pt-4 border-b-1 border-solid border-black">
           <section class="flex space-x-4">
@@ -334,12 +334,12 @@
           },
         ],
       });
+      
       const vuexSPs = JSON.parse(JSON.stringify(store.state.sandPlan.all));
-      //   console.log(vuexSPs);
       const vuexSP = vuexSPs.find((sp) => {
         return sp.id == id;
       });
-      //   console.log(currentSandPlan);
+
       const buckupStages = ref([]);
       if (!vuexSP || true) {
         const { data: spData } = useAxios('/sandPlan/' + id, instance);
@@ -393,7 +393,6 @@
       const editingStage = ref(lastStageId);
 
       const editStage = (stage) => {
-        console.log('stage', stage)
         editingStage.value = Number(stage.id);
       };
       const saveStage = (stage) => {
@@ -406,8 +405,7 @@
         editingStage.value = -1;
       };
       const duplicateStage = (stage) => {
-        const lastStage =
-          currentSandPlan.stages[currentSandPlan.stages.length - 1];
+        const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
         const lastStageId = { id: Number(lastStage.id) + 1 };
         const lastStageStage = { stage: lastStage.stage + 1 };
         const newStatus = { status: 0 };
@@ -425,6 +423,11 @@
         const stageId = stage.id;
         currentSandPlan.stages = currentSandPlan.stages.filter(
           (s) => s.id !== stageId
+        );
+        const { data } = useAxios(
+          '/sandStage/' + stageId,
+          { method: 'DELETE' },
+          instance
         );
       };
       const upgrade = (stage) => {
@@ -500,6 +503,7 @@
             (stage.sandId3 !== null && stage.quantity3 > 0);
           return noSandTypeNull;
         });
+
         const { data } = useAxios(
           '/sandPlan/' + currentSandPlan.id,
           {
@@ -508,6 +512,8 @@
               companyId: currentSandPlan.companyId,
               pitId: currentSandPlan.pitId,
               id: currentSandPlan.id,
+              stagesAmount: currentSandPlan.stagesAmount,
+              stages: currentSandPlan.stages
             },
           },
           instance
@@ -533,7 +539,7 @@
             currentSandPlan.stages.map((stage) => {
               const { ...sandStage } = stage;
               sandStage.sandPlanId = sandPlanId;
-              console.log('Sand Stage', sandStage);
+              // console.log('Sand Stage', sandStage);
               if (sandStage.action === 'create') {
                 sandStage.action = 'update';
                 const { data } = useAxios(

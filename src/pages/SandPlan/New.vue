@@ -1,10 +1,9 @@
 <template>
-  <Layout :class="windowWidth < 427 ? 'bg-white' : ''">
+  <Layout class="bg-white sm:bg-gray-100">
     <header
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
-      <h1 :class="windowWidth < 427 ? 'mt-4' : ''"
-      class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">
+      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0 sm:mt-4">
         Planificación de arenas
       </h1>
     </header>
@@ -20,7 +19,7 @@
         </FieldGroup>
       </form>
     </section>
-    <section v-if="windowWidth > 426" class="bg-white rounded-md shadow-sm mb-14">
+    <section class="bg-white rounded-md shadow-sm mb-14 hidden sm:block">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <header class="flex justify-between">
           <section class="flex space-x-4">
@@ -83,7 +82,7 @@
         </div>
       </form>
     </section>
-    <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm">
+    <section class="bg-white rounded-md shadow-sm block sm:hidden">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
         <header class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded-t-lg border-b-1 border-solid border-black bg-gray-100">
           <section class="flex space-x-4 pr-3">
@@ -137,7 +136,7 @@
         </div>
       </form>
     </section>
-    <section v-if="windowWidth > 426" class="bg-white rounded-md shadow-sm mt-4">
+    <section class="bg-white rounded-md shadow-sm mt-4 hidden sm:block">
       <form method="POST" action="/" class="p-4 flex flex-col gap-4">
         <header class="flex justify-between">
           <section class="flex space-x-4">
@@ -194,7 +193,7 @@
         </div>
       </form>
     </section>
-    <section v-if="windowWidth < 427" class="bg-white rounded-md shadow-sm mt-4">
+    <section class="bg-white rounded-md shadow-sm mt-4 block sm:hidden">
       <form method="POST" action="/" class=" flex flex-col rounded border-solid border-black">
         <header class="flex justify-between px-3 pb-3 pt-4 pr-4 rounded-t-lg border-b-1 border-solid border-black bg-gray-100">
           <section class="flex space-x-4 pr-3 mt-2">
