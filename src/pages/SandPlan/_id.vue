@@ -61,7 +61,6 @@
                     <StageHeader />
                   </thead>
                   <tbody v-show="currentOpened" class="divide-y">
-                  {{ inProgressStages }}
                     <SandPlanStage
                       v-for="(stage, Key) in inProgressStages"
                       :key="Key"
