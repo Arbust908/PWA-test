@@ -61,6 +61,7 @@
                     <StageHeader />
                   </thead>
                   <tbody v-show="currentOpened" class="divide-y">
+                  {{ inProgressStages }}
                     <SandPlanStage
                       v-for="(stage, Key) in inProgressStages"
                       :key="Key"
@@ -317,21 +318,25 @@
       const instance = axios.create({
         baseURL: api,
       });
-
+      const defaultStage = {
+          innerId: 0,
+          stage: 1,
+          sandId1: -1,
+          quantity1: null,
+          sandId2: -1,
+          quantity2: null,
+          sandId3: -1,
+          quantity3: null,
+          sandPlanId: 0,
+          status: 0,
+      };
       const currentSandPlan = reactive({
         id: -1,
         companyId: -1,
         pitId: -1,
         stagesAmount: 1,
         stages: [
-          {
-            id: 0,
-            stage: 1,
-            sandId: -1,
-            quantity: 0,
-            sandPlanId: 0,
-            status: 0,
-          },
+          { ...defaultStage, },
         ],
       });
       
@@ -350,9 +355,12 @@
             currentSandPlan.companyId = Number(sp.companyId);
             currentSandPlan.pitId = Number(sp.pitId);
             currentSandPlan.stagesAmount = sp.stagesAmount;
-            currentSandPlan.stages = sp.stages;
-            buckupStages.value = sp.stages;
-            currentSandPlan.stages[0].id = Number(sp.stages[0].id);
+            const formatedStages = sp.stages.map((stage) => {
+              return { ...stage, innerId: Number(stage.id) };
+            });
+            currentSandPlan.stages = formatedStages;
+            buckupStages.value = formatedStages;
+            // currentSandPlan.stages[0].id = Number(sp.stages[0].id);
           }
          
         });
@@ -368,14 +376,6 @@
       }
 
       const addStage = () => {
-        const defaultStage = {
-          id: 0,
-          stage: 1,
-          sandId: -1,
-          quantity: 0,
-          sandPlanId: 0,
-          status: 0,
-        };
         duplicateStage(defaultStage);
       };
 
@@ -389,24 +389,19 @@
       });
       const lastStage =
         currentSandPlan.stages[currentSandPlan.stages.length - 1];
-      const lastStageId = lastStage ? Number(lastStage.id) : -1;
+      const lastStageId = lastStage ? Number(lastStage.innerId) : -1;
       const editingStage = ref(lastStageId);
 
       const editStage = (stage) => {
-        editingStage.value = Number(stage.id);
+        editingStage.value = Number(stage.innerId);
       };
       const saveStage = (stage) => {
-        currentSandPlan.stages.map((s) => {
-          if (s.id === stage.id) {
-            s = stage;
-          }
-          return s;
-        });
+        currentSandPlan.stages[stage.innerId] = stage;
         editingStage.value = -1;
       };
       const duplicateStage = (stage) => {
         const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
-        const lastStageId = { id: Number(lastStage.id) + 1 };
+        const lastStageId = { innerId: Number(lastStage.innerId) + 1 };
         const lastStageStage = { stage: lastStage.stage + 1 };
         const newStatus = { status: 0 };
         console.log(lastStage, lastStageId, lastStageStage, newStatus);
@@ -419,20 +414,22 @@
         currentSandPlan.stages.push(newStage);
         editStage(newStage);
       };
+      const stagesToDelete = ref([]);
       const deleteStage = (stage) => {
-        const stageId = stage.id;
+        const stageId = stage.innerId;
+        const isDB = stage.id ?? false;
+        console.log(isDB);
+        console.log(stageId, isDB);
         currentSandPlan.stages = currentSandPlan.stages.filter(
-          (s) => s.id !== stageId
+          (s) => s.innerId !== stageId
         );
-        const { data } = useAxios(
-          '/sandStage/' + stageId,
-          { method: 'DELETE' },
-          instance
-        );
+        if (isDB) {
+          stagesToDelete.value.push(stageId);
+        }
       };
       const upgrade = (stage) => {
         currentSandPlan.stages.map((s) => {
-          if (s.id === stage.id) {
+          if (s.innerId === stage.innerId) {
             s.status += 1;
           }
           return s;
