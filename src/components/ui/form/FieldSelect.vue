@@ -69,6 +69,7 @@
     setup(props, { emit }) {
       const endpointData = useVModel(props, 'endpointData', emit);
       const value = useVModel(props, 'data', emit);
+      console.log(value.value)
       const getApiVal = () => {
         const { read } = useApi(props.endpoint);
         return read();
