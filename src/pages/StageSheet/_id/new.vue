@@ -87,7 +87,17 @@
         <article class="p-6">
           <h3 class="font-bold text-xl mb-6">Estaciones</h3>
           <div>
-            <h3>{{selectedCradle?.name}}</h3>
+            <FieldSelect
+              v-if="cradles.length > 0"
+              class="max-w-[200px]"
+              fieldName="cradle"
+              placeholder="Seleccionar cradle"
+              :endpointData="cradles"
+              :data="currentStageSheet.cradleId"
+              @update:data="updateSelectedCradle($event)"
+            />
+            <FieldLoading :title="false" class="max-w-[200px]" v-else />
+            <!-- <h3>{{selectedCradle?.name}}</h3> -->
           </div>
           <div class="cradle-grid">
             <div
@@ -108,9 +118,6 @@
         Cancelar
       </NoneBtn>
       <PrimaryBtn
-        type="submit"
-        size="sm"
-        class="p-4"
         :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
         :disabled="!isFull"
         @click.prevent="isFull && save()"
@@ -193,11 +200,20 @@
           console.log(newVal);
           currentStage.stage = newVal.stages.length + 1;
           selectedCradle.value = newVal.operativeCradle;
+          console.log(newVal.operativeCradle.id);
+          newVal.operativeCradle && cradles.value.push(newVal.operativeCradle);
+          newVal.backupCradle && cradles.value.push(newVal.backupCradle);
+          currentStageSheet.value.cradleId = newVal.operativeCradle.id;
           setLayoutDimensions(newVal.warehouse)
           warehouse.value = newVal.warehouse;
         }
       });
+      const updateSelectedCradle = (id) => {
+        selectedCradle.value = cradles.value.find(c => c.id === id);
+        currentStageSheet.cradleId = id;
+      };
 
+      const cradles = ref([]);
       const currentStage = reactive({
         id: 0,
         stage: 1,
@@ -365,6 +381,8 @@
         visibleCategories,
         setBox,
         selectedCradle,
+        cradles,
+        updateSelectedCradle,
       };
     },
   };

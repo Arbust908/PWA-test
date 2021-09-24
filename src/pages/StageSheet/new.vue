@@ -491,6 +491,10 @@
         const { stages, ...newStageSheet} = currentStageSheet;
         const stage = stages[0];
         newStageSheet.operativeCradleId = newStageSheet.cradleId;
+        const backupCradle = cradles.value.filter((cradle) => {
+          return cradle.id != newStageSheet.cradleId;
+        });
+        newStageSheet.backupCradleId = backupCradle[0].id || null;
         console.log('New Stage Sheet', newStageSheet);
         console.log('Stage', stage);
         const { data } = useAxios(
