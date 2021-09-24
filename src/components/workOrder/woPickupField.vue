@@ -23,17 +23,24 @@
         @update:data="pickup.description = $event"
       />
       <span
-        v-if="pickups.length > 1 && pickupI !== lastIndex"
-        class="flex items-center col-span-1"
+        v-if="pickups.length > 1"
+        class="flex justify-center items-center col-span-1 cursor-pointer"
         :class="pickupI == 0 ? 'mt-6' : 'mt-2'"
       >
-        <Icon icon="Trash" class="w-6 h-6 btn__delete" @click="remove(pickup.id)"/>
-        {{ pickup.innerId }}
+        <CircularBtn size="md" class="btn__delete">
+          <Icon
+            icon="Trash"
+            type="outline"
+            class="w-6 h-6 icon"
+            @click="remove(pickup.id)"
+          />
+        </CircularBtn>
       </span>
+      
     </FieldGroup>
     <button class="mt-1 flex items-center col-span-6" @click.prevent="add">
       <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
-      <span class="font-bold"> Agregar pickup </span>
+      <span class="font-bold w-full sm:w-max"> Agregar pickup </span>
     </button>
   </FieldGroup>
 </template>
@@ -68,6 +75,16 @@
       const lastIndex = computed(() => {
         return props.pickups.length - 1;
       });
+
+      const defaultPickup = {
+          id: 0,
+          pickupId: '',
+          description: '',
+      }
+      if(pickups.value.length === 0) {
+        pickups.value.push(defaultPickup);
+      }
+
       const firstIndex = 0;
       const pickupInnerId = ref(0);
       pickups.value = pickups.value.map((pickup) => {

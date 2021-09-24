@@ -90,7 +90,7 @@
           class="pb-4 mb-2 border-b md:pb-0 md:mb-0 md:border-none"
         >
           <GhostBtn
-            class="w-full md:w-auto justify-center"
+            class="w-full border-2 rounded border-green-600 border-opacity-60 md:w-auto justify-center sm:border-0"
             @click.prevent="addCrew"
           >
             Agregar Crew
@@ -112,8 +112,8 @@
           >
             Cancelar
           </NoneBtn>
-          <GhostBtn  @click="save()">
-            <BookmarkIcon class="w-4 h-4" />
+          <GhostBtn class="w-1/2 md:w-max" @click="save()">
+            <BookmarkIcon class="w-6 h-6 md:w-4 h-4" />
             <span> Guardar Provisorio </span>
           </GhostBtn>
           <PrimaryBtn v-if="isLoading"  disabled>

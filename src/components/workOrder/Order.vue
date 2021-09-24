@@ -21,7 +21,7 @@
         @update:data="serviceCompanyId = $event"
       />
       <FieldInput
-        class="col-span-full"
+        class="col-span-full mb-4"
         fieldName="observations"
         placeholder="ej: 12313"
         title="PAD"

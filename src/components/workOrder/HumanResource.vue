@@ -52,8 +52,8 @@
             @update:data="people.role = $event"
           />
           <span
-            v-if="notLast(peopleI, crew.resources) && notOnly(crew.resources)"
-            :class="peopleI === 0 ? 'md:top-12' : 'md:top-8' "
+            v-if="notOnly(crew.resources)"
+            :class="peopleI === 0 ? 'md:top-10' : 'md:top-6' "
             class="md:absolute md:-right-12">
             <CircularBtn
               class="btn__delete"

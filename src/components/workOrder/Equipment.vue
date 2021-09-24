@@ -22,7 +22,7 @@
           @update:data="backupCradleId = $event"
         />
       </FieldGroup>
-      <FieldGroup>
+      <FieldGroup class="pb-6">
         <FieldLegend>Forklift</FieldLegend>
         <FieldSelect
           class="col-span-full"
