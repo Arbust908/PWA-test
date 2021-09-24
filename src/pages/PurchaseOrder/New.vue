@@ -68,19 +68,26 @@
                 @update:data="order.boxId = $event"
               />
               <div class="absolute bottom-6 left-full ml-2 flex gap-2">
-                <CircularBtn v-if="providerId.sandOrders.length > 1" size="md" btnClass="p-1">
+                <CircularBtn
+                  v-if="useIfNotLonly(providerId.sandOrders)"
+                  btnClass="p-1"
+                  @click="removeOrder(order.id, providerId.innerId)"
+                >
                   <Icon
                     icon="Trash"
                     type="outline"
                     class="w-6 h-6"
-                    @click="removeOrder(order.id, providerId.innerId)"
+                    
                   />
                 </CircularBtn>
-                <CircularBtn size="md" btnClass="bg-green-500">
+                <CircularBtn
+                  v-if="isLast(orderKey, providerId.sandOrders)"
+                  btnClass="bg-green-500"
+                  @click.prevent="addOrder(providerId.innerId)"
+                >
                   <Icon
                     icon="Plus"
                     class="w-8 h-8 text-white"
-                     @click.prevent="addOrder(providerId.innerId)"
                   />
                 </CircularBtn>
               </div>
@@ -146,7 +153,7 @@
                     class="w-6 h-6"
                   />
                 </CircularBtn>
-                <!-- <CircularBtn
+                <CircularBtn
                   v-if="isLast(toKey, TransportOrders)"
                   size="md"
                   btnClass="bg-green-500"
@@ -156,7 +163,7 @@
                     icon="Plus"
                     class="w-8 h-8 text-white"
                   />
-                </CircularBtn> -->
+                </CircularBtn>
               </div>
           </FieldGroup>
         </FieldGroup>
@@ -432,18 +439,47 @@
         }
         showModal.value = true;
       }
-      const save = (): void => {
-        if (isFull.value) {
-          const currentTransportOrder = TransportOrders.value[0];
-          // Formateamos la orden de pedido
-          const purchaseOrder: PurchaseOrder = {
+
+
+      const _saveTO = (poId: number) => {
+        TransportOrders.value.forEach((to) => {
+          to.purchaseOrderId = poId;
+          useAxios(
+            '/transportOrder',
+            { method: 'POST', data: to },
+            instance
+          );
+        });
+      }
+      const _saveSO = (poId: number) => {
+        sandProvidersIds.value.map((spI) => {
+        // Guradamos via api las ordenes de sand
+          spI.sandOrders.map((sO: SandOrder) => {
+            const { id, ...newSO } = sO;
+            newSO.purchaseOrderId = poId;
+            newSO.sandProviderId = spI.id;
+            useAxios(
+              '/sandOrder',
+              { method: 'POST', data: newSO },
+              instance
+            );
+          });
+        });
+      }
+      const _formatPO = () => {
+        const purchaseOrder: PurchaseOrder = {
             companyId: companyClientId.value,
             companyClientId: companyClientId.value,
             pitId: pitId.value,
             sandProviderId: sandProvidersIds.value[0].id,
             transportProviderId: transportProviderId.value,
-            ...currentTransportOrder,
-          };
+        };
+        return purchaseOrder;
+      }
+      const save = (): void => {
+        if (isFull.value) {
+          // Formateamos la orden de pedido
+          const purchaseOrder = _formatPO();
           console.log(purchaseOrder);
           // Creamos via API la orden de pedido
           const { data: pODone } = useAxios(
@@ -455,28 +491,12 @@
           watch(pODone, (newVal, _) => {
             if (newVal && newVal.data) {
               // Recorremos los proveedores de sand
-              sandProvidersIds.value.map((spI) => {
-                // Guradamos via api las ordenes de sand
-                spI.sandOrders.map((sO: SandOrder) => {
-                  const { id, ...newSO } = sO;
-                  newSO.purchaseOrderId = newVal.data.id;
-                  newSO.sandProviderId = spI.id;
-                  const { data: sODone } = useAxios(
-                    '/sandOrder',
-                    { method: 'POST', data: newSO },
-                    instance
-                  );
-                  watch(sODone, async (newVal, _) => {
-                    if (newVal && newVal.data) {
-                      await sOisDone.value.push(newVal.data);
-                      const ordenDePedido = pODone.value.data;
-                      const pedidoDeArena = sOisDone.value;
-                      ordenDePedido.sandOrders = pedidoDeArena;
-                      router.push('/orden-de-pedido');
-                    }
-                  });
-                });
-              });
+              const poId = newVal.data.id;
+              _saveTO(poId);
+              _saveSO(poId);
+              setTimeout(() => {
+                router.push('/orden-de-pedido');
+              }, 1000);
             }
           });
         }

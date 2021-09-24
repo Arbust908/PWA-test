@@ -6,6 +6,7 @@ export const isNotFirst = (key: number): boolean => !isFirst(key);
 export const isNotLastAndNotLonly = (key: number, array: any[]): boolean => {
   return !isLast(key, array) && notLonly(array);
 }
+export const isEven = (key: number): boolean => key % 2 === 0;
 /**
  * useOnFirst se fija si el elemento es el primero de la lista
  * y devuelev algo. No se si es lo mas util
@@ -24,4 +25,5 @@ export default {
   notLonly,
   isFirst,
   isLast,
+  isEven,
 }
