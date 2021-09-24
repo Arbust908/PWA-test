@@ -212,6 +212,25 @@
         Guardar
       </PrimaryBtn>
     </footer>
+    <Modal
+      type="success"
+      :open="confirmModal"
+      @close="resetBoxIn"
+      class="modal"
+      title="Orden de pedido guardada"
+    >
+      <template #body>
+        <p>La Orden de pedido se guardo con exito</p>
+      </template>
+      <template #btn>
+        <NoneBtn @click.prevent="$router.push('/')">
+          Salir
+        </NoneBtn>
+        <PrimaryBtn @click.prevent="resetBoxIn">
+          Crear Nueva
+        </PrimaryBtn>
+      </template>
+    </Modal>
   </Layout>
 </template>
 
@@ -245,6 +264,8 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
+  import Modal from '@/components/modal/General.vue';
 
   import axios from 'axios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -268,6 +289,8 @@
       FieldGroup,
       FieldSelect,
       FieldInput,
+      Icon,
+      Modal,
     },
     setup() {
       useTitle('Ingreso de Cajas <> Sandflow');
@@ -582,6 +605,13 @@
       // :: DEPOSIT
       const deposit = ref({});
       // << DEPOSIT
+      const confirmModal = ref(false);
+      const resetBoxIn = () => {
+        clientId.value = -1;
+        pitId.value = -1;
+        purchaseOrderId.value = -1;
+        confirmModal.value = false
+      };
       const save = async () => {
         const warehouseDone = ref(false);
         const warehouseId = warehouse.value.id;
@@ -618,9 +648,9 @@
           .catch((err) => console.error(err))
         }
 
-        if(warehouseDone.value && cradleDone.value) router.push('/');
-        if(warehouseDone.value && wasCradleModificated.value == false) router.push('/');
-        if(cradleDone.value && wasWarehouseModificated.value == false) router.push('/');
+        if(warehouseDone.value && cradleDone.value) confirmModal.value = true;
+        if(warehouseDone.value && wasCradleModificated.value == false) confirmModal.value = true;
+        if(cradleDone.value && wasWarehouseModificated.value == false) confirmModal.value = true;
 
       };
 
@@ -654,6 +684,8 @@
         purchaseOrders,
         filteredPurchaseOrders,
         clearBoxInDeposit,
+        confirmModal,
+        resetBoxIn,
       };
     },
   });
