@@ -16,10 +16,10 @@
             </div>
             <div class="space-y-2 py-4">
                 <h3 class="font-semibold">{{ po.transportProvider.name }}</h3>
-                <template v-for="tp in po.transportOrders">
+                <div v-for="(tp, i) in po.transportOrders" :key="i" :class="isEven(i) ? 'bg-gray-100' : null" class="py-1 rounded">
                    <p>Patente: {{ tp.licensePlate }}{{ tp.observations !== '' ? ' - ' + tp.observations : null }}</p>
                     <p>Cantidad: {{ tp.boxAmount }} caja{{ tp.boxAmount > 1 ? 's' : null }}</p>
-                </template>
+                </div>
             </div>
         </div>
       </template>
@@ -45,6 +45,7 @@
     import Modal from '@/components/modal/General.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import { isEven } from '@/helpers/iteretionHelpers';
     export default defineComponent({
         components: {
             Modal,
@@ -68,6 +69,7 @@
             }
             return {
                 getSandType,
+                isEven,
             }
         }
     });
