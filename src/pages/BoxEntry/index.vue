@@ -223,12 +223,14 @@
         <p>La Orden de pedido se guardo con exito</p>
       </template>
       <template #btn>
-        <NoneBtn @click.prevent="$router.push('/')">
-          Salir
-        </NoneBtn>
-        <PrimaryBtn @click.prevent="resetBoxIn">
-          Crear Nueva
-        </PrimaryBtn>
+        <div class="w-full flex justify-end gap-5">
+          <NoneBtn @click.prevent="$router.push('/')">
+            Salir
+          </NoneBtn>
+          <PrimaryBtn @click.prevent="resetBoxIn">
+            Crear Nueva
+          </PrimaryBtn>
+        </div>
       </template>
     </Modal>
   </Layout>
@@ -252,6 +254,7 @@
   import EyeIconOff from './EyeIconOff.vue';
   import Layout from '@/layouts/Main.vue';
   import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+  import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import Counter from '@/components/ui/Counter.vue';
@@ -291,6 +294,7 @@
       FieldInput,
       Icon,
       Modal,
+      NoneBtn,
     },
     setup() {
       useTitle('Ingreso de Cajas <> Sandflow');

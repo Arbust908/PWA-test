@@ -124,9 +124,6 @@
         Cancelar
       </NoneBtn>
       <PrimaryBtn
-        type="submit"
-        size="sm"
-        class="p-4"
         :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
         :disabled="!isFull"
         @click.prevent="isFull && save()"
