@@ -1,82 +1,87 @@
 <template>
   <Layout>
-    <input class="cajitaMagica" type="text" name="" id="" />
-    <section class="grid grid-cols-8 gap-6">
-      <p class="col-span-full">About page.</p>
-      <p class="col-span-full">
-        {{ storage.gipi.value }}
-        {{ storage.gipi.get() }}
-        {{ keys }}
-      </p>
-      <progress
-        v-if="isLoading"
-        class="fixed inset-x-0 top-0 z-50 w-full h-1 bg-green-500 shadow"
-        :value="(progress * 100).toFixed(0)"
-        max="100"
-      >
-        50%
-      </progress>
-      <b v-if="isLoading" class="ml-2 col-span-full"
-        >{{ (progress * 100).toFixed(0) }}%</b
-      >
-      <button
-        class="
-          px-3
-          py-1
-          rounded
-          bg-green-500
-          text-green-100
-          hover:bg-green-700 hover:shadow
-          mb-1
-          col-span-2
-        "
-        @click="initProgrss"
-      >
-        Load
-      </button>
-      <button
-        class="
-          px-3
-          py-1
-          rounded
-          bg-green-500
-          text-green-100
-          hover:bg-green-700 hover:shadow
-          mb-1
-          col-span-2
-        "
-        @click="done"
-      >
-        Finish
-      </button>
-      <button
-        class="
-          px-3
-          py-1
-          rounded-lg
-          bg-green-500
-          text-green-100
-          hover:bg-green-700 hover:shadow
-          mb-1
-          col-span-2
-        "
-        @click="start"
-      >
-        Start
-      </button>
+    <NoMobile class="md:hidden" />
+    <section class="hidden md:block">
+      <input class="cajitaMagica" type="text" name="" id="" />
+      <section class="grid grid-cols-8 gap-6">
+        <p class="col-span-full">About page.</p>
+        <p class="col-span-full">
+          {{ storage.gipi.value }}
+          {{ storage.gipi.get() }}
+          {{ keys }}
+        </p>
+        <progress
+          v-if="isLoading"
+          class="fixed inset-x-0 top-0 z-50 w-full h-1 bg-green-500 shadow"
+          :value="(progress * 100).toFixed(0)"
+          max="100"
+        >
+          50%
+        </progress>
+        <b v-if="isLoading" class="ml-2 col-span-full"
+          >{{ (progress * 100).toFixed(0) }}%</b
+        >
+        <button
+          class="
+            px-3
+            py-1
+            rounded
+            bg-green-500
+            text-green-100
+            hover:bg-green-700 hover:shadow
+            mb-1
+            col-span-2
+          "
+          @click="initProgrss"
+        >
+          Load
+        </button>
+        <button
+          class="
+            px-3
+            py-1
+            rounded
+            bg-green-500
+            text-green-100
+            hover:bg-green-700 hover:shadow
+            mb-1
+            col-span-2
+          "
+          @click="done"
+        >
+          Finish
+        </button>
+        <button
+          class="
+            px-3
+            py-1
+            rounded-lg
+            bg-green-500
+            text-green-100
+            hover:bg-green-700 hover:shadow
+            mb-1
+            col-span-2
+          "
+          @click="start"
+        >
+          Start
+        </button>
+      </section>
     </section>
   </Layout>
 </template>
 
 <script lang="ts">
-  import Layout from '@/layouts/Main.vue';
   import { useLocalStorage } from '@/helpers/useLocalStorage';
   import { useNProgress } from '@vueuse/integrations/useNProgress';
   import { useTitle } from '@vueuse/core';
+  import Layout from '@/layouts/Main.vue';
+  import NoMobile from '@/components/ui/NoMobile.vue';
 
   export default {
     components: {
       Layout,
+      NoMobile,
     },
     setup() {
       const { storage, keys } = useLocalStorage(['user', 'gipi']);
