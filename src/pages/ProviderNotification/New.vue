@@ -101,13 +101,38 @@
         <div
           class="
             divide-y
+            flex flex-col
+            text-left
+          "
+          v-if="!isNotificationConfirmed"
+        >
+          <p class="text-xl font-bold">Notificación a proovedores</p>
+          <div v-if="modalData.sandProvider">
+            <p class="font-bold text-gray-400 text-lg">Arena</p>
+            <p class="text-purple-600 font-bold">Notificación para {{modalData.sandProvider}}</p>
+            <ul>
+              <li v-for="(order, index) in modalData.sandOrders" :key="index" class="ml-4 text-purple-600 list-disc">{{order.sandType}} - {{order.amount}}t</li>
+            </ul>
+          </div>
+          <!-- <hr class="my-4" v-if="modalData.sandProvider && modalData.transportProvider"> -->
+          <div v-if="modalData.transportProvider">
+            <p class="font-bold text-gray-400 text-lg">Transporte</p>
+            <p class="text-purple-600 font-bold">Notificación para {{modalData.transportProvider}}</p>
+            <ul>
+              <li class="ml-4 text-purple-600 list-disc">{{modalData.transportQuantity}}U{{` - ${modalData.transportObservations}`}}</li>
+            </ul>
+          </div>
+        </div>
+        <div
+          class="
+            divide-y
             text-center
             flex flex-col
             justify-center
             text-xl
             items-center
           "
-          v-if="hasSaveSuccess"
+          v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
         >
           <Icon
             :icon="checkCircle"
@@ -126,7 +151,7 @@
             text-xl
             items-center
           "
-          v-else
+          v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess"
         >
           <Icon
             icon="exclamationCircle"
@@ -139,7 +164,23 @@
         </div>
       </template>
       <template #btn>
-        <div class="flex gap-4" v-if="hasSaveSuccess">
+        <div class="flex gap-4" v-if="!isNotificationConfirmed">
+          <button
+            type="button"
+            class="modal-close-button"
+            @click.prevent="toggleModal"
+          >
+            Volver
+          </button>
+          <button
+            type="button"
+            class="modal-create-new-button"
+            @click.prevent="confirmNotification"
+          >
+            Confirmar
+          </button>
+        </div>
+        <div class="flex gap-4" v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess">
           <router-link to="/" class="modal-close-button">
             <button type="button">Cerrar</button>
           </router-link>
@@ -151,7 +192,7 @@
             Crear nueva
           </button>
         </div>
-        <div class="flex gap-4" v-else>
+        <div class="flex gap-4" v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess">
           <button
             type="button"
             class="modal-close-button"
@@ -279,7 +320,6 @@
         const currST = sandTypes.value.find(
           (st) => st.id === currSO?.sandTypeId
         );
-        console.log(currST);
         currSO.sandType = currST;
       };
 
@@ -343,6 +383,9 @@
       const showModal = ref(false);
       const toggleModal = useToggle(showModal);
       const hasSaveSuccess = ref(false);
+      const isNotificationConfirmed = ref(false);
+      const apiRequest = ref(false);
+      const modalData = ref({})
 
       const save = async () => {
         if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId < 0){
@@ -368,14 +411,41 @@
             cantidadCamiones: Number(transportOrder.value[0].amount),
             observations: transportOrder.value[0].observation,
           };
-          console.log('Notificacion a ambos')
         }
-        // pN.value = {
-        //   sandProviderId: Number(sandProviderIds.value[0].id),
-        //   sandOrderId: sandProviderIds.value[0].SandOrders[0].id,
-        //   transportProviderId: Number(transportOrder.value[0].transportProviderId),
-        // };
-        // console.log(transportOrder.value[0].transportProviderId);
+      
+        const getSanitizedSandOrders = () => {
+          let sanitizedSandOrders = []
+          pN.value.sandOrders.forEach(order => {
+          return sanitizedSandOrders.push(
+            {
+              sandType: getSTName(order.sandTypeId),
+              amount: order.amount
+            }
+          )
+        })
+          return sanitizedSandOrders
+        }
+        
+        const getTranportProviderName = (id) => {
+          return transportProviders.value.filter(each => {
+            if(each.id == id) return each
+          })[0].name
+        }
+
+        modalData.value = {
+          sandProvider: getSPName(pN.value.sandProviderId) || null,
+          sandOrders: pN.value.sandOrders ? getSanitizedSandOrders() : null,
+          transportProvider : Number(transportOrder.value[0].transportProviderId) !== -1 ? getTranportProviderName(Number(transportOrder.value[0].transportProviderId)) : null,
+          transportQuantity: pN.value.cantidadCamiones || null,
+          transportObservations: pN.value.observations || null
+        }
+
+
+
+        toggleModal(true);
+      };
+
+      const confirmNotification = async () => {
         const response = await axios
           .post(`${apiUrl}/ProviderNotification`, pN.value)
           .then((res) => {
@@ -384,14 +454,20 @@
           .catch((err) => console.error(err));
 
         if (response.status == 200) {
+          isNotificationConfirmed.value = true
+          apiRequest.value = true
           hasSaveSuccess.value = true;
-          store.dispatch('saveProviderNotification', pN.value);
+          // store.dispatch('saveProviderNotification', pN.value);
+        } else {
+          isNotificationConfirmed.value = true
+          apiRequest.value = true
+          hasSaveSuccess.value = false;
         }
-
-        toggleModal(true);
-      };
+      }
 
       const createNew = () => {
+        isNotificationConfirmed.value = false
+        apiRequest.value = false
         transportOrder.value = [];
         transportOrder.value[0] = defaultTransportProvider;
         sandProviderIds.value = [];
@@ -440,6 +516,10 @@
         hasSaveSuccess,
         createNew,
         router,
+        isNotificationConfirmed,
+        apiRequest,
+        modalData,
+        confirmNotification
       };
     },
   });
