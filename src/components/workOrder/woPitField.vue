@@ -3,7 +3,7 @@
     <FieldInput
       :class="pits.length > 1 ? 'col-span-10' : 'col-span-12'"
       fieldName="name"
-      placeholder="Nombre de cliente"
+      placeholder="Nombre del pozo"
       :data="pit.name"
       @update:data="pit.name = $event"
     />

@@ -3,7 +3,7 @@
     <td class="text-gray-500 px-3 text-center py-4 whitespace-nowrap text-lg">
       {{ pos }} - 40
     </td>
-    <template v-if="editing === Number(stage.id)">
+    <template v-if="editing === Number(stage[editingKey])">
       <td class="typeWrap" :id="`sandType${stage.id}`">
         <FieldSelect
           fieldName="sandType1"
@@ -125,9 +125,9 @@
             <span class="sr-only">Duplicar</span>
           </button>
         </Popper>
-        <Popper hover :content="editing !== Number(stage.id) ? 'Editar etapa' : 'dejar de editar'">
+        <Popper hover :content="editing !== Number(stage[editingKey]) ? 'Editar etapa' : 'dejar de editar'">
           <button
-            v-if="editing !== Number(stage.id)"
+            v-if="editing !== Number(stage[editingKey])"
             @click.prevent="editStage"
             :disabled="stage.status > 0"
             class="action edit text-gray-600 hover:text-blue-800 p-2"
@@ -190,6 +190,12 @@
         type: Number,
         required: true,
       },
+      // ESTO ES TEMPÖRAL
+      // ESTO PASARIA A SER InnerID
+      editingKey: {
+        type: String,
+        default: 'id',
+      }
     },
     components: {
       Icon,
