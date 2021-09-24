@@ -68,6 +68,7 @@
                       :stage="stage"
                       :editing="editingStage"
                       :sands="sands"
+                      editingKey="innerId"
                       @editStage="editStage"
                       @saveStage="saveStage"
                       @duplicateStage="duplicateStage"
@@ -127,6 +128,7 @@
             :stage="stage"
             :editing="editingStage"
             :sands="sands"
+            editingKey="innerId"
             @editStage="editStage"
             @saveStage="saveStage"
             @duplicateStage="duplicateStage"
@@ -245,9 +247,6 @@
         Cancelar
       </NoneBtn>
       <PrimaryBtn
-        type="submit"
-        size="sm"
-        class="p-4"
         :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
         :disabled="!isFull"
         @click.prevent="isFull && save()"
@@ -375,6 +374,7 @@
       }
 
       const addStage = () => {
+        console.log('DEFAULT',defaultStage);
         duplicateStage(defaultStage);
       };
 
@@ -395,12 +395,12 @@
         editingStage.value = Number(stage.innerId);
       };
       const saveStage = (stage) => {
-        currentSandPlan.stages[stage.innerId] = stage;
+        // currentSandPlan.stages[stage.innerId] = stage;
         editingStage.value = -1;
       };
       const duplicateStage = (stage) => {
         const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
-        const lastStageId = { innerId: Number(lastStage.innerId) + 1 };
+        const lastStageId = { innerId: (Number(lastStage.innerId) + 1 || 0) };
         const lastStageStage = { stage: lastStage.stage + 1 };
         const newStatus = { status: 0 };
         console.log(lastStage, lastStageId, lastStageStage, newStatus);
@@ -410,6 +410,7 @@
           ...lastStageStage,
           ...newStatus,
         };
+        console.log('NEWSTAGE',newStage);
         currentSandPlan.stages.push(newStage);
         editStage(newStage);
       };
@@ -424,6 +425,7 @@
         );
         if (isDB) {
           stagesToDelete.value.push(stageId);
+          console.log(stagesToDelete.value);
         }
       };
       const upgrade = (stage) => {
@@ -518,15 +520,11 @@
           if (apiData && apiData.data) {
             const sandPlanId = apiData.data.id;
             currentSandPlan.id = sandPlanId;
-            const deletingStages = buckupStages.value.filter((stage) => {
-              return currentSandPlan.stages.find(
-                (curS) => curS.id === stage.id
-              );
-            });
-
-            deletingStages.map((stage) => {
+            console.log('toDeltete', stagesToDelete.value);
+            const deletingStages = stagesToDelete.value;
+            deletingStages.map((id) => {
               const { data } = useAxios(
-                '/sandStage/' + stage.id,
+                '/sandStage/' + id,
                 { method: 'DELETE' },
                 instance
               );
@@ -546,11 +544,13 @@
               } else {
                 const { id, ...newStage } = sandStage;
                 newStage.action = 'create';
-                const { data } = useAxios(
-                  '/sandStage',
-                  { method: 'POST', data: newStage },
-                  instance
-                );
+                if(!sandStage.id){
+                  const { data } = useAxios(
+                    '/sandStage',
+                    { method: 'POST', data: newStage },
+                    instance
+                  );
+                }
               }
             });
             console.log(currentSandPlan);

@@ -128,6 +128,7 @@
             :stage="stage"
             :editing="editingStage"
             :sands="sands"
+            editingKey="innerId"
             @editStage="editStage"
             @saveStage="saveStage"
             @duplicateStage="duplicateStage"
@@ -227,7 +228,6 @@
             :key="Key"
             :pos="Key + 1"
             :stage="stage"
-            :editing="editingStage"
             :sands="sands"
             @editStage="editStage"
             @saveStage="saveStage"
@@ -243,9 +243,6 @@
         Cancelar
       </NoneBtn>
       <PrimaryBtn
-        type="submit"
-        size="sm"
-        class="p-4"
         :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
         :disabled="!isFull"
         @click.prevent="isFull && save()"
