@@ -1,5 +1,6 @@
 <template>
   <Layout>
+
     <header
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
@@ -134,7 +135,7 @@
       };
 
       const deleteMeshType = (index: Object) => {
-        sandProvider.value.meshType.splice(index)
+        sandProvider.value.meshType.splice(index,1)
       };
 
 
