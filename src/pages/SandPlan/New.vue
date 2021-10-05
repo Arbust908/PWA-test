@@ -3,7 +3,7 @@
     <header
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
-      <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0 sm:mt-4">
+      <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0 sm:mt-4">
         Planificación de arenas
       </h1>
     </header>
@@ -244,6 +244,7 @@
       </NoneBtn>
       <PrimaryBtn
         :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
+        size="md"
         :disabled="!isFull"
         @click.prevent="isFull && save()"
       >

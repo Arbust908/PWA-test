@@ -1,9 +1,9 @@
 <template>
-  <FieldGroup>
+  <FieldGroup class="py-2 w-full rid grid-cols-12 gap-3 md:gap-4">
     <FieldLegend>Arena</FieldLegend>
     <template v-for="(sPov, i) in sandProviders" :key="i">
         <FieldSelect
-          class="col-span-12 sm:col-span-6"
+          class="col-span-full sm:col-span-6" 
           fieldName="sandProvider"
           placeholder="Selecciona un proveedor"
           title="Proveedor"
@@ -11,25 +11,14 @@
           :data="sPov.id"
           @update:data="sPov.id = $event"
         />
-      <div
-        v-if="sandProviders.length > 1 && i !== lastSandProviderInner"
-        class="col-span-2 flex items-end"
-      >
-        <CircularBtn
-          class="btn__delete  flex items-center justify-center ml-2"
-          size="sm"
-          @click="removeSandProvider(sPov.innerId)"
-        >
-          <Icon icon="Trash" outline class="w-5 h-5" />
-        </CircularBtn>
-      </div>
+
       <div
         v-for="(so, Key) in sPov.SandOrders"
         :key="Key"
         class="relative grid grid-cols-12 col-span-full gap-4 mt-2"
       >
         <FieldSelect
-          class="col-span-6"
+          class="col-span-5 sm:col-span-6"
           :title="Key === 0 ? 'Tipo' : '' "
           fieldName="sandType"
           placeholder="Arena"
@@ -39,7 +28,7 @@
           @update:data="so.sandTypeId = $event"
         />
         <FieldWithSides
-          :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-4 sm:col-span-3' "
+          class='col-span-5 sm:col-span-3'
           :title="Key === 0 ? 'Cantidad' : ''"
           :fieldName="`sandQuantity${Key}`"
           placeholder="0 t"
@@ -54,34 +43,35 @@
           :amount="so.amount"
           @update:amount="so.amount = $event"
         /> -->
-        <div class="col-span-1 my-auto mx-auto" v-if="sPov.SandOrders.length > 0 && Key +1 === sPov.SandOrders.length ">
+        <div class="col-span-1 my-auto mx-auto hidden sm:block" v-if="sPov.SandOrders.length > 0 && Key +1 === sPov.SandOrders.length">
           <Icon 
             icon="PlusCircle" outline 
-            class="w-6 h-6 mt-3 text-green-500"
-            :class="Key +1 === sPov.SandOrders.length ? 'mt-4' : null" 
+            class="w-7 h-7 text-green-500 mr-1"
+            :class="sPov.SandOrders.length == 1 ? 'mt-7' : 'mt-2'" 
             @click.prevent="addSandOrder(sPov.innerId)"
           />
         </div>
-        <div class="col-span-1 ml-2 my-auto">
+        <div class="col-span-2 ml-2 my-auto">
           <Icon v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length " 
             icon="Trash" outline 
-            class="w-5 h-5 mt-4 " 
+            class="w-6 h-6"
+            :class="Key +1 === sPov.SandOrders.length ? 'mt-2' : 'mt-6'" 
             @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
           />
         </div>
       </div>
-      <!-- <div class="col-span-full mt-2">
+      <div class="col-span-full mt-2 sm:hidden">
         <button
-          class="flex items-center p-1"
+          class="flex items-center"
           @click.prevent="addSandOrder(sPov.innerId)"
         >
         <Icon 
           icon="PlusCircle" outline 
           class="w-6 h-6 text-green-500"
         />
-          <span class="font-semibold text pl-1">Agregar arena</span>
+          <span class="font-semibold text pl-1">Agregar</span>
         </button>
-      </div> -->
+      </div>
     </template>
   </FieldGroup>
 </template>
