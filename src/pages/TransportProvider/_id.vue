@@ -252,7 +252,7 @@
         newDriver.phone = driver.phone;
         newDriver.email = driver.email;
         newDriver.vehicleType = driver.vehicleType;
-        newDriver.transportId = driver.vehicleId;
+        newDriver.transportId = driver.transportId;
         newDriver.observations = driver.observations;
       };
 
