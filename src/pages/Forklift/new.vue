@@ -8,14 +8,14 @@
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm max-w-2xl">
-      <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
+      <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" @update-validation-state="updateValidationState"/>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -67,18 +67,33 @@
         observations: '',
       });
 
+      const fieldsValidations = ref({
+        name: false,
+        observations: false
+      })
+
       const goToIndex = (): void => {
         router.push('/forklift');
       };
+
+      const isValidated = ref(false)
+
+      const updateValidationState = (data) => {
+        const {fieldName, validationsPassed} = data
+        fieldsValidations.value[`${fieldName}`] = validationsPassed
+
+        const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
+          if(input[1] == false) return input
+        })
+
+        if(isInvalidated.length > 0) return isValidated.value = false
+        if(isInvalidated.length == 0) return isValidated.value = true
+      }
 
       const notificationModalvisible = ref(false);
       const errorMessage = ref('');
       const toggleNotificationModal = () =>
         (notificationModalvisible.value = !notificationModalvisible.value);
-
-      const isFull = computed(() => {
-        return !!(forklift.name !== '');
-      });
 
       const save = async () => {
         await useStoreLogic(router, store, 'forklift', 'create', forklift).then(
@@ -96,10 +111,11 @@
         forklift,
         goToIndex,
         save,
-        isFull,
+        isValidated,
         notificationModalvisible,
         toggleNotificationModal,
         errorMessage,
+        updateValidationState
       };
     },
   };

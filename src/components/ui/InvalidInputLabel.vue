@@ -21,17 +21,19 @@ export default {
     validationType: {
       type: String,
       required: false
+    },
+    charAmount: {
+      type: Number,
+      required: false
     }
   },
   setup (props) {
     const validationType = ref(props.validationType)
     const message = ref("")
 
-    watchEffect(() => {
-      if(validationType.value == "empty") message.value = "Este campo es obligatorio."
-      if(validationType.value == "email") message.value = "Formato de mail incorrecto."
-      if(validationType.value == "extension") message.value = "Cantidad de caracteres incorrecto."
-    })
+    if(validationType.value == "empty") message.value = "Este campo es obligatorio."
+    if(validationType.value == "email") message.value = "Formato de mail incorrecto."
+    if(validationType.value == "extension") message.value = "Cantidad de caracteres incorrecta."
   
     return {
       message

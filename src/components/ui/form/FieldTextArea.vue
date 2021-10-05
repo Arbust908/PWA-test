@@ -9,10 +9,10 @@
       :placeholder="placeholder"
       v-model="value"
       :rows="rows"
-      @blur="initiateValidations"
+      @blur="initiateValidators"
     >
     </textarea>
-    <InvalidInputLabel v-if="!isValid && wasInputEntered" :validationType="validationType"/>
+    <InvalidInputLabel v-if="!isValid && wasInputEntered" :validationType="validationType" :charAmount="charAmount"/>
   </label>
 </template>
 
@@ -21,7 +21,7 @@
   import { useVModel } from '@vueuse/core';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
   import useVuelidate from '@vuelidate/core'
-  import {required, email} from '@vuelidate/validators'
+  import {required, email, minLength, maxLength} from '@vuelidate/validators'
   import InvalidInputLabel from '../InvalidInputLabel.vue';
 
   export default defineComponent({
@@ -62,33 +62,73 @@
         type: Boolean,
         require: false,
       },
+      validationType: {
+        type: String,
+        required: false
+      },
+      charAmount: {
+        type: Object,
+        required: false
+      }
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
       const {requireValidation, fieldName} = toRefs(props)
       const wasInputEntered = ref(false)
       const validationType = ref(props.validationType || "empty")
+      const charAmount = ref(props.charAmount || null)
       const validationRules = ref({})
       const state = {
         [`${fieldName.value}`]: value
       }
       
+      const getCharsAmountRule = (charsRule) => {
+        if(charsRule.min && charsRule.max) {
+          return {minLength: minLength(charsRule.min),maxLength: maxLength(charsRule.max),required}
+        } 
+        if(charsRule.min && !charsRule.max) {
+          return {minLength: minLength(charsRule.min),required}
+        } 
+        if(!charsRule.min && charsRule.max) {
+          return {maxLength: maxLength(charsRule.max),required}
+        }
+      }
+
       if(requireValidation.value) {
-        validationRules.value = {
-          [`${fieldName.value}`]: {required}
+        if(validationType.value == "empty") {
+          validationRules.value = {
+            [`${fieldName.value}`]: {required}
+          }
+        }
+        if(validationType.value == "email") {
+          validationRules.value = {
+            [`${fieldName.value}`]: {required, email}
+          }
+        }
+        if(validationType.value == "extension") {
+          validationRules.value = {
+            [`${fieldName.value}`]: getCharsAmountRule(charAmount.value)
+          }
         }
       }
       
+      const updateValidationState = (fieldName,validationsPassed) => {
+        emit('update-validation-state',{fieldName,validationsPassed})
+      }
+
       const v$ = useVuelidate(validationRules, state)
 
-      const initiateValidations = () => {
+      const initiateValidators = () => {
         wasInputEntered.value = true
       }
 
       const isValid = computed(() => {
-        if(!wasInputEntered.value) return true
-        if(!v$.value.$silentErrors[0]) return true
-        return v$.value.$silentErrors[0].$propertyPath == fieldName ? true : false
+        updateValidationState(fieldName.value,false)
+        if(!wasInputEntered.value) return false
+        if(v$.value.$silentErrors[0]) return false
+        
+        updateValidationState(fieldName.value,true)
+        return true
       })
 
       return {
@@ -97,9 +137,10 @@
         v$,
         fieldName,
         isValid,
-        initiateValidations,
         wasInputEntered,
-        validationType
+        validationType,
+        charAmount,
+        initiateValidators
       };
     },
   });
