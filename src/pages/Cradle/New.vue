@@ -8,7 +8,7 @@
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm max-w-2xl">
-      <form method="POST" action="/" class="p-4 flex flex-col gap-4">
+      <form method="POST" action="/" class="p-4 flex flex-col gap-4" @submit.prevent>
         <FieldGroup>
           <FieldInput
             class="col-span-full"

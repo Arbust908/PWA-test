@@ -1,5 +1,5 @@
 <template>
-  <form method="POST" action="/" class="p-4 w-full flex flex-col lg:flex-row">
+  <form method="POST" action="/" class="p-4 w-full flex flex-col lg:flex-row" @submit.prevent>
     <FieldGroup>
       <FieldInput
         class="col-span-full"
