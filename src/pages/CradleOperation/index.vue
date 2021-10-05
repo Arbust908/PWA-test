@@ -14,8 +14,8 @@
             <ClientPitCombo
               :clientId="Number(clientId)"
               :pitId="Number(pitId)"
-              @update:clientId="clientId = Number($event)"
-              @update:pitId="pitId = Number($event)"
+              @update:clientId="clientId = Number($event); cradleId = -1"
+              @update:pitId="pitId = Number($event); cradleId = -1"
             />
           </span>
         </FieldGroup>
