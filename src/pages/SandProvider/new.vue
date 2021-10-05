@@ -134,7 +134,7 @@
       };
 
       const deleteMeshType = (index: Object) => {
-        sandProvider.value.meshType.splice(index)
+        sandProvider.value.meshType.splice(index, 1)
       };
 
 
