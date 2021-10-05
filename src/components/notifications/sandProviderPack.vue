@@ -1,5 +1,5 @@
 <template>
-  <FieldGroup class="py-2 w-full rid grid-cols-12 gap-3 md:gap-4">
+  <FieldGroup class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
     <FieldLegend>Arena</FieldLegend>
     <template v-for="(sPov, i) in sandProviders" :key="i">
         <FieldSelect
