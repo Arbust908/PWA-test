@@ -13,12 +13,12 @@
           :sandProviders="sandProviderIds"
           @update:sandProviders="sandProviderIds = $event"
         />
-        <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
+        <fieldset class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl">Transporte</h2>
           <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
             <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
             <FieldSelect
-              :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full'"
+              :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full sm:col-span-6'"
               title="Proveedor"
               :fieldName="`transportProvider${tO.id}`"
               placeholder="Seleccionar"
@@ -34,35 +34,25 @@
                 @click="removeTransportProvider(tO.id)"
               />
             </div>
-            <FieldInput
-              class="col-span-6"
-              :fieldName="`transportAmount${tO.id}`"
-              placeholder="Camiones"
-              title="Cantidad de camiones"
-              :data="tO.amount"
-              @update:data="tO.amount = $event"
-            />
-            <FieldInput
-              class="col-span-6"
-              :fieldName="`transportObservations${tO.id}`"
-              placeholder="Observaciones"
-              title="Observaciones"
-              :data="tO.observation"
-              @update:data="tO.observation = $event"
-            />
+            <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
+              <FieldInput
+                class="col-span-full sm:col-span-3"
+                :fieldName="`transportAmount${tO.id}`"
+                placeholder="Camiones"
+                title="Camiones"
+                :data="tO.amount"
+                @update:data="tO.amount = $event"
+              />
+              <FieldInput
+                class="col-span-full sm:col-span-6"
+                :fieldName="`transportObservations${tO.id}`"
+                placeholder="Observaciones"
+                title="Observaciones"
+                :data="tO.observation"
+                @update:data="tO.observation = $event"
+              />
+            </div>
           </template>
-          <!-- <div class="col-span-full mt-1 pb-4 mb-4">
-            <button
-              class="flex items-center p-1"
-              @click.prevent="addTransportProvider"
-            >
-            <Icon 
-              icon="PlusCircle" outline 
-              class="w-6 h-6 text-green-500"
-            />
-              <span class="font-semibold text pl-1">Agregar transporte</span>
-            </button>
-          </div> -->
         </fieldset>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
@@ -83,43 +73,26 @@
         </PrimaryBtn>
       </footer>
     </section>
-    <!-- <Modal type="off" :open="showModal" @close="togglemodal">
-      <template #body>
-        <div class="flex flex-col">
-          <h1 class="font-bold text-second-900 text-xl self-start mb-3">
-            Notificación a proveedores
-          </h1>
-          <span class="text-left font-bold">Arena</span>
-          <template v-for="">
-            <span>{{sPov.value}}</span>
-          </template>
-        </div>
-      </template>
-    </Modal> -->
     <Modal type="off" :open="showModal" @close="togglemodal">
       <template #body>
-        <div
-          class="
-            divide-y
-            flex flex-col
-            text-left
-          "
-          v-if="!isNotificationConfirmed"
-        >
-          <p class="text-xl font-bold">Notificación a proovedores</p>
-          <div v-if="modalData.sandProvider">
-            <p class="font-bold text-gray-400 text-lg">Arena</p>
-            <p class="text-purple-600 font-bold">Notificación para {{modalData.sandProvider}}</p>
+        <div class="text-left" v-if="!isNotificationConfirmed">
+          <p class="text-base text-black font-bold">Notificación a proveedores</p>
+          <div v-if="modalData.sandProvider" class="bg-gray-100 mt-3 rounded-r-md pt-2 pl-4 pb-3 border-l-4 border-green-500 border-t-0">
+            <p class="font-bold text-black text-base">Arenas {{modalData.sandProvider}}</p>
             <ul>
-              <li v-for="(order, index) in modalData.sandOrders" :key="index" class="ml-4 text-purple-600 list-disc">{{order.sandType}} - {{order.amount}}t</li>
+              <li v-for="(order, index) in modalData.sandOrders" 
+                :key="index" 
+                class="ml-2 text-black text-sm list-none">
+                {{order.amount}}t - {{order.sandType}} 
+              </li>
             </ul>
           </div>
-          <!-- <hr class="my-4" v-if="modalData.sandProvider && modalData.transportProvider"> -->
-          <div v-if="modalData.transportProvider">
-            <p class="font-bold text-gray-400 text-lg">Transporte</p>
-            <p class="text-purple-600 font-bold">Notificación para {{modalData.transportProvider}}</p>
+          <div v-if="modalData.transportProvider" class="bg-gray-100 mt-3 rounded-r-md pt-2 pl-4 pb-3 border-l-4 border-green-500 border-t-0">
+            <p class="font-bold text-black text-base">Transporte {{modalData.transportProvider}}</p>
             <ul>
-              <li class="ml-4 text-purple-600 list-disc">{{modalData.transportQuantity}}U{{` - ${modalData.transportObservations}`}}</li>
+              <li class="ml-2 text-black text-sm list-none">
+                {{modalData.transportQuantity}} camion(es){{` - ${modalData.transportObservations}`}}
+              </li>
             </ul>
           </div>
         </div>
