@@ -16,6 +16,12 @@ const routes: Array<RouteRecordRaw> = [
     beforeEnter: isGuest,
   },
   {
+    path: '/denied',
+    name: 'BeforeLogin',
+    component: () => import('@/pages/Error/401.vue'),
+    beforeEnter: isGuest,
+  },
+  {
     path: '/about',
     name: 'About',
     component: () => import('@/pages/About.vue'),
@@ -275,7 +281,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/:catchAll(.*)',
     name: 'PageNotFound',
-    component: () => import('@/pages/404.vue'),
+    component: () => import('@/pages/Error/404.vue'),
   },
 ];
 

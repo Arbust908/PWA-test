@@ -36,12 +36,12 @@ export const isGuest = (to, from, next) => {
   const isGuest = store.getters.isGuest;
   if (isGuest) {
     if (to.path !== '/login') {
-      next({ path: '/login' });
+      next({ path: '/denied' });
       return;
     } else {
       next();
     }
-  } else if (to.path === '/login') {
+  } else if (to.path === '/denied') {
     next({ path: '/' });
     return;
   } else {
