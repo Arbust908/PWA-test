@@ -142,7 +142,7 @@
                 :title="useOnFirst(toKey, 'Observaciones')"
                 class="col-span-9 sm:col-span-4"
                 fieldName="observations"
-                placeholder="Chasis shico"
+                placeholder="Ej: chasis chico"
                 isOptional
                 :data="to.observations"
                 @update:data="to.observations = $event"
