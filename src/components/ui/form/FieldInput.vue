@@ -22,7 +22,7 @@
   import { maska } from 'maska';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
   import useVuelidate from '@vuelidate/core'
-  import {required, email, minLength, maxLength} from '@vuelidate/validators'
+  import {required, email, minLength, maxLength, numeric} from '@vuelidate/validators'
   import InvalidInputLabel from '../InvalidInputLabel.vue';
 
   export default defineComponent({
@@ -104,6 +104,11 @@
         if(validationType.value == "empty") {
           validationRules.value = {
             [`${fieldName.value}`]: {required}
+          }
+        }
+        if(validationType.value == "numeric") {
+          validationRules.value = {
+            [`${fieldName.value}`]: {required, numeric}
           }
         }
         if(validationType.value == "email") {

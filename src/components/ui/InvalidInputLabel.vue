@@ -34,6 +34,7 @@ export default {
     if(validationType.value == "empty") message.value = "Este campo es obligatorio."
     if(validationType.value == "email") message.value = "Formato de mail incorrecto."
     if(validationType.value == "extension") message.value = "Cantidad de caracteres incorrecta."
+    if(validationType.value == "numeric") message.value = "Este campo sólo puede estar compuesto por números"
   
     return {
       message

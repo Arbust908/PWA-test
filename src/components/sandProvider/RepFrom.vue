@@ -8,6 +8,8 @@
       placeholder="Ingresar Nombre y Apellido"
       :data="repName"
       @update:data="repName = $event"
+      requireValidation
+      @update-validation-state="updateValidationState"
     />
     <FieldInput
       class="col-span-full"
@@ -17,6 +19,9 @@
       mask="#*"
       :data="repPhone"
       @update:data="repPhone = $event"
+      requireValidation
+      validationType="numeric"
+      @update-validation-state="updateValidationState"
     />
     <FieldInput
       class="col-span-full"
@@ -25,6 +30,9 @@
       placeholder="empresa@mail.com"
       :data="repEmail"
       @update:data="repEmail = $event"
+      requireValidation
+      validationType="email"
+      @update-validation-state="updateValidationState"
     />
   </FieldGroup>
 </template>
@@ -63,7 +71,11 @@
     setup(props, { emit }) {
       const { repName, repPhone, repEmail } = useVModels(props, emit);
 
-      return { repName, repPhone, repEmail };
+      const updateValidationState = (data: Object) => {
+        emit('update-validation-state',{fieldName: data.fieldName,validationsPassed: data.validationsPassed})
+      }
+
+      return { repName, repPhone, repEmail, updateValidationState };
     },
   });
 </script>

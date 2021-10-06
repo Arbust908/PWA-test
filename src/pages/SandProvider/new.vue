@@ -24,6 +24,7 @@
           @update:spMesh="meshType = $event"
           @add-mesh-type="addMeshType"
           @delete-mesh-type="deleteMeshType"
+          @update-validation-state="updateValidationState"
         />
         <SandProviderRep
           :repName="companyRepresentative.name"
@@ -32,6 +33,7 @@
           @update:repName="companyRepresentative.name = $event"
           @update:repPhone="companyRepresentative.phone = $event"
           @update:repEmail="companyRepresentative.email = $event"
+          @update-validation-state="updateValidationState"
         />
       </form>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
@@ -40,9 +42,9 @@
             Cancelar
           </NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -65,7 +67,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, ComputedRef, onMounted } from 'vue';
+  import { ref, Ref, computed, ComputedRef, onMounted, watchEffect } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
@@ -110,7 +112,7 @@
       const toggleRepStatus = useToggle(isNewRep);
 
       const companyRepresentative: CompanyRepresentative = ref({
-        name: '',
+        companyRepresentativeName: '',
         phone: '',
         email: '',
       });
@@ -137,29 +139,29 @@
         sandProvider.value.meshType.splice(index, 1)
       };
 
+      const fieldsValidations = ref({
+        sandProvName: false,
+        sandProvAddress: false,
+        sandProvId: false,
+        meshType: false,
+        sandRepName: false,
+        sandRepPhone: false,
+        sandRepEmail: false,
+      })
 
-      const providerFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          (
-            sandProvider.value.name !== '' &&
-            sandProvider.value.address !== '0' &&
-            sandProvider.value.legalId >= 0 &&
-            sandProvider.value.meshType.length > 0
-          )
-        );
-      });
+      const isValidated = ref(false)
 
-      const repFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          companyRepresentative.value.name !== '' &&
-          companyRepresentative.value.phone !== '' &&
-          companyRepresentative.value.email !== ''
-        );
-      });
+      const updateValidationState = (data) => {
+        const {fieldName, validationsPassed} = data
+        fieldsValidations.value[`${fieldName}`] = validationsPassed
 
-      const isFull: ComputedRef<boolean> = computed(() => {
-        return providerFull.value && repFull.value;
-      });
+        const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
+          if(input[1] == false) return input
+        })
+        
+        if(isInvalidated.length > 0) return isValidated.value = false
+        if(isInvalidated.length == 0) return isValidated.value = true
+      }
 
       const save = async () => {
         sandProvider.value.companyRepresentative = companyRepresentative.value
@@ -173,6 +175,14 @@
           }
         );
       };
+
+      watchEffect(() => {
+        if(sandProvider.value.meshType.length > 0) {
+          updateValidationState({fieldName: "meshType", validationsPassed: true})
+        } else {
+          updateValidationState({fieldName: "meshType", validationsPassed: false})
+        }
+      })
 
       onMounted(async () => {
         await axios.get(`${apiUrl}/sand`)
@@ -191,14 +201,15 @@
         toggleRepStatus,
         companyRepresentative,
         sandProvider,
-        isFull,
+        isValidated,
         save,
         deleteMeshType,
         addMeshType,
         meshType,
         notificationModalvisible,
         toggleNotificationModal,
-        errorMessage
+        errorMessage,
+        updateValidationState
       };
     },
   };

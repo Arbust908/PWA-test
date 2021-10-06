@@ -7,6 +7,8 @@
       placeholder="Ingresar Nombre / Razón Social"
       :data="spName"
       @update:data="spName = $event"
+      requireValidation
+      @update-validation-state="updateValidationState"
     />
     <FieldInput
       class="col-span-full"
@@ -16,6 +18,10 @@
       mask="#*"
       :data="spLegalId"
       @update:data="spLegalId = Number($event)"
+      requireValidation
+      validationType="extension"
+      :charAmount="{min: 11,max:11}"
+      @update-validation-state="updateValidationState"
     />
     <FieldInput
       class="col-span-full"
@@ -24,6 +30,8 @@
       placeholder="Ingresar domicilio"
       :data="spAddress"
       @update:data="spAddress = $event"
+      requireValidation
+      @update-validation-state="updateValidationState"
     />
     <label class="col-span-full" for="meshType">
       <span>Tipo de malla</span>
@@ -136,6 +144,10 @@
         emit('add-mesh-type',mesh)
       };
 
+      const updateValidationState = (data: Object) => {
+        emit('update-validation-state',{fieldName: data.fieldName,validationsPassed: data.validationsPassed})
+      }
+
       watchEffect(() => {
         if(spMesh.value !== 0 && spMesh.value !== "") {
           addMeshType(spMesh.value)
@@ -150,7 +162,8 @@
         spAddress,
         spMeshTypes,
         spMesh,
-        spObs
+        spObs,
+        updateValidationState
       };
     },
   });
