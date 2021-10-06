@@ -131,9 +131,16 @@
       const deleteMeshType = (index: Number) => {
         emit('delete-mesh-type',index)
       };
+
       const addMeshType = (mesh: Object) => {
         emit('add-mesh-type',mesh)
       };
+
+      watchEffect(() => {
+        if(spMesh.value !== 0 && spMesh.value !== "") {
+          addMeshType(spMesh.value)
+        }
+      })
 
       return {
         deleteMeshType,
@@ -143,7 +150,7 @@
         spAddress,
         spMeshTypes,
         spMesh,
-        spObs,
+        spObs
       };
     },
   });
