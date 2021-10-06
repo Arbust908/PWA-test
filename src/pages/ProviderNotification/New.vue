@@ -77,7 +77,7 @@
       <template #body>
         <div class="text-left" v-if="!isNotificationConfirmed">
           <p class="text-base text-black font-bold">Notificación a proveedores</p>
-          <div v-if="modalData.sandProvider" class="bg-gray-100 mt-3 rounded-r-md pt-2 pl-4 pb-3 border-l-4 border-green-500 border-t-0">
+          <div v-if="modalData.sandProvider" class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
             <p class="font-bold text-black text-base">Arenas {{modalData.sandProvider}}</p>
             <ul>
               <li v-for="(order, index) in modalData.sandOrders" 
@@ -87,7 +87,7 @@
               </li>
             </ul>
           </div>
-          <div v-if="modalData.transportProvider" class="bg-gray-100 mt-3 rounded-r-md pt-2 pl-4 pb-3 border-l-4 border-green-500 border-t-0">
+          <div v-if="modalData.transportProvider" class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
             <p class="font-bold text-black text-base">Transporte {{modalData.transportProvider}}</p>
             <ul>
               <li class="ml-2 text-black text-sm list-none">
