@@ -9,11 +9,16 @@ export default {
     },
     UPDATE_WORKORDER(state, payload) {
       // Que no sea map
-      state.all.map((workOrder, index) => {
-        if (workOrder.id === payload.id) {
-          state.all[index] = payload;
-        }
-      });
+      const index = state.all.findIndex(
+        (workOrder) => workOrder.id === payload.id
+      );
+      state.all[index] = payload;
+
+      // state.all.map((workOrder, index) => {
+      //   if (workOrder.id === payload.id) {
+      //     state.all[index] = payload;
+      //   }
+      // });
     },
     DELETE_WORKORDER(state, payload) {
       state.all = state.all.filter((workOrder) => workOrder.id !== payload);
