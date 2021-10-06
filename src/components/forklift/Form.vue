@@ -8,6 +8,8 @@
         title="Nombre"
         :data="forklift.name"
         @update:data="forklift.name = $event"
+        requireValidation
+        @update-validation-state="updateValidationState"
       />
       <FieldTextArea
         class="col-span-full"
@@ -24,7 +26,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, ref } from 'vue';
   import { useVModel } from '@vueuse/core';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
@@ -43,8 +45,14 @@
     },
     setup(props, { emit }) {
       const forklift = useVModel(props, 'forklift', emit);
+      
+      const updateValidationState = (data: Object) => {
+        emit('update-validation-state',{fieldName: data.fieldName,validationsPassed: data.validationsPassed})
+      }
+
       return {
         forklift,
+        updateValidationState
       };
     },
   });
