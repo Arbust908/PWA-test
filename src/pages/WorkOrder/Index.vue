@@ -28,12 +28,8 @@
           <td>
             {{ wo.id }}
           </td>
-          <td :class="wo.client ? null : 'empty'">
-            {{ clientIdToName(wo.client) }}
-          </td>
-          <td :class="wo.serviceCompany ? null : 'empty'">
-            {{ clientIdToName(wo.serviceCompany) }}
-          </td>
+          <td :class="wo.client ? null : 'empty'">{{wo.clientName}}</td>
+          <td :class="wo.serviceCompany ? null : 'empty'">{{wo.operatorName}}</td>
           <td>
             {{ listPits(wo.pits) }}
           </td>
@@ -43,7 +39,7 @@
                 <Icon icon="PencilAlt" class="w-5 h-5" />
                 <span> Editar </span>
               </router-link>
-              <button class="delete" @click="deleteWO(wo.id)">
+              <button class="delete" @click="deleteWorkOrder(wo.id)">
                 <Icon icon="Trash" class="w-5 h-5" />
                 <span> Eliminar </span>
               </button>
@@ -61,14 +57,15 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, watch, defineComponent } from 'vue';
+  import { ref, Ref, watch, defineComponent, onMounted } from 'vue';
   import { useStore } from 'vuex';
   import Layout from '@/layouts/Main.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import UiTable from '@/components/ui/TableWrapper.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
+  import axios from 'axios'
+  const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-  import { useApi } from '@/helpers/useApi';
 
   import { useTitle } from '@vueuse/core';
   import { WorkOrder } from '@/interfaces/WorkOrder';
@@ -83,29 +80,15 @@
     setup() {
       useTitle('Ordenes de Trabajo <> Sandflow');
       const store = useStore();
+      const workOrders = ref([])
+      const companies = ref([])
 
-      const { read, destroy } = useApi('/workOrder');
-      const workOrders = read();
       watch(workOrders, (newValue, _) => {
-        console.log('Work Orders', newValue);
         if (newValue) {
           storeToState(newValue);
         }
       });
-      const { read: getCompanies } = useApi('/company');
-      const companies = getCompanies();
-      const clientIdToName = (id: number) => {
-        if (typeof id === 'string' && Number.isNaN(Number(id))) {
-          return id;
-        }
-        if (!companies && !companies.value) {
-          return '-';
-        }
-        const client = companies.value.find((c) => {
-          return c.id === id;
-        });
-        return client ? client.name : 'Sin cliente';
-      };
+
       const listPits = (pits: Array<Pit>) => {
         if (!pits || pits.length <= 0) {
           return '-';
@@ -115,25 +98,61 @@
           return list;
         }, '');
       };
+
       const storeToState = (wOs: Array<WorkOrder>) => {
         return wOs.map((wO) => {
           store.dispatch('saveWorkOrder', wO);
         });
       };
-      const deleteWO = (woId) => {
-        const data = destroy(woId);
-        watch(data, (_, __) => {
-          store.dispatch('deleteWorkOrder', woId);
-          workOrders.value = workOrders.value.filter((woFromApi) => {
-            return woFromApi.id !== woId;
-          });
-        });
+
+      const deleteWorkOrder = async (woId) => {
+        await axios.delete(`${apiUrl}/workOrder/${woId}`)
+        .then(res => {
+          if(res.status == 200) {
+            store.dispatch('deleteWorkOrder', woId);
+            workOrders.value = workOrders.value.filter((woFromApi) => {
+              return woFromApi.id !== woId;
+            });
+          }
+        })
       };
+
+      const getWorkOrders = async () => {
+        return await axios.get(`${apiUrl}/workOrder`)
+        .then(res => {
+          workOrders.value = res.data.data
+        })
+      }
+
+      const getCompanies = async () => {
+        return await axios.get(`${apiUrl}/company`)
+        .then(res => {
+          companies.value = res.data.data
+        })
+      }
+
+      const idToName = (id: number) => {
+        if(id == -1) return "Sin operadora"
+        let company = companies.value.filter(company => {
+          if(company.id == id) return company
+        })[0]
+        
+        return company.name
+      };
+
+      onMounted(async() => {
+        await getWorkOrders()
+        await getCompanies()
+        workOrders.value.forEach(workOrder => {
+          workOrder.clientName = idToName(parseInt(workOrder.client))
+          workOrder.operatorName = idToName(parseInt(workOrder.serviceCompany))
+          return workOrder
+        })
+      })
 
       return {
         workOrders,
-        deleteWO,
-        clientIdToName,
+        deleteWorkOrder,
         listPits,
       };
     },
