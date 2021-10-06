@@ -31,6 +31,7 @@
               endpoint="/sandProvider"
               :data="providerId.id"
               @update:data="providerId.id = $event"
+              @change="changeProvider"
             />
           </div>
           <FieldGroup 
@@ -48,6 +49,7 @@
               endpointKey="type"
               :data="order.sandTypeId"
               @update:data="order.sandTypeId = $event"
+              :filteredData="filteredSandTypes"
             />
             <FieldWithSides
               :title="orderKey === 0 ? 'Cantidad' : ''"
@@ -298,6 +300,16 @@
         },
       ] as Array<Object>);
 
+      const filteredSandTypes = ref([])
+
+      const changeProvider = () => {
+        const [provider] = sandProviders.value.filter(sandProvider => {
+          if(sandProvider.id == sandProvidersIds.value[0].id) return sandProvider
+        })
+
+        filteredSandTypes.value = provider.meshType
+      }
+
       const defaultTransportOrder = {
           innerId: 0,
           boxAmount: 0,
@@ -372,15 +384,16 @@
       ]);
       // :: Ordenes de Sand
       const sandOrders = ref([] as Array<SandOrder>);
-      // :: Tipos de Sand
+
       const sandTypes = ref([] as Array<Sand>);
       const { data: sandTypesData } = useAxios('/sand', instance);
+
       watch(sandTypesData, (sOData, prevCount) => {
         if (sOData && sOData.data) {
           sandTypes.value = sOData.data;
         }
       });
-      // >> Tipos de Sand
+
       const removeOrder = (id: number, providerOrderId): void => {
         const currentSPI = sandProvidersIds.value.find(
           (spi) => spi.innerId === providerOrderId
@@ -561,6 +574,8 @@
         isFirst,
         isLast,
         isNotLastAndNotLonly,
+        changeProvider,
+        filteredSandTypes
       };
     },
   };

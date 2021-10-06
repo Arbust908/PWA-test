@@ -83,10 +83,7 @@
       />
       <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
         <section>
-          <GhostBtn
-            v-if="isLastSection()"
-            @click.prevent="addCrew"
-          >
+          <GhostBtn v-if="isLastSection()" @click.prevent="addCrew">
             Agregar Crew
           </GhostBtn>
         </section>
@@ -165,7 +162,7 @@
       EquipmentSection,
       NoneBtn,
       TimePicker,
-      RRHHSection
+      RRHHSection,
     },
     setup() {
       // Init
@@ -187,8 +184,7 @@
       const currentWorkOrder: WorkOrder = workOrders.find((wo) => {
         return wo.id == id;
       });
-      const newCWO = ref(currentWorkOrder);
-      console.log('Orden de Trabajo', newCWO);
+      let newCWO = ref(currentWorkOrder);
 
       const woID = ref(newCWO.value.id);
       const client = ref(newCWO.value.client);
@@ -416,41 +412,98 @@
             if (pits.value.length > 0) {
               const isPitsFinished = ref([]);
               pits.value.forEach((pit: Pit) => {
-                const { data } = useAxios(
-                  `/pit/${pit.id}`,
-                  { method: 'PUT', data: pit },
-                  instance
-                );
-                isPitsFinished.value.push(data);
+                if (!pit.id) {
+                  const { data } = useAxios(
+                    `/pit/${pit.id}`,
+                    {
+                      method: 'POST',
+                      data: { ...pit, workOrderId: newVal.data.id },
+                    },
+                    instance
+                  );
+                  isPitsFinished.value.push(data);
+                  newVal.data.pits.push(pit);
+                } else {
+                  const { data } = useAxios(
+                    `/pit/${pit.id}`,
+                    { method: 'PUT', data: pit },
+                    instance
+                  );
+                  isPitsFinished.value.push(data);
+                  newVal.data.pits = newVal.data.pits.map((p) => {
+                    if (p.id === pit.id) {
+                      return pit;
+                    }
+
+                    return p;
+                  });
+                }
               });
-              console.log(isPitsFinished.value);
             }
             if (traktors.value.length > 0) {
               const isTraktorsFinished = ref([]);
               traktors.value.forEach((traktor) => {
-                const { data } = useAxios(
-                  `/traktor/${traktor.id}`,
-                  { method: 'PUT', data: traktor },
-                  instance
-                );
-                isTraktorsFinished.value.push(data);
+                if (!traktor.id) {
+                  const { data } = useAxios(
+                    `/traktor/`,
+                    {
+                      method: 'POST',
+                      data: { ...traktor, workOrderId: newVal.data.id },
+                    },
+                    instance
+                  );
+                  isTraktorsFinished.value.push(data);
+                  newVal.data.traktors.push(traktor);
+                } else {
+                  const { data } = useAxios(
+                    `/traktor/${traktor.id}`,
+                    { method: 'PUT', data: traktor },
+                    instance
+                  );
+                  isTraktorsFinished.value.push(data);
+                  newVal.data.traktors = newVal.data.traktors.map((trak) => {
+                    if (trak.id === traktor.id) {
+                      return traktor;
+                    }
+
+                    return trak;
+                  });
+                }
               });
-              console.log(isTraktorsFinished.value);
             }
             if (pickups.value.length > 0) {
               const isPickupFinished = ref([]);
               pickups.value.forEach((pickup) => {
-                console.log(pickup);
-                const { data } = useAxios(
-                  `/pickup/${pickup.id}`,
-                  { method: 'POST', data: pickup },
-                  instance
-                );
-                isPickupFinished.value.push(data);
+                if (!pickup.id) {
+                  const { data } = useAxios(
+                    `/pickup/`,
+                    {
+                      method: 'POST',
+                      data: { ...pickup, workOrderId: newVal.data.id },
+                    },
+                    instance
+                  );
+                  isPickupFinished.value.push(data.value);
+                  newVal.data.pickups.push(pickup);
+                } else {
+                  const { data } = useAxios(
+                    `/pickup/${pickup.id}`,
+                    { method: 'PUT', data: pickup },
+                    instance
+                  );
+                  isPickupFinished.value.push(data);
+                  newVal.data.pickups = newVal.data.pickups.map((pick) => {
+                    if (pick.id === pickup.id) {
+                      return pickup;
+                    }
+
+                    return pick;
+                  });
+                }
               });
-              console.log(isPickupFinished.value);
             }
-            // store.dispatch('updateWorkOrder', newVal.data);
+
+            store.dispatch('updateWorkOrder', newVal.data);
             setTimeout(() => {
               toggleLoading(false);
               setTimeout(() => {
