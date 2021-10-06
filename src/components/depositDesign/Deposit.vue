@@ -102,6 +102,11 @@
       const setFloor = (floor: number) => {
         currentFloor.value = floor;
       };
+      watch(floor, (newVal, _) => {
+        if (newVal < currentFloor.value) {
+          setFloor(newVal);
+        }
+      })
       const selectBox = (box: Box) => {
         emit('select-box', box);
       };

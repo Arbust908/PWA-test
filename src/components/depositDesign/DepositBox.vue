@@ -44,13 +44,13 @@
 
       const category = computed(() => {
         return (
-          boxData ? boxData.value.category : 'empty'
+          boxData && boxData.value ? boxData.value.category : 'empty'
         );
       });
 
       const id = computed(() => {
         return (
-          boxData ? boxData.value.id : ''
+          boxData && boxData.value ? boxData.value.id : ''
         );
       });
 
@@ -59,8 +59,8 @@
           floor: floor.value,
           row: row.value,
           col: col.value,
-          category: category.value,
-          id: id.value,
+          category: category.value || '',
+          id: id.value || '',
         };
         emit('select-box', box);
       };
