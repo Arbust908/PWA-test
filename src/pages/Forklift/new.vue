@@ -68,8 +68,7 @@
       });
 
       const fieldsValidations = ref({
-        name: false,
-        observations: false
+        name: false
       })
 
       const goToIndex = (): void => {
@@ -85,7 +84,7 @@
         const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
           if(input[1] == false) return input
         })
-
+        
         if(isInvalidated.length > 0) return isValidated.value = false
         if(isInvalidated.length == 0) return isValidated.value = true
       }
