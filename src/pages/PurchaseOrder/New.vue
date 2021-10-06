@@ -8,7 +8,7 @@
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm">
-      <form method="POST" action="/" class="p-4 flex flex-col gap-4">
+      <form method="POST" action="/" class="p-4 flex-col gap-4">
         <FieldGroup class="max-w-2xl border-none">
           <ClientPitCombo
             :clientId="companyClientId"
@@ -22,9 +22,9 @@
           v-for="(providerId, sandProvidersKey) in sandProvidersIds"
           :key="sandProvidersKey"
         >
-          <FieldGroup class="max-w-2xl border-none">
+          <div class="w-full grid grid-cols-12 gap-6 mb-4">
             <FieldSelect
-              class="col-span-12 sm:col-span-6"
+              class="col-span-12 mt-5 md:col-span-6"
               fieldName="sandProvider"
               title="Proveedor"
               placeholder="Selecciona proveedor"
@@ -33,72 +33,82 @@
               @update:data="providerId.id = $event"
               @change="changeProvider"
             />
-          </FieldGroup>
+          </div>
           <FieldGroup 
-              v-for="(order, orderKey) in providerId.sandOrders"
-              :key="orderKey"
-              class="max-w-3xl relative"
+            v-for="(order, orderKey) in providerId.sandOrders"
+            :key="orderKey"
+            class="max-w-3xl relative"
+            :class="isFirst(orderKey) ? null : ' mt-5'"
+          >
+            <FieldSelect
+              :title="orderKey === 0 ? 'Tipo' : ''"
+              class="col-span-6 sm:col-span-3"
+              fieldName="sandType"
+              placeholder="Tipo de Arena"
+              endpoint="/sand"
+              endpointKey="type"
+              :data="order.sandTypeId"
+              @update:data="order.sandTypeId = $event"
+              :filteredData="filteredSandTypes"
+            />
+            <FieldWithSides
+              :title="orderKey === 0 ? 'Cantidad' : ''"
+              class="col-span-6 sm:col-span-3"
+              fieldName="sandQuantity"
+              placeholder="Arena"
+              type="number"
+              :post="{ title: '0', value: 't', width: '3rem' }"
+              :data="order.amount"
+              @update:data="order.amount = $event"
+            />
+            <FieldInput
+              :title="orderKey === 0 ? 'ID de caja' : ''"
+              class="col-span-9 sm:col-span-4"
+              fieldName="sandBoxId"
+              placeholder="ID"
+              isOptional
+              :data="order.boxId"
+              @update:data="order.boxId = $event"
+            />
+            <div
+              :class="isFirst(orderKey) ? 'mt-7':'mt-3'"
+              class="col-span-1 md:col-span-2 flex flex-row"
             >
-              <FieldSelect
-                :title="orderKey === 0 ? 'Tipo' : ''"
-                class="col-span-12 sm:col-span-5 mt-3"
-                fieldName="sandType"
-                placeholder="Tipo de Arena"
-                endpoint="/sand"
-                endpointKey="type"
-                :data="order.sandTypeId"
-                @update:data="order.sandTypeId = $event"
-                :filteredData="filteredSandTypes"
-              />
-              <FieldWithSides
-                :title="orderKey === 0 ? 'Cantidad' : ''"
-                class="col-span-4 sm:col-span-3 mt-3"
-                fieldName="sandQuantity"
-                placeholder="Arena"
-                type="number"
-                :post="{ title: '0', value: 't', width: '3rem' }"
-                :data="order.amount"
-                @update:data="order.amount = $event"
-              />
-              <FieldInput
-                :title="orderKey === 0 ? 'ID de caja' : ''"
-                class="col-span-6 sm:col-span-4 mt-3"
-                fieldName="sandBoxId"
-                placeholder="ID"
-                isOptional
-                :data="order.boxId"
-                @update:data="order.boxId = $event"
-              />
-              <div class="absolute bottom-6 left-full ml-2 flex gap-2">
-                <CircularBtn
-                  v-if="useIfNotLonly(providerId.sandOrders)"
-                  btnClass="p-1"
-                  @click="removeOrder(order.id, providerId.innerId)"
-                >
-                  <Icon
-                    icon="Trash"
-                    type="outline"
-                    class="w-6 h-6"
-                    
-                  />
-                </CircularBtn>
+              <CircularBtn
+                v-if="useIfNotLonly(providerId.sandOrders)"
+                size="md"
+                @click="removeOrder(order.id, providerId.innerId)"
+              >
+                <Icon
+                  icon="Trash"
+                  type="outline"
+                  class="w-7 h-7"
+                />
+              </CircularBtn>
+              <div>
                 <CircularBtn
                   v-if="isLast(orderKey, providerId.sandOrders)"
+                  size="md"
                   btnClass="bg-green-500"
                   @click.prevent="addOrder(providerId.innerId)"
                 >
-                  <Icon
+                  <Icon 
                     icon="Plus"
-                    class="w-8 h-8 text-white"
+                    class="w-7 h-7 text-white"
                   />
                 </CircularBtn>
               </div>
+            </div>
           </FieldGroup>
+          <!-- <button class="mt-1 flex items-center col-span-6 sm:hidden" @click.prevent="addOrder(providerId.innerId)">
+            <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
+            <span class="font-bold"> Agregar</span>
+          </button> -->
         </template>
         <FieldGroup>
-          <FieldLegend>Transporte</FieldLegend>
+          <FieldLegend class="mt-2">Transporte</FieldLegend>
           <FieldSelect
-            class="col-span-12 mt-3 pl-1 md:col-span-6"
+            class="col-span-12 md:col-span-6"
             fieldName="transportProvider"
             title="Proveedor"
             placeholder="Selecciona proveedor"
@@ -106,10 +116,10 @@
             :data="transportProviderId"
             @update:data="transportProviderId = $event"
           />
-        <FieldGroup 
+          <FieldGroup 
               v-for="(to, toKey) in TransportOrders"
               :key="toKey"
-              class="col-span-full max-w-xl relative"
+              class="col-span-full relative"
             >
               <FieldInput
                 :title="useOnFirst(toKey, 'Patente')"
@@ -132,29 +142,29 @@
               />
               <FieldInput
                 :title="useOnFirst(toKey, 'Observaciones')"
-                class="col-span-8 sm:col-span-6"
+                class="col-span-9 sm:col-span-4"
                 fieldName="observations"
-                placeholder="Chasis shico"
+                placeholder="Ej: chasis chico"
                 isOptional
                 :data="to.observations"
                 @update:data="to.observations = $event"
               />
               <div
-                :class="isNotLastAndNotLonly(toKey, TransportOrders) ? 'bottom-6' : 'bottom-2'"
-                class="absolute left-full ml-2 flex gap-2"
+                :class="isFirst(toKey) ? 'mt-7':'mt-3'"
+                class="col-span-1 md:col-span-2 flex flex-row"
               >
                 <CircularBtn
                   v-if="useIfNotLonly(TransportOrders)"
                   size="md"
-                  btnClass="p-1"
                   @click="removeTransportOrder(to.innerId)"
                 >
                   <Icon
                     icon="Trash"
                     type="outline"
-                    class="w-6 h-6"
+                    class="w-7 h-7"
                   />
                 </CircularBtn>
+                <div>
                 <CircularBtn
                   v-if="isLast(toKey, TransportOrders)"
                   size="md"
@@ -163,11 +173,16 @@
                 >
                   <Icon 
                     icon="Plus"
-                    class="w-8 h-8 text-white"
+                    class="w-7 h-7 text-white"
                   />
                 </CircularBtn>
+                </div>
               </div>
           </FieldGroup>
+          <!-- <button class="mt-1 flex items-center col-span-6 sm:hidden" @click.prevent="addTransportOrder()">
+            <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
+            <span class="font-bold"> Agregar</span>
+          </button> -->
         </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">
