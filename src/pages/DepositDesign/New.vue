@@ -9,8 +9,8 @@
     </header>
     <section class="deposit bg-second-0 rounded-md shadow-sm">
       <form method="POST" action="/" class="p-12 flex flex-col gap-4">
-       <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
-         <h2 class="col-span-full text-3xl font-bold">
+        <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
+          <h2 class="col-span-full text-3xl font-bold">
             Pozo {{ designName }}
           </h2>
           <ClientPitCombo
@@ -19,15 +19,21 @@
             @update:clientId="clientId = $event"
             @update:pitId="pitId = $event"
           />
-          <div class="col-span-6  md:col-span-4 flex flex-col items-center gap-4">
+          <div
+            class="col-span-6 md:col-span-4 flex flex-col items-center gap-4"
+          >
             <h3 class="text-xs">Cantidad de filas</h3>
             <Counter :amount="rows" @update:amount="rows = $event" />
           </div>
-          <div class="col-span-6  md:col-span-4 flex flex-col items-center gap-4">
+          <div
+            class="col-span-6 md:col-span-4 flex flex-col items-center gap-4"
+          >
             <h3 class="text-xs">Cantidad de columnas</h3>
             <Counter :amount="cols" @update:amount="cols = $event" />
           </div>
-          <div class="col-span-6  md:col-span-4 flex flex-col items-center gap-4">
+          <div
+            class="col-span-6 md:col-span-4 flex flex-col items-center gap-4"
+          >
             <h3 class="text-xs">Cantidad de pisos</h3>
             <Counter :amount="floors" @update:amount="floors = $event" />
           </div>
@@ -35,7 +41,7 @@
             <h3 class="text-xs">Cantidad de ubicación</h3>
             <Counter />
           </div> -->
-      </FieldGroup>
+        </FieldGroup>
         <fieldset class="py-2 flex gap-x-10 2xl:gap-x-40">
           <section
             class="
@@ -267,8 +273,8 @@
         }
       };
       const removeFloor = (floor: number) => {
-        for (let c = cols.value; c > 1; c--) {
-          for (let r = rows.value; r > 1; r--) {
+        for (let c = cols.value; c >= 1; c--) {
+          for (let r = rows.value; r >= 1; r--) {
             removeCell(floor, c, r);
           }
         }
