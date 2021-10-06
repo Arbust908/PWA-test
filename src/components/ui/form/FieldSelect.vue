@@ -24,7 +24,7 @@
 </template>
 
 <script>
-  import { defineComponent, computed, ref } from 'vue';
+  import { defineComponent, computed, ref, toRefs, watchEffect } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { useApi } from '@/helpers/useApi';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
@@ -65,27 +65,41 @@
         type: Boolean,
         default: false,
       },
+      filteredData: {
+        type: Array,
+        required: false
+      }
     },
     setup(props, { emit }) {
+      const {filteredData} = toRefs(props)
       const endpointData = useVModel(props, 'endpointData', emit);
       const value = useVModel(props, 'data', emit);
-      console.log(value.value)
       const getApiVal = () => {
         const { read } = useApi(props.endpoint);
         return read();
       };
       let resources = ref([]);
+
       const epData = computed(() => {
         return props.endpoint === '/' ? endpointData.value : null;
       });
-      if (props.endpoint !== '/' && props.endpoint !== null) {
+
+      if (props.endpoint !== '/' && props.endpoint !== null && !props.filteredData) {
         resources = getApiVal();
       }
+
+      watchEffect(() => {
+        if(props.filteredData && props.filteredData.length > 0) {
+          resources.value = filteredData.value
+        }
+      })
+
       return {
         value,
         resources,
         epData,
-        ...props,
+        filteredData,
+        ...props
       };
     },
   });
