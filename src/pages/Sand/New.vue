@@ -13,14 +13,15 @@
         :description="observations"
         @update:type="type = $event"
         @update:description="observations = $event"
+        @update-validation-state="updateValidationState"
       />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -31,7 +32,7 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, computed } from 'vue';
+  import { reactive, toRefs, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import { useTitle } from '@vueuse/core';
@@ -67,9 +68,24 @@
         observations: '',
       });
 
-      const isFull = computed(() => {
-        return !!(newSand.type.length > 0);
-      });
+      const fieldsValidations = ref({
+        sandMesh: false
+      })
+
+      const isValidated = ref(false)
+
+      const updateValidationState = (data) => {
+        const {fieldName, validationsPassed} = data
+        fieldsValidations.value[`${fieldName}`] = validationsPassed
+
+        const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
+          if(input[1] == false) return input
+        })
+        
+        if(isInvalidated.length > 0) return isValidated.value = false
+        if(isInvalidated.length == 0) return isValidated.value = true
+      }
+
 
       const save = async () => {
         let sandDB = await axios
@@ -92,7 +108,8 @@
         goToIndex,
         save,
         ...toRefs(newSand),
-        isFull,
+        isValidated,
+        updateValidationState
       };
     },
   };

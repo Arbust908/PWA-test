@@ -8,6 +8,8 @@
         title="Tipo de malla"
         :data="type"
         @update:data="type = $event"
+        requireValidation
+        @update-validation-state="updateValidationState"
       />
       <FieldTextArea
         class="col-span-full"
@@ -47,9 +49,15 @@
     },
     setup(props, { emit }) {
       const { type, description } = useVModels(props, emit);
+
+      const updateValidationState = (data: Object) => {
+        emit('update-validation-state',{fieldName: data.fieldName,validationsPassed: data.validationsPassed})
+      }
+
       return {
         type,
         description,
+        updateValidationState
       };
     },
   });
