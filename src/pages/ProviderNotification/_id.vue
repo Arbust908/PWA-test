@@ -20,7 +20,7 @@
               name="sandProvider"
             >
               <option selected disabled value="">
-                Seleccionar Proveedor de Arena
+                Seleccionar centro de carga de arena
               </option>
               <option v-for="sP in sandProviders" :key="sP.id" :value="sP.id">
                 {{ toCapitalize(sP.name) }}

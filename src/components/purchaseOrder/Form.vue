@@ -10,7 +10,7 @@
           type="text"
           name="sandProvider"
           list="sandProvider"
-          placeholder="Proveedor de Arena"
+          placeholder="Centro de Carga de Arena"
         />
         <datalist id="sandProvider">
           <option value="San Luis">San Luis</option>
