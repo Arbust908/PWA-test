@@ -17,6 +17,8 @@
             title="Nombre"
             :data="name"
             @update:data="name = $event"
+            requireValidation
+            @update-validation-state="updateValidationState"
           />
           <FieldTextArea
             class="col-span-full"
@@ -34,9 +36,9 @@
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -47,7 +49,7 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, computed } from 'vue';
+  import { reactive, toRefs, ref } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import { useTitle } from '@vueuse/core';
@@ -97,9 +99,23 @@
         ]
       });
       
-      const isFull = computed(() => {
-        return !!(newCradle.name && newCradle.name.length > 3);
-      });
+      const fieldsValidations = ref({
+        name: false
+      })
+
+      const isValidated = ref(false)
+
+      const updateValidationState = (data) => {
+        const {fieldName, validationsPassed} = data
+        fieldsValidations.value[`${fieldName}`] = validationsPassed
+
+        const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
+          if(input[1] == false) return input
+        })
+        
+        if(isInvalidated.length > 0) return isValidated.value = false
+        if(isInvalidated.length == 0) return isValidated.value = true
+      }
 
       const save = async () => {
         let sandDB = await axios
@@ -124,8 +140,9 @@
         goToIndex,
         save,
         newCradle,
-        isFull,
+        updateValidationState,
         ...toRefs(newCradle),
+        isValidated
       };
     },
   };
