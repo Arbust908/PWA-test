@@ -29,22 +29,48 @@
             @update:data="purchaseOrderId = $event"
           />
         </FieldGroup>
-        <fieldset v-if="selectionsAreDone" class="w-full py-5 px-2">
-          <div v-if="boxes.length > 0">
+        <fieldset v-if="selectionsAreDone" class="w-full pt-1 pb-5 px-2">
+          <span v-if="boxesWithoutId.length > 0" class="text-xs text-green-600">*Complete los ids de caja faltantes</span>
+          <div class="mt-2" v-if="boxes.length > 0 || boxesWithId.length > 0">
             <div v-for="box in boxes" :key="box.id" class="available-box">
               <button
                 :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
                 class="radio-button"
                 @click.prevent="setSelectedBox(box.boxId)"
               ></button>
-              <div class="box-id">
+              <div class="mx-2 flex items-center">
                 <span> {{ box.category }} - {{ box.amount }}t - </span>
-                <input
-                  v-model="box.boxId"
-                  :name="`boxId-${box.id}`"
-                  type="text"
-                  placeholder="S-0001"
-                />
+                <div class="mx-2 w-48 flex justify-between text-center border-2 rounded-md border-warmGray-300">
+                  <span class="px-2 w-1/2 bg-gray-200 border-r-2 border-gray-400">ID Caja</span>
+                  <input
+                    v-model="box.boxId"
+                    :name="`boxId-${box.id}`"
+                    type="text"
+                    placeholder="Ej: S-0001"
+                    class="input-read-only"
+                    disabled
+                  />
+                </div>
+              </div>
+            </div>
+            <div v-for="box in boxesWithoutId" :key="box.id" class="available-box">
+              <button
+                :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
+                class="radio-button"
+                @click.prevent="setSelectedBox(box.boxId)"
+              ></button>
+              <div class="mx-2 flex items-center">
+                <span> {{ box.category }} - {{ box.amount }}t - </span>
+                <div class="mx-2 w-48 flex justify-between text-center border-2 rounded-md border-warmGray-300">
+                  <span class="px-2 w-1/2 bg-gray-200 border-r-2 border-gray-400">ID Caja</span>
+                  <input
+                    v-model="box.boxId"
+                    :name="`boxId-${box.id}`"
+                    type="text"
+                    placeholder="Ej: S-0001"
+                    class="input"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -204,6 +230,7 @@
     <footer class="p-4 space-x-8 flex justify-end">
       <GhostBtn
         class="border-none"
+        
         @click.prevent="$router.push('/diseno-de-deposito')"
       >
         Cancelar
@@ -301,6 +328,7 @@
       const router = useRouter();
       let activeSection = ref('deposit');
       let boxes = ref([]);
+      let boxesWithoutId = ref([]);
 
       const purchaseOrders = ref([]);
       const filteredPurchaseOrders = ref([]);
@@ -431,10 +459,27 @@
               .catch((err) => console.error(err));
             
               filteredPurchaseOrders.value.length > 0
-                ? boxes.value = filteredPurchaseOrders.value[filteredPurchaseOrders.value.findIndex(po => po.id == purchaseOrderId.value)].sandOrders
+                ? boxes.value = filteredPurchaseOrders.value[filteredPurchaseOrders.value.
+                findIndex(po => po.id == purchaseOrderId.value)].sandOrders.filter(so => so.boxId.length > 0)
                 : boxes.value = [];
+
+              filteredPurchaseOrders.value.length > 0
+                ? boxesWithoutId.value = filteredPurchaseOrders.value[filteredPurchaseOrders.value
+                  .findIndex(po => po.id == purchaseOrderId.value)].sandOrders.filter(so => so.boxId.length < 1)
+                : boxesWithoutId.value = [];
+
+              console.log('boxes', boxes.value);
+              console.log('boxesWitoutId', boxesWithoutId.value)
+
               
             boxes.value.map((box) => {
+              let sandType = sandTypes.find(
+                (type) => parseInt(type.id) == parseInt(box.sandTypeId)
+              );
+              box.category = sandType.type.toLowerCase();
+            });
+
+            boxesWithoutId.value.map((box) => {
               let sandType = sandTypes.find(
                 (type) => parseInt(type.id) == parseInt(box.sandTypeId)
               );
@@ -493,14 +538,15 @@
       }
 
       const setSelectedBox = async (id: Number) => {
-        choosedBox.value = await boxes.value.filter((box) => {
+        choosedBox.value = boxes.value.filter((box) => {
+          if (box.boxId == id) return box;
+        })[0] || boxesWithoutId.value.filter((box) => {
           if (box.boxId == id) return box;
         })[0];
         if(checkIfWasBoxInOriginalDeposit(id)) {
           Object.entries(warehouse.value.layout).forEach(cell => {
           if(cell[1].id == id) {
-            const proxy = cell[0].split('|');
-            const [floor, row, col] = proxy;
+            const [floor, row, col] = cell[0].split('|');
             choosedBox.value.floor = parseInt(floor)
             choosedBox.value.row = parseInt(row)
             choosedBox.value.col = parseInt(col)
@@ -535,7 +581,7 @@
           choosedBox.value.col = box.col;
           choosedBox.value.row = box.row;
           warehouse.value.layout[`${newBPos}`].category =
-            choosedBox.value.category;
+          choosedBox.value.category;
           warehouse.value.layout[`${newBPos}`].id = choosedBox.value.boxId;
         }
       };
@@ -616,6 +662,7 @@
         purchaseOrderId.value = -1;
         confirmModal.value = false
       };
+
       const save = async () => {
         const warehouseDone = ref(false);
         const warehouseId = warehouse.value.id;
@@ -652,10 +699,31 @@
           .catch((err) => console.error(err))
         }
 
+        boxes.value.forEach(async box => {
+          const data = {
+            id: box.id,
+            boxId: box.boxId,
+            sandTypeId: box.sandTypeId,
+            amount: box.amount,
+          }
+          await axios
+          .put(`${apiUrl}/sandOrder/${data.id}`, data)
+        });
+
+        boxesWithoutId.value.forEach(async box => {
+          const data = {
+            id: box.id,
+            boxId: box.boxId,
+            sandTypeId: box.sandTypeId,
+            amount: box.amount,
+          }
+          await axios
+          .put(`${apiUrl}/sandOrder/${data.id}`, data)
+        });
+
         if(warehouseDone.value && cradleDone.value) confirmModal.value = true;
         if(warehouseDone.value && wasCradleModificated.value == false) confirmModal.value = true;
         if(cradleDone.value && wasWarehouseModificated.value == false) confirmModal.value = true;
-
       };
 
       return {
@@ -673,6 +741,7 @@
         changeSection,
         selectionsAreDone,
         boxes,
+        boxesWithoutId,
         setSelectedBox,
         warehouse,
         floor,
@@ -702,9 +771,7 @@
   .section-tab.active {
     @apply border-main-500 text-main-500;
   }
-  .input {
-    @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
-  }
+  
   span.select-category {
     @apply flex items-center;
 
@@ -735,9 +802,9 @@
       @apply text-second-200 text-second-200;
     }
   }
-  // input:read-only {
-  //   @apply bg-second-200 border cursor-not-allowed;
-  // }
+  input:read-only {
+    @apply bg-second-200 border cursor-not-allowed;
+  }
   fieldset:not(:last-of-type) {
     @apply border-b pb-6;
   }
@@ -789,12 +856,15 @@
       }
     }
     .box-id {
-      @apply mx-2 flex items-center;
-      & > input {
-        @apply border-none inline p-0.5 rounded w-20 hover:bg-gray-200 focus:ring-main-500 focus:border-main-500;
-      }
+      @apply mx-2 flex items-center;   
     }
-  }
+    .input {
+      @apply border-none inline text-center p-0.5 w-1/2 bg-gray-200 focus:ring-main-500 focus:border-main-500;
+    }
+    .input-read-only {
+      @apply cursor-not-allowed text-center border-none bg-white inline p-0.5 w-1/2 focus:ring-main-500 focus:border-main-500;;
+    }
+}
   @keyframes pop_in {
     from {
       @apply transform scale-0;
