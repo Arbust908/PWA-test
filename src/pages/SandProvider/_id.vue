@@ -4,7 +4,7 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">
-        Proveedor de arena - {{ id }}
+        Centro de carga de arena - {{ id }}
       </h1>
     </header>
     <section class="bg-white rounded-md max-w-2xl shadow-sm">
@@ -99,7 +99,7 @@ import indexVue from './index.vue';
       const router = useRouter();
       const route = useRoute();
       const id = ref(0);
-      useTitle(`Proveedor de Arena ${id} <> Sandflow`);
+      useTitle(`Centro de Carga de Arena ${id} <> Sandflow`);
       const notificationModalvisible = ref(false);
       const toggleNotificationModal = () =>
         (notificationModalvisible.value = !notificationModalvisible.value);

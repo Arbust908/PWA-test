@@ -5,11 +5,11 @@ export default {
   state: () => ({
     all: [],
     error_messages: {
-      getAll: "No se pudieron obtener los datos de los proveedores de arena.",
-      get: "No se pudieron obtener los datos del proveedor de arena.",
-      create: "No se pudo crear el proveedor de arena.",
-      update: "No se pudo actualizar el proveedor de arena.",
-      delete: "No se pudo eliminar el proveedor de arena."
+      getAll: "No se pudieron obtener los datos de los centros de carga de arena.",
+      get: "No se pudieron obtener los datos del centro de carga de arena.",
+      create: "No se pudo crear el centro de carga de arena.",
+      update: "No se pudo actualizar el centro de carga de arena.",
+      delete: "No se pudo eliminar el centro de carga de arena."
     }
   }),
   getters: {

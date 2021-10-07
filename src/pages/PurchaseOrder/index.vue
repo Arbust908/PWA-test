@@ -10,7 +10,7 @@
       <template #header>
         <tr>
           <th scope="col" title="Numero de Pedido">N°</th>
-          <th scope="col">Proveedor de arena</th>
+          <th scope="col">Centro de Carga de Arena</th>
           <th scope="col">Proveedor de transporte</th>
           <!-- <th scope="col">Estado</th> -->
           <th scope="col">
