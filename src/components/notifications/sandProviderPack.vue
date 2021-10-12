@@ -3,7 +3,7 @@
     <FieldLegend>Arena</FieldLegend>
     <template v-for="(sPov, i) in sandProviders" :key="i">
         <FieldSelect
-          class="col-span-full sm:col-span-6" 
+          class="col-span-full sm:col-span-5" 
           fieldName="sandProvider"
           placeholder="Selecciona un proveedor"
           title="Proveedor"
@@ -15,10 +15,10 @@
       <div
         v-for="(so, Key) in sPov.SandOrders"
         :key="Key"
-        class="relative grid grid-cols-12 col-span-full gap-4 mt-2"
+        class="relative grid grid-cols-12 col-span-full gap-4 my-2"
       >
         <FieldSelect
-          class="col-span-5 sm:col-span-6"
+          class="col-span-5 sm:col-span-5"
           :title="Key === 0 ? 'Tipo' : '' "
           fieldName="sandType"
           placeholder="Arena"
