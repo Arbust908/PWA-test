@@ -78,7 +78,7 @@
             <ul>
               <li v-for="(order, index) in modalData.sandOrders" 
                 :key="index" 
-                class="text-black text-sm list-none mt-1">
+                class="text-black text-base list-none mt-1">
                 {{order.amount}}t - {{order.sandType}} 
               </li>
             </ul>
@@ -86,7 +86,7 @@
           <div v-if="modalData.transportProvider" class="bg-gray-100 mt-3 rounded-r-md py-4 pl-4 border-l-4 border-green-500 border-opacity-50">
             <p class="font-bold text-black text-base">Transporte {{modalData.transportProvider}}</p>
             <ul>
-              <li class="text-black text-sm list-none mt-2">
+              <li class="text-black text-base list-none mt-2">
                 {{modalData.transportQuantity}} camion(es){{` - ${modalData.transportObservations}`}}
               </li>
             </ul>
