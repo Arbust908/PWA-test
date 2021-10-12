@@ -24,7 +24,6 @@
           @update:spMesh="meshType = $event"
           @add-mesh-type="addMeshType"
           @delete-mesh-type="deleteMeshType"
-          @update-validation-state="updateValidationState"
         />
         <SandProviderRep
           :repName="companyRepresentative.name"
@@ -33,7 +32,6 @@
           @update:repName="companyRepresentative.name = $event"
           @update:repPhone="companyRepresentative.phone = $event"
           @update:repEmail="companyRepresentative.email = $event"
-          @update-validation-state="updateValidationState"
         />
       </form>
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
@@ -80,6 +78,7 @@
   import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
   import Modal from '@/components/modal/General.vue';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
+  import { useValidator } from '@/helpers/useValidator';
   import axios from 'axios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
   import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
@@ -139,29 +138,11 @@
         sandProvider.value.meshType.splice(index, 1)
       };
 
-      const fieldsValidations = ref({
-        sandProvName: false,
-        sandProvAddress: false,
-        sandProvId: false,
-        meshType: false,
-        sandRepName: false,
-        sandRepPhone: false,
-        sandRepEmail: false,
-      })
-
       const isValidated = ref(false)
 
-      const updateValidationState = (data) => {
-        const {fieldName, validationsPassed} = data
-        fieldsValidations.value[`${fieldName}`] = validationsPassed
-
-        const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
-          if(input[1] == false) return input
-        })
-        
-        if(isInvalidated.length > 0) return isValidated.value = false
-        if(isInvalidated.length == 0) return isValidated.value = true
-      }
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'sandProvider') ? true : false
+      })
 
       const save = async () => {
         sandProvider.value.companyRepresentative = companyRepresentative.value
@@ -175,14 +156,6 @@
           }
         );
       };
-
-      watchEffect(() => {
-        if(sandProvider.value.meshType.length > 0) {
-          updateValidationState({fieldName: "meshType", validationsPassed: true})
-        } else {
-          updateValidationState({fieldName: "meshType", validationsPassed: false})
-        }
-      })
 
       onMounted(async () => {
         await axios.get(`${apiUrl}/sand`)
@@ -209,7 +182,6 @@
         notificationModalvisible,
         toggleNotificationModal,
         errorMessage,
-        updateValidationState
       };
     },
   };

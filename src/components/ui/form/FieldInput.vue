@@ -10,20 +10,22 @@
       :readonly="isReadonly"
       v-model="value"
       v-maska="mask"
-      @blur="initiateValidators"
+      @blur="checkValidation(false)"
     />
     <InvalidInputLabel v-if="!isValid && wasInputEntered" :validationType="validationType" :charAmount="charAmount"/>
   </label>
 </template>
 
 <script>
-  import { computed, defineComponent, ref, toRefs, watchEffect } from 'vue';
+  import { computed, defineComponent, onMounted, onUpdated, ref, toRefs, watchEffect } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { maska } from 'maska';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
   import useVuelidate from '@vuelidate/core'
   import {required, email, minLength, maxLength, numeric} from '@vuelidate/validators'
   import InvalidInputLabel from '../InvalidInputLabel.vue';
+  import { useStore } from 'vuex';
+  import { useRoute } from 'vue-router'
 
   export default defineComponent({
     directives: { maska },
@@ -75,17 +77,22 @@
       charAmount: {
         type: Object,
         required: false
+      },
+      entity: {
+        type: String,
+        required: false
       }
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
-      const {requireValidation, fieldName} = toRefs(props)
+      const store = useStore()
+      const {requireValidation, fieldName, entity} = toRefs(props)
       const wasInputEntered = ref(false)
       const validationType = ref(props.validationType || "empty")
       const charAmount = ref(props.charAmount || null)
       const validationRules = ref({})
       const state = {
-        [`${fieldName.value}`]: value
+        [fieldName.value]: value
       }
 
       const getCharsAmountRule = (charsRule) => {
@@ -123,23 +130,36 @@
         }
       }
 
-      const updateValidationState = (fieldName,validationsPassed) => {
-        emit('update-validation-state',{fieldName,validationsPassed})
-      }
-
       const v$ = useVuelidate(validationRules, state)
+      const isValid = ref(null)
+      const route = useRoute()
 
-      const initiateValidators = () => {
-        wasInputEntered.value = true
+      const updateValidationState = (fieldName,validationsPassed,entity) => {
+        store.dispatch('sandProviderUpdateValidation', {fieldName,validationsPassed,entity})
       }
 
-      const isValid = computed(() => {
-        updateValidationState(fieldName.value,false)
-        if(!wasInputEntered.value) return false
-        if(v$.value.$silentErrors[0]) return false
-        
-        updateValidationState(fieldName.value,true)
-        return true
+      const validationsHandler = (valid) => {
+        if(isValid.value == valid) return
+        else {
+          isValid.value = valid
+          updateValidationState(fieldName.value,valid,entity.value)
+        }
+      }
+
+      const checkValidation = (isTheFirstUse) => {
+        if(!requireValidation.value) return
+        if(!isTheFirstUse && !wasInputEntered.value) wasInputEntered.value = true
+        v$.value.$invalid ? validationsHandler(false) : validationsHandler(true)
+      }
+
+      onMounted(() => { 
+        // Si es new, ejecuta.
+        if(route.path.includes('nuevo')) checkValidation(true)
+      })
+      
+      onUpdated(() => {
+        // Si es edit, ejecuta.
+        if(!route.path.includes('nuevo')) checkValidation(true)
       })
 
       return {  
@@ -148,10 +168,10 @@
         v$,
         fieldName,
         isValid,
-        initiateValidators,
         wasInputEntered,
         validationType,
-        charAmount
+        charAmount,
+        checkValidation
       };
     },
   });

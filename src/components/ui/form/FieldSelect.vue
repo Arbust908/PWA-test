@@ -9,6 +9,7 @@
       class="input"
       :name="fieldName"
       v-model.number="value"
+      @blur="$emit('is-blured')"
     >
       <option disabled value="-1">
         {{ placeholder }}
@@ -28,10 +29,11 @@
   import { useVModel } from '@vueuse/core';
   import { useApi } from '@/helpers/useApi';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
+
   export default defineComponent({
     name: 'FieldSelect',
     components: {
-      FieldTitle,
+      FieldTitle
     },
     props: {
       data: {
@@ -68,12 +70,24 @@
       filteredData: {
         type: Array,
         required: false
+      },
+      requireValidation: {
+        type: Boolean,
+        required: false
+      },
+      validationType: {
+        type: String,
+        required: false
+      },
+      entity: {
+        type: String,
+        required: false
       }
     },
     setup(props, { emit }) {
       const {filteredData} = toRefs(props)
-      const endpointData = useVModel(props, 'endpointData', emit);
       const value = useVModel(props, 'data', emit);
+      const endpointData = useVModel(props, 'endpointData', emit);
       const getApiVal = () => {
         const { read } = useApi(props.endpoint);
         return read();

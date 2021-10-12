@@ -9,7 +9,7 @@
       :data="repName"
       @update:data="repName = $event"
       requireValidation
-      @update-validation-state="updateValidationState"
+      entity="sandProvider"
     />
     <FieldInput
       class="col-span-full"
@@ -21,7 +21,7 @@
       @update:data="repPhone = $event"
       requireValidation
       validationType="numeric"
-      @update-validation-state="updateValidationState"
+      entity="sandProvider"
     />
     <FieldInput
       class="col-span-full"
@@ -32,7 +32,7 @@
       @update:data="repEmail = $event"
       requireValidation
       validationType="email"
-      @update-validation-state="updateValidationState"
+      entity="sandProvider"
     />
   </FieldGroup>
 </template>
@@ -71,11 +71,7 @@
     setup(props, { emit }) {
       const { repName, repPhone, repEmail } = useVModels(props, emit);
 
-      const updateValidationState = (data: Object) => {
-        emit('update-validation-state',{fieldName: data.fieldName,validationsPassed: data.validationsPassed})
-      }
-
-      return { repName, repPhone, repEmail, updateValidationState };
+      return { repName, repPhone, repEmail };
     },
   });
 </script>

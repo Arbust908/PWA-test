@@ -40,9 +40,9 @@
             Cancelar
           </NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, ComputedRef, Ref, computed, onMounted } from 'vue';
+  import { ref, Ref, watchEffect, onMounted } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { useTitle } from '@vueuse/core';
@@ -78,6 +78,8 @@
   import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
   import Modal from '@/components/modal/General.vue';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
+  import { useValidator } from '@/helpers/useValidator';
+
   // TIPOS
   import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
   import axios from 'axios'
@@ -125,25 +127,11 @@ import indexVue from './index.vue';
         currentSandProvider.value.meshType.splice(index)
       };
 
-      const providerFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          currentSandProvider.value.name !== '' &&
-          currentSandProvider.value.legalName !== '' &&
-          currentSandProvider.value.legalId >= 0
-        );
-      });
+      const isValidated = ref(false)
 
-      const repFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          companyRepresentative.value.name !== '' &&
-          companyRepresentative.value.phone !== '' &&
-          companyRepresentative.value.email !== ''
-        );
-      });
-
-      const isFull: ComputedRef<boolean> = computed(() => {
-        return providerFull.value && repFull.value;
-      });
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'sandProvider') ? true : false
+      })
 
       const save = async () => {
         await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value).then(
@@ -186,7 +174,7 @@ import indexVue from './index.vue';
         toggleRepStatus,
         companyRepresentative,
         currentSandProvider,
-        isFull,
+        isValidated,
         save,
         meshType,
         addMeshType,
