@@ -154,12 +154,16 @@
 
       onMounted(() => { 
         // Si es new, ejecuta.
-        if(route.path.includes('nuevo')) checkValidation(true)
+        if(route.path.includes('nuevo') || route.path.includes('nueva')) {
+          checkValidation(true)
+        }
       })
       
       onUpdated(() => {
         // Si es edit, ejecuta.
-        if(!route.path.includes('nuevo')) checkValidation(true)
+        if(!route.path.includes('nuevo') && route.path.includes('nueva')) {
+          checkValidation(true)
+        }
       })
 
       return {  

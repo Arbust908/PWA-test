@@ -13,7 +13,6 @@
         :description="observations"
         @update:type="type = $event"
         @update:description="observations = $event"
-        @update-validation-state="updateValidationState"
       />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
@@ -32,13 +31,14 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, ref } from 'vue';
+  import { reactive, toRefs, ref, watchEffect } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+  import { useValidator } from '@/helpers/useValidator'
   import axios from 'axios';
   const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -68,24 +68,11 @@
         observations: '',
       });
 
-      const fieldsValidations = ref({
-        sandMesh: false
-      })
-
       const isValidated = ref(false)
 
-      const updateValidationState = (data) => {
-        const {fieldName, validationsPassed} = data
-        fieldsValidations.value[`${fieldName}`] = validationsPassed
-
-        const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
-          if(input[1] == false) return input
-        })
-        
-        if(isInvalidated.length > 0) return isValidated.value = false
-        if(isInvalidated.length == 0) return isValidated.value = true
-      }
-
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'sand') ? true : false
+      })
 
       const save = async () => {
         let sandDB = await axios
@@ -108,8 +95,7 @@
         goToIndex,
         save,
         ...toRefs(newSand),
-        isValidated,
-        updateValidationState
+        isValidated
       };
     },
   };

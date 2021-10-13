@@ -1,39 +1,15 @@
 export default {
     state: () => ({
-      all: [
-      //   {
-      //     id: 1,
-      //     type: "Comun",
-      //     description: "Arena" ,
-      //     meshType: "#110",
-      //     grainType: "80",
-      //     observations: "",
-      //     isCompleted: true
-      // },
-      // {
-      //     id: 2,
-      //     type: "Resinada",
-      //     description: "Arena" ,
-      //     meshType: "#30",
-      //     grainType: "70",
-      //     observations: "-",
-      //     isCompleted: true
-      // },
-      // {
-      //     id: 3,
-      //     type: "Sinterlite",
-      //     description: "Arena" ,
-      //     meshType: "#40",
-      //     grainType: "",
-      //     observations: "-",
-      //     isCompleted: false
-      // }
-      ],
+      all: [],
+      validations: {}
     }),
     getters: {
       getSandbyId: state => (id) => {
         return state.all.find(all => all.id === id)
       },
+      sandValidation: state => {
+        return state.validations
+      }
     },
     mutations: {
       ADD_SAND(state, payload) {
@@ -46,8 +22,14 @@ export default {
           }
         });
       },
+      UPDATE_SAND_VALIDATION(state,payload) {
+        state.validations[payload.fieldName] = payload.validationsPassed
+      }
     },
     actions: {
+      sandUpdateValidation: async({commit}, payload) => {
+        await commit('UPDATE_SAND_VALIDATION', payload)
+      },
       saveSand({ commit }, sand) {
         // console.log('>>Adding Sand', sand);
         console.table(sand);
