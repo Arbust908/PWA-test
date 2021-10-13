@@ -8,7 +8,7 @@
       </h1>
     </header>
     <section class="bg-white rounded-md shadow-sm max-w-2xl">
-      <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" @update-validation-state="updateValidationState"/>
+      <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
       <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-  import { computed, reactive, ref } from 'vue';
+  import { watchEffect, reactive, ref } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
@@ -48,6 +48,7 @@
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import Modal from '@/components/modal/General.vue';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
+  import { useValidator } from '@/helpers/useValidator';
 
   export default {
     components: {
@@ -67,27 +68,15 @@
         observations: '',
       });
 
-      const fieldsValidations = ref({
-        name: false
-      })
-
       const goToIndex = (): void => {
         router.push('/forklift');
       };
 
       const isValidated = ref(false)
 
-      const updateValidationState = (data) => {
-        const {fieldName, validationsPassed} = data
-        fieldsValidations.value[`${fieldName}`] = validationsPassed
-
-        const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
-          if(input[1] == false) return input
-        })
-        
-        if(isInvalidated.length > 0) return isValidated.value = false
-        if(isInvalidated.length == 0) return isValidated.value = true
-      }
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'forklift') ? true : false
+      })
 
       const notificationModalvisible = ref(false);
       const errorMessage = ref('');
@@ -113,8 +102,7 @@
         isValidated,
         notificationModalvisible,
         toggleNotificationModal,
-        errorMessage,
-        updateValidationState
+        errorMessage
       };
     },
   };

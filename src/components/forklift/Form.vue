@@ -9,7 +9,7 @@
         :data="forklift.name"
         @update:data="forklift.name = $event"
         requireValidation
-        @update-validation-state="updateValidationState"
+        entity="forklift"
       />
       <FieldTextArea
         class="col-span-full"
@@ -45,14 +45,9 @@
     },
     setup(props, { emit }) {
       const forklift = useVModel(props, 'forklift', emit);
-      
-      const updateValidationState = (data: Object) => {
-        emit('update-validation-state',{fieldName: data.fieldName,validationsPassed: data.validationsPassed})
-      }
 
       return {
-        forklift,
-        updateValidationState
+        forklift
       };
     },
   });

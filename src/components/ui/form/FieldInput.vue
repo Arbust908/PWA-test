@@ -135,7 +135,7 @@
       const route = useRoute()
 
       const updateValidationState = (fieldName,validationsPassed,entity) => {
-        store.dispatch('sandProviderUpdateValidation', {fieldName,validationsPassed,entity})
+        store.dispatch(`${entity}UpdateValidation`, {fieldName,validationsPassed,entity})
       }
 
       const validationsHandler = (valid) => {
