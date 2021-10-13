@@ -12,11 +12,15 @@ export default {
             observatios: "No funciona correctamente" ,
         } 
         ],
+        validations: {}
     }),
     getters: {
       getCradlebyId: state => (id) => {
         return state.all.find(all => all.id === id)
       },
+      cradleValidation: state => {
+        return state.validations
+      }
     },
     mutations: {
       SET_CRADLES(state,payload) {
@@ -32,8 +36,14 @@ export default {
           }
         });
       },
+      UPDATE_CRADLE_VALIDATION(state,payload) {
+        state.validations[payload.fieldName] = payload.validationsPassed
+      }
     },
     actions: {
+      cradleUpdateValidation: async({commit}, payload) => {
+        await commit('UPDATE_CRADLE_VALIDATION', payload)
+      },
       setCradles({commit}, cradle) {
         commit('SET_CRADLES', cradle)
       },

@@ -17,6 +17,8 @@
             title="Nombre"
             :data="name"
             @update:data="name = $event"
+            requireValidation
+            entity="cradle"
           />
           <FieldTextArea
             class="col-span-full"
@@ -34,9 +36,9 @@
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && update()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && update()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -48,7 +50,7 @@
 
 <script lang="ts">
   import Layout from '@/layouts/Main.vue';
-  import { reactive, ref, toRefs, computed } from 'vue';
+  import { reactive, ref, toRefs, computed, watchEffect } from 'vue';
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'vuex';
   import { useTitle } from '@vueuse/core';
@@ -58,6 +60,7 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
+  import {useValidator} from '@/helpers/useValidator'
   import axios from 'axios';
 
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -90,9 +93,11 @@
         observations: currentCradle.observations,
       });
 
-      const isFull = computed(() => {
-        return !!(currentCradle.name && currentCradle.name.length > 3);
-      });
+      const isValidated = ref(false)
+
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'cradle') ? true : false
+      })
 
       const update = async () => {
         const loading = ref(true);
@@ -121,7 +126,7 @@
       return {
         update,
         goToIndex,
-        isFull,
+        isValidated,
         ...toRefs(cradleToUpdate),
       };
     },

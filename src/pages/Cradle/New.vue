@@ -18,7 +18,7 @@
             :data="name"
             @update:data="name = $event"
             requireValidation
-            @update-validation-state="updateValidationState"
+            entity="cradle"
           />
           <FieldTextArea
             class="col-span-full"
@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, ref } from 'vue';
+  import { reactive, toRefs, ref, watchEffect } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import { useTitle } from '@vueuse/core';
@@ -59,6 +59,7 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
+  import { useValidator } from '@/helpers/useValidator'
   import axios from 'axios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
@@ -105,17 +106,9 @@
 
       const isValidated = ref(false)
 
-      const updateValidationState = (data) => {
-        const {fieldName, validationsPassed} = data
-        fieldsValidations.value[`${fieldName}`] = validationsPassed
-
-        const isInvalidated = Object.entries(fieldsValidations.value).filter(input => {
-          if(input[1] == false) return input
-        })
-        
-        if(isInvalidated.length > 0) return isValidated.value = false
-        if(isInvalidated.length == 0) return isValidated.value = true
-      }
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'cradle') ? true : false
+      })
 
       const save = async () => {
         let sandDB = await axios
@@ -140,7 +133,6 @@
         goToIndex,
         save,
         newCradle,
-        updateValidationState,
         ...toRefs(newCradle),
         isValidated
       };
