@@ -1,11 +1,15 @@
 export default {
     state: () => ({
-      all: []
+      all: [],
+      validations: {}
     }),
     getters: {
       getClientbyId: state => (id) => {
         return state.all.find(all => all.id === id)
       },
+      clientValidation: state => {
+        return state.validations
+      }
     },
     mutations: {
       SET_CLIENTS(state,payload) {
@@ -21,8 +25,14 @@ export default {
           }
         });
       },
+      UPDATE_CLIENT_VALIDATION(state,payload) {
+        state.validations[payload.fieldName] = payload.validationsPassed
+      }
     },
     actions: {
+      clientUpdateValidation: async({commit}, payload) => {
+        await commit('UPDATE_CLIENT_VALIDATION', payload)
+      },
       setClients({commit}, clients) {
         commit('SET_CLIENTS', clients)
       },

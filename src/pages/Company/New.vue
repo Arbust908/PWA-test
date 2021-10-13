@@ -17,6 +17,8 @@
             title="Nombre y apellido / Razón social"
             :data="newClient.name"
             @update:data="newClient.name = $event"
+            requireValidation
+            entity="client"
           />
           <FieldInput
             class="col-span-full"
@@ -26,6 +28,10 @@
             title="CUIL / CUIT"
             :data="newClient.legalId"
             @update:data="newClient.legalId = $event"
+            requireValidation
+            entity="client"
+            validationType="extension"
+            :charAmount="{min: 11,max:11}"
           />
           <FieldInput
             class="col-span-full"
@@ -34,6 +40,8 @@
             title="Domicilio"
             :data="newClient.address"
             @update:data="newClient.address = $event"
+            requireValidation
+            entity="client"
           />
           <toggle
             label="Es operadora"
@@ -57,6 +65,8 @@
             title="Nombre"
             :data="newClient.companyRepresentative.name"
             @update:data="newClient.companyRepresentative.name = $event"
+            requireValidation
+            entity="client"
           />
           <FieldInput
             class="col-span-full"
@@ -66,6 +76,8 @@
             title="Teléfono"
             :data="newClient.companyRepresentative.phone"
             @update:data="newClient.companyRepresentative.phone = $event"
+            requireValidation
+            entity="client"
           />
           <FieldInput
             class="col-span-full"
@@ -74,6 +86,9 @@
             title="Email"
             :data="newClient.companyRepresentative.email"
             @update:data="newClient.companyRepresentative.email = $event"
+            requireValidation
+            entity="client"
+            validationType="email"
           />
         </FieldGroup>
       </form>
@@ -84,9 +99,9 @@
             Cancelar
           </NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -97,7 +112,7 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, computed, defineComponent, watch, ref } from 'vue';
+  import { reactive, toRefs, computed, defineComponent, watch, ref, watchEffect } from 'vue';
   import Toggle from '@/components/ui/Toggle.vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
@@ -109,6 +124,7 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  import {useValidator} from '@/helpers/useValidator'
   // AXIOS
   import axios from 'axios';
   import { useAxios } from '@vueuse/integrations/useAxios';
@@ -158,20 +174,11 @@
         newClient.value.isOperator = !newClient.value.isOperator;
       };
 
-      const isFull = computed(() => {
-        return !!(
-          newClient.value.name !== '' &&
-          newClient.value.name.length > 3 &&
-          newClient.value.address.length > 3 &&
-          newClient.value.legalId >= 0 &&
-          newClient.value.companyRepresentative?.name &&
-          newClient.value.companyRepresentative?.name.length > 0 &&
-          newClient.value.companyRepresentative?.email &&
-          newClient.value.companyRepresentative?.email.length > 0 &&
-          newClient.value.companyRepresentative?.phone &&
-          newClient.value.companyRepresentative?.phone.length > 0
-        );
-      });
+      const isValidated = ref(false)
+
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'client') ? true : false
+      })
 
       const save = async () => {
         const { data: CRdata } = useAxios(
@@ -202,7 +209,7 @@
         goToIndex,
         save,
         newClient,
-        isFull,
+        isValidated,
         handleToggleState,
       };
     },
