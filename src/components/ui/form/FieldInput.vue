@@ -12,12 +12,12 @@
       v-maska="mask"
       @blur="checkValidation(false)"
     />
-    <InvalidInputLabel v-if="!isValid && wasInputEntered" :validationType="validationType" :charAmount="charAmount"/>
+    <InvalidInputLabel v-if="v$.$invalid && wasInputEntered" :validationType="validationType" :charAmount="charAmount"/>
   </label>
 </template>
 
 <script>
-  import { computed, defineComponent, onMounted, onUpdated, ref, toRefs, watchEffect } from 'vue';
+  import { defineComponent, onMounted, onUpdated, ref, toRefs, watch } from 'vue';
   import { useVModel } from '@vueuse/core';
   import { maska } from 'maska';
   import FieldTitle from '@/components/ui/form/FieldTitle.vue';
@@ -81,12 +81,17 @@
       entity: {
         type: String,
         required: false
+      },
+      silenced: {
+        type: Boolean,
+        required: false,
+        default: null
       }
     },
     setup(props, { emit }) {
       const value = useVModel(props, 'data', emit);
       const store = useStore()
-      const {requireValidation, fieldName, entity} = toRefs(props)
+      const {requireValidation, fieldName, entity, silenced} = toRefs(props)
       const wasInputEntered = ref(false)
       const validationType = ref(props.validationType || "empty")
       const charAmount = ref(props.charAmount || null)
@@ -131,26 +136,24 @@
       }
 
       const v$ = useVuelidate(validationRules, state)
-      const isValid = ref(null)
       const route = useRoute()
 
       const updateValidationState = (fieldName,validationsPassed,entity) => {
+        if(silenced.value) return
         store.dispatch(`${entity}UpdateValidation`, {fieldName,validationsPassed,entity})
-      }
-
-      const validationsHandler = (valid) => {
-        if(isValid.value == valid) return
-        else {
-          isValid.value = valid
-          updateValidationState(fieldName.value,valid,entity.value)
-        }
       }
 
       const checkValidation = (isTheFirstUse) => {
         if(!requireValidation.value) return
         if(!isTheFirstUse && !wasInputEntered.value) wasInputEntered.value = true
-        v$.value.$invalid ? validationsHandler(false) : validationsHandler(true)
+        updateValidationState(fieldName.value,!v$.value.$invalid,entity.value)
       }
+
+      watch(silenced, (newSilencedVal) => {
+        if(!newSilencedVal) { 
+          updateValidationState(fieldName.value,!v$.value.$invalid,entity.value)
+        }
+      })
 
       onMounted(() => { 
         // Si es new, ejecuta.
@@ -161,7 +164,7 @@
       
       onUpdated(() => {
         // Si es edit, ejecuta.
-        if(!route.path.includes('nuevo') && route.path.includes('nueva')) {
+        if(!route.path.includes('nuevo') && !route.path.includes('nueva')) {
           checkValidation(true)
         }
       })
@@ -171,11 +174,11 @@
         ...props,
         v$,
         fieldName,
-        isValid,
         wasInputEntered,
         validationType,
         charAmount,
-        checkValidation
+        checkValidation,
+        silenced
       };
     },
   });

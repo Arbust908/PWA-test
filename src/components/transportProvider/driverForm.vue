@@ -7,6 +7,10 @@
       placeholder="Ingresar conductor"
       :data="driverName"
       @update:data="driverName = $event"
+      requireValidation
+      :silenced="silenced"
+      entity="transportProvider"
+      @change="activateValidation"
     />
     <FieldInput
       class="col-span-full"
@@ -16,6 +20,9 @@
       title="Teléfono"
       :data="driverPhone"
       @update:data="driverPhone = $event"
+      requireValidation
+      :silenced="silenced"
+      entity="transportProvider"
     />
     <FieldInput
       class="col-span-full"
@@ -24,6 +31,10 @@
       title="Email"
       :data="driverEmail"
       @update:data="driverEmail = $event"
+      requireValidation
+      :silenced="silenced"
+      entity="transportProvider"
+      validationType="email"
     />
     <FieldInput
       class="col-span-full"
@@ -32,6 +43,9 @@
       placeholder="Doble carga"
       :data="driverTType"
       @update:data="driverTType = $event"
+      requireValidation
+      :silenced="silenced"
+      entity="transportProvider"
     />
     <FieldInput
       class="col-span-full"
@@ -40,6 +54,9 @@
       placeholder="patente"
       :data="driverTId"
       @update:data="driverTId = $event"
+      requireValidation
+      :silenced="silenced"
+      entity="transportProvider"
     />
     <!-- <FieldTextArea
       class="col-span-full"
@@ -56,7 +73,7 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent } from 'vue';
+  import { defineComponent, ref, computed } from 'vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import { useVModels } from '@vueuse/core';
@@ -85,7 +102,7 @@
       driverObs: {
         type: String,
         default: '',
-      },
+      }
     },
     components: {
       FieldGroup,
@@ -98,8 +115,15 @@
         driverEmail,
         driverTType,
         driverTId,
-        driverObs,
+        driverObs
       } = useVModels(props, emit);
+
+      const silenced = ref(true)
+
+      const activateValidation = () => {
+        silenced.value = false
+      }
+
       return {
         driverName,
         driverPhone,
@@ -107,6 +131,8 @@
         driverTType,
         driverTId,
         driverObs,
+        silenced,
+        activateValidation
       };
     },
   });

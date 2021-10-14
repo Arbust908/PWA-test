@@ -1,8 +1,13 @@
 export default {
   state: () => ({
     all: [],
+    validations: {}
   }),
-  getters: {},
+  getters: {
+    transportProviderValidation: state => {
+      return state.validations
+    }
+  },
   mutations: {
     SET_TRANSPORTPROVIDERS(state,payload) {
       state.all = payload
@@ -27,8 +32,14 @@ export default {
         return i.id === payload;
       }), 1);
     },
+    UPDATE_TRANSPORTPROVIDER_VALIDATION(state,payload) {
+      state.validations[payload.fieldName] = payload.validationsPassed
+    }
   },
   actions: {
+    transportProviderUpdateValidation: async({commit}, payload) => {
+      await commit('UPDATE_TRANSPORTPROVIDER_VALIDATION', payload)
+    },
     setTransportProviders({commit}, transportProviders) {
       commit('SET_TRANSPORTPROVIDERS', transportProviders)
     },

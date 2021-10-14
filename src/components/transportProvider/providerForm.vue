@@ -8,6 +8,8 @@
         title="Nombre / Razón Social"
         :data="tpName"
         @update:data="tpName = $event"
+        requireValidation
+        entity="transportProvider"
       />
       <FieldInput
         class="col-span-full"
@@ -17,6 +19,10 @@
         mask="#*"
         :data="tpId"
         @update:data="tpId = $event"
+        requireValidation
+        entity="transportProvider"
+        validationType="extension"
+        :charAmount="{min: 11,max:11}"
       />
       <FieldInput
         class="col-span-full"
@@ -47,6 +53,8 @@
         placeholder="Ingresar Nombre y Apellido"
         :data="crName"
         @update:data="crName = $event"
+        requireValidation
+        entity="transportProvider"
       />
       <FieldInput
         class="col-span-full"
@@ -56,6 +64,8 @@
         mask="#*"
         :data="crPhone"
         @update:data="crPhone = $event"
+        requireValidation
+        entity="transportProvider"
       />
       <FieldInput
         class="col-span-full"
@@ -64,6 +74,9 @@
         placeholder="empresa@mail.com"
         :data="crEmail"
         @update:data="crEmail = $event"
+        requireValidation
+        entity="transportProvider"
+        validationType="email"
       />
     </FieldGroup>
   </form>

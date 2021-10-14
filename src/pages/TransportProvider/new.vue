@@ -58,9 +58,9 @@
                 Cancelar
               </NoneBtn>
               <PrimaryBtn
-                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                @click="isFull && save()"
-                :disabled="!isFull"
+                :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+                @click="isValidated && save()"
+                :disabled="!isValidated"
               >
                 Finalizar
               </PrimaryBtn>
@@ -77,7 +77,7 @@
               :driverPhone="newDriver.phone"
               :driverEmail="newDriver.email"
               :driverTType="newDriver.vehicleType"
-              :driverTId="newDriver.vehicleId"
+              :driverTId="newDriver.transportId"
               :driverObs="newDriver.observations"
               @update:driverName="newDriver.name = $event"
               @update:driverPhone="newDriver.phone = $event"
@@ -107,9 +107,9 @@
                 Cancelar
               </NoneBtn>
               <PrimaryBtn
-                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                @click="hasFullNewDriver && addDriver(); isFull && save()"
-                :disabled="!isFull"
+                :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+                @click="hasFullNewDriver && addDriver(); isValidated && save()"
+                :disabled="!isValidated"
               >
                 Finalizar
               </PrimaryBtn>
@@ -140,6 +140,7 @@
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
+  import { useValidator } from '@/helpers/useValidator'
   import Icon from '@/components/icon/TheAllIcon.vue';
   import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
   import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
@@ -241,14 +242,6 @@
         email: '',
       });
 
-      const transportProviderFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          newTransportProvider.name !== '' &&
-          newTransportProvider.address !== '0' &&
-          newTransportProvider.legalId >= 0
-        );
-      });
-
       const hasFullNewDriver = computed(() => {
         return !!(
           newDriver.name !== '' &&
@@ -271,17 +264,11 @@
         return !!(hasFullDriverCards || hasFullNewDriver);
       });
 
-      const repFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          companyRepresentative.name !== '' &&
-          companyRepresentative.phone !== '' &&
-          companyRepresentative.email !== ''
-        );
-      });
+      const isValidated = ref(false)
 
-      const isFull: ComputedRef<boolean> = computed(() => {
-        return transportProviderFull.value && repFull.value;
-      });
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'transportProvider') ? true : false
+      })
 
       const save = async () => {
         const representanteDone = ref(false);
@@ -356,7 +343,7 @@
 
       return {
         newTransportProvider,
-        isFull,
+        isValidated,
         save,
         companyRepresentative,
         activeSection,
