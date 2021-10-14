@@ -3,20 +3,17 @@
     <Dialog
       as="div"
       static
-      class="fixed z-10 inset-0 overflow-y-auto"
+      class="fixed z-10 top-10 inset-x-0 md:inset-0 overflow-y-auto"
       :open="open"
       @close="$emit('close')"
     >
       <div
         class="
-          flex
-          items-end
-          justify-center
+          block
           min-h-screen
           pt-4
           px-4
           text-center
-          sm:block sm:p-0
         "
       >
         <!-- <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"> -->
@@ -35,14 +32,13 @@
               inset-0
               bg-gray-600 bg-opacity-50
               transition-opacity
-              
             "
           />
         </TransitionChild>
 
         <!-- This element is to trick the browser into centering the modal contents. -->
         <span
-          class="hidden sm:inline-block sm:align-middle sm:h-screen"
+          class="hidden sm:inline-block align-middle sm:h-screen"
           aria-hidden="true"
           >&#8203;</span
         >
@@ -58,19 +54,15 @@
           <div
             class="
               inline-block
-              align-bottom
               bg-second-50
-              rounded-t-lg
-              px-4
-              pt-5
-              pb-12
+              rounded-lg
               text-left
               overflow-hidden
               shadow-xl
               transform
               transition-all
               w-full
-              sm:my-8 sm:align-middle sm:max-w-sm sm:w-full sm:p-6 sm:rounded-lg
+              my-8 align-middle max-w-sm p-6
             "
           >
             <div>
@@ -117,10 +109,8 @@
                   flex-shrink-0 flex
                   items-center
                   justify-center
-                  h-12
-                  w-12
                   rounded-full
-                  sm:h-10 sm:w-10
+                  h-10 w-10
                   bg-second-200
                 "
               >

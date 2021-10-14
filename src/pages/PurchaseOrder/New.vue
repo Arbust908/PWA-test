@@ -85,7 +85,7 @@
                   class="w-7 h-7"
                 />
               </CircularBtn>
-              <div>
+              <div class="hidden sm:block">
                 <CircularBtn
                   v-if="isLast(orderKey, providerId.sandOrders)"
                   size="md"
@@ -99,11 +99,14 @@
                 </CircularBtn>
               </div>
             </div>
+            <button v-if="isLast(orderKey, providerId.sandOrders)" 
+              class="mt-1 flex items-center col-span-6 sm:hidden" 
+              @click.prevent="addOrder(providerId.innerId)"
+            >
+              <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
+              <span class="font-bold"> Agregar</span>
+            </button>
           </FieldGroup>
-          <!-- <button class="mt-1 flex items-center col-span-6 sm:hidden" @click.prevent="addOrder(providerId.innerId)">
-            <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
-            <span class="font-bold"> Agregar</span>
-          </button> -->
         </template>
         <FieldGroup>
           <FieldLegend class="mt-2">Transporte</FieldLegend>
@@ -164,25 +167,28 @@
                     class="w-7 h-7"
                   />
                 </CircularBtn>
-                <div>
-                <CircularBtn
-                  v-if="isLast(toKey, TransportOrders)"
-                  size="md"
-                  btnClass="bg-green-500"
-                  @click.prevent="addTransportOrder()"
-                >
-                  <Icon 
-                    icon="Plus"
-                    class="w-7 h-7 text-white"
-                  />
-                </CircularBtn>
+                <div class="hidden sm:block">
+                  <CircularBtn
+                    v-if="isLast(toKey, TransportOrders)"
+                    size="md"
+                    btnClass="bg-green-500"
+                    @click.prevent="addTransportOrder()"
+                  >
+                    <Icon 
+                      icon="Plus"
+                      class="w-7 h-7 text-white"
+                    />
+                  </CircularBtn>
                 </div>
               </div>
+              <button v-if="isLast(toKey, TransportOrders)" 
+                class="mt-1 flex items-center col-span-6 sm:hidden" 
+                @click.prevent="addTransportOrder()"
+              >
+                <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
+                <span class="font-bold"> Agregar</span>
+              </button>
           </FieldGroup>
-          <!-- <button class="mt-1 flex items-center col-span-6 sm:hidden" @click.prevent="addTransportOrder()">
-            <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
-            <span class="font-bold"> Agregar</span>
-          </button> -->
         </FieldGroup>
       </form>
       <footer class="p-4 space-x-8 flex justify-end">

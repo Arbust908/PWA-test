@@ -4,7 +4,7 @@
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
       <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">
-        Nuevo proveedor de arena
+        Nuevo centro de carga de arena
       </h1>
     </header>
     <section class="bg-white rounded-md max-w-2xl shadow-sm">
@@ -94,7 +94,7 @@
       Modal
     },
     setup() {
-      useTitle(`Nuevo Proveedor de Arena <> Sandflow`);
+      useTitle(`Nuevo Centro de Carga de Arena <> Sandflow`);
       const store = useStore();
       const router = useRouter();
       const instance = axios.create({

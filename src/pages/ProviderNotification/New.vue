@@ -3,22 +3,22 @@
     <header
       class="flex flex-col md:flex-row md:justify-between items-center md:mb-4"
     >
-      <h1 class="font-bold text-second-900 text-xl self-start mb-3 md:mb-0">
+      <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">
         Notificación a proveedores
       </h1>
     </header>
     <section class="bg-second-0 rounded-md shadow-sm">
-      <form method="POST" action="/" class="p-4 flex flex-col gap-4">
+      <form method="POST" action="/" class="p-4 flex-col gap-4">
         <SandProviderPack
           :sandProviders="sandProviderIds"
           @update:sandProviders="sandProviderIds = $event"
         />
         <fieldset class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
-          <h2 class="col-span-full text-xl">Transporte</h2>
+          <h2 class="col-span-full text-xl mt-4">Transporte</h2>
           <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
             <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
             <FieldSelect
-              :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full sm:col-span-6'"
+              :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full sm:col-span-5'"
               title="Proveedor"
               :fieldName="`transportProvider${tO.id}`"
               placeholder="Seleccionar"
@@ -44,7 +44,7 @@
                 @update:data="tO.amount = $event"
               />
               <FieldInput
-                class="col-span-full sm:col-span-6"
+                class="col-span-full sm:col-span-5"
                 :fieldName="`transportObservations${tO.id}`"
                 placeholder="Observaciones"
                 title="Observaciones"
@@ -60,12 +60,8 @@
           <NoneBtn> Cancelar </NoneBtn>
         </router-link>
         <PrimaryBtn
-          type="submit"
-          :class="
-            isSandFull || isTransportFull
-              ? null
-              : 'opacity-50 cursor-not-allowed'
-          "
+          size="md"
+          :class="isSandFull || isTransportFull ? null : 'opacity-50 cursor-not-allowed'"
           :disabled="!(isSandFull || isTransportFull)"
           @click.prevent="(isSandFull || isTransportFull) && save()"
         >
@@ -77,20 +73,20 @@
       <template #body>
         <div class="text-left" v-if="!isNotificationConfirmed">
           <p class="text-base text-black font-bold">Notificación a proveedores</p>
-          <div v-if="modalData.sandProvider" class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
+          <div v-if="modalData.sandProvider" class="bg-gray-100 mt-4 rounded-r-md py-4 pl-4 mb-2 border-l-4 border-green-500 border-opacity-50">
             <p class="font-bold text-black text-base">Arenas {{modalData.sandProvider}}</p>
             <ul>
               <li v-for="(order, index) in modalData.sandOrders" 
                 :key="index" 
-                class="ml-2 text-black text-sm list-none">
+                class="text-black text-base list-none mt-1">
                 {{order.amount}}t - {{order.sandType}} 
               </li>
             </ul>
           </div>
-          <div v-if="modalData.transportProvider" class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
+          <div v-if="modalData.transportProvider" class="bg-gray-100 mt-3 rounded-r-md py-4 pl-4 border-l-4 border-green-500 border-opacity-50">
             <p class="font-bold text-black text-base">Transporte {{modalData.transportProvider}}</p>
             <ul>
-              <li class="ml-2 text-black text-sm list-none">
+              <li class="text-black text-base list-none mt-2">
                 {{modalData.transportQuantity}} camion(es){{` - ${modalData.transportObservations}`}}
               </li>
             </ul>
@@ -108,8 +104,8 @@
           v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
         >
           <Icon
-            :icon="checkCircle"
-            class="h-[54px] w-[54px] mb-4 text-green-400"
+            icon="CheckCircle"
+            class="h-[60px] w-[60px] mb-5 text-green-400"
           />
           <span class="text-center text-base border-none text-gray-900"
             >¡La notificación fue enviada con éxito!</span
@@ -137,7 +133,7 @@
         </div>
       </template>
       <template #btn>
-        <div class="flex gap-4" v-if="!isNotificationConfirmed">
+        <div class="flex gap-4 justify-end" v-if="!isNotificationConfirmed">
           <button
             type="button"
             class="modal-close-button"
@@ -153,8 +149,8 @@
             Confirmar
           </button>
         </div>
-        <div class="flex gap-4" v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess">
-          <router-link to="/" class="modal-close-button">
+        <div class="flex justify-center gap-4" v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess">
+          <router-link to="/" class="modal-close-button w-1/3">
             <button type="button">Cerrar</button>
           </router-link>
           <button
@@ -501,10 +497,10 @@
 <style lang="scss" scoped>
   @import '@/assets/button.scss';
   .modal-close-button {
-    @apply flex justify-center items-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-white text-base font-medium text-second-400 hover:bg-gray-100 sm:text-sm;
+    @apply flex justify-center items-center rounded-md border border-black border-opacity-10 shadow-sm px-4 py-2 bg-white text-base font-medium text-second-400 hover:bg-gray-100 ;
   }
   .modal-create-new-button {
-    @apply inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-main-600 text-base font-medium text-second-50 hover:bg-main-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500 sm:text-sm;
+    @apply inline-flex justify-center w-1/2 rounded-md border border-transparent shadow-sm px-4 py-2 bg-main-600 text-base font-medium text-second-50 hover:bg-main-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500;
   }
   .input {
     @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
