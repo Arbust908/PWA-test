@@ -85,17 +85,8 @@
               @update:driverTType="newDriver.vehicleType = $event"
               @update:driverTId="newDriver.transportId = $event"
               @update:driverObs="newDriver.observations = $event"
+              @add-driver="addDriver()"
             />
-            <button
-              :class="[
-                'flex items-center',
-                driverFull ? null : 'text-gray-200 cursor-not-allowed',
-              ]"
-              @click.prevent="driverFull && addDriver()"
-            >
-              <Icon icon="Plus" type="outline" class="w-5 h-5" />
-              <h2>Agregar Transportista</h2>
-            </button>
           </form>
           <footer
             class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between"
@@ -252,18 +243,6 @@
         );
       });
 
-      const driverFull: ComputedRef<boolean> = computed(() => {
-        const hasFullDriverCards = drivers.every(
-          (driver: Driver) =>
-            driver.name !== '' &&
-            driver.phone !== '' &&
-            driver.email !== '' &&
-            driver.vehicleType !== '' &&
-            driver.vehicleId !== ''
-        );
-        return !!(hasFullDriverCards || hasFullNewDriver);
-      });
-
       const isValidated = ref(false)
 
       watchEffect(async() => {
@@ -352,7 +331,6 @@
         Icon,
         addDriver,
         newDriver,
-        driverFull,
         deleteDriver,
         editDriver,
       };

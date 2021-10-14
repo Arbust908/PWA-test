@@ -149,9 +149,13 @@
         updateValidationState(fieldName.value,!v$.value.$invalid,entity.value)
       }
 
-      watch(silenced, (newSilencedVal) => {
-        if(!newSilencedVal) { 
+      watch(silenced, (newSilencedVal, oldSilencedVal) => {
+        if(oldSilencedVal == true && newSilencedVal == false) { 
           updateValidationState(fieldName.value,!v$.value.$invalid,entity.value)
+        }
+        if(oldSilencedVal == false && newSilencedVal == true) { 
+          wasInputEntered.value = false
+          store.dispatch(`${entity.value}DeleteValidation`, fieldName.value)
         }
       })
 

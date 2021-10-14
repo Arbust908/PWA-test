@@ -10,7 +10,7 @@
       requireValidation
       :silenced="silenced"
       entity="transportProvider"
-      @change="activateValidation"
+      @change="validationHandler"
     />
     <FieldInput
       class="col-span-full"
@@ -58,17 +58,16 @@
       :silenced="silenced"
       entity="transportProvider"
     />
-    <!-- <FieldTextArea
-      class="col-span-full"
-      fieldName="observations"
-      placeholder="Observaciones..."
-      title="Observaciones"
-      :rows="5"
-      isFixed
-      isOptional
-      :data="driverObs"
-      @update:data="driverObs = $event"
-    /> -->
+    <button
+      :class="[
+        'flex items-center w-[250px]',
+        driverFull ? null : 'text-gray-200 cursor-not-allowed',
+      ]"
+      @click.prevent="driverFull && addDriver()"
+    >
+      <Icon icon="Plus" type="outline" class="w-5 h-5" />
+      <h2>Agregar Transportista</h2>
+    </button>
   </FieldGroup>
 </template>
 
@@ -77,6 +76,8 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import { useVModels } from '@vueuse/core';
+  import Icon from '@/components/icon/TheAllIcon.vue';
+
   export default defineComponent({
     props: {
       driverName: {
@@ -107,6 +108,7 @@
     components: {
       FieldGroup,
       FieldInput,
+      Icon
     },
     setup(props, { emit }) {
       const {
@@ -120,9 +122,22 @@
 
       const silenced = ref(true)
 
-      const activateValidation = () => {
+      const validationHandler = () => {
         silenced.value = false
       }
+
+      const addDriver = () => {
+        silenced.value = true
+        emit('add-driver')
+      }
+
+      const driverFull: ComputedRef<boolean> = computed(() => {
+        return driverName.value !== '' &&
+        driverPhone.value !== '' &&
+        driverEmail.value !== '' &&
+        driverTType.value !== '' &&
+        driverTId.value !== ''
+      });
 
       return {
         driverName,
@@ -132,7 +147,10 @@
         driverTId,
         driverObs,
         silenced,
-        activateValidation
+        validationHandler,
+        driverFull,
+        addDriver,
+        Icon
       };
     },
   });

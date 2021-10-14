@@ -34,9 +34,15 @@ export default {
     },
     UPDATE_TRANSPORTPROVIDER_VALIDATION(state,payload) {
       state.validations[payload.fieldName] = payload.validationsPassed
+    },
+    TRANSPORTPROVIDER_DELETE_VALIDATION(state,payload) {
+      delete state.validations[payload]
     }
   },
   actions: {
+    transportProviderDeleteValidation: async({commit}, payload) => {
+      await commit('TRANSPORTPROVIDER_DELETE_VALIDATION', payload)
+    },
     transportProviderUpdateValidation: async({commit}, payload) => {
       await commit('UPDATE_TRANSPORTPROVIDER_VALIDATION', payload)
     },
