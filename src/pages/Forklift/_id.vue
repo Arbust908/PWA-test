@@ -13,9 +13,9 @@
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && update()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && update()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, reactive, onMounted, onBeforeMount, computed } from 'vue';
+  import { ref, reactive, onMounted, watchEffect, onBeforeMount, computed } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter, useRoute } from 'vue-router';
   import { useTitle } from '@vueuse/core';
@@ -49,6 +49,7 @@
   import Modal from '@/components/modal/General.vue';
   import { Forklift } from '@/interfaces/sandflow';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
+  import { useValidator } from '@/helpers/useValidator';
 
   export default {
     components: {
@@ -97,9 +98,11 @@
         router.push('/forklift');
       };
 
-      const isFull = computed(() => {
-        return !!(forklift.name !== '');
-      });
+      const isValidated = ref(false)
+
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'forklift') ? true : false
+      })
 
       const update = async () => {
         await useStoreLogic(router, store, 'forklift', 'update', forklift).then(
@@ -116,7 +119,7 @@
       return {
         id,
         forklift,
-        isFull,
+        isValidated,
         goToIndex,
         update,
         notificationModalvisible,

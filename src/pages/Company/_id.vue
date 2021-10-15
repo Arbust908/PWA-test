@@ -17,6 +17,8 @@
             title="Nombre y apellido / Razón social"
             :data="editedCompany.name"
             @update:data="editedCompany.name = $event"
+            requireValidation
+            entity="client"
           />
           <FieldInput
             class="col-span-full"
@@ -26,6 +28,10 @@
             title="CUIL / CUIT"
             :data="editedCompany.legalId"
             @update:data="editedCompany.legalId = $event"
+            requireValidation
+            entity="client"
+            validationType="extension"
+            :charAmount="{min: 11,max:11}"
           />
           <FieldInput
             class="col-span-full"
@@ -34,6 +40,8 @@
             title="Domicilio"
             :data="editedCompany.address"
             @update:data="editedCompany.address = $event"
+            requireValidation
+            entity="client"
           />
           <toggle
             label="Es operadora"
@@ -58,6 +66,8 @@
             title="Nombre"
             :data="editedCompany.companyRepresentative.name"
             @update:data="editedCompany.companyRepresentative.name = $event"
+            requireValidation
+            entity="client"
           />
           <FieldInput
             class="col-span-full"
@@ -67,6 +77,8 @@
             title="Teléfono"
             :data="editedCompany.companyRepresentative.phone"
             @update:data="editedCompany.companyRepresentative.phone = $event"
+            requireValidation
+            entity="client"
           />
           <FieldInput
             class="col-span-full"
@@ -75,6 +87,9 @@
             title="Email"
             :data="editedCompany.companyRepresentative.email"
             @update:data="editedCompany.companyRepresentative.email = $event"
+            requireValidation
+            entity="client"
+            validationType="email"
           />
         </FieldGroup>
       </form>
@@ -85,9 +100,9 @@
             Cancelar
           </NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && update()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && update()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -100,11 +115,11 @@
 <script lang="ts">
   import { useRouter, useRoute } from 'vue-router';
   import { useStore } from 'vuex';
-  import { ref, computed } from 'vue';
+  import { ref, computed, watchEffect } from 'vue';
   import { useTitle } from '@vueuse/core';
   import { Company } from '@/interfaces/sandflow';
   import Toggle from '@/components/ui/Toggle.vue';
-
+  import {useValidator} from '@/helpers/useValidator'
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -151,20 +166,11 @@
         editedCompany.value.isOperator = !editedCompany.value.isOperator;
       };
 
-      const isFull = computed(() => {
-        return !!(
-          editedCompany.value.name !== '' &&
-          editedCompany.value.name.length > 3 &&
-          editedCompany.value.address.length > 3 &&
-          editedCompany.value.legalId >= 0 &&
-          editedCompany.value.companyRepresentative?.name &&
-          editedCompany.value.companyRepresentative?.name.length > 0 &&
-          editedCompany.value.companyRepresentative?.email &&
-          editedCompany.value.companyRepresentative?.email.length > 0 &&
-          editedCompany.value.companyRepresentative?.phone &&
-          editedCompany.value.companyRepresentative?.phone.length > 0
-        );
-      });
+      const isValidated = ref(false)
+
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'client') ? true : false
+      })
 
       const update = async () => {
         const loading = ref(true);
@@ -223,7 +229,7 @@
         goToIndex,
         editedCompany,
         handleToggleState,
-        isFull,
+        isValidated
       };
     },
   };

@@ -10,7 +10,8 @@ export default {
       create: "No se pudo crear el centro de carga de arena.",
       update: "No se pudo actualizar el centro de carga de arena.",
       delete: "No se pudo eliminar el centro de carga de arena."
-    }
+    },
+    validations: {}
   }),
   getters: {
     sandProviderMessage: (state) => (method) => {
@@ -18,6 +19,9 @@ export default {
     },
     getSandProviders: state => {
       return state.all
+    },
+    sandProviderValidation: state => {
+      return state.validations
     }
   },
   mutations: {
@@ -39,8 +43,14 @@ export default {
         return i.id === payload;
       }), 1);
     },
+    UPDATE_SANDPROVIDER_VALIDATION(state,payload) {
+      state.validations[payload.fieldName] = payload.validationsPassed
+    }
   },
   actions: {
+    sandProviderUpdateValidation: async({commit}, payload) => {
+      await commit('UPDATE_SANDPROVIDER_VALIDATION', payload)
+    },
     sandProviderDataHandler: async({dispatch, getters}, methodAndPayload) => {
       let {method,payload} = methodAndPayload
       method = `sandProvider_${method}`

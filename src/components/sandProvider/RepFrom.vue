@@ -8,6 +8,8 @@
       placeholder="Ingresar Nombre y Apellido"
       :data="repName"
       @update:data="repName = $event"
+      requireValidation
+      entity="sandProvider"
     />
     <FieldInput
       class="col-span-full"
@@ -17,6 +19,9 @@
       mask="#*"
       :data="repPhone"
       @update:data="repPhone = $event"
+      requireValidation
+      validationType="numeric"
+      entity="sandProvider"
     />
     <FieldInput
       class="col-span-full"
@@ -25,6 +30,9 @@
       placeholder="empresa@mail.com"
       :data="repEmail"
       @update:data="repEmail = $event"
+      requireValidation
+      validationType="email"
+      entity="sandProvider"
     />
   </FieldGroup>
 </template>

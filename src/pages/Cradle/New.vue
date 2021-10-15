@@ -17,6 +17,8 @@
             title="Nombre"
             :data="name"
             @update:data="name = $event"
+            requireValidation
+            entity="cradle"
           />
           <FieldTextArea
             class="col-span-full"
@@ -34,9 +36,9 @@
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -47,7 +49,7 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, computed } from 'vue';
+  import { reactive, toRefs, ref, watchEffect } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import { useTitle } from '@vueuse/core';
@@ -57,6 +59,7 @@
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
+  import { useValidator } from '@/helpers/useValidator'
   import axios from 'axios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
@@ -97,9 +100,15 @@
         ]
       });
       
-      const isFull = computed(() => {
-        return !!(newCradle.name && newCradle.name.length > 3);
-      });
+      const fieldsValidations = ref({
+        name: false
+      })
+
+      const isValidated = ref(false)
+
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'cradle') ? true : false
+      })
 
       const save = async () => {
         let sandDB = await axios
@@ -124,8 +133,8 @@
         goToIndex,
         save,
         newCradle,
-        isFull,
         ...toRefs(newCradle),
+        isValidated
       };
     },
   };

@@ -13,9 +13,9 @@
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-  import { computed, reactive, ref } from 'vue';
+  import { watchEffect, reactive, ref } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
@@ -48,6 +48,7 @@
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
   import Modal from '@/components/modal/General.vue';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
+  import { useValidator } from '@/helpers/useValidator';
 
   export default {
     components: {
@@ -71,14 +72,16 @@
         router.push('/forklift');
       };
 
+      const isValidated = ref(false)
+
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'forklift') ? true : false
+      })
+
       const notificationModalvisible = ref(false);
       const errorMessage = ref('');
       const toggleNotificationModal = () =>
         (notificationModalvisible.value = !notificationModalvisible.value);
-
-      const isFull = computed(() => {
-        return !!(forklift.name !== '');
-      });
 
       const save = async () => {
         await useStoreLogic(router, store, 'forklift', 'create', forklift).then(
@@ -96,10 +99,10 @@
         forklift,
         goToIndex,
         save,
-        isFull,
+        isValidated,
         notificationModalvisible,
         toggleNotificationModal,
-        errorMessage,
+        errorMessage
       };
     },
   };

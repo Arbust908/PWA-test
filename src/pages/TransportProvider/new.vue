@@ -58,9 +58,9 @@
                 Cancelar
               </NoneBtn>
               <PrimaryBtn
-                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                @click="isFull && save()"
-                :disabled="!isFull"
+                :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+                @click="isValidated && save()"
+                :disabled="!isValidated"
               >
                 Finalizar
               </PrimaryBtn>
@@ -77,7 +77,7 @@
               :driverPhone="newDriver.phone"
               :driverEmail="newDriver.email"
               :driverTType="newDriver.vehicleType"
-              :driverTId="newDriver.vehicleId"
+              :driverTId="newDriver.transportId"
               :driverObs="newDriver.observations"
               @update:driverName="newDriver.name = $event"
               @update:driverPhone="newDriver.phone = $event"
@@ -85,17 +85,8 @@
               @update:driverTType="newDriver.vehicleType = $event"
               @update:driverTId="newDriver.transportId = $event"
               @update:driverObs="newDriver.observations = $event"
+              @add-driver="addDriver()"
             />
-            <button
-              :class="[
-                'flex items-center',
-                driverFull ? null : 'text-gray-200 cursor-not-allowed',
-              ]"
-              @click.prevent="driverFull && addDriver()"
-            >
-              <Icon icon="Plus" type="outline" class="w-5 h-5" />
-              <h2>Agregar Transportista</h2>
-            </button>
           </form>
           <footer
             class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between"
@@ -107,9 +98,9 @@
                 Cancelar
               </NoneBtn>
               <PrimaryBtn
-                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                @click="hasFullNewDriver && addDriver(); isFull && save()"
-                :disabled="!isFull"
+                :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+                @click="hasFullNewDriver && addDriver(); isValidated && save()"
+                :disabled="!isValidated"
               >
                 Finalizar
               </PrimaryBtn>
@@ -140,6 +131,7 @@
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
+  import { useValidator } from '@/helpers/useValidator'
   import Icon from '@/components/icon/TheAllIcon.vue';
   import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
   import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
@@ -241,14 +233,6 @@
         email: '',
       });
 
-      const transportProviderFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          newTransportProvider.name !== '' &&
-          newTransportProvider.address !== '0' &&
-          newTransportProvider.legalId >= 0
-        );
-      });
-
       const hasFullNewDriver = computed(() => {
         return !!(
           newDriver.name !== '' &&
@@ -259,29 +243,11 @@
         );
       });
 
-      const driverFull: ComputedRef<boolean> = computed(() => {
-        const hasFullDriverCards = drivers.every(
-          (driver: Driver) =>
-            driver.name !== '' &&
-            driver.phone !== '' &&
-            driver.email !== '' &&
-            driver.vehicleType !== '' &&
-            driver.vehicleId !== ''
-        );
-        return !!(hasFullDriverCards || hasFullNewDriver);
-      });
+      const isValidated = ref(false)
 
-      const repFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          companyRepresentative.name !== '' &&
-          companyRepresentative.phone !== '' &&
-          companyRepresentative.email !== ''
-        );
-      });
-
-      const isFull: ComputedRef<boolean> = computed(() => {
-        return transportProviderFull.value && repFull.value;
-      });
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'transportProvider') ? true : false
+      })
 
       const save = async () => {
         const representanteDone = ref(false);
@@ -356,7 +322,7 @@
 
       return {
         newTransportProvider,
-        isFull,
+        isValidated,
         save,
         companyRepresentative,
         activeSection,
@@ -365,7 +331,6 @@
         Icon,
         addDriver,
         newDriver,
-        driverFull,
         deleteDriver,
         editDriver,
       };

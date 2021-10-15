@@ -40,9 +40,9 @@
             Cancelar
           </NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -65,7 +65,7 @@
 </template>
 
 <script lang="ts">
-  import { ref, Ref, computed, ComputedRef, onMounted } from 'vue';
+  import { ref, Ref, computed, ComputedRef, onMounted, watchEffect } from 'vue';
   import { useStore } from 'vuex';
   import { useRouter } from 'vue-router';
   import { useTitle } from '@vueuse/core';
@@ -78,6 +78,7 @@
   import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
   import Modal from '@/components/modal/General.vue';
   import { useStoreLogic } from '@/helpers/useStoreLogic';
+  import { useValidator } from '@/helpers/useValidator';
   import axios from 'axios';
   const apiUrl = import.meta.env.VITE_API_URL || '/api';
   import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
@@ -110,7 +111,7 @@
       const toggleRepStatus = useToggle(isNewRep);
 
       const companyRepresentative: CompanyRepresentative = ref({
-        name: '',
+        companyRepresentativeName: '',
         phone: '',
         email: '',
       });
@@ -137,29 +138,11 @@
         sandProvider.value.meshType.splice(index, 1)
       };
 
+      const isValidated = ref(false)
 
-      const providerFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          (
-            sandProvider.value.name !== '' &&
-            sandProvider.value.address !== '0' &&
-            sandProvider.value.legalId >= 0 &&
-            sandProvider.value.meshType.length > 0
-          )
-        );
-      });
-
-      const repFull: ComputedRef<boolean> = computed(() => {
-        return !!(
-          companyRepresentative.value.name !== '' &&
-          companyRepresentative.value.phone !== '' &&
-          companyRepresentative.value.email !== ''
-        );
-      });
-
-      const isFull: ComputedRef<boolean> = computed(() => {
-        return providerFull.value && repFull.value;
-      });
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'sandProvider') ? true : false
+      })
 
       const save = async () => {
         sandProvider.value.companyRepresentative = companyRepresentative.value
@@ -191,14 +174,14 @@
         toggleRepStatus,
         companyRepresentative,
         sandProvider,
-        isFull,
+        isValidated,
         save,
         deleteMeshType,
         addMeshType,
         meshType,
         notificationModalvisible,
         toggleNotificationModal,
-        errorMessage
+        errorMessage,
       };
     },
   };

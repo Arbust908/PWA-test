@@ -7,6 +7,8 @@
       placeholder="Ingresar Nombre / Razón Social"
       :data="spName"
       @update:data="spName = $event"
+      requireValidation
+      entity="sandProvider"
     />
     <FieldInput
       class="col-span-full"
@@ -16,6 +18,10 @@
       mask="#*"
       :data="spLegalId"
       @update:data="spLegalId = Number($event)"
+      requireValidation
+      validationType="extension"
+      :charAmount="{min: 11,max:11}"
+      entity="sandProvider"
     />
     <FieldInput
       class="col-span-full"
@@ -24,10 +30,12 @@
       placeholder="Ingresar domicilio"
       :data="spAddress"
       @update:data="spAddress = $event"
+      requireValidation
+      entity="sandProvider"
     />
     <label class="col-span-full" for="meshType">
       <span>Tipo de malla</span>
-      <div class="mb-4">
+      <div class="mb-4" v-if="spMeshTypes.length > 0">
         <div
           class="flex items-center"
           v-for="(mesh, i) in spMeshTypes"
@@ -39,6 +47,7 @@
             placeholder="Malla"
             isReadonly
             :data="mesh.type"
+            requireValidation
           />
           <Icon
             icon="Trash"
@@ -49,14 +58,24 @@
           />
         </div>
       </div>
+      <div class="mb-4 hidden" v-else>
+        <FieldInput
+          class="col-span-7"
+          fieldName="mesh"
+          placeholder="Malla"
+          isReadonly
+          requireValidation
+        />
+      </div>
       <div class="flex items-center">
         <FieldSelect
-          fieldName="sandType1"
+          fieldName="sandType"
           placeholder="Seleccionar"
           endpoint="/sand"
           endpointKey="type"
           :data="spMesh"
           @update:data="spMesh = $event"
+          @is-blured="checkMeshValidation"
         />
         <Icon
           icon="Plus"
@@ -66,6 +85,7 @@
           @click="addMeshType(spMesh)"
         />
       </div>
+      <InvalidInputLabel v-if="!isMeshValid && wasMeshSelectBlured" validationType="empty"/>
     </label>
     <FieldTextArea
       class="col-span-full"
@@ -82,13 +102,14 @@
 </template>
 
 <script lang="ts">
-  import { defineComponent, onMounted, watchEffect } from 'vue';
+  import { computed, defineComponent, ref, watchEffect } from 'vue';
   import { useVModels } from '@vueuse/core';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
   import FieldInput from '@/components/ui/form/FieldInput.vue';
   import FieldSelect from '@/components/ui/form/FieldSelect.vue';
   import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
+  import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
 
   export default defineComponent({
     components: {
@@ -97,6 +118,7 @@
       FieldSelect,
       FieldTextArea,
       Icon,
+      InvalidInputLabel
     },
     props: {
       spName: {
@@ -136,11 +158,27 @@
         emit('add-mesh-type',mesh)
       };
 
+      const wasMeshSelectBlured = ref(false)
+      
+      const isMeshValid = computed(() => {
+        if(!wasMeshSelectBlured.value) return
+        if(spMeshTypes.value.length > 0) {
+          return true
+        }
+        else {
+          return false
+        }
+      })
+
       watchEffect(() => {
         if(spMesh.value !== 0 && spMesh.value !== "") {
           addMeshType(spMesh.value)
         }
       })
+
+      const checkMeshValidation = () => {
+        if(!wasMeshSelectBlured.value) wasMeshSelectBlured.value = true
+      }
 
       return {
         deleteMeshType,
@@ -150,7 +188,10 @@
         spAddress,
         spMeshTypes,
         spMesh,
-        spObs
+        spObs,
+        checkMeshValidation,
+        wasMeshSelectBlured,
+        isMeshValid
       };
     },
   });

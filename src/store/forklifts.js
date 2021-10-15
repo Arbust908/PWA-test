@@ -10,7 +10,8 @@ export default {
       create: "No se pudo crear el montacargas",
       update: "No se pudo actualizar el montacargas",
       delete: "No se pudo eliminar el montacargas"
-    }
+    },
+    validations: {}
   }),
   getters: {
     forkliftMessage: (state) => (method) => {
@@ -18,6 +19,9 @@ export default {
     },
     getForklifts: state => {
       return state.all
+    },
+    forkliftValidation: state => {
+      return state.validations
     }
   },
   mutations: {
@@ -39,8 +43,14 @@ export default {
         return i.id === payload;
       }), 1);
     },
+    UPDATE_FORKLIFT_VALIDATION(state,payload) {
+      state.validations[payload.fieldName] = payload.validationsPassed
+    }
   },
   actions: {
+    forkliftUpdateValidation: async({commit}, payload) => {
+      await commit('UPDATE_FORKLIFT_VALIDATION', payload)
+    },
     forkliftDataHandler: async({dispatch, getters}, methodAndPayload) => {
       let {method,payload} = methodAndPayload
       method = `forklift_${method}`

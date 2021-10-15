@@ -18,9 +18,9 @@
         <section class="space-x-6 flex items-center justify-end">
           <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
           <PrimaryBtn
-            :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-            @click="isFull && save()"
-            :disabled="!isFull"
+            :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+            @click="isValidated && save()"
+            :disabled="!isValidated"
           >
             Finalizar
           </PrimaryBtn>
@@ -31,13 +31,14 @@
 </template>
 
 <script lang="ts">
-  import { reactive, toRefs, computed } from 'vue';
+  import { reactive, toRefs, ref, watchEffect } from 'vue';
   import { useRouter } from 'vue-router';
   import { useStore } from 'vuex';
   import { useTitle } from '@vueuse/core';
   import Layout from '@/layouts/Main.vue';
   import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
   import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+  import { useValidator } from '@/helpers/useValidator'
   import axios from 'axios';
   const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -67,9 +68,11 @@
         observations: '',
       });
 
-      const isFull = computed(() => {
-        return !!(newSand.type.length > 0);
-      });
+      const isValidated = ref(false)
+
+      watchEffect(async() => {
+        isValidated.value = await useValidator(store,'sand') ? true : false
+      })
 
       const save = async () => {
         let sandDB = await axios
@@ -92,7 +95,7 @@
         goToIndex,
         save,
         ...toRefs(newSand),
-        isFull,
+        isValidated
       };
     },
   };
