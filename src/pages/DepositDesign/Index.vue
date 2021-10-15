@@ -3,7 +3,7 @@
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-second-900">Depositos</h2>
       <router-link to="/diseno-de-deposito/nueva">
-        <PrimaryBtn>Nuevo Deposito</PrimaryBtn>
+        <PrimaryBtn>Nuevo Depósito</PrimaryBtn>
       </router-link>
     </header>
     <UiTable>
@@ -80,7 +80,7 @@
       UiTable,
     },
     setup() {
-      useTitle('Depositos <> Sandflow');
+      useTitle('Depósitos <> Sandflow');
       const store = useStore();
       const instance = axios.create({
         baseURL: apiUrl,
