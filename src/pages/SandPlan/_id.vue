@@ -502,7 +502,6 @@
         });
         
         currentSandPlan.stages.forEach(stage => {
-          console.log(stage)
           const { data } = useAxios(
             '/sandStage/' + stage.id,
             {
