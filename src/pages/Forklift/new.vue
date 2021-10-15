@@ -58,7 +58,7 @@
       Modal,
     },
     setup() {
-      useTitle('Forklift <> Sandflow');
+      useTitle('Nuevo Forklift <> Sandflow');
       const store = useStore();
       const router = useRouter();
 
