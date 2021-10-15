@@ -31,7 +31,7 @@
         </FieldGroup>
         <fieldset v-if="selectionsAreDone" class="w-full pt-1 pb-5 px-2">
           <span v-if="boxesWithoutId.length > 0" class="text-xs text-green-600">*Complete los ids de caja faltantes</span>
-          <div class="mt-2" v-if="boxes.length > 0 || boxesWithId.length > 0">
+          <div class="mt-2" v-if="boxes.length> 0 || boxesWithoutId.length > 0">
             <div v-for="box in boxes" :key="box.id" class="available-box">
               <button
                 :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
@@ -495,7 +495,8 @@
               }
             })[0];
 
-            originalWarehouseLayout.value = warehouse.value.layout
+            originalWarehouseLayout.value = warehouse.value
+            console.log('wh', warehouse.value);
 
             if (warehouse.value) {
               floor.value = formatDeposit(warehouse.value.layout).floor;

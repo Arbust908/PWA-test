@@ -1,9 +1,9 @@
 <template>
   <Layout class="relative">
-    <header>
-      <h1>
+    <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
+      <h2 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">
         Stage sheet
-      </h1>
+      </h2>
     </header>
     <div class="grid gap-8 grid-cols-2 relative">
       <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
