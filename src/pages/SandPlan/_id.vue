@@ -312,7 +312,7 @@
       const router = useRouter();
       const route = useRoute();
       const id = route.params.id;
-      useTitle(`Panificacion de Arena ${id} <> Sandflow`);
+      useTitle(`Planificación de Arena ${id} <> Sandflow`);
       const instance = axios.create({
         baseURL: api,
       });

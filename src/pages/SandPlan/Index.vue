@@ -2,7 +2,7 @@
   <Layout>
     <header class="flex justify-between items-center mb-4 px-3">
       <h2 class="text-2xl font-semibold text-gray-900">
-        Planificacíon de arenas
+        Planificación de arenas
       </h2>
       <router-link to="/planificacion-de-arena/nueva">
         <PrimaryBtn>Nuevo</PrimaryBtn>
@@ -97,7 +97,7 @@
       Icon,
     },
     setup() {
-      useTitle('Planificacíones de Arena <> Sandflow');
+      useTitle('Planificaciones de Arena <> Sandflow');
       const instance = axios.create({
         baseURL: api,
       });

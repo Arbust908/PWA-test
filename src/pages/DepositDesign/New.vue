@@ -204,7 +204,7 @@
       ClientPitCombo,
     },
     setup() {
-      useTitle('Nuevo Deposito <> Sandflow');
+      useTitle('Nuevo Depósito <> Sandflow');
       const router = useRouter();
       const store = useStore();
       const instance = axios.create({
