@@ -12,6 +12,8 @@
         <SandProviderPack
           :sandProviders="sandProviderIds"
           @update:sandProviders="sandProviderIds = $event"
+          @change="sandProviderHandler"
+          :filteredSandTypes="filteredSandTypes"
         />
         <fieldset class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
           <h2 class="col-span-full text-xl mt-4">Transporte</h2>
@@ -459,8 +461,21 @@
         return str.charAt(0).toUpperCase() + str.slice(1);
       };
 
+      const filteredSandTypes = ref({})
+
+      const sandProviderHandler = (event: Event) => {
+        const selectedSandProviderId = event.target.value
+        const [filtered] = sandProviders.value.filter(sandProvider => {
+          return sandProvider.id == selectedSandProviderId
+        })
+
+        filteredSandTypes.value = filtered.meshType
+      }
+
       return {
         // sandProviderId,
+        filteredSandTypes,
+        sandProviderHandler,
         sandOrder,
         transportProviders,
         // addSandOrder,
