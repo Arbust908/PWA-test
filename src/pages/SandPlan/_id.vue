@@ -482,7 +482,6 @@
       const { updateSandPlan } = useActions(['updateSandPlan']);
       const save = (): void => {
         currentSandPlan.stages.map((stage) => {
-          console.log('stage', stage);
           if (stage.sandId1 === -1) {
             stage.sandId1 = null;
           }
@@ -501,6 +500,27 @@
             (stage.sandId3 !== null && stage.quantity3 > 0);
           return noSandTypeNull;
         });
+        
+        currentSandPlan.stages.forEach(stage => {
+          console.log(stage)
+          const { data } = useAxios(
+            '/sandStage/' + stage.id,
+            {
+              method: 'PUT',
+              data: {
+                stage: stage.stage,
+                sandId1: stage.sandId1,
+                sandId2: stage.sandId2,
+                sandId3: stage.sandId3,
+                quantity1: stage.quantity1,
+                quantity2: stage.quantity2,
+                quantity3: stage.quantity3
+              },
+            },
+            instance
+          )
+        });
+        
 
         const { data } = useAxios(
           '/sandPlan/' + currentSandPlan.id,
