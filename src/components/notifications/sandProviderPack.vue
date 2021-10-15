@@ -26,6 +26,7 @@
           endpointKey="type"
           :data="so.sandTypeId"
           @update:data="so.sandTypeId = $event"
+          :filteredData="filteredSandTypes"
         />
         <FieldWithSides
           class='col-span-5 sm:col-span-3'
@@ -77,7 +78,7 @@
 </template>
 
 <script lang="ts">
-  import { computed, defineComponent, ref } from 'vue';
+  import { computed, defineComponent, ref, watchEffect } from 'vue';
   import Icon from '@/components/icon/TheAllIcon.vue';
   import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
   import FieldGroup from '@/components/ui/form/FieldGroup.vue';
@@ -112,13 +113,23 @@
         type: Array,
         required: true,
       },
+      filteredSandTypes: {
+        type: Array,
+        required: true
+      }
     },
     setup(props, { emit }) {
       const sandProviders = useVModel(props, 'sandProviders', emit);
 
+      const filteredSandTypes = ref([])
+
       const getCurrentSandProvider = (Inid: number): SandProvider => {
         return sandProviders.value.find((s) => s.innerId === Inid);
       };
+
+      watchEffect(() =>{
+        filteredSandTypes.value = props.filteredSandTypes
+      })
 
       const sandOrderInnerId = ref(0);
       const addSandOrder = (spId: number) => {
@@ -169,6 +180,7 @@
         addSandProvider,
         removeSandProvider,
         lastSandProviderInner,
+        filteredSandTypes
       };
     },
   });
