@@ -14,51 +14,51 @@ import transportProviders from '@/store/transportProviders';
 import workOrders from '@/store/workOrders';
 
 const store = createStore({
-  state: {
-    user: { username: '', role: 0 },
-  },
-  getters: {
-    isAdmin(state) {
-      return state.user.role == 99;
+    state: {
+        user: { username: '', role: 0 },
+        workOrders: { all: [] },
     },
-    isLogged(state) {
-      return state.user.role > 0;
+    getters: {
+        isAdmin(state) {
+            return state.user.role == 99;
+        },
+        isLogged(state) {
+            return state.user.role > 0;
+        },
+        isGuest(state) {
+            return state.user.role === 0;
+        },
+        getUserToken(state) {
+            return state.user.token || null;
+        },
     },
-    isGuest(state) {
-      return state.user.role === 0;
+    actions: {
+        setUser({ commit }, user) {
+            commit('SET_USER', user);
+        },
+        logOutUser({ commit }) {
+            commit('SET_USER', { username: '', role: 0 });
+        },
     },
-    getUserToken(state) {
-      return state.user.token || null;
+    mutations: {
+        SET_USER(state, payload) {
+            state.user = payload;
+        },
     },
-  },
-  actions: {
-    setUser({ commit }, user) {
-      commit('SET_USER', user);
+    modules: {
+        client,
+        cradle,
+        depositDesign,
+        forklifts,
+        global,
+        providerNotification,
+        purchaseOrder,
+        sand,
+        sandPlan,
+        sandProviders,
+        transportProviders,
+        workOrders,
     },
-    logOutUser({ commit }) {
-      commit('SET_USER', { username: '', role: 0 });
-    },
-  },
-  mutations: {
-    SET_USER(state, payload) {
-      state.user = payload;
-    },
-  },
-  modules: {
-    client,
-    cradle,
-    depositDesign,
-    forklifts,
-    global,
-    providerNotification,
-    purchaseOrder,
-    sand,
-    sand,
-    sandPlan,
-    sandProviders,
-    transportProviders,
-    workOrders,
-  },
-  strict: true,
+    strict: true,
 });
 export default store;

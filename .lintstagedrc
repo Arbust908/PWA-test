@@ -1,0 +1,6 @@
+{
+    "./src/**/**/**/*.{js,md,json,ts,vue}": [
+        "node ./cli lint-files",
+        "node ./cli prettify-files"
+    ]
+}
