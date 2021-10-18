@@ -1,141 +1,144 @@
 <template>
-  <Layout>
-    <header class="flex justify-between items-center mb-4 px-3">
-      <h2 class="text-2xl font-semibold text-gray-900">Clientes</h2>
-      <router-link to="/clientes/nuevo">
-        <PrimaryBtn>Nuevo</PrimaryBtn>
-      </router-link>
-    </header>
-    <UiTable>
-      <template #header>
-        <tr>
-          <th scope="col">Nombre y Apellido / Razón Social</th>
-          <th scope="col">CUIL/CUIT</th>
-          <th scope="col">Observaciones</th>
-          <th scope="col">
-            <span class="sr-only">Acciones</span>
-          </th>
-        </tr>
-      </template>
-      <template #body>
-        <tr
-          v-for="(client, cKey) in clDB"
-          :key="client.id"
-          :class="cKey % 2 === 0 ? 'even' : 'odd'"
-          class="body-row"
-        >
-          <td :class="client.name ? null : 'empty'">
-            {{ client.name || 'Sin definir' }}
-          </td>
-          <td :class="client.legalId ? null : 'empty'">
-            {{ client.legalId || 'Sin definir' }}
-          </td>
-          <td :class="client.observations ? null : 'empty'">
-            {{ client.observations || 'Sin definir' }}
-          </td>
-          <td>
-            <div class="btn-panel">
-              <router-link :to="`/clientes/${client.id}`" class="edit">
-                <Icon icon="PencilAlt" class="w-5 h-5" />
-                <span> Editar </span>
-              </router-link>
-              <button class="delete" @click="deleteFrom(client.id)">
-                <Icon icon="Trash" class="w-5 h-5" />
-                <span> Eliminar </span>
-              </button>
-            </div>
-          </td>
-        </tr>
-        <tr v-if="clDB && clDB.length <= 0">
-          <td colspan="5" class="emptyState">
-            <p>No hay clientes cargados</p>
-          </td>
-        </tr>
-      </template>
-    </UiTable>
-  </Layout>
+    <Layout>
+        <header class="flex justify-between items-center mb-4 px-3">
+            <h2 class="text-2xl font-semibold text-gray-900">Clientes</h2>
+            <router-link to="/clientes/nuevo">
+                <PrimaryBtn>Nuevo</PrimaryBtn>
+            </router-link>
+        </header>
+        <UiTable>
+            <template #header>
+                <tr>
+                    <th scope="col">Nombre y Apellido / Razón Social</th>
+                    <th scope="col">CUIL/CUIT</th>
+                    <th scope="col">Observaciones</th>
+                    <th scope="col">
+                        <span class="sr-only">Acciones</span>
+                    </th>
+                </tr>
+            </template>
+            <template #body>
+                <tr
+                    v-for="(client, cKey) in clDB"
+                    :key="client.id"
+                    :class="cKey % 2 === 0 ? 'even' : 'odd'"
+                    class="body-row"
+                >
+                    <td :class="client.name ? null : 'empty'">
+                        {{ client.name || 'Sin definir' }}
+                    </td>
+                    <td :class="client.legalId ? null : 'empty'">
+                        {{ client.legalId || 'Sin definir' }}
+                    </td>
+                    <td :class="client.observations ? null : 'empty'">
+                        {{ client.observations || 'Sin definir' }}
+                    </td>
+                    <td>
+                        <div class="btn-panel">
+                            <router-link :to="`/clientes/${client.id}`" class="edit">
+                                <Icon icon="PencilAlt" class="w-5 h-5" />
+                                <span> Editar </span>
+                            </router-link>
+                            <button class="delete" @click="deleteFrom(client.id)">
+                                <Icon icon="Trash" class="w-5 h-5" />
+                                <span> Eliminar </span>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                <tr v-if="clDB && clDB.length <= 0">
+                    <td colspan="5" class="emptyState">
+                        <p>No hay clientes cargados</p>
+                    </td>
+                </tr>
+            </template>
+        </UiTable>
+    </Layout>
 </template>
 
 <script>
-  import { onMounted, ref } from 'vue';
-  import { useTitle } from '@vueuse/core';
+    import { onMounted, ref } from 'vue';
+    import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-  import UiTable from '@/components/ui/TableWrapper.vue';
-  import Icon from '@/components/icon/TheAllIcon.vue';
-  import { useClone } from '@/helpers/useClone';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import UiTable from '@/components/ui/TableWrapper.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
+    import { useClone } from '@/helpers/useClone';
 
-  import { useStore } from 'vuex';
-  import axios from 'axios';
-  const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    import { useStore } from 'vuex';
+    import axios from 'axios';
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-  export default {
-    components: {
-      Layout,
-      PrimaryBtn,
-      UiTable,
-      Icon,
-    },
-    setup() {
-      useTitle('Clientes <> Sandflow');
-      const store = useStore();
-      const clDB = ref([]);
-      const clStoreDB = useClone(store.state.client.all);
-      const loading = ref(false);
+    export default {
+        components: {
+            Layout,
+            PrimaryBtn,
+            UiTable,
+            Icon,
+        },
+        setup() {
+            useTitle('Clientes <> Sandflow');
+            const store = useStore();
+            const clDB = ref([]);
+            const clStoreDB = useClone(store.state.client.all);
+            const loading = ref(false);
 
-      const headers = {
-        'Content-Type': 'Application/JSON',
-      };
+            const headers = {
+                'Content-Type': 'Application/JSON',
+            };
 
-      const getClients = async () => {
-        loading.value = true;
+            const getClients = async () => {
+                loading.value = true;
 
-        clDB.value = await axios
-          .get(`${apiUrl}/company`, headers)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            if (res.status === 200) {
-              return res.data.data;
-            }
-            return [];
-          });
+                clDB.value = await axios
+                    .get(`${apiUrl}/company`, headers)
+                    .catch((err) => {
+                        console.log(err);
+                    })
+                    .then((res) => {
+                        if (res.status === 200) {
+                            return res.data.data;
+                        }
 
-        store.dispatch('setClients', clDB.value);
-      };
+                        return [];
+                    });
 
-      const deleteFrom = async (id) => {
-        const loading = ref(true);
-        let clStoreDB = await axios
-          .delete(`${apiUrl}/company/${id}`)
-          .catch((err) => {
-            console.log(err);
-          })
-          .then((res) => {
-            console.log('OK', id);
-            return {};
-          })
-          .finally(() => {
-            loading.value = false;
-            clDB.value = clDB.value.filter((st) => st.id !== id);
-          });
-      };
+                store.dispatch('setClients', clDB.value);
+            };
 
-      onMounted(async () => {
-        loading.value = true;
-        await getClients();
-        loading.value = false;
-      });
-      return {
-        clDB,
-        deleteFrom,
-        loading,
-      };
-    },
-  };
+            const deleteFrom = async (id) => {
+                const loading = ref(true);
+                let clStoreDB = await axios
+                    .delete(`${apiUrl}/company/${id}`)
+                    .catch((err) => {
+                        console.log(err);
+                    })
+                    .then((res) => {
+                        console.log('OK', id);
+
+                        return {};
+                    })
+                    .finally(() => {
+                        loading.value = false;
+                        clDB.value = clDB.value.filter((st) => st.id !== id);
+                    });
+            };
+
+            onMounted(async () => {
+                loading.value = true;
+                await getClients();
+                loading.value = false;
+            });
+
+            return {
+                clDB,
+                deleteFrom,
+                loading,
+            };
+        },
+    };
 </script>
 
 <style lang="scss" scoped>
-  @import '@/assets/table.scss';
+    @import '@/assets/table.scss';
 </style>
