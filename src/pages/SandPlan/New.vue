@@ -305,7 +305,7 @@
       ResposiveTableSandPlan
     },
     setup() {
-      useTitle('Nueva Planificación de arenas <> Sandflow');
+      useTitle('Nueva planificación de arenas <> Sandflow');
       // Init
       const windowWidth = window.innerWidth;
       const store = useStore();
