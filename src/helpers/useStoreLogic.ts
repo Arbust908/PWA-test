@@ -1,46 +1,57 @@
-export async function useStoreLogic (router: Object, store: Object, entity: String, method:String, payload?:Object) {
-  return await store.dispatch(`${entity}DataHandler`, {method, payload})
-  .then((res) => {
-    String.prototype.capitalize = function() {
-      return this.charAt(0).toUpperCase() + this.slice(1);
+declare global {
+    interface String {
+        capitalize(): string;
     }
-    let routeName = entity.capitalize() 
-    
-    if(res && method == 'create') {
-      router.push({name: routeName})
-      return { type: "success", res }
-    }
+}
+export async function useStoreLogic(router: any, store: any, entity: string, method: string, payload?: any) {
+    return await store.dispatch(`${entity}DataHandler`, { method, payload }).then((res: any) => {
+        String.prototype.capitalize = function () {
+            return this.charAt(0).toUpperCase() + this.slice(1);
+        };
+        const routeName = entity.capitalize();
 
-    if(!res.createdAt && method == 'create'){
-      let message = store.getters[`${entity}Message`](method)
-      return { type: "failed", message }
-    }
+        if (res && method == 'create') {
+            router.push({ name: routeName });
 
-    if(method == 'get' || method == 'getAll') { 
-      if(res.status !== 'failed') return { type: "success", res }
-      else { 
-        let message = store.getters[`${entity}Message`](method) 
-        return { type: "failed", message }
-      }
-    }
+            return { type: 'success', res };
+        }
 
-    if(method == 'delete') {
-      if(res.status !== 'failed') return { type: "success", res }
-      else { 
-        let message = store.getters[`${entity}Message`](method) 
-        return { type: "failed", message }
-      }
-    }
+        if (!res.createdAt && method == 'create') {
+            const message = store.getters[`${entity}Message`](method);
 
-    if(method == 'update') {
-      if(res.status !== 'failed') {
-        router.push({name: routeName})
-        return { type: "success", res }
-      }
-      else { 
-        let message = store.getters[`${entity}Message`](method) 
-        return { type: "failed", message }
-      }
-    }
-  })
+            return { type: 'failed', message };
+        }
+
+        if (method == 'get' || method == 'getAll') {
+            if (res.status !== 'failed') {
+                return { type: 'success', res };
+            } else {
+                const message = store.getters[`${entity}Message`](method);
+
+                return { type: 'failed', message };
+            }
+        }
+
+        if (method == 'delete') {
+            if (res.status !== 'failed') {
+                return { type: 'success', res };
+            } else {
+                const message = store.getters[`${entity}Message`](method);
+
+                return { type: 'failed', message };
+            }
+        }
+
+        if (method == 'update') {
+            if (res.status !== 'failed') {
+                router.push({ name: routeName });
+
+                return { type: 'success', res };
+            } else {
+                const message = store.getters[`${entity}Message`](method);
+
+                return { type: 'failed', message };
+            }
+        }
+    });
 }
