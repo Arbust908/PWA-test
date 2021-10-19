@@ -66,21 +66,16 @@
                         <div class="btn-panel">
                             <router-link :to="`/clientes/${client.id}`">
                                 <CircularBtn size="xs" class="btn__delete bg-blue-500">
-                                    <Icon
-                                        icon="PencilAlt"
-                                        type="outlined"
-                                        class="w-6 h-6 icon text-white"
-                                        @click="remove(pickup.id)"
-                                    />
+                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
                                 </CircularBtn>
                             </router-link>
 
-                            <CircularBtn size="xs" :class="client.isOperator ? 'bg-blue-500' : 'bg-red-500'">
+                            <CircularBtn size="xs" :class="client.visible ? 'bg-red-500' : 'bg-blue-500'">
                                 <Icon
-                                    :icon="client.isOperator ? 'Eye' : 'EyeOff'"
+                                    :icon="client.visible ? 'EyeOff' : 'Eye'"
                                     type="outlined"
                                     class="w-6 h-6 text-white"
-                                    @click="remove(pickup.id)"
+                                    @click="update(client)"
                                 />
                             </CircularBtn>
                         </div>
@@ -160,6 +155,7 @@
                 if (res.status === 200) {
                     clDB.value = res.data.data;
                 }
+                store.dispatch('setClients', clDB.value);
 
                 loading.value = false;
             };
@@ -182,6 +178,15 @@
                     });
             };
 
+            const update = async (client) => {
+                const payload = {
+                    ...client,
+                    visible: !client.visible,
+                };
+                await store.dispatch('updateVisibilityClient', payload);
+                await getClients();
+            };
+
             onMounted(async () => {
                 await getClients();
             });
@@ -198,6 +203,7 @@
                 clientId,
                 clearFilters,
                 total,
+                update,
             };
         },
     };
