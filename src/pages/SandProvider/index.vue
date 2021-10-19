@@ -1,48 +1,85 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 px-3">
-            <h2 class="text-2xl font-semibold text-gray-900">Proveedores de arena</h2>
-            <router-link to="/proveedores-de-arena/nuevo">
-                <PrimaryBtn>Nuevo</PrimaryBtn>
+        <header class="flex justify-start space-x-4 items-center mb-4 px-3">
+            <h2 class="text-2xl font-semibold text-gray-900">Centro de carga de arena</h2>
+            <router-link to="/proveedores-de-arena/nuevo ">
+                <PrimaryBtn size="sm"
+                    >Crear
+                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
+                </PrimaryBtn>
             </router-link>
         </header>
-        <UiTable>
+        <hr />
+        <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
+            <FieldSelect
+                title="Filtro"
+                placeholder="Seleccionar centro de carga"
+                class="col-span-full sm:col-span-5"
+                field-name="name"
+                endpoint-key="name"
+                endpoint="/sandProvider"
+                :data="sandProviderId"
+                @update:data="sandProviderId = $event"
+            />
+            <div class="col-span-4 mt-7">
+                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
+            </div>
+        </div>
+
+        <UiTable class="mt-6">
             <template #header>
                 <tr>
-                    <th scope="col">Nombre y Apellido / Razón Social</th>
+                    <th scope="col">Proveedor</th>
                     <th scope="col">Domicilio</th>
-                    <th scope="col">CUIL/CUIT</th>
-                    <th scope="col">
-                        <span class="sr-only">Acciones</span>
-                    </th>
+                    <th scope="col">Tipo de Malla</th>
+                    <th scope="col">Representante</th>
+                    <th scope="col">Teléfono</th>
+                    <th scope="col">Acciones</th>
                 </tr>
             </template>
             <template #body>
                 <tr
-                    v-for="(sandProvider, spKey) in sandProviders"
+                    v-for="(sandProvider, spKey) in filteredSandProviders"
                     :key="sandProvider.id"
                     :class="spKey % 2 === 0 ? 'even' : 'odd'"
                     class="body-row"
                 >
                     <td :class="sandProvider.name ? null : 'empty'">
-                        {{ sandProvider.name || 'Sin nombre' }}
+                        {{ sandProvider?.name || 'Sin nombre' }}
                     </td>
                     <td :class="sandProvider.address ? null : 'empty'">
-                        {{ sandProvider.address || 'Sin dirección' }}
+                        {{ sandProvider?.address || 'Sin dirección' }}
                     </td>
-                    <td :class="sandProvider.legalId ? null : 'empty'">
-                        {{ sandProvider.legalId || 'Sin CUIL/CUIT' }}
+                    <td :class="sandProvider.meshType ? null : 'empty'">
+                        <p v-for="meshType in sandProvider.meshType" :key="meshType">
+                            {{ meshType?.type || '-' }}
+                        </p>
+                    </td>
+                    <td :class="sandProvider.companyRepresentative ? null : 'empty'">
+                        {{ sandProvider.companyRepresentative?.name || 'Sin definir' }}
+                    </td>
+                    <td :class="sandProvider.companyRepresentative ? null : 'empty'">
+                        {{ sandProvider.companyRepresentative?.phone || 'Sin definir' }}
                     </td>
                     <td>
                         <div class="btn-panel">
-                            <router-link :to="`/proveedores-de-arena/${sandProvider.id}`" class="edit">
-                                <Icon icon="PencilAlt" class="w-5 h-5" />
-                                <span> Editar </span>
+                            <router-link :to="`/proveedores-de-arena/${sandProvider.id}`">
+                                <CircularBtn size="xs" class="bg-blue-500">
+                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
+                                </CircularBtn>
                             </router-link>
-                            <button class="delete" @click="deleteSandProvider(sandProvider.id)">
-                                <Icon icon="Trash" class="w-5 h-5" />
-                                <span> Eliminar </span>
-                            </button>
+
+                            <CircularBtn
+                                size="xs"
+                                :class="sandProvider.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                @click="updateVisibility(sandProvider)"
+                            >
+                                <Icon
+                                    :icon="sandProvider.visible ? 'EyeOff' : 'Eye'"
+                                    type="outlined"
+                                    class="w-6 h-6 text-white"
+                                />
+                            </CircularBtn>
                         </div>
                     </td>
                 </tr>
@@ -63,24 +100,30 @@
 </template>
 
 <script>
-    import { onMounted, ref } from 'vue';
+    import { onMounted, ref, computed } from 'vue';
     import { useStore } from 'vuex';
     import { useTitle } from '@vueuse/core';
+    import { useRouter } from 'vue-router';
+    import { useStoreLogic } from '@/helpers/useStoreLogic';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import { useStoreLogic } from '@/helpers/useStoreLogic';
     import Modal from '@/components/modal/General.vue';
-    import { useRouter } from 'vue-router';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
 
     export default {
         components: {
             Layout,
             PrimaryBtn,
+            GhostBtn,
             UiTable,
             Icon,
             Modal,
+            FieldSelect,
+            CircularBtn,
         },
         setup() {
             useTitle(`Proveedores de Arena <> Sandflow`);
@@ -91,6 +134,7 @@
             const notificationModalvisible = ref(false);
             const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
             const errorMessage = ref('');
+            const sandProviderId = ref(-1);
 
             const deleteSandProvider = async (spID) => {
                 await useStoreLogic(router, store, 'sandProvider', 'delete', spID).then((res) => {
@@ -120,6 +164,27 @@
                 loading.value = false;
             });
 
+            const filteredSandProviders = computed(() => {
+                if (sandProviderId.value > -1) {
+                    return sandProviders.value.filter((sandProvider) => sandProvider.id == sandProviderId.value);
+                }
+
+                return sandProviders.value;
+            });
+
+            const clearFilters = () => {
+                sandProviderId.value = -1;
+            };
+
+            const updateVisibility = async (sandProvider) => {
+                const payload = {
+                    ...sandProvider,
+                    visible: !sandProvider.visible,
+                };
+
+                await store.dispatch('sandProvider_update', payload);
+            };
+
             return {
                 sandProviders,
                 deleteSandProvider,
@@ -127,6 +192,10 @@
                 notificationModalvisible,
                 toggleNotificationModal,
                 errorMessage,
+                filteredSandProviders,
+                sandProviderId,
+                clearFilters,
+                updateVisibility,
             };
         },
     };
