@@ -67,3 +67,28 @@ export const isValidWO = (to: any, from: any, next: any) => {
         next();
     }
 };
+
+export const isMobile = (to: any, from: any, next: any) => {
+    if (window.innerWidth < 640) {
+        next({ path: '/no-mobile' });
+    } else {
+        next();
+    }
+};
+
+export const isMobileAndLogged = (to: any, from: any, next: any) => {
+    recoverLocalUser();
+    const isLoggedIn = store.getters.isLogged;
+
+    if (!isLoggedIn) {
+        next({ path: '/login' });
+
+        return;
+    } else {
+        if (window.innerWidth < 640) {
+            next({ path: '/no-mobile' });
+        } else {
+            next();
+        }
+    }
+};
