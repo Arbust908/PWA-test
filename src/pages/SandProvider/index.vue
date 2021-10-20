@@ -70,15 +70,21 @@
                             </router-link>
 
                             <CircularBtn
+                                v-if="sandProvider.visible"
+                                class="bg-red-500"
                                 size="xs"
-                                :class="sandProvider.visible ? 'bg-red-500' : 'bg-blue-500'"
                                 @click="updateVisibility(sandProvider)"
                             >
-                                <Icon
-                                    :icon="sandProvider.visible ? 'EyeOff' : 'Eye'"
-                                    type="outlined"
-                                    class="w-6 h-6 text-white"
-                                />
+                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                            </CircularBtn>
+
+                            <CircularBtn
+                                v-else
+                                class="bg-blue-500"
+                                size="xs"
+                                @click="openModalVisibility(sandProvider)"
+                            >
+                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
                             </CircularBtn>
                         </div>
                     </td>
@@ -94,6 +100,22 @@
             <template #body>
                 <p>{{ errorMessage }}</p>
                 <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
+            </template>
+        </Modal>
+
+        <Modal title="¿Desea inhabilitar este centro de carga de arena?" type="error" :open="showModal">
+            <template #body>
+                <div>
+                    Una vez inhabilitado, no podrá utilizar este centro de carga de arena en ninguna otra sección de la
+                    aplicación
+                </div>
+                <div></div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center gap-5 btn">
+                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar centro de carga </PrimaryBtn>
+                </div>
             </template>
         </Modal>
     </Layout>
@@ -135,19 +157,8 @@
             const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
             const errorMessage = ref('');
             const sandProviderId = ref(-1);
-
-            const deleteSandProvider = async (spID) => {
-                await useStoreLogic(router, store, 'sandProvider', 'delete', spID).then((res) => {
-                    if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
-                    }
-
-                    if (res.type == 'success') {
-                        sandProviders.value = store.getters['getSandProviders'];
-                    }
-                });
-            };
+            const selectedsandProvider = ref(null);
+            const showModal = ref(false);
 
             onMounted(async () => {
                 loading.value = true;
@@ -176,6 +187,16 @@
                 sandProviderId.value = -1;
             };
 
+            const openModalVisibility = (sandProvider) => {
+                selectedsandProvider.value = sandProvider;
+                showModal.value = true;
+            };
+
+            const confirm = async () => {
+                await updateVisibility(selectedsandProvider.value);
+                showModal.value = false;
+            };
+
             const updateVisibility = async (sandProvider) => {
                 const payload = {
                     ...sandProvider,
@@ -187,7 +208,6 @@
 
             return {
                 sandProviders,
-                deleteSandProvider,
                 loading,
                 notificationModalvisible,
                 toggleNotificationModal,
@@ -196,6 +216,9 @@
                 sandProviderId,
                 clearFilters,
                 updateVisibility,
+                showModal,
+                openModalVisibility,
+                confirm,
             };
         },
     };
@@ -203,4 +226,7 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
+    .outline-none {
+        outline: 0;
+    }
 </style>
