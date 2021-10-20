@@ -97,7 +97,6 @@
                         errorMessage.value = res.message;
                         toggleNotificationModal();
                     }
-                    if (res.type == 'success') return goToIndex();
                 });
             };
 

@@ -1,10 +1,16 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/pages/Home.vue';
-import { isLogged, isAdmin, isGuest, isMobileAndLogged } from '@/router/guards';
+import { isLogged, isAdmin, isGuest, goToLogin, isMobileAndLogged } from '@/router/guards';
 
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
+        name: 'Main',
+        component: Home,
+        beforeEnter: goToLogin,
+    },
+    {
+        path: '/home',
         name: 'Home',
         component: Home,
         beforeEnter: isLogged,
@@ -287,6 +293,26 @@ const routes: Array<RouteRecordRaw> = [
         path: '/:catchAll(.*)',
         name: 'PageNotFound',
         component: () => import('@/pages/Error/404.vue'),
+    },
+    {
+        path: '/notLogged',
+        name: 'NotLogged',
+        component: () => import('@/pages/Error/401.vue'),
+    },
+    {
+        path: '/error500',
+        name: 'Error-500',
+        component: () => import('@/pages/Error/500.vue'),
+    },
+    {
+        path: '/error503',
+        name: 'Error-503',
+        component: () => import('@/pages/Error/503.vue'),
+    },
+    {
+        path: '/error504',
+        name: 'Error-504',
+        component: () => import('@/pages/Error/504.vue'),
     },
 ];
 
