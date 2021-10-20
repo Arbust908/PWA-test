@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <header class="flex justify-between items-center mb-4 px-3">
-            <h2 class="text-2xl font-semibold text-second-900">Depositos</h2>
+            <h2 class="text-2xl font-semibold text-second-900">Depósitos</h2>
             <router-link to="/diseno-de-deposito/nueva">
                 <PrimaryBtn>Nuevo Depósito</PrimaryBtn>
             </router-link>
@@ -45,7 +45,7 @@
                 </tr>
                 <tr v-if="Deposits.length <= 0">
                     <td colspan="5" class="emptyState">
-                        <p>No hay Depositos</p>
+                        <p>No hay Depósitos</p>
                     </td>
                 </tr>
             </template>

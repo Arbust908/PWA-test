@@ -58,6 +58,17 @@
             :silenced="silenced"
             entity="transportProvider"
         />
+        <FieldTextArea
+            class="col-span-full"
+            fieldName="observations"
+            placeholder="Observaciones..."
+            title="Observaciones"
+            :rows="5"
+            isFixed
+            isOptional
+            :data="driverObs"
+            @update:data="driverObs = $event"
+        />
         <button
             :class="['flex items-center w-[250px]', driverFull ? null : 'text-gray-200 cursor-not-allowed']"
             @click.prevent="driverFull && addDriver()"

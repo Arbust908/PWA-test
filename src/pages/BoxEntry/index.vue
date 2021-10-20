@@ -467,9 +467,12 @@
 
             const checkIfWasBoxInOriginalDeposit = (boxId) => {
                 let response = false;
-                Object.entries(originalWarehouseLayout.value).forEach((cell) => {
-                    if (cell[1].id == boxId) response = true;
+                Object.entries(originalWarehouseLayout.value.layout).forEach((cell) => {
+                    if (cell[1].id == boxId) {
+                        return (response = true);
+                    }
                 });
+
                 return response;
             };
 

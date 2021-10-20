@@ -1,3 +1,6 @@
+import axios from 'axios';
+const api = import.meta.env.VITE_API_URL || '/api';
+
 export default {
     state: () => ({
         all: [],
@@ -51,6 +54,13 @@ export default {
         },
         updateSand({ commit }, sand) {
             commit('UPDATE_SAND', sand);
+        },
+
+        //TODO: el metodo debería updateSand
+        async updateVisibilitySand({ commit }, sand) {
+            return await axios.put(`${api}/sand/${sand.id}`, sand).catch((error) => {
+                throw error.response.data;
+            });
         },
     },
 };

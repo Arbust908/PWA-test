@@ -8,84 +8,84 @@
                 <FieldGroup>
                     <FieldInput
                         class="col-span-full"
-                        fieldName="name"
+                        field-name="name"
                         placeholder="Nombre y apellido / Razón social"
                         title="Nombre y apellido / Razón social"
                         :data="editedCompany.name"
-                        @update:data="editedCompany.name = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
+                        @update:data="editedCompany.name = $event"
                     />
                     <FieldInput
                         class="col-span-full"
-                        fieldName="legalId"
+                        field-name="legalId"
                         placeholder="CUIL / CUIT"
                         mask="#*"
                         title="CUIL / CUIT"
                         :data="editedCompany.legalId"
-                        @update:data="editedCompany.legalId = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
-                        validationType="extension"
-                        :charAmount="{ min: 11, max: 11 }"
+                        validation-type="extension"
+                        :char-amount="{ min: 11, max: 11 }"
+                        @update:data="editedCompany.legalId = $event"
                     />
                     <FieldInput
                         class="col-span-full"
-                        fieldName="address"
+                        field-name="address"
                         placeholder="Domicilio"
                         title="Domicilio"
                         :data="editedCompany.address"
-                        @update:data="editedCompany.address = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
+                        @update:data="editedCompany.address = $event"
                     />
                     <toggle
                         label="Es operadora"
+                        :initial-state="editedCompany.isOperator"
                         @handle-toggle-state="handleToggleState"
-                        :initialState="editedCompany.isOperator"
                     />
                     <textarea
+                        v-model="editedCompany.observations"
                         class="col-span-full resize-none rounded-md input"
                         fieldName="observations"
                         rows="4"
                         placeholder="Observaciones..."
                         title="Observaciones"
-                        v-model="editedCompany.observations"
                     ></textarea>
                 </FieldGroup>
                 <FieldGroup>
                     <FieldLegend>Contacto principal</FieldLegend>
                     <FieldInput
                         class="col-span-full"
-                        fieldName="nr-name"
+                        field-name="nr-name"
                         placeholder="Nombre de representante"
                         title="Nombre"
                         :data="editedCompany.companyRepresentative.name"
-                        @update:data="editedCompany.companyRepresentative.name = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
+                        @update:data="editedCompany.companyRepresentative.name = $event"
                     />
                     <FieldInput
                         class="col-span-full"
-                        fieldName="nr-phone"
+                        field-name="nr-phone"
                         placeholder="+11 1111 1111"
                         mask="#*"
                         title="Teléfono"
                         :data="editedCompany.companyRepresentative.phone"
-                        @update:data="editedCompany.companyRepresentative.phone = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
+                        @update:data="editedCompany.companyRepresentative.phone = $event"
                     />
                     <FieldInput
                         class="col-span-full"
-                        fieldName="nr-email"
+                        field-name="nr-email"
                         placeholder="empresa@mail.com"
                         title="Email"
                         :data="editedCompany.companyRepresentative.email"
-                        @update:data="editedCompany.companyRepresentative.email = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
-                        validationType="email"
+                        validation-type="email"
+                        @update:data="editedCompany.companyRepresentative.email = $event"
                     />
                 </FieldGroup>
             </form>
@@ -95,8 +95,8 @@
                     <NoneBtn @click.prevent="$router.push('/clientes')"> Cancelar </NoneBtn>
                     <PrimaryBtn
                         :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
-                        @click="isValidated && update()"
                         :disabled="!isValidated"
+                        @click="isValidated && update()"
                     >
                         Finalizar
                     </PrimaryBtn>
@@ -204,6 +204,7 @@
                         if (res.status === 200) {
                             return res.data;
                         }
+
                         return {};
                     })
                     .finally(() => {
