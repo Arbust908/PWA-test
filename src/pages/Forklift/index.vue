@@ -59,12 +59,12 @@
                                 </CircularBtn>
                             </router-link>
 
-                            <CircularBtn
-                                size="xs"
-                                :class="f.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                @click="updateVisibility(f)"
-                            >
-                                <Icon :icon="f.visible ? 'EyeOff' : 'Eye'" type="outlined" class="w-6 h-6 text-white" />
+                            <CircularBtn v-if="f.visible" class="bg-red-500" size="xs" @click="updateVisibility(f)">
+                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                            </CircularBtn>
+
+                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(f)">
+                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
                             </CircularBtn>
                         </div>
                     </td>
@@ -80,6 +80,21 @@
             <template #body>
                 <p>{{ errorMessage }}</p>
                 <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
+            </template>
+        </Modal>
+
+        <Modal title="¿Desea inhabilitar este forklift?" type="error" :open="showModal">
+            <template #body>
+                <div>
+                    Una vez inhabilitado, no podrá utilizar este forklift en ninguna otra sección de la aplicación
+                </div>
+                <div></div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center gap-5 btn">
+                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar forklift </PrimaryBtn>
+                </div>
             </template>
         </Modal>
     </Layout>
@@ -122,19 +137,8 @@
             const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
             const errorMessage = ref('');
             const forkliftId = ref(-1);
-
-            const deleteTP = async (tpID) => {
-                await useStoreLogic(router, store, 'forklift', 'delete', tpID).then((res) => {
-                    if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
-                    }
-
-                    if (res.type == 'success') {
-                        fDB.value = store.getters['getForklifts'];
-                    }
-                });
-            };
+            const selectedForklift = ref(null);
+            const showModal = ref(false);
 
             const filteredForklifts = computed(() => {
                 if (forkliftId.value > -1) {
@@ -148,12 +152,22 @@
                 forkliftId.value = -1;
             };
 
+            const openModalVisibility = (forklift) => {
+                selectedForklift.value = forklift;
+                showModal.value = true;
+            };
+
+            const confirm = async () => {
+                await updateVisibility(selectedForklift.value);
+                showModal.value = false;
+            };
+
             const updateVisibility = async (forklift) => {
                 const payload = {
                     ...forklift,
                     visible: !forklift.visible,
                 };
-
+                delete payload.owned;
                 await store.dispatch('forklift_update', payload);
             };
 
@@ -178,7 +192,6 @@
 
             return {
                 fDB,
-                deleteTP,
                 loading,
                 notificationModalvisible,
                 toggleNotificationModal,
@@ -186,7 +199,10 @@
                 forkliftId,
                 filteredForklifts,
                 clearFilters,
+                showModal,
+                openModalVisibility,
                 updateVisibility,
+                confirm,
             };
         },
     };
@@ -196,5 +212,9 @@
     @import '@/assets/table.scss';
     .closeButton {
         @apply inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-200 sm:bg-transparent text-base font-medium text-second-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm mt-3;
+    }
+
+    .outline-none {
+        outline: 0;
     }
 </style>
