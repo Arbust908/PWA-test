@@ -83,7 +83,6 @@
     import { defineComponent, ref, computed } from 'vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import { useVModels } from '@vueuse/core';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
@@ -117,7 +116,6 @@
         components: {
             FieldGroup,
             FieldInput,
-            FieldTextArea,
             Icon,
         },
         setup(props, { emit }) {
