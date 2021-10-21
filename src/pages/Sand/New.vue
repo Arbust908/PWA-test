@@ -13,11 +13,7 @@
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
-                    <PrimaryBtn
-                        :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
-                        @click="isValidated && save()"
-                        :disabled="!isValidated"
-                    >
+                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
                         Finalizar
                     </PrimaryBtn>
                 </section>

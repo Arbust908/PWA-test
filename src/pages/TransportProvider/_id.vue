@@ -85,11 +85,7 @@
                     <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                         <section class="space-x-6 flex items-center justify-end">
                             <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')"> Cancelar </NoneBtn>
-                            <PrimaryBtn
-                                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                                @click="isFull && update()"
-                                :disabled="!isFull"
-                            >
+                            <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isFull && update()">
                                 Finalizar
                             </PrimaryBtn>
                         </section>

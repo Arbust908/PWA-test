@@ -3,6 +3,9 @@
     &__draft {
         @apply border-[#117E49] text-[#117E49] bg-transparent hover:bg-[#117E49] hover:bg-opacity-25 hover:shadow-lg;
     }
+    &[disabled='true'] {
+        @apply opacity-50 cursor-not-allowed;
+    }
 
     &__delete {
         @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
@@ -44,6 +47,9 @@
     }
     &.main {
         @apply text-white bg-main-600 hover:bg-main-700 border shadow-sm hover:shadow-lg;
+        &[disabled='yes'] {
+            @apply bg-gray-400 cursor-not-allowed;
+        }
     }
     &.secondary {
         @apply text-main-700 bg-main-500 hover:bg-main-700 hover:text-white border shadow-sm hover:shadow-lg;
