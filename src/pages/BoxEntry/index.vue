@@ -294,6 +294,7 @@
             let col = ref('');
             let dimensions = ref('');
             let cradles = ref([]);
+            let cleanCradles = ref([]);
 
             const getPurchaseOrders = async () => {
                 await axios
@@ -320,31 +321,38 @@
                     .get(`${apiUrl}/cradle`)
                     .then((res) => {
                         cradles.value = res.data.data;
+                        cleanCradles.value = res.data.data;
                     })
                     .catch((err) => console.error(err));
             };
 
             const getFilteredCradles = async () => {
-                let cradlesToFilter = [];
-                let workOrders = await axios
+                const cradlesIds = [];
+                const workOrders = await axios
                     .get(`${apiUrl}/workOrder`)
                     .then((res) => {
                         return res.data.data;
                     })
                     .catch((err) => console.error(err));
 
-                await workOrders.forEach((workOrder) => {
+                workOrders.forEach((workOrder) => {
                     workOrder.pits.forEach((pit) => {
                         if (pit.id == pitId.value) {
-                            if (workOrder.operativeCradle !== '-1') cradlesToFilter.push(workOrder.operativeCradle);
-                            if (workOrder.backupCradle !== '-1') cradlesToFilter.push(workOrder.backupCradle);
+                            if (workOrder.operativeCradle !== '-1') {
+                                cradlesIds.push(parseInt(workOrder.operativeCradle));
+                            }
+                            if (workOrder.backupCradle !== '-1') {
+                                cradlesIds.push(parseInt(workOrder.backupCradle));
+                            }
                         }
                     });
                 });
 
-                cradles.value = await cradles.value.filter((cradle) => {
-                    if (cradlesToFilter.includes(cradle.id.toString())) return cradle;
+                const newCradles = cleanCradles.value.filter((cradle) => {
+                    if (cradlesIds.includes(cradle.id)) return cradle;
                 });
+
+                cradles.value = newCradles;
             };
 
             onMounted(async () => {
@@ -400,7 +408,6 @@
                         });
                     }
                     if (purchaseOrderId.value !== -1) {
-                        await getFilteredCradles();
                         let sandTypes = await axios
                             .get(`${apiUrl}/sand`)
                             .then((res) => {
@@ -408,20 +415,21 @@
                             })
                             .catch((err) => console.error(err));
 
-                        filteredPurchaseOrders.value.length > 0
-                            ? (boxes.value = filteredPurchaseOrders.value[
-                                  filteredPurchaseOrders.value.findIndex((po) => po.id == purchaseOrderId.value)
-                              ].sandOrders.filter((so) => so.boxId.length > 0))
-                            : (boxes.value = []);
+                        if (filteredPurchaseOrders.value.length > 0) {
+                            const purchaseOrderIndex = filteredPurchaseOrders.value.findIndex(
+                                (po) => po.id == purchaseOrderId.value
+                            );
 
-                        filteredPurchaseOrders.value.length > 0
-                            ? (boxesWithoutId.value = filteredPurchaseOrders.value[
-                                  filteredPurchaseOrders.value.findIndex((po) => po.id == purchaseOrderId.value)
-                              ].sandOrders.filter((so) => so.boxId.length < 1))
-                            : (boxesWithoutId.value = []);
-
-                        console.log('boxes', boxes.value);
-                        console.log('boxesWitoutId', boxesWithoutId.value);
+                            boxes.value = filteredPurchaseOrders.value[purchaseOrderIndex].sandOrders.filter(
+                                (so) => so.boxId.length > 0
+                            );
+                            boxesWithoutId.value = filteredPurchaseOrders.value[purchaseOrderIndex].sandOrders.filter(
+                                (so) => so.boxId.length < 1
+                            );
+                        } else {
+                            boxes.value = [];
+                            boxesWithoutId.value = [];
+                        }
 
                         boxes.value.map((box) => {
                             let sandType = sandTypes.find((type) => parseInt(type.id) == parseInt(box.sandTypeId));
@@ -443,7 +451,7 @@
                         })[0];
 
                         originalWarehouseLayout.value = warehouse.value;
-                        console.log('wh', warehouse.value);
+                        await getFilteredCradles();
 
                         if (warehouse.value) {
                             floor.value = formatDeposit(warehouse.value.layout).floor;
@@ -591,7 +599,7 @@
             const deposit = ref({});
             // << DEPOSIT
             const confirmModal = ref(false);
-            const resetBoxIn = () => {
+            const resetBoxIn = async () => {
                 clientId.value = -1;
                 pitId.value = -1;
                 purchaseOrderId.value = -1;
