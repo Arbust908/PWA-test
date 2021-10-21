@@ -1,63 +1,63 @@
 th {
-  @apply px-6 py-3 text-left text-sm font-medium text-second-500 uppercase tracking-wider;
+    @apply px-6 py-3 text-center text-sm font-medium uppercase tracking-wider;
 }
 
 .body-row {
-  @apply hover:bg-second-200;
+    @apply hover:bg-second-200;
 
-  &.odd {
-    @apply bg-second-50;
-  }
+    &.odd {
+        @apply bg-second-50;
+    }
 
-  &.even {
-    @apply bg-second-100;
-  }
+    &.even {
+        @apply bg-second-100;
+    }
 }
 
 td {
-  @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-second-700;
+    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-second-700 text-center;
 
-  &.empty {
-    @apply text-second-400 italic;
-  }
-  &.done {
-    @apply text-green-500;
-  }
-  &.idle {
-    @apply text-blue-500;
-  }
-  &.warn {
-    @apply text-orange-500;
-  }
+    &.empty {
+        @apply text-second-400 italic;
+    }
+    &.done {
+        @apply text-green-500;
+    }
+    &.idle {
+        @apply text-blue-500;
+    }
+    &.warn {
+        @apply text-orange-500;
+    }
 }
 
 .btn-panel {
-  @apply flex justify-end space-x-4;
+    @apply flex justify-center space-x-4;
 
-  .add {
-    @apply flex items-center text-emerald-600 hover:text-emerald-800;
-  }
-  .edit {
-    @apply flex items-center text-indigo-600 hover:text-indigo-800;
-  }
+    .add {
+        @apply flex items-center text-emerald-600 hover:text-emerald-800;
+    }
+    .edit {
+        @apply flex items-center text-indigo-600 hover:text-indigo-800;
+    }
 
-  .delete {
-    @apply flex items-center text-red-600 hover:text-red-800;
-  }
+    .delete {
+        @apply flex items-center text-red-600 hover:text-red-800;
+    }
 }
 
 td.emptyState {
-  @apply text-center text-xs text-second-300 px-6 py-4;
+    @apply text-center text-xs text-second-300 px-6 py-4;
 }
 
 .centered {
-  :is(th,td) {
-    @apply text-center;
-    & > * {
-      @apply mx-auto;
+    :is(th, td) {
+        @apply text-center;
+        & > * {
+            @apply mx-auto;
+        }
     }
-  }
-  .btn-panel {
-    @apply justify-center;
-  }
+    .btn-panel {
+        @apply justify-center;
+    }
 }
