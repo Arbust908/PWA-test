@@ -55,13 +55,12 @@
                                 </CircularBtn>
                             </router-link>
 
-                            <CircularBtn size="xs" :class="cr.visible ? 'bg-red-500' : 'bg-blue-500'">
-                                <Icon
-                                    :icon="cr.visible ? 'EyeOff' : 'Eye'"
-                                    type="outlined"
-                                    class="w-6 h-6 text-white"
-                                    @click="update(cr)"
-                                />
+                            <CircularBtn v-if="cr.visible" class="bg-red-500" size="xs" @click="update(cr)">
+                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                            </CircularBtn>
+
+                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(cr)">
+                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
                             </CircularBtn>
                         </div>
                     </td>
@@ -73,6 +72,18 @@
                 </tr>
             </template>
         </UiTable>
+        <Modal title="¿Desea inhabilitar este cradle?" type="error" :open="showModal">
+            <template #body>
+                <div>Una vez inhabilitado, no podrá utilizar este cradle en ninguna otra sección de la aplicación</div>
+                <div></div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center gap-5 btn">
+                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar cradle </PrimaryBtn>
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
@@ -87,6 +98,7 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import Modal from '@/components/modal/General.vue';
 
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -100,6 +112,7 @@
             FieldSelect,
             GhostBtn,
             CircularBtn,
+            Modal,
         },
         setup() {
             useTitle('Cradles <> Sandflow');
@@ -108,6 +121,8 @@
             const cradleDB = JSON.parse(JSON.stringify(store.state.cradle.all));
             const loading = ref(false);
             let cradleId = ref(-1);
+            const selectedCradle = ref(null);
+            const showModal = ref(false);
 
             const filteredCradles = computed(() => {
                 if (cradleId.value > -1) {
@@ -132,22 +147,14 @@
                 loading.value = false;
             };
 
-            const deleteFrom = async (id) => {
-                const loading = ref(true);
-                let cradleDB = await axios
-                    .delete(`${apiUrl}/cradle/${id}`)
-                    .catch((err) => {
-                        console.log(err);
-                    })
-                    .then((res) => {
-                        console.log('OK', id);
+            const openModalVisibility = (cradle) => {
+                selectedCradle.value = cradle;
+                showModal.value = true;
+            };
 
-                        return {};
-                    })
-                    .finally(() => {
-                        loading.value = false;
-                        crDB.value = crDB.value.filter((st) => st.id !== id);
-                    });
+            const confirm = async () => {
+                await update(selectedCradle.value);
+                showModal.value = false;
             };
 
             const update = async (cradle) => {
@@ -169,11 +176,13 @@
 
             return {
                 crDB,
-                deleteFrom,
                 cradleId,
                 clearFilters,
                 filteredCradles,
                 update,
+                showModal,
+                openModalVisibility,
+                confirm,
             };
         },
     };

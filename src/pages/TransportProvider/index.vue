@@ -60,16 +60,13 @@
                                     <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
                                 </CircularBtn>
                             </router-link>
-                            <CircularBtn
-                                size="xs"
-                                :class="tp.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                @click="updateVisibility(tp)"
-                            >
-                                <Icon
-                                    :icon="tp.visible ? 'EyeOff' : 'Eye'"
-                                    type="outlined"
-                                    class="w-5 h-5 text-white"
-                                />
+
+                            <CircularBtn v-if="tp.visible" class="bg-red-500" size="xs" @click="updateVisibility(tp)">
+                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                            </CircularBtn>
+
+                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(tp)">
+                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
                             </CircularBtn>
                         </div>
                     </td>
@@ -81,6 +78,22 @@
                 </tr>
             </template>
         </UiTable>
+
+        <Modal title="¿Desea inhabilitar este proveedor de transporte?" type="error" :open="showModal">
+            <template #body>
+                <div>
+                    Una vez inhabilitado, no podrá utilizar este proveedor de transporte en ninguna otra sección de la
+                    aplicación
+                </div>
+                <div></div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center gap-5 btn">
+                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar proveedor </PrimaryBtn>
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
@@ -95,6 +108,7 @@
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Modal from '@/components/modal/General.vue';
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
@@ -108,6 +122,7 @@
             Icon,
             GhostBtn,
             FieldSelect,
+            Modal,
         },
         setup() {
             useTitle('Proveedores de Transporte <> Sandflow');
@@ -115,8 +130,9 @@
             const store = useStore();
             const transportProviders = JSON.parse(JSON.stringify(store.state.transportProviders.all));
             const loading = ref(false);
-
             const transportProviderId = ref(-1);
+            const selectedtransportProvider = ref(null);
+            const showModal = ref(false);
 
             const filteredTransportProviders = computed(() => {
                 if (transportProviderId.value > -1) {
@@ -179,6 +195,16 @@
                 loading.value = false;
             });
 
+            const openModalVisibility = (transportProvider) => {
+                selectedtransportProvider.value = transportProvider;
+                showModal.value = true;
+            };
+
+            const confirm = async () => {
+                await updateVisibility(selectedtransportProvider.value);
+                showModal.value = false;
+            };
+
             const updateVisibility = async (tp) => {
                 const payload = {
                     ...tp,
@@ -196,6 +222,9 @@
                 clearFilters,
                 transportProviderId,
                 updateVisibility,
+                showModal,
+                openModalVisibility,
+                confirm,
             };
         },
     };
@@ -203,4 +232,7 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
+    .outline-none {
+        outline: 0;
+    }
 </style>

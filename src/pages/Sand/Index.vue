@@ -55,16 +55,13 @@
                                     <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
                                 </CircularBtn>
                             </router-link>
-                            <CircularBtn
-                                size="xs"
-                                :class="st.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                @click="updateVisibility(st)"
-                            >
-                                <Icon
-                                    :icon="st.visible ? 'EyeOff' : 'Eye'"
-                                    type="outlined"
-                                    class="w-5 h-5 text-white"
-                                />
+
+                            <CircularBtn v-if="st.visible" class="bg-red-500" size="xs" @click="updateVisibility(st)">
+                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                            </CircularBtn>
+
+                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(st)">
+                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
                             </CircularBtn>
                         </div>
                     </td>
@@ -76,6 +73,21 @@
                 </tr>
             </template>
         </UiTable>
+
+        <Modal title="¿Desea inhabilitar este tipo de arena?" type="error" :open="showModal">
+            <template #body>
+                <div>
+                    Una vez inhabilitado, no podrá utilizar este tipo de arena en ninguna otra sección de la aplicación
+                </div>
+                <div></div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center gap-5 btn">
+                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar tipo de arena</PrimaryBtn>
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
@@ -87,11 +99,10 @@
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Modal from '@/components/modal/General.vue';
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
@@ -105,6 +116,7 @@
             GhostBtn,
             FieldSelect,
             CircularBtn,
+            Modal,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');
@@ -113,6 +125,8 @@
             const sandDB = JSON.parse(JSON.stringify(store.state.sand.all));
             const sandId = ref(-1);
             const loading = ref(true);
+            const selectedSand = ref(null);
+            const showModal = ref(false);
 
             const getSands = async () => {
                 loading.value = true;
@@ -149,26 +163,6 @@
                 }
             });
 
-            const deleteFrom = async (id) => {
-                const loading = ref(true);
-                let sandDB = await axios
-                    .delete(`${api}/sand/${id}`)
-                    .catch((err) => {
-                        console.log(err);
-                    })
-                    .then((res) => {
-                        if (res.status === 200) {
-                            return res.data;
-                        }
-
-                        return {};
-                    })
-                    .finally(() => {
-                        loading.value = false;
-                        stDB.value = stDB.value.filter((st) => st.id !== id);
-                    });
-            };
-
             const filteredSands = computed(() => {
                 if (sandId.value > -1) {
                     return stDB.value.filter((sand) => sand.id == sandId.value);
@@ -179,6 +173,16 @@
 
             const clearFilters = () => {
                 sandId.value = -1;
+            };
+
+            const openModalVisibility = (sand) => {
+                selectedSand.value = sand;
+                showModal.value = true;
+            };
+
+            const confirm = async () => {
+                await updateVisibility(selectedSand.value);
+                showModal.value = false;
             };
 
             const updateVisibility = async (sand) => {
@@ -192,11 +196,13 @@
 
             return {
                 stDB,
-                deleteFrom,
                 sandId,
                 filteredSands,
                 clearFilters,
                 updateVisibility,
+                showModal,
+                openModalVisibility,
+                confirm,
             };
         },
     };

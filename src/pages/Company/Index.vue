@@ -70,13 +70,12 @@
                                 </CircularBtn>
                             </router-link>
 
-                            <CircularBtn size="xs" :class="client.visible ? 'bg-red-500' : 'bg-blue-500'">
-                                <Icon
-                                    :icon="client.visible ? 'EyeOff' : 'Eye'"
-                                    type="outlined"
-                                    class="w-6 h-6 text-white"
-                                    @click="update(client)"
-                                />
+                            <CircularBtn v-if="client.visible" class="bg-red-500" size="xs" @click="update(client)">
+                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                            </CircularBtn>
+
+                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(client)">
+                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
                             </CircularBtn>
                         </div>
                     </td>
@@ -88,6 +87,19 @@
                 </tr>
             </template>
         </UiTable>
+
+        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
+            <template #body>
+                <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
+                <div></div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center gap-5 btn">
+                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar cliente </PrimaryBtn>
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
@@ -100,8 +112,7 @@
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-
-    import { useClone } from '@/helpers/useClone';
+    import Modal from '@/components/modal/General.vue';
 
     import { useStore } from 'vuex';
     import axios from 'axios';
@@ -120,14 +131,16 @@
             Icon,
             FieldSelect,
             Badge,
+            Modal,
         },
         setup() {
             useTitle('Clientes <> Sandflow');
             const store = useStore();
             const clDB = ref([]);
-            const clStoreDB = useClone(store.state.client.all);
             const loading = ref(false);
             const clientId = ref(-1);
+            const selectedClient = ref(null);
+            const showModal = ref(false);
 
             const headers = {
                 'Content-Type': 'Application/JSON',
@@ -160,22 +173,14 @@
                 loading.value = false;
             };
 
-            const deleteFrom = async (id) => {
-                const loading = ref(true);
-                let clStoreDB = await axios
-                    .delete(`${apiUrl}/company/${id}`)
-                    .catch((err) => {
-                        console.log(err);
-                    })
-                    .then((res) => {
-                        console.log('OK', id);
+            const openModalVisibility = (client) => {
+                selectedClient.value = client;
+                showModal.value = true;
+            };
 
-                        return {};
-                    })
-                    .finally(() => {
-                        loading.value = false;
-                        clDB.value = clDB.value.filter((st) => st.id !== id);
-                    });
+            const confirm = async () => {
+                await update(selectedClient.value);
+                showModal.value = false;
             };
 
             const update = async (client) => {
@@ -197,13 +202,15 @@
 
             return {
                 clDB,
-                deleteFrom,
                 loading,
                 filteredClients,
                 clientId,
                 clearFilters,
                 total,
                 update,
+                openModalVisibility,
+                confirm,
+                showModal,
             };
         },
     };
@@ -211,4 +218,7 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
+    .outline-none {
+        outline: 0;
+    }
 </style>
