@@ -31,7 +31,7 @@
             <template #header>
                 <tr>
                     <th v-for="column in tableColumns" :key="column" scope="col">
-                        <div class="flex">
+                        <div class="flex justify-center">
                             {{ column }}
                             <Icon icon="ArrowUp" class="w-4 h-4" />
                             <Icon icon="ArrowDown" class="w-4 h-4" />
