@@ -13,13 +13,7 @@
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
-                    <PrimaryBtn
-                        :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                        @click="isFull && save()"
-                        :disabled="!isFull"
-                    >
-                        Finalizar
-                    </PrimaryBtn>
+                    <PrimaryBtn :disabled="!isFull ? 'yes' : null" @click="isFull && save()"> Finalizar </PrimaryBtn>
                 </section>
             </footer>
         </section>

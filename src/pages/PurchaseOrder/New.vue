@@ -167,11 +167,7 @@
             </form>
             <footer class="p-4 space-x-8 flex justify-end">
                 <NoneBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </NoneBtn>
-                <PrimaryBtn
-                    :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                    :disabled="!isFull"
-                    @click.prevent="isFull && confirm()"
-                >
+                <PrimaryBtn :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && confirm()">
                     Crear Orden
                 </PrimaryBtn>
             </footer>

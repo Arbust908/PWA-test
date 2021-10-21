@@ -143,13 +143,7 @@
         </section>
         <footer class="p-4 space-x-8 flex justify-end">
             <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
-            <PrimaryBtn
-                type="submit"
-                size="lg"
-                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                :disabled="!isFull"
-                @click.prevent="isFull && save()"
-            >
+            <PrimaryBtn type="submit" size="lg" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                 Guardar
             </PrimaryBtn>
         </footer>

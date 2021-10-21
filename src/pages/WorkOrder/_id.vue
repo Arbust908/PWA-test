@@ -80,12 +80,7 @@
                         <span> Guardar Provisorio </span>
                     </GhostBtn>
                     <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
-                    <PrimaryBtn
-                        v-else
-                        :class="isAllFull ? null : 'opacity-50 cursor-not-allowed'"
-                        :disabled="!isAllFull"
-                        @click="isAllFull && save(false)"
-                    >
+                    <PrimaryBtn v-else :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
                         Finalizar
                     </PrimaryBtn>
                 </section>

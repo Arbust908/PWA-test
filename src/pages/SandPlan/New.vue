@@ -233,12 +233,7 @@
         </section>
         <footer class="p-4 space-x-8 flex justify-end">
             <NoneBtn @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </NoneBtn>
-            <PrimaryBtn
-                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                size="md"
-                :disabled="!isFull"
-                @click.prevent="isFull && save()"
-            >
+            <PrimaryBtn size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                 Guardar
             </PrimaryBtn>
         </footer>

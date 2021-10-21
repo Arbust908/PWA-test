@@ -73,12 +73,11 @@
                         <section class="space-x-6 flex items-center justify-end">
                             <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')"> Cancelar </NoneBtn>
                             <PrimaryBtn
-                                :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
+                                :disabled="!isValidated ? 'yes' : null"
                                 @click="
                                     hasFullNewDriver && addDriver();
                                     isValidated && save();
                                 "
-                                :disabled="!isValidated"
                             >
                                 Finalizar
                             </PrimaryBtn>

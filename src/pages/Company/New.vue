@@ -89,11 +89,7 @@
             <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
                 <section class="w-full space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="$router.push('/clientes')"> Cancelar </NoneBtn>
-                    <PrimaryBtn
-                        :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
-                        @click="isValidated && save()"
-                        :disabled="!isValidated"
-                    >
+                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
                         Finalizar
                     </PrimaryBtn>
                 </section>
