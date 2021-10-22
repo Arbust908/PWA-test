@@ -29,7 +29,7 @@
                 <tr>
                     <th scope="col">Cliente</th>
                     <th scope="col">CUIT</th>
-                    <th scope="col">Contacto</th>
+                    <th scope="col">Representante</th>
                     <th scope="col">Teléfono</th>
                     <th scope="col">Operadora</th>
                     <th scope="col">
