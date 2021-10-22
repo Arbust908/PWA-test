@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4 px-3">
+        <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Forklift</h2>
             <router-link to="/forklift/nuevo">
                 <PrimaryBtn size="sm"
@@ -14,7 +14,7 @@
             <FieldSelect
                 title="Filtro"
                 placeholder="Seleccionar forklift"
-                class="col-span-full sm:col-span-4"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
                 endpoint-key="name"
                 endpoint="/forklift"
@@ -29,10 +29,15 @@
         <UiTable class="mt-5">
             <template #header>
                 <tr>
-                    <th scope="col">Nombre</th>
-                    <th class="w-1/5" scope="col">Observaciones</th>
+                    <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
+                        <div class="flex justify-center">
+                            {{ column.text }}
+                            <Icon icon="ArrowUp" class="w-4 h-4" />
+                            <Icon icon="ArrowDown" class="w-4 h-4" />
+                        </div>
+                    </th>
                     <th scope="col">
-                        <span class="sr-olny">Acciones</span>
+                        <span>Acciones</span>
                     </th>
                 </tr>
             </template>
@@ -140,6 +145,17 @@
             const selectedForklift = ref(null);
             const showModal = ref(false);
 
+            const tableColumns = [
+                {
+                    text: 'Nombre',
+                    class: 'w-2/5',
+                },
+                {
+                    text: 'Observaciones',
+                    class: 'w-1/5',
+                },
+            ];
+
             const filteredForklifts = computed(() => {
                 if (forkliftId.value > -1) {
                     return fDB.value.filter((forklift) => forklift.id == forkliftId.value);
@@ -203,6 +219,7 @@
                 openModalVisibility,
                 updateVisibility,
                 confirm,
+                tableColumns,
             };
         },
     };
