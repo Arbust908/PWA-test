@@ -24,9 +24,10 @@
                 <FieldGroup v-for="(people, peopleI) in crew.resources" :key="people.id" class="pt-2 pb-3 relative">
                     <!-- TODO: Pasaria a FiledSelect si tuvieramos ABM de roles y Usuarios -->
                     <FieldInput
-                        class="col-span-full"
+                        class="col-span-full mr-5"
+                        :class="peopleI === 0 ? mr - 5 : ''"
                         :title="peopleI === 0 ? 'Rol' : null"
-                        :field-name="`crew-${crew.id}-${people.id}-role`"
+                        :fieldName="`crew-${crew.id}-${people.id}-role`"
                         placeholder="Rol"
                         :data="people.role"
                         @update:data="people.role = $event"
@@ -34,15 +35,15 @@
                     <span
                         v-if="notOnly(crew.resources)"
                         :class="peopleI === 0 ? 'md:top-10' : 'md:top-6'"
-                        class="md:absolute md:-right-12"
+                        class="md:absolute md:-right-12 ml-4"
                     >
                         <CircularBtn class="btn__delete" size="sm" @click="removeResource(crew.id, people.id)">
-                            <Icon icon="Trash" class="w-5 h-5" />
+                            <Icon icon="Trash" class="w-6 h-6" />
                         </CircularBtn>
                     </span>
                     <FieldInput
-                        class="col-span-full"
-                        :field-name="`crew-${crew.id}-${people.id}-name`"
+                        class="col-span-full mr-5"
+                        :fieldName="`crew-${crew.id}-${people.id}-name`"
                         placeholder="Empleado"
                         :data="people.name"
                         @update:data="people.name = $event"
@@ -60,129 +61,147 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed } from 'vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import TimePicker from '@/components/ui/form/TimePicker.vue';
-    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+  import { ref, Ref, computed } from 'vue';
+  import Icon from '@/components/icon/TheAllIcon.vue';
+  import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+  import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+  import Layout from '@/layouts/Main.vue';
+  import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
 
-    import { useVModels } from '@vueuse/core';
-    import { HumanResource, Crew } from '@/interfaces/sandflow';
+  import TimePicker from '@/components/ui/form/TimePicker.vue';
 
-    export default {
-        components: {
-            FieldGroup,
-            FieldInput,
-            FieldLegend,
-            CircularBtn,
-            Icon,
-            TimePicker,
-        },
-        props: {
-            crews: {
-                type: Array,
-                default: () => [],
-            },
-            isFull: {
-                type: Boolean,
-                default: false,
-            },
-        },
-        setup(props, { emit }) {
-            const { crews } = useVModels(props, emit);
-            const defaultResource = {
-                id: 0,
-                name: '',
-                role: '',
-            };
-            const removeResource = (crewId: number, peopleId: number) => {
-                const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-                selectedCrew.resources = selectedCrew.resources.filter(
-                    (resource: HumanResource) => resource.id !== peopleId
-                );
-            };
-            const addResource = (crewId: number): void => {
-                const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-                const lastId = selectedCrew.resources.length;
-                selectedCrew.resources.push({
-                    ...defaultResource,
-                    id: lastId,
-                });
-            };
-            const addCrew = (): void => {
-                const lastId = crews.value.length + 1;
-                const crewLetter = String.fromCharCode(lastId + 64);
-                crews.value.push({
-                    id: lastId,
-                    start_time: '',
-                    end_time: '',
-                    title: `Crew ${crewLetter}`,
-                    resources: [],
-                });
-                addResource(lastId);
-            };
-            const removeCrew = (crewId: number): void => {
-                crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
-            };
+  import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+  import FieldInput from '@/components/ui/form/FieldInput.vue';
+  import FieldLegend from '@/components/ui/form/FieldLegend.vue';
 
-            if (crews?.value?.length === 0) {
-                addCrew();
-            } else if (crews?.value?.some((crew: Crew) => crew.resources.length === 0)) {
-                crews.value.forEach((crew: Crew) => {
-                    if (crew.resources.length === 0) {
-                        addResource(crew.id);
-                    }
-                });
-            }
+  import { useVModels } from '@vueuse/core';
 
-            const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
-                // get last crew
-                if (crewList.length === 0) {
-                    return false;
-                }
-                console.log(crewList);
-                const lastCrew = crewList[crewList.length - 1];
-                console.log(crewList[crewList.length - 1]);
-                console.log(lastCrew);
-                console.log(crewInnerId);
-                console.log(crewInnerId !== lastCrew.id ? 'not last' : 'last');
+  import { HumanResource, Crew } from '@/interfaces/sandflow';
 
-                return crewInnerId !== lastCrew.id;
-            };
-            const notOnly = (crewList: Array<HumanResource>) => {
-                return crewList.length > 1;
-            };
+  export default {
+    components: {
+      FieldGroup,
+      FieldInput,
+      FieldLegend,
+      CircularBtn,
+      GhostBtn,
+      Layout,
+      PrimaryBtn,
+      Icon,
+      TimePicker,
+    },
+    props: {
+      crews: {
+        type: Array,
+        default: () => [],
+      },
+      isFull: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props, { emit }) {
+      const { crews, isFull } = useVModels(props, emit);
+      const defaultResource = {
+        id: 0,
+        name: '',
+        role: '',
+      };
+      const removeResource = (crewId: number, peopleId: number) => {
+        const selectedCrew = crews.value.find(
+          (crew: Crew) => crew.id === crewId
+        );
+        selectedCrew.resources = selectedCrew.resources.filter(
+          (resource: HumanResource) => resource.id !== peopleId
+        );
+      };
+      const addResource = (crewId: number): void => {
+        const selectedCrew = crews.value.find(
+          (crew: Crew) => crew.id === crewId
+        );
+        const lastId = selectedCrew.resources.length;
+        selectedCrew.resources.push({
+          ...defaultResource,
+          id: lastId,
+        });
+      };
+      const addCrew = (): void => {
+        const lastId = crews.value.length + 1;
+        const crewLetter = String.fromCharCode(lastId + 64);
+        crews.value.push({
+          id: lastId,
+          start_time: '',
+          end_time: '',
+          title: `Crew ${crewLetter}`,
+          resources: [],
+        });
+        addResource(lastId);
+      };
+      const removeCrew = (crewId: number): void => {
+        crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
+      };
 
-            // Is the RRHH section is full
-            const isRRHHFull = computed(() => {
-                return !!(crews.value.length > 0 && crews.value[0].start_time && crews.value[0].end_time);
-            });
+      if (crews?.value?.length === 0) {
+        addCrew();
+      } else if (
+        crews?.value?.some((crew: Crew) => crew.resources.length === 0)
+      ) {
+        crews.value.forEach((crew: Crew) => {
+          if (crew.resources.length === 0) {
+            addResource(crew.id);
+          }
+        });
+      }
 
-            return {
-                isRRHHFull,
-                removeResource,
-                addResource,
-                crews,
-                removeCrew,
-                addCrew,
-                notLast,
-                notOnly,
-            };
-        },
-    };
+      const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
+        // get last crew
+        if (crewList.length === 0) {
+          return false;
+        }
+        console.log(crewList);
+        const lastCrew = crewList[crewList.length - 1];
+        console.log(crewList[crewList.length - 1]);
+        console.log(lastCrew);
+        console.log(crewInnerId);
+        console.log(crewInnerId !== lastCrew.id ? 'not last' : 'last');
+        return crewInnerId !== lastCrew.id;
+      };
+      const notOnly = (crewList: Array<HumanResource>) => {
+        return crewList.length > 1;
+      };
+
+      // Is the RRHH section is full
+      const isRRHHFull = computed(() => {
+        return !!(
+          crews.value.length > 0 &&
+          crews.value[0].start_time &&
+          crews.value[0].end_time
+        );
+      });
+
+      return {
+        isRRHHFull,
+        removeResource,
+        addResource,
+        crews,
+        removeCrew,
+        addCrew,
+        notLast,
+        notOnly,
+      };
+    },
+  };
 </script>
 
 <style lang="scss" scoped>
-    @import '@/assets/button.scss';
-    .icon {
-        @apply w-5 h-5;
-    }
-    .ghost {
-        @apply border-none shadow-none;
-        & > .icon {
-            @apply text-transparent;
-        }
-    }
+  @import '@/assets/button.scss';
+  .icon {
+    @apply w-5 h-5;
+  }
+  .ghost {
+     @apply border-none shadow-none;
+     & > .icon {
+       @apply text-transparent;
+     }
+  }
 </style>
