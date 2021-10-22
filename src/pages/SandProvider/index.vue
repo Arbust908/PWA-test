@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4 px-3">
+        <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Centro de carga de arena</h2>
             <router-link to="/proveedores-de-arena/nuevo ">
                 <PrimaryBtn size="sm"
@@ -10,11 +10,12 @@
             </router-link>
         </header>
         <hr />
+
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
                 placeholder="Seleccionar centro de carga"
-                class="col-span-full sm:col-span-5"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
                 endpoint-key="name"
                 endpoint="/sandProvider"
@@ -29,11 +30,13 @@
         <UiTable class="mt-6">
             <template #header>
                 <tr>
-                    <th scope="col">Proveedor</th>
-                    <th scope="col">Domicilio</th>
-                    <th scope="col">Tipo de Malla</th>
-                    <th scope="col">Representante</th>
-                    <th scope="col">Teléfono</th>
+                    <th v-for="column in tableColumns" :key="column" scope="col">
+                        <div class="flex justify-center">
+                            {{ column }}
+                            <Icon icon="ArrowUp" class="w-4 h-4" />
+                            <Icon icon="ArrowDown" class="w-4 h-4" />
+                        </div>
+                    </th>
                     <th scope="col">Acciones</th>
                 </tr>
             </template>
@@ -44,7 +47,7 @@
                     :class="spKey % 2 === 0 ? 'even' : 'odd'"
                     class="body-row"
                 >
-                    <td :class="sandProvider.name ? null : 'empty'">
+                    <td :class="sandProvider.name ? null : 'empty'" class="text-center">
                         {{ sandProvider?.name || 'Sin nombre' }}
                     </td>
                     <td :class="sandProvider.address ? null : 'empty'">
@@ -61,7 +64,7 @@
                     <td :class="sandProvider.companyRepresentative ? null : 'empty'">
                         {{ sandProvider.companyRepresentative?.phone || 'Sin definir' }}
                     </td>
-                    <td>
+                    <td class="text-center">
                         <div class="btn-panel">
                             <router-link :to="`/proveedores-de-arena/${sandProvider.id}`">
                                 <CircularBtn size="xs" class="bg-blue-500">
@@ -159,6 +162,7 @@
             const sandProviderId = ref(-1);
             const selectedsandProvider = ref(null);
             const showModal = ref(false);
+            const tableColumns = ['Proveedor', 'Domicilio', 'Tipo de Malla', 'Representante', 'Teléfono'];
 
             onMounted(async () => {
                 loading.value = true;
@@ -219,6 +223,7 @@
                 showModal,
                 openModalVisibility,
                 confirm,
+                tableColumns,
             };
         },
     };
