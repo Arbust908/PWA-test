@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4 px-3">
+        <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Tipos de arena</h2>
             <router-link to="/tipos-de-arena/nueva">
                 <PrimaryBtn size="sm"
@@ -14,7 +14,7 @@
             <FieldSelect
                 title="Filtro"
                 placeholder="Seleccionar malla"
-                class="col-span-full sm:col-span-4"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="type"
                 endpoint-key="type"
                 endpoint="/sand"
@@ -28,8 +28,13 @@
         <UiTable class="mt-5">
             <template #header>
                 <tr>
-                    <th scope="col">Tipo de malla</th>
-                    <th class="w-1/5" scope="col">Observaciones</th>
+                    <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
+                        <div class="flex justify-center">
+                            {{ column.text }}
+                            <Icon icon="ArrowUp" class="w-4 h-4" />
+                            <Icon icon="ArrowDown" class="w-4 h-4" />
+                        </div>
+                    </th>
                     <th scope="col">Acciones</th>
                 </tr>
             </template>
@@ -128,6 +133,17 @@
             const selectedSand = ref(null);
             const showModal = ref(false);
 
+            const tableColumns = [
+                {
+                    text: 'Tipo de Malla',
+                    class: 'w-2/5',
+                },
+                {
+                    text: 'Observaciones',
+                    class: 'w-1/5',
+                },
+            ];
+
             const getSands = async () => {
                 loading.value = true;
 
@@ -203,6 +219,7 @@
                 showModal,
                 openModalVisibility,
                 confirm,
+                tableColumns,
             };
         },
     };
