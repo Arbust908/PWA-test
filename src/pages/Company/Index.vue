@@ -144,7 +144,7 @@
             const clientId = ref(-1);
             const selectedClient = ref(null);
             const showModal = ref(false);
-            const tableColumns = ['Cliente', 'CUIT', 'Contacto', 'Teléfono', 'Operadora'];
+            const tableColumns = ['Cliente', 'CUIT', 'Representante', 'Teléfono', 'Operadora'];
 
             const headers = {
                 'Content-Type': 'Application/JSON',

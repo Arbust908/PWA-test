@@ -1,5 +1,5 @@
 <template>
-    <span :class="classes" class="badge">
+    <span :class="classes" class="badge px-4 font-medium rounded-full py-1.5">
         {{ text }}
     </span>
 </template>
@@ -22,8 +22,4 @@
     });
 </script>
 
-<style lang="scss" scoped>
-    .badge {
-        @apply px-4 font-medium rounded-full py-1.5;
-    }
-</style>
+<style lang="scss" scoped></style>
