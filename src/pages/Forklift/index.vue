@@ -26,7 +26,7 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5">
+        <UiTable class="mt-5 lg:w-7/12 min-w-min">
             <template #header>
                 <tr>
                     <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
@@ -51,7 +51,7 @@
                     <td :class="f.name ? null : 'empty'">
                         {{ f.name || 'Sin nombre' }}
                     </td>
-                    <td :class="f.observations ? null : 'empty'">
+                    <td>
                         <p class="w-52 truncate">
                             {{ f.observations || 'Sin observaciones' }}
                         </p>
