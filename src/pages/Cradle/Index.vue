@@ -13,7 +13,7 @@
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
-                placeholder="Seleccionar cliente.."
+                placeholder="Seleccionar cradle.."
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
                 endpoint="/cradle"
@@ -24,7 +24,7 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5">
+        <UiTable class="mt-5 lg:w-7/12 min-w-min">
             <template #header>
                 <tr>
                     <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
@@ -48,7 +48,7 @@
                     <td :class="cr.name ? null : 'empty'">
                         {{ cr.name || 'Sin definir' }}
                     </td>
-                    <td :class="cr.observations ? null : 'empty'">
+                    <td>
                         <p class="w-52 truncate">
                             {{ cr.observations || 'Sin definir' }}
                         </p>
