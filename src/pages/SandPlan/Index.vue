@@ -119,6 +119,7 @@
                         }
                     });
                 });
+
                 return total;
             };
             const deleteSP = (id) => {
@@ -130,6 +131,7 @@
                 });
                 loading.value = false;
             };
+
             return {
                 sandPlans,
                 deleteSP,

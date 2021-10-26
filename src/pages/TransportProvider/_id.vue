@@ -23,15 +23,15 @@
                         <span> Transportista </span>
                     </button>
                 </nav>
-                <section class="bg-white rounded-md max-w-2xl shadow-sm" v-if="activeSection === 'provider'">
+                <section v-if="activeSection === 'provider'" class="bg-white rounded-md max-w-2xl shadow-sm">
                     <TransportProviderFrom
-                        :tpName="newTransportProvider.name"
-                        :tpId="newTransportProvider.legalId"
-                        :tpAddress="newTransportProvider.address"
-                        :tpObservations="newTransportProvider.observations"
-                        :crName="companyRepresentative.name"
-                        :crPhone="companyRepresentative.phone"
-                        :crEmail="companyRepresentative.email"
+                        :tp-name="newTransportProvider.name"
+                        :tp-id="newTransportProvider.legalId"
+                        :tp-address="newTransportProvider.address"
+                        :tp-observations="newTransportProvider.observations"
+                        :cr-name="companyRepresentative.name"
+                        :cr-phone="companyRepresentative.phone"
+                        :cr-email="companyRepresentative.email"
                         @update:tpName="newTransportProvider.name = $event"
                         @update:tpId="newTransportProvider.legalId = $event"
                         @update:tpAddress="newTransportProvider.address = $event"
@@ -45,23 +45,23 @@
                             <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')"> Cancelar </NoneBtn>
                             <PrimaryBtn
                                 :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                                @click="isFull && update()"
                                 :disabled="!isFull"
+                                @click="isFull && update()"
                             >
                                 Finalizar
                             </PrimaryBtn>
                         </section>
                     </footer>
                 </section>
-                <section class="bg-white rounded-md max-w-2xl shadow-sm" v-if="activeSection === 'driver'">
+                <section v-if="activeSection === 'driver'" class="bg-white rounded-md max-w-2xl shadow-sm">
                     <form method="POST" action="/" class="p-4 max-w-lg">
                         <TransportProviderDriverForm
-                            :driverName="newDriver.name"
-                            :driverPhone="newDriver.phone"
-                            :driverEmail="newDriver.email"
-                            :driverTType="newDriver.vehicleType"
-                            :driverTId="newDriver.transportId"
-                            :driverObs="newDriver.observations"
+                            :driver-name="newDriver.name"
+                            :driver-phone="newDriver.phone"
+                            :driver-email="newDriver.email"
+                            :driver-t-type="newDriver.vehicleType"
+                            :driver-t-id="newDriver.transportId"
+                            :driver-obs="newDriver.observations"
                             @update:driverName="newDriver.name = $event"
                             @update:driverPhone="newDriver.phone = $event"
                             @update:driverEmail="newDriver.email = $event"
@@ -99,8 +99,8 @@
                     :name="driver.name"
                     :phone="driver.phone"
                     :email="driver.email"
-                    :vehicleType="driver.vehicleType"
-                    :transportId="driver.transportId"
+                    :vehicle-type="driver.vehicleType"
+                    :transport-id="driver.transportId"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
@@ -161,7 +161,7 @@
 
             let activeSection = ref('provider');
 
-            const changeSection = (option: String) => {
+            const changeSection = (option: string) => {
                 return (activeSection.value = option);
             };
 
@@ -180,7 +180,8 @@
 
             const addDriver = () => {
                 const driver = { ...newDriver };
-                if (hasFullNewDriver) {
+
+                if (hasFullNewDriver.value) {
                     drivers.push(driver);
                 }
                 cleanNewDriver();
@@ -194,15 +195,18 @@
                         if (res.status === 200) {
                             return res.data.data;
                         }
+
                         return [];
                     })
                     .catch((err) => {
                         console.log(err);
+
                         return;
                     })
                     .finally(() => {
                         drivers.splice(index, 1);
                     });
+
                 return {
                     response,
                 };
@@ -279,7 +283,7 @@
             });
 
             const update = async () => {
-                if (hasFullNewDriver) {
+                if (hasFullNewDriver.value) {
                     addDriver();
                 }
                 const { drivers, ...newTProv } = currentTransportProvider;

@@ -7,6 +7,9 @@
 <script>
     import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
     export default {
+        components: {
+            BaseBtn,
+        },
         props: {
             type: {
                 type: String,
@@ -20,9 +23,6 @@
                 type: String,
                 default: '',
             },
-        },
-        components: {
-            BaseBtn,
         },
     };
 </script>

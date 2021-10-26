@@ -3,69 +3,69 @@
         <FieldInput
             class="col-span-full"
             title="Nombre y apellido"
-            fieldName="driverName"
+            field-name="driverName"
             placeholder="Ingresar conductor"
             :data="driverName"
-            @update:data="driverName = $event"
-            requireValidation
+            require-validation
             :silenced="silenced"
             entity="transportProvider"
+            @update:data="driverName = $event"
             @change="validationHandler"
         />
         <FieldInput
             class="col-span-full"
-            fieldName="driverPhone"
+            field-name="driverPhone"
             placeholder="+11 1234 5678"
             mask="#*"
             title="Teléfono"
             :data="driverPhone"
-            @update:data="driverPhone = $event"
-            requireValidation
+            require-validation
             :silenced="silenced"
             entity="transportProvider"
+            @update:data="driverPhone = $event"
         />
         <FieldInput
             class="col-span-full"
-            fieldName="driverEmail"
+            field-name="driverEmail"
             placeholder="empresa@mail.com"
             title="Email"
             :data="driverEmail"
-            @update:data="driverEmail = $event"
-            requireValidation
+            require-validation
             :silenced="silenced"
             entity="transportProvider"
-            validationType="email"
+            validation-type="email"
+            @update:data="driverEmail = $event"
         />
         <FieldInput
             class="col-span-full"
             title="Tipo de transporte"
-            fieldName="driverVehicleType"
+            field-name="driverVehicleType"
             placeholder="Doble carga"
             :data="driverTType"
-            @update:data="driverTType = $event"
-            requireValidation
+            require-validation
             :silenced="silenced"
             entity="transportProvider"
+            @update:data="driverTType = $event"
         />
         <FieldInput
             class="col-span-full"
             title="Patente"
-            fieldName="driverVehicleId"
+            field-name="driverVehicleId"
             placeholder="patente"
             :data="driverTId"
-            @update:data="driverTId = $event"
-            requireValidation
+            require-validation
             :silenced="silenced"
             entity="transportProvider"
+            @update:data="driverTId = $event"
         />
         <FieldTextArea
             class="col-span-full"
-            fieldName="observations"
+            field-name="observations"
             placeholder="Observaciones..."
             title="Observaciones"
             :rows="5"
-            isFixed
-            isOptional
+            is-fixed
+            is-optional
             :data="driverObs"
             @update:data="driverObs = $event"
         />
@@ -87,6 +87,11 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
 
     export default defineComponent({
+        components: {
+            FieldGroup,
+            FieldInput,
+            Icon,
+        },
         props: {
             driverName: {
                 type: String,
@@ -112,11 +117,6 @@
                 type: String,
                 default: '',
             },
-        },
-        components: {
-            FieldGroup,
-            FieldInput,
-            Icon,
         },
         setup(props, { emit }) {
             const { driverName, driverPhone, driverEmail, driverTType, driverTId, driverObs } = useVModels(props, emit);

@@ -4,7 +4,7 @@
         <template v-for="(sPov, i) in sandProviders" :key="i">
             <FieldSelect
                 class="col-span-full sm:col-span-5"
-                fieldName="sandProvider"
+                field-name="sandProvider"
                 placeholder="Selecciona un proveedor"
                 title="Proveedor"
                 endpoint="/sandProvider"
@@ -20,18 +20,18 @@
                 <FieldSelect
                     class="col-span-5 sm:col-span-5"
                     :title="Key === 0 ? 'Tipo' : ''"
-                    fieldName="sandType"
+                    field-name="sandType"
                     placeholder="Arena"
                     endpoint="/sand"
-                    endpointKey="type"
+                    endpoint-key="type"
                     :data="so.sandTypeId"
+                    :filtered-data="filteredSandTypes"
                     @update:data="so.sandTypeId = $event"
-                    :filteredData="filteredSandTypes"
                 />
                 <FieldWithSides
                     class="col-span-5 sm:col-span-3"
                     :title="Key === 0 ? 'Cantidad' : ''"
-                    :fieldName="`sandQuantity${Key}`"
+                    :field-name="`sandQuantity${Key}`"
                     placeholder="0 t"
                     type="number"
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
@@ -45,8 +45,8 @@
           @update:amount="so.amount = $event"
         /> -->
                 <div
-                    class="col-span-1 my-auto mx-auto hidden sm:block"
                     v-if="sPov.SandOrders.length > 0 && Key + 1 === sPov.SandOrders.length"
+                    class="col-span-1 my-auto mx-auto hidden sm:block"
                 >
                     <Icon
                         icon="PlusCircle"
@@ -140,6 +140,7 @@
             };
             const removeSandOrder = (spId: number, soInid: number) => {
                 const currSP = getCurrentSandProvider(spId);
+
                 if (currSP) {
                     currSP.SandOrders = currSP.SandOrders.filter((so) => so.innerId !== soInid);
                 }
@@ -160,11 +161,13 @@
             });
 
             console.log(sandProviders);
+
             if (sandProviders && sandProviders.value && sandProviders.value.length <= 0) {
                 console.log('no sandProviders');
                 addSandProvider();
             }
             console.log(sandProviders);
+
             return {
                 sandProviders,
                 addSandOrder,

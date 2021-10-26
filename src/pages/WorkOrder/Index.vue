@@ -92,8 +92,10 @@
                 if (!pits || pits.length <= 0) {
                     return '-';
                 }
+
                 return pits.reduce((list, pit) => {
                     list += list === '' ? pit.name : `, ${pit.name}`;
+
                     return list;
                 }, '');
             };
@@ -128,9 +130,13 @@
             };
 
             const idToName = (id: number) => {
-                if (id == -1) return 'Sin operadora';
+                if (id == -1) {
+                    return 'Sin operadora';
+                }
                 let company = companies.value.filter((company) => {
-                    if (company.id == id) return company;
+                    if (company.id == id) {
+                        return company;
+                    }
                 })[0];
 
                 return company.name;
@@ -142,6 +148,7 @@
                 workOrders.value.forEach((workOrder) => {
                     workOrder.clientName = idToName(parseInt(workOrder.client));
                     workOrder.operatorName = idToName(parseInt(workOrder.serviceCompany));
+
                     return workOrder;
                 });
             });

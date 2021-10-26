@@ -74,15 +74,18 @@
                     })
                     .then((res) => {
                         console.log(res);
+
                         if (res.status === 200) {
                             return res.data;
                         }
+
                         return {};
                     })
                     .finally(() => {
                         router.push('/tipos-de-arena');
                     });
             };
+
             return {
                 goToIndex,
                 save,

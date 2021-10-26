@@ -6,8 +6,8 @@
         <div class="grid gap-8 grid-cols-2 relative">
             <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
                 <ClientPitCombo
-                    :clientId="currentStageSheet.companyId"
-                    :pitId="currentStageSheet.pitId"
+                    :client-id="currentStageSheet.companyId"
+                    :pit-id="currentStageSheet.pitId"
                     @update:clientId="currentStageSheet.companyId = $event"
                     @update:pitId="currentStageSheet.pitId = $event"
                 />
@@ -53,12 +53,12 @@
                             <span v-else-if="warehouse" class="px-5 py-8 text-center m-4">
                                 <DepositGrid
                                     class="w-full flex flex-col gap-5"
-                                    :selectedBox="choosedBox"
+                                    :selected-box="choosedBox"
                                     :rows="row"
                                     :cols="col"
                                     :floor="floor"
                                     :deposit="warehouse.layout"
-                                    :visibleCategories="visibleCategories"
+                                    :visible-categories="visibleCategories"
                                     @select-box="selectBox"
                                 />
                             </span>
@@ -89,13 +89,13 @@
                         <FieldSelect
                             v-if="cradles.length > 0"
                             class="max-w-[200px]"
-                            fieldName="cradle"
+                            field-name="cradle"
                             placeholder="Seleccionar cradle"
-                            :endpointData="cradles"
+                            :endpoint-data="cradles"
                             :data="currentStageSheet.cradleId"
                             @update:data="currentStageSheet.cradleId = $event"
                         />
-                        <FieldLoading :title="false" class="max-w-[200px]" v-else />
+                        <FieldLoading v-else :title="false" class="max-w-[200px]" />
                     </div>
                     <div v-if="currentStageSheet.cradleId == -1" class="cradle-grid">
                         <div v-for="pos in 4" :key="pos" class="cradle-slot ph">
@@ -293,6 +293,7 @@
             };
             const setBox = (slotPos: number) => {
                 console.log(slotPos);
+
                 if (selectedCradle.value) {
                     // Reset los slots
                     selectedCradle.value.slots.map((slot) => {
@@ -301,6 +302,7 @@
                             slot.category = null;
                         }
                     });
+
                     // Si hay box lo ponemos
                     if (choosedBox.value.id) {
                         selectedCradle.value.slots[slotPos].category = choosedBox.value.category;
@@ -320,11 +322,13 @@
                         dims.floor = Math.max(dims.floor, floor);
                         dims.row = Math.max(dims.row, row);
                         dims.col = Math.max(dims.col, col);
+
                         return dims;
                     },
                     { floor: 0, row: 0, col: 0 }
                 );
                 dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
+
                 return dimensions;
             };
             const floor = ref(0);
@@ -337,6 +341,7 @@
                 const { data: purchaseOrdersData } = useAxios('/purchaseOrder', instance);
                 watch(purchaseOrdersData, (api) => {
                     console.log(api);
+
                     if (api && api.data) {
                         purchaseOrder.value = api.data.filter((po) => {
                             return po.companyId === companyId && po.pitId === pitId;
@@ -344,6 +349,7 @@
                         console.log(purchaseOrder.value);
                     }
                 });
+
                 return purchaseOrder;
             };
             const clientPitComboSelected: Ref<boolean> = ref(false);
@@ -364,6 +370,7 @@
                             warehouse.clientCompanyId == currentStageSheet.companyId
                         );
                     });
+
                     if (!warehouse.value) {
                         console.log('no warehouse');
                         warehouse.value = {
@@ -420,6 +427,7 @@
                         cradle.id == lasWO.backupCradleId
                     );
                 });
+
                 if (cradles.value.length === 0) {
                     cradles.value = [{ id: -1, name: 'No hay cradles' }];
                 }
@@ -436,6 +444,7 @@
                     currentStageSheet.stages[0].quantity1 !== 0 ||
                     currentStageSheet.stages[0].quantity2 !== 0 ||
                     currentStageSheet.stages[0].quantity3 !== 0;
+
                 return !!(
                     currentStageSheet.companyId >= 0 &&
                     currentStageSheet.pitId >= 0 &&
@@ -488,6 +497,7 @@
                                 setTimeout(() => {
                                     console.groupEnd();
                                     router.push('/stage-sheet');
+
                                     return;
                                 }, 500);
                             }
@@ -495,6 +505,7 @@
                     }
                 });
             };
+
             return {
                 currentStageSheet,
                 save,

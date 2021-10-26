@@ -8,80 +8,80 @@
                 <FieldGroup>
                     <FieldInput
                         class="col-span-full"
-                        fieldName="name"
+                        field-name="name"
                         placeholder="Nombre y apellido / Razón social"
                         title="Nombre y apellido / Razón social"
                         :data="newClient.name"
-                        @update:data="newClient.name = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
+                        @update:data="newClient.name = $event"
                     />
                     <FieldInput
                         class="col-span-full"
-                        fieldName="legalId"
+                        field-name="legalId"
                         placeholder="CUIL / CUIT"
                         mask="#*"
                         title="CUIL / CUIT"
                         :data="newClient.legalId"
-                        @update:data="newClient.legalId = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
-                        validationType="extension"
-                        :charAmount="{ min: 11, max: 11 }"
+                        validation-type="extension"
+                        :char-amount="{ min: 11, max: 11 }"
+                        @update:data="newClient.legalId = $event"
                     />
                     <FieldInput
                         class="col-span-full"
-                        fieldName="address"
+                        field-name="address"
                         placeholder="Domicilio"
                         title="Domicilio"
                         :data="newClient.address"
-                        @update:data="newClient.address = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
+                        @update:data="newClient.address = $event"
                     />
                     <toggle label="Es operadora" @handle-toggle-state="handleToggleState" />
                     <textarea
+                        v-model="newClient.observations"
                         class="col-span-full resize-none rounded-md input"
                         fieldName="observations"
                         rows="4"
                         placeholder="Observaciones..."
                         title="Observaciones"
-                        v-model="newClient.observations"
                     ></textarea>
                 </FieldGroup>
                 <FieldGroup>
                     <FieldLegend>Contacto principal</FieldLegend>
                     <FieldInput
                         class="col-span-full"
-                        fieldName="nr-name"
+                        field-name="nr-name"
                         placeholder="Nombre de representante"
                         title="Nombre"
                         :data="newClient.companyRepresentative.name"
-                        @update:data="newClient.companyRepresentative.name = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
+                        @update:data="newClient.companyRepresentative.name = $event"
                     />
                     <FieldInput
                         class="col-span-full"
-                        fieldName="nr-phone"
+                        field-name="nr-phone"
                         placeholder="+11 1111 1111"
                         mask="#*"
                         title="Teléfono"
                         :data="newClient.companyRepresentative.phone"
-                        @update:data="newClient.companyRepresentative.phone = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
+                        @update:data="newClient.companyRepresentative.phone = $event"
                     />
                     <FieldInput
                         class="col-span-full"
-                        fieldName="nr-email"
+                        field-name="nr-email"
                         placeholder="empresa@mail.com"
                         title="Email"
                         :data="newClient.companyRepresentative.email"
-                        @update:data="newClient.companyRepresentative.email = $event"
-                        requireValidation
+                        require-validation
                         entity="client"
-                        validationType="email"
+                        validation-type="email"
+                        @update:data="newClient.companyRepresentative.email = $event"
                     />
                 </FieldGroup>
             </form>

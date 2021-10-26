@@ -130,10 +130,13 @@ export default {
                                     sandProvider.id = response.data.data.id;
                                     commit('UPDATE_SANDPROVIDER', sandProvider);
 
-                                    return response.data.data;
+                                    let res = response.data.data;
+                                    res['status'] = 200;
+
+                                    return res;
                                 }
                             })
-                            .catch(() => {
+                            .catch((err) => {
                                 return { status: 'failed' };
                             });
                     }

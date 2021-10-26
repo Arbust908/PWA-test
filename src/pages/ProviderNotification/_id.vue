@@ -265,6 +265,7 @@
             const stateNotifications = store.state.providerNotification.all;
             const stateNot = stateNotifications.find((notification: ProviderNotification) => notification.id == id);
             const currentProviderNotification = ref({});
+
             if (!stateNot) {
                 const { data: pNData } = useAxios('/ProviderNotification', instance);
                 watch(pNData, (pNData, prevCount) => {
@@ -333,6 +334,7 @@
             const removeSandOrder = (soId: number) => {
                 sandOrder.value = sandOrder.value.filter((so) => so.id !== soId);
             };
+
             if (sandOrder.value.length === 0) {
                 addSandOrder();
             }
@@ -354,6 +356,7 @@
             const removeTransportProvider = (tpId: number) => {
                 transportOrder.value = transportOrder.value.filter((tp) => tp.id !== tpId);
             };
+
             if (transportOrder.value.length === 0) {
                 addTransportProvider();
             }
