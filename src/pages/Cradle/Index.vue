@@ -56,18 +56,24 @@
                     <td>
                         <div class="btn-panel">
                             <router-link :to="`/cradle/${cr.id}`">
-                                <CircularBtn size="xs" class="bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                </CircularBtn>
+                                <Popper hover content="Editar">
+                                    <CircularBtn size="xs" class="bg-blue-500">
+                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
+                                    </CircularBtn>
+                                </Popper>
                             </router-link>
 
-                            <CircularBtn v-if="cr.visible" class="bg-red-500" size="xs" @click="update(cr)">
-                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-
-                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(cr)">
-                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
+                            <Popper hover :content="cr.visible ? 'Inhabilitar' : 'Habilitar'">
+                                <CircularBtn
+                                    class="ml-4"
+                                    :class="cr.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    size="xs"
+                                    @click="openModalVisibility(cr)"
+                                >
+                                    <Icon v-if="cr.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                </CircularBtn>
+                            </Popper>
                         </div>
                     </td>
                 </tr>
@@ -86,7 +92,7 @@
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar cradle </PrimaryBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirmModal">Inhabilitar cradle </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -105,6 +111,7 @@
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import Modal from '@/components/modal/General.vue';
+    import Popper from 'vue3-popper';
 
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -119,6 +126,7 @@
             GhostBtn,
             CircularBtn,
             Modal,
+            Popper,
         },
         setup() {
             useTitle('Cradles <> Sandflow');
@@ -162,17 +170,23 @@
                 loading.value = false;
             };
 
-            const openModalVisibility = (cradle) => {
+            const openModalVisibility = async (cradle) => {
                 selectedCradle.value = cradle;
-                showModal.value = true;
+
+                if (cradle.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await updateVisibility(selectedCradle.value);
             };
 
-            const confirm = async () => {
-                await update(selectedCradle.value);
+            const confirmModal = async () => {
+                await updateVisibility(selectedCradle.value);
                 showModal.value = false;
             };
 
-            const update = async (cradle) => {
+            const updateVisibility = async (cradle) => {
                 const payload = {
                     ...cradle,
                     visible: !cradle.visible,
@@ -194,10 +208,9 @@
                 cradleId,
                 clearFilters,
                 filteredCradles,
-                update,
                 showModal,
                 openModalVisibility,
-                confirm,
+                confirmModal,
                 tableColumns,
             };
         },
