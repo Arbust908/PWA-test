@@ -3,47 +3,47 @@
         <FieldInput
             class="col-span-full"
             title="Nombre / Razón Social"
-            fieldName="sandProvName"
+            field-name="sandProvName"
             placeholder="Ingresar Nombre / Razón Social"
             :data="spName"
-            @update:data="spName = $event"
-            requireValidation
+            require-validation
             entity="sandProvider"
+            @update:data="spName = $event"
         />
         <FieldInput
             class="col-span-full"
             title="CUIT / CUIL"
-            fieldName="sandProvId"
+            field-name="sandProvId"
             placeholder="Ingresar CUIT / CUIL"
             mask="#*"
             :data="spLegalId"
-            @update:data="spLegalId = Number($event)"
-            requireValidation
-            validationType="extension"
-            :charAmount="{ min: 11, max: 11 }"
+            require-validation
+            validation-type="extension"
+            :char-amount="{ min: 11, max: 11 }"
             entity="sandProvider"
+            @update:data="spLegalId = Number($event)"
         />
         <FieldInput
             class="col-span-full"
             title="Domicilio"
-            fieldName="sandProvAddress"
+            field-name="sandProvAddress"
             placeholder="Ingresar domicilio"
             :data="spAddress"
-            @update:data="spAddress = $event"
-            requireValidation
+            require-validation
             entity="sandProvider"
+            @update:data="spAddress = $event"
         />
         <label class="col-span-full" for="meshType">
             <span>Tipo de malla</span>
-            <div class="mb-4" v-if="spMeshTypes.length > 0">
-                <div class="flex items-center" v-for="(mesh, i) in spMeshTypes" :key="i">
+            <div v-if="spMeshTypes.length > 0" class="mb-4">
+                <div v-for="(mesh, i) in spMeshTypes" :key="i" class="flex items-center">
                     <FieldInput
                         class="col-span-7"
-                        fieldName="mesh"
+                        field-name="mesh"
                         placeholder="Malla"
-                        isReadonly
+                        is-readonly
                         :data="mesh.type"
-                        requireValidation
+                        require-validation
                     />
                     <Icon
                         icon="Trash"
@@ -54,15 +54,15 @@
                     />
                 </div>
             </div>
-            <div class="mb-4 hidden" v-else>
-                <FieldInput class="col-span-7" fieldName="mesh" placeholder="Malla" isReadonly requireValidation />
+            <div v-else class="mb-4 hidden">
+                <FieldInput class="col-span-7" field-name="mesh" placeholder="Malla" is-readonly require-validation />
             </div>
             <div class="flex items-center">
                 <FieldSelect
-                    fieldName="sandType"
+                    field-name="sandType"
                     placeholder="Seleccionar"
                     endpoint="/sand"
-                    endpointKey="type"
+                    endpoint-key="type"
                     :data="spMesh"
                     @update:data="spMesh = $event"
                     @is-blured="checkMeshValidation"
@@ -75,16 +75,16 @@
                     @click="addMeshType(spMesh)"
                 />
             </div>
-            <InvalidInputLabel v-if="!isMeshValid && wasMeshSelectBlured" validationType="empty" />
+            <InvalidInputLabel v-if="!isMeshValid && wasMeshSelectBlured" validation-type="empty" />
         </label>
         <FieldTextArea
             class="col-span-full"
-            fieldName="observations"
+            field-name="observations"
             placeholder="Observaciones..."
             title="Observaciones"
             :rows="5"
-            isFixed
-            isOptional
+            is-fixed
+            is-optional
             :data="spObs"
             @update:data="spObs = $event"
         />
@@ -139,7 +139,7 @@
         setup(props, { emit }) {
             const { spName, spLegalId, spAddress, spMeshTypes, spMesh, spObs } = useVModels(props, emit);
 
-            const deleteMeshType = (index: Number) => {
+            const deleteMeshType = (index: number) => {
                 emit('delete-mesh-type', index);
             };
 
@@ -150,7 +150,10 @@
             const wasMeshSelectBlured = ref(false);
 
             const isMeshValid = computed(() => {
-                if (!wasMeshSelectBlured.value) return;
+                if (!wasMeshSelectBlured.value) {
+                    return;
+                }
+
                 if (spMeshTypes.value.length > 0) {
                     return true;
                 } else {
@@ -165,7 +168,9 @@
             });
 
             const checkMeshValidation = () => {
-                if (!wasMeshSelectBlured.value) wasMeshSelectBlured.value = true;
+                if (!wasMeshSelectBlured.value) {
+                    wasMeshSelectBlured.value = true;
+                }
             };
 
             return {
