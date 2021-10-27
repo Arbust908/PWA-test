@@ -44,6 +44,7 @@
                         is-readonly
                         :data="mesh.type"
                         require-validation
+                        entity="sandProvider"
                     />
                     <Icon
                         icon="Trash"
@@ -55,7 +56,14 @@
                 </div>
             </div>
             <div v-else class="mb-4 hidden">
-                <FieldInput class="col-span-7" field-name="mesh" placeholder="Malla" is-readonly require-validation />
+                <FieldInput
+                    class="col-span-7"
+                    field-name="mesh"
+                    placeholder="Malla"
+                    is-readonly
+                    require-validation
+                    entity="sandProvider"
+                />
             </div>
             <div class="flex items-center">
                 <FieldSelect
