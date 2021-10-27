@@ -58,7 +58,7 @@
             :silenced="silenced"
             entity="transportProvider"
         />
-        <FieldInput
+        <FieldTextArea
             class="col-span-full"
             title="Observaciones"
             fieldName="observations"
@@ -83,6 +83,7 @@
     import { defineComponent, ref, computed } from 'vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
+    import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import { useVModels } from '@vueuse/core';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
@@ -117,6 +118,7 @@
             FieldGroup,
             FieldInput,
             Icon,
+            FieldTextArea,
         },
         setup(props, { emit }) {
             const { driverName, driverPhone, driverEmail, driverTType, driverTId, driverObs } = useVModels(props, emit);
