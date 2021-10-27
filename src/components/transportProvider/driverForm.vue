@@ -58,11 +58,11 @@
             :silenced="silenced"
             entity="transportProvider"
         />
-        <FieldTextArea
+        <FieldInput
             class="col-span-full"
+            title="Observaciones"
             fieldName="observations"
             placeholder="Observaciones..."
-            title="Observaciones"
             :rows="5"
             isFixed
             isOptional
