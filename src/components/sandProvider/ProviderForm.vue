@@ -144,7 +144,9 @@
             };
 
             const addMeshType = (mesh: Object) => {
-                emit('add-mesh-type', mesh);
+                if (mesh) {
+                    emit('add-mesh-type', mesh);
+                }
             };
 
             const wasMeshSelectBlured = ref(false);
