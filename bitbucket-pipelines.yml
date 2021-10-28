@@ -1,73 +1,75 @@
 image: node:latest
 
 definitions:
-  steps:
-    - step: &build
-        name: 'Dependencies & build project'
-        artifacts:
-          - release.zip
-          - dist/**
-          - ci/**
-          - deploy.yml
-        script:
-          - npm -g install n
-          - n 12
-          - npm install
-          - npm run build
-          - rm -rf node_modules
-          - npx bestzip release.zip dist/*
-          - mv .ci ci
-          - env
-    - step: &deploy-qa
-        image: python:3.9
-        name: 'Deployment to QA'
-        trigger: manual
-        deployment: test
-        script:
-          - ls -l
-          - pip3 install paramiko pyyaml scp
-          - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
-          - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
-          - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
-          - python3 ./ci/deploy.py
-    - step: &deploy-staging
-        image: python:3.9
-        name: 'Deployment to STAGING'
-        trigger: manual
-        deployment: staging
-        script:
-          - ls -l
-          - pip3 install paramiko pyyaml scp
-          - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
-          - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
-          - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
-          - python3 ./ci/deploy.py
-    - step: &deploy-prod
-        image: python:3.9
-        name: 'Deployment to PROD'
-        trigger: manual
-        deployment: production
-        script:
-          - ls -l
-          - pip3 install paramiko pyyaml scp
-          - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
-          - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
-          - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
-          - python3 ./ci/deploy.py
+    steps:
+        - step: &build
+              name: 'Dependencies & build project'
+              artifacts:
+                  - release.zip
+                  - dist/**
+                  - ci/**
+                  - deploy.yml
+              script:
+                  - npm -g install n
+                  - n 12
+                  - npm install
+                  - npm run build
+                  - rm -rf node_modules
+                  - npx bestzip release.zip dist/*
+                  - mv .ci ci
+                  - env
+        - step: &deploy-qa
+              image: python:3.9
+              name: 'Deployment to QA'
+              trigger: manual
+              deployment: test
+              script:
+                  - ls -l
+                  - pip3 install paramiko pyyaml scp
+                  - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
+                  - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
+                  - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
+                  - python3 ./ci/deploy.py
+        - step: &deploy-staging
+              image: python:3.9
+              name: 'Deployment to STAGING'
+              trigger: manual
+              deployment: staging
+              script:
+                  - ls -l
+                  - pip3 install paramiko pyyaml scp
+                  - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
+                  - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
+                  - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
+                  - python3 ./ci/deploy.py
+        - step: &deploy-prod
+              image: python:3.9
+              name: 'Deployment to PROD'
+              trigger: manual
+              deployment: production
+              script:
+                  - ls -l
+                  - pip3 install paramiko pyyaml scp
+                  - export SVC_APP_BUILD=$BITBUCKET_BUILD_NUMBER
+                  - export SVC_APP_COMMIT=$BITBUCKET_COMMIT
+                  - export SVC_APP_PR_ID=$BITBUCKET_PR_ID
+                  - python3 ./ci/deploy.py
 pipelines:
-  branches:
-    main:
-      - step: *build
-      - step: *deploy-prod
-    staging:
-      - step: *build
-      - step: *deploy-staging
-  pull-requests:
-    feature/*:
-      - step: *build
-      - step: *deploy-qa
-    fix/*:
-      - step: *build
-      - step: *deploy-qa
-    release/*:
-      - step: *build
+    branches:
+        main:
+            - step: *build
+            - step: *deploy-prod
+        staging:
+            - step: *build
+            - step: *deploy-staging
+    pull-requests:
+        feature/*:
+            - step: *build
+        fix/*:
+            - step: *build
+            - step: *deploy-prod
+        sprint/*:
+            - step: *build
+            - step: *deploy-qa
+        release/*:
+            - step: *build
