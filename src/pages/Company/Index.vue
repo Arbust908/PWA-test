@@ -36,7 +36,7 @@
                     </th>
 
                     <th scope="col">
-                        <span class="sr-only">Acciones</span>
+                        <span>Acciones</span>
                     </th>
                 </tr>
             </template>
