@@ -65,6 +65,8 @@ pipelines:
     pull-requests:
         feature/*:
             - step: *build
+        bug/*:
+            - step: *build
         fix/*:
             - step: *build
             - step: *deploy-prod
