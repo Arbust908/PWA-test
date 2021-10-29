@@ -7,8 +7,8 @@
             <form method="POST" action="/" class="py-4">
                 <FieldGroup class="grid-cols-6 md:grid-cols-12 max-w-2xl">
                     <ClientPitCombo
-                        :clientId="currentSandPlan.companyId"
-                        :pitId="currentSandPlan.pitId"
+                        :client-id="currentSandPlan.companyId"
+                        :pit-id="currentSandPlan.pitId"
                         @update:clientId="currentSandPlan.companyId = $event"
                         @update:pitId="currentSandPlan.pitId = $event"
                     />
@@ -95,8 +95,8 @@
                             <Icon icon="PlusCircle" class="w-7 h-7 m-auto text-green-500 mr-1" />
                         </button>
                         <button
-                            @click.prevent="toggleCurOp"
                             :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
+                            @click.prevent="toggleCurOp"
                         >
                             <Icon
                                 icon="ChevronUp"
@@ -118,16 +118,16 @@
                         </button>
                     </section>
                 </header>
-                <div class="pr-8 pl-2 border-2 border-solid" v-show="currentOpened">
+                <div v-show="currentOpened" class="pr-8 pl-2 border-2 border-solid">
                     <ResposiveTableSandPlan
-                        class="mt-2"
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
+                        class="mt-2"
                         :pos="Key + 1"
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
-                        editingKey="innerId"
+                        editing-key="innerId"
                         @editStage="editStage"
                         @saveStage="saveStage"
                         @duplicateStage="duplicateStage"
@@ -215,7 +215,7 @@
                         />
                     </section>
                 </header>
-                <div class="flex flex-col p-4 border-2 border-solid" v-show="finishedOpened">
+                <div v-show="finishedOpened" class="flex flex-col p-4 border-2 border-solid">
                     <ResposiveTableSandPlan
                         v-for="(stage, Key) in finishedStages"
                         :key="Key"
@@ -396,6 +396,7 @@
                 console.log(pits.value);
                 console.log(pits.value.find((pit) => pit.id == currentSandPlan.pitId));
                 console.groupEnd();
+
                 return currentSandPlan.pitId >= 0 ? pits.value.find((pit) => pit.id == currentSandPlan.pitId).name : '';
             });
             // << PITS
@@ -418,6 +419,7 @@
                     currentSandPlan.stages[0].quantity1 !== 0 ||
                     currentSandPlan.stages[0].quantity2 !== 0 ||
                     currentSandPlan.stages[0].quantity3 !== 0;
+
                 return !!(
                     currentSandPlan.companyId >= 0 &&
                     currentSandPlan.pitId >= 0 &&
@@ -431,15 +433,19 @@
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
                     console.log(stage);
+
                     if (stage.sandId1 === -1) {
                         stage.sandId1 = null;
                     }
+
                     if (stage.sandId2 === -1) {
                         stage.sandId2 = null;
                     }
+
                     if (stage.sandId3 === -1) {
                         stage.sandId3 = null;
                     }
+
                     return stage;
                 });
                 currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
@@ -447,6 +453,7 @@
                         (stage.sandId1 !== null && stage.quantity1 > 0) ||
                         (stage.sandId2 !== null && stage.quantity2 > 0) ||
                         (stage.sandId3 !== null && stage.quantity3 > 0);
+
                     return noSandTypeNull;
                 });
                 const { data } = useAxios('/sandPlan', { method: 'POST', data: currentSandPlan }, instance);
@@ -467,6 +474,7 @@
                     }
                 });
             };
+
             return {
                 currentSandPlan,
                 inProgressStages,

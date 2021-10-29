@@ -6,12 +6,12 @@
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
                 <SandProviderForm
-                    :spName="sandProvider.name"
-                    :spLegalId="sandProvider.legalId"
-                    :spAddress="sandProvider.address"
-                    :spMeshTypes="sandProvider.meshType"
-                    :spObs="sandProvider.observations"
-                    :spMesh="meshType"
+                    :sp-name="sandProvider.name"
+                    :sp-legal-id="sandProvider.legalId"
+                    :sp-address="sandProvider.address"
+                    :sp-mesh-types="sandProvider.meshType"
+                    :sp-obs="sandProvider.observations"
+                    :sp-mesh="meshType"
                     @update:spName="sandProvider.name = $event"
                     @update:spLegalId="sandProvider.legalId = $event"
                     @update:spAddress="sandProvider.address = $event"
@@ -22,9 +22,9 @@
                     @delete-mesh-type="deleteMeshType"
                 />
                 <SandProviderRep
-                    :repName="companyRepresentative.name"
-                    :repPhone="companyRepresentative.phone"
-                    :repEmail="companyRepresentative.email"
+                    :rep-name="companyRepresentative.name"
+                    :rep-phone="companyRepresentative.phone"
+                    :rep-email="companyRepresentative.email"
                     @update:repName="companyRepresentative.name = $event"
                     @update:repPhone="companyRepresentative.phone = $event"
                     @update:repEmail="companyRepresentative.email = $event"
@@ -42,7 +42,7 @@
         <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
             <template #body>
                 <p>{{ errorMessage }}</p>
-                <button @click.prevent="toggleNotificationModal" class="closeButton">Cerrar</button>
+                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
             </template>
         </Modal>
     </Layout>
@@ -112,7 +112,9 @@
 
             const addMeshType = (newMeshType: string) => {
                 let mesh = meshTypes.value.filter((mesh) => {
-                    if (mesh.id == newMeshType) return mesh;
+                    if (mesh.id == newMeshType) {
+                        return mesh;
+                    }
                 })[0];
                 sandProvider.value.meshType.push(mesh);
             };
@@ -134,7 +136,10 @@
                         errorMessage.value = res.message;
                         toggleNotificationModal();
                     }
-                    if (res.type == 'success') return { res };
+
+                    if (res.type == 'success') {
+                        return { res };
+                    }
                 });
             };
 

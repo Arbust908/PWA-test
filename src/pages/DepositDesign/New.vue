@@ -8,8 +8,8 @@
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
                     <h2 class="col-span-full text-3xl font-bold">Pozo {{ designName }}</h2>
                     <ClientPitCombo
-                        :clientId="clientId"
-                        :pitId="pitId"
+                        :client-id="clientId"
+                        :pit-id="pitId"
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
                     />
@@ -40,8 +40,8 @@
                                     :checked="selectedBox.category === 'aisle'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('aisle')"
                                     class="form-checkbox aisle"
+                                    @click="setCat('aisle')"
                                 />
                                 <span>Pasillo</span>
                             </label>
@@ -51,8 +51,8 @@
                                     :checked="selectedBox.category === 'fina'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('fina')"
                                     class="form-checkbox fina"
+                                    @click="setCat('fina')"
                                 />
                                 <span>Arena fina</span>
                             </label>
@@ -62,8 +62,8 @@
                                     :checked="selectedBox.category === 'gruesa'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('gruesa')"
                                     class="form-checkbox gruesa"
+                                    @click="setCat('gruesa')"
                                 />
                                 <span>Arena gruesa</span>
                             </label>
@@ -73,8 +73,8 @@
                                     :checked="selectedBox.category === 'cortada'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('cortada')"
                                     class="form-checkbox cortada"
+                                    @click="setCat('cortada')"
                                 />
                                 <span>Caja cortada</span>
                             </label>
@@ -84,8 +84,8 @@
                                     :checked="selectedBox.category === 'empty'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('empty')"
                                     class="form-checkbox empty"
+                                    @click="setCat('empty')"
                                 />
                                 <span>Vacio</span>
                             </label>
@@ -115,7 +115,7 @@
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5"
-                        :selectedBox="selectedBox"
+                        :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
                         :floor="floors"
@@ -316,6 +316,7 @@
             const isFull = computed(() => {
                 const hasClientAndPit: boolean = clientId.value >= 0 && pitId.value >= 0;
                 const hasDeposit: boolean = rows.value > 0 && cols.value > 0 && floors.value > 0;
+
                 return hasClientAndPit && hasDeposit;
             });
             const save = () => {
