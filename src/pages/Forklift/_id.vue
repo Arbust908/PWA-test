@@ -8,7 +8,7 @@
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
-                    <PrimaryBtn @click="isValidated && update()" :disabled="!isValidated ? 'yes' : null">
+                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
                         Finalizar
                     </PrimaryBtn>
                 </section>
@@ -17,7 +17,7 @@
         <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
             <template #body>
                 <p>{{ errorMessage }}</p>
-                <button @click.prevent="toggleNotificationModal" class="closeButton">Cerrar</button>
+                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
             </template>
         </Modal>
     </Layout>
