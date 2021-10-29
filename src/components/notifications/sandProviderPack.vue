@@ -9,7 +9,7 @@
                 title="Centro de Carga de Arena"
                 endpoint="/sandProvider"
                 :data="sPov.id"
-                @update:data="sPov.id = $event"
+                @update:data="(sPov.id = $event), cleanSandOrders()"
             />
 
             <div
@@ -39,11 +39,11 @@
                     @update:data="so.amount = $event"
                 />
                 <!-- <AmountInput
-          :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
-          :title="Key === 0"
-          :amount="so.amount"
-          @update:amount="so.amount = $event"
-        /> -->
+                    :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
+                    :title="Key === 0"
+                    :amount="so.amount"
+                    @update:amount="so.amount = $event"
+                /> -->
                 <div
                     v-if="sPov.SandOrders.length > 0 && Key + 1 === sPov.SandOrders.length"
                     class="col-span-1 my-auto mx-auto hidden sm:block"
@@ -146,6 +146,11 @@
                 }
             };
 
+            const cleanSandOrders = () => {
+                sandProviders.value[0].SandOrders.length = 0;
+                addSandOrder(1);
+            };
+
             const sandProviderInnerId = ref(0);
             const addSandProvider = () => {
                 const newSandProvider = { ...defaultSandProvider };
@@ -160,13 +165,10 @@
                 return sandProviders.value.length - 1;
             });
 
-            console.log(sandProviders);
-
             if (sandProviders && sandProviders.value && sandProviders.value.length <= 0) {
                 console.log('no sandProviders');
                 addSandProvider();
             }
-            console.log(sandProviders);
 
             return {
                 sandProviders,
@@ -176,6 +178,7 @@
                 removeSandProvider,
                 lastSandProviderInner,
                 filteredSandTypes,
+                cleanSandOrders,
             };
         },
     });
