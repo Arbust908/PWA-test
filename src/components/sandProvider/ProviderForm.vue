@@ -64,6 +64,7 @@
                     require-validation
                     entity="sandProvider"
                 />
+                <FieldInput class="col-span-7" field-name="mesh" placeholder="Malla" is-readonly require-validation />
             </div>
             <div class="flex items-center">
                 <FieldSelect
@@ -152,7 +153,9 @@
             };
 
             const addMeshType = (mesh: Object) => {
-                emit('add-mesh-type', mesh);
+                if (mesh) {
+                    emit('add-mesh-type', mesh);
+                }
             };
 
             const wasMeshSelectBlured = ref(false);
