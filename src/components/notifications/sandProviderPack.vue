@@ -4,9 +4,9 @@
         <template v-for="(sPov, i) in sandProviders" :key="i">
             <FieldSelect
                 class="col-span-full sm:col-span-5"
-                fieldName="sandProvider"
-                placeholder="Selecciona un proveedor"
-                title="Proveedor"
+                field-name="sandProvider"
+                placeholder="Seleccionar centro de carga"
+                title="Centro de Carga de Arena"
                 endpoint="/sandProvider"
                 :data="sPov.id"
                 @update:data="(sPov.id = $event), cleanSandOrders()"
@@ -20,18 +20,18 @@
                 <FieldSelect
                     class="col-span-5 sm:col-span-5"
                     :title="Key === 0 ? 'Tipo' : ''"
-                    fieldName="sandType"
+                    field-name="sandType"
                     placeholder="Arena"
                     endpoint="/sand"
-                    endpointKey="type"
+                    endpoint-key="type"
                     :data="so.sandTypeId"
+                    :filtered-data="filteredSandTypes"
                     @update:data="so.sandTypeId = $event"
-                    :filteredData="filteredSandTypes"
                 />
                 <FieldWithSides
                     class="col-span-5 sm:col-span-3"
                     :title="Key === 0 ? 'Cantidad' : ''"
-                    :fieldName="`sandQuantity${Key}`"
+                    :field-name="`sandQuantity${Key}`"
                     placeholder="0 t"
                     type="number"
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
@@ -39,14 +39,14 @@
                     @update:data="so.amount = $event"
                 />
                 <!-- <AmountInput
-          :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
-          :title="Key === 0"
-          :amount="so.amount"
-          @update:amount="so.amount = $event"
-        /> -->
+                    :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
+                    :title="Key === 0"
+                    :amount="so.amount"
+                    @update:amount="so.amount = $event"
+                /> -->
                 <div
-                    class="col-span-1 my-auto mx-auto hidden sm:block"
                     v-if="sPov.SandOrders.length > 0 && Key + 1 === sPov.SandOrders.length"
+                    class="col-span-1 my-auto mx-auto hidden sm:block"
                 >
                     <Icon
                         icon="PlusCircle"
@@ -140,6 +140,7 @@
             };
             const removeSandOrder = (spId: number, soInid: number) => {
                 const currSP = getCurrentSandProvider(spId);
+
                 if (currSP) {
                     currSP.SandOrders = currSP.SandOrders.filter((so) => so.innerId !== soInid);
                 }
