@@ -7,8 +7,8 @@
             <form method="POST" action="/" class="p-4 flex-col gap-4">
                 <FieldGroup class="max-w-2xl border-none">
                     <ClientPitCombo
-                        :clientId="companyClientId"
-                        :pitId="pitId"
+                        :client-id="companyClientId"
+                        :pit-id="pitId"
                         @update:clientId="companyClientId = $event"
                         @update:pitId="pitId = $event"
                     />
@@ -18,9 +18,9 @@
                     <div class="w-full grid grid-cols-12 gap-6 mb-4">
                         <FieldSelect
                             class="col-span-12 mt-5 md:col-span-6"
-                            fieldName="sandProvider"
-                            title="Proveedor"
-                            placeholder="Selecciona proveedor"
+                            field-name="sandProvider"
+                            title="Centro de Carga de Arena"
+                            placeholder="Seleccionar centro de carga"
                             endpoint="/sandProvider"
                             :data="providerId.id"
                             @update:data="providerId.id = $event"
@@ -36,18 +36,18 @@
                         <FieldSelect
                             :title="orderKey === 0 ? 'Tipo' : ''"
                             class="col-span-6 sm:col-span-3"
-                            fieldName="sandType"
+                            field-name="sandType"
                             placeholder="Tipo de Arena"
                             endpoint="/sand"
-                            endpointKey="type"
+                            endpoint-key="type"
                             :data="order.sandTypeId"
+                            :filtered-data="filteredSandTypes"
                             @update:data="order.sandTypeId = $event"
-                            :filteredData="filteredSandTypes"
                         />
                         <FieldWithSides
                             :title="orderKey === 0 ? 'Cantidad' : ''"
                             class="col-span-6 sm:col-span-3"
-                            fieldName="sandQuantity"
+                            field-name="sandQuantity"
                             placeholder="Arena"
                             type="number"
                             :post="{ title: '0', value: 't', width: '3rem' }"
@@ -57,9 +57,9 @@
                         <FieldInput
                             :title="orderKey === 0 ? 'ID de caja' : ''"
                             class="col-span-9 sm:col-span-4"
-                            fieldName="sandBoxId"
+                            field-name="sandBoxId"
                             placeholder="ID"
-                            isOptional
+                            is-optional
                             :data="order.boxId"
                             @update:data="order.boxId = $event"
                         />
@@ -78,7 +78,7 @@
                                 <CircularBtn
                                     v-if="isLast(orderKey, providerId.sandOrders)"
                                     size="md"
-                                    btnClass="bg-green-500"
+                                    btn-class="bg-green-500"
                                     @click.prevent="addOrder(providerId.innerId)"
                                 >
                                     <Icon icon="Plus" class="w-7 h-7 text-white" />
@@ -99,7 +99,7 @@
                     <FieldLegend class="mt-2">Transporte</FieldLegend>
                     <FieldSelect
                         class="col-span-12 md:col-span-6"
-                        fieldName="transportProvider"
+                        field-name="transportProvider"
                         title="Proveedor"
                         placeholder="Selecciona proveedor"
                         endpoint="/transportProvider"
@@ -110,17 +110,17 @@
                         <FieldInput
                             :title="useOnFirst(toKey, 'Patente')"
                             class="col-span-6 sm:col-span-3"
-                            fieldName="trasportPatent"
+                            field-name="trasportPatent"
                             placeholder="AA123AA"
                             endpoint="/sand"
-                            endpointKey="type"
+                            endpoint-key="type"
                             :data="to.licensePlate"
                             @update:data="to.licensePlate = $event"
                         />
                         <FieldInput
                             :title="useOnFirst(toKey, 'Cantidad')"
                             class="col-span-6 sm:col-span-3"
-                            fieldName="boxAmount"
+                            field-name="boxAmount"
                             placeholder="0"
                             type="number"
                             :data="to.boxAmount"
@@ -129,9 +129,9 @@
                         <FieldInput
                             :title="useOnFirst(toKey, 'Observaciones')"
                             class="col-span-9 sm:col-span-4"
-                            fieldName="observations"
+                            field-name="observations"
                             placeholder="Ej: chasis chico"
-                            isOptional
+                            is-optional
                             :data="to.observations"
                             @update:data="to.observations = $event"
                         />
@@ -147,7 +147,7 @@
                                 <CircularBtn
                                     v-if="isLast(toKey, TransportOrders)"
                                     size="md"
-                                    btnClass="bg-green-500"
+                                    btn-class="bg-green-500"
                                     @click.prevent="addTransportOrder()"
                                 >
                                     <Icon icon="Plus" class="w-7 h-7 text-white" />
@@ -172,7 +172,7 @@
                 </PrimaryBtn>
             </footer>
         </section>
-        <OrderModal v-if="showModal" :showModal="showModal" :po="po" @close="showModal = false" @confirm="save()" />
+        <OrderModal v-if="showModal" :show-modal="showModal" :po="po" @close="showModal = false" @confirm="save()" />
         <!-- <Modal
       type="off"
       :open="confirmModal"
@@ -264,7 +264,9 @@
 
             const changeProvider = () => {
                 const [provider] = sandProviders.value.filter((sandProvider) => {
-                    if (sandProvider.id == sandProvidersIds.value[0].id) return sandProvider;
+                    if (sandProvider.id == sandProvidersIds.value[0].id) {
+                        return sandProvider;
+                    }
                 });
 
                 filteredSandTypes.value = provider.meshType;
@@ -465,6 +467,7 @@
                     sandProviderId: sandProvidersIds.value[0].id,
                     transportProviderId: transportProviderId.value,
                 };
+
                 return purchaseOrder;
             };
             const save = (): void => {
@@ -492,6 +495,7 @@
                     });
                 }
             };
+
             return {
                 sandOrder,
                 removeOrder,
