@@ -13,7 +13,11 @@
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                    <PrimaryBtn
+                        :disabled="!isValidated ? 'yes' : null"
+                        :is-loading="isLoading"
+                        @click="isValidated && save()"
+                    >
                         Finalizar
                     </PrimaryBtn>
                 </section>
@@ -61,33 +65,32 @@
             });
 
             const isValidated = ref(false);
+            const isLoading = ref(false);
 
             watchEffect(async () => {
                 isValidated.value = (await useValidator(store, 'sand')) ? true : false;
             });
 
             const save = async () => {
-                let sandDB = await axios
-                    .post(`${api}/sand`, newSand)
-                    .catch((err) => {
-                        console.log(err);
-                    })
-                    .then((res) => {
-                        console.log(res);
-                        if (res.status === 200) {
-                            return res.data;
-                        }
-                        return {};
-                    })
-                    .finally(() => {
-                        router.push('/tipos-de-arena');
-                    });
+                isLoading.value = true;
+
+                const response = await axios.post(`${api}/sand`, newSand).catch((err) => {
+                    console.log(err);
+                });
+
+                isLoading.value = false;
+
+                if (response.status === 200) {
+                    router.push('/tipos-de-arena');
+                }
             };
+
             return {
                 goToIndex,
                 save,
                 ...toRefs(newSand),
                 isValidated,
+                isLoading,
             };
         },
     };
