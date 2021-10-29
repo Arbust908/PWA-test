@@ -192,7 +192,7 @@
             Icon,
         },
         setup() {
-            useTitle('Notificacion a Proveedores <> Sandflow');
+            useTitle('Notificación a Proveedores <> Sandflow');
             const router = useRouter();
             const store = useStore();
             const instance = axios.create({
