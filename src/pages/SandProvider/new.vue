@@ -134,14 +134,11 @@
 
                 const res = await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value);
 
-                console.log('res', res);
-
                 if (res.type === 'failed') {
                     errorMessage.value = res.message;
                     toggleNotificationModal();
                 } else if (res.type == 'success') {
-                    console.log('SUCCESS');
-                    router.push('/tipos-de-arena');
+                    router.push('/proveedores-de-arena');
 
                     return { res };
                 }
