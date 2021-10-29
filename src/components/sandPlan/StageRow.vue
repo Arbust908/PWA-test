@@ -1,7 +1,7 @@
 <template>
   <tr>
     <td class="text-gray-500 px-3 text-center py-4 whitespace-nowrap text-lg">
-      {{ pos }} - 40
+      {{ stage.stage }} - 40
     </td>
     <template v-if="editing === Number(stage[editingKey])">
       <td class="typeWrap" :id="`sandType${stage.id}`">
@@ -206,7 +206,7 @@
     },
     setup(props, { emit }) {
       const { stage, editing, sands, pos } = toRefs(props);
-      stage.value.stage = pos.value;
+      // stage.value.stage = pos.value;
 
       const totalWheight = computed(() => {
         return (
