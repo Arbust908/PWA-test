@@ -208,14 +208,13 @@
             <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
             <PrimaryBtn type="submit" @click.prevent="save()"> Guardar </PrimaryBtn>
         </footer>
-        <Modal type="success" :open="confirmModal" class="modal" title="Orden de pedido guardada" @close="resetBoxIn">
+        <Modal type="success" :open="confirmModal" class="modal" @close="resetBoxIn">
             <template #body>
-                <p>La Orden de pedido se guardo con exito</p>
+                <p class="font-bold text-black">El ingreso de cajas ha sido guardado con éxito</p>
             </template>
             <template #btn>
-                <div class="w-full flex justify-end gap-5">
-                    <NoneBtn @click.prevent="$router.push('/')"> Salir </NoneBtn>
-                    <PrimaryBtn @click.prevent="resetBoxIn"> Crear Nueva </PrimaryBtn>
+                <div class="w-full flex justify-center gap-5">
+                    <PrimaryBtn @click.prevent="resetBoxIn">Continuar</PrimaryBtn>
                 </div>
             </template>
         </Modal>
