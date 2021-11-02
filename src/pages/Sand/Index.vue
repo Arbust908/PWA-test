@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4 px-3">
+        <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Tipos de arena</h2>
             <router-link to="/tipos-de-arena/nueva">
                 <PrimaryBtn size="sm"
@@ -14,7 +14,7 @@
             <FieldSelect
                 title="Filtro"
                 placeholder="Seleccionar malla"
-                class="col-span-full sm:col-span-4"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="type"
                 endpoint-key="type"
                 endpoint="/sand"
@@ -25,11 +25,16 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5">
+        <UiTable class="mt-5 lg:w-7/12 min-w-min">
             <template #header>
                 <tr>
-                    <th scope="col">Tipo de malla</th>
-                    <th class="w-1/5" scope="col">Observaciones</th>
+                    <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
+                        <div class="flex justify-center">
+                            {{ column.text }}
+                            <Icon icon="ArrowUp" class="w-4 h-4" />
+                            <Icon icon="ArrowDown" class="w-4 h-4" />
+                        </div>
+                    </th>
                     <th scope="col">Acciones</th>
                 </tr>
             </template>
@@ -51,18 +56,24 @@
                     <td>
                         <div class="btn-panel">
                             <router-link :to="`/tipos-de-arena/${st.id}`">
-                                <CircularBtn size="xs" class="bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
-                                </CircularBtn>
+                                <Popper hover content="Editar">
+                                    <CircularBtn size="xs" class="bg-blue-500">
+                                        <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
+                                    </CircularBtn>
+                                </Popper>
                             </router-link>
 
-                            <CircularBtn v-if="st.visible" class="bg-red-500" size="xs" @click="updateVisibility(st)">
-                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-
-                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(st)">
-                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
+                            <Popper hover :content="st.visible ? 'Inhabilitar' : 'Habilitar'">
+                                <CircularBtn
+                                    class="ml-4"
+                                    :class="st.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    size="xs"
+                                    @click="openModalVisibility(st)"
+                                >
+                                    <Icon v-if="st.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                </CircularBtn>
+                            </Popper>
                         </div>
                     </td>
                 </tr>
@@ -84,7 +95,9 @@
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar tipo de arena</PrimaryBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirmModal"
+                        >Inhabilitar tipo de arena</PrimaryBtn
+                    >
                 </div>
             </template>
         </Modal>
@@ -104,6 +117,8 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import Modal from '@/components/modal/General.vue';
 
+    import Popper from 'vue3-popper';
+
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -117,6 +132,7 @@
             FieldSelect,
             CircularBtn,
             Modal,
+            Popper,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');
@@ -127,6 +143,17 @@
             const loading = ref(true);
             const selectedSand = ref(null);
             const showModal = ref(false);
+
+            const tableColumns = [
+                {
+                    text: 'Tipo de Malla',
+                    class: 'w-2/5',
+                },
+                {
+                    text: 'Observaciones',
+                    class: 'w-1/5',
+                },
+            ];
 
             const getSands = async () => {
                 loading.value = true;
@@ -175,12 +202,18 @@
                 sandId.value = -1;
             };
 
-            const openModalVisibility = (sand) => {
+            const openModalVisibility = async (sand) => {
                 selectedSand.value = sand;
-                showModal.value = true;
+
+                if (sand.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await updateVisibility(selectedSand.value);
             };
 
-            const confirm = async () => {
+            const confirmModal = async () => {
                 await updateVisibility(selectedSand.value);
                 showModal.value = false;
             };
@@ -199,10 +232,10 @@
                 sandId,
                 filteredSands,
                 clearFilters,
-                updateVisibility,
                 showModal,
                 openModalVisibility,
-                confirm,
+                confirmModal,
+                tableColumns,
             };
         },
     };

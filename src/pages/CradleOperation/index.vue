@@ -28,7 +28,7 @@
                         title="Cradle"
                         fieldName="cradle"
                         placeholder="Seleccionar cradle"
-                        endpointKey="id"
+                        endpointKey="name"
                         :endpointData="filteredCradles"
                         :data="cradleId"
                         @update:data="cradleId = $event"

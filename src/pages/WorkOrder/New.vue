@@ -24,11 +24,11 @@
             </nav>
             <OrderSection
                 v-if="WO_section === 'orden'"
-                :clientId="clientId"
-                :serviceCompanyId="serviceCompanyId"
+                :client-id="clientId"
+                :service-company-id="serviceCompanyId"
                 :pad="pad"
                 :pits="pits"
-                :isFull="isOrderFull"
+                :is-full="isOrderFull"
                 @update:clientId="clientId = $event"
                 @update:serviceCompanyId="serviceCompanyId = $event"
                 @update:pad="pad = $event"
@@ -37,10 +37,10 @@
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
-                :operativeCradleId="operativeCradleId"
-                :backupCradleId="backupCradleId"
-                :operativeForkliftId="operativeForkliftId"
-                :backupForkliftId="backupForkliftId"
+                :operative-cradle-id="operativeCradleId"
+                :backup-cradle-id="backupCradleId"
+                :operative-forklift-id="operativeForkliftId"
+                :backup-forklift-id="backupForkliftId"
                 :traktors="traktors"
                 :pickups="pickups"
                 :rigmats="rigmats"
@@ -48,7 +48,7 @@
                 :generators="generators"
                 :tower="tower"
                 :cabin="cabin"
-                :isFull="isEquipmentFull"
+                :is-full="isEquipmentFull"
                 @update:operativeCradleId="operativeCradleId = $event"
                 @update:backupCradleId="backupCradleId = $event"
                 @update:operativeForkliftId="operativeForkliftId = $event"
@@ -65,7 +65,7 @@
             <RRHHSection
                 v-else-if="WO_section === 'rrhh'"
                 :crews="crews"
-                :isFull="isRRHHFull"
+                :is-full="isRRHHFull"
                 @update:crews="crews = $event"
                 @update:isFull="isRRHHFull = $event"
             />
@@ -94,7 +94,7 @@
                         Cancelar
                     </NoneBtn>
                     <GhostBtn class="w-1/2 md:w-max" @click="save()">
-                        <BookmarkIcon class="w-6 h-6 md:w-4 h-4" />
+                        <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                         <span> Guardar Provisorio </span>
                     </GhostBtn>
                     <PrimaryBtn v-if="isLoading" disabled> Guardando... </PrimaryBtn>
@@ -109,39 +109,32 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, ComputedRef, watchEffect, watch } from 'vue';
+    import { ref, Ref, computed, ComputedRef, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useToggle, useTitle } from '@vueuse/core';
-    import { BookmarkIcon, TrashIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-    import { PlusIcon } from '@heroicons/vue/solid';
+    import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
     import OrderSection from '@/components/workOrder/Order.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import TimePicker from '@/components/ui/form/TimePicker.vue';
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     const api = import.meta.env.VITE_API_URL || '/api';
     // TIPOS
-    import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/sandflow';
+    import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/sandflow';
 
     export default {
         components: {
             BookmarkIcon,
-            CircularBtn,
             GhostBtn,
             Layout,
             CheckCircleIcon,
-            PlusIcon,
             PrimaryBtn,
-            TrashIcon,
-            TimePicker,
             NoneBtn,
             OrderSection,
             EquipmentSection,
@@ -149,7 +142,6 @@
         },
         setup() {
             // Init
-            const store = useStore();
             const router = useRouter();
             useTitle(`Nueva Orden de Trabajo <> Sandflow`);
             const instance = axios.create({
@@ -174,6 +166,7 @@
                     const savedPit = pits.value[0];
                 }
                 pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
+
                 if (!isDraft.value && pits.value.length === 0) {
                     pits.value.push(savedPit);
                 }
@@ -218,6 +211,7 @@
             };
             const addResource = (crewId: number): void => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+
                 if (!selectedCrew) {
                     return new Error('No crew selected');
                 }
@@ -237,6 +231,7 @@
                     .filter((crew: Crew) => {
                         return !(crew.resources.length <= 0 && crew.timeStart === '' && crew.timeEnd === '');
                     });
+
                 if (!isDraft.value && crews.value.length === 0) {
                     crews.value.push(savedCrew);
                 }
@@ -270,15 +265,18 @@
             };
             const removeEmptyResource = (crewId: number): void => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+
                 if (!isDraft.value) {
                     const saveResourse = selectedCrew.resources[0];
                 }
                 selectedCrew.resources = selectedCrew.resources.filter(
                     (resource: HumanResource) => resource.role !== '' && resource.name !== ''
                 );
+
                 if (!isDraft.value && selectedCrew.resources.length === 0) {
                     selectedCrew.resources.push(saveResourse);
                 }
+
                 return selectedCrew;
             };
             // :: >>> Sections
@@ -329,6 +327,21 @@
                 toggleLoading(true);
                 toggleDraft(draft);
                 console.log('isDraft', isDraft.value);
+                console.log('----------------------------------------');
+                console.groupCollapsed('RRHH');
+                crews.value.map((crew: Crew) => {
+                    console.log(crew.title);
+                    console.log(new Date(crew.timeEnd));
+                    console.log(new Date(crew.timeStart));
+                    crew.resources.map((rrhh: HumanResource) => {
+                        console.log('resource', rrhh);
+                    });
+                    console.log(crew);
+                    console.log('<>--<>--<>--<>--<>--<>--<>--<>--<>--<>');
+                });
+                console.log(crews.value);
+                console.groupEnd();
+                console.log('----------------------------------------');
                 // removeAllEmptys();
                 const newWO = {
                     client: clientId.value,
@@ -355,13 +368,16 @@
                     cabin: cabin.value,
                     draft: isDraft.value,
                 };
+
                 try {
                     const { data: WODone } = useAxios('/workOrder', { method: 'POST', data: newWO }, instance);
                     watch(WODone, (newVal, _) => {
                         console.log('nuevo', newVal);
+
                         if (newVal && newVal.data && newVal.data.id) {
                             const workOrderId = Number(newVal.data.id);
                             console.log('nuevo id', newVal.data.id);
+
                             if (pits.value.length > 0) {
                                 const isPitsFinished = ref([]);
                                 pits.value.forEach((pit: Pit) => {
@@ -375,6 +391,7 @@
                                 });
                                 console.log(isPitsFinished.value);
                             }
+
                             if (traktors.value.length > 0) {
                                 const isTraktorsFinished = ref([]);
                                 traktors.value.forEach((traktor) => {
@@ -390,6 +407,7 @@
                                 });
                                 console.log(isTraktorsFinished.value);
                             }
+
                             if (pickups.value.length > 0) {
                                 const isPickupFinished = ref([]);
                                 pickups.value.forEach((pickup) => {
@@ -399,6 +417,7 @@
                                     isPickupFinished.value.push(data);
                                 });
                             }
+
                             if (crews.value.length > 0) {
                                 const isCrewsFinished = ref([]);
                                 crews.value.forEach((crew) => {

@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4 px-3">
+        <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Clientes</h2>
             <router-link to="/clientes/nuevo">
                 <PrimaryBtn size="sm"
@@ -13,7 +13,7 @@
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
-                class="col-span-full sm:col-span-4"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
                 placeholder="Seleccionar cliente"
                 endpoint="/company"
@@ -27,13 +27,16 @@
         <UiTable class="mt-5">
             <template #header>
                 <tr>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">CUIT</th>
-                    <th scope="col">Contacto</th>
-                    <th scope="col">Teléfono</th>
-                    <th scope="col">Operadora</th>
+                    <th v-for="column in tableColumns" :key="column" scope="col">
+                        <div class="flex justify-center">
+                            {{ column }}
+                            <Icon icon="ArrowUp" class="w-4 h-4" />
+                            <Icon icon="ArrowDown" class="w-4 h-4" />
+                        </div>
+                    </th>
+
                     <th scope="col">
-                        <span class="sr-only">Acciones</span>
+                        <span>Acciones</span>
                     </th>
                 </tr>
             </template>
@@ -58,25 +61,36 @@
                     </td>
 
                     <td class="text-center" :class="client ? null : 'empty'">
-                        <Badge v-if="client.isOperator" text="SI" classes="bg-gray-500 text-white" />
+                        <Badge v-if="client.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
                         <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
                     </td>
 
                     <td>
                         <div class="btn-panel">
                             <router-link :to="`/clientes/${client.id}`">
-                                <CircularBtn size="xs" class="btn__delete bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                </CircularBtn>
+                                <Popper hover content="Editar">
+                                    <CircularBtn size="xs" class="btn__delete bg-blue-500">
+                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
+                                    </CircularBtn>
+                                </Popper>
                             </router-link>
 
-                            <CircularBtn v-if="client.visible" class="bg-red-500" size="xs" @click="update(client)">
-                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-
-                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(client)">
-                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
+                            <Popper hover :content="client.visible ? 'Inhabilitar' : 'Habilitar'">
+                                <CircularBtn
+                                    class="ml-4"
+                                    :class="client.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    size="xs"
+                                    @click="openModalVisibility(client)"
+                                >
+                                    <Icon
+                                        v-if="client.visible"
+                                        icon="EyeOff"
+                                        type="outlined"
+                                        class="w-6 h-6 text-white"
+                                    />
+                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                </CircularBtn>
+                            </Popper>
                         </div>
                     </td>
                 </tr>
@@ -96,7 +110,7 @@
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar cliente </PrimaryBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -113,13 +127,13 @@
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Modal from '@/components/modal/General.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Badge from '@/components/ui/Badge.vue';
+    import Popper from 'vue3-popper';
 
     import { useStore } from 'vuex';
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
-
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import Badge from '@/components/ui/Badge.vue';
 
     export default {
         components: {
@@ -132,6 +146,7 @@
             FieldSelect,
             Badge,
             Modal,
+            Popper,
         },
         setup() {
             useTitle('Clientes <> Sandflow');
@@ -141,6 +156,7 @@
             const clientId = ref(-1);
             const selectedClient = ref(null);
             const showModal = ref(false);
+            const tableColumns = ['Cliente', 'CUIT', 'Representante', 'Teléfono', 'Operadora'];
 
             const headers = {
                 'Content-Type': 'Application/JSON',
@@ -173,12 +189,18 @@
                 loading.value = false;
             };
 
-            const openModalVisibility = (client) => {
+            const openModalVisibility = async (client) => {
                 selectedClient.value = client;
-                showModal.value = true;
+
+                if (client.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await update(selectedClient.value);
             };
 
-            const confirm = async () => {
+            const confirmModal = async () => {
                 await update(selectedClient.value);
                 showModal.value = false;
             };
@@ -209,8 +231,9 @@
                 total,
                 update,
                 openModalVisibility,
-                confirm,
+                confirmModal,
                 showModal,
+                tableColumns,
             };
         },
     };

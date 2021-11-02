@@ -7,9 +7,9 @@
             <form method="POST" action="/" class="p-4 flex-col gap-4">
                 <SandProviderPack
                     :sandProviders="sandProviderIds"
+                    :filteredSandTypes="filteredSandTypes"
                     @update:sandProviders="sandProviderIds = $event"
                     @change="sandProviderHandler"
-                    :filteredSandTypes="filteredSandTypes"
                 />
                 <fieldset class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
                     <h2 class="col-span-full text-xl mt-4">Transporte</h2>
@@ -192,7 +192,7 @@
             Icon,
         },
         setup() {
-            useTitle('Notificacion a Proveedores <> Sandflow');
+            useTitle('Notificación a Proveedores <> Sandflow');
             const router = useRouter();
             const store = useStore();
             const instance = axios.create({

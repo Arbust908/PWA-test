@@ -1,23 +1,23 @@
 <template>
-    <form method="POST" action="/" class="p-4">
+    <form method="POST" action="/" class="p-4" @submit.prevent>
         <FieldGroup>
             <FieldInput
                 class="col-span-full"
-                fieldName="sandMesh"
+                field-name="sandMesh"
                 placeholder="Ingrese tipo de malla"
                 title="Tipo de malla"
                 :data="type"
-                @update:data="type = $event"
-                requireValidation
+                require-validation
                 entity="sand"
+                @update:data="type = $event"
             />
             <FieldTextArea
                 class="col-span-full"
-                fieldName="observations"
+                field-name="observations"
                 placeholder="Observaciones..."
                 title="Observaciones"
                 :rows="5"
-                isOptional
+                is-optional
                 :data="description"
                 @update:data="description = $event"
             />

@@ -16,7 +16,7 @@ import workOrders from '@/store/workOrders';
 const store = createStore({
     state: {
         user: { username: '', role: 0 },
-        workOrders: { all: [] },
+        // workOrders: { all: [] },
     },
     getters: {
         isAdmin(state) {

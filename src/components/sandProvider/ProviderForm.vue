@@ -64,7 +64,7 @@
                     require-validation
                     entity="sandProvider"
                 />
-                <FieldInput class="col-span-7" field-name="mesh" placeholder="Malla" is-readonly />
+                <FieldInput class="col-span-7" field-name="mesh" placeholder="Malla" is-readonly require-validation />
             </div>
             <div class="flex items-center">
                 <FieldSelect
