@@ -2,7 +2,7 @@
     <Layout>
         <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Centro de carga de arena</h2>
-            <router-link to="/proveedores-de-arena/nuevo ">
+            <router-link to="/proveedores-de-arena/nuevo">
                 <PrimaryBtn size="sm"
                     >Crear
                     <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
