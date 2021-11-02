@@ -55,7 +55,7 @@
                     />
                 </div>
             </div>
-            <div v-else class="mb-4 hidden">
+            <div v-else class="mb-6 hidden">
                 <FieldInput
                     class="col-span-7"
                     field-name="mesh"
@@ -64,7 +64,6 @@
                     require-validation
                     entity="sandProvider"
                 />
-                <FieldInput class="col-span-7" field-name="mesh" placeholder="Malla" is-readonly require-validation />
             </div>
             <div class="flex items-center">
                 <FieldSelect
@@ -73,6 +72,8 @@
                     endpoint-key="type"
                     :data="spMesh"
                     :filtered-data="filteredMeshTypes"
+                    require-validation
+                    entity="sandProvider"
                     @is-blured="checkMeshValidation"
                     @change="addMeshType($event.target.value)"
                 />
@@ -152,14 +153,15 @@
             const { meshTypes } = toRefs(props);
 
             const filteredMeshTypes = computed(() => {
-                const alreadySelectedMeshTypes = spMeshTypes.value.map((mesh) => mesh.id);
+                const selectedMeshTypes = spMeshTypes.value.map((mesh) => mesh.id);
 
-                return meshTypes.value.filter((m: any) => !alreadySelectedMeshTypes.includes(m.id));
+                return meshTypes.value.filter((m: any) => !selectedMeshTypes.includes(m.id));
             });
 
             const deleteMeshType = (index: number) => {
                 emit('delete-mesh-type', index);
                 spMesh.value = -1;
+                checkMeshValidation();
             };
 
             const addMeshType = (mesh: Object) => {

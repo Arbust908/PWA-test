@@ -4,35 +4,35 @@
         <FieldInput
             class="col-span-full"
             title="Nombre y Apellido"
-            fieldName="sandRepName"
+            field-name="sandRepName"
             placeholder="Ingresar Nombre y Apellido"
             :data="repName"
-            @update:data="repName = $event"
-            requireValidation
+            require-validation
             entity="sandProvider"
+            @update:data="repName = $event"
         />
         <FieldInput
             class="col-span-full"
             title="Teléfono"
-            fieldName="sandRepPhone"
+            field-name="sandRepPhone"
             placeholder="+11 1234 5678"
             mask="#*"
             :data="repPhone"
-            @update:data="repPhone = $event"
-            requireValidation
-            validationType="numeric"
+            require-validation
+            validation-type="numeric"
             entity="sandProvider"
+            @update:data="repPhone = $event"
         />
         <FieldInput
             class="col-span-full"
             title="Email"
-            fieldName="sandRepEmail"
+            field-name="sandRepEmail"
             placeholder="empresa@mail.com"
             :data="repEmail"
-            @update:data="repEmail = $event"
-            requireValidation
-            validationType="email"
+            require-validation
+            validation-type="email"
             entity="sandProvider"
+            @update:data="repEmail = $event"
         />
     </FieldGroup>
 </template>

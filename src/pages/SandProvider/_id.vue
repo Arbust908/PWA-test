@@ -34,7 +34,6 @@
                 />
             </form>
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                isValidated {{ isValidated }}
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="$router.push('/proveedores-de-arena')"> Cancelar </NoneBtn>
                     <PrimaryBtn
@@ -105,11 +104,19 @@
             let meshType = ref('');
 
             const addMeshType = (newMeshType: string) => {
+                // check duplicates
+                const exists = currentSandProvider.value.meshType.map((mesh) => mesh.id).includes(newMeshType);
+
+                if (exists) {
+                    return;
+                }
+
                 let mesh = meshTypes.value.filter((mesh) => {
                     if (mesh.id == newMeshType) {
                         return mesh;
                     }
                 })[0];
+
                 currentSandProvider.value.meshType.push(mesh);
             };
 
@@ -124,6 +131,14 @@
             });
 
             const save = async () => {
+                //Todo: fix validación para el campo sandProvider.mesh
+
+                if (currentSandProvider.value.meshType.length === 0) {
+                    alert('debe ingresar un tipo de malla');
+
+                    return;
+                }
+
                 loading.value = true;
                 const res = await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value);
 
