@@ -6,12 +6,13 @@
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
                 <SandProviderForm
-                    :spName="sandProvider.name"
-                    :spLegalId="sandProvider.legalId"
-                    :spAddress="sandProvider.address"
-                    :spMeshTypes="sandProvider.meshType"
-                    :spObs="sandProvider.observations"
-                    :spMesh="meshType"
+                    :sp-name="sandProvider.name"
+                    :sp-legal-id="sandProvider.legalId"
+                    :sp-address="sandProvider.address"
+                    :sp-mesh-types="sandProvider.meshType"
+                    :sp-obs="sandProvider.observations"
+                    :sp-mesh="meshType"
+                    :mesh-types="meshTypes"
                     @update:spName="sandProvider.name = $event"
                     @update:spLegalId="sandProvider.legalId = $event"
                     @update:spAddress="sandProvider.address = $event"
@@ -22,9 +23,9 @@
                     @delete-mesh-type="deleteMeshType"
                 />
                 <SandProviderRep
-                    :repName="companyRepresentative.name"
-                    :repPhone="companyRepresentative.phone"
-                    :repEmail="companyRepresentative.email"
+                    :rep-name="companyRepresentative.name"
+                    :rep-phone="companyRepresentative.phone"
+                    :rep-email="companyRepresentative.email"
                     @update:repName="companyRepresentative.name = $event"
                     @update:repPhone="companyRepresentative.phone = $event"
                     @update:repEmail="companyRepresentative.email = $event"
@@ -33,7 +34,11 @@
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="$router.push('/proveedores-de-arena')"> Cancelar </NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                    <PrimaryBtn
+                        :is-loading="loading"
+                        :disabled="!isValidated ? 'yes' : null"
+                        @click="isValidated && save()"
+                    >
                         Finalizar
                     </PrimaryBtn>
                 </section>
@@ -42,14 +47,14 @@
         <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
             <template #body>
                 <p>{{ errorMessage }}</p>
-                <button @click.prevent="toggleNotificationModal" class="closeButton">Cerrar</button>
+                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
             </template>
         </Modal>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, ComputedRef, onMounted, watchEffect } from 'vue';
+    import { ref, Ref, onMounted, watchEffect } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
@@ -81,9 +86,7 @@
             useTitle(`Nuevo Centro de Carga de Arena <> Sandflow`);
             const store = useStore();
             const router = useRouter();
-            const instance = axios.create({
-                baseURL: apiUrl,
-            });
+
             const meshTypes = ref([]);
 
             const notificationModalvisible = ref(false);
@@ -92,6 +95,7 @@
 
             const isNewRep: Ref<boolean> = ref(false);
             const toggleRepStatus = useToggle(isNewRep);
+            const loading = ref(false);
 
             const companyRepresentative: CompanyRepresentative = ref({
                 companyRepresentativeName: '',
@@ -111,9 +115,19 @@
             let meshType = ref('');
 
             const addMeshType = (newMeshType: string) => {
+                // check duplicates
+                const exists = sandProvider.value.meshType.map((mesh) => mesh.id).includes(newMeshType);
+
+                if (exists) {
+                    return;
+                }
+
                 let mesh = meshTypes.value.filter((mesh) => {
-                    if (mesh.id == newMeshType) return mesh;
+                    if (mesh.id == newMeshType) {
+                        return mesh;
+                    }
                 })[0];
+
                 sandProvider.value.meshType.push(mesh);
             };
 
@@ -128,14 +142,21 @@
             });
 
             const save = async () => {
+                loading.value = true;
                 sandProvider.value.companyRepresentative = companyRepresentative.value;
-                await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value).then((res) => {
-                    if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
-                    }
-                    if (res.type == 'success') return { res };
-                });
+
+                const res = await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value);
+
+                loading.value = false;
+
+                if (res.type === 'failed') {
+                    errorMessage.value = res.message;
+                    toggleNotificationModal();
+                } else if (res.type == 'success') {
+                    router.push('/proveedores-de-arena');
+
+                    return { res };
+                }
             };
 
             onMounted(async () => {
@@ -162,6 +183,8 @@
                 notificationModalvisible,
                 toggleNotificationModal,
                 errorMessage,
+                meshTypes,
+                loading,
             };
         },
     };

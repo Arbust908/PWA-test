@@ -8,12 +8,13 @@
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
                 <SandProviderForm
-                    :spName="currentSandProvider.name"
-                    :spLegalId="currentSandProvider.legalId"
-                    :spAddress="currentSandProvider.address"
-                    :spMeshTypes="currentSandProvider.meshType"
-                    :spObs="currentSandProvider.observations"
-                    :spMesh="meshType"
+                    :sp-name="currentSandProvider.name"
+                    :sp-legal-id="currentSandProvider.legalId"
+                    :sp-address="currentSandProvider.address"
+                    :sp-mesh-types="currentSandProvider.meshType"
+                    :sp-obs="currentSandProvider.observations"
+                    :sp-mesh="meshType"
+                    :mesh-types="meshTypes"
                     @update:spName="currentSandProvider.name = $event"
                     @update:spLegalId="currentSandProvider.legalId = $event"
                     @update:spAddress="currentSandProvider.address = $event"
@@ -24,18 +25,23 @@
                     @delete-mesh-type="deleteMeshType"
                 />
                 <SandProviderRep
-                    :repName="companyRepresentative.name"
-                    :repPhone="companyRepresentative.phone"
-                    :repEmail="companyRepresentative.email"
+                    :rep-name="companyRepresentative.name"
+                    :rep-phone="companyRepresentative.phone"
+                    :rep-email="companyRepresentative.email"
                     @update:repName="companyRepresentative.name = $event"
                     @update:repPhone="companyRepresentative.phone = $event"
                     @update:repEmail="companyRepresentative.email = $event"
                 />
             </form>
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
+                isValidated {{ isValidated }}
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="$router.push('/proveedores-de-arena')"> Cancelar </NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                    <PrimaryBtn
+                        :is-loading="loading"
+                        :disabled="!isValidated ? 'yes' : null"
+                        @click="isValidated && save()"
+                    >
                         Finalizar
                     </PrimaryBtn>
                 </section>
@@ -44,7 +50,7 @@
         <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
             <template #body>
                 <p>{{ errorMessage }}</p>
-                <button @click.prevent="toggleNotificationModal" class="closeButton">Cerrar</button>
+                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
             </template>
         </Modal>
     </Layout>
@@ -55,7 +61,6 @@
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
     import { useTitle } from '@vueuse/core';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -69,14 +74,12 @@
     // TIPOS
     import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
     import axios from 'axios';
-    import indexVue from './index.vue';
 
     export default {
         components: {
             Layout,
             NoneBtn,
             PrimaryBtn,
-            Icon,
             SandProviderForm,
             SandProviderRep,
             Modal,
@@ -87,7 +90,7 @@
             const router = useRouter();
             const route = useRoute();
             const id = ref(0);
-            useTitle(`Centro de Carga de Arena ${id} <> Sandflow`);
+            useTitle(`Centro de Carga de Arena ${id.value} <> Sandflow`);
             const notificationModalvisible = ref(false);
             const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
             const errorMessage = ref('');
@@ -103,13 +106,15 @@
 
             const addMeshType = (newMeshType: string) => {
                 let mesh = meshTypes.value.filter((mesh) => {
-                    if (mesh.id == newMeshType) return mesh;
+                    if (mesh.id == newMeshType) {
+                        return mesh;
+                    }
                 })[0];
                 currentSandProvider.value.meshType.push(mesh);
             };
 
             const deleteMeshType = (index: Object) => {
-                currentSandProvider.value.meshType.splice(index);
+                currentSandProvider.value.meshType.splice(index, 1);
             };
 
             const isValidated = ref(false);
@@ -119,13 +124,17 @@
             });
 
             const save = async () => {
-                await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value).then((res) => {
-                    if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
-                    }
-                    if (res.type == 'success') return { res };
-                });
+                loading.value = true;
+                const res = await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value);
+
+                loading.value = false;
+
+                if (res.type == 'failed') {
+                    errorMessage.value = res.message;
+                    toggleNotificationModal();
+                } else if (res.type == 'success') {
+                    router.push('/proveedores-de-arena');
+                }
             };
 
             onMounted(async () => {
@@ -164,6 +173,7 @@
                 toggleNotificationModal,
                 errorMessage,
                 meshTypes,
+                loading,
             };
         },
     };
