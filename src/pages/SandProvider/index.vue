@@ -18,7 +18,7 @@
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
                 endpoint-key="name"
-                endpoint="/sandProvider"
+                endpoint="/sandProvider?order=name"
                 :data="sandProviderId"
                 @update:data="sandProviderId = $event"
             />
