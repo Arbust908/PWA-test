@@ -98,11 +98,13 @@
                         dims.floor = Math.max(dims.floor, floor);
                         dims.row = Math.max(dims.row, row);
                         dims.col = Math.max(dims.col, col);
+
                         return dims;
                     },
                     { floor: 0, row: 0, col: 0 }
                 );
                 dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
+
                 return dimensions;
             };
             const deleteDeposit = (id) => {
@@ -114,6 +116,7 @@
                 });
                 loading.value = false;
             };
+
             return {
                 Deposits,
                 formatedDeposit,

@@ -3,21 +3,21 @@
         <FieldGroup>
             <FieldInput
                 class="col-span-full"
-                fieldName="name"
+                field-name="name"
                 placeholder="Nombre de Forklift"
                 title="Nombre"
                 :data="forklift.name"
-                @update:data="forklift.name = $event"
-                requireValidation
+                require-validation
                 entity="forklift"
+                @update:data="forklift.name = $event"
             />
             <FieldTextArea
                 class="col-span-full"
-                fieldName="observations"
+                field-name="observations"
                 placeholder="Observaciones..."
                 title="Observaciones"
                 :rows="5"
-                isOptional
+                is-optional
                 :data="forklift.observations"
                 @update:data="forklift.observations = $event"
             />
