@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref, watch, toRefs, computed } from 'vue';
+    import { defineComponent, ref, toRefs, computed } from 'vue';
     import { Box } from '@/interfaces/sandflow';
 
     export default defineComponent({
@@ -33,12 +33,15 @@
             visibleCategories: {
                 type: Array,
                 required: false,
+                default: () => undefined,
             },
             boxData: {
                 type: Object,
                 required: false,
+                default: ref({}),
             },
         },
+        emits: { 'select-box': null },
         setup(props, { emit }) {
             let { floor, row, col, selectedBox, boxData } = toRefs(props);
 
@@ -88,10 +91,6 @@
             };
 
             return {
-                floor,
-                row,
-                col,
-                selectedBox,
                 category,
                 selectBox,
                 isTheSelected,

@@ -36,7 +36,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref, watch, toRefs, reactive, computed } from 'vue';
+    import { defineComponent, ref, watch, toRefs } from 'vue';
     import { useCssVar } from '@vueuse/core';
     import { Box } from '@/interfaces/sandflow';
     import DepositBox from '@/components/depositDesign/DepositBox.vue';
@@ -70,51 +70,53 @@
             visibleCategories: {
                 type: Array,
                 required: false,
+                default: () => undefined,
             },
         },
+        emits: { 'select-box': null },
         setup(props, { emit }) {
-            const { floor, rows, cols, selectedBox, deposit } = toRefs(props);
+            const { floor, rows, cols, deposit } = toRefs(props);
             const depo = ref(null);
             const cssRows = useCssVar('--rows', depo);
             cssRows.value = '' + rows.value;
-            watch(rows, (newVal, oldVal) => {
+
+            watch(rows, (newVal) => {
                 cssRows.value = `${newVal}`;
             });
+
             const cssCols = useCssVar('--cols', depo);
             cssCols.value = '' + cols.value;
-            watch(cols, (newVal, oldVal) => {
+
+            watch(cols, (newVal) => {
                 cssCols.value = `${newVal}`;
             });
+
             const currentFloor = ref(1);
-            const setFloor = (floor: number) => {
-                currentFloor.value = floor;
+            const setFloor = (floorNum: number) => {
+                currentFloor.value = floorNum;
             };
-            watch(floor, (newVal, _) => {
+
+            watch(floor, (newVal) => {
                 if (newVal < currentFloor.value) {
                     setFloor(newVal);
                 }
             });
+
             const selectBox = (box: Box) => {
                 emit('select-box', box);
             };
 
-            const getBoxData = (row: number, col: number, floor: number) => {
-                return deposit.value[`${floor}|${row}|${col}`];
+            const getBoxData = (row: number, col: number, floorNum: number) => {
+                return deposit.value[`${floorNum}|${row}|${col}`];
             };
 
-            let visibleCategories = ref(props.visibleCategories);
+            ref(props.visibleCategories);
 
             return {
-                deposit,
-                floor,
-                rows,
-                cols,
-                selectedBox,
                 currentFloor,
                 getBoxData,
                 setFloor,
                 selectBox,
-                visibleCategories,
             };
         },
     });

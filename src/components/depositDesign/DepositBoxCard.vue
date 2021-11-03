@@ -49,21 +49,20 @@
             choosedBox: {
                 type: Object,
                 required: false,
+                default: () => {
+                    return {};
+                },
             },
         },
+
         setup(props) {
-            const { floor, row, col, category, choosedBox } = toRefs(props);
+            const { category } = toRefs(props);
             const makeValue = computed(() => {
                 return BoxCategory[category.value];
             });
 
             return {
-                floor,
-                row,
-                col,
-                category,
                 makeValue,
-                choosedBox,
             };
         },
     });
