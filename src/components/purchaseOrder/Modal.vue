@@ -23,9 +23,9 @@
         </template>
         <template #btn>
             <input
-                type="checkbox"
                 id="checkbox"
                 v-model="checked"
+                type="checkbox"
                 class="outline-none appearance-none focus:outline-none"
             />
             <label for="checkbox">Descargar como .pdf</label>
@@ -68,6 +68,7 @@
         setup(props) {
             const getSandType = (sandTypeId: number) => {
                 const sandType = props.po.sands.find((st) => st.id === sandTypeId);
+
                 return sandType ? sandType.type : 'Sin tipo de arena';
             };
             const content = ref(null);

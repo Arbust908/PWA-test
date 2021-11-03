@@ -8,8 +8,8 @@
                 <FieldGroup class="grid grid-cols-12 gap-4 max-w-4xl">
                     <span class="col-span-12 md:col-span-8 grid grid-cols-12 gap-4">
                         <ClientPitCombo
-                            :clientId="Number(clientId)"
-                            :pitId="Number(pitId)"
+                            :client-id="Number(clientId)"
+                            :pit-id="Number(pitId)"
                             @update:clientId="
                                 clientId = Number($event);
                                 cradleId = -1;
@@ -26,10 +26,10 @@
                     <FieldSelect
                         class="cradle-col"
                         title="Cradle"
-                        fieldName="cradle"
+                        field-name="cradle"
                         placeholder="Seleccionar cradle"
-                        endpointKey="name"
-                        :endpointData="filteredCradles"
+                        endpoint-key="name"
+                        :endpoint-data="filteredCradles"
                         :data="cradleId"
                         @update:data="cradleId = $event"
                     />
@@ -46,30 +46,30 @@
             </section>
             <section v-else class="cradle-slots">
                 <div v-for="(slot, index) in cradleSlots" :key="index">
-                    <div class="slot" v-if="slot.boxId">
+                    <div v-if="slot.boxId" class="slot">
                         <span class="station-title">Estación {{ index + 1 }} - {{ slot.boxId }}</span>
                         <div class="cradle-status-wrapper">
                             <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '1')">
                                 <div class="icon-wrapper check" :class="[slot.status == '1' ? 'active' : '']">
-                                    <Icon icon="Check" class="icon" v-if="slot.status == '1'" />
+                                    <Icon v-if="slot.status == '1'" icon="Check" class="icon" />
                                 </div>
                                 En ejecución
                             </span>
                             <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '2')">
                                 <div class="icon-wrapper pause" :class="[slot.status == '2' ? 'active' : '']">
-                                    <Icon icon="Pause" type="outline" class="icon" v-if="slot.status == '2'" />
+                                    <Icon v-if="slot.status == '2'" icon="Pause" type="outline" class="icon" />
                                 </div>
                                 Pausa
                             </span>
                             <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '3')">
                                 <div class="icon-wrapper empty" :class="[slot.status == '3' ? 'active' : '']">
-                                    <Icon icon="Minus" class="icon" v-if="slot.status == '3'" />
+                                    <Icon v-if="slot.status == '3'" icon="Minus" class="icon" />
                                 </div>
                                 Vacía
                             </span>
                             <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '0')">
                                 <div class="icon-wrapper unavailable" :class="[slot.status == '0' ? 'active' : '']">
-                                    <Icon icon="X" class="icon" v-if="slot.status == '0'" />
+                                    <Icon v-if="slot.status == '0'" icon="X" class="icon" />
                                 </div>
                                 No disponible
                             </span>
@@ -90,7 +90,7 @@
                             </span>
                         </div>
                     </div>
-                    <div class="slot without-box" v-else>
+                    <div v-else class="slot without-box">
                         <span class="station-title">Estación {{ index + 1 }} - Sin caja</span>
                     </div>
                     <button class="calibrate">Calibrar E{{ index + 1 }}</button>
@@ -98,16 +98,14 @@
             </section>
         </section>
         <footer class="p-4 space-x-8 flex justify-end items-center">
-            <span class="mr-2 cursor-pointer" @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</span>
+            <NoneBtn @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</NoneBtn>
             <PrimaryBtn type="submit" @click.prevent="completeStageHandle"> Finalizar </PrimaryBtn>
         </footer>
-        <Modal type="off" :open="isModalVisible" @close="toggleModal" class="modal">
+        <Modal type="off" :open="isModalVisible" class="modal" @close="toggleModal">
             <template #body>
                 <Icon icon="check" class="mx-auto mb-4 w-16 h-16 text-green-400" />
                 <p class="mb-4 text-lg text-gray-600">{{ modalMessage }}</p>
-                <button @click.prevent="toggleModal" class="confirm-button mt-4 px-4 py-2 rounded-sm">
-                    {{ modalButtonText }}
-                </button>
+                <PrimaryBtn btn="confirm-button" @click.prevent="toggleModal">{{ modalButtonText }}</PrimaryBtn>
             </template>
         </Modal>
     </Layout>
@@ -119,47 +117,32 @@
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import Counter from '@/components/ui/Counter.vue';
-    import DepositGrid from '@/components/depositDesign/Deposit.vue';
-    import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
+    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import Modal from '@/components/modal/General.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
-    import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
+    import { Company, Pit } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
 
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
         components: {
-            CircularBtn,
-            Counter,
-            GhostBtn,
+            NoneBtn,
             Layout,
             PrimaryBtn,
-            DepositGrid,
-            BoxCard,
             ClientPitCombo,
             FieldGroup,
             FieldSelect,
-            FieldInput,
             Modal,
             Icon,
         },
         setup() {
             useTitle('Operación en cradle <> Sandflow');
-            const router = useRouter();
-            const store = useStore();
-            const instance = axios.create({
-                baseURL: apiUrl,
-            });
 
             const workOrders = ref([]);
             const clients = ref([] as Array<Company>);
@@ -176,7 +159,7 @@
             const selectedCradle = ref({});
             const sandTypes = ref([]);
 
-            const changeCradleSlotStatus = async (slotIndex: Number, newStatus: String) => {
+            const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
                 await axios
                     .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
                     .catch((err) => console.error(err));
@@ -235,14 +218,21 @@
                 workOrders.value.forEach((workOrder) => {
                     workOrder.pits.forEach((pit) => {
                         if (pit.id == pitId.value) {
-                            if (workOrder.operativeCradle !== '-1') cradlesToFilter.push(workOrder.operativeCradle);
-                            if (workOrder.backupCradle !== '-1') cradlesToFilter.push(workOrder.backupCradle);
+                            if (workOrder.operativeCradle !== '-1') {
+                                cradlesToFilter.push(workOrder.operativeCradle);
+                            }
+
+                            if (workOrder.backupCradle !== '-1') {
+                                cradlesToFilter.push(workOrder.backupCradle);
+                            }
                         }
                     });
                 });
 
                 filteredCradles.value = cradles.value.filter((cradle) => {
-                    if (cradlesToFilter.includes(cradle.id.toString())) return cradle;
+                    if (cradlesToFilter.includes(cradle.id.toString())) {
+                        return cradle;
+                    }
                 });
             };
 
@@ -255,11 +245,14 @@
                     cradleSlots.value.forEach((slot) => {
                         const { sandTypeId } = slot;
                         let sandType = sandTypes.value.filter((sandType) => {
-                            if (sandType.id == sandTypeId) return sandType;
+                            if (sandType.id == sandTypeId) {
+                                return sandType;
+                            }
                         })[0].type;
                         slot.sandType = sandType;
                     });
                 }
+
                 if (cradles.value.length > 0 && clientId.value >= 0 && pitId.value >= 0) {
                     await getFilteredCradles();
                 }

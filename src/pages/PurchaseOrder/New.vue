@@ -173,21 +173,6 @@
             </footer>
         </section>
         <OrderModal v-if="showModal" :show-modal="showModal" :po="po" @close="showModal = false" @confirm="save()" />
-        <!-- <Modal
-      type="off"
-      :open="confirmModal"
-      @close="confirmModal = false"
-      class="modal"
-    >
-      <template #body>
-        <Icon icon="check" class="mx-auto mb-4 w-16 h-16 text-green-400" />
-        <p class="mb-4 text-lg text-gray-600">Orden de pedido guardada</p>
-        <p>La Orden de pedido se guardo con exito</p>
-        <PrimaryBtn @click.prevent="confirmModal = false">
-          Crear Nueva
-        </PrimaryBtn>
-      </template>
-    </Modal> -->
     </Layout>
 </template>
 
