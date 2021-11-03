@@ -65,13 +65,7 @@ export default {
 
             let response = await dispatch(method, payload);
 
-            if (!getters.getInternetConnection) {
-                return (response.err = 'Sin internet');
-            }
-
-            let resp = await dispatch(method, payload);
-
-            return resp;
+            return response;
         },
         setSandProviders({ commit }, sandProviders) {
             commit('SET_SANDPROVIDERS', sandProviders);

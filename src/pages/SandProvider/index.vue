@@ -67,28 +67,29 @@
                     <td class="text-center">
                         <div class="btn-panel">
                             <router-link :to="`/proveedores-de-arena/${sandProvider.id}`">
-                                <CircularBtn size="xs" class="bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                </CircularBtn>
+                                <Popper hover content="Editar">
+                                    <CircularBtn size="xs" class="bg-blue-500">
+                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
+                                    </CircularBtn>
+                                </Popper>
                             </router-link>
 
-                            <CircularBtn
-                                v-if="sandProvider.visible"
-                                class="bg-red-500"
-                                size="xs"
-                                @click="updateVisibility(sandProvider)"
-                            >
-                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-
-                            <CircularBtn
-                                v-else
-                                class="bg-blue-500"
-                                size="xs"
-                                @click="openModalVisibility(sandProvider)"
-                            >
-                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
+                            <Popper hover :content="sandProvider.visible ? 'Inhabilitar' : 'Habilitar'">
+                                <CircularBtn
+                                    class="ml-4"
+                                    :class="sandProvider.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    size="xs"
+                                    @click="openModalVisibility(sandProvider)"
+                                >
+                                    <Icon
+                                        v-if="sandProvider.visible"
+                                        icon="EyeOff"
+                                        type="outlined"
+                                        class="w-6 h-6 text-white"
+                                    />
+                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                </CircularBtn>
+                            </Popper>
                         </div>
                     </td>
                 </tr>
@@ -117,7 +118,9 @@
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar centro de carga </PrimaryBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirmModal"
+                        >Inhabilitar centro de carga
+                    </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -138,6 +141,7 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Popper from 'vue3-popper';
 
     export default {
         components: {
@@ -149,6 +153,7 @@
             Modal,
             FieldSelect,
             CircularBtn,
+            Popper,
         },
         setup() {
             useTitle(`Proveedores de Arena <> Sandflow`);
@@ -191,12 +196,18 @@
                 sandProviderId.value = -1;
             };
 
-            const openModalVisibility = (sandProvider) => {
+            const openModalVisibility = async (sandProvider) => {
                 selectedsandProvider.value = sandProvider;
-                showModal.value = true;
+
+                if (sandProvider.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await updateVisibility(selectedsandProvider.value);
             };
 
-            const confirm = async () => {
+            const confirmModal = async () => {
                 await updateVisibility(selectedsandProvider.value);
                 showModal.value = false;
             };
@@ -219,10 +230,9 @@
                 filteredSandProviders,
                 sandProviderId,
                 clearFilters,
-                updateVisibility,
                 showModal,
                 openModalVisibility,
-                confirm,
+                confirmModal,
                 tableColumns,
             };
         },
