@@ -5,23 +5,8 @@
         </header>
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
-                <SandProviderForm
-                    :sp-name="sandProvider.name"
-                    :sp-legal-id="sandProvider.legalId"
-                    :sp-address="sandProvider.address"
-                    :sp-mesh-types="sandProvider.meshType"
-                    :sp-obs="sandProvider.observations"
-                    :sp-mesh="meshType"
-                    :mesh-types="meshTypes"
-                    @update:spName="sandProvider.name = $event"
-                    @update:spLegalId="sandProvider.legalId = $event"
-                    @update:spAddress="sandProvider.address = $event"
-                    @update:spMeshTypes="sandProvider.meshType = $event"
-                    @update:spObs="sandProvider.observations = $event"
-                    @update:spMesh="meshType = $event"
-                    @add-mesh-type="addMeshType"
-                    @delete-mesh-type="deleteMeshType"
-                />
+                <SandProviderForm v-model="sandProvider" />
+
                 <SandProviderRep
                     :rep-name="companyRepresentative.name"
                     :rep-phone="companyRepresentative.phone"
@@ -87,8 +72,6 @@
             const store = useStore();
             const router = useRouter();
 
-            const meshTypes = ref([]);
-
             const notificationModalvisible = ref(false);
             const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
             const errorMessage = ref('');
@@ -114,27 +97,6 @@
 
             let meshType = ref('');
 
-            const addMeshType = (newMeshType: string) => {
-                // check duplicates
-                const exists = sandProvider.value.meshType.map((mesh) => mesh.id).includes(newMeshType);
-
-                if (exists) {
-                    return;
-                }
-
-                let mesh = meshTypes.value.filter((mesh) => {
-                    if (mesh.id == newMeshType) {
-                        return mesh;
-                    }
-                })[0];
-
-                sandProvider.value.meshType.push(mesh);
-            };
-
-            const deleteMeshType = (index: Object) => {
-                sandProvider.value.meshType.splice(index, 1);
-            };
-
             const isValidated = ref(false);
 
             watchEffect(async () => {
@@ -159,17 +121,6 @@
                 }
             };
 
-            onMounted(async () => {
-                await axios.get(`${apiUrl}/sand`).then((res) => {
-                    meshTypes.value = res.data.data.map((sand) => {
-                        return {
-                            id: sand.id,
-                            type: sand.type,
-                        };
-                    });
-                });
-            });
-
             return {
                 isNewRep,
                 toggleRepStatus,
@@ -177,13 +128,10 @@
                 sandProvider,
                 isValidated,
                 save,
-                deleteMeshType,
-                addMeshType,
                 meshType,
                 notificationModalvisible,
                 toggleNotificationModal,
                 errorMessage,
-                meshTypes,
                 loading,
             };
         },

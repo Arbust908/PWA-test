@@ -7,23 +7,8 @@
         </header>
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
-                <SandProviderForm
-                    :sp-name="currentSandProvider.name"
-                    :sp-legal-id="currentSandProvider.legalId"
-                    :sp-address="currentSandProvider.address"
-                    :sp-mesh-types="currentSandProvider.meshType"
-                    :sp-obs="currentSandProvider.observations"
-                    :sp-mesh="meshType"
-                    :mesh-types="meshTypes"
-                    @update:spName="currentSandProvider.name = $event"
-                    @update:spLegalId="currentSandProvider.legalId = $event"
-                    @update:spAddress="currentSandProvider.address = $event"
-                    @update:spMeshTypes="currentSandProvider.meshType = $event"
-                    @update:spObs="currentSandProvider.observations = $event"
-                    @update:spMesh="meshType = $event"
-                    @add-mesh-type="addMeshType"
-                    @delete-mesh-type="deleteMeshType"
-                />
+                <SandProviderForm v-if="currentSandProvider" v-model="currentSandProvider" />
+
                 <SandProviderRep
                     :rep-name="companyRepresentative.name"
                     :rep-phone="companyRepresentative.phone"
@@ -96,33 +81,14 @@
             const meshTypes = ref([]);
             const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-            const currentSandProvider: SandProvider = ref({});
+            const currentSandProvider: SandProvider = ref({
+                meshType: [],
+            });
             const isNewRep: Ref<boolean> = ref(false);
             const toggleRepStatus = useToggle(isNewRep);
             const companyRepresentative: CompanyRepresentative = ref({});
 
             let meshType = ref('');
-
-            const addMeshType = (newMeshType: string) => {
-                // check duplicates
-                const exists = currentSandProvider.value.meshType.map((mesh) => mesh.id).includes(newMeshType);
-
-                if (exists) {
-                    return;
-                }
-
-                let mesh = meshTypes.value.filter((mesh) => {
-                    if (mesh.id == newMeshType) {
-                        return mesh;
-                    }
-                })[0];
-
-                currentSandProvider.value.meshType.push(mesh);
-            };
-
-            const deleteMeshType = (index: Object) => {
-                currentSandProvider.value.meshType.splice(index, 1);
-            };
 
             const isValidated = ref(false);
 
@@ -182,8 +148,6 @@
                 isValidated,
                 save,
                 meshType,
-                addMeshType,
-                deleteMeshType,
                 notificationModalvisible,
                 toggleNotificationModal,
                 errorMessage,
