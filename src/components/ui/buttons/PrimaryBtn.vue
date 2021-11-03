@@ -1,12 +1,17 @@
 <template>
-    <BaseBtn btn="main" :type="type" :size="size" :disabled="disabled">
-        <slot></slot>
-    </BaseBtn>
+    <div>
+        <BaseBtn btn="main" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
+            <slot></slot>
+        </BaseBtn>
+    </div>
 </template>
 
 <script>
     import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
     export default {
+        components: {
+            BaseBtn,
+        },
         props: {
             type: {
                 type: String,
@@ -20,9 +25,10 @@
                 type: String,
                 default: '',
             },
-        },
-        components: {
-            BaseBtn,
+            isLoading: {
+                type: Boolean,
+                default: false,
+            },
         },
     };
 </script>

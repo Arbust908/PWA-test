@@ -2,9 +2,14 @@ export default {
     state: () => ({
         all: [],
     }),
-    getters: {},
+    getters: {
+        getSandPlans: (state) => {
+            return state.all;
+        },
+    },
     mutations: {
         ADD_SANDPLAN(state, payload) {
+            console.log('store', payload);
             state.all.push(payload);
         },
         UPDATE_SANDPLAN(state, payload) {
