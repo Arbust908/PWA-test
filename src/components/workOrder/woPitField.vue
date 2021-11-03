@@ -2,7 +2,7 @@
     <template v-for="(pit, pitI) in pits" :key="pitI">
         <FieldInput
             :class="pits.length > 1 ? 'col-span-10' : 'col-span-12'"
-            fieldName="name"
+            field-name="name"
             placeholder="Nombre del pozo"
             :data="pit.name"
             @update:data="pit.name = $event"
@@ -21,19 +21,19 @@
     import { useVModel } from '@vueuse/core';
 
     export default defineComponent({
-        name: 'woPitField',
+        name: 'WoPitField',
         components: {
             FieldInput,
             Icon,
             CircularBtn,
         },
-        emits: ['removePit'],
         props: {
             pits: {
                 type: Array,
                 required: true,
             },
         },
+        emits: ['removePit'],
         setup(props, { emit }) {
             const pits = useVModel(props, 'pits', emit);
             const lastPitIndex = computed(() => {
@@ -43,6 +43,7 @@
             const removePit = (pitId) => {
                 emit('removePit', pitId);
             };
+
             return {
                 pits,
                 lastPitIndex,

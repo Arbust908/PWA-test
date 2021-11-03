@@ -55,7 +55,6 @@
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
     import { useTitle } from '@vueuse/core';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -69,14 +68,12 @@
     // TIPOS
     import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
     import axios from 'axios';
-    import indexVue from './index.vue';
 
     export default {
         components: {
             Layout,
             NoneBtn,
             PrimaryBtn,
-            Icon,
             SandProviderForm,
             SandProviderRep,
             Modal,
