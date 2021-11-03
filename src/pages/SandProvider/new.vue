@@ -49,12 +49,11 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, ComputedRef, onMounted, watchEffect } from 'vue';
+    import { ref, Ref, onMounted, watchEffect } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import { useToggle } from '@vueuse/core';
@@ -72,7 +71,6 @@
             Layout,
             NoneBtn,
             PrimaryBtn,
-            Icon,
             SandProviderForm,
             SandProviderRep,
             Modal,
@@ -81,9 +79,6 @@
             useTitle(`Nuevo Centro de Carga de Arena <> Sandflow`);
             const store = useStore();
             const router = useRouter();
-            const instance = axios.create({
-                baseURL: apiUrl,
-            });
             const meshTypes = ref([]);
 
             const notificationModalvisible = ref(false);
@@ -119,7 +114,7 @@
                 sandProvider.value.meshType.push(mesh);
             };
 
-            const deleteMeshType = (index: Object) => {
+            const deleteMeshType = (index) => {
                 sandProvider.value.meshType.splice(index, 1);
             };
 
@@ -131,17 +126,13 @@
 
             const save = async () => {
                 sandProvider.value.companyRepresentative = companyRepresentative.value;
-
-                const res = await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value);
-
-                if (res.type === 'failed') {
-                    errorMessage.value = res.message;
-                    toggleNotificationModal();
-                } else if (res.type == 'success') {
-                    router.push('/proveedores-de-arena');
-
-                    return { res };
-                }
+                await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value).then((res) => {
+                    if (res.type == 'failed') {
+                        errorMessage.value = res.message;
+                        toggleNotificationModal();
+                    }
+                    // if (res.type == 'success') return { res };
+                });
             };
 
             onMounted(async () => {

@@ -80,6 +80,7 @@
                         if (res.status === 200) {
                             return res.data;
                         }
+
                         return {};
                     })
                     .finally(() => {

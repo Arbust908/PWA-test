@@ -1,19 +1,19 @@
 <template>
     <tr>
-        <td class="text-gray-500 px-3 text-center py-4 whitespace-nowrap text-lg">{{ stage.stage }} - 40</td>
+        <td class="text-gray-500 px-3 text-center py-4 whitespace-nowrap text-lg">{{ pos }} - 40</td>
         <template v-if="editing === Number(stage[editingKey])">
-            <td class="typeWrap" :id="`sandType${stage.id}`">
+            <td :id="`sandType${stage.id}`" class="typeWrap">
                 <FieldSelect
-                    fieldName="sandType1"
+                    field-name="sandType1"
                     placeholder="Seleccionar"
                     endpoint="/sand"
-                    endpointKey="type"
+                    endpoint-key="type"
                     :data="stage.sandId1"
                     @update:data="stage.sandId1 = $event"
                 />
                 <FieldWithSides
                     class="mt-2"
-                    fieldName="sandQuantity1"
+                    field-name="sandQuantity1"
                     placeholder="0 t"
                     type="number"
                     :post="{ title: '0', value: 't' }"
@@ -23,16 +23,16 @@
             </td>
             <td class="typeWrap">
                 <FieldSelect
-                    fieldName="sandType2"
+                    field-name="sandType2"
                     placeholder="Seleccionar"
                     endpoint="/sand"
-                    endpointKey="type"
+                    endpoint-key="type"
                     :data="stage.sandId2"
                     @update:data="stage.sandId2 = $event"
                 />
                 <FieldWithSides
                     class="mt-2"
-                    fieldName="sandQuantity2"
+                    field-name="sandQuantity2"
                     placeholder="0 t"
                     type="number"
                     :post="{ title: '0', value: 't' }"
@@ -42,16 +42,16 @@
             </td>
             <td class="typeWrap">
                 <FieldSelect
-                    fieldName="sandType3"
+                    field-name="sandType3"
                     placeholder="Seleccionar"
                     endpoint="/sand"
-                    endpointKey="type"
+                    endpoint-key="type"
                     :data="stage.sandId3"
                     @update:data="stage.sandId3 = $event"
                 />
                 <FieldWithSides
                     class="mt-2"
-                    fieldName="sandQuantity3"
+                    field-name="sandQuantity3"
                     placeholder="0 t"
                     type="number"
                     :post="{ title: '0', value: 't' }"
@@ -114,7 +114,7 @@
         <td class="px-3 py-4 whitespace-nowrap text-right text-sm font-medium">
             <div class="flex justify-center gap-x-2">
                 <Popper hover content="Duplicar etapa">
-                    <button @click.prevent="duplicateStage" class="action duplicate" title="Duplicar">
+                    <button class="action duplicate" title="Duplicar" @click.prevent="duplicateStage">
                         <Icon icon="DocumentDuplicate" class="w-6 h-6" />
                         <span class="sr-only">Duplicar</span>
                     </button>
@@ -122,20 +122,20 @@
                 <Popper hover :content="editing !== Number(stage[editingKey]) ? 'Editar etapa' : 'dejar de editar'">
                     <button
                         v-if="editing !== Number(stage[editingKey])"
-                        @click.prevent="editStage"
                         :disabled="stage.status > 0"
                         class="action edit text-gray-600 hover:text-blue-800 p-2"
                         title="Editar"
+                        @click.prevent="editStage"
                     >
                         <Icon icon="PencilAlt" class="w-6 h-6" />
                         <span class="sr-only">Editar</span>
                     </button>
                     <button
                         v-else
-                        @click.prevent="saveStage"
                         :disabled="stage.status > 0"
                         class="action edit text-gray-600 hover:text-blue-800 p-2"
                         title="Guardar"
+                        @click.prevent="saveStage"
                     >
                         <Icon icon="Save" class="w-6 h-6" />
                         <span class="sr-only">Guardar</span>
@@ -143,10 +143,10 @@
                 </Popper>
                 <Popper hover content="Borrar etapa">
                     <button
-                        @click.prevent="deleteStage"
                         :disabled="stage.status > 0 || stage.stage === 1"
                         class="action delete text-gray-600 hover:text-red-800 p-2"
                         title="Borrar"
+                        @click.prevent="deleteStage"
                     >
                         <Icon icon="Trash" class="w-6 h-6" />
                         <span class="sr-only">Borrar</span>
@@ -167,6 +167,13 @@
     import { Sand } from '@/interfaces/sandflow';
 
     export default defineComponent({
+        components: {
+            Icon,
+            Pill,
+            FieldSelect,
+            FieldWithSides,
+            Popper,
+        },
         props: {
             stage: {
                 type: Object,
@@ -191,16 +198,9 @@
                 default: 'id',
             },
         },
-        components: {
-            Icon,
-            Pill,
-            FieldSelect,
-            FieldWithSides,
-            Popper,
-        },
         setup(props, { emit }) {
             const { stage, editing, sands, pos } = toRefs(props);
-            // stage.value.stage = pos.value;
+            stage.value.stage = pos.value;
 
             const totalWheight = computed(() => {
                 return (
@@ -231,6 +231,7 @@
                 if (stage.value.status >= 2) {
                     console.error('Reset status');
                     stage.value.status = 0;
+
                     return;
                 }
                 stage.value.status++;
