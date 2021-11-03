@@ -43,6 +43,8 @@
                         placeholder="Malla"
                         is-readonly
                         :data="mesh.type"
+                        require-validation
+                        entity="sandProvider"
                     />
                     <Icon
                         icon="Trash"
@@ -143,7 +145,9 @@
             };
 
             const addMeshType = (mesh: Object) => {
-                emit('add-mesh-type', mesh);
+                if (mesh) {
+                    emit('add-mesh-type', mesh);
+                }
             };
 
             const wasMeshSelectBlured = ref(false);

@@ -65,13 +65,7 @@ export default {
 
             let response = await dispatch(method, payload);
 
-            if (!getters.getInternetConnection) {
-                return (response.err = 'Sin internet');
-            }
-
-            let resp = await dispatch(method, payload);
-
-            return resp;
+            return response;
         },
         setSandProviders({ commit }, sandProviders) {
             commit('SET_SANDPROVIDERS', sandProviders);
@@ -130,13 +124,15 @@ export default {
                                     sandProvider.id = response.data.data.id;
                                     commit('UPDATE_SANDPROVIDER', sandProvider);
 
-                                    let res = response.data.data;
-                                    res['status'] = 200;
+                                    let result = response.data.data;
+                                    result['status'] = 200;
 
-                                    return res;
+                                    return result;
                                 }
                             })
                             .catch((err) => {
+                                console.log(err);
+
                                 return { status: 'failed' };
                             });
                     }

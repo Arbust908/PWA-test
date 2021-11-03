@@ -19,8 +19,8 @@
                         <FieldSelect
                             class="col-span-12 mt-5 md:col-span-6"
                             field-name="sandProvider"
-                            title="Proveedor"
-                            placeholder="Selecciona proveedor"
+                            title="Centro de Carga de Arena"
+                            placeholder="Seleccionar centro de carga"
                             endpoint="/sandProvider"
                             :data="providerId.id"
                             @update:data="providerId.id = $event"

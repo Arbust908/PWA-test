@@ -432,8 +432,6 @@
             const { saveSandPlan } = useActions(['saveSandPlan']);
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
-                    console.log(stage);
-
                     if (stage.sandId1 === -1) {
                         stage.sandId1 = null;
                     }
@@ -461,14 +459,28 @@
                     if (apiData && apiData.data) {
                         const sandPlanId = apiData.data.id;
                         currentSandPlan.id = sandPlanId;
-                        currentSandPlan.stages.map((stage) => {
-                            const { id, ...sandStage } = stage;
-                            sandStage.sandPlanId = sandPlanId;
-                            sandStage.action = 'create';
-                            console.log('Sand Stage', sandStage);
-                            const { data } = useAxios('/sandStage', { method: 'POST', data: sandStage }, instance);
+
+                        currentSandPlan.stages.forEach((stage) => {
+                            console.log(stage);
+                            const { data } = useAxios(
+                                '/sandStage',
+                                {
+                                    method: 'POST',
+                                    data: {
+                                        sandPlanId: sandPlanId,
+                                        stage: stage.stage,
+                                        sandId1: stage.sandId1,
+                                        sandId2: stage.sandId2,
+                                        sandId3: stage.sandId3,
+                                        quantity1: stage.quantity1,
+                                        quantity2: stage.quantity2,
+                                        quantity3: stage.quantity3,
+                                    },
+                                },
+                                instance
+                            );
                         });
-                        console.log(currentSandPlan);
+
                         saveSandPlan({ ...currentSandPlan });
                         router.push('/planificacion-de-arena');
                     }

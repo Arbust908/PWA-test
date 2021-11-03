@@ -269,7 +269,7 @@
             });
             const defaultStage = {
                 innerId: 0,
-                stage: 1,
+                stage: null,
                 sandId1: -1,
                 quantity1: null,
                 sandId2: -1,
@@ -303,12 +303,19 @@
                         currentSandPlan.companyId = Number(sp.companyId);
                         currentSandPlan.pitId = Number(sp.pitId);
                         currentSandPlan.stagesAmount = sp.stagesAmount;
+
                         const formatedStages = sp.stages.map((stage) => {
                             return { ...stage, innerId: Number(stage.id) };
                         });
+
+                        formatedStages.sort((a, b) => {
+                            return a.stage - b.stage;
+                        });
+
+                        console.log('stages', sp.stages);
                         currentSandPlan.stages = formatedStages;
-                        buckupStages.value = formatedStages;
-                        // currentSandPlan.stages[0].id = Number(sp.stages[0].id);
+                        console.log('formatedStages', formatedStages);
+                        buckupStages.value = sp.stages;
                     }
                 });
             } else {
@@ -328,7 +335,7 @@
             };
 
             const inProgressStages = computed(() => {
-                return currentSandPlan.stages.filter((stage) => stage.status < 2) || [];
+                return currentSandPlan.stages;
             });
             const finishedStages = computed(() => {
                 return currentSandPlan.stages.filter((stage) => stage.status >= 2) || [];
@@ -346,7 +353,8 @@
             };
             const duplicateStage = (stage) => {
                 const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
-                const lastStageId = { innerId: Number(lastStage.innerId) + 1 || 0 };
+                // SOLUCION TEMPORAL PARA DUPLICADO DE INNER ID
+                const lastStageId = { innerId: Number(lastStage.innerId) + 100000 || 0 };
                 const lastStageStage = { stage: lastStage.stage + 1 };
                 const newStatus = { status: 0 };
                 console.log(lastStage, lastStageId, lastStageStage, newStatus);
@@ -546,7 +554,7 @@
                 save,
                 isFull,
                 addStage,
-                upgrade,
+                // upgrade,
                 windowWidth,
             };
         },

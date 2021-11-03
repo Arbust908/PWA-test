@@ -127,36 +127,11 @@
                 Guardar
             </PrimaryBtn>
         </footer>
-        <!-- <button
-      class="
-        tab
-        fixed
-        right-0
-        top-[40%]
-        rounded-l-lg
-        bg-second-0
-        border
-        w-10
-        h-56
-        flex
-        justify-center
-        items-center
-        text-second-600
-        transition-all
-        duration-150
-        ease-in-out
-        hover:w-14
-      "
-    >
-      <div class="">
-        <SideTabName />
-      </div>
-    </button> -->
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, watchEffect, watch } from 'vue';
+    import { ref, Ref, reactive, computed, watchEffect, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';

@@ -24,7 +24,7 @@
                 <FieldGroup v-for="(people, peopleI) in crew.resources" :key="people.id" class="pt-2 pb-3 relative">
                     <!-- TODO: Pasaria a FiledSelect si tuvieramos ABM de roles y Usuarios -->
                     <FieldInput
-                        class="col-span-full"
+                        class="col-span-full mr-5"
                         :title="peopleI === 0 ? 'Rol' : null"
                         :field-name="`crew-${crew.id}-${people.id}-role`"
                         placeholder="Rol"
@@ -34,14 +34,14 @@
                     <span
                         v-if="notOnly(crew.resources)"
                         :class="peopleI === 0 ? 'md:top-10' : 'md:top-6'"
-                        class="md:absolute md:-right-12"
+                        class="md:absolute md:-right-12 ml-4"
                     >
                         <CircularBtn class="btn__delete" size="sm" @click="removeResource(crew.id, people.id)">
-                            <Icon icon="Trash" class="w-5 h-5" />
+                            <Icon icon="Trash" class="w-6 h-6" />
                         </CircularBtn>
                     </span>
                     <FieldInput
-                        class="col-span-full"
+                        class="col-span-full mr-5"
                         :field-name="`crew-${crew.id}-${people.id}-name`"
                         placeholder="Empleado"
                         :data="people.name"
@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed } from 'vue';
+    import { computed } from 'vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import TimePicker from '@/components/ui/form/TimePicker.vue';
@@ -111,25 +111,11 @@
                     id: lastId,
                 });
             };
-            const addCrew = (): void => {
-                const lastId = crews.value.length + 1;
-                const crewLetter = String.fromCharCode(lastId + 64);
-                crews.value.push({
-                    id: lastId,
-                    start_time: '',
-                    end_time: '',
-                    title: `Crew ${crewLetter}`,
-                    resources: [],
-                });
-                addResource(lastId);
-            };
             const removeCrew = (crewId: number): void => {
                 crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
             };
 
-            if (crews?.value?.length === 0) {
-                addCrew();
-            } else if (crews?.value?.some((crew: Crew) => crew.resources.length === 0)) {
+            if (crews?.value?.some((crew: Crew) => crew.resources.length === 0)) {
                 crews.value.forEach((crew: Crew) => {
                     if (crew.resources.length === 0) {
                         addResource(crew.id);
@@ -138,16 +124,10 @@
             }
 
             const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
-                // get last crew
                 if (crewList.length === 0) {
                     return false;
                 }
-                console.log(crewList);
                 const lastCrew = crewList[crewList.length - 1];
-                console.log(crewList[crewList.length - 1]);
-                console.log(lastCrew);
-                console.log(crewInnerId);
-                console.log(crewInnerId !== lastCrew.id ? 'not last' : 'last');
 
                 return crewInnerId !== lastCrew.id;
             };
@@ -161,14 +141,13 @@
             });
 
             return {
-                isRRHHFull,
-                removeResource,
                 addResource,
                 crews,
-                removeCrew,
-                addCrew,
+                isRRHHFull,
                 notLast,
                 notOnly,
+                removeCrew,
+                removeResource,
             };
         },
     };

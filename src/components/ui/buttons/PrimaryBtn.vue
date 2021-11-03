@@ -1,7 +1,9 @@
 <template>
-    <BaseBtn btn="main" :type="type" :size="size" :disabled="disabled">
-        <slot></slot>
-    </BaseBtn>
+    <div>
+        <BaseBtn btn="main" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
+            <slot></slot>
+        </BaseBtn>
+    </div>
 </template>
 
 <script>
@@ -22,6 +24,10 @@
             disabled: {
                 type: String,
                 default: '',
+            },
+            isLoading: {
+                type: Boolean,
+                default: false,
             },
         },
     };

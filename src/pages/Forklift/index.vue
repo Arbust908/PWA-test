@@ -26,7 +26,7 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5">
+        <UiTable class="mt-5 lg:w-7/12 min-w-min">
             <template #header>
                 <tr>
                     <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
@@ -51,7 +51,7 @@
                     <td :class="f.name ? null : 'empty'">
                         {{ f.name || 'Sin nombre' }}
                     </td>
-                    <td :class="f.observations ? null : 'empty'">
+                    <td>
                         <p class="w-52 truncate">
                             {{ f.observations || 'Sin observaciones' }}
                         </p>
@@ -59,18 +59,24 @@
                     <td>
                         <div class="btn-panel">
                             <router-link :to="`/forklift/${f.id}`">
-                                <CircularBtn size="xs" class="bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                </CircularBtn>
+                                <Popper hover content="Editar">
+                                    <CircularBtn size="xs" class="bg-blue-500">
+                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
+                                    </CircularBtn>
+                                </Popper>
                             </router-link>
 
-                            <CircularBtn v-if="f.visible" class="bg-red-500" size="xs" @click="updateVisibility(f)">
-                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-
-                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(f)">
-                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
+                            <Popper hover :content="f.visible ? 'Inhabilitar' : 'Habilitar'">
+                                <CircularBtn
+                                    class="ml-4"
+                                    :class="f.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    size="xs"
+                                    @click="openModalVisibility(f)"
+                                >
+                                    <Icon v-if="f.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                </CircularBtn>
+                            </Popper>
                         </div>
                     </td>
                 </tr>
@@ -98,7 +104,7 @@
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar forklift </PrimaryBtn>
+                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirmModal">Inhabilitar forklift </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -117,9 +123,9 @@
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useRouter } from 'vue-router';
     import Modal from '@/components/modal/General.vue';
-
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Popper from 'vue3-popper';
 
     export default {
         components: {
@@ -131,6 +137,7 @@
             GhostBtn,
             CircularBtn,
             FieldSelect,
+            Popper,
         },
         setup() {
             useTitle('Forklifts <> Sandflow');
@@ -168,12 +175,18 @@
                 forkliftId.value = -1;
             };
 
-            const openModalVisibility = (forklift) => {
+            const openModalVisibility = async (forklift) => {
                 selectedForklift.value = forklift;
-                showModal.value = true;
+
+                if (forklift.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await updateVisibility(selectedForklift.value);
             };
 
-            const confirm = async () => {
+            const confirmModal = async () => {
                 await updateVisibility(selectedForklift.value);
                 showModal.value = false;
             };
@@ -217,8 +230,7 @@
                 clearFilters,
                 showModal,
                 openModalVisibility,
-                updateVisibility,
-                confirm,
+                confirmModal,
                 tableColumns,
             };
         },
