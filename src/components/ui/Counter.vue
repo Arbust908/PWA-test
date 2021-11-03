@@ -1,64 +1,64 @@
 <template>
-  <div>
-    <button @click.prevent="dec()" :disabled="count <= 0">
-      <MinusIcon class="icon" />
-    </button>
-    <input type="text" v-model.number="count" />
-    <button @click.prevent="inc()">
-      <PlusIcon class="icon" />
-    </button>
-  </div>
+    <div>
+        <button :disabled="count <= 0" @click.prevent="dec()">
+            <MinusIcon class="icon" />
+        </button>
+        <input v-model.number="count" type="text" />
+        <button @click.prevent="inc()">
+            <PlusIcon class="icon" />
+        </button>
+    </div>
 </template>
 
 <script>
-  import { defineComponent, watch } from 'vue';
-  import { PlusIcon, MinusIcon } from '@heroicons/vue/solid';
-  import { useVModel, useCounter } from '@vueuse/core';
-  export default defineComponent({
-    name: 'Counter',
-    components: {
-      PlusIcon,
-      MinusIcon,
-    },
-    props: {
-      amount: {
-        type: Number,
-        required: true,
-      },
-    },
-    setup(props, { emit }) {
-      const amount = useVModel(props, 'amount', emit);
-      const { count, inc, dec } = useCounter(amount);
-      watch(count, (data, oldData) => {
-        amount.value = data;
-      });
+    import { defineComponent, watch } from 'vue';
+    import { PlusIcon, MinusIcon } from '@heroicons/vue/solid';
+    import { useVModel, useCounter } from '@vueuse/core';
+    export default defineComponent({
+        name: 'Counter',
+        components: {
+            PlusIcon,
+            MinusIcon,
+        },
+        props: {
+            amount: {
+                type: Number,
+                required: true,
+            },
+        },
+        setup(props, { emit }) {
+            const amount = useVModel(props, 'amount', emit);
+            const { count, inc, dec } = useCounter(amount);
+            watch(count, (data, oldData) => {
+                amount.value = data;
+            });
 
-      return {
-        count,
-        inc,
-        dec,
-      };
-    },
-  });
+            return {
+                count,
+                inc,
+                dec,
+            };
+        },
+    });
 </script>
 
 <style lang="scss" scoped>
-  div {
-    @apply flex;
-  }
-  button {
-    @apply bg-second-200 text-second-500 p-2 rounded-full w-8 h-8;
-    &:disabled {
-      @apply opacity-50 cursor-not-allowed;
+    div {
+        @apply flex;
     }
-    &:not(:disabled):hover {
-      @apply shadow bg-second-300;
+    button {
+        @apply bg-second-200 text-second-500 p-2 rounded-full w-8 h-8;
+        &:disabled {
+            @apply opacity-50 cursor-not-allowed;
+        }
+        &:not(:disabled):hover {
+            @apply shadow bg-second-300;
+        }
     }
-  }
-  input {
-    @apply w-8 bg-transparent p-0 border-none text-center rounded;
-  }
-  .icon {
-    @apply w-full;
-  }
+    input {
+        @apply w-8 bg-transparent p-0 border-none text-center rounded;
+    }
+    .icon {
+        @apply w-full;
+    }
 </style>

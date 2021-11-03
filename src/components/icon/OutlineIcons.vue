@@ -1,20 +1,20 @@
 <template>
-  <component v-if="isLoaded" :is="heroIcons[name]" />
+    <component :is="heroIcons[name]" v-if="isLoaded" />
 </template>
 <script>
-  import * as heroIcons from '@heroicons/vue/outline';
-  export default {
-    data() {
-      return {
-        isLoaded: false,
-        heroIcons: heroIcons,
-      };
-    },
-    props: {
-      name: String,
-    },
-    mounted() {
-      this.isLoaded = true;
-    },
-  };
+    import * as heroIcons from '@heroicons/vue/outline';
+    export default {
+        props: {
+            name: String,
+        },
+        data() {
+            return {
+                isLoaded: false,
+                heroIcons: heroIcons,
+            };
+        },
+        mounted() {
+            this.isLoaded = true;
+        },
+    };
 </script>

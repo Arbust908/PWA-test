@@ -1,21 +1,21 @@
 <template>
     <label :for="fieldName">
-        <FieldTitle v-if="title" :title="title" :isOptional="isOptional" />
+        <FieldTitle v-if="title" :title="title" :is-optional="isOptional" />
         <input
             :id="fieldName"
+            v-model="value"
+            v-maska="mask"
             class="input"
             :type="type"
             :name="fieldName"
             :placeholder="placeholder"
             :readonly="isReadonly"
-            v-model="value"
-            v-maska="mask"
             @blur="checkValidation(false)"
         />
         <InvalidInputLabel
             v-if="v$.$invalid && wasInputEntered"
-            :validationType="validationType"
-            :charAmount="charAmount"
+            :validation-type="validationType"
+            :char-amount="charAmount"
         />
     </label>
 </template>
@@ -32,8 +32,8 @@
     import { useRoute } from 'vue-router';
 
     export default defineComponent({
-        directives: { maska },
         name: 'FieldInput',
+        directives: { maska },
         components: {
             FieldTitle,
             InvalidInputLabel,
@@ -95,7 +95,8 @@
         setup(props, { emit }) {
             const value = useVModel(props, 'data', emit);
             const store = useStore();
-            const { requireValidation, fieldName, entity, silenced } = toRefs(props);
+            const { fieldName, entity, silenced } = toRefs(props);
+            const requireValidation = ref(props.requireValidation) || false;
             const wasInputEntered = ref(false);
             const validationType = ref(props.validationType || 'empty');
             const charAmount = ref(props.charAmount || null);
@@ -108,9 +109,11 @@
                 if (charsRule.min && charsRule.max) {
                     return { minLength: minLength(charsRule.min), maxLength: maxLength(charsRule.max), required };
                 }
+
                 if (charsRule.min && !charsRule.max) {
                     return { minLength: minLength(charsRule.min), required };
                 }
+
                 if (!charsRule.min && charsRule.max) {
                     return { maxLength: maxLength(charsRule.max), required };
                 }
@@ -122,16 +125,19 @@
                         [`${fieldName.value}`]: { required },
                     };
                 }
+
                 if (validationType.value == 'numeric') {
                     validationRules.value = {
                         [`${fieldName.value}`]: { required, numeric },
                     };
                 }
+
                 if (validationType.value == 'email') {
                     validationRules.value = {
                         [`${fieldName.value}`]: { required, email },
                     };
                 }
+
                 if (validationType.value == 'extension') {
                     validationRules.value = {
                         [`${fieldName.value}`]: getCharsAmountRule(charAmount.value),
@@ -143,13 +149,20 @@
             const route = useRoute();
 
             const updateValidationState = (fieldName, validationsPassed, entity) => {
-                if (silenced.value) return;
+                if (silenced.value) {
+                    return;
+                }
                 store.dispatch(`${entity}UpdateValidation`, { fieldName, validationsPassed, entity });
             };
 
             const checkValidation = (isTheFirstUse) => {
-                if (!requireValidation.value) return;
-                if (!isTheFirstUse && !wasInputEntered.value) wasInputEntered.value = true;
+                if (!requireValidation.value) {
+                    return;
+                }
+
+                if (!isTheFirstUse && !wasInputEntered.value) {
+                    wasInputEntered.value = true;
+                }
                 updateValidationState(fieldName.value, !v$.value.$invalid, entity.value);
             };
 
@@ -157,6 +170,7 @@
                 if (oldSilencedVal == true && newSilencedVal == false) {
                     updateValidationState(fieldName.value, !v$.value.$invalid, entity.value);
                 }
+
                 if (oldSilencedVal == false && newSilencedVal == true) {
                     wasInputEntered.value = false;
                     store.dispatch(`${entity.value}DeleteValidation`, fieldName.value);

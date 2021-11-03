@@ -119,6 +119,7 @@
                         }
                     });
                 });
+
                 return total;
             };
             const deleteSP = (id) => {
@@ -137,7 +138,6 @@
                 sumQty,
             };
         },
-        
     };
 </script>
 
