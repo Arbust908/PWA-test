@@ -56,14 +56,6 @@
                 </div>
             </div>
             <div v-else class="mb-4 hidden">
-                <FieldInput
-                    class="col-span-7"
-                    field-name="mesh"
-                    placeholder="Malla"
-                    is-readonly
-                    require-validation
-                    entity="sandProvider"
-                />
                 <FieldInput class="col-span-7" field-name="mesh" placeholder="Malla" is-readonly require-validation />
             </div>
             <div class="flex items-center">
@@ -73,6 +65,7 @@
                     endpoint="/sand"
                     endpoint-key="type"
                     :data="spMesh"
+                    require-validation
                     @update:data="spMesh = $event"
                     @is-blured="checkMeshValidation"
                 />
@@ -126,7 +119,6 @@
             },
             spLegalId: {
                 type: Number,
-                default: 12345678901,
             },
             spAddress: {
                 type: String,

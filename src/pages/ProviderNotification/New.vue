@@ -6,8 +6,8 @@
         <section class="bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-4 flex-col gap-4">
                 <SandProviderPack
-                    :sandProviders="sandProviderIds"
-                    :filteredSandTypes="filteredSandTypes"
+                    :sand-providers="sandProviderIds"
+                    :filtered-sand-types="filteredSandTypes"
                     @update:sandProviders="sandProviderIds = $event"
                     @change="sandProviderHandler"
                 />
@@ -18,7 +18,7 @@
                         <FieldSelect
                             :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full sm:col-span-5'"
                             title="Proveedor"
-                            :fieldName="`transportProvider${tO.id}`"
+                            :field-name="`transportProvider${tO.id}`"
                             placeholder="Seleccionar"
                             endpoint="/transportProvider"
                             :data="tO.transportProviderId"
@@ -30,7 +30,7 @@
                         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
                             <FieldInput
                                 class="col-span-full sm:col-span-3"
-                                :fieldName="`transportAmount${tO.id}`"
+                                :field-name="`transportAmount${tO.id}`"
                                 placeholder="Camiones"
                                 title="Camiones"
                                 :data="tO.amount"
@@ -38,7 +38,7 @@
                             />
                             <FieldInput
                                 class="col-span-full sm:col-span-5"
-                                :fieldName="`transportObservations${tO.id}`"
+                                :field-name="`transportObservations${tO.id}`"
                                 placeholder="Observaciones"
                                 title="Observaciones"
                                 :data="tO.observation"
@@ -64,7 +64,7 @@
         </section>
         <Modal type="off" :open="showModal" @close="togglemodal">
             <template #body>
-                <div class="text-left" v-if="!isNotificationConfirmed">
+                <div v-if="!isNotificationConfirmed" class="text-left">
                     <p class="text-base text-black font-bold">Notificación a proveedores</p>
                     <div
                         v-if="modalData.sandProvider"
@@ -104,8 +104,8 @@
                     </div>
                 </div>
                 <div
-                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
                     v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
+                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
                 >
                     <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
                     <span class="text-center text-base border-none text-gray-900"
@@ -113,8 +113,8 @@
                     >
                 </div>
                 <div
-                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
                     v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess"
+                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
                 >
                     <Icon icon="exclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
                     <span class="text-center text-base border-none text-gray-900"
@@ -123,13 +123,13 @@
                 </div>
             </template>
             <template #btn>
-                <div class="flex gap-4 justify-end" v-if="!isNotificationConfirmed">
+                <div v-if="!isNotificationConfirmed" class="flex gap-4 justify-end">
                     <button type="button" class="modal-close-button" @click.prevent="toggleModal">Volver</button>
                     <button type="button" class="modal-create-new-button" @click.prevent="confirmNotification">
                         Confirmar
                     </button>
                 </div>
-                <div class="flex justify-center gap-4" v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess">
+                <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
                     <router-link to="/" class="modal-close-button w-1/3">
                         <button type="button">Cerrar</button>
                     </router-link>
@@ -137,7 +137,7 @@
                         Crear nueva
                     </button>
                 </div>
-                <div class="flex gap-4" v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess">
+                <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
                     <button type="button" class="modal-close-button" @click.prevent="toggleModal">Volver</button>
                 </div>
             </template>
@@ -212,6 +212,7 @@
                 const sp = sandProviders.value.find((sp) => {
                     return sp.id == spId;
                 });
+
                 return sp ? sp.name : '';
             };
 
@@ -227,6 +228,7 @@
                 const st = sandTypes.value.find((st) => {
                     return st.id == stId;
                 });
+
                 return st ? st.type : '';
             };
 
@@ -276,6 +278,7 @@
             const removeTransportProvider = (tpId: number) => {
                 transportOrder.value = transportOrder.value.filter((tp) => tp.id !== tpId);
             };
+
             if (transportOrder.value.length === 0) {
                 addTransportProvider();
             }
@@ -307,6 +310,7 @@
                         sandOrders: sandProviderIds.value[0].SandOrders,
                     };
                 }
+
                 if (transportOrder.value[0].transportProviderId > 0 && sandProviderIds.value[0].id < 0) {
                     pN.value = {
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
@@ -314,6 +318,7 @@
                         observations: transportOrder.value[0].observation,
                     };
                 }
+
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId > 0) {
                     pN.value = {
                         textArena: 'Arena',
@@ -334,12 +339,15 @@
                             amount: order.amount,
                         });
                     });
+
                     return sanitizedSandOrders;
                 };
 
                 const getTranportProviderName = (id) => {
                     return transportProviders.value.filter((each) => {
-                        if (each.id == id) return each;
+                        if (each.id == id) {
+                            return each;
+                        }
                     })[0].name;
                 };
 

@@ -4,7 +4,7 @@
         <FieldGroup v-for="(pickup, pickupI) in pickups" :key="pickupI" class="relative col-span-full max-w-2xl">
             <FieldInput
                 class="col-span-6 lg:col-span-4"
-                fieldName="pickupId"
+                field-name="pickupId"
                 placeholder="Patente"
                 :title="pickupI === firstIndex ? 'ID Pickup' : null"
                 :data="pickup.pickupId"
@@ -12,7 +12,7 @@
             />
             <FieldInput
                 class="col-span-5"
-                fieldName="description"
+                field-name="description"
                 placeholder="Descripción de pickup"
                 :title="pickupI === firstIndex ? 'Descripción' : null"
                 :data="pickup.description"
@@ -44,7 +44,7 @@
     import { useVModel } from '@vueuse/core';
 
     export default defineComponent({
-        name: 'woPickupField',
+        name: 'WoPickupField',
         components: {
             FieldInput,
             FieldGroup,
@@ -52,13 +52,13 @@
             Icon,
             CircularBtn,
         },
-        emits: ['update:pickups'],
         props: {
             pickups: {
                 type: Array,
                 required: true,
             },
         },
+        emits: ['update:pickups'],
         setup(props, { emit }) {
             const pickups = useVModel(props, 'pickups', emit);
             const lastIndex = computed(() => {
@@ -79,11 +79,14 @@
             pickups.value = pickups.value.map((pickup) => {
                 pickupInnerId.value++;
                 pickup.innerId = pickup.innerId ?? pickupInnerId.value;
+
                 return pickup;
             });
             const remove = (id: number) => {
                 pickups.value = pickups.value.filter((pickup) => {
-                    if (pickup.id !== id) return pickup;
+                    if (pickup.id !== id) {
+                        return pickup;
+                    }
                 });
             };
             const add = (): void => {
@@ -96,9 +99,11 @@
                 });
                 console.log(pickups.value);
             };
+
             if (pickups?.value?.length === 0) {
                 add();
             }
+
             return {
                 lastIndex,
                 firstIndex,
