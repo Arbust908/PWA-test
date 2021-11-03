@@ -134,7 +134,7 @@
                         errorMessage.value = res.message;
                         toggleNotificationModal();
                     }
-                    if (res.type == 'success') return { res };
+                    // if (res.type == 'success') return { res };
                 });
             };
 
