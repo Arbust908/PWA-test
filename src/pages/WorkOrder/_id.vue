@@ -196,12 +196,21 @@
                 } as HumanResource);
             };
             const addCrew = (): void => {
-                const lastId = crews.value.length + 1;
-                const crewLetter = String.fromCharCode(lastId + 64);
+                const lastCrew = crews.value[crews.value.length - 1];
+                const lastId = lastCrew.id + 1 || 1;
+                const makeNextCrewLetter = () => {
+                    const lastLetter = lastCrew.title ? lastCrew.title.split(' ')[1] : 'A';
+                    const letterNum = lastLetter.charCodeAt(0);
+
+                    return String.fromCharCode(letterNum + 1);
+                };
+                const crewLetter = makeNextCrewLetter();
+                const start_time = new Date().setHours(7);
+                const end_time = new Date().setHours(16);
                 crews.value.push({
                     id: lastId,
-                    start_time: '',
-                    end_time: '',
+                    start_time,
+                    end_time,
                     title: `Crew ${crewLetter}`,
                     resources: [],
                 });

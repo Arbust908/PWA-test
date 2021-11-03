@@ -26,7 +26,7 @@
                     <FieldInput
                         class="col-span-full mr-5"
                         :title="peopleI === 0 ? 'Rol' : null"
-                        :fieldName="`crew-${crew.id}-${people.id}-role`"
+                        :field-name="`crew-${crew.id}-${people.id}-role`"
                         placeholder="Rol"
                         :data="people.role"
                         @update:data="people.role = $event"
@@ -42,7 +42,7 @@
                     </span>
                     <FieldInput
                         class="col-span-full mr-5"
-                        :fieldName="`crew-${crew.id}-${people.id}-name`"
+                        :field-name="`crew-${crew.id}-${people.id}-name`"
                         placeholder="Empleado"
                         :data="people.name"
                         @update:data="people.name = $event"
@@ -60,7 +60,7 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed } from 'vue';
+    import { computed } from 'vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import TimePicker from '@/components/ui/form/TimePicker.vue';
@@ -111,25 +111,11 @@
                     id: lastId,
                 });
             };
-            const addCrew = (): void => {
-                const lastId = crews.value.length + 1;
-                const crewLetter = String.fromCharCode(lastId + 64);
-                crews.value.push({
-                    id: lastId,
-                    start_time: '',
-                    end_time: '',
-                    title: `Crew ${crewLetter}`,
-                    resources: [],
-                });
-                addResource(lastId);
-            };
             const removeCrew = (crewId: number): void => {
                 crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
             };
 
-            if (crews?.value?.length === 0) {
-                addCrew();
-            } else if (crews?.value?.some((crew: Crew) => crew.resources.length === 0)) {
+            if (crews?.value?.some((crew: Crew) => crew.resources.length === 0)) {
                 crews.value.forEach((crew: Crew) => {
                     if (crew.resources.length === 0) {
                         addResource(crew.id);
@@ -138,16 +124,10 @@
             }
 
             const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
-                // get last crew
                 if (crewList.length === 0) {
                     return false;
                 }
-                console.log(crewList);
                 const lastCrew = crewList[crewList.length - 1];
-                console.log(crewList[crewList.length - 1]);
-                console.log(lastCrew);
-                console.log(crewInnerId);
-                console.log(crewInnerId !== lastCrew.id ? 'not last' : 'last');
 
                 return crewInnerId !== lastCrew.id;
             };
@@ -161,14 +141,13 @@
             });
 
             return {
-                isRRHHFull,
-                removeResource,
                 addResource,
                 crews,
-                removeCrew,
-                addCrew,
+                isRRHHFull,
                 notLast,
                 notOnly,
+                removeCrew,
+                removeResource,
             };
         },
     };

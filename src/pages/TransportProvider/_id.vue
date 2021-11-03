@@ -68,19 +68,8 @@
                             @update:driverTType="newDriver.vehicleType = $event"
                             @update:driverTId="newDriver.transportId = $event"
                             @update:driverObs="newDriver.observations = $event"
+                            @add-driver="addDriver()"
                         />
-                        <div
-                            :class="[
-                                'flex',
-                                'items-center',
-                                'cursor-pointer',
-                                hasFullNewDriver ? null : 'text-gray-200',
-                            ]"
-                            @click="hasFullNewDriver && addDriver()"
-                        >
-                            <Icon icon="Plus" type="outline" class="w-5 h-5" />
-                            <h2>Agregar Transportista</h2>
-                        </div>
                     </form>
                     <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                         <section class="space-x-6 flex items-center justify-end">
@@ -215,7 +204,6 @@
                 if (activeSection.value === 'provider') {
                     changeSection('driver');
                 }
-
                 newDriver.name = driver.name;
                 newDriver.phone = driver.phone;
                 newDriver.email = driver.email;

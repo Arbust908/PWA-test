@@ -192,7 +192,7 @@
                 baseURL: apiUrl,
             });
             const id = route.params.id;
-            useTitle(`Depostio ${id} <> Sandflow`);
+            useTitle(`Depósito ${id} <> Sandflow`);
             const Deposit = ref([]);
 
             const rows: Ref<number> = ref(0);
