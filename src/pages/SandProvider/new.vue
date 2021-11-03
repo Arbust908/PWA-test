@@ -5,22 +5,8 @@
         </header>
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
-                <SandProviderForm
-                    :sp-name="sandProvider.name"
-                    :sp-legal-id="sandProvider.legalId"
-                    :sp-address="sandProvider.address"
-                    :sp-mesh-types="sandProvider.meshType"
-                    :sp-obs="sandProvider.observations"
-                    :sp-mesh="meshType"
-                    @update:spName="sandProvider.name = $event"
-                    @update:spLegalId="sandProvider.legalId = $event"
-                    @update:spAddress="sandProvider.address = $event"
-                    @update:spMeshTypes="sandProvider.meshType = $event"
-                    @update:spObs="sandProvider.observations = $event"
-                    @update:spMesh="meshType = $event"
-                    @add-mesh-type="addMeshType"
-                    @delete-mesh-type="deleteMeshType"
-                />
+                <SandProviderForm v-model="sandProvider" />
+
                 <SandProviderRep
                     :rep-name="companyRepresentative.name"
                     :rep-phone="companyRepresentative.phone"
@@ -33,7 +19,11 @@
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="$router.push('/proveedores-de-arena')"> Cancelar </NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                    <PrimaryBtn
+                        :is-loading="loading"
+                        :disabled="!isValidated ? 'yes' : null"
+                        @click="isValidated && save()"
+                    >
                         Finalizar
                     </PrimaryBtn>
                 </section>
@@ -49,7 +39,7 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, onMounted, watchEffect } from 'vue';
+    import { ref, Ref, watchEffect } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
@@ -62,8 +52,6 @@
     import Modal from '@/components/modal/General.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
-    import axios from 'axios';
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
     import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
     export default {
@@ -79,7 +67,6 @@
             useTitle(`Nuevo Centro de Carga de Arena <> Sandflow`);
             const store = useStore();
             const router = useRouter();
-            const meshTypes = ref([]);
 
             const notificationModalvisible = ref(false);
             const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
@@ -87,6 +74,9 @@
 
             const isNewRep: Ref<boolean> = ref(false);
             const toggleRepStatus = useToggle(isNewRep);
+            const loading = ref(false);
+
+            const isValidated = ref(false);
 
             const companyRepresentative: CompanyRepresentative = ref({
                 companyRepresentativeName: '',
@@ -103,48 +93,23 @@
                 companyRepresentativeId: -1,
             });
 
-            let meshType = ref('');
-
-            const addMeshType = (newMeshType: string) => {
-                let mesh = meshTypes.value.filter((mesh) => {
-                    if (mesh.id == newMeshType) {
-                        return mesh;
-                    }
-                })[0];
-                sandProvider.value.meshType.push(mesh);
-            };
-
-            const deleteMeshType = (index) => {
-                sandProvider.value.meshType.splice(index, 1);
-            };
-
-            const isValidated = ref(false);
-
             watchEffect(async () => {
                 isValidated.value = (await useValidator(store, 'sandProvider')) ? true : false;
             });
 
             const save = async () => {
+                loading.value = true;
                 sandProvider.value.companyRepresentative = companyRepresentative.value;
-                await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value).then((res) => {
-                    if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
-                    }
-                    // if (res.type == 'success') return { res };
-                });
-            };
 
-            onMounted(async () => {
-                await axios.get(`${apiUrl}/sand`).then((res) => {
-                    meshTypes.value = res.data.data.map((sand) => {
-                        return {
-                            id: sand.id,
-                            type: sand.type,
-                        };
-                    });
-                });
-            });
+                const res = await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value);
+
+                loading.value = false;
+
+                if (res.type === 'failed') {
+                    errorMessage.value = res.message;
+                    toggleNotificationModal();
+                }
+            };
 
             return {
                 isNewRep,
@@ -153,12 +118,10 @@
                 sandProvider,
                 isValidated,
                 save,
-                deleteMeshType,
-                addMeshType,
-                meshType,
                 notificationModalvisible,
                 toggleNotificationModal,
                 errorMessage,
+                loading,
             };
         },
     };
