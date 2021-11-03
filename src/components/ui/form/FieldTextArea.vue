@@ -1,21 +1,21 @@
 <template>
     <label :for="fieldName">
-        <FieldTitle v-if="title" :title="title" :isOptional="isOptional" />
+        <FieldTitle v-if="title" :title="title" :is-optional="isOptional" />
         <textarea
             :id="fieldName"
+            v-model="value"
             :class="[isFixed ? 'resize-none' : null, !isValid && wasInputEntered ? 'invalid' : null]"
             class="input"
             :name="fieldName"
             :placeholder="placeholder"
-            v-model="value"
             :rows="rows"
             @blur="initiateValidators"
         >
         </textarea>
         <InvalidInputLabel
             v-if="!isValid && wasInputEntered"
-            :validationType="validationType"
-            :charAmount="charAmount"
+            :validation-type="validationType"
+            :char-amount="charAmount"
         />
     </label>
 </template>
@@ -90,9 +90,11 @@
                 if (charsRule.min && charsRule.max) {
                     return { minLength: minLength(charsRule.min), maxLength: maxLength(charsRule.max), required };
                 }
+
                 if (charsRule.min && !charsRule.max) {
                     return { minLength: minLength(charsRule.min), required };
                 }
+
                 if (!charsRule.min && charsRule.max) {
                     return { maxLength: maxLength(charsRule.max), required };
                 }
@@ -104,11 +106,13 @@
                         [`${fieldName.value}`]: { required },
                     };
                 }
+
                 if (validationType.value == 'email') {
                     validationRules.value = {
                         [`${fieldName.value}`]: { required, email },
                     };
                 }
+
                 if (validationType.value == 'extension') {
                     validationRules.value = {
                         [`${fieldName.value}`]: getCharsAmountRule(charAmount.value),
@@ -128,10 +132,17 @@
 
             const isValid = computed(() => {
                 updateValidationState(fieldName.value, false);
-                if (!wasInputEntered.value) return false;
-                if (v$.value.$silentErrors[0]) return false;
+
+                if (!wasInputEntered.value) {
+                    return false;
+                }
+
+                if (v$.value.$silentErrors[0]) {
+                    return false;
+                }
 
                 updateValidationState(fieldName.value, true);
+
                 return true;
             });
 

@@ -119,6 +119,7 @@
                         }
                     });
                 });
+
                 return total;
             };
             const deleteSP = (id) => {

@@ -61,7 +61,6 @@
             },
             repPhone: {
                 type: String,
-                default: '12345678901',
             },
             repEmail: {
                 type: String,
