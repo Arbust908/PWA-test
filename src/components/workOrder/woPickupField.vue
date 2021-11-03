@@ -18,15 +18,14 @@
                 :data="pickup.description"
                 @update:data="pickup.description = $event"
             />
-            <span
+            <CircularBtn
                 v-if="pickups.length > 1"
-                class="flex justify-center items-center col-span-1 cursor-pointer"
+                class="btn__delete"
                 :class="pickupI == 0 ? 'mt-6' : 'mt-2'"
+                @click="remove(pickup.id)"
             >
-                <CircularBtn size="md" class="btn__delete">
-                    <Icon icon="Trash" type="outline" class="w-6 h-6 icon" @click="remove(pickup.id)" />
-                </CircularBtn>
-            </span>
+                <Icon icon="Trash" class="w-6 h-6" />
+            </CircularBtn>
         </FieldGroup>
         <button class="mt-1 flex items-center col-span-6" @click.prevent="add">
             <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
@@ -118,9 +117,14 @@
 </script>
 
 <style lang="scss" scoped>
-    .btn {
-        &__delete {
-            @apply border-transparent text-gray-800 bg-transparent hover:text-red-600 mx-2 transition duration-150 ease-out ml-0 mr-0 cursor-pointer;
+    @import '@/assets/button.scss';
+    .icon {
+        @apply w-5 h-5;
+    }
+    .ghost {
+        @apply border-none shadow-none;
+        & > .icon {
+            @apply text-transparent;
         }
     }
 </style>
