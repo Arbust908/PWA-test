@@ -125,11 +125,16 @@
                 </fieldset>
             </form>
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
-            <PrimaryBtn type="submit" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                Guardar
-            </PrimaryBtn>
+
+        <footer class="mt-5 gap-3 flex justify-end">
+            <section class="space-x-6 flex items-center justify-end">
+                <SecondaryBtn btn="secondary !px-6" @click.prevent="$router.push('/diseno-de-deposito')"
+                    >Cancelar</SecondaryBtn
+                >
+                <PrimaryBtn btn="btn main !px-6" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                    Guardar
+                </PrimaryBtn>
+            </section>
         </footer>
     </Layout>
 </template>
@@ -143,7 +148,7 @@
     import { TrashIcon } from '@heroicons/vue/outline';
     import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Counter from '@/components/ui/Counter.vue';
@@ -162,7 +167,7 @@
             BellIcon,
             CircularBtn,
             Counter,
-            GhostBtn,
+            SecondaryBtn,
             Layout,
             PlusIcon,
             PrimaryBtn,

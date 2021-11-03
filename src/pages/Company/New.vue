@@ -85,28 +85,26 @@
                     />
                 </FieldGroup>
             </form>
-
-            <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-                <section class="w-full space-x-6 flex items-center justify-end">
-                    <NoneBtn @click.prevent="$router.push('/clientes')"> Cancelar </NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
         </section>
+        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+            <section class="w-full space-x-6 flex items-center justify-end">
+                <SecondaryBtn btn="secondary !px-6" @click.prevent="$router.push('/clientes')"> Cancelar </SecondaryBtn>
+                <PrimaryBtn btn="main !px-6" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { reactive, toRefs, computed, defineComponent, watch, ref, watchEffect } from 'vue';
+    import { watch, ref, watchEffect } from 'vue';
     import Toggle from '@/components/ui/Toggle.vue';
     import { useRouter } from 'vue-router';
     import { useStore } from 'vuex';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-    import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
@@ -117,14 +115,12 @@
     import { useAxios } from '@vueuse/integrations/useAxios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
     // TIPOS
-    import { Company, companyRepresentative } from '@/interfaces/sandflow';
+    import { Company } from '@/interfaces/sandflow';
 
     export default {
         components: {
             Layout,
-            BookmarkIcon,
-            CheckCircleIcon,
-            NoneBtn,
+            SecondaryBtn,
             PrimaryBtn,
             FieldGroup,
             FieldInput,
@@ -207,42 +203,8 @@
     .input {
         @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
     }
-    input[type='text']:read-only {
-        @apply bg-second-200 border cursor-not-allowed;
-    }
-    fieldset:not(:last-of-type) {
-        @apply border-b pb-6;
-    }
-    label:not(.toggle) {
-        @apply flex flex-col;
-        span {
-            @apply text-sm;
-        }
-    }
+
     .toggle {
         @apply flex space-x-3 items-center;
-    }
-    .btn {
-        &__draft {
-            @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-        }
-        &__delete {
-            @apply border-transparent text-second-800 bg-transparent hover:bg-red-600 hover:text-second-50 mx-2 p-2 transition duration-150 ease-out;
-        }
-        &__options {
-            @apply border-transparent text-second-800 bg-transparent hover:bg-second-300 hover:text-indigo-800 mx-2 p-2 transition duration-150 ease-out;
-        }
-        &__add {
-            @apply border-transparent text-second-50 bg-green-500 hover:bg-green-600 mr-2;
-        }
-        &__add--special {
-            @apply border-2 border-second-400 text-second-400 bg-transparent group-hover:bg-second-200 group-hover:text-second-600 group-hover:border-second-600;
-        }
-        &__mobile-only {
-            @apply lg:hidden;
-        }
-        &__desktop-only {
-            @apply hidden lg:inline-flex;
-        }
     }
 </style>
