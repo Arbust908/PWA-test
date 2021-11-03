@@ -7,7 +7,7 @@ export default {
                 icon: 'Briefcase',
             },
             {
-                name: 'Planificacion',
+                name: 'Planificación',
                 to: '/planificacion-de-arena',
                 icon: 'ClipboardList',
             },
@@ -27,7 +27,7 @@ export default {
                 icon: 'Tag',
             },
             {
-                name: 'Diseño de Deposito',
+                name: 'Diseño de Depósito',
                 to: '/diseno-de-deposito',
                 icon: 'ViewGridAdd',
             },
@@ -66,7 +66,7 @@ export default {
                 icon: 'UserCircle',
             },
             {
-                name: 'Configuracion',
+                name: 'Configuración',
                 icon: 'Cog',
                 subNav: [
                     {

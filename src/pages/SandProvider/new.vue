@@ -131,16 +131,17 @@
 
             const save = async () => {
                 sandProvider.value.companyRepresentative = companyRepresentative.value;
-                await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value).then((res) => {
-                    if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
-                    }
 
-                    if (res.type == 'success') {
-                        return { res };
-                    }
-                });
+                const res = await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value);
+
+                if (res.type === 'failed') {
+                    errorMessage.value = res.message;
+                    toggleNotificationModal();
+                } else if (res.type == 'success') {
+                    router.push('/proveedores-de-arena');
+
+                    return { res };
+                }
             };
 
             onMounted(async () => {
