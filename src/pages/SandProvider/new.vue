@@ -39,96 +39,92 @@
 </template>
 
 <script lang="ts">
-    <<<<<<< HEAD
-        import { ref, Ref, watchEffect } from 'vue';
-    =======
-        import { ref, Ref, onMounted, watchEffect } from 'vue';
-    >>>>>>> sprint/v3.00.00
-        import { useStore } from 'vuex';
-        import { useRouter } from 'vue-router';
-        import { useTitle } from '@vueuse/core';
-        import Layout from '@/layouts/Main.vue';
-        import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-        import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-        import { useToggle } from '@vueuse/core';
-        import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
-        import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
-        import Modal from '@/components/modal/General.vue';
-        import { useStoreLogic } from '@/helpers/useStoreLogic';
-        import { useValidator } from '@/helpers/useValidator';
-        import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
+    import { ref, Ref, watchEffect } from 'vue';
+    import { useStore } from 'vuex';
+    import { useRouter } from 'vue-router';
+    import { useTitle } from '@vueuse/core';
+    import Layout from '@/layouts/Main.vue';
+    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import { useToggle } from '@vueuse/core';
+    import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
+    import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
+    import Modal from '@/components/modal/General.vue';
+    import { useStoreLogic } from '@/helpers/useStoreLogic';
+    import { useValidator } from '@/helpers/useValidator';
+    import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
-        export default {
-            components: {
-                Layout,
-                NoneBtn,
-                PrimaryBtn,
-                SandProviderForm,
-                SandProviderRep,
-                Modal,
-            },
-            setup() {
-                useTitle(`Nuevo Centro de Carga de Arena <> Sandflow`);
-                const store = useStore();
-                const router = useRouter();
+    export default {
+        components: {
+            Layout,
+            NoneBtn,
+            PrimaryBtn,
+            SandProviderForm,
+            SandProviderRep,
+            Modal,
+        },
+        setup() {
+            useTitle(`Nuevo Centro de Carga de Arena <> Sandflow`);
+            const store = useStore();
+            const router = useRouter();
 
-                const notificationModalvisible = ref(false);
-                const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
-                const errorMessage = ref('');
+            const notificationModalvisible = ref(false);
+            const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
+            const errorMessage = ref('');
 
-                const isNewRep: Ref<boolean> = ref(false);
-                const toggleRepStatus = useToggle(isNewRep);
-                const loading = ref(false);
+            const isNewRep: Ref<boolean> = ref(false);
+            const toggleRepStatus = useToggle(isNewRep);
+            const loading = ref(false);
 
-                const isValidated = ref(false);
+            const isValidated = ref(false);
 
-                const companyRepresentative: CompanyRepresentative = ref({
-                    companyRepresentativeName: '',
-                    phone: '',
-                    email: '',
-                });
+            const companyRepresentative: CompanyRepresentative = ref({
+                companyRepresentativeName: '',
+                phone: '',
+                email: '',
+            });
 
-                const sandProvider: SandProvider = ref({
-                    name: '',
-                    address: '',
-                    legalId: null,
-                    meshType: [],
-                    observations: '',
-                    companyRepresentativeId: -1,
-                });
+            const sandProvider: SandProvider = ref({
+                name: '',
+                address: '',
+                legalId: null,
+                meshType: [],
+                observations: '',
+                companyRepresentativeId: -1,
+            });
 
-                watchEffect(async () => {
-                    isValidated.value = (await useValidator(store, 'sandProvider')) ? true : false;
-                });
+            watchEffect(async () => {
+                isValidated.value = (await useValidator(store, 'sandProvider')) ? true : false;
+            });
 
-                const save = async () => {
-                    loading.value = true;
-                    sandProvider.value.companyRepresentative = companyRepresentative.value;
+            const save = async () => {
+                loading.value = true;
+                sandProvider.value.companyRepresentative = companyRepresentative.value;
 
-                    const res = await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value);
+                const res = await useStoreLogic(router, store, 'sandProvider', 'create', sandProvider.value);
 
-                    loading.value = false;
+                loading.value = false;
 
-                    if (res.type === 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
-                    }
-                };
+                if (res.type === 'failed') {
+                    errorMessage.value = res.message;
+                    toggleNotificationModal();
+                }
+            };
 
-                return {
-                    isNewRep,
-                    toggleRepStatus,
-                    companyRepresentative,
-                    sandProvider,
-                    isValidated,
-                    save,
-                    notificationModalvisible,
-                    toggleNotificationModal,
-                    errorMessage,
-                    loading,
-                };
-            },
-        };
+            return {
+                isNewRep,
+                toggleRepStatus,
+                companyRepresentative,
+                sandProvider,
+                isValidated,
+                save,
+                notificationModalvisible,
+                toggleNotificationModal,
+                errorMessage,
+                loading,
+            };
+        },
+    };
 </script>
 
 <style lang="scss" scoped>
