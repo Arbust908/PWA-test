@@ -127,7 +127,9 @@ export default {
                                     return response;
                                 }
                             })
-                            .catch(() => {
+                            .catch((err) => {
+                                console.log(err);
+
                                 return { status: 'failed' };
                             });
                     }

@@ -8,21 +8,21 @@
                 <FieldGroup>
                     <FieldInput
                         class="col-span-full"
-                        fieldName="name"
+                        field-name="name"
                         placeholder="Nombre del Cradle"
                         title="Nombre"
                         :data="name"
-                        @update:data="name = $event"
-                        requireValidation
+                        require-validation
                         entity="cradle"
+                        @update:data="name = $event"
                     />
                     <FieldTextArea
                         class="col-span-full"
-                        fieldName="observations"
+                        field-name="observations"
                         placeholder="Observaciones..."
                         title="Observaciones"
                         :rows="5"
-                        isOptional
+                        is-optional
                         :data="observations"
                         @update:data="observations = $event"
                     />
@@ -110,9 +110,11 @@
                     })
                     .then((res) => {
                         console.log(res);
+
                         if (res.status === 200) {
                             return res.data.data;
                         }
+
                         return {};
                     })
                     .finally(() => {});

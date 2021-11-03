@@ -53,8 +53,8 @@
                                     :checked="selectedBox.category === 'aisle'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('aisle')"
                                     class="form-checkbox aisle"
+                                    @click="setCat('aisle')"
                                 />
                                 <span>Pasillo</span>
                             </label>
@@ -64,8 +64,8 @@
                                     :checked="selectedBox.category === 'fina'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('fina')"
                                     class="form-checkbox fina"
+                                    @click="setCat('fina')"
                                 />
                                 <span>Arena fina</span>
                             </label>
@@ -75,8 +75,8 @@
                                     :checked="selectedBox.category === 'gruesa'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('gruesa')"
                                     class="form-checkbox gruesa"
+                                    @click="setCat('gruesa')"
                                 />
                                 <span>Arena gruesa</span>
                             </label>
@@ -86,8 +86,8 @@
                                     :checked="selectedBox.category === 'cortada'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('cortada')"
                                     class="form-checkbox cortada"
+                                    @click="setCat('cortada')"
                                 />
                                 <span>Caja cortada</span>
                             </label>
@@ -97,8 +97,8 @@
                                     :checked="selectedBox.category === 'empty'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('empty')"
                                     class="form-checkbox empty"
+                                    @click="setCat('empty')"
                                 />
                                 <span>Vacio</span>
                             </label>
@@ -128,7 +128,7 @@
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5"
-                        :selectedBox="selectedBox"
+                        :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
                         :floor="floors"
@@ -215,6 +215,7 @@
                     if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
                         const proxy = key.split('|');
                         const [Pfloor, Prow, Pcol] = proxy;
+
                         if (Number(Prow) > row) {
                             removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
                         }
@@ -241,6 +242,7 @@
                     if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
                         const proxy = key.split('|');
                         const [Pfloor, Prow, Pcol] = proxy;
+
                         if (Number(Pcol) > col) {
                             removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
                         }
@@ -267,6 +269,7 @@
                     if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
                         const proxy = key.split('|');
                         const [Pfloor, Prow, Pcol] = proxy;
+
                         if (Number(Pfloor) > floor) {
                             removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
                         }
@@ -279,9 +282,11 @@
                         const cell = deposit.value[key];
                         const proxy = key.split('|');
                         const [Pfloor, Prow, Pcol] = proxy;
+
                         if (cell === 'DELETED') {
                             //BOrrar ?
                         }
+
                         if (Number(Pfloor) > floors.value || Number(Prow) > rows.value || Number(Pcol) > cols.value) {
                             removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
                         }
@@ -376,11 +381,13 @@
                         dims.floor = Math.max(dims.floor, floor);
                         dims.row = Math.max(dims.row, row);
                         dims.col = Math.max(dims.col, col);
+
                         return dims;
                     },
                     { floor: 0, row: 0, col: 0 }
                 );
                 dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
+
                 return dimensions;
             };
 
@@ -401,6 +408,7 @@
                     return depo.id === Number(id);
                 })
             );
+
             if (vuexData.value) {
                 Deposit.value = vuexData;
                 updateData(vuexData.value);
@@ -422,6 +430,7 @@
             const isFull = computed(() => {
                 const hasClientAndPit: boolean = clientId.value >= 0 && pitId.value >= 0;
                 const hasDeposit: boolean = rows.value > 0 && cols.value > 0 && floors.value > 0;
+
                 return hasClientAndPit && hasDeposit;
             });
             const save = () => {

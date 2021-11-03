@@ -7,8 +7,8 @@
             <form method="POST" action="/" class="p-4 flex flex-col gap-4">
                 <FieldGroup class="max-w-2xl">
                     <ClientPitCombo
-                        :clientId="companyClientId"
-                        :pitId="pitId"
+                        :client-id="companyClientId"
+                        :pit-id="pitId"
                         @update:clientId="companyClientId = $event"
                         @update:pitId="pitId = $event"
                     />
@@ -22,7 +22,7 @@
                     <FieldGroup class="grid border-none max-w-full">
                         <FieldSelect
                             class="col-span-4"
-                            fieldName="sandProvider"
+                            field-name="sandProvider"
                             title="Proveedor"
                             placeholder="Selecciona proveedor"
                             endpoint="/sandProvider"
@@ -40,10 +40,10 @@
                             <FieldSelect
                                 :title="orderKey === 0 ? 'Tipo' : ''"
                                 class="col-span-4"
-                                fieldName="sandType"
+                                field-name="sandType"
                                 placeholder="Seleccciona Tipo de Arena"
                                 endpoint="/sand"
-                                endpointKey="type"
+                                endpoint-key="type"
                                 :data="order.sandTypeId"
                                 @update:data="order.sandTypeId = $event"
                             />
@@ -51,7 +51,7 @@
                                 <FieldWithSides
                                     :title="orderKey === 0 ? 'Cantidad' : ''"
                                     class="mt-3"
-                                    fieldName="sandQuantity"
+                                    field-name="sandQuantity"
                                     placeholder="Arena"
                                     type="number"
                                     :post="{ title: '0', value: 't' }"
@@ -62,7 +62,7 @@
                             <FieldInput
                                 :title="orderKey === 0 ? 'ID de caja' : ''"
                                 class="col-span-3"
-                                fieldName="sandBoxId"
+                                field-name="sandBoxId"
                                 placeholder="Ingresar ID de caja"
                                 :data="order.boxId"
                                 @update:data="order.boxId = $event"
@@ -75,8 +75,8 @@
                                 @click="removeOrder(order.id, providerId.innerId)"
                             />
                             <Icon
-                                icon="Plus"
                                 v-if="providerId.sandOrders.length - 1 == orderKey"
+                                icon="Plus"
                                 type="outline"
                                 class="icon w-5 h-5 mt-5 items-center cursor-pointer"
                                 @click.prevent="addOrder(providerId.innerId)"
@@ -84,16 +84,16 @@
                         </template>
                         <div class="flex items-center col-span-12">
                             <div
-                                class="icon-button"
                                 v-if="sandProvidersIds.length > 1"
+                                class="icon-button"
                                 @click.prevent="removeSandProvider(providerId.innerId)"
                             >
                                 <Icon icon="Trash" type="outline" class="w-5 h-5 items-center" />
                                 Borrar proveedor
                             </div>
                             <div
-                                :class="['icon-button', sandProvidersIds.length - 1 !== sandProvidersKey ? '' : 'ml-3']"
                                 v-if="sandProvidersIds.length - 1 == sandProvidersKey"
+                                :class="['icon-button', sandProvidersIds.length - 1 !== sandProvidersKey ? '' : 'ml-3']"
                                 @click.prevent="addSandProvider"
                             >
                                 <Icon icon="Plus" type="outline" class="icon w-5 h-5 items-center" />
@@ -106,7 +106,7 @@
                     <FieldLegend>Transporte</FieldLegend>
                     <FieldSelect
                         class="col-span-full"
-                        fieldName="transportProvider"
+                        field-name="transportProvider"
                         title="Proveedor"
                         placeholder="Selecciona proveedor"
                         endpoint="/transportProvider"
@@ -332,6 +332,7 @@
                     }, 1000);
                 }
             };
+
             return {
                 sandProviderId,
                 sandOrder,
