@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4 px-3">
+        <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Proveedores de transporte</h2>
             <router-link to="/proveedores-de-transporte/nuevo">
                 <PrimaryBtn size="sm"
@@ -13,7 +13,7 @@
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
-                class="col-span-full sm:col-span-4"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
                 placeholder="Seleccionar proveedor"
                 endpoint="/transportProvider"
@@ -27,10 +27,13 @@
         <UiTable class="mt-5">
             <template #header>
                 <tr>
-                    <th scope="col">Proveedor</th>
-                    <th scope="col">Domicilio</th>
-                    <th scope="col">Representante</th>
-                    <th scope="col">Teléfono</th>
+                    <th v-for="column in tableColumns" :key="column" scope="col">
+                        <div class="flex justify-center">
+                            {{ column }}
+                            <Icon icon="ArrowUp" class="w-4 h-4" />
+                            <Icon icon="ArrowDown" class="w-4 h-4" />
+                        </div>
+                    </th>
                     <th scope="col">Acciones</th>
                 </tr>
             </template>
@@ -50,7 +53,7 @@
                     <td :class="tp.companyRepresentative !== null ? null : 'empty'">
                         {{ tp.companyRepresentative?.name || 'Sin Representante' }}
                     </td>
-                    <td :class="tp.observations ? null : 'empty'">
+                    <td :class="tp.companyRepresentative ? null : 'empty'">
                         {{ tp.companyRepresentative?.phone || 'Sin observaciones' }}
                     </td>
                     <td>
@@ -62,11 +65,11 @@
                             </router-link>
 
                             <CircularBtn v-if="tp.visible" class="bg-red-500" size="xs" @click="updateVisibility(tp)">
-                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                                <Icon icon="EyeOff" type="outlined" class="w-5 h-5 text-white" />
                             </CircularBtn>
 
                             <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(tp)">
-                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                <Icon icon="Eye" type="outlined" class="w-5 h-5 text-white" />
                             </CircularBtn>
                         </div>
                     </td>
@@ -128,13 +131,15 @@
             useTitle('Proveedores de Transporte <> Sandflow');
             const tpDB = ref([]);
             const store = useStore();
-            const transportProviders = JSON.parse(JSON.stringify(store.state.transportProviders.all));
             const loading = ref(false);
             const transportProviderId = ref(-1);
             const selectedtransportProvider = ref(null);
             const showModal = ref(false);
+            const tableColumns = ['Proveedor', 'Domicilio', 'Representante', 'Teléfono'];
 
             const filteredTransportProviders = computed(() => {
+                console.log('cambio?');
+
                 if (transportProviderId.value > -1) {
                     return tpDB.value.filter((tp) => tp.id == transportProviderId.value);
                 }
@@ -147,46 +152,15 @@
             };
 
             const getTP = async () => {
-                loading.value = true;
-                tpDB.value = await axios
-                    .get(`${api}/transportProvider`)
-                    .catch((err) => {
-                        console.log(err);
-                    })
-                    .then((res) => {
-                        if (res.status === 200) {
-                            return res.data.data;
-                        }
+                const res = await axios.get(`${api}/transportProvider`).catch((err) => {
+                    console.log(err);
+                });
 
-                        return [];
-                    });
+                if (res.status === 200) {
+                    tpDB.value = res.data.data;
+                }
+
                 store.dispatch('setTransportProviders', tpDB.value);
-            };
-
-            const deleteTP = async (tpID) => {
-                let response = await axios
-                    .delete(`${api}/transportProvider/${tpID}`)
-
-                    .then((res) => {
-                        if (res.status === 200) {
-                            return res.data.data;
-                        }
-
-                        return [];
-                    })
-                    .catch((err) => {
-                        console.log(err);
-
-                        return;
-                    })
-                    .finally(() => {
-                        store.dispatch('deleteTransportProvider', tpID);
-                        getTP();
-                    });
-
-                return {
-                    response,
-                };
             };
 
             onMounted(async () => {
@@ -216,7 +190,6 @@
 
             return {
                 tpDB,
-                deleteTP,
                 loading,
                 filteredTransportProviders,
                 clearFilters,
@@ -225,6 +198,7 @@
                 showModal,
                 openModalVisibility,
                 confirm,
+                tableColumns,
             };
         },
     };

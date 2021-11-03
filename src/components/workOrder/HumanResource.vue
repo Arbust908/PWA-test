@@ -25,7 +25,6 @@
                     <!-- TODO: Pasaria a FiledSelect si tuvieramos ABM de roles y Usuarios -->
                     <FieldInput
                         class="col-span-full mr-5"
-                        :class="peopleI === 0 ? mr - 5 : ''"
                         :title="peopleI === 0 ? 'Rol' : null"
                         :fieldName="`crew-${crew.id}-${people.id}-role`"
                         placeholder="Rol"
@@ -64,18 +63,12 @@
     import { ref, Ref, computed } from 'vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-
     import TimePicker from '@/components/ui/form/TimePicker.vue';
-
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
 
     import { useVModels } from '@vueuse/core';
-
     import { HumanResource, Crew } from '@/interfaces/sandflow';
 
     export default {
@@ -84,9 +77,6 @@
             FieldInput,
             FieldLegend,
             CircularBtn,
-            GhostBtn,
-            Layout,
-            PrimaryBtn,
             Icon,
             TimePicker,
         },
@@ -101,7 +91,7 @@
             },
         },
         setup(props, { emit }) {
-            const { crews, isFull } = useVModels(props, emit);
+            const { crews } = useVModels(props, emit);
             const defaultResource = {
                 id: 0,
                 name: '',
@@ -158,6 +148,7 @@
                 console.log(lastCrew);
                 console.log(crewInnerId);
                 console.log(crewInnerId !== lastCrew.id ? 'not last' : 'last');
+
                 return crewInnerId !== lastCrew.id;
             };
             const notOnly = (crewList: Array<HumanResource>) => {

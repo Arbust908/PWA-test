@@ -1,10 +1,17 @@
 <template>
     <label :for="fieldName">
-        <FieldTitle v-if="title" :title="title" :isOptional="isOptional" />
+        <FieldTitle v-if="title" :title="title" :is-optional="isOptional" />
         <!-- TODO: Dropdown con Busqueda -->
         <!-- TODO: Options con entrada cheta -->
         <!-- TODO: StoreLogic -->
-        <select :id="fieldName" class="input" :name="fieldName" v-model.number="value" @blur="$emit('is-blured')">
+        <select
+            :id="fieldName"
+            v-model.number="value"
+            class="input"
+            :class="noOptionSelected && 'unselected'"
+            :name="fieldName"
+            @blur="$emit('is-blured')"
+        >
             <option disabled value="-1">
                 {{ placeholder }}
             </option>
@@ -84,6 +91,7 @@
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
                 const { read } = useApi(props.endpoint);
+
                 return read();
             };
             let resources = ref([]);
@@ -102,12 +110,15 @@
                 }
             });
 
+            const noOptionSelected = computed(() => value.value === -1);
+
             return {
                 value,
                 resources,
                 epData,
                 filteredData,
                 ...props,
+                noOptionSelected,
             };
         },
     });
@@ -115,4 +126,16 @@
 
 <style lang="scss" scoped>
     @import '@/assets/inputs.scss';
+</style>
+
+<style scoped>
+    .unselected {
+        color: #a6a6a6;
+    }
+    .unselected option {
+        color: black;
+    }
+    .unselected option:first-child {
+        color: #a6a6a6;
+    }
 </style>

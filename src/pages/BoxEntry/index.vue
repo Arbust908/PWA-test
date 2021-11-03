@@ -8,8 +8,8 @@
                 <FieldGroup class="grid grid-cols-12 gap-4 max-w-4xl">
                     <span class="col-span-8 grid grid-cols-12 gap-4">
                         <ClientPitCombo
-                            :clientId="Number(clientId)"
-                            :pitId="Number(pitId)"
+                            :client-id="Number(clientId)"
+                            :pit-id="Number(pitId)"
                             @update:clientId="clientId = Number($event)"
                             @update:pitId="pitId = Number($event)"
                         />
@@ -17,10 +17,10 @@
                     <FieldSelect
                         class="col-span-4"
                         title="Orden de pedido"
-                        fieldName="sandType3"
+                        field-name="sandType3"
                         placeholder="Seleccionar orden de pedido"
-                        endpointKey="id"
-                        :endpointData="filteredPurchaseOrders"
+                        endpoint-key="id"
+                        :endpoint-data="filteredPurchaseOrders"
                         :data="purchaseOrderId"
                         @update:data="purchaseOrderId = $event"
                     />
@@ -29,7 +29,7 @@
                     <span v-if="boxesWithoutId.length > 0" class="text-xs text-green-600"
                         >*Complete los ids de caja faltantes</span
                     >
-                    <div class="mt-2" v-if="boxes.length > 0 || boxesWithoutId.length > 0">
+                    <div v-if="boxes.length > 0 || boxesWithoutId.length > 0" class="mt-2">
                         <div v-for="box in boxes" :key="box.id" class="available-box">
                             <button
                                 :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
@@ -120,18 +120,18 @@
                                     <h2 class="col-span-full text-xl font-bold">Referencias</h2>
                                     <div class="flex flex-col gap-5 mt-4">
                                         <span class="select-category fina" @click="setVisibleCategories('fina')">
-                                            <EyeIcon class="icon" v-if="visibleCategories.includes('fina')" />
-                                            <EyeIconOff class="icon" v-else />
+                                            <EyeIcon v-if="visibleCategories.includes('fina')" class="icon" />
+                                            <EyeIconOff v-else class="icon" />
                                             Arena fina</span
                                         >
                                         <span class="select-category gruesa" @click="setVisibleCategories('gruesa')">
-                                            <EyeIcon class="icon" v-if="visibleCategories.includes('gruesa')" />
-                                            <EyeIconOff class="icon" v-else />
+                                            <EyeIcon v-if="visibleCategories.includes('gruesa')" class="icon" />
+                                            <EyeIconOff v-else class="icon" />
                                             Arena gruesa</span
                                         >
                                         <span class="select-category cortada" @click="setVisibleCategories('cortada')">
-                                            <EyeIcon class="icon" v-if="visibleCategories.includes('cortada')" />
-                                            <EyeIconOff class="icon" v-else />
+                                            <EyeIcon v-if="visibleCategories.includes('cortada')" class="icon" />
+                                            <EyeIconOff v-else class="icon" />
                                             Caja cortada</span
                                         >
                                         <span class="select-category aisle">Pasillo</span>
@@ -143,19 +143,19 @@
                                         :row="choosedBox.row"
                                         :col="choosedBox.col"
                                         :category="choosedBox.category"
-                                        :choosedBox="choosedBox"
+                                        :choosed-box="choosedBox"
                                     />
                                 </div>
                             </section>
                             <DepositGrid
-                                class="w-full flex flex-col gap-5"
                                 v-if="warehouse"
-                                :selectedBox="choosedBox"
+                                class="w-full flex flex-col gap-5"
+                                :selected-box="choosedBox"
                                 :rows="row"
                                 :cols="col"
                                 :floor="floor"
                                 :deposit="warehouse.layout"
-                                :visibleCategories="visibleCategories"
+                                :visible-categories="visibleCategories"
                                 @select-box="selectBox"
                             />
                         </fieldset>
@@ -163,13 +163,13 @@
                             <h2 class="text-xl font-bold">Elegir Cradle para montar</h2>
                             <div class="mt-4 w-full flex flex-col gap-6 md:gap-8">
                                 <CradleRow
-                                    class="cradle-row-wrapper flex flex-row"
                                     v-for="cradle in cradles"
-                                    :key="cradle.id"
                                     :id="cradle.id"
+                                    :key="cradle.id"
+                                    class="cradle-row-wrapper flex flex-row"
                                     :cradle="cradle"
                                     :selected="selectedCradle == cradle.id"
-                                    :choosedBox="choosedBox"
+                                    :choosed-box="choosedBox"
                                     @handle-selected-cradle="handleSelectedCradle(cradle.id)"
                                     @clear-box-in-deposit="clearBoxInDeposit"
                                 />
@@ -208,7 +208,7 @@
             <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
             <PrimaryBtn type="submit" @click.prevent="save()"> Guardar </PrimaryBtn>
         </footer>
-        <Modal type="success" :open="confirmModal" @close="resetBoxIn" class="modal" title="Orden de pedido guardada">
+        <Modal type="success" :open="confirmModal" class="modal" title="Orden de pedido guardada" @close="resetBoxIn">
             <template #body>
                 <p>La Orden de pedido se guardo con exito</p>
             </template>
@@ -341,6 +341,7 @@
                             if (workOrder.operativeCradle !== '-1') {
                                 cradlesIds.push(parseInt(workOrder.operativeCradle));
                             }
+
                             if (workOrder.backupCradle !== '-1') {
                                 cradlesIds.push(parseInt(workOrder.backupCradle));
                             }
@@ -349,7 +350,9 @@
                 });
 
                 const newCradles = cleanCradles.value.filter((cradle) => {
-                    if (cradlesIds.includes(cradle.id)) return cradle;
+                    if (cradlesIds.includes(cradle.id)) {
+                        return cradle;
+                    }
                 });
 
                 cradles.value = newCradles;
@@ -369,11 +372,13 @@
                         dims.floor = Math.max(dims.floor, floor);
                         dims.row = Math.max(dims.row, row);
                         dims.col = Math.max(dims.col, col);
+
                         return dims;
                     },
                     { floor: 0, row: 0, col: 0 }
                 );
                 dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
+
                 return dimensions;
             };
 
@@ -393,6 +398,7 @@
                                 boxId: null,
                             };
                         }
+
                         return slot;
                     });
                 });
@@ -407,6 +413,7 @@
                             }
                         });
                     }
+
                     if (purchaseOrderId.value !== -1) {
                         let sandTypes = await axios
                             .get(`${apiUrl}/sand`)
@@ -488,20 +495,28 @@
                 let response = false;
                 cradles.value.forEach((cradle) => {
                     cradle.slots.forEach((slot) => {
-                        if (slot.boxId == boxId) response = true;
+                        if (slot.boxId == boxId) {
+                            response = true;
+                        }
                     });
                 });
+
                 return response;
             };
 
-            const setSelectedBox = async (id: Number) => {
+            const setSelectedBox = async (id: number) => {
                 choosedBox.value =
                     boxes.value.filter((box) => {
-                        if (box.boxId == id) return box;
+                        if (box.boxId == id) {
+                            return box;
+                        }
                     })[0] ||
                     boxesWithoutId.value.filter((box) => {
-                        if (box.boxId == id) return box;
+                        if (box.boxId == id) {
+                            return box;
+                        }
                     })[0];
+
                 if (checkIfWasBoxInOriginalDeposit(id)) {
                     Object.entries(warehouse.value.layout).forEach((cell) => {
                         if (cell[1].id == id) {
@@ -517,15 +532,25 @@
             };
 
             const selectBox = (box: Box) => {
-                if (choosedBox.value.wasOriginallyOnDeposit) return;
-                if (choosedBox.value.wasOriginallyOnCradle) return;
+                if (choosedBox.value.wasOriginallyOnDeposit) {
+                    return;
+                }
+
+                if (choosedBox.value.wasOriginallyOnCradle) {
+                    return;
+                }
 
                 clearBoxInCradleSlots(choosedBox.value.boxId);
-                if (box.category == 'aisle') return;
+
+                if (box.category == 'aisle') {
+                    return;
+                }
+
                 if (box.category == 'empty' || box.category !== 'aisle') {
                     // if (visibleCategories.value.includes(box.category)) {
                     wasWarehouseModificated.value = true;
                     const hasPos = [choosedBox.value.floor, choosedBox.value.row, choosedBox.value.col].some(Boolean);
+
                     if (hasPos) {
                         let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
                         warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
@@ -540,7 +565,7 @@
                 }
             };
 
-            const changeSection = (option: String) => {
+            const changeSection = (option: string) => {
                 return (activeSection.value = option);
             };
 
@@ -554,7 +579,7 @@
             const originalWarehouseLayout = ref({});
             let visibleCategories = ref(['fina', 'gruesa', 'cortada']);
 
-            const setVisibleCategories = (category: String) => {
+            const setVisibleCategories = (category: string) => {
                 if (visibleCategories.value.includes(category)) {
                     visibleCategories.value.splice(visibleCategories.value.indexOf(category), 1);
                 } else {
@@ -615,7 +640,10 @@
                 const cradleData = cradles.value.find((c) => {
                     return c.id === cradleId;
                 });
-                if (cradleId !== 0) wasCradleModificated.value = true;
+
+                if (cradleId !== 0) {
+                    wasCradleModificated.value = true;
+                }
 
                 if (wasWarehouseModificated.value) {
                     await axios
@@ -655,9 +683,17 @@
                     await axios.put(`${apiUrl}/sandOrder/${data.id}`, data);
                 });
 
-                if (warehouseDone.value && cradleDone.value) confirmModal.value = true;
-                if (warehouseDone.value && wasCradleModificated.value == false) confirmModal.value = true;
-                if (cradleDone.value && wasWarehouseModificated.value == false) confirmModal.value = true;
+                if (warehouseDone.value && cradleDone.value) {
+                    confirmModal.value = true;
+                }
+
+                if (warehouseDone.value && wasCradleModificated.value == false) {
+                    confirmModal.value = true;
+                }
+
+                if (cradleDone.value && wasWarehouseModificated.value == false) {
+                    confirmModal.value = true;
+                }
             };
 
             return {
