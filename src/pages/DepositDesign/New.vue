@@ -140,11 +140,8 @@
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
 
-    import { TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Counter from '@/components/ui/Counter.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
@@ -159,14 +156,10 @@
 
     export default defineComponent({
         components: {
-            BellIcon,
-            CircularBtn,
             Counter,
             GhostBtn,
             Layout,
-            PlusIcon,
             PrimaryBtn,
-            TrashIcon,
             DepositGrid,
             BoxCard,
             FieldGroup,
@@ -183,6 +176,7 @@
             let deposit = ref({});
 
             const rows: Ref<number> = ref(0);
+
             watch(rows, (newV, oldV) => {
                 if (newV > oldV) {
                     addRow(newV);
@@ -190,6 +184,7 @@
                     removeRow(oldV);
                 }
             });
+
             const addRow = (row: number) => {
                 for (let c = 1; c <= cols.value; c++) {
                     for (let f = 1; f <= floors.value; f++) {
@@ -204,7 +199,9 @@
                     }
                 }
             };
+
             const cols: Ref<number> = ref(0);
+
             watch(cols, (newV, oldV) => {
                 if (newV > oldV) {
                     addCol(newV);
@@ -212,6 +209,7 @@
                     removeCol(oldV);
                 }
             });
+
             const addCol = (col: number) => {
                 for (let r = 1; r <= rows.value; r++) {
                     for (let f = 1; f <= floors.value; f++) {
@@ -227,6 +225,7 @@
                 }
             };
             const floors: Ref<number> = ref(1);
+
             watch(floors, (newV, oldV) => {
                 if (newV > oldV) {
                     addFloor(newV);
@@ -234,13 +233,15 @@
                     removeFloor(oldV);
                 }
             });
+
             const addFloor = (floor: number) => {
                 for (let c = 1; c <= cols.value; c++) {
                     for (let r = 1; r <= rows.value; r++) {
-                        addNewCell(floor, c, r);
+                        addNewCell(floor, r, c);
                     }
                 }
             };
+
             const removeFloor = (floor: number) => {
                 for (let c = cols.value; c >= 1; c--) {
                     for (let r = rows.value; r >= 1; r--) {
@@ -254,6 +255,7 @@
                     deposit.value[`${floor}|${row}|${col}`] = {};
                 }
             };
+
             const removeCell = (floor: number, row: number, col: number) => {
                 if (deposit.value[`${floor}|${row}|${col}`] !== undefined) {
                     deposit.value[`${floor}|${row}|${col}`] = 'DELETED';
@@ -265,28 +267,34 @@
             const clientId = ref(-1);
             const clients = ref([] as Array<Company>);
             const { data: companiesData } = useAxios('/company', instance);
-            watch(companiesData, (companiesApi, prevCount) => {
+
+            watch(companiesData, (companiesApi) => {
                 if (companiesApi && companiesApi.data) {
                     clients.value = companiesApi.data;
                 }
             });
+
             const selectedClientName = computed(() => {
                 return clientId.value >= 0 ? clients.value.find((pit) => pit.id === clientId.value).name : '';
             });
             // << CLIENT
+
             // :: PITS
             const pitId = ref(-1);
             const pits = ref([] as Array<Pit>);
             const { data: pitsData } = useAxios('/pit', instance);
-            watch(pitsData, (pitApi, prevCount) => {
+
+            watch(pitsData, (pitApi) => {
                 if (pitApi && pitApi.data) {
                     pits.value = pitApi.data;
                 }
             });
+
             const selectedPitName = computed(() => {
                 return pitId.value >= 0 ? pits.value.find((pit) => pit.id === pitId.value).name : '';
             });
             // << PITS
+
             const designName = computed(() => {
                 return selectedClientName.value !== '' && selectedPitName.value !== ''
                     ? `${selectedPitName.value} - ${selectedClientName.value}`
@@ -307,8 +315,10 @@
             const selectBox = (box: Box) => {
                 selectedBox.value = box;
             };
+
             const setCat = (cat: string) => {
                 selectedBox.value.category = cat;
+
                 const { floor, row, col } = selectedBox.value;
                 deposit.value[`${floor}|${row}|${col}`].category = cat;
             };
@@ -319,6 +329,7 @@
 
                 return hasClientAndPit && hasDeposit;
             });
+
             const save = () => {
                 const wH: Warehouse = {
                     clientCompanyId: clientId.value,
@@ -326,7 +337,7 @@
                     layout: deposit.value,
                 };
                 const { data } = useAxios('/warehouse', { method: 'POST', data: wH }, instance);
-                watch(data, (warehouseApi, prevCount) => {
+                watch(data, (warehouseApi) => {
                     if (warehouseApi && warehouseApi.data) {
                         store.dispatch('saveDeposit', warehouseApi.data);
                         router.push('/diseno-de-deposito');

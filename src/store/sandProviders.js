@@ -77,7 +77,7 @@ export default {
                     if (res.status == 200) {
                         commit('SET_SANDPROVIDERS', res.data.data);
 
-                        return res.data.data;
+                        return res;
                     }
                 })
                 .catch(() => {
@@ -89,7 +89,7 @@ export default {
                 .get(`${api}/sandProvider/${payload}`)
                 .then((res) => {
                     if (res.status == 200) {
-                        return res.data.data;
+                        return res;
                     }
                 })
                 .catch((err) => {
@@ -124,10 +124,7 @@ export default {
                                     sandProvider.id = response.data.data.id;
                                     commit('UPDATE_SANDPROVIDER', sandProvider);
 
-                                    let result = response.data.data;
-                                    result['status'] = 200;
-
-                                    return result;
+                                    return response;
                                 }
                             })
                             .catch((err) => {
@@ -152,7 +149,7 @@ export default {
                                 if (response.status === 200) {
                                     commit('UPDATE_SANDPROVIDER', payload);
 
-                                    return response.data.data;
+                                    return response;
                                 }
                             })
                             .catch(() => {
@@ -171,7 +168,7 @@ export default {
                     if (res.status == 200) {
                         commit('DELETE_SANDPROVIDER', payload);
 
-                        return res.status;
+                        return res;
                     }
                 })
                 .catch((err) => {

@@ -70,6 +70,7 @@
                 pickupId: '',
                 description: '',
             };
+
             if (pickups.value.length === 0) {
                 pickups.value.push(defaultPickup);
             }
