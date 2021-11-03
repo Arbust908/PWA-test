@@ -100,7 +100,7 @@
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent, ref, toRefs, onMounted } from 'vue';
+    import { computed, defineComponent, ref, onMounted } from 'vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -181,8 +181,6 @@
             };
 
             onMounted(async () => {
-                console.log('sandProvider', sandProvider.value);
-
                 const result = await useStoreLogic(router, store, 'sand', 'getAll');
 
                 if (result.type == 'success') {

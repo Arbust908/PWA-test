@@ -39,12 +39,11 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, onMounted, watchEffect } from 'vue';
+    import { ref, Ref, watchEffect } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import { useToggle } from '@vueuse/core';
@@ -53,8 +52,6 @@
     import Modal from '@/components/modal/General.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
-    import axios from 'axios';
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
     import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
     export default {
@@ -62,7 +59,6 @@
             Layout,
             NoneBtn,
             PrimaryBtn,
-            Icon,
             SandProviderForm,
             SandProviderRep,
             Modal,
@@ -80,6 +76,8 @@
             const toggleRepStatus = useToggle(isNewRep);
             const loading = ref(false);
 
+            const isValidated = ref(false);
+
             const companyRepresentative: CompanyRepresentative = ref({
                 companyRepresentativeName: '',
                 phone: '',
@@ -94,10 +92,6 @@
                 observations: '',
                 companyRepresentativeId: -1,
             });
-
-            let meshType = ref('');
-
-            const isValidated = ref(false);
 
             watchEffect(async () => {
                 isValidated.value = (await useValidator(store, 'sandProvider')) ? true : false;
@@ -128,7 +122,6 @@
                 sandProvider,
                 isValidated,
                 save,
-                meshType,
                 notificationModalvisible,
                 toggleNotificationModal,
                 errorMessage,
