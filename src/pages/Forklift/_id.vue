@@ -24,7 +24,7 @@
 </template>
 
 <script lang="ts">
-    import { ref, reactive, onMounted, watchEffect, onBeforeMount, computed } from 'vue';
+    import { ref, reactive, onMounted, watchEffect } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
     import { useTitle } from '@vueuse/core';
