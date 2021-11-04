@@ -165,29 +165,14 @@
                     </FieldGroup>
                 </FieldGroup>
             </form>
-            <footer class="p-4 space-x-8 flex justify-end">
-                <NoneBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </NoneBtn>
-                <PrimaryBtn :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && confirm()">
-                    Crear Orden
-                </PrimaryBtn>
-            </footer>
         </section>
+        <footer class="mt-4 space-x-8 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && confirm()">
+                Crear Orden
+            </PrimaryBtn>
+        </footer>
         <OrderModal v-if="showModal" :show-modal="showModal" :po="po" @close="showModal = false" @confirm="save()" />
-        <!-- <Modal
-      type="off"
-      :open="confirmModal"
-      @close="confirmModal = false"
-      class="modal"
-    >
-      <template #body>
-        <Icon icon="check" class="mx-auto mb-4 w-16 h-16 text-green-400" />
-        <p class="mb-4 text-lg text-gray-600">Orden de pedido guardada</p>
-        <p>La Orden de pedido se guardo con exito</p>
-        <PrimaryBtn @click.prevent="confirmModal = false">
-          Crear Nueva
-        </PrimaryBtn>
-      </template>
-    </Modal> -->
     </Layout>
 </template>
 
@@ -198,7 +183,7 @@
     import { useTitle } from '@vueuse/core';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import axios from 'axios';
@@ -225,7 +210,7 @@
     export default {
         components: {
             Layout,
-            NoneBtn,
+            SecondaryBtn,
             CircularBtn,
             PrimaryBtn,
             FieldGroup,

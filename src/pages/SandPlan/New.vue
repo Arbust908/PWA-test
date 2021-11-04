@@ -231,9 +231,9 @@
                 </div>
             </form>
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <NoneBtn @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </NoneBtn>
-            <PrimaryBtn size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+        <footer class="mt-5 space-x-8 flex justify-end">
+            <SecondaryBtn @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                 Guardar
             </PrimaryBtn>
         </footer>
@@ -262,7 +262,7 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -272,7 +272,7 @@
             GhostBtn,
             CircularBtn,
             PrimaryBtn,
-            NoneBtn,
+            SecondaryBtn,
             Icon,
             SandPlanStage,
             StageEmptyState,

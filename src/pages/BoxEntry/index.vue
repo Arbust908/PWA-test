@@ -204,9 +204,11 @@
                 </div>
             </form>
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
-            <PrimaryBtn type="submit" @click.prevent="save()"> Guardar </PrimaryBtn>
+        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end">
+            <section class="w-full space-x-6 flex items-center justify-end">
+                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
+                <PrimaryBtn btn="wide" type="submit" @click.prevent="save()"> Guardar </PrimaryBtn>
+            </section>
         </footer>
         <Modal type="success" :open="confirmModal" class="modal" @close="resetBoxIn">
             <template #body>
@@ -229,7 +231,7 @@
     import { EyeIcon } from '@heroicons/vue/solid';
     import EyeIconOff from './EyeIconOff.vue';
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
@@ -255,7 +257,7 @@
             EyeIconOff,
             FieldGroup,
             FieldSelect,
-            GhostBtn,
+            SecondaryBtn,
             Layout,
             Modal,
             NoneBtn,

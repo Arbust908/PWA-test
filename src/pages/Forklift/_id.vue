@@ -5,15 +5,15 @@
         </header>
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
-            <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                <section class="space-x-6 flex items-center justify-end">
-                    <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
         </section>
+        <footer class="mt-5 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
+            <section class="space-x-6 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click.prevent="goToIndex">Cancelar</SecondaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
         <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
             <template #body>
                 <p>{{ errorMessage }}</p>
@@ -30,7 +30,7 @@
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import ForkliftForm from '@/components/forklift/Form.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Modal from '@/components/modal/General.vue';
     import { Forklift } from '@/interfaces/sandflow';
@@ -40,7 +40,7 @@
     export default {
         components: {
             Layout,
-            NoneBtn,
+            SecondaryBtn,
             PrimaryBtn,
             ForkliftForm,
             Modal,

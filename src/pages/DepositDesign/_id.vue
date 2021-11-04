@@ -103,27 +103,6 @@
                                 <span>Vacio</span>
                             </label>
                         </div>
-                        <!-- <h2 class="col-span-full text-xl font-bold">Asignar ubicación</h2>
-            <div class="flex flex-col gap-5 ml-4">
-              <label class="type-select" for="top">
-                <input
-                  id="aisle"
-                  type="radio"
-                  name="boxCat"
-                  class="form-checkbox"
-                />
-                <span>Pasillo</span>
-              </label>
-              <label class="type-select" for="bot">
-                <input
-                  id="fine"
-                  type="radio"
-                  name="boxCat"
-                  class="form-checkbox"
-                />
-                <span>Arena fina</span>
-              </label>
-            </div> -->
                         <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" />
                     </section>
                     <DepositGrid
@@ -137,15 +116,15 @@
                     />
                 </fieldset>
             </form>
-            <!-- {{ selectedBox }}
-      <hr />
-      {{ deposit }} -->
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
-            <PrimaryBtn type="submit" size="lg" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                Guardar
-            </PrimaryBtn>
+
+        <footer class="mt-5 gap-3 flex justify-end">
+            <section class="space-x-6 flex items-center justify-end">
+                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                    Guardar
+                </PrimaryBtn>
+            </section>
         </footer>
     </Layout>
 </template>
@@ -159,7 +138,7 @@
     import { TrashIcon } from '@heroicons/vue/outline';
     import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Counter from '@/components/ui/Counter.vue';
@@ -176,7 +155,7 @@
             BellIcon,
             CircularBtn,
             Counter,
-            GhostBtn,
+            SecondaryBtn,
             Layout,
             PlusIcon,
             PrimaryBtn,
