@@ -124,21 +124,15 @@
             </template>
             <template #btn>
                 <div v-if="!isNotificationConfirmed" class="flex gap-4 justify-end">
-                    <button type="button" class="modal-close-button" @click.prevent="toggleModal">Volver</button>
-                    <button type="button" class="modal-create-new-button" @click.prevent="confirmNotification">
-                        Confirmar
-                    </button>
+                    <GhostBtn class="outline-none" @click.prevent="toggleModal"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
-                    <router-link to="/" class="modal-close-button w-1/3">
-                        <button type="button">Cerrar</button>
-                    </router-link>
-                    <button type="button" class="modal-create-new-button" @click.prevent="createNew">
-                        Crear nueva
-                    </button>
+                    <GhostBtn class="outline-none w-1/3" @click.prevent="$router.push('/')"> Cerrar </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click.prevent="createNew">Crear nueva</PrimaryBtn>
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
-                    <button type="button" class="modal-close-button" @click.prevent="toggleModal">Volver</button>
+                    <GhostBtn class="outline-none" @click.prevent="toggleModal"> Volver </GhostBtn>
                 </div>
             </template>
         </Modal>
@@ -146,48 +140,36 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, defineAsyncComponent, watch, watchEffect } from 'vue';
+    import { ref, Ref, computed, defineComponent, defineAsyncComponent, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import { TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import { ProviderNotification, SandOrder, TransportProvider, SandProvider, Sand } from '@/interfaces/sandflow';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import { ProviderNotification, SandOrder, TransportProvider, Sand } from '@/interfaces/sandflow';
     import { useToggle } from '@vueuse/core';
-    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
     import SandProviderPack from '@/components/notifications/sandProviderPack.vue';
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
-    import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
         components: {
-            BellIcon,
-            CircularBtn,
             NoneBtn,
             Layout,
             Modal,
-            PlusIcon,
             PrimaryBtn,
-            TrashIcon,
-            FieldGroup,
+            GhostBtn,
             FieldInput,
-            FieldLegend,
             FieldSelect,
-            FieldWithSides,
             SandProviderPack,
             Icon,
         },
