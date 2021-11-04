@@ -1,5 +1,5 @@
 <template>
-    <BaseBtn btn="secondary" :type="type" :size="size">
+    <BaseBtn :btn="`secondary ${btn}`" :type="type" :size="size">
         <slot></slot>
     </BaseBtn>
 </template>
@@ -18,6 +18,10 @@
             size: {
                 type: String,
                 default: 'md',
+            },
+            btn: {
+                type: String,
+                default: 'secondary',
             },
         },
     };

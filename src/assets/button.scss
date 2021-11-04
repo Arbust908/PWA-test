@@ -60,4 +60,7 @@
     &.none:hover {
         @apply bg-second-100 bg-opacity-50;
     }
+    &.wide {
+        @apply px-8;
+    }
 }

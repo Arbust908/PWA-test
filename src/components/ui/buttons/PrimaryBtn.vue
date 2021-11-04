@@ -1,6 +1,6 @@
 <template>
     <div>
-        <BaseBtn btn="main" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
+        <BaseBtn :btn="`main ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
             <slot></slot>
         </BaseBtn>
     </div>
@@ -20,6 +20,10 @@
             size: {
                 type: String,
                 default: 'md',
+            },
+            btn: {
+                type: String,
+                default: 'main',
             },
             disabled: {
                 type: String,
