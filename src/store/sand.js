@@ -1,3 +1,6 @@
+import axios from 'axios';
+const api = import.meta.env.VITE_API_URL || '/api';
+
 export default {
     state: () => ({
         all: [],
@@ -12,6 +15,9 @@ export default {
         },
     },
     mutations: {
+        SET_SAND(state, payload) {
+            state.all = payload;
+        },
         ADD_SAND(state, payload) {
             state.all.push(payload);
         },
@@ -29,6 +35,33 @@ export default {
     actions: {
         sandUpdateValidation: async ({ commit }, payload) => {
             await commit('UPDATE_SAND_VALIDATION', payload);
+        },
+        sandDataHandler: async ({ dispatch, getters }, methodAndPayload) => {
+            let { method, payload } = methodAndPayload;
+            method = `sand_${method}`;
+            await dispatch('verifyInternetConnection');
+
+            if (!getters.getInternetConnection) {
+                return (response.err = 'Sin internet');
+            }
+
+            let response = await dispatch(method, payload);
+
+            return response;
+        },
+        sand_getAll: async ({ commit }) => {
+            return await axios
+                .get(`${api}/sand`)
+                .then((res) => {
+                    if (res.status == 200) {
+                        commit('SET_SAND', res.data.data);
+
+                        return res.data.data;
+                    }
+                })
+                .catch(() => {
+                    return { status: 'failed' };
+                });
         },
         saveSand({ commit }, sand) {
             // console.log('>>Adding Sand', sand);
@@ -51,6 +84,13 @@ export default {
         },
         updateSand({ commit }, sand) {
             commit('UPDATE_SAND', sand);
+        },
+
+        //TODO: el metodo debería updateSand
+        async updateVisibilitySand({ commit }, sand) {
+            return await axios.put(`${api}/sand/${sand.id}`, sand).catch((error) => {
+                throw error.response.data;
+            });
         },
     },
 };

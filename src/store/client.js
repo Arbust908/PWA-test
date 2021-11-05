@@ -1,3 +1,6 @@
+import axios from 'axios';
+const api = import.meta.env.VITE_API_URL || '/api';
+
 export default {
     state: () => ({
         all: [],
@@ -58,6 +61,12 @@ export default {
         },
         updateClient({ commit }, client) {
             commit('UPDATE_CLIENT', client);
+        },
+
+        async updateVisibilityClient({ commit }, client) {
+            return await axios.put(`${api}/company/${client.id}`, client).catch((error) => {
+                throw error.response.data;
+            });
         },
     },
 };

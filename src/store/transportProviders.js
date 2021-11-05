@@ -1,3 +1,6 @@
+import axios from 'axios';
+const api = import.meta.env.VITE_API_URL || '/api';
+
 export default {
     state: () => ({
         all: [],
@@ -68,7 +71,11 @@ export default {
             //   // Axios POST to incomplete transport provider
             // }
         },
-        updateTransportProvider({ commit }, transportProvider) {
+        async updateTransportProvider({ commit }, transportProvider) {
+            await axios.put(`${api}/transportProvider/${transportProvider.id}`, transportProvider).catch((error) => {
+                throw error.response.data;
+            });
+
             commit('UPDATE_TRANSPORTPROVIDER', transportProvider);
         },
         deleteTransportProvider({ commit }, transportProviderId) {

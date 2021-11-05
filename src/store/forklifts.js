@@ -64,13 +64,7 @@ export default {
             }
             let response = await dispatch(method, payload);
 
-            if (!getters.getInternetConnection) {
-                return (response.err = 'Sin internet');
-            }
-
-            let resp = await dispatch(method, payload);
-
-            return resp;
+            return response;
         },
         setForklifts({ commit }, forklifts) {
             commit('SET_FORKLIFTS', forklifts);
@@ -94,7 +88,7 @@ export default {
                 .get(`${api}/forklift/${payload}`)
                 .then((res) => {
                     if (res.status == 200) {
-                        return res.data.data;
+                        return res;
                     }
                 })
                 .catch((err) => {
@@ -115,7 +109,7 @@ export default {
                         forklift.id = res.data.data.id;
                         commit('ADD_FORKLIFT', forklift);
 
-                        return res.data.data;
+                        return res;
                     }
                 })
                 .catch(() => {
@@ -129,7 +123,7 @@ export default {
                     if (res.status === 200) {
                         commit('UPDATE_FORKLIFT', payload);
 
-                        return res.data.data;
+                        return res;
                     }
                 })
                 .catch(() => {
@@ -143,7 +137,7 @@ export default {
                     if (res.status == 200) {
                         commit('DELETE_FORKLIFT', payload);
 
-                        return res.status;
+                        return res;
                     }
                 })
                 .catch((err) => {

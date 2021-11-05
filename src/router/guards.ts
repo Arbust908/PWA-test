@@ -12,18 +12,20 @@ export const wokrOrdersID = store.state.workOrders.all.reduce((woIds: any[], wor
 
     return woIds;
 }, []);
+
 export const isLogged = (to: any, from: any, next: any) => {
     recoverLocalUser();
     const isLoggedIn = store.getters.isLogged;
 
     if (!isLoggedIn) {
-        next({ path: '/login' });
+        next({ path: '/notLogged' });
 
         return;
     } else {
         next();
     }
 };
+
 export const isAdmin = (to: any, from: any, next: any) => {
     recoverLocalUser();
     const isUserAnAdmin = store.getters.isAdmin;
@@ -36,7 +38,8 @@ export const isAdmin = (to: any, from: any, next: any) => {
         next();
     }
 };
-export const isGuest = (to: any, from: any, next: any) => {
+
+export const isGuest = (to, from, next) => {
     recoverLocalUser();
     const isUserGuest = store.getters.isGuest;
 
@@ -56,6 +59,7 @@ export const isGuest = (to: any, from: any, next: any) => {
         next();
     }
 };
+
 export const isValidWO = (to: any, from: any, next: any) => {
     const id = to.params.id;
 
@@ -65,5 +69,43 @@ export const isValidWO = (to: any, from: any, next: any) => {
         return;
     } else {
         next();
+    }
+};
+
+export const goToLogin = (to: any, from: any, next: any) => {
+    recoverLocalUser();
+    const isLoggedIn = store.getters.isLogged;
+
+    if (!isLoggedIn) {
+        next({ path: '/login' });
+
+        return;
+    } else {
+        next({ path: '/home' });
+    }
+};
+
+export const isMobile = (to: any, from: any, next: any) => {
+    if (window.innerWidth < 640) {
+        next({ path: '/no-mobile' });
+    } else {
+        next();
+    }
+};
+
+export const isMobileAndLogged = (to: any, from: any, next: any) => {
+    recoverLocalUser();
+    const isLoggedIn = store.getters.isLogged;
+
+    if (!isLoggedIn) {
+        next({ path: '/notLogged' });
+
+        return;
+    } else {
+        if (window.innerWidth < 640) {
+            next({ path: '/no-mobile' });
+        } else {
+            next();
+        }
     }
 };

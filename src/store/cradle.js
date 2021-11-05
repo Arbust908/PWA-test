@@ -1,3 +1,6 @@
+import axios from 'axios';
+const api = import.meta.env.VITE_API_URL || '/api';
+
 export default {
     state: () => ({
         all: [
@@ -65,6 +68,12 @@ export default {
         },
         updateCradle({ commit }, cradle) {
             commit('UPDATE_CRADLE', cradle);
+        },
+
+        async updateVisibilityCradle({ commit }, cradle) {
+            return await axios.put(`${api}/cradle/${cradle.id}`, cradle).catch((error) => {
+                throw error.response.data;
+            });
         },
     },
 };

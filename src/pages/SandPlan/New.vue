@@ -7,8 +7,8 @@
             <form method="POST" action="/" class="py-4">
                 <FieldGroup class="grid-cols-6 md:grid-cols-12 max-w-2xl">
                     <ClientPitCombo
-                        :clientId="currentSandPlan.companyId"
-                        :pitId="currentSandPlan.pitId"
+                        :client-id="currentSandPlan.companyId"
+                        :pit-id="currentSandPlan.pitId"
                         @update:clientId="currentSandPlan.companyId = $event"
                         @update:pitId="currentSandPlan.pitId = $event"
                     />
@@ -95,8 +95,8 @@
                             <Icon icon="PlusCircle" class="w-7 h-7 m-auto text-green-500 mr-1" />
                         </button>
                         <button
-                            @click.prevent="toggleCurOp"
                             :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
+                            @click.prevent="toggleCurOp"
                         >
                             <Icon
                                 icon="ChevronUp"
@@ -118,16 +118,16 @@
                         </button>
                     </section>
                 </header>
-                <div class="pr-8 pl-2 border-2 border-solid" v-show="currentOpened">
+                <div v-show="currentOpened" class="pr-8 pl-2 border-2 border-solid">
                     <ResposiveTableSandPlan
-                        class="mt-2"
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
+                        class="mt-2"
                         :pos="Key + 1"
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
-                        editingKey="innerId"
+                        editing-key="innerId"
                         @editStage="editStage"
                         @saveStage="saveStage"
                         @duplicateStage="duplicateStage"
@@ -215,7 +215,7 @@
                         />
                     </section>
                 </header>
-                <div class="flex flex-col p-4 border-2 border-solid" v-show="finishedOpened">
+                <div v-show="finishedOpened" class="flex flex-col p-4 border-2 border-solid">
                     <ResposiveTableSandPlan
                         v-for="(stage, Key) in finishedStages"
                         :key="Key"
@@ -231,14 +231,9 @@
                 </div>
             </form>
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <NoneBtn @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </NoneBtn>
-            <PrimaryBtn
-                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                size="md"
-                :disabled="!isFull"
-                @click.prevent="isFull && save()"
-            >
+        <footer class="mt-5 space-x-8 flex justify-end">
+            <SecondaryBtn @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                 Guardar
             </PrimaryBtn>
         </footer>
@@ -267,7 +262,7 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -277,7 +272,7 @@
             GhostBtn,
             CircularBtn,
             PrimaryBtn,
-            NoneBtn,
+            SecondaryBtn,
             Icon,
             SandPlanStage,
             StageEmptyState,
@@ -401,6 +396,7 @@
                 console.log(pits.value);
                 console.log(pits.value.find((pit) => pit.id == currentSandPlan.pitId));
                 console.groupEnd();
+
                 return currentSandPlan.pitId >= 0 ? pits.value.find((pit) => pit.id == currentSandPlan.pitId).name : '';
             });
             // << PITS
@@ -423,6 +419,7 @@
                     currentSandPlan.stages[0].quantity1 !== 0 ||
                     currentSandPlan.stages[0].quantity2 !== 0 ||
                     currentSandPlan.stages[0].quantity3 !== 0;
+
                 return !!(
                     currentSandPlan.companyId >= 0 &&
                     currentSandPlan.pitId >= 0 &&
@@ -435,16 +432,18 @@
             const { saveSandPlan } = useActions(['saveSandPlan']);
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
-                    console.log(stage);
                     if (stage.sandId1 === -1) {
                         stage.sandId1 = null;
                     }
+
                     if (stage.sandId2 === -1) {
                         stage.sandId2 = null;
                     }
+
                     if (stage.sandId3 === -1) {
                         stage.sandId3 = null;
                     }
+
                     return stage;
                 });
                 currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
@@ -452,6 +451,7 @@
                         (stage.sandId1 !== null && stage.quantity1 > 0) ||
                         (stage.sandId2 !== null && stage.quantity2 > 0) ||
                         (stage.sandId3 !== null && stage.quantity3 > 0);
+
                     return noSandTypeNull;
                 });
                 const { data } = useAxios('/sandPlan', { method: 'POST', data: currentSandPlan }, instance);
@@ -459,19 +459,34 @@
                     if (apiData && apiData.data) {
                         const sandPlanId = apiData.data.id;
                         currentSandPlan.id = sandPlanId;
-                        currentSandPlan.stages.map((stage) => {
-                            const { id, ...sandStage } = stage;
-                            sandStage.sandPlanId = sandPlanId;
-                            sandStage.action = 'create';
-                            console.log('Sand Stage', sandStage);
-                            const { data } = useAxios('/sandStage', { method: 'POST', data: sandStage }, instance);
+
+                        currentSandPlan.stages.forEach((stage) => {
+                            console.log(stage);
+                            const { data } = useAxios(
+                                '/sandStage',
+                                {
+                                    method: 'POST',
+                                    data: {
+                                        sandPlanId: sandPlanId,
+                                        stage: stage.stage,
+                                        sandId1: stage.sandId1,
+                                        sandId2: stage.sandId2,
+                                        sandId3: stage.sandId3,
+                                        quantity1: stage.quantity1,
+                                        quantity2: stage.quantity2,
+                                        quantity3: stage.quantity3,
+                                    },
+                                },
+                                instance
+                            );
                         });
-                        console.log(currentSandPlan);
+
                         saveSandPlan({ ...currentSandPlan });
                         router.push('/planificacion-de-arena');
                     }
                 });
             };
+
             return {
                 currentSandPlan,
                 inProgressStages,

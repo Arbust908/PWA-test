@@ -1,51 +1,52 @@
 <template>
-  <NavLine v-if="isLine" v-bind="item" />
-  <NavLink v-else-if="isNotSection" v-bind="item" :mode="mode" />
-  <NavSection v-else v-bind="item" :mode="mode" />
+    <NavLine v-if="isLine" v-bind="item" />
+    <NavLink v-else-if="isNotSection" v-bind="item" :mode="mode" />
+    <NavSection v-else v-bind="item" :mode="mode" />
 </template>
 <script lang="ts">
-  import { defineComponent } from 'vue';
-  import NavLine from '@/components/navigation/NavLine.vue';
-  import NavLink from '@/components/navigation/NavLink.vue';
-  import NavSection from '@/components/navigation/NavSection.vue';
+    import { defineComponent } from 'vue';
+    import NavLine from '@/components/navigation/NavLine.vue';
+    import NavLink from '@/components/navigation/NavLink.vue';
+    import NavSection from '@/components/navigation/NavSection.vue';
 
-  export default defineComponent({
-    components: {
-      NavLine,
-      NavLink,
-      NavSection,
-    },
-    props: {
-      to: {
-        type: String,
-        default: null,
-      },
-      icon: {
-        type: String,
-        default: null,
-      },
-      name: {
-        type: String,
-        required: true,
-      },
-      subNav: {
-        type: Array,
-        default: null,
-      },
-      mode: {
-        type: String,
-        default: '',
-      },
-    },
-    setup(props) {
-      const { subNav, name } = props;
-      const isNotSection = subNav === null;
-      const isLine = name === 'LINE';
-      return {
-        item: props,
-        isNotSection,
-        isLine,
-      };
-    },
-  });
+    export default defineComponent({
+        components: {
+            NavLine,
+            NavLink,
+            NavSection,
+        },
+        props: {
+            to: {
+                type: String,
+                default: null,
+            },
+            icon: {
+                type: String,
+                default: null,
+            },
+            name: {
+                type: String,
+                required: true,
+            },
+            subNav: {
+                type: Array,
+                default: null,
+            },
+            mode: {
+                type: String,
+                default: '',
+            },
+        },
+        setup(props) {
+            const { subNav, name } = props;
+            const isNotSection = subNav === null;
+            const isLine = name === 'LINE';
+
+            return {
+                item: props,
+                isNotSection,
+                isLine,
+            };
+        },
+    });
 </script>

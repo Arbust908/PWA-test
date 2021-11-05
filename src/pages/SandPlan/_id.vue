@@ -7,8 +7,8 @@
             <form method="POST" action="/" class="py-4">
                 <FieldGroup class="grid-cols-6 md:grid-cols-12 max-w-2xl">
                     <ClientPitCombo
-                        :clientId="currentSandPlan.companyId"
-                        :pitId="currentSandPlan.pitId"
+                        :client-id="currentSandPlan.companyId"
+                        :pit-id="currentSandPlan.pitId"
                         @update:clientId="currentSandPlan.companyId = $event"
                         @update:pitId="currentSandPlan.pitId = $event"
                     />
@@ -55,7 +55,7 @@
                                             :stage="stage"
                                             :editing="editingStage"
                                             :sands="sands"
-                                            editingKey="innerId"
+                                            editing-key="innerId"
                                             @editStage="editStage"
                                             @saveStage="saveStage"
                                             @duplicateStage="duplicateStage"
@@ -85,8 +85,8 @@
                             <Icon icon="PlusCircle" class="w-7 h-7 m-auto text-green-500 mr-1" />
                         </button>
                         <button
-                            @click.prevent="toggleCurOp"
                             :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
+                            @click.prevent="toggleCurOp"
                         >
                             <Icon
                                 icon="ChevronUp"
@@ -98,7 +98,7 @@
                         </button>
                     </section>
                 </header>
-                <div class="flex flex-col p-4" v-show="currentOpened">
+                <div v-show="currentOpened" class="flex flex-col p-4">
                     <ResposiveTableSandPlan
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
@@ -106,7 +106,7 @@
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
-                        editingKey="innerId"
+                        editing-key="innerId"
                         @editStage="editStage"
                         @saveStage="saveStage"
                         @duplicateStage="duplicateStage"
@@ -184,7 +184,7 @@
                         />
                     </section>
                 </header>
-                <div class="flex flex-col p-4" v-show="finishedOpened">
+                <div v-show="finishedOpened" class="flex flex-col p-4">
                     <ResposiveTableSandPlan
                         v-for="(stage, Key) in finishedStages"
                         :key="Key"
@@ -202,15 +202,14 @@
                 </div>
             </form>
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <NoneBtn @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </NoneBtn>
-            <PrimaryBtn
-                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                :disabled="!isFull"
-                @click.prevent="isFull && save()"
-            >
-                Guardar
-            </PrimaryBtn>
+
+        <footer class="mt-5 space-x-8 flex justify-end">
+            <section class="w-full space-x-6 flex items-center justify-end">
+                <SecondaryBtn @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                    Guardar
+                </PrimaryBtn>
+            </section>
         </footer>
     </Layout>
 </template>
@@ -244,7 +243,7 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
 
     export default {
@@ -259,7 +258,7 @@
             FieldGroup,
             ClientPitCombo,
             Icon,
-            NoneBtn,
+            SecondaryBtn,
             ResposiveTableSandPlan,
         },
         setup() {
@@ -275,7 +274,7 @@
             });
             const defaultStage = {
                 innerId: 0,
-                stage: 1,
+                stage: null,
                 sandId1: -1,
                 quantity1: null,
                 sandId2: -1,
@@ -299,6 +298,7 @@
             });
 
             const buckupStages = ref([]);
+
             if (!vuexSP || true) {
                 const { data: spData } = useAxios('/sandPlan/' + id, instance);
                 watch(spData, (sandplanApi, prevCount) => {
@@ -308,12 +308,19 @@
                         currentSandPlan.companyId = Number(sp.companyId);
                         currentSandPlan.pitId = Number(sp.pitId);
                         currentSandPlan.stagesAmount = sp.stagesAmount;
+
                         const formatedStages = sp.stages.map((stage) => {
                             return { ...stage, innerId: Number(stage.id) };
                         });
+
+                        formatedStages.sort((a, b) => {
+                            return a.stage - b.stage;
+                        });
+
+                        console.log('stages', sp.stages);
                         currentSandPlan.stages = formatedStages;
-                        buckupStages.value = formatedStages;
-                        // currentSandPlan.stages[0].id = Number(sp.stages[0].id);
+                        console.log('formatedStages', formatedStages);
+                        buckupStages.value = sp.stages;
                     }
                 });
             } else {
@@ -333,7 +340,7 @@
             };
 
             const inProgressStages = computed(() => {
-                return currentSandPlan.stages.filter((stage) => stage.status < 2) || [];
+                return currentSandPlan.stages;
             });
             const finishedStages = computed(() => {
                 return currentSandPlan.stages.filter((stage) => stage.status >= 2) || [];
@@ -351,7 +358,8 @@
             };
             const duplicateStage = (stage) => {
                 const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
-                const lastStageId = { innerId: Number(lastStage.innerId) + 1 || 0 };
+                // SOLUCION TEMPORAL PARA DUPLICADO DE INNER ID
+                const lastStageId = { innerId: Number(lastStage.innerId) + 100000 || 0 };
                 const lastStageStage = { stage: lastStage.stage + 1 };
                 const newStatus = { status: 0 };
                 console.log(lastStage, lastStageId, lastStageStage, newStatus);
@@ -372,6 +380,7 @@
                 console.log(isDB);
                 console.log(stageId, isDB);
                 currentSandPlan.stages = currentSandPlan.stages.filter((s) => s.innerId !== stageId);
+
                 if (isDB) {
                     stagesToDelete.value.push(stageId);
                     console.log(stagesToDelete.value);
@@ -382,6 +391,7 @@
                     if (s.innerId === stage.innerId) {
                         s.status += 1;
                     }
+
                     return s;
                 });
             };
@@ -409,6 +419,7 @@
             });
             const selectedPitName = computed(() => {
                 console.log('computed-pitId', currentSandPlan.pitId);
+
                 return Number(currentSandPlan.pitId) >= 0
                     ? pits.value.find((pit) => pit.id == currentSandPlan.pitId)?.name || 'Pit'
                     : '';
@@ -433,12 +444,15 @@
                     if (stage.sandId1 === -1) {
                         stage.sandId1 = null;
                     }
+
                     if (stage.sandId2 === -1) {
                         stage.sandId2 = null;
                     }
+
                     if (stage.sandId3 === -1) {
                         stage.sandId3 = null;
                     }
+
                     return stage;
                 });
                 currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
@@ -446,6 +460,7 @@
                         (stage.sandId1 !== null && stage.quantity1 > 0) ||
                         (stage.sandId2 !== null && stage.quantity2 > 0) ||
                         (stage.sandId3 !== null && stage.quantity3 > 0);
+
                     return noSandTypeNull;
                 });
 
@@ -495,6 +510,7 @@
                         currentSandPlan.stages.map((stage) => {
                             const { ...sandStage } = stage;
                             sandStage.sandPlanId = sandPlanId;
+
                             // console.log('Sand Stage', sandStage);
                             if (sandStage.action === 'create') {
                                 sandStage.action = 'update';
@@ -506,6 +522,7 @@
                             } else {
                                 const { id, ...newStage } = sandStage;
                                 newStage.action = 'create';
+
                                 if (!sandStage.id) {
                                     const { data } = useAxios(
                                         '/sandStage',
@@ -521,6 +538,7 @@
                     }
                 });
             };
+
             return {
                 currentSandPlan,
                 inProgressStages,
@@ -541,7 +559,7 @@
                 save,
                 isFull,
                 addStage,
-                upgrade,
+                // upgrade,
                 windowWidth,
             };
         },
