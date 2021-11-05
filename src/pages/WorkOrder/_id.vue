@@ -470,7 +470,8 @@
                             console.log('comparedCrews', comparedCrews);
                             comparedCrews.changed.forEach((crewToUpdate) => {
                                 const { ...newCrew } = crewToUpdate;
-                                console.log('newValue', newVal.data.id);
+                                console.log('newCrew', newCrew);
+                                console.log('crewToUpdate', crewToUpdate);
                                 newCrew.workOrderId = newVal.data.id;
                                 const { data } = useAxios(
                                     `/crew/${newCrew.id}`,
@@ -507,7 +508,7 @@
                             });
                             comparedCrews.new.forEach((crewToCreate) => {
                                 const { id: innerCrewId, ...newCrew } = crewToCreate;
-                                newCrew.workOrderId = newVal.id;
+                                newCrew.workOrderId = newVal.data.id;
                                 const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
                                 isCrewsFinished.value.push(data);
                                 watch(data, (newVal, _) => {
@@ -527,8 +528,9 @@
 
                             crews.value.forEach((crew) => {
                                 const { id, ...newCrew } = crew;
-                                newCrew.workOrderId = newVal.id;
-                                console.log('crew', newCrew);
+                                // console.log(newVal)
+                                // console.log(newVal.data)
+                                newCrew.workOrderId = newVal.data.id;
                                 const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
                                 isCrewsFinished.value.push(data);
                                 watch(data, (newVal, _) => {
