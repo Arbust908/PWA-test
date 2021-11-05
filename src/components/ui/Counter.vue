@@ -4,7 +4,7 @@
             <MinusIcon class="icon" />
         </button>
         <input v-model.number="count" type="text" />
-        <button @click.prevent="inc()">
+        <button :disabled="count >= max" @click.prevent="inc()">
             <PlusIcon class="icon" />
         </button>
     </div>
@@ -24,6 +24,9 @@
             amount: {
                 type: Number,
                 required: true,
+            },
+            max: {
+                type: Number,
             },
         },
         setup(props, { emit }) {
@@ -47,6 +50,15 @@
         @apply flex;
     }
     button {
+        @apply bg-second-200 text-second-500 p-2 rounded-full w-8 h-8;
+        &:disabled {
+            @apply opacity-50 cursor-not-allowed;
+        }
+        &:not(:disabled):hover {
+            @apply shadow bg-second-300;
+        }
+    }
+    span {
         @apply bg-second-200 text-second-500 p-2 rounded-full w-8 h-8;
         &:disabled {
             @apply opacity-50 cursor-not-allowed;

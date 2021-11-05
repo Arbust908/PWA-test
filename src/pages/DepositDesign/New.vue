@@ -6,24 +6,24 @@
         <section class="deposit bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
-                    <h2 class="col-span-full text-3xl font-bold">Pozo {{ designName }}</h2>
+                    <h2 class="col-span-full text-[24px] font-bold">Pozo {{ designName }}</h2>
                     <ClientPitCombo
                         :client-id="clientId"
                         :pit-id="pitId"
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
                     />
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de filas</h3>
+                    <div class="col-span-6 md:col-span-4 flex flex-col items-left gap-4">
+                        <h3 class="text-sm">Cantidad de filas</h3>
                         <Counter :amount="rows" @update:amount="rows = $event" />
                     </div>
                     <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de columnas</h3>
+                        <h3 class="text-sm">Cantidad de columnas</h3>
                         <Counter :amount="cols" @update:amount="cols = $event" />
                     </div>
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de pisos</h3>
-                        <Counter :amount="floors" @update:amount="floors = $event" />
+                    <div class="col-span-6 md:col-span-4 flex flex-col items-end gap-4">
+                        <h3 class="text-sm">Cantidad de pisos</h3>
+                        <Counter :amount="floors" :max="2" @update:amount="floors = $event" />
                     </div>
                     <!-- <div class="col-span-3 flex flex-col items-center gap-4">
             <h3 class="text-xs">Cantidad de ubicación</h3>
@@ -127,9 +127,7 @@
         </section>
         <footer class="p-4 space-x-8 flex justify-end">
             <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
-            <PrimaryBtn type="submit" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                Guardar
-            </PrimaryBtn>
+            <PrimaryBtn :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()"> Guardar </PrimaryBtn>
         </footer>
     </Layout>
 </template>
