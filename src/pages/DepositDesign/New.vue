@@ -31,7 +31,7 @@
           </div> -->
                 </FieldGroup>
                 <fieldset class="py-2 flex gap-x-10 2xl:gap-x-40">
-                    <section class="w-full max-w-[170px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
+                    <section class="w-full max-w-[220px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
                         <h2 class="col-span-full text-xl font-bold">Asignar categoría</h2>
                         <div class="flex flex-col gap-5 ml-4">
                             <label class="type-select" for="aisle">
@@ -114,7 +114,7 @@
                         <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" />
                     </section>
                     <DepositGrid
-                        class="w-full flex flex-col gap-5"
+                        class="w-full flex flex-col gap-5 overflow-auto"
                         :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
