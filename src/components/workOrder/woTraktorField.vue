@@ -36,6 +36,7 @@
                 class="btn__delete"
                 :class="traktorI == 0 ? 'mt-6' : 'mt-2'"
                 @click="remove(traktor.innerId)"
+                size="sm"
             >
                 <Icon icon="Trash" class="w-6 h-6" />
             </CircularBtn>
