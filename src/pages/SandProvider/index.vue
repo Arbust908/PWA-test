@@ -18,7 +18,7 @@
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
                 endpoint-key="name"
-                endpoint="/sandProvider"
+                endpoint="/sandProvider?order=name"
                 :data="sandProviderId"
                 @update:data="sandProviderId = $event"
             />
@@ -117,10 +117,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirmModal"
-                        >Inhabilitar centro de carga
-                    </PrimaryBtn>
+                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar centro de carga </PrimaryBtn>
                 </div>
             </template>
         </Modal>

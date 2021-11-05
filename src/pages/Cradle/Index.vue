@@ -91,8 +91,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirmModal">Inhabilitar cradle </PrimaryBtn>
+                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cradle </PrimaryBtn>
                 </div>
             </template>
         </Modal>

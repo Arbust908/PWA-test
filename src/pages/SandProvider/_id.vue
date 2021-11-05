@@ -7,22 +7,8 @@
         </header>
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
-                <SandProviderForm
-                    :sp-name="currentSandProvider.name"
-                    :sp-legal-id="currentSandProvider.legalId"
-                    :sp-address="currentSandProvider.address"
-                    :sp-mesh-types="currentSandProvider.meshType"
-                    :sp-obs="currentSandProvider.observations"
-                    :sp-mesh="meshType"
-                    @update:spName="currentSandProvider.name = $event"
-                    @update:spLegalId="currentSandProvider.legalId = $event"
-                    @update:spAddress="currentSandProvider.address = $event"
-                    @update:spMeshTypes="currentSandProvider.meshType = $event"
-                    @update:spObs="currentSandProvider.observations = $event"
-                    @update:spMesh="meshType = $event"
-                    @add-mesh-type="addMeshType"
-                    @delete-mesh-type="deleteMeshType"
-                />
+                <SandProviderForm v-if="currentSandProvider" v-model="currentSandProvider" />
+
                 <SandProviderRep
                     :rep-name="companyRepresentative.name"
                     :rep-phone="companyRepresentative.phone"
@@ -35,7 +21,11 @@
             <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
                 <section class="space-x-6 flex items-center justify-end">
                     <NoneBtn @click.prevent="$router.push('/proveedores-de-arena')"> Cancelar </NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                    <PrimaryBtn
+                        :is-loading="loading"
+                        :disabled="!isValidated ? 'yes' : null"
+                        @click="isValidated && save()"
+                    >
                         Finalizar
                     </PrimaryBtn>
                 </section>
@@ -91,25 +81,14 @@
             const meshTypes = ref([]);
             const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-            const currentSandProvider: SandProvider = ref({});
+            const currentSandProvider: SandProvider = ref({
+                meshType: [],
+            });
             const isNewRep: Ref<boolean> = ref(false);
             const toggleRepStatus = useToggle(isNewRep);
             const companyRepresentative: CompanyRepresentative = ref({});
 
             let meshType = ref('');
-
-            const addMeshType = (newMeshType: string) => {
-                let mesh = meshTypes.value.filter((mesh) => {
-                    if (mesh.id == newMeshType) {
-                        return mesh;
-                    }
-                })[0];
-                currentSandProvider.value.meshType.push(mesh);
-            };
-
-            const deleteMeshType = (index: Object) => {
-                currentSandProvider.value.meshType.splice(index);
-            };
 
             const isValidated = ref(false);
 
@@ -118,16 +97,25 @@
             });
 
             const save = async () => {
-                await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value).then((res) => {
-                    if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
-                    }
+                //Todo: fix validación para el campo sandProvider.mesh
 
-                    if (res.type == 'success') {
-                        return { res };
-                    }
-                });
+                if (currentSandProvider.value.meshType.length === 0) {
+                    alert('debe ingresar un tipo de malla');
+
+                    return;
+                }
+
+                loading.value = true;
+                const res = await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value);
+
+                loading.value = false;
+
+                if (res.type == 'failed') {
+                    errorMessage.value = res.message;
+                    toggleNotificationModal();
+                } else if (res.type == 'success') {
+                    router.push('/proveedores-de-arena');
+                }
             };
 
             onMounted(async () => {
@@ -160,12 +148,11 @@
                 isValidated,
                 save,
                 meshType,
-                addMeshType,
-                deleteMeshType,
                 notificationModalvisible,
                 toggleNotificationModal,
                 errorMessage,
                 meshTypes,
+                loading,
             };
         },
     };
