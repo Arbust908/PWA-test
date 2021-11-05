@@ -28,15 +28,15 @@
                     />
                 </FieldGroup>
             </form>
-            <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                <section class="space-x-6 flex items-center justify-end">
-                    <NoneBtn @click="goToIndex">Cancelar</NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
         </section>
+        <footer class="mt-5 gap-3 flex justify-end max-w-2xl">
+            <section class="space-x-6 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click="goToIndex">Cancelar</SecondaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
@@ -46,7 +46,7 @@
     import { useStore } from 'vuex';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
@@ -61,7 +61,7 @@
             FieldInput,
             FieldTextArea,
             PrimaryBtn,
-            NoneBtn,
+            SecondaryBtn,
             Layout,
         },
         setup() {

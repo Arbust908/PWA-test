@@ -16,19 +16,19 @@
                     @update:repEmail="companyRepresentative.email = $event"
                 />
             </form>
-            <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                <section class="space-x-6 flex items-center justify-end">
-                    <NoneBtn @click.prevent="$router.push('/proveedores-de-arena')"> Cancelar </NoneBtn>
-                    <PrimaryBtn
-                        :is-loading="loading"
-                        :disabled="!isValidated ? 'yes' : null"
-                        @click="isValidated && save()"
-                    >
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
         </section>
+
+        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+            <section class="w-full space-x-6 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-arena')">
+                    Cancelar
+                </SecondaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
+
         <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
             <template #body>
                 <p>{{ errorMessage }}</p>
@@ -44,7 +44,7 @@
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import { useToggle } from '@vueuse/core';
     import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
@@ -57,7 +57,7 @@
     export default {
         components: {
             Layout,
-            NoneBtn,
+            SecondaryBtn,
             PrimaryBtn,
             SandProviderForm,
             SandProviderRep,
