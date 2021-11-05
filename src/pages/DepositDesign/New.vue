@@ -125,9 +125,14 @@
                 </fieldset>
             </form>
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
-            <PrimaryBtn :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()"> Guardar </PrimaryBtn>
+
+        <footer class="mt-5 gap-3 flex justify-end">
+            <section class="space-x-6 flex items-center justify-end">
+                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                    Guardar
+                </PrimaryBtn>
+            </section>
         </footer>
     </Layout>
 </template>
@@ -139,7 +144,7 @@
     import { useTitle } from '@vueuse/core';
 
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Counter from '@/components/ui/Counter.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
@@ -155,7 +160,7 @@
     export default defineComponent({
         components: {
             Counter,
-            GhostBtn,
+            SecondaryBtn,
             Layout,
             PrimaryBtn,
             DepositGrid,

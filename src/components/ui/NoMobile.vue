@@ -41,7 +41,7 @@
             @apply text-xl text-gray-800 mb-3 max-w-xs;
         }
         & > p {
-            @apply mb-9 text-gray-400 max-w-xs;
+            @apply mb-9 text-gray-400 max-w-xs text-sm;
         }
     }
 </style>
