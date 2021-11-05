@@ -23,6 +23,7 @@
                 class="btn__delete"
                 :class="pickupI == 0 ? 'mt-6' : 'mt-2'"
                 @click="remove(pickup.id)"
+                size="sm"
             >
                 <Icon icon="Trash" class="w-6 h-6" />
             </CircularBtn>
