@@ -8,7 +8,7 @@
         >
             <FieldInput
                 class="col-span-full sm:col-span-6 lg:col-span-3"
-                fieldName="chassis"
+                field-name="chassis"
                 placeholder="Id de tractor"
                 :title="traktorI === firstTraktorIndex ? 'ID Tractor/Chasis' : null"
                 :data="traktor.chassis"
@@ -16,7 +16,7 @@
             />
             <FieldInput
                 class="col-span-full sm:col-span-6 lg:col-span-4"
-                fieldName="supplier"
+                field-name="supplier"
                 placeholder="Proveedor de tractor"
                 :title="traktorI === firstTraktorIndex ? 'Proveedor' : null"
                 :data="traktor.supplier"
@@ -25,9 +25,9 @@
             <FieldInput
                 class="col-span-9 sm:col-span-6 lg:col-span-4"
                 :title="traktorI === firstTraktorIndex ? 'Descripción' : null"
-                fieldName="description"
+                field-name="description"
                 placeholder="Descripción de tractor"
-                isOptional
+                is-optional
                 :data="traktor.description"
                 @update:data="traktor.description = $event"
             />
@@ -36,6 +36,7 @@
                 class="btn__delete"
                 :class="traktorI == 0 ? 'mt-6' : 'mt-2'"
                 @click="remove(traktor.innerId)"
+                size="sm"
             >
                 <Icon icon="Trash" class="w-6 h-6" />
             </CircularBtn>
@@ -57,7 +58,7 @@
     import { useVModel } from '@vueuse/core';
 
     export default defineComponent({
-        name: 'woTraktorField',
+        name: 'WoTraktorField',
         components: {
             FieldInput,
             FieldGroup,
@@ -65,13 +66,13 @@
             Icon,
             CircularBtn,
         },
-        emits: ['update:traktors'],
         props: {
             traktors: {
                 type: Array,
                 required: true,
             },
         },
+        emits: ['update:traktors'],
         setup(props, { emit }) {
             const traktors = useVModel(props, 'traktors', emit);
             const lastTraktorIndex = computed(() => {
@@ -84,6 +85,7 @@
                 supplier: '',
                 description: '',
             };
+
             if (traktors.value.length === 0) {
                 traktors.value.push(defaultTraktor);
             }
@@ -93,6 +95,7 @@
             traktors.value = traktors.value.map((traktor) => {
                 tracktorInnerId.value++;
                 traktor.innerId = traktor.innerId ?? tracktorInnerId.value;
+
                 return traktor;
             });
             const remove = (traktorId: number) => {
@@ -108,9 +111,11 @@
                     description: '',
                 });
             };
+
             if (traktors?.value?.length === 0) {
                 add();
             }
+
             return {
                 lastTraktorIndex,
                 firstTraktorIndex,

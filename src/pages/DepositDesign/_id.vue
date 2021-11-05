@@ -53,8 +53,8 @@
                                     :checked="selectedBox.category === 'aisle'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('aisle')"
                                     class="form-checkbox aisle"
+                                    @click="setCat('aisle')"
                                 />
                                 <span>Pasillo</span>
                             </label>
@@ -64,8 +64,8 @@
                                     :checked="selectedBox.category === 'fina'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('fina')"
                                     class="form-checkbox fina"
+                                    @click="setCat('fina')"
                                 />
                                 <span>Arena fina</span>
                             </label>
@@ -75,8 +75,8 @@
                                     :checked="selectedBox.category === 'gruesa'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('gruesa')"
                                     class="form-checkbox gruesa"
+                                    @click="setCat('gruesa')"
                                 />
                                 <span>Arena gruesa</span>
                             </label>
@@ -86,8 +86,8 @@
                                     :checked="selectedBox.category === 'cortada'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('cortada')"
                                     class="form-checkbox cortada"
+                                    @click="setCat('cortada')"
                                 />
                                 <span>Caja cortada</span>
                             </label>
@@ -97,38 +97,17 @@
                                     :checked="selectedBox.category === 'empty'"
                                     type="radio"
                                     name="boxCat"
-                                    @click="setCat('empty')"
                                     class="form-checkbox empty"
+                                    @click="setCat('empty')"
                                 />
                                 <span>Vacio</span>
                             </label>
                         </div>
-                        <!-- <h2 class="col-span-full text-xl font-bold">Asignar ubicación</h2>
-            <div class="flex flex-col gap-5 ml-4">
-              <label class="type-select" for="top">
-                <input
-                  id="aisle"
-                  type="radio"
-                  name="boxCat"
-                  class="form-checkbox"
-                />
-                <span>Pasillo</span>
-              </label>
-              <label class="type-select" for="bot">
-                <input
-                  id="fine"
-                  type="radio"
-                  name="boxCat"
-                  class="form-checkbox"
-                />
-                <span>Arena fina</span>
-              </label>
-            </div> -->
                         <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" />
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5"
-                        :selectedBox="selectedBox"
+                        :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
                         :floor="floors"
@@ -137,15 +116,15 @@
                     />
                 </fieldset>
             </form>
-            <!-- {{ selectedBox }}
-      <hr />
-      {{ deposit }} -->
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
-            <PrimaryBtn type="submit" size="lg" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                Guardar
-            </PrimaryBtn>
+
+        <footer class="mt-5 gap-3 flex justify-end">
+            <section class="space-x-6 flex items-center justify-end">
+                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                    Guardar
+                </PrimaryBtn>
+            </section>
         </footer>
     </Layout>
 </template>
@@ -159,7 +138,7 @@
     import { TrashIcon } from '@heroicons/vue/outline';
     import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Counter from '@/components/ui/Counter.vue';
@@ -176,7 +155,7 @@
             BellIcon,
             CircularBtn,
             Counter,
-            GhostBtn,
+            SecondaryBtn,
             Layout,
             PlusIcon,
             PrimaryBtn,
@@ -192,7 +171,7 @@
                 baseURL: apiUrl,
             });
             const id = route.params.id;
-            useTitle(`Depostio ${id} <> Sandflow`);
+            useTitle(`Depósito ${id} <> Sandflow`);
             const Deposit = ref([]);
 
             const rows: Ref<number> = ref(0);
@@ -215,6 +194,7 @@
                     if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
                         const proxy = key.split('|');
                         const [Pfloor, Prow, Pcol] = proxy;
+
                         if (Number(Prow) > row) {
                             removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
                         }
@@ -241,6 +221,7 @@
                     if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
                         const proxy = key.split('|');
                         const [Pfloor, Prow, Pcol] = proxy;
+
                         if (Number(Pcol) > col) {
                             removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
                         }
@@ -267,6 +248,7 @@
                     if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
                         const proxy = key.split('|');
                         const [Pfloor, Prow, Pcol] = proxy;
+
                         if (Number(Pfloor) > floor) {
                             removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
                         }
@@ -279,9 +261,11 @@
                         const cell = deposit.value[key];
                         const proxy = key.split('|');
                         const [Pfloor, Prow, Pcol] = proxy;
+
                         if (cell === 'DELETED') {
                             //BOrrar ?
                         }
+
                         if (Number(Pfloor) > floors.value || Number(Prow) > rows.value || Number(Pcol) > cols.value) {
                             removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
                         }
@@ -376,11 +360,13 @@
                         dims.floor = Math.max(dims.floor, floor);
                         dims.row = Math.max(dims.row, row);
                         dims.col = Math.max(dims.col, col);
+
                         return dims;
                     },
                     { floor: 0, row: 0, col: 0 }
                 );
                 dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
+
                 return dimensions;
             };
 
@@ -401,6 +387,7 @@
                     return depo.id === Number(id);
                 })
             );
+
             if (vuexData.value) {
                 Deposit.value = vuexData;
                 updateData(vuexData.value);
@@ -422,6 +409,7 @@
             const isFull = computed(() => {
                 const hasClientAndPit: boolean = clientId.value >= 0 && pitId.value >= 0;
                 const hasDeposit: boolean = rows.value > 0 && cols.value > 0 && floors.value > 0;
+
                 return hasClientAndPit && hasDeposit;
             });
             const save = () => {

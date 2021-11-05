@@ -52,12 +52,15 @@
         }
     }
     &.secondary {
-        @apply text-main-700 bg-main-500 hover:bg-main-700 hover:text-white border shadow-sm hover:shadow-lg;
+        @apply text-second-700 bg-second-100 hover:bg-second-200 border border-second-400 hover:shadow-lg;
     }
     &.ghost {
         @apply text-main-600 border shadow-sm hover:text-main-400 hover:shadow-lg;
     }
     &.none:hover {
         @apply bg-second-100 bg-opacity-50;
+    }
+    &.wide {
+        @apply px-8;
     }
 }

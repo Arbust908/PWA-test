@@ -59,18 +59,24 @@
                     <td>
                         <div class="btn-panel">
                             <router-link :to="`/proveedores-de-transporte/${tp.id}`">
-                                <CircularBtn size="xs" class="bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
-                                </CircularBtn>
+                                <Popper hover content="Editar">
+                                    <CircularBtn size="xs" class="bg-blue-500">
+                                        <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
+                                    </CircularBtn>
+                                </Popper>
                             </router-link>
 
-                            <CircularBtn v-if="tp.visible" class="bg-red-500" size="xs" @click="updateVisibility(tp)">
-                                <Icon icon="EyeOff" type="outlined" class="w-5 h-5 text-white" />
-                            </CircularBtn>
-
-                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(tp)">
-                                <Icon icon="Eye" type="outlined" class="w-5 h-5 text-white" />
-                            </CircularBtn>
+                            <Popper hover :content="tp.visible ? 'Inhabilitar' : 'Habilitar'">
+                                <CircularBtn
+                                    class="ml-4"
+                                    :class="tp.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    size="xs"
+                                    @click="openModalVisibility(tp)"
+                                >
+                                    <Icon v-if="tp.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                </CircularBtn>
+                            </Popper>
                         </div>
                     </td>
                 </tr>
@@ -92,8 +98,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar proveedor </PrimaryBtn>
+                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar proveedor </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -112,6 +118,7 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import Modal from '@/components/modal/General.vue';
+    import Popper from 'vue3-popper';
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
@@ -126,6 +133,7 @@
             GhostBtn,
             FieldSelect,
             Modal,
+            Popper,
         },
         setup() {
             useTitle('Proveedores de Transporte <> Sandflow');
@@ -138,8 +146,6 @@
             const tableColumns = ['Proveedor', 'Domicilio', 'Representante', 'Teléfono'];
 
             const filteredTransportProviders = computed(() => {
-                console.log('cambio?');
-
                 if (transportProviderId.value > -1) {
                     return tpDB.value.filter((tp) => tp.id == transportProviderId.value);
                 }
@@ -169,12 +175,18 @@
                 loading.value = false;
             });
 
-            const openModalVisibility = (transportProvider) => {
+            const openModalVisibility = async (transportProvider) => {
                 selectedtransportProvider.value = transportProvider;
-                showModal.value = true;
+
+                if (transportProvider.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await updateVisibility(selectedtransportProvider.value);
             };
 
-            const confirm = async () => {
+            const confirmModal = async () => {
                 await updateVisibility(selectedtransportProvider.value);
                 showModal.value = false;
             };
@@ -194,10 +206,9 @@
                 filteredTransportProviders,
                 clearFilters,
                 transportProviderId,
-                updateVisibility,
                 showModal,
                 openModalVisibility,
-                confirm,
+                confirmModal,
                 tableColumns,
             };
         },
