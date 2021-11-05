@@ -5,7 +5,7 @@
             <h1 class="text-center text-xl sm:text-2xl text-black font-bold mt-8">
                 La experiencia móvil no está disponible para esta sección.
             </h1>
-            <p class="text-center text-gray-400 font-bold text-sm mt-4 px-4">
+            <p class="text-center text-sm text-gray-400 mt-3 max-w-[287px] mx-auto px-2">
                 Para continuar, te sugerimos acceder desde una computadora o tablet.
             </p>
             <div class="flex justify-center mt-6">
