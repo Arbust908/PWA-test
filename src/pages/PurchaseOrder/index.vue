@@ -109,6 +109,7 @@
                 const data = destroy(poId);
                 deletePurchaseOrder(poId);
             };
+
             return {
                 PurchaseOrders,
                 deletePO,

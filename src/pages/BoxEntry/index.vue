@@ -203,18 +203,19 @@
                 </div>
             </form>
         </section>
-        <footer class="p-4 space-x-8 flex justify-end">
-            <GhostBtn class="border-none" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </GhostBtn>
-            <PrimaryBtn type="submit" @click.prevent="save()"> Guardar </PrimaryBtn>
+        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end">
+            <section class="w-full space-x-6 flex items-center justify-end">
+                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
+                <PrimaryBtn btn="wide" type="submit" @click.prevent="save()"> Guardar </PrimaryBtn>
+            </section>
         </footer>
-        <Modal type="success" :open="confirmModal" class="modal" title="Orden de pedido guardada" @close="resetBoxIn">
+        <Modal type="success" :open="confirmModal" class="modal" @close="resetBoxIn">
             <template #body>
-                <p>La Orden de pedido se guardo con exito</p>
+                <p class="font-bold text-black">El ingreso de cajas ha sido guardado con éxito</p>
             </template>
             <template #btn>
-                <div class="w-full flex justify-end gap-5">
-                    <NoneBtn @click.prevent="$router.push('/')"> Salir </NoneBtn>
-                    <PrimaryBtn @click.prevent="resetBoxIn"> Crear Nueva </PrimaryBtn>
+                <div class="w-full flex justify-center gap-5">
+                    <PrimaryBtn @click.prevent="resetBoxIn">Continuar</PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -222,29 +223,24 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, watch, onMounted, watchEffect } from 'vue';
+    import { ref, Ref, computed, defineComponent, onMounted, watchEffect } from 'vue';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
 
-    import { TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon, BellIcon, EyeIcon } from '@heroicons/vue/solid';
+    import { EyeIcon } from '@heroicons/vue/solid';
     import EyeIconOff from './EyeIconOff.vue';
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import Counter from '@/components/ui/Counter.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
     import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
     import CradleRow from './CradleRow.vue';
 
-    import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
+    import { Company, Pit, Box } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import Modal from '@/components/modal/General.vue';
 
     import axios from 'axios';
@@ -252,26 +248,19 @@
 
     export default defineComponent({
         components: {
-            BellIcon,
-            CircularBtn,
-            Counter,
-            GhostBtn,
-            Layout,
-            PlusIcon,
-            PrimaryBtn,
-            TrashIcon,
-            DepositGrid,
             BoxCard,
-            EyeIcon,
-            EyeIconOff,
             ClientPitCombo,
             CradleRow,
+            DepositGrid,
+            EyeIcon,
+            EyeIconOff,
             FieldGroup,
             FieldSelect,
-            FieldInput,
-            Icon,
+            SecondaryBtn,
+            Layout,
             Modal,
             NoneBtn,
+            PrimaryBtn,
         },
         setup() {
             useTitle('Ingreso de Cajas <> Sandflow');
@@ -575,9 +564,7 @@
             };
 
             const selectionsAreDone = computed(() => {
-                if (clientId.value !== -1 && pitId.value !== -1 && purchaseOrderId.value !== -1) {
-                    return true;
-                }
+                return clientId.value !== -1 && pitId.value !== -1 && purchaseOrderId.value !== -1;
             });
 
             const warehouse = ref({});

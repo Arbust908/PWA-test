@@ -3,22 +3,27 @@
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
             <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo tipo de arena</h1>
         </header>
-        <section class="bg-white rounded-md shadow-sm max-w-2xl">
+        <section class="bg-white rounded-md shadow-sm max-w-2xl pb-5">
             <SandForm
                 :type="type"
                 :description="observations"
                 @update:type="type = $event"
                 @update:description="observations = $event"
             />
-            <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                <section class="space-x-6 flex items-center justify-end">
-                    <NoneBtn @click.prevent="goToIndex">Cancelar</NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
         </section>
+        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl m">
+            <section class="w-full space-x-6 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/tipos-de-arena')"> Cancelar </SecondaryBtn>
+                <PrimaryBtn
+                    btn="wide"
+                    :is-loading="isLoading"
+                    :disabled="!isValidated ? 'yes' : null"
+                    @click="isValidated && save()"
+                >
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
@@ -28,7 +33,7 @@
     import { useStore } from 'vuex';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import { useValidator } from '@/helpers/useValidator';
     import axios from 'axios';
@@ -39,7 +44,7 @@
     export default {
         components: {
             PrimaryBtn,
-            NoneBtn,
+            SecondaryBtn,
             Layout,
             SandForm,
         },
@@ -54,40 +59,36 @@
 
             const newSand = reactive({
                 type: '',
-                // description: '',
-                // meshType: '',
-                // grainType: '',
                 observations: '',
             });
 
             const isValidated = ref(false);
+            const isLoading = ref(false);
 
             watchEffect(async () => {
                 isValidated.value = (await useValidator(store, 'sand')) ? true : false;
             });
 
             const save = async () => {
-                let sandDB = await axios
-                    .post(`${api}/sand`, newSand)
-                    .catch((err) => {
-                        console.log(err);
-                    })
-                    .then((res) => {
-                        console.log(res);
-                        if (res.status === 200) {
-                            return res.data;
-                        }
-                        return {};
-                    })
-                    .finally(() => {
-                        router.push('/tipos-de-arena');
-                    });
+                isLoading.value = true;
+
+                const response = await axios.post(`${api}/sand`, newSand).catch((err) => {
+                    console.log(err);
+                });
+
+                isLoading.value = false;
+
+                if (response.status === 200) {
+                    router.push('/tipos-de-arena');
+                }
             };
+
             return {
                 goToIndex,
                 save,
                 ...toRefs(newSand),
                 isValidated,
+                isLoading,
             };
         },
     };

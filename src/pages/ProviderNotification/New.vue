@@ -6,10 +6,10 @@
         <section class="bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-4 flex-col gap-4">
                 <SandProviderPack
-                    :sandProviders="sandProviderIds"
+                    :sand-providers="sandProviderIds"
+                    :filtered-sand-types="filteredSandTypes"
                     @update:sandProviders="sandProviderIds = $event"
                     @change="sandProviderHandler"
-                    :filteredSandTypes="filteredSandTypes"
                 />
                 <fieldset class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
                     <h2 class="col-span-full text-xl mt-4">Transporte</h2>
@@ -18,7 +18,7 @@
                         <FieldSelect
                             :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full sm:col-span-5'"
                             title="Proveedor"
-                            :fieldName="`transportProvider${tO.id}`"
+                            :field-name="`transportProvider${tO.id}`"
                             placeholder="Seleccionar"
                             endpoint="/transportProvider"
                             :data="tO.transportProviderId"
@@ -30,7 +30,7 @@
                         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
                             <FieldInput
                                 class="col-span-full sm:col-span-3"
-                                :fieldName="`transportAmount${tO.id}`"
+                                :field-name="`transportAmount${tO.id}`"
                                 placeholder="Camiones"
                                 title="Camiones"
                                 :data="tO.amount"
@@ -38,7 +38,7 @@
                             />
                             <FieldInput
                                 class="col-span-full sm:col-span-5"
-                                :fieldName="`transportObservations${tO.id}`"
+                                :field-name="`transportObservations${tO.id}`"
                                 placeholder="Observaciones"
                                 title="Observaciones"
                                 :data="tO.observation"
@@ -64,7 +64,7 @@
         </section>
         <Modal type="off" :open="showModal" @close="togglemodal">
             <template #body>
-                <div class="text-left" v-if="!isNotificationConfirmed">
+                <div v-if="!isNotificationConfirmed" class="text-left">
                     <p class="text-base text-black font-bold">Notificación a proveedores</p>
                     <div
                         v-if="modalData.sandProvider"
@@ -104,8 +104,8 @@
                     </div>
                 </div>
                 <div
-                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
                     v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
+                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
                 >
                     <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
                     <span class="text-center text-base border-none text-gray-900"
@@ -113,8 +113,8 @@
                     >
                 </div>
                 <div
-                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
                     v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess"
+                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
                 >
                     <Icon icon="exclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
                     <span class="text-center text-base border-none text-gray-900"
@@ -123,22 +123,16 @@
                 </div>
             </template>
             <template #btn>
-                <div class="flex gap-4 justify-end" v-if="!isNotificationConfirmed">
-                    <button type="button" class="modal-close-button" @click.prevent="toggleModal">Volver</button>
-                    <button type="button" class="modal-create-new-button" @click.prevent="confirmNotification">
-                        Confirmar
-                    </button>
+                <div v-if="!isNotificationConfirmed" class="flex gap-4 justify-end">
+                    <GhostBtn class="outline-none" @click.prevent="toggleModal"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
                 </div>
-                <div class="flex justify-center gap-4" v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess">
-                    <router-link to="/" class="modal-close-button w-1/3">
-                        <button type="button">Cerrar</button>
-                    </router-link>
-                    <button type="button" class="modal-create-new-button" @click.prevent="createNew">
-                        Crear nueva
-                    </button>
+                <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
+                    <GhostBtn class="outline-none w-1/3" @click.prevent="$router.push('/')"> Cerrar </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click.prevent="createNew">Crear nueva</PrimaryBtn>
                 </div>
-                <div class="flex gap-4" v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess">
-                    <button type="button" class="modal-close-button" @click.prevent="toggleModal">Volver</button>
+                <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
+                    <GhostBtn class="outline-none" @click.prevent="toggleModal"> Volver </GhostBtn>
                 </div>
             </template>
         </Modal>
@@ -146,53 +140,41 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, defineAsyncComponent, watch, watchEffect } from 'vue';
+    import { ref, Ref, computed, defineComponent, defineAsyncComponent, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import { TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import { ProviderNotification, SandOrder, TransportProvider, SandProvider, Sand } from '@/interfaces/sandflow';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import { ProviderNotification, SandOrder, TransportProvider, Sand } from '@/interfaces/sandflow';
     import { useToggle } from '@vueuse/core';
-    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
     import SandProviderPack from '@/components/notifications/sandProviderPack.vue';
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
-    import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
         components: {
-            BellIcon,
-            CircularBtn,
             NoneBtn,
             Layout,
             Modal,
-            PlusIcon,
             PrimaryBtn,
-            TrashIcon,
-            FieldGroup,
+            GhostBtn,
             FieldInput,
-            FieldLegend,
             FieldSelect,
-            FieldWithSides,
             SandProviderPack,
             Icon,
         },
         setup() {
-            useTitle('Notificacion a Proveedores <> Sandflow');
+            useTitle('Notificación a Proveedores <> Sandflow');
             const router = useRouter();
             const store = useStore();
             const instance = axios.create({
@@ -212,6 +194,7 @@
                 const sp = sandProviders.value.find((sp) => {
                     return sp.id == spId;
                 });
+
                 return sp ? sp.name : '';
             };
 
@@ -227,6 +210,7 @@
                 const st = sandTypes.value.find((st) => {
                     return st.id == stId;
                 });
+
                 return st ? st.type : '';
             };
 
@@ -276,6 +260,7 @@
             const removeTransportProvider = (tpId: number) => {
                 transportOrder.value = transportOrder.value.filter((tp) => tp.id !== tpId);
             };
+
             if (transportOrder.value.length === 0) {
                 addTransportProvider();
             }
@@ -307,6 +292,7 @@
                         sandOrders: sandProviderIds.value[0].SandOrders,
                     };
                 }
+
                 if (transportOrder.value[0].transportProviderId > 0 && sandProviderIds.value[0].id < 0) {
                     pN.value = {
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
@@ -314,6 +300,7 @@
                         observations: transportOrder.value[0].observation,
                     };
                 }
+
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId > 0) {
                     pN.value = {
                         textArena: 'Arena',
@@ -334,12 +321,15 @@
                             amount: order.amount,
                         });
                     });
+
                     return sanitizedSandOrders;
                 };
 
                 const getTranportProviderName = (id) => {
                     return transportProviders.value.filter((each) => {
-                        if (each.id == id) return each;
+                        if (each.id == id) {
+                            return each;
+                        }
                     })[0].name;
                 };
 

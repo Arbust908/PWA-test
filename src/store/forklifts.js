@@ -64,13 +64,7 @@ export default {
             }
             let response = await dispatch(method, payload);
 
-            if (!getters.getInternetConnection) {
-                return (response.err = 'Sin internet');
-            }
-
-            let resp = await dispatch(method, payload);
-
-            return resp;
+            return response;
         },
         setForklifts({ commit }, forklifts) {
             commit('SET_FORKLIFTS', forklifts);

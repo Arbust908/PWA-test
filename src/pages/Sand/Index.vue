@@ -25,7 +25,7 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5">
+        <UiTable class="mt-5 lg:w-7/12 min-w-min">
             <template #header>
                 <tr>
                     <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
@@ -56,18 +56,24 @@
                     <td>
                         <div class="btn-panel">
                             <router-link :to="`/tipos-de-arena/${st.id}`">
-                                <CircularBtn size="xs" class="bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
-                                </CircularBtn>
+                                <Popper hover content="Editar">
+                                    <CircularBtn size="xs" class="bg-blue-500">
+                                        <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
+                                    </CircularBtn>
+                                </Popper>
                             </router-link>
 
-                            <CircularBtn v-if="st.visible" class="bg-red-500" size="xs" @click="updateVisibility(st)">
-                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-
-                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(st)">
-                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
+                            <Popper hover :content="st.visible ? 'Inhabilitar' : 'Habilitar'">
+                                <CircularBtn
+                                    class="ml-4"
+                                    :class="st.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    size="xs"
+                                    @click="openModalVisibility(st)"
+                                >
+                                    <Icon v-if="st.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                </CircularBtn>
+                            </Popper>
                         </div>
                     </td>
                 </tr>
@@ -88,8 +94,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar tipo de arena</PrimaryBtn>
+                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar tipo de arena</PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -109,6 +115,8 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import Modal from '@/components/modal/General.vue';
 
+    import Popper from 'vue3-popper';
+
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -122,6 +130,7 @@
             FieldSelect,
             CircularBtn,
             Modal,
+            Popper,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');
@@ -191,12 +200,18 @@
                 sandId.value = -1;
             };
 
-            const openModalVisibility = (sand) => {
+            const openModalVisibility = async (sand) => {
                 selectedSand.value = sand;
-                showModal.value = true;
+
+                if (sand.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await updateVisibility(selectedSand.value);
             };
 
-            const confirm = async () => {
+            const confirmModal = async () => {
                 await updateVisibility(selectedSand.value);
                 showModal.value = false;
             };
@@ -215,10 +230,9 @@
                 sandId,
                 filteredSands,
                 clearFilters,
-                updateVisibility,
                 showModal,
                 openModalVisibility,
-                confirm,
+                confirmModal,
                 tableColumns,
             };
         },

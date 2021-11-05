@@ -21,15 +21,15 @@
                         <span> Transportista </span>
                     </button>
                 </nav>
-                <section class="bg-white rounded-md max-w-2xl shadow-sm" v-if="activeSection === 'provider'">
+                <section v-if="activeSection === 'provider'" class="bg-white rounded-md max-w-2xl shadow-sm">
                     <TransportProviderFrom
-                        :tpName="newTransportProvider.name"
-                        :tpId="newTransportProvider.legalId"
-                        :tpAddress="newTransportProvider.address"
-                        :tpObservations="newTransportProvider.observations"
-                        :crName="companyRepresentative.name"
-                        :crPhone="companyRepresentative.phone"
-                        :crEmail="companyRepresentative.email"
+                        :tp-name="newTransportProvider.name"
+                        :tp-id="newTransportProvider.legalId"
+                        :tp-address="newTransportProvider.address"
+                        :tp-observations="newTransportProvider.observations"
+                        :cr-name="companyRepresentative.name"
+                        :cr-phone="companyRepresentative.phone"
+                        :cr-email="companyRepresentative.email"
                         @update:tpName="newTransportProvider.name = $event"
                         @update:tpId="newTransportProvider.legalId = $event"
                         @update:tpAddress="newTransportProvider.address = $event"
@@ -38,28 +38,16 @@
                         @update:crPhone="companyRepresentative.phone = $event"
                         @update:crEmail="companyRepresentative.email = $event"
                     />
-                    <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                        <section class="space-x-6 flex items-center justify-end">
-                            <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')"> Cancelar </NoneBtn>
-                            <PrimaryBtn
-                                :class="isValidated ? null : 'opacity-50 cursor-not-allowed'"
-                                @click="isValidated && save()"
-                                :disabled="!isValidated"
-                            >
-                                Finalizar
-                            </PrimaryBtn>
-                        </section>
-                    </footer>
                 </section>
-                <section class="bg-white rounded-md max-w-2xl shadow-sm" v-if="activeSection === 'driver'">
+                <section v-if="activeSection === 'driver'" class="bg-white rounded-md max-w-2xl shadow-sm">
                     <form method="POST" action="/" class="p-4 max-w-lg">
                         <TransportProviderDriverForm
-                            :driverName="newDriver.name"
-                            :driverPhone="newDriver.phone"
-                            :driverEmail="newDriver.email"
-                            :driverTType="newDriver.vehicleType"
-                            :driverTId="newDriver.transportId"
-                            :driverObs="newDriver.observations"
+                            :driver-name="newDriver.name"
+                            :driver-phone="newDriver.phone"
+                            :driver-email="newDriver.email"
+                            :driver-t-type="newDriver.vehicleType"
+                            :driver-t-id="newDriver.transportId"
+                            :driver-obs="newDriver.observations"
                             @update:driverName="newDriver.name = $event"
                             @update:driverPhone="newDriver.phone = $event"
                             @update:driverEmail="newDriver.email = $event"
@@ -69,21 +57,24 @@
                             @add-driver="addDriver()"
                         />
                     </form>
-                    <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                        <section class="space-x-6 flex items-center justify-end">
-                            <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')"> Cancelar </NoneBtn>
-                            <PrimaryBtn
-                                :disabled="!isValidated ? 'yes' : null"
-                                @click="
-                                    hasFullNewDriver && addDriver();
-                                    isValidated && save();
-                                "
-                            >
-                                Finalizar
-                            </PrimaryBtn>
-                        </section>
-                    </footer>
                 </section>
+                <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+                    <section class="w-full space-x-6 flex items-center justify-end">
+                        <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
+                            Cancelar
+                        </SecondaryBtn>
+                        <PrimaryBtn
+                            btn="wide"
+                            :disabled="!isValidated ? 'yes' : null"
+                            @click="
+                                hasFullNewDriver && addDriver();
+                                isValidated && save();
+                            "
+                        >
+                            Finalizar
+                        </PrimaryBtn>
+                    </section>
+                </footer>
             </section>
             <section class="w-4/12 mt-12 ml-4 flex flex-col gap-y-4">
                 <DriverCard
@@ -92,8 +83,8 @@
                     :name="driver.name"
                     :phone="driver.phone"
                     :email="driver.email"
-                    :vehicleType="driver.vehicleType"
-                    :transportId="driver.transportId"
+                    :vehicle-type="driver.vehicleType"
+                    :transport-id="driver.transportId"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
@@ -114,7 +105,7 @@
     import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
     import DriverCard from '@/components/transportProvider/DriverCard.vue';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     // AXIOS
@@ -130,7 +121,7 @@
             DriverCard,
             Icon,
             Layout,
-            NoneBtn,
+            SecondaryBtn,
             PrimaryBtn,
             TransportProviderFrom,
             TransportProviderDriverForm,
@@ -145,7 +136,7 @@
 
             let activeSection = ref('provider');
 
-            const changeSection = (option: String) => {
+            const changeSection = (option: string) => {
                 return (activeSection.value = option);
             };
 
@@ -162,7 +153,8 @@
 
             const addDriver = () => {
                 const driver = { ...newDriver };
-                if (hasFullNewDriver) {
+
+                if (hasFullNewDriver.value) {
                     drivers.push(driver);
                 }
                 cleanNewDriver();
@@ -226,7 +218,7 @@
                 const representanteDone = ref(false);
                 const transportProviderDone = ref(false);
 
-                if (hasFullNewDriver) {
+                if (hasFullNewDriver.value) {
                     addDriver();
                 }
                 //
@@ -242,6 +234,7 @@
                 });
                 watch(compRepData, (apiData) => {
                     console.log(apiData);
+
                     if (apiData && apiData.data) {
                         newTransportProvider.companyRepresentativeId = apiData.data.id;
                         const { data, isFinished: transProvDone } = useAxios(
@@ -256,6 +249,7 @@
                         });
                         watch(data, (newData, _) => {
                             console.log(newData);
+
                             if (newData && newData.data) {
                                 const tpId = newData.data.id;
                                 const tpSave = reactive({ ...newData.data });

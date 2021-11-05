@@ -65,13 +65,7 @@ export default {
 
             let response = await dispatch(method, payload);
 
-            if (!getters.getInternetConnection) {
-                return (response.err = 'Sin internet');
-            }
-
-            let resp = await dispatch(method, payload);
-
-            return resp;
+            return response;
         },
         setSandProviders({ commit }, sandProviders) {
             commit('SET_SANDPROVIDERS', sandProviders);
@@ -83,7 +77,7 @@ export default {
                     if (res.status == 200) {
                         commit('SET_SANDPROVIDERS', res.data.data);
 
-                        return res.data.data;
+                        return res;
                     }
                 })
                 .catch(() => {
@@ -95,7 +89,7 @@ export default {
                 .get(`${api}/sandProvider/${payload}`)
                 .then((res) => {
                     if (res.status == 200) {
-                        return res.data.data;
+                        return res;
                     }
                 })
                 .catch((err) => {
@@ -130,10 +124,12 @@ export default {
                                     sandProvider.id = response.data.data.id;
                                     commit('UPDATE_SANDPROVIDER', sandProvider);
 
-                                    return response.data.data;
+                                    return response;
                                 }
                             })
-                            .catch(() => {
+                            .catch((err) => {
+                                console.log(err);
+
                                 return { status: 'failed' };
                             });
                     }
@@ -153,7 +149,7 @@ export default {
                                 if (response.status === 200) {
                                     commit('UPDATE_SANDPROVIDER', payload);
 
-                                    return response.data.data;
+                                    return response;
                                 }
                             })
                             .catch(() => {
@@ -172,7 +168,7 @@ export default {
                     if (res.status == 200) {
                         commit('DELETE_SANDPROVIDER', payload);
 
-                        return res.status;
+                        return res;
                     }
                 })
                 .catch((err) => {

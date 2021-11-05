@@ -89,29 +89,29 @@
                     />
                 </FieldGroup>
             </form>
-
-            <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-                <section class="w-full space-x-6 flex items-center justify-end">
-                    <NoneBtn @click.prevent="$router.push('/clientes')"> Cancelar </NoneBtn>
-                    <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
         </section>
+        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+            <section class="w-full space-x-6 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/clientes')"> Cancelar </SecondaryBtn>
+
+                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
 <script lang="ts">
     import { useRouter, useRoute } from 'vue-router';
     import { useStore } from 'vuex';
-    import { ref, computed, watchEffect } from 'vue';
+    import { ref, watchEffect } from 'vue';
     import { useTitle } from '@vueuse/core';
     import { Company } from '@/interfaces/sandflow';
     import Toggle from '@/components/ui/Toggle.vue';
     import { useValidator } from '@/helpers/useValidator';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
@@ -125,7 +125,7 @@
             Layout,
             PrimaryBtn,
             Toggle,
-            NoneBtn,
+            SecondaryBtn,
             FieldGroup,
             FieldInput,
             FieldLegend,
@@ -182,6 +182,7 @@
                         if (res.status === 200) {
                             return res.data;
                         }
+
                         return {};
                     })
                     .finally(() => {

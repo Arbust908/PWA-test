@@ -36,7 +36,7 @@
                     </th>
 
                     <th scope="col">
-                        <span class="sr-only">Acciones</span>
+                        <span>Acciones</span>
                     </th>
                 </tr>
             </template>
@@ -68,18 +68,29 @@
                     <td>
                         <div class="btn-panel">
                             <router-link :to="`/clientes/${client.id}`">
-                                <CircularBtn size="xs" class="btn__delete bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                </CircularBtn>
+                                <Popper hover content="Editar">
+                                    <CircularBtn size="xs" class="btn__delete bg-blue-500">
+                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
+                                    </CircularBtn>
+                                </Popper>
                             </router-link>
 
-                            <CircularBtn v-if="client.visible" class="bg-red-500" size="xs" @click="update(client)">
-                                <Icon icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-
-                            <CircularBtn v-else class="bg-blue-500" size="xs" @click="openModalVisibility(client)">
-                                <Icon icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
+                            <Popper hover :content="client.visible ? 'Inhabilitar' : 'Habilitar'">
+                                <CircularBtn
+                                    class="ml-4"
+                                    :class="client.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    size="xs"
+                                    @click="openModalVisibility(client)"
+                                >
+                                    <Icon
+                                        v-if="client.visible"
+                                        icon="EyeOff"
+                                        type="outlined"
+                                        class="w-6 h-6 text-white"
+                                    />
+                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                                </CircularBtn>
+                            </Popper>
                         </div>
                     </td>
                 </tr>
@@ -98,8 +109,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirm">Inhabilitar cliente </PrimaryBtn>
+                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -116,13 +127,13 @@
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Modal from '@/components/modal/General.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Badge from '@/components/ui/Badge.vue';
+    import Popper from 'vue3-popper';
 
     import { useStore } from 'vuex';
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
-
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import Badge from '@/components/ui/Badge.vue';
 
     export default {
         components: {
@@ -135,6 +146,7 @@
             FieldSelect,
             Badge,
             Modal,
+            Popper,
         },
         setup() {
             useTitle('Clientes <> Sandflow');
@@ -177,12 +189,18 @@
                 loading.value = false;
             };
 
-            const openModalVisibility = (client) => {
+            const openModalVisibility = async (client) => {
                 selectedClient.value = client;
-                showModal.value = true;
+
+                if (client.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await update(selectedClient.value);
             };
 
-            const confirm = async () => {
+            const confirmModal = async () => {
                 await update(selectedClient.value);
                 showModal.value = false;
             };
@@ -213,7 +231,7 @@
                 total,
                 update,
                 openModalVisibility,
-                confirm,
+                confirmModal,
                 showModal,
                 tableColumns,
             };

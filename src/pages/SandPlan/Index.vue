@@ -56,7 +56,7 @@
 </template>
 
 <script>
-    import { watch, ref } from 'vue';
+    import { onMounted, watch, ref } from 'vue';
     import { useStore } from 'vuex';
     import Layout from '@/layouts/Main.vue';
     import {
@@ -100,15 +100,15 @@
                 if (sPData && sPData.data) {
                     sandPlans.value = sPData.data;
                     console.log('mis sps', sandPlans.value);
-                    sandPlans.value.map((sp) => {
-                        storeToVuex(sp);
-                    });
+                    // sandPlans.value.map((sp) => {
+                    //     storeToVuex(sp);
+                    // });
                 }
             });
 
-            const storeToVuex = (sandPlan) => {
-                store.dispatch('saveSandPlan', sandPlan);
-            };
+            // const storeToVuex = (sandPlan) => {
+            //     store.dispatch('saveSandPlan', sandPlan);
+            // };
 
             const sumQty = (sandStages) => {
                 let total = 0;
@@ -119,6 +119,7 @@
                         }
                     });
                 });
+
                 return total;
             };
             const deleteSP = (id) => {
@@ -130,6 +131,7 @@
                 });
                 loading.value = false;
             };
+
             return {
                 sandPlans,
                 deleteSP,

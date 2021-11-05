@@ -3,30 +3,30 @@
         <FieldGroup>
             <FieldInput
                 class="col-span-full"
-                fieldName="transportName"
+                field-name="transportName"
                 placeholder="Ingresar Nombre / Razón Social"
                 title="Nombre / Razón Social"
                 :data="tpName"
-                @update:data="tpName = $event"
-                requireValidation
+                require-validation
                 entity="transportProvider"
+                @update:data="tpName = $event"
             />
             <FieldInput
                 class="col-span-full"
-                fieldName="transportId"
+                field-name="transportId"
                 placeholder="Ingresar CUIT / CUIL"
                 title="CUIT / CUIL"
                 mask="#*"
                 :data="tpId"
-                @update:data="tpId = $event"
-                requireValidation
+                require-validation
                 entity="transportProvider"
-                validationType="extension"
-                :charAmount="{ min: 11, max: 11 }"
+                validation-type="extension"
+                :char-amount="{ min: 11, max: 11 }"
+                @update:data="tpId = $event"
             />
             <FieldInput
                 class="col-span-full"
-                fieldName="address"
+                field-name="address"
                 placeholder="Ingresar Domicilio"
                 title="Domicilio"
                 :data="tpAddress"
@@ -34,12 +34,12 @@
             />
             <FieldTextArea
                 class="col-span-full"
-                fieldName="observations"
+                field-name="observations"
                 placeholder="Observaciones..."
                 title="Observaciones"
                 :rows="5"
-                isFixed
-                isOptional
+                is-fixed
+                is-optional
                 :data="tpObservations"
                 @update:data="tpObservations = $event"
             />
@@ -49,34 +49,34 @@
             <FieldInput
                 class="col-span-full"
                 title="Nombre y Apellido"
-                fieldName="repName"
+                field-name="repName"
                 placeholder="Ingresar Nombre y Apellido"
                 :data="crName"
-                @update:data="crName = $event"
-                requireValidation
+                require-validation
                 entity="transportProvider"
+                @update:data="crName = $event"
             />
             <FieldInput
                 class="col-span-full"
                 title="Teléfono"
-                fieldName="repTel"
+                field-name="repTel"
                 placeholder="+11 1234 5678"
                 mask="#*"
                 :data="crPhone"
-                @update:data="crPhone = $event"
-                requireValidation
+                require-validation
                 entity="transportProvider"
+                @update:data="crPhone = $event"
             />
             <FieldInput
                 class="col-span-full"
                 title="Email"
-                fieldName="repEmail"
+                field-name="repEmail"
                 placeholder="empresa@mail.com"
                 :data="crEmail"
-                @update:data="crEmail = $event"
-                requireValidation
+                require-validation
                 entity="transportProvider"
-                validationType="email"
+                validation-type="email"
+                @update:data="crEmail = $event"
             />
         </FieldGroup>
     </form>
@@ -90,6 +90,12 @@
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import { useVModels } from '@vueuse/core';
     export default defineComponent({
+        components: {
+            FieldGroup,
+            FieldInput,
+            FieldLegend,
+            FieldTextArea,
+        },
         props: {
             tpName: {
                 type: String,
@@ -120,14 +126,9 @@
                 default: '',
             },
         },
-        components: {
-            FieldGroup,
-            FieldInput,
-            FieldLegend,
-            FieldTextArea,
-        },
         setup(props, { emit }) {
             const { tpName, tpId, tpAddress, tpObservations, crName, crPhone, crEmail } = useVModels(props, emit);
+
             return {
                 tpName,
                 tpId,
