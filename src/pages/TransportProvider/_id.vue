@@ -65,7 +65,7 @@
                         <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
                             Cancelar
                         </SecondaryBtn>
-                        <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isFull && update()">
+                        <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click="isFull && update()">
                             Finalizar
                         </PrimaryBtn>
                     </section>
