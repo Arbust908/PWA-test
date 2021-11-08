@@ -3,10 +3,7 @@
         <FieldGroup v-for="(crew, key) in crews" :key="crew.id" class="max-w-sm w-full content-start">
             <FieldLegend>
                 <span>{{ crew.title }}</span>
-                <CircularBtn v-if="key !== 0" class="btn__delete" @click="removeCrew(crew.id)">
-                    <Icon icon="Trash" class="icon" />
-                </CircularBtn>
-                <CircularBtn v-else class="ghost">
+                <CircularBtn v-if="crews.length > 1" class="btn__delete" size="sm" @click="removeCrew(crew.id)">
                     <Icon icon="Trash" class="icon" />
                 </CircularBtn>
             </FieldLegend>

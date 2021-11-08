@@ -155,8 +155,7 @@
             </template>
             <template #btn>
                 <div class="flex gap-4">
-                    <button
-                        type="button"
+                    <GhostBtn
                         class="
                             inline-flex
                             justify-center
@@ -177,30 +176,8 @@
                         @click.prevent="toggleModal"
                     >
                         Volver
-                    </button>
-                    <button
-                        type="button"
-                        class="
-                            inline-flex
-                            justify-center
-                            w-full
-                            rounded-md
-                            border border-transparent
-                            shadow-sm
-                            px-4
-                            py-2
-                            bg-main-600
-                            text-base
-                            font-medium
-                            text-second-50
-                            hover:bg-main-700
-                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500
-                            sm:text-sm
-                        "
-                        @click.prevent="confirm"
-                    >
-                        Confirmar
-                    </button>
+                    </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click.prevent="confirm">Confirmar</PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -208,7 +185,7 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, defineAsyncComponent, watch, toRefs } from 'vue';
+    import { ref, Ref, computed, defineComponent, defineAsyncComponent, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
 
@@ -218,21 +195,14 @@
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import { ProviderNotification, SandOrder, TransportProvider } from '@/interfaces/ProviderNotification.ts';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import { useToggle } from '@vueuse/core';
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
-    import { SandProvider } from '@/interfaces/SandProvider';
-    import { Sand } from '@/interfaces/SandType';
-    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import FieldLegend from '@/components/ui/form/FieldLegend.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
-    import SandProviderPack from '@/components/notifications/sandProviderPack.vue';
+    import { SandProvider, Sand, ProviderNotification, SandOrder, TransportProvider } from '@/interfaces/sandflow';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
@@ -244,13 +214,8 @@
             Modal,
             PlusIcon,
             PrimaryBtn,
+            GhostBtn,
             TrashIcon,
-            FieldGroup,
-            FieldInput,
-            FieldLegend,
-            FieldSelect,
-            FieldWithSides,
-            SandProviderPack,
         },
         setup() {
             const router = useRouter();

@@ -40,18 +40,6 @@
                         @update:crPhone="companyRepresentative.phone = $event"
                         @update:crEmail="companyRepresentative.email = $event"
                     />
-                    <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                        <section class="space-x-6 flex items-center justify-end">
-                            <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')"> Cancelar </NoneBtn>
-                            <PrimaryBtn
-                                :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
-                                :disabled="!isFull"
-                                @click="isFull && update()"
-                            >
-                                Finalizar
-                            </PrimaryBtn>
-                        </section>
-                    </footer>
                 </section>
                 <section v-if="activeSection === 'driver'" class="bg-white rounded-md max-w-2xl shadow-sm">
                     <form method="POST" action="/" class="p-4 max-w-lg">
@@ -71,15 +59,17 @@
                             @add-driver="addDriver()"
                         />
                     </form>
-                    <footer class="p-4 mr-5 gap-3 flex md:flex-row-reverse justify-between">
-                        <section class="space-x-6 flex items-center justify-end">
-                            <NoneBtn @click.prevent="$router.push('/proveedores-de-transporte')"> Cancelar </NoneBtn>
-                            <PrimaryBtn :disabled="!isValidated ? 'yes' : null" @click="isFull && update()">
-                                Finalizar
-                            </PrimaryBtn>
-                        </section>
-                    </footer>
                 </section>
+                <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+                    <section class="w-full space-x-6 flex items-center justify-end">
+                        <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
+                            Cancelar
+                        </SecondaryBtn>
+                        <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isFull && update()">
+                            Finalizar
+                        </PrimaryBtn>
+                    </section>
+                </footer>
             </section>
             <section class="w-4/12 mt-12 ml-4 flex flex-col gap-y-4">
                 <DriverCard
@@ -100,7 +90,7 @@
 </template>
 
 <script lang="ts">
-    import { computed, reactive, watch, ref, watchEffect } from 'vue';
+    import { computed, reactive, ref } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
     import { useTitle } from '@vueuse/core';
@@ -109,7 +99,7 @@
     import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
     import DriverCard from '@/components/transportProvider/DriverCard.vue';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     // AXIOS
@@ -125,7 +115,7 @@
             DriverCard,
             Icon,
             Layout,
-            NoneBtn,
+            SecondaryBtn,
             PrimaryBtn,
             TransportProviderFrom,
             TransportProviderDriverForm,

@@ -114,8 +114,9 @@
             </section>
         </div>
         <footer class="p-4 space-x-8 flex justify-end">
-            <NoneBtn @click.prevent="$router.push('/stage-sheet')"> Cancelar </NoneBtn>
+            <SecondaryBtn @click.prevent="$router.push('/stage-sheet')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
+                btn="wide"
                 :class="isFull ? null : 'opacity-50 cursor-not-allowed'"
                 :disabled="!isFull"
                 @click.prevent="isFull && save()"
@@ -140,7 +141,7 @@
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
 
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import StageSheetStage from '@/components/stageSheet/StageRow.vue';
@@ -156,7 +157,7 @@
     export default {
         components: {
             Layout,
-            NoneBtn,
+            SecondaryBtn,
             CircularBtn,
             PrimaryBtn,
             StageSheetStage,
