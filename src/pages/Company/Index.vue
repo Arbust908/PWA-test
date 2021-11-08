@@ -24,50 +24,39 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5">
-            <template #header>
-                <tr>
-                    <th v-for="column in tableColumns" :key="column" scope="col">
-                        <div class="flex justify-center">
-                            {{ column }}
-                            <Icon icon="ArrowUp" class="w-4 h-4" />
-                            <Icon icon="ArrowDown" class="w-4 h-4" />
-                        </div>
-                    </th>
-
-                    <th scope="col">
-                        <span>Acciones</span>
-                    </th>
-                </tr>
-            </template>
-            <template #body>
-                <tr
-                    v-for="(client, cKey) in filteredClients"
-                    :key="client.id"
-                    :class="cKey % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td :class="client.name ? null : 'empty'">
-                        {{ client.name || 'Sin definir' }}
-                    </td>
-                    <td :class="client.legalId ? null : 'empty'">
-                        {{ client.legalId || 'Sin definir' }}
-                    </td>
-                    <td :class="client.companyRepresentative ? null : 'empty'">
-                        {{ client.companyRepresentative.name || 'Sin definir' }}
-                    </td>
-                    <td :class="client.companyRepresentative ? null : 'empty'">
-                        {{ client.companyRepresentative.phone || 'Sin definir' }}
+        <VTable
+            class="mt-5"
+            :columns="tableColumns"
+            :pagination="pagination"
+            :data="filteredClients"
+            :loading="loading"
+        >
+            <template #item="{ item, index }">
+                <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
+                    <td :class="item.name ? null : 'empty'">
+                        {{ item.name || 'Sin definir' }}
                     </td>
 
-                    <td class="text-center" :class="client ? null : 'empty'">
-                        <Badge v-if="client.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
+                    <td :class="item.legalId ? null : 'empty'">
+                        {{ item.legalId || 'Sin definir' }}
+                    </td>
+
+                    <td :class="item.companyRepresentative ? null : 'empty'">
+                        {{ item.companyRepresentative.name || 'Sin definir' }}
+                    </td>
+
+                    <td :class="item.companyRepresentative ? null : 'empty'">
+                        {{ item.companyRepresentative.phone || 'Sin definir' }}
+                    </td>
+
+                    <td class="text-center" :class="item ? null : 'empty'">
+                        <Badge v-if="item.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
                         <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
                     </td>
 
                     <td>
                         <div class="btn-panel">
-                            <router-link :to="`/clientes/${client.id}`">
+                            <router-link :to="`/clientes/${item.id}`">
                                 <Popper hover content="Editar">
                                     <CircularBtn size="xs" class="btn__delete bg-blue-500">
                                         <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
@@ -75,15 +64,15 @@
                                 </Popper>
                             </router-link>
 
-                            <Popper hover :content="client.visible ? 'Inhabilitar' : 'Habilitar'">
+                            <Popper hover :content="item.visible ? 'Inhabilitar' : 'Habilitar'">
                                 <CircularBtn
                                     class="ml-4"
-                                    :class="client.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                    :class="item.visible ? 'bg-red-500' : 'bg-blue-500'"
                                     size="xs"
-                                    @click="openModalVisibility(client)"
+                                    @click="openModalVisibility(item)"
                                 >
                                     <Icon
-                                        v-if="client.visible"
+                                        v-if="item.visible"
                                         icon="EyeOff"
                                         type="outlined"
                                         class="w-6 h-6 text-white"
@@ -100,7 +89,7 @@
                     </td>
                 </tr>
             </template>
-        </UiTable>
+        </VTable>
 
         <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
             <template #body>
@@ -109,8 +98,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn size="sm" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" size="sm" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
+                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -128,6 +117,7 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
     import Popper from 'vue3-popper';
 
@@ -147,6 +137,7 @@
             Badge,
             Modal,
             Popper,
+            VTable,
         },
         setup() {
             useTitle('Clientes <> Sandflow');
@@ -156,7 +147,31 @@
             const clientId = ref(-1);
             const selectedClient = ref(null);
             const showModal = ref(false);
-            const tableColumns = ['Cliente', 'CUIT', 'Representante', 'Teléfono', 'Operadora'];
+
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+            });
+
+            const tableConfig = {
+                columns: [
+                    { title: 'Cliente', key: 'name', sortable: true },
+                    { title: 'CUIT', key: 'legalId', sortable: true },
+                    { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
+                    { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
+                    { title: 'Operadora', key: 'operadora' },
+                    { title: 'Acciones', key: 'name' },
+                ],
+            };
+
+            const tableColumns = [
+                { title: 'Cliente', key: 'name', sortable: true },
+                { title: 'CUIT', key: 'legalId', sortable: true },
+                { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
+                { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
+                { title: 'Operadora', key: 'operadora' },
+                { title: 'Acciones', key: 'name' },
+            ];
 
             const headers = {
                 'Content-Type': 'Application/JSON',
@@ -234,6 +249,8 @@
                 confirmModal,
                 showModal,
                 tableColumns,
+                tableConfig,
+                pagination,
             };
         },
     };
