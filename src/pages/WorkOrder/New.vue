@@ -75,36 +75,35 @@
             >
                 <section v-if="isLastSection()" class="pb-4 mb-2 border-b md:pb-0 md:mb-0 md:border-none">
                     <GhostBtn
-                        class="
-                            w-full
-                            border-2
-                            rounded
-                            border-green-600 border-opacity-60
-                            md:w-auto
-                            justify-center
-                            sm:border-0
-                        "
+                        btn="text-green-700  border !border-green-700 hover:bg-second-100"
                         @click.prevent="addCrew"
                     >
                         Agregar Crew
                     </GhostBtn>
                 </section>
-                <section class="gap-6 flex flex-wrap items-center justify-center sm:justify-end">
-                    <NoneBtn class="order-last sm:order-none" @click.prevent="$router.push('/orden-de-trabajo')">
-                        Cancelar
-                    </NoneBtn>
-                    <GhostBtn class="w-1/2 md:w-max" @click="save()">
-                        <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
-                        <span> Guardar Provisorio </span>
-                    </GhostBtn>
-                    <PrimaryBtn v-if="isLoading" disabled> Guardando... </PrimaryBtn>
-                    <PrimaryBtn v-else-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
-                    <PrimaryBtn v-else :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
             </footer>
         </section>
+        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end">
+            <section class="gap-6 flex flex-wrap items-center">
+                <SecondaryBtn
+                    btn="wide"
+                    class="order-last sm:order-none"
+                    @click.prevent="$router.push('/orden-de-trabajo')"
+                >
+                    Cancelar
+                </SecondaryBtn>
+                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                    <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
+                    <span> Guardar Provisorio </span>
+                </GhostBtn>
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection">
+                    Siguiente
+                </PrimaryBtn>
+                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
@@ -117,7 +116,7 @@
     import OrderSection from '@/components/workOrder/Order.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -135,7 +134,7 @@
             Layout,
             CheckCircleIcon,
             PrimaryBtn,
-            NoneBtn,
+            SecondaryBtn,
             OrderSection,
             EquipmentSection,
             RRHHSection,

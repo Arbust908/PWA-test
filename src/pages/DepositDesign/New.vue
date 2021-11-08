@@ -25,10 +25,6 @@
                         <h3 class="text-xs">Cantidad de pisos</h3>
                         <Counter :amount="floors" @update:amount="floors = $event" />
                     </div>
-                    <!-- <div class="col-span-3 flex flex-col items-center gap-4">
-            <h3 class="text-xs">Cantidad de ubicación</h3>
-            <Counter />
-          </div> -->
                 </FieldGroup>
                 <fieldset class="py-2 flex gap-x-10 2xl:gap-x-40">
                     <section class="w-full max-w-[170px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
@@ -127,8 +123,8 @@
         </section>
 
         <footer class="mt-5 gap-3 flex justify-end">
-            <section class="space-x-6 flex items-center justify-end">
-                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
+            <section class="space-x-3 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
                 <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                     Guardar
                 </PrimaryBtn>

@@ -7,7 +7,7 @@
             <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
         </section>
         <footer class="mt-5 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
-            <section class="space-x-6 flex items-center justify-end">
+            <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="goToIndex">Cancelar</SecondaryBtn>
                 <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
                     Finalizar
