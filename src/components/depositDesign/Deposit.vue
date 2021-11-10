@@ -8,7 +8,7 @@
                 class="floor"
                 @click.prevent="setFloor(f)"
             >
-                Piso {{ f }}
+                Nivel {{ f }}
             </button>
         </nav>
         <article class="max-w-md md:max-w-lg lg:max-w-2xl p-2 max-h-[400px]">
@@ -28,8 +28,8 @@
                     </template>
                 </template>
             </div>
-            <div v-else class="w-full max-w-sm border border-dashed border- rounded-xl p-5 my-3 mx-3">
-                <span> Eligé las dimensiones del depósito para comenzar</span>
+            <div v-else class="w-full max-w-sm border-dashed border-4 rounded-xl p-5 my-3 mx-3">
+                <span> Elige las dimensiones del depósito para comenzar</span>
             </div>
         </article>
     </section>
