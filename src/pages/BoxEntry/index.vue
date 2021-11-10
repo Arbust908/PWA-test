@@ -26,9 +26,6 @@
                     />
                 </FieldGroup>
                 <fieldset v-if="selectionsAreDone" class="w-full pt-1 pb-5 px-2">
-                    <span v-if="boxesWithoutId.length > 0" class="text-xs text-green-600"
-                        >*Complete los ids de caja faltantes</span
-                    >
                     <div v-if="boxes.length > 0 || boxesWithoutId.length > 0" class="mt-2">
                         <div v-for="box in boxes" :key="box.id" class="available-box">
                             <button
@@ -62,12 +59,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div v-for="box in boxesWithoutId" :key="box.id" class="available-box">
+                        <span v-if="idMessage" class="text-xs text-green-600">*Complete los ids de caja faltantes</span>
+                        <div v-for="box in boxesWithoutId" :key="box.id" class="available-box mt-2">
                             <button
                                 :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
                                 class="radio-button"
-                                @click.prevent="setSelectedBox(box.boxId)"
+                                @click.prevent="box.boxId ? setSelectedBox(box.boxId) : triggerCompleteIdMessage()"
                             ></button>
+                            <span>{{ box.boxId }}</span>
                             <div class="mx-2 flex items-center">
                                 <span> {{ box.category }} - {{ box.amount }}t - </span>
                                 <div
@@ -285,6 +284,8 @@
             let cradles = ref([]);
             let cleanCradles = ref([]);
 
+            let idMessage = ref(false);
+
             const getPurchaseOrders = async () => {
                 await axios
                     .get(`${apiUrl}/purchaseOrder`)
@@ -491,6 +492,10 @@
                 });
 
                 return response;
+            };
+
+            const triggerCompleteIdMessage = () => {
+                idMessage.value = true;
             };
 
             const setSelectedBox = async (id: number) => {
@@ -716,6 +721,8 @@
                 clearBoxInDeposit,
                 confirmModal,
                 resetBoxIn,
+                idMessage,
+                triggerCompleteIdMessage,
             };
         },
     });
