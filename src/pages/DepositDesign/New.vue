@@ -13,16 +13,16 @@
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
                     />
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-left gap-4">
+                    <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de filas</h3>
                         <Counter :amount="rows" @update:amount="rows = $event" />
                     </div>
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
+                    <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de columnas</h3>
                         <Counter :amount="cols" @update:amount="cols = $event" />
                     </div>
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-end gap-4">
-                        <h3 class="text-sm">Cantidad de pisos</h3>
+                    <div class="col-span-4 flex flex-col items-center gap-4">
+                        <h3 class="text-sm">Cantidad de niveles</h3>
                         <Counter :amount="floors" :max="2" @update:amount="floors = $event" />
                     </div>
                 </FieldGroup>
