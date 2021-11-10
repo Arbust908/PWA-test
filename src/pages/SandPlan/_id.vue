@@ -9,12 +9,11 @@
                     <ClientPitCombo
                         :client-id="currentSandPlan.companyId"
                         :pit-id="currentSandPlan.pitId"
+                        :is-disabled="true"
                         @update:clientId="currentSandPlan.companyId = $event"
                         @update:pitId="currentSandPlan.pitId = $event"
-                        :isDisabled="true"
                     />
                 </FieldGroup>
-                <span>{{ currentSandPlan.companyId }} aa </span>
             </form>
         </section>
         <section class="bg-white rounded-md shadow-sm mb-14 hidden sm:block">
@@ -219,10 +218,10 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
+    import { ref, Ref, reactive, computed, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
-    import { useState, useActions } from 'vuex-composition-helpers';
+    import { useActions } from 'vuex-composition-helpers';
     import { useTitle } from '@vueuse/core';
 
     import Layout from '@/layouts/Main.vue';
@@ -232,14 +231,7 @@
     import SandPlanStage from '@/components/sandPlan/StageRow.vue';
     import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
     import StageHeader from '@/components/sandPlan/StageHeader.vue';
-    import {
-        PurchaseOrder,
-        SandProvider,
-        SandOrder,
-        TransportProvider,
-        Pit,
-        Company,
-    } from '@/interfaces/sandflow.Types.ts';
+    import { Pit, Company } from '@/interfaces/sandflow';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     import { useToggle } from '@vueuse/core';
