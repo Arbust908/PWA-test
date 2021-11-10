@@ -11,8 +11,10 @@
                         :pit-id="currentSandPlan.pitId"
                         @update:clientId="currentSandPlan.companyId = $event"
                         @update:pitId="currentSandPlan.pitId = $event"
+                        :isDisabled="true"
                     />
                 </FieldGroup>
+                <span>{{ currentSandPlan.companyId }} aa </span>
             </form>
         </section>
         <section class="bg-white rounded-md shadow-sm mb-14 hidden sm:block">
