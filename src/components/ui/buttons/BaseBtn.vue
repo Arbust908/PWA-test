@@ -46,7 +46,7 @@
 <style lang="scss" scoped>
     @import '@/assets/button.scss';
     button {
-        @apply p-1;
+        @apply py-1 pl-1;
     }
 
     @keyframes spinner {

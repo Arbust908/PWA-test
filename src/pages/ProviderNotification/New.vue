@@ -50,20 +50,16 @@
             </form>
         </section>
 
-        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end">
-            <section class="w-full space-x-3 flex items-center justify-end">
-                <router-link to="/">
-                    <SecondaryBtn btn="wide"> Cancelar </SecondaryBtn>
-                </router-link>
-                <PrimaryBtn
-                    btn="wide"
-                    :class="isSandFull || isTransportFull ? null : 'opacity-50 cursor-not-allowed'"
-                    :disabled="!(isSandFull || isTransportFull)"
-                    @click.prevent="(isSandFull || isTransportFull) && save()"
-                >
-                    Finalizar
-                </PrimaryBtn>
-            </section>
+        <footer class="mt-[32px] space-x-3 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn
+                btn="wide"
+                :class="isSandFull || isTransportFull ? null : 'opacity-50 cursor-not-allowed'"
+                :disabled="!(isSandFull || isTransportFull)"
+                @click.prevent="(isSandFull || isTransportFull) && save()"
+            >
+                Finalizar
+            </PrimaryBtn>
         </footer>
         <Modal type="off" :open="showModal" @close="togglemodal">
             <template #body>

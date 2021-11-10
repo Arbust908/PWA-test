@@ -71,7 +71,7 @@
             />
             <footer
                 :class="isLastSection() ? 'justify-between' : 'justify-end'"
-                class="p-4 gap-3 flex flex-col md:flex-row"
+                class="mt-[32px] p-4 gap-3 flex flex-col md:flex-row"
             >
                 <section v-if="isLastSection()" class="pb-4 mb-2 border-b md:pb-0 md:mb-0 md:border-none">
                     <GhostBtn
@@ -83,22 +83,16 @@
                 </section>
             </footer>
         </section>
-        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end">
-            <section class="gap-6 flex flex-wrap items-center">
-                <SecondaryBtn
-                    btn="wide"
-                    class="order-last sm:order-none"
-                    @click.prevent="$router.push('/orden-de-trabajo')"
-                >
-                    Cancelar
-                </SecondaryBtn>
+        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end">
+            <section class="gap-6 flex flex-wrap items-right">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')">Cancelar</SecondaryBtn>
                 <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
                     <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
-                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection">
-                    Siguiente
-                </PrimaryBtn>
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection"
+                    >Siguiente</PrimaryBtn
+                >
                 <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
                     Finalizar
                 </PrimaryBtn>

@@ -97,7 +97,7 @@
                 </div>
             </section>
         </section>
-        <footer class="p-4 space-x-3 flex justify-end items-center">
+        <footer class="mt-[32px] space-x-3 flex justify-end items-center">
             <SecondaryBtn btn="wide" @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</SecondaryBtn>
             <PrimaryBtn btn="wide" type="submit" @click.prevent="completeStageHandle"> Finalizar </PrimaryBtn>
         </footer>

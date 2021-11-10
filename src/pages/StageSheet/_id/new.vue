@@ -113,7 +113,7 @@
                 </article>
             </section>
         </div>
-        <footer class="p-4 space-x-8 flex justify-end">
+        <footer class="mt-[32px] px-4 space-x-8 flex justify-end">
             <SecondaryBtn @click.prevent="$router.push('/stage-sheet')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"
