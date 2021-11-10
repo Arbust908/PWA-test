@@ -3,8 +3,8 @@
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
             <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Diseño de depósito</h1>
         </header>
-        <section class="deposit bg-second-0 rounded-md shadow-sm">
-            <form method="POST" action="/" class="p-12 flex flex-col gap-4">
+        <section class="deposit bg-second-0 rounded-md shadow-sm overflow-hidden">
+            <form method="POST" action="/" class="p-8 md:p-12 flex flex-col gap-4">
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
                     <h2 class="col-span-full text-[24px] font-bold">Pozo {{ designName }}</h2>
                     <ClientPitCombo
@@ -25,10 +25,6 @@
                         <h3 class="text-sm">Cantidad de pisos</h3>
                         <Counter :amount="floors" :max="2" @update:amount="floors = $event" />
                     </div>
-                    <!-- <div class="col-span-3 flex flex-col items-center gap-4">
-            <h3 class="text-xs">Cantidad de ubicación</h3>
-            <Counter />
-          </div> -->
                 </FieldGroup>
                 <fieldset class="py-2 flex gap-x-10 2xl:gap-x-40">
                     <section class="w-full max-w-[220px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
@@ -90,27 +86,6 @@
                                 <span>Vacio</span>
                             </label>
                         </div>
-                        <!-- <h2 class="col-span-full text-xl font-bold">Asignar ubicación</h2>
-            <div class="flex flex-col gap-5 ml-4">
-              <label class="type-select" for="top">
-                <input
-                  id="aisle"
-                  type="radio"
-                  name="boxCat"
-                  class="form-checkbox"
-                />
-                <span>Pasillo</span>
-              </label>
-              <label class="type-select" for="bot">
-                <input
-                  id="fine"
-                  type="radio"
-                  name="boxCat"
-                  class="form-checkbox"
-                />
-                <span>Arena fina</span>
-              </label>
-            </div> -->
                         <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" />
                     </section>
                     <DepositGrid
