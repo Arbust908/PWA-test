@@ -178,6 +178,24 @@
                 }
             };
 
+            const purgeOffCells = () => {
+                for (const key in deposit.value) {
+                    if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
+                        const cell = deposit.value[key];
+                        const proxy = key.split('|');
+                        const [Pfloor, Prow, Pcol] = proxy;
+
+                        if (cell === 'DELETED') {
+                            //BOrrar ?
+                        }
+
+                        if (Number(Pfloor) > floors.value || Number(Prow) > rows.value || Number(Pcol) > cols.value) {
+                            removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
+                        }
+                    }
+                }
+            };
+
             const cols: Ref<number> = ref(0);
 
             watch(cols, (newV, oldV) => {
@@ -309,6 +327,7 @@
             });
 
             const save = () => {
+                purgeOffCells();
                 const wH: Warehouse = {
                     clientCompanyId: clientId.value,
                     pitId: pitId.value,
