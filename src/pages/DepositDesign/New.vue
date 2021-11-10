@@ -102,8 +102,8 @@
         </section>
 
         <footer class="mt-5 gap-3 flex justify-end">
-            <section class="space-x-6 flex items-center justify-end">
-                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
+            <section class="space-x-3 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
                 <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                     Guardar
                 </PrimaryBtn>

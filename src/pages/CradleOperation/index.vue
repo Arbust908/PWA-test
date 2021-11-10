@@ -97,9 +97,9 @@
                 </div>
             </section>
         </section>
-        <footer class="p-4 space-x-8 flex justify-end items-center">
-            <NoneBtn @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</NoneBtn>
-            <PrimaryBtn type="submit" @click.prevent="completeStageHandle"> Finalizar </PrimaryBtn>
+        <footer class="p-4 space-x-3 flex justify-end items-center">
+            <SecondaryBtn btn="wide" @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</SecondaryBtn>
+            <PrimaryBtn btn="wide" type="submit" @click.prevent="completeStageHandle"> Finalizar </PrimaryBtn>
         </footer>
         <Modal type="off" :open="isModalVisible" class="modal" @close="toggleModal">
             <template #body>
@@ -118,7 +118,7 @@
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import Modal from '@/components/modal/General.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
@@ -132,7 +132,7 @@
 
     export default defineComponent({
         components: {
-            NoneBtn,
+            SecondaryBtn,
             Layout,
             PrimaryBtn,
             ClientPitCombo,

@@ -69,23 +69,29 @@
                 @update:crews="crews = $event"
                 @update:isFull="isRRHHFull = $event"
             />
-            <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-                <section>
-                    <GhostBtn v-if="isLastSection()" @click.prevent="addCrew"> Agregar Crew </GhostBtn>
-                </section>
-                <section class="space-x-6 flex items-center justify-end">
-                    <NoneBtn @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </NoneBtn>
-                    <GhostBtn @click="save()">
-                        <BookmarkIcon class="w-4 h-4" />
-                        <span> Guardar Provisorio </span>
-                    </GhostBtn>
-                    <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
-                    <PrimaryBtn v-else :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
+            <section class="p-4">
+                <GhostBtn
+                    v-if="isLastSection()"
+                    btn="text-green-700 border !border-green-700 hover:bg-second-200"
+                    @click.prevent="addCrew"
+                >
+                    Agregar Crew
+                </GhostBtn>
+            </section>
         </section>
+        <footer class="mt-4 gap-3 flex flex-col md:flex-row justify-end">
+            <section class="space-x-3 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </SecondaryBtn>
+                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                    <BookmarkIcon class="w-4 h-4" />
+                    <span> Guardar Provisorio </span>
+                </GhostBtn>
+                <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
+                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
@@ -98,7 +104,7 @@
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import OrderSection from '@/components/workOrder/Order.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
@@ -118,7 +124,7 @@
             EquipmentSection,
             GhostBtn,
             Layout,
-            NoneBtn,
+            SecondaryBtn,
             OrderSection,
             PrimaryBtn,
             RRHHSection,

@@ -48,20 +48,23 @@
                     </template>
                 </fieldset>
             </form>
-            <footer class="p-4 space-x-8 flex justify-end">
+        </section>
+
+        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end">
+            <section class="w-full space-x-3 flex items-center justify-end">
                 <router-link to="/">
-                    <NoneBtn> Cancelar </NoneBtn>
+                    <SecondaryBtn btn="wide"> Cancelar </SecondaryBtn>
                 </router-link>
                 <PrimaryBtn
-                    size="md"
+                    btn="wide"
                     :class="isSandFull || isTransportFull ? null : 'opacity-50 cursor-not-allowed'"
                     :disabled="!(isSandFull || isTransportFull)"
                     @click.prevent="(isSandFull || isTransportFull) && save()"
                 >
                     Finalizar
                 </PrimaryBtn>
-            </footer>
-        </section>
+            </section>
+        </footer>
         <Modal type="off" :open="showModal" @close="togglemodal">
             <template #body>
                 <div v-if="!isNotificationConfirmed" class="text-left">
@@ -146,7 +149,7 @@
     import { useTitle } from '@vueuse/core';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import { ProviderNotification, SandOrder, TransportProvider, Sand } from '@/interfaces/sandflow';
@@ -163,7 +166,7 @@
 
     export default defineComponent({
         components: {
-            NoneBtn,
+            SecondaryBtn,
             Layout,
             Modal,
             PrimaryBtn,

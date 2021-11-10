@@ -204,8 +204,8 @@
             </form>
         </section>
         <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end">
-            <section class="w-full space-x-6 flex items-center justify-end">
-                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
+            <section class="w-full space-x-3 flex items-center justify-end">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
                 <PrimaryBtn btn="wide" type="submit" @click.prevent="save()"> Guardar </PrimaryBtn>
             </section>
         </footer>
