@@ -7,9 +7,6 @@
             :data="pit.name"
             @update:data="pit.name = $event"
         />
-        <!-- <CircularBtn v-if="pits.length > 1" class="btn__delete mt-2" @click="removePit(pit.id)">
-            <Icon icon="Trash" class="w-6 h-6" />
-        </CircularBtn> -->
         <CircularBtn
             v-if="pits.length > 1"
             class="btn__delete"
