@@ -371,7 +371,7 @@
 
                 try {
                     const { data: WODone } = useAxios('/workOrder', { method: 'POST', data: newWO }, instance);
-                    watch(WODone, (newVal, _) => {
+                    watch(WODone, async (newVal, _) => {
                         console.log('nuevo', newVal);
 
                         if (newVal && newVal.data && newVal.data.id) {
@@ -394,28 +394,20 @@
 
                             if (traktors.value.length > 0) {
                                 const isTraktorsFinished = ref([]);
-                                traktors.value.forEach((traktor) => {
-                                    console.log(traktor);
+                                for (const traktor of traktors.value) {
                                     const { id, ...newTraktor } = traktor;
                                     newTraktor.workOrderId = workOrderId;
-                                    const { data, isFinished } = useAxios(
-                                        '/traktor',
-                                        { method: 'POST', data: newTraktor },
-                                        instance
-                                    );
-                                    isTraktorsFinished.value.push(data);
-                                });
-                                console.log(isTraktorsFinished.value);
+                                    await axios.post(api + '/traktor', newTraktor);
+                                }
                             }
 
                             if (pickups.value.length > 0) {
                                 const isPickupFinished = ref([]);
-                                pickups.value.forEach((pickup) => {
+                                for (const pickup of pickups.value) {
                                     const { id, ...newPickup } = pickup;
                                     newPickup.workOrderId = workOrderId;
-                                    const { data } = useAxios('/pickup', { method: 'POST', data: newPickup }, instance);
-                                    isPickupFinished.value.push(data);
-                                });
+                                    await axios.post(api + '/pickup', newPickup);
+                                }
                             }
 
                             if (crews.value.length > 0) {
