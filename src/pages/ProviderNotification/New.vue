@@ -32,7 +32,7 @@
                                 class="col-span-full sm:col-span-3"
                                 :field-name="`transportAmount${tO.id}`"
                                 placeholder="Camiones"
-                                title="Camiones"
+                                title="Cantidad de camiones"
                                 :data="tO.amount"
                                 @update:data="tO.amount = $event"
                             />
