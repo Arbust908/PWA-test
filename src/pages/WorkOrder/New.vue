@@ -90,9 +90,9 @@
                     <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
-                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection"
-                    >Siguiente</PrimaryBtn
-                >
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection">
+                    Siguiente
+                </PrimaryBtn>
                 <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
                     Finalizar
                 </PrimaryBtn>
