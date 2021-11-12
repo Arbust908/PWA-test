@@ -50,20 +50,16 @@
             </form>
         </section>
 
-        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end">
-            <section class="w-full space-x-3 flex items-center justify-end">
-                <router-link to="/">
-                    <SecondaryBtn btn="wide"> Cancelar </SecondaryBtn>
-                </router-link>
-                <PrimaryBtn
-                    btn="wide"
-                    :class="isSandFull || isTransportFull ? null : 'opacity-50 cursor-not-allowed'"
-                    :disabled="!(isSandFull || isTransportFull)"
-                    @click.prevent="(isSandFull || isTransportFull) && save()"
-                >
-                    Finalizar
-                </PrimaryBtn>
-            </section>
+        <footer class="mt-[32px] space-x-3 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn
+                btn="wide"
+                :class="isSandFull || isTransportFull ? null : 'opacity-50 cursor-not-allowed'"
+                :disabled="!(isSandFull || isTransportFull)"
+                @click.prevent="(isSandFull || isTransportFull) && save()"
+            >
+                Finalizar
+            </PrimaryBtn>
         </footer>
         <Modal type="off" :open="showModal" @close="togglemodal">
             <template #body>
@@ -111,18 +107,18 @@
                     class="divide-y text-center flex flex-col justify-center text-xl items-center"
                 >
                     <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡La notificación fue enviada con éxito!</span
-                    >
+                    <span class="text-center text-base border-none text-gray-900">
+                        ¡La notificación fue enviada con éxito!
+                    </span>
                 </div>
                 <div
                     v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess"
                     class="divide-y text-center flex flex-col justify-center text-xl items-center"
                 >
                     <Icon icon="exclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >Hubo un problema con el envío de la notificación. <br />Por favor, intenta nuevamente</span
-                    >
+                    <span class="text-center text-base border-none text-gray-900">
+                        Hubo un problema con el envío de la notificación. <br />Por favor, intenta nuevamente
+                    </span>
                 </div>
             </template>
             <template #btn>

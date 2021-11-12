@@ -231,7 +231,7 @@
                 </div>
             </form>
         </section>
-        <footer class="mt-5 space-x-3 flex justify-end">
+        <footer class="mt-[32px] space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
             <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                 Guardar

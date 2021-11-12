@@ -204,15 +204,11 @@
             </form>
         </section>
 
-        <footer class="mt-5 space-x-8 flex justify-end">
-            <section class="w-full space-x-space-x-3 flex items-center justify-end">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')">
-                    Cancelar
-                </SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                    Guardar
-                </PrimaryBtn>
-            </section>
+        <footer class="mt-[32px] space-x-3 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')">Cancelar</SecondaryBtn>
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                Guardar
+            </PrimaryBtn>
         </footer>
     </Layout>
 </template>
