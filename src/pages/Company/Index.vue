@@ -20,18 +20,14 @@
                 :data="clientId"
                 @update:data="clientId = $event"
             />
-            <div class="col-span-4 mt-7">
+            <div class="col-span-full sm:mt-7 sm:col-span-5">
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <VTable
-            class="mt-5"
-            :columns="tableColumns"
-            :pagination="pagination"
-            :data="filteredClients"
-            :loading="loading"
-        >
+
+        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredClients" :actions="actions">
             <template #item="{ item, index }">
+                <!-- Desktop -->
                 <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
                     <td :class="item.name ? null : 'empty'">
                         {{ item.name || 'Sin definir' }}
@@ -89,12 +85,20 @@
                     </td>
                 </tr>
             </template>
+
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }">
+                {{ item.name }}
+            </template>
+
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Domicilio: </span>{{ item.address }}
+            </template>
         </VTable>
 
         <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
             <template #body>
                 <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
-                <div></div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
@@ -109,6 +113,8 @@
 <script>
     import { onMounted, ref, computed } from 'vue';
     import { useTitle } from '@vueuse/core';
+    import { useRouter } from 'vue-router';
+
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
@@ -131,7 +137,6 @@
             PrimaryBtn,
             CircularBtn,
             GhostBtn,
-            UiTable,
             Icon,
             FieldSelect,
             Badge,
@@ -147,30 +152,55 @@
             const clientId = ref(-1);
             const selectedClient = ref(null);
             const showModal = ref(false);
+            const router = useRouter();
 
             const pagination = ref({
                 sortKey: 'id',
                 sortDir: 'asc',
+                currentPage: 1,
+                perPage: 2,
             });
 
-            const tableConfig = {
-                columns: [
-                    { title: 'Cliente', key: 'name', sortable: true },
-                    { title: 'CUIT', key: 'legalId', sortable: true },
-                    { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
-                    { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
-                    { title: 'Operadora', key: 'operadora' },
-                    { title: 'Acciones', key: 'name' },
-                ],
-            };
-
-            const tableColumns = [
+            const columns = [
                 { title: 'Cliente', key: 'name', sortable: true },
                 { title: 'CUIT', key: 'legalId', sortable: true },
                 { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
                 { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
                 { title: 'Operadora', key: 'operadora' },
                 { title: 'Acciones', key: 'name' },
+            ];
+
+            const actions = [
+                {
+                    label: 'Ver más',
+                    callback: () => {
+                        console.log('Ver más');
+                    },
+                },
+                {
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/clientes/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
             ];
 
             const headers = {
@@ -248,9 +278,9 @@
                 openModalVisibility,
                 confirmModal,
                 showModal,
-                tableColumns,
-                tableConfig,
+                columns,
                 pagination,
+                actions,
             };
         },
     };

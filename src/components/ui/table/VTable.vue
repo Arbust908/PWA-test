@@ -1,59 +1,94 @@
 <template>
-    <section>
-        <div>
-            <div>
-                <article>
-                    <table>
-                        <thead>
-                            <slot name="header">
-                                <TableHeader :columns="columns" :pagination="localPagination" />
-                            </slot>
-                        </thead>
-                        <tbody v-if="loading">
-                            <td :colspan="[columns.length]" class="emptyState">
-                                <p>No hay datos cargados</p>
-                            </td>
-                        </tbody>
-                        <tbody v-else>
-                            <template v-for="(item, index) in filteredItems" :key="item.id">
-                                <slot name="item" :item="item" :index="index" />
-                            </template>
-                        </tbody>
-                    </table>
-                </article>
+    <div>
+        <section>
+            <!-- Desktop Table -->
+            <div class="hidden sm:block">
+                <div>
+                    <article>
+                        <table>
+                            <thead>
+                                <slot name="header">
+                                    <TableHeader :columns="columns" :pagination="localPagination" />
+                                </slot>
+                            </thead>
+                            <tbody v-if="loading">
+                                <td :colspan="[columns.length]" class="emptyState">
+                                    <p>No hay datos cargados</p>
+                                </td>
+                            </tbody>
+                            <tbody v-else>
+                                <template v-for="(item, index) in paginatedItems" :key="item.id">
+                                    <slot name="item" :item="item" :index="index" />
+                                </template>
+                            </tbody>
+                        </table>
+                    </article>
+                </div>
             </div>
-        </div>
-        <div class="flex items-center space-x-1 mt-5 justify-end">
-            <a href="#" class="flex items-center px-4 py-2 text-gray-500 bg-gray-300 rounded-md"> Anterior </a>
 
-            <a href="#" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-blue-400 hover:text-white">
-                1
-            </a>
-            <a href="#" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-blue-400 hover:text-white">
-                2
-            </a>
-            <a href="#" class="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-blue-400 hover:text-white">
-                3
-            </a>
+            <!-- Mobile Table -->
+            <!-- Podría ir en un componente aparte  -->
+            <div class="flex items-start lg:items-center justify-center mt-2 sm:hidden">
+                <div class="mx-auto h-full">
+                    <div class="shadow-md bg-gray-100 overflow-none rounded-lg sm:shadow-lg text-sm sm:text-base">
+                        <div v-for="item in paginatedItems" :key="item.id" class="bg-white border-gray-400">
+                            <div class="divide-y divide-black border-t-2">
+                                <div class="grid grid-cols-12 p-2 pl-2 pr-2 items-center">
+                                    <div class="col-span-10 bg-white rounded truncate pl-2">
+                                        <span class="text-sm font-semibold">
+                                            <slot name="mobileTitle" :item="item"></slot>
+                                        </span>
 
-            <a
-                href="#"
-                class="px-4 py-2 font-bold text-gray-500 bg-gray-300 rounded-md hover:bg-blue-400 hover:text-white"
-            >
-                Siguiente
-            </a>
-        </div>
-    </section>
+                                        <p class="text-xs text-warmGray-500">
+                                            <slot name="mobileSubtitle" :item="item"></slot>
+                                        </p>
+                                    </div>
+
+                                    <div class="col-span-2 bg-white rounded flex flex-col justify-center items-center">
+                                        <DropdownBtn :actions="actions" :item="item">
+                                            <CircularBtn size="xs" class="bg-white">
+                                                <Icon
+                                                    icon="DotsVertical"
+                                                    type="outlined"
+                                                    class="w-6 h-6 icon text-gray-800"
+                                                />
+                                            </CircularBtn>
+                                        </DropdownBtn>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination -->
+            <TablePagination
+                v-if="localPagination.perPage"
+                :pagination="localPagination"
+                :total="filteredItems.length"
+            ></TablePagination>
+        </section>
+    </div>
 </template>
 
 <script lang="ts">
-    import { defineComponent, computed } from 'vue';
+    import { defineComponent, computed, ref } from 'vue';
     import TableHeader from '@/components/ui/table/TableHeader.vue';
+    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import DropdownBtn from '@/components/ui/buttons/DropdownBtn.vue';
+    import TablePagination from '@/components/ui/table/TablePagination.vue';
+
+    import Icon from '@/components/icon/TheAllIcon.vue';
 
     export default defineComponent({
         name: 'VTable',
         components: {
             TableHeader,
+            CircularBtn,
+            Icon,
+            DropdownBtn,
+            TablePagination,
         },
         props: {
             columns: {
@@ -66,7 +101,7 @@
                     return {};
                 },
             },
-            data: {
+            items: {
                 type: Array,
                 default: () => [],
             },
@@ -74,12 +109,22 @@
                 type: Boolean,
                 default: false,
             },
+            actions: {
+                type: Array,
+                default: () => [],
+            },
+            showPagination: {
+                type: Boolean,
+                default: false,
+            },
         },
         setup(props, { emit }) {
+            const show = ref(false);
             const localPagination = computed({
                 get: () => props.pagination,
                 set: (value) => emit('update:pagination', value),
             });
+            const dropdown = ref(0);
 
             const getDescendantProp = (obj, desc: string) => {
                 var arr = desc.split('.');
@@ -90,15 +135,13 @@
             };
 
             const filteredItems = computed(() => {
-                let items = [...props.data];
+                let items = [...props.items];
 
                 if (items.length < 1) {
-                    return;
+                    return [];
                 }
 
                 items = sortData(items);
-
-                //pagination
 
                 return items;
             });
@@ -125,9 +168,35 @@
                 });
             };
 
+            const paginatedItems = computed(() => {
+                if (!localPagination.value.perPage) {
+                    return filteredItems.value;
+                }
+
+                const perPage = localPagination.value.perPage || 10;
+
+                if (filteredItems.value) {
+                    return paginate(filteredItems.value, perPage, localPagination.value.currentPage);
+                }
+
+                return [];
+            });
+
+            const paginate = (array, length, pageNumber) => {
+                localPagination.value.from = array.length ? (pageNumber - 1) * length + 1 : ' ';
+                localPagination.value.to = pageNumber * length > array.length ? array.length : pageNumber * length;
+                localPagination.value.prevPage = pageNumber > 1 ? pageNumber : '';
+                localPagination.value.nextPage = array.length > localPagination.value.to ? pageNumber + 1 : '';
+
+                return array.slice((pageNumber - 1) * length, pageNumber * length);
+            };
+
             return {
                 localPagination,
                 filteredItems,
+                dropdown,
+                show,
+                paginatedItems,
             };
         },
     });
@@ -137,7 +206,6 @@
     section {
         @apply flex flex-col;
         & > div {
-            @apply overflow-x-auto;
             & > div {
                 @apply align-middle inline-block min-w-full;
                 & > article {
@@ -158,6 +226,10 @@
     }
     .unselected {
         @apply text-gray-400;
+    }
+
+    .dropdown:hover .dropdown-menu {
+        display: block;
     }
 
     @import '@/assets/table.scss';
