@@ -57,10 +57,19 @@
     &.ghost {
         @apply text-main-600 border shadow-sm hover:text-main-400 hover:shadow-lg;
     }
+    &.side {
+        @apply text-main-500 bg-white hover:bg-second-200 text-center font-semibold border border-transparent shadow-lg hover:shadow justify-center p-4;
+    }
     &.none:hover {
         @apply bg-second-100 bg-opacity-50;
     }
     &.wide {
         @apply px-8;
+    }
+    &.narrow {
+        @apply px-2;
+    }
+    &.full {
+        @apply w-full;
     }
 }

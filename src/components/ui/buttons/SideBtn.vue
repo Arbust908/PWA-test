@@ -1,9 +1,7 @@
 <template>
-    <div>
-        <BaseBtn :btn="`side ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
-            <slot></slot>
-        </BaseBtn>
-    </div>
+    <BaseBtn :btn="`side ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
+        <slot></slot>
+    </BaseBtn>
 </template>
 
 <script>
