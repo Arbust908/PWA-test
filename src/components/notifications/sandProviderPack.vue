@@ -30,7 +30,7 @@
                 />
                 <FieldWithSides
                     class="col-span-5 sm:col-span-3"
-                    :title="Key === 0 ? 'Cantidad' : ''"
+                    :title="Key === 0 ? 'Peso' : ''"
                     :field-name="`sandQuantity${Key}`"
                     placeholder="0 t"
                     type="number"

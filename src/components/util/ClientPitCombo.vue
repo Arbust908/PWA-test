@@ -8,6 +8,7 @@
         :endpoint-data="clients"
         :data="clientId"
         @update:data="clientId = $event"
+        :isDisabled="isDisabled"
     />
     <FieldLoading v-else class="col-span-6" />
     <FieldSelect
@@ -19,6 +20,7 @@
         :endpoint-data="pits"
         :data="pitId"
         @update:data="pitId = $event"
+        :isDisabled="isDisabled"
     />
     <FieldLoading v-else class="col-span-6" />
 </template>
@@ -46,6 +48,10 @@
             pitId: {
                 type: Number,
                 required: true,
+            },
+            isDisabled: {
+                type: Boolean,
+                default: false,
             },
         },
         setup(props, { emit }) {

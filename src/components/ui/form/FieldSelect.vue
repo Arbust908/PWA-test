@@ -11,6 +11,7 @@
             :class="noOptionSelected && 'unselected'"
             :name="fieldName"
             @blur="$emit('is-blured')"
+            :disabled="isDisabled"
         >
             <option disabled value="-1">
                 {{ placeholder }}
@@ -83,6 +84,10 @@
             entity: {
                 type: String,
                 required: false,
+            },
+            isDisabled: {
+                type: Boolean,
+                default: false,
             },
         },
         setup(props, { emit }) {

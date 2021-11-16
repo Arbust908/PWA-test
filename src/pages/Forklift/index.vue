@@ -3,8 +3,8 @@
         <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Forklift</h2>
             <router-link to="/forklift/nuevo">
-                <PrimaryBtn size="sm"
-                    >Crear
+                <PrimaryBtn size="sm">
+                    <span> Crear </span>
                     <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
                 </PrimaryBtn>
             </router-link>

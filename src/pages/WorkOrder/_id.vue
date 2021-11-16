@@ -69,23 +69,29 @@
                 @update:crews="crews = $event"
                 @update:isFull="isRRHHFull = $event"
             />
-            <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-                <section>
-                    <GhostBtn v-if="isLastSection()" @click.prevent="addCrew"> Agregar Crew </GhostBtn>
-                </section>
-                <section class="space-x-6 flex items-center justify-end">
-                    <NoneBtn @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </NoneBtn>
-                    <GhostBtn @click="save()">
-                        <BookmarkIcon class="w-4 h-4" />
-                        <span> Guardar Provisorio </span>
-                    </GhostBtn>
-                    <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
-                    <PrimaryBtn v-else :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
+            <section class="mt-[32px] p-4">
+                <GhostBtn
+                    v-if="isLastSection()"
+                    btn="text-green-700 border !border-green-700 hover:bg-second-200"
+                    @click.prevent="addCrew"
+                >
+                    Agregar Crew
+                </GhostBtn>
+            </section>
         </section>
+        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end">
+            <section class="gap-6 flex flex-wrap items-center">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </SecondaryBtn>
+                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                    <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
+                    <span> Guardar Provisorio </span>
+                </GhostBtn>
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" @click="nextSection"> Siguiente </PrimaryBtn>
+                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
@@ -98,7 +104,7 @@
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import OrderSection from '@/components/workOrder/Order.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
@@ -118,7 +124,7 @@
             EquipmentSection,
             GhostBtn,
             Layout,
-            NoneBtn,
+            SecondaryBtn,
             OrderSection,
             PrimaryBtn,
             RRHHSection,
@@ -470,7 +476,8 @@
                             console.log('comparedCrews', comparedCrews);
                             comparedCrews.changed.forEach((crewToUpdate) => {
                                 const { ...newCrew } = crewToUpdate;
-                                console.log('newValue', newVal.data.id);
+                                console.log('newCrew', newCrew);
+                                console.log('crewToUpdate', crewToUpdate);
                                 newCrew.workOrderId = newVal.data.id;
                                 const { data } = useAxios(
                                     `/crew/${newCrew.id}`,
@@ -507,7 +514,7 @@
                             });
                             comparedCrews.new.forEach((crewToCreate) => {
                                 const { id: innerCrewId, ...newCrew } = crewToCreate;
-                                newCrew.workOrderId = newVal.id;
+                                newCrew.workOrderId = newVal.data.id;
                                 const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
                                 isCrewsFinished.value.push(data);
                                 watch(data, (newVal, _) => {
@@ -527,8 +534,9 @@
 
                             crews.value.forEach((crew) => {
                                 const { id, ...newCrew } = crew;
-                                newCrew.workOrderId = newVal.id;
-                                console.log('crew', newCrew);
+                                // console.log(newVal)
+                                // console.log(newVal.data)
+                                newCrew.workOrderId = newVal.data.id;
                                 const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
                                 isCrewsFinished.value.push(data);
                                 watch(data, (newVal, _) => {

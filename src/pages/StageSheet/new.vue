@@ -117,8 +117,8 @@
             </section>
         </div>
 
-        <footer class="mt-5 space-x-8 flex justify-end">
-            <SecondaryBtn @click.prevent="$router.push('/stage-sheet')"> Cancelar </SecondaryBtn>
+        <footer class="mt-[32px] space-x-3 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/stage-sheet')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"
                 :class="isFull ? null : 'opacity-50 cursor-not-allowed'"

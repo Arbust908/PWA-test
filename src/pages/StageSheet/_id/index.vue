@@ -32,7 +32,7 @@
                 </StageTable>
             </section>
         </div>
-        <footer class="mt-5 space-x-8 flex justify-end">
+        <footer class="mt-[32px] space-x-8 flex justify-end">
             <SecondaryBtn @click.prevent="$router.push('/stage-sheet')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"

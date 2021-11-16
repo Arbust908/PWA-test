@@ -166,7 +166,7 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-4 space-x-8 flex justify-end">
+        <footer class="mt-[32px] space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
             <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && confirm()">
                 Crear Orden

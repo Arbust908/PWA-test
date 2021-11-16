@@ -92,6 +92,7 @@
             FieldGroup,
             FieldInput,
             Icon,
+            FieldTextArea,
         },
         props: {
             driverName: {

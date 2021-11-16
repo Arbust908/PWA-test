@@ -13,8 +13,8 @@
                 </template>
             </Modal>
         </section>
-        <footer class="mt-5 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
-            <section class="space-x-6 flex items-center justify-end">
+        <footer class="mt-[32px] gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
+            <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="goToIndex">Cancelar</SecondaryBtn>
                 <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
                     Finalizar

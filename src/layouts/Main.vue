@@ -204,8 +204,9 @@
                                             font-bold
                                             hover:bg-gradient-br hover:from-main-400 hover:to-main-700 hover:shadow-lg
                                         "
-                                        >{{ user.username.split('')[0] }}</span
                                     >
+                                        {{ user.username.split('')[0] }}
+                                    </span>
                                 </MenuButton>
                             </div>
                             <transition

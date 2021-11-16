@@ -8,7 +8,7 @@
                 class="floor"
                 @click.prevent="setFloor(f)"
             >
-                Piso {{ f }}
+                Nivel {{ f }}
             </button>
         </nav>
         <article class="max-w-md md:max-w-lg lg:max-w-2xl p-2 max-h-[400px]">

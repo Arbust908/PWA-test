@@ -71,40 +71,33 @@
             />
             <footer
                 :class="isLastSection() ? 'justify-between' : 'justify-end'"
-                class="p-4 gap-3 flex flex-col md:flex-row"
+                class="mt-[32px] p-4 gap-3 flex flex-col md:flex-row"
             >
                 <section v-if="isLastSection()" class="pb-4 mb-2 border-b md:pb-0 md:mb-0 md:border-none">
                     <GhostBtn
-                        class="
-                            w-full
-                            border-2
-                            rounded
-                            border-green-600 border-opacity-60
-                            md:w-auto
-                            justify-center
-                            sm:border-0
-                        "
+                        btn="text-green-700  border !border-green-700 hover:bg-second-100"
                         @click.prevent="addCrew"
                     >
                         Agregar Crew
                     </GhostBtn>
                 </section>
-                <section class="gap-6 flex flex-wrap items-center justify-center sm:justify-end">
-                    <NoneBtn class="order-last sm:order-none" @click.prevent="$router.push('/orden-de-trabajo')">
-                        Cancelar
-                    </NoneBtn>
-                    <GhostBtn class="w-1/2 md:w-max" @click="save()">
-                        <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
-                        <span> Guardar Provisorio </span>
-                    </GhostBtn>
-                    <PrimaryBtn v-if="isLoading" disabled> Guardando... </PrimaryBtn>
-                    <PrimaryBtn v-else-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
-                    <PrimaryBtn v-else :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
             </footer>
         </section>
+        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end">
+            <section class="gap-6 flex flex-wrap items-right">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')">Cancelar</SecondaryBtn>
+                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                    <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
+                    <span> Guardar Provisorio </span>
+                </GhostBtn>
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection">
+                    Siguiente
+                </PrimaryBtn>
+                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
@@ -117,7 +110,7 @@
     import OrderSection from '@/components/workOrder/Order.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -135,7 +128,7 @@
             Layout,
             CheckCircleIcon,
             PrimaryBtn,
-            NoneBtn,
+            SecondaryBtn,
             OrderSection,
             EquipmentSection,
             RRHHSection,
@@ -371,7 +364,7 @@
 
                 try {
                     const { data: WODone } = useAxios('/workOrder', { method: 'POST', data: newWO }, instance);
-                    watch(WODone, (newVal, _) => {
+                    watch(WODone, async (newVal, _) => {
                         console.log('nuevo', newVal);
 
                         if (newVal && newVal.data && newVal.data.id) {
@@ -394,28 +387,20 @@
 
                             if (traktors.value.length > 0) {
                                 const isTraktorsFinished = ref([]);
-                                traktors.value.forEach((traktor) => {
-                                    console.log(traktor);
+                                for (const traktor of traktors.value) {
                                     const { id, ...newTraktor } = traktor;
                                     newTraktor.workOrderId = workOrderId;
-                                    const { data, isFinished } = useAxios(
-                                        '/traktor',
-                                        { method: 'POST', data: newTraktor },
-                                        instance
-                                    );
-                                    isTraktorsFinished.value.push(data);
-                                });
-                                console.log(isTraktorsFinished.value);
+                                    await axios.post(api + '/traktor', newTraktor);
+                                }
                             }
 
                             if (pickups.value.length > 0) {
                                 const isPickupFinished = ref([]);
-                                pickups.value.forEach((pickup) => {
+                                for (const pickup of pickups.value) {
                                     const { id, ...newPickup } = pickup;
                                     newPickup.workOrderId = workOrderId;
-                                    const { data } = useAxios('/pickup', { method: 'POST', data: newPickup }, instance);
-                                    isPickupFinished.value.push(data);
-                                });
+                                    await axios.post(api + '/pickup', newPickup);
+                                }
                             }
 
                             if (crews.value.length > 0) {
