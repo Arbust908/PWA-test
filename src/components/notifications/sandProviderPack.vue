@@ -9,7 +9,7 @@
                 title="Centro de Carga de Arena"
                 endpoint="/sandProvider"
                 :data="sPov.id"
-                @update:data="(sPov.id = $event), cleanSandOrders()"
+                @update:data="(sPov.id = $event), handleSandProviderUpdate($event)"
             />
 
             <div
@@ -78,7 +78,7 @@
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent, ref, watchEffect } from 'vue';
+    import { computed, defineComponent, ref, watchEffect, onMounted } from 'vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
@@ -166,9 +166,13 @@
             });
 
             if (sandProviders && sandProviders.value && sandProviders.value.length <= 0) {
-                console.log('no sandProviders');
                 addSandProvider();
             }
+
+            const handleSandProviderUpdate = (id: Number) => {
+                emit('sand-provider-handler', id);
+                cleanSandOrders();
+            };
 
             return {
                 sandProviders,
@@ -179,6 +183,7 @@
                 lastSandProviderInner,
                 filteredSandTypes,
                 cleanSandOrders,
+                handleSandProviderUpdate,
             };
         },
     });

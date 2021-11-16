@@ -9,7 +9,7 @@
                     :sand-providers="sandProviderIds"
                     :filtered-sand-types="filteredSandTypes"
                     @update:sandProviders="sandProviderIds = $event"
-                    @change="sandProviderHandler"
+                    @sand-provider-handler="sandProviderHandler"
                 />
                 <fieldset class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
                     <h2 class="col-span-full text-xl mt-4">Transporte</h2>
@@ -394,8 +394,8 @@
 
             const filteredSandTypes = ref({});
 
-            const sandProviderHandler = (event: Event) => {
-                const selectedSandProviderId = event.target.value;
+            const sandProviderHandler = (id: Number) => {
+                const selectedSandProviderId = id;
                 const [filtered] = sandProviders.value.filter((sandProvider) => {
                     return sandProvider.id == selectedSandProviderId;
                 });
