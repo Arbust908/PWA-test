@@ -501,7 +501,7 @@
                         toggleModal();
                     });
                 } catch (error) {
-                    // toggleApiErrorModal();
+                    toggleApiErrorModal();
                     console.log(error);
                 }
             };
