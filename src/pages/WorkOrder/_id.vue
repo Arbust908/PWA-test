@@ -69,7 +69,7 @@
                 @update:crews="crews = $event"
                 @update:isFull="isRRHHFull = $event"
             />
-            <section class="p-4">
+            <section class="mt-[32px] p-4">
                 <GhostBtn
                     v-if="isLastSection()"
                     btn="text-green-700 border !border-green-700 hover:bg-second-200"
@@ -79,14 +79,14 @@
                 </GhostBtn>
             </section>
         </section>
-        <footer class="mt-4 gap-3 flex flex-col md:flex-row justify-end">
-            <section class="space-x-3 flex items-center justify-end">
+        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end">
+            <section class="gap-6 flex flex-wrap items-center">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </SecondaryBtn>
                 <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
-                    <BookmarkIcon class="w-4 h-4" />
+                    <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
-                <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" @click="nextSection"> Siguiente </PrimaryBtn>
                 <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
                     Finalizar
                 </PrimaryBtn>

@@ -101,13 +101,11 @@
             </form>
         </section>
 
-        <footer class="mt-5 gap-3 flex justify-end">
-            <section class="space-x-3 flex items-center justify-end">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                    Guardar
-                </PrimaryBtn>
-            </section>
+        <footer class="mt-[32px] space-x-3 flex justify-end items-center">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                Guardar
+            </PrimaryBtn>
         </footer>
     </Layout>
 </template>
@@ -174,6 +172,24 @@
                 for (let c = cols.value; c > 1; c--) {
                     for (let f = floors.value; f > 1; f--) {
                         removeCell(f, row, c);
+                    }
+                }
+            };
+
+            const purgeOffCells = () => {
+                for (const key in deposit.value) {
+                    if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
+                        const cell = deposit.value[key];
+                        const proxy = key.split('|');
+                        const [Pfloor, Prow, Pcol] = proxy;
+
+                        if (cell === 'DELETED') {
+                            //BOrrar ?
+                        }
+
+                        if (Number(Pfloor) > floors.value || Number(Prow) > rows.value || Number(Pcol) > cols.value) {
+                            removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
+                        }
                     }
                 }
             };
@@ -309,6 +325,7 @@
             });
 
             const save = () => {
+                purgeOffCells();
                 const wH: Warehouse = {
                     clientCompanyId: clientId.value,
                     pitId: pitId.value,

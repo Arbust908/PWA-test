@@ -108,13 +108,13 @@
             @apply bg-second-300 text-second-300;
         }
         &.fina {
-            @apply bg-orange-600 text-orange-800 font-medium;
+            @apply bg-[#FFD19B] text-[#974A08] font-medium;
         }
         &.gruesa {
-            @apply bg-green-600 text-green-800 font-medium;
+            @apply bg-[#AFDCC6] text-[#106843] font-medium;
         }
         &.cortada {
-            @apply bg-blue-600 text-blue-800 font-medium;
+            @apply bg-[#A6AFFE] text-[#2E36AF] font-medium;
         }
         &.blocked {
             @apply bg-second-800 text-second-800;

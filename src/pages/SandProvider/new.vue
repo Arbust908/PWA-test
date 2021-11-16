@@ -18,7 +18,7 @@
             </form>
         </section>
 
-        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-arena')">
                     Cancelar

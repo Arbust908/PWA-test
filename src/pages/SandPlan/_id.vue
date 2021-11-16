@@ -9,6 +9,7 @@
                     <ClientPitCombo
                         :client-id="currentSandPlan.companyId"
                         :pit-id="currentSandPlan.pitId"
+                        :is-disabled="true"
                         @update:clientId="currentSandPlan.companyId = $event"
                         @update:pitId="currentSandPlan.pitId = $event"
                     />
@@ -203,24 +204,20 @@
             </form>
         </section>
 
-        <footer class="mt-5 space-x-8 flex justify-end">
-            <section class="w-full space-x-space-x-3 flex items-center justify-end">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')">
-                    Cancelar
-                </SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                    Guardar
-                </PrimaryBtn>
-            </section>
+        <footer class="mt-[32px] space-x-3 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')">Cancelar</SecondaryBtn>
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                Guardar
+            </PrimaryBtn>
         </footer>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
+    import { ref, Ref, reactive, computed, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
-    import { useState, useActions } from 'vuex-composition-helpers';
+    import { useActions } from 'vuex-composition-helpers';
     import { useTitle } from '@vueuse/core';
 
     import Layout from '@/layouts/Main.vue';
@@ -230,14 +227,7 @@
     import SandPlanStage from '@/components/sandPlan/StageRow.vue';
     import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
     import StageHeader from '@/components/sandPlan/StageHeader.vue';
-    import {
-        PurchaseOrder,
-        SandProvider,
-        SandOrder,
-        TransportProvider,
-        Pit,
-        Company,
-    } from '@/interfaces/sandflow.Types.ts';
+    import { Pit, Company } from '@/interfaces/sandflow';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     import { useToggle } from '@vueuse/core';
