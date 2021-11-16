@@ -63,4 +63,7 @@
     &.wide {
         @apply px-8;
     }
+    &.warning {
+        @apply border-transparent text-white bg-red-700 hover:bg-red-800 hover:text-white mx-2 px-5 py-3 transition duration-150 ease-out;
+    }
 }

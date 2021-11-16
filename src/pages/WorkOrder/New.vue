@@ -104,15 +104,61 @@
                 </PrimaryBtn>
             </section>
         </footer>
+        <Modal type="off" :open="showModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
+                    <span class="text-center text-base border-none text-gray-900"
+                        >¡La orden de trabajo fue guardada con éxito!</span
+                    >
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <PrimaryBtn @click.prevent="$router.push('/orden-de-trabajo')">Continuar</PrimaryBtn>
+                </div>
+            </template>
+        </Modal>
+        <Modal type="off" :open="showErrorModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
+                    <span class="text-center text-base border-none text-gray-900">
+                        Hubo un problema al intentar guardar.
+                    </span>
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
+                </div>
+            </template>
+        </Modal>
+        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="exclamation-circle" class="h-[54px] w-[54px] mb-4 text-red-400" />
+                    <span class="text-center text-base border-none text-gray-900">
+                        ¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo.
+                    </span>
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, ComputedRef, watch } from 'vue';
+    import { ref, Ref, computed, ComputedRef, defineAsyncComponent, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useToggle, useTitle } from '@vueuse/core';
     import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import OrderSection from '@/components/workOrder/Order.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
@@ -120,12 +166,15 @@
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     const api = import.meta.env.VITE_API_URL || '/api';
     // TIPOS
     import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/sandflow';
+    // MODAL
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     export default {
         components: {
@@ -138,6 +187,9 @@
             OrderSection,
             EquipmentSection,
             RRHHSection,
+            Modal,
+            Icon,
+            WarningBtn,
         },
         setup() {
             // Init
@@ -321,6 +373,17 @@
                 removeEmptyPickups();
                 removeEmptyCrews();
             };
+
+            // MODAL
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showErrorModal);
+
             // :: SAVE
             const save = async (draft = true) => {
                 toggleLoading(true);
@@ -433,16 +496,18 @@
                                 console.log(isCrewsFinished.value);
                             }
                             // store.dispatch('saveWorkOrder', newVal.data);
-                            setTimeout(() => {
-                                toggleLoading(false);
-                                setTimeout(() => {
-                                    // Modal de procesasando?
-                                    router.push('/orden-de-trabajo');
-                                }, 100);
-                            }, 1000);
+                            // setTimeout(() => {
+                            //     toggleLoading(false);
+                            //     setTimeout(() => {
+                            //         // Modal de procesasando?
+                            //         router.push('/orden-de-trabajo');
+                            //     }, 100);
+                            // }, 1000);
                         }
+                        toggleModal();
                     });
                 } catch (error) {
+                    toggleApiErrorModal();
                     console.log(error);
                 }
             };
@@ -478,6 +543,12 @@
                 save,
                 isAllFull,
                 isLoading,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
             };
         },
     };
