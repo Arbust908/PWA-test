@@ -3,8 +3,8 @@
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
             <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo proveedor de transporte</h1>
         </header>
-        <section class="flex">
-            <section class="w-8/12">
+        <section class="flex flex-wrap md:flex-nowrap">
+            <section class="w-full md:w-8/12">
                 <nav class="flex justify-between max-w-2xl bg-white">
                     <button
                         :class="['section-tab', activeSection === 'provider' ? 'active' : '']"
@@ -47,19 +47,39 @@
                             :driver-email="newDriver.email"
                             :driver-t-type="newDriver.vehicleType"
                             :driver-t-id="newDriver.transportId"
+                            :driver-t-id2="newDriver.transportId2"
                             :driver-obs="newDriver.observations"
                             @update:driverName="newDriver.name = $event"
                             @update:driverPhone="newDriver.phone = $event"
                             @update:driverEmail="newDriver.email = $event"
                             @update:driverTType="newDriver.vehicleType = $event"
                             @update:driverTId="newDriver.transportId = $event"
+                            @update:driverTId2="newDriver.transportId2 = $event"
                             @update:driverObs="newDriver.observations = $event"
                             @add-driver="addDriver()"
                         />
                     </form>
                 </section>
-                <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
-                    <section class="w-full space-x-3 flex items-center justify-end">
+                <section v-if="showDrivers" class="w-full md:w-4/12 mt-12 flex flex-col gap-y-4 md:hidden">
+                    <DriverCard
+                        v-for="(driver, index) in drivers"
+                        :key="index"
+                        :name="driver.name"
+                        :phone="driver.phone"
+                        :email="driver.email"
+                        :vehicle-type="driver.vehicleType"
+                        :transport-id="driver.transportId"
+                        :transport-id2="driver.transportId2"
+                        :observations="driver.observations"
+                        @delete-driver="deleteDriver(index)"
+                        @edit-driver="editDriver(index)"
+                    />
+                </section>
+                <footer class="mt-[32px] gap-3 flex flex-col justify-end max-w-2xl">
+                    <SideBtn v-if="drivers.length" class="md:hidden" btn="full" @click="driversShown = !driversShown">
+                        {{ showDrivers ? driverTabText : 'Volver' }}
+                    </SideBtn>
+                    <section v-if="!showDrivers" class="w-full space-x-3 flex items-center justify-end">
                         <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
                             Cancelar
                         </SecondaryBtn>
@@ -76,7 +96,7 @@
                     </section>
                 </footer>
             </section>
-            <section class="w-4/12 mt-12 ml-4 flex flex-col gap-y-4">
+            <section class="hidden w-full md:w-4/12 mt-12 ml-4 md:flex flex-col gap-y-4">
                 <DriverCard
                     v-for="(driver, index) in drivers"
                     :key="index"
@@ -85,6 +105,7 @@
                     :email="driver.email"
                     :vehicle-type="driver.vehicleType"
                     :transport-id="driver.transportId"
+                    :transport-id2="driver.transportId2"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
@@ -106,7 +127,7 @@
     import DriverCard from '@/components/transportProvider/DriverCard.vue';
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import SideBtn from '@/components/ui/buttons/SideBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     // AXIOS
     import axios from 'axios';
@@ -117,14 +138,13 @@
 
     export default {
         components: {
-            CircularBtn,
             DriverCard,
-            Icon,
             Layout,
-            SecondaryBtn,
             PrimaryBtn,
-            TransportProviderFrom,
+            SecondaryBtn,
+            SideBtn,
             TransportProviderDriverForm,
+            TransportProviderFrom,
         },
         setup() {
             const store = useStore();
@@ -139,6 +159,12 @@
             const changeSection = (option: string) => {
                 return (activeSection.value = option);
             };
+            const driversShown = ref(false);
+            const showDrivers = computed(() => {
+                const windowWidth = window.innerWidth;
+
+                return driversShown.value && windowWidth > 768;
+            });
 
             const drivers: Array<Driver> = reactive([]);
 
@@ -148,6 +174,7 @@
                 email: '',
                 vehicleType: '',
                 transportId: '',
+                transportId2: '',
                 observations: '',
             });
 
@@ -172,6 +199,7 @@
                 newDriver.email = driver.email;
                 newDriver.vehicleType = driver.vehicleType;
                 newDriver.transportId = driver.transportId;
+                newDriver.transportId2 = driver.transportId2;
                 newDriver.observations = driver.observations;
             };
 
@@ -181,6 +209,7 @@
                 newDriver.email = '';
                 newDriver.vehicleType = '';
                 newDriver.transportId = '';
+                newDriver.transportId2 = '';
                 newDriver.observations = '';
             };
 
@@ -204,12 +233,18 @@
                     newDriver.phone !== '' &&
                     newDriver.email !== '' &&
                     newDriver.vehicleType !== '' &&
-                    newDriver.transportId !== ''
+                    newDriver.transportId !== '' &&
+                    newDriver.transportId2 !== ''
                 );
             });
 
-            const isValidated = ref(false);
+            const driverTabText = computed(() => {
+                console.log(drivers.length);
 
+                return `Transportista${drivers.length > 1 ? `s (${drivers.length})` : ''}`;
+            });
+
+            const isValidated = ref(false);
             watchEffect(async () => {
                 isValidated.value = (await useValidator(store, 'transportProvider')) ? true : false;
             });
@@ -300,33 +335,15 @@
                 newDriver,
                 deleteDriver,
                 editDriver,
+                driverTabText,
+                showDrivers,
+                driversShown,
             };
         },
     };
 </script>
 
 <style lang="scss" scoped>
-    .btn {
-        &__draft {
-            @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-        }
-        &__delete {
-            @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-            /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-        }
-        &__add {
-            @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-        }
-        &__add--special {
-            @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-        }
-        &__mobile-only {
-            @apply lg:hidden;
-        }
-        &__desktop-only {
-            @apply hidden lg:inline-flex;
-        }
-    }
     .section-tab {
         @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
     }
