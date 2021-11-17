@@ -12,15 +12,16 @@
                         :class="getSortClass(column.key, 'asc')"
                         @click="sortBy(column.key)"
                     >
-                        <Icon icon="ArrowUp" class="w-4 h-4 ml-1 mr-1 active:bg-gray-300"
-                    /></a>
+                        <Icon icon="ArrowUp" class="w-4 h-4 ml-1 mr-1 active:bg-gray-300" />
+                    </a>
                     <a
                         role="button"
                         tab-index="0"
                         class="text-gray-400"
                         :class="getSortClass(column.key, 'desc')"
                         @click="sortBy(column.key, 'desc')"
-                        ><Icon icon="ArrowDown" class="w-4 h-4 active:bg-gray-300" />
+                    >
+                        <Icon icon="ArrowDown" class="w-4 h-4 active:bg-gray-300" />
                     </a>
                 </template>
             </div>
