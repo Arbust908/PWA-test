@@ -48,15 +48,26 @@
             @update:data="driverTType = $event"
         />
         <FieldInput
-            class="col-span-full"
-            title="Patente"
+            class="col-span-6"
+            title="Patente camión"
             field-name="driverVehicleId"
-            placeholder="patente"
+            placeholder="patente del camion"
             :data="driverTId"
             require-validation
             :silenced="silenced"
             entity="transportProvider"
             @update:data="driverTId = $event"
+        />
+        <FieldInput
+            class="col-span-6"
+            title="Patente acoplado"
+            field-name="driverVehicleId"
+            placeholder="patente del acoplado"
+            :data="driverTId2"
+            require-validation
+            :silenced="silenced"
+            entity="transportProvider"
+            @update:data="driverTId2 = $event"
         />
         <FieldTextArea
             class="col-span-full"
@@ -115,13 +126,20 @@
                 type: String,
                 default: '',
             },
+            driverTId2: {
+                type: String,
+                default: '',
+            },
             driverObs: {
                 type: String,
                 default: '',
             },
         },
         setup(props, { emit }) {
-            const { driverName, driverPhone, driverEmail, driverTType, driverTId, driverObs } = useVModels(props, emit);
+            const { driverName, driverPhone, driverEmail, driverTType, driverTId, driverTId2, driverObs } = useVModels(
+                props,
+                emit
+            );
 
             const silenced = ref(true);
 
@@ -140,7 +158,8 @@
                     driverPhone.value !== '' &&
                     driverEmail.value !== '' &&
                     driverTType.value !== '' &&
-                    driverTId.value !== ''
+                    driverTId.value !== '' &&
+                    driverTId2.value !== ''
                 );
             });
 
@@ -150,6 +169,7 @@
                 driverEmail,
                 driverTType,
                 driverTId,
+                driverTId2,
                 driverObs,
                 silenced,
                 validationHandler,

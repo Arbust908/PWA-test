@@ -123,6 +123,8 @@ export interface Driver {
     email: string;
     vehicleType: string;
     vehicleId: string;
+    transportId: string;
+    transportId2?: string;
     observations?: string;
 }
 
