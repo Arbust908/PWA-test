@@ -201,6 +201,7 @@
 
             onMounted(async () => {
                 await getCradles();
+                console.log(crDB.value);
             });
 
             return {
