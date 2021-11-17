@@ -131,7 +131,7 @@
         <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="exclamation-circle" class="h-[54px] w-[54px] mb-4 text-red-400" />
+                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
                     <span class="text-center text-base border-none text-gray-900">
                         ¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo.
                     </span>
@@ -376,7 +376,7 @@
             const toggleErrorModal = useToggle(showErrorModal);
 
             const showApiErrorModal = ref(false);
-            const toggleApiErrorModal = useToggle(showErrorModal);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
 
             // :: SAVE
             const save = async (draft = true) => {
