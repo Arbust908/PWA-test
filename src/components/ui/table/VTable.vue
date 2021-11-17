@@ -18,7 +18,20 @@
                             </tbody>
                             <tbody v-else>
                                 <template v-for="(item, index) in paginatedItems" :key="item.id">
-                                    <slot name="item" :item="item" :index="index" />
+                                    <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
+                                        <slot name="item" :item="item" />
+                                        <td v-if="actions" class="p-0">
+                                            <DropdownBtn :actions="actions" :item="item">
+                                                <CircularBtn size="xs" class="even">
+                                                    <Icon
+                                                        icon="DotsVertical"
+                                                        type="outlined"
+                                                        class="w-6 h-6 icon text-gray-800"
+                                                    />
+                                                </CircularBtn>
+                                            </DropdownBtn>
+                                        </td>
+                                    </tr>
                                 </template>
                             </tbody>
                         </table>
@@ -27,13 +40,13 @@
             </div>
 
             <!-- Mobile Table -->
-            <!-- Podría ir en un componente aparte  -->
+            <!-- TODO: Podría ir en un componente aparte  -->
             <div class="flex items-start lg:items-center justify-center mt-2 sm:hidden">
                 <div class="mx-auto h-full">
                     <div class="shadow-md bg-gray-100 overflow-none rounded-lg sm:shadow-lg text-sm sm:text-base">
                         <div v-for="item in paginatedItems" :key="item.id" class="bg-white border-gray-400">
                             <div class="divide-y divide-black border-t-2">
-                                <div class="grid grid-cols-12 p-2 pl-2 pr-2 items-center">
+                                <div class="grid grid-cols-12 p-6 pl-2 pr-2 items-center">
                                     <div class="col-span-10 bg-white rounded truncate pl-2">
                                         <span class="text-sm font-semibold">
                                             <slot name="mobileTitle" :item="item"></slot>

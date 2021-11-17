@@ -26,59 +26,53 @@
         </div>
 
         <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredClients" :actions="actions">
-            <template #item="{ item, index }">
+            <template #item="{ item }">
                 <!-- Desktop -->
-                <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
-                    <td :class="item.name ? null : 'empty'">
-                        {{ item.name || 'Sin definir' }}
-                    </td>
+                <td :class="item.name ? null : 'empty'">
+                    {{ item.name || 'Sin definir' }}
+                </td>
 
-                    <td :class="item.legalId ? null : 'empty'">
-                        {{ item.legalId || 'Sin definir' }}
-                    </td>
+                <td :class="item.legalId ? null : 'empty'">
+                    {{ item.legalId || 'Sin definir' }}
+                </td>
 
-                    <td :class="item.companyRepresentative ? null : 'empty'">
-                        {{ item.companyRepresentative.name || 'Sin definir' }}
-                    </td>
+                <td :class="item.companyRepresentative ? null : 'empty'">
+                    {{ item.companyRepresentative.name || 'Sin definir' }}
+                </td>
 
-                    <td :class="item.companyRepresentative ? null : 'empty'">
-                        {{ item.companyRepresentative.phone || 'Sin definir' }}
-                    </td>
+                <td :class="item.companyRepresentative ? null : 'empty'">
+                    {{ item.companyRepresentative.phone || 'Sin definir' }}
+                </td>
 
-                    <td class="text-center" :class="item ? null : 'empty'">
-                        <Badge v-if="item.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
-                        <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
-                    </td>
+                <td class="text-center" :class="item ? null : 'empty'">
+                    <Badge v-if="item.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
+                    <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
+                </td>
 
-                    <td>
-                        <div class="btn-panel">
-                            <router-link :to="`/clientes/${item.id}`">
-                                <Popper hover content="Editar">
-                                    <CircularBtn size="xs" class="btn__delete bg-blue-500">
-                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                    </CircularBtn>
-                                </Popper>
-                            </router-link>
-
-                            <Popper hover :content="item.visible ? 'Inhabilitar' : 'Habilitar'">
-                                <CircularBtn
-                                    class="ml-4"
-                                    :class="item.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                    size="xs"
-                                    @click="openModalVisibility(item)"
-                                >
-                                    <Icon
-                                        v-if="item.visible"
-                                        icon="EyeOff"
-                                        type="outlined"
-                                        class="w-6 h-6 text-white"
-                                    />
-                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                <td v-if="false">
+                    <div class="btn-panel">
+                        <router-link :to="`/clientes/${item.id}`">
+                            <Popper hover content="Editar">
+                                <CircularBtn size="xs" class="btn__delete bg-blue-500">
+                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
                                 </CircularBtn>
                             </Popper>
-                        </div>
-                    </td>
-                </tr>
+                        </router-link>
+
+                        <Popper hover :content="item.visible ? 'Inhabilitar' : 'Habilitar'">
+                            <CircularBtn
+                                class="ml-4"
+                                :class="item.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                size="xs"
+                                @click="openModalVisibility(item)"
+                            >
+                                <Icon v-if="item.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                                <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                            </CircularBtn>
+                        </Popper>
+                    </div>
+                </td>
+
                 <tr v-if="clDB && clDB.length <= 0">
                     <td colspan="5" class="emptyState">
                         <p>No hay clientes cargados</p>
@@ -119,7 +113,6 @@
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -157,8 +150,8 @@
             const pagination = ref({
                 sortKey: 'id',
                 sortDir: 'asc',
-                currentPage: 1,
-                perPage: 2,
+                // currentPage: 1,
+                // perPage: 10,
             });
 
             const columns = [
