@@ -155,7 +155,7 @@
             </template>
             <template #btn>
                 <div class="flex gap-4">
-                    <GhostBtn
+                    <SecondaryBtn
                         class="
                             inline-flex
                             justify-center
@@ -176,7 +176,7 @@
                         @click.prevent="toggleModal"
                     >
                         Volver
-                    </GhostBtn>
+                    </SecondaryBtn>
                     <PrimaryBtn btn="btn__warning" @click.prevent="confirm">Confirmar</PrimaryBtn>
                 </div>
             </template>
@@ -193,6 +193,7 @@
     import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
