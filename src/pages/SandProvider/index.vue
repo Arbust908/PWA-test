@@ -27,79 +27,51 @@
             </div>
         </div>
 
-        <UiTable class="mt-6">
-            <template #header>
-                <tr>
-                    <th v-for="column in tableColumns" :key="column" scope="col">
-                        <div class="flex justify-center">
-                            {{ column }}
-                            <Icon icon="ArrowUp" class="w-4 h-4" />
-                            <Icon icon="ArrowDown" class="w-4 h-4" />
-                        </div>
-                    </th>
-                    <th scope="col">Acciones</th>
-                </tr>
-            </template>
-            <template #body>
-                <tr
-                    v-for="(sandProvider, spKey) in filteredSandProviders"
-                    :key="sandProvider.id"
-                    :class="spKey % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td :class="sandProvider.name ? null : 'empty'" class="text-center">
-                        {{ sandProvider?.name || 'Sin nombre' }}
-                    </td>
-                    <td :class="sandProvider.address ? null : 'empty'">
-                        {{ sandProvider?.address || 'Sin dirección' }}
-                    </td>
-                    <td :class="sandProvider.meshType ? null : 'empty'">
-                        <p v-for="meshType in sandProvider.meshType" :key="meshType">
-                            {{ meshType?.type || '-' }}
-                        </p>
-                    </td>
-                    <td :class="sandProvider.companyRepresentative ? null : 'empty'">
-                        {{ sandProvider.companyRepresentative?.name || 'Sin definir' }}
-                    </td>
-                    <td :class="sandProvider.companyRepresentative ? null : 'empty'">
-                        {{ sandProvider.companyRepresentative?.phone || 'Sin definir' }}
-                    </td>
-                    <td class="text-center">
-                        <div class="btn-panel">
-                            <router-link :to="`/proveedores-de-arena/${sandProvider.id}`">
-                                <Popper hover content="Editar">
-                                    <CircularBtn size="xs" class="bg-blue-500">
-                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                    </CircularBtn>
-                                </Popper>
-                            </router-link>
+        <VTable
+            class="mt-5"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredSandProviders"
+            :actions="actions"
+        >
+            <template #item="{ item: sandProvider }">
+                <!-- Desktop -->
+                <td :class="sandProvider.name ? null : 'empty'" class="text-center">
+                    {{ sandProvider?.name || '-' }}
+                </td>
+                <td :class="sandProvider.address ? null : 'empty'">
+                    {{ sandProvider?.address || '-' }}
+                </td>
+                <td :class="sandProvider.meshType ? null : 'empty'">
+                    <p v-for="meshType in sandProvider.meshType" :key="meshType">
+                        {{ meshType?.type || '-' }}
+                    </p>
+                </td>
+                <td :class="sandProvider.companyRepresentative ? null : 'empty'">
+                    {{ sandProvider.companyRepresentative?.name || '-' }}
+                </td>
+                <td :class="sandProvider.companyRepresentative ? null : 'empty'">
+                    {{ sandProvider.companyRepresentative?.phone || '-' }}
+                </td>
 
-                            <Popper hover :content="sandProvider.visible ? 'Inhabilitar' : 'Habilitar'">
-                                <CircularBtn
-                                    class="ml-4"
-                                    :class="sandProvider.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                    size="xs"
-                                    @click="openModalVisibility(sandProvider)"
-                                >
-                                    <Icon
-                                        v-if="sandProvider.visible"
-                                        icon="EyeOff"
-                                        type="outlined"
-                                        class="w-6 h-6 text-white"
-                                    />
-                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                                </CircularBtn>
-                            </Popper>
-                        </div>
-                    </td>
-                </tr>
                 <tr v-if="sandProviders.length <= 0">
                     <td colspan="5" class="emptyState">
                         <p>No hay proveedores de arena</p>
                     </td>
                 </tr>
             </template>
-        </UiTable>
+
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }"> {{ item.name }} </template>
+
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Malla: </span>
+                <span v-for="(meshType, index) in item.meshType" :key="meshType">
+                    {{ meshType?.type || '-' }}<span v-if="index != item.meshType.length - 1">, </span>
+                </span>
+            </template>
+        </VTable>
+
         <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
             <template #body>
                 <p>{{ errorMessage }}</p>
@@ -134,24 +106,20 @@
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import Popper from 'vue3-popper';
+    import VTable from '@/components/ui/table/VTable.vue';
 
     export default {
         components: {
             Layout,
             PrimaryBtn,
             GhostBtn,
-            UiTable,
             Icon,
             Modal,
             FieldSelect,
-            CircularBtn,
-            Popper,
+            VTable,
         },
         setup() {
             useTitle(`Centro de carga de Arena <> Sandflow`);
@@ -166,6 +134,54 @@
             const selectedsandProvider = ref(null);
             const showModal = ref(false);
             const tableColumns = ['Proveedor', 'Domicilio', 'Tipo de Malla', 'Representante', 'Teléfono'];
+
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+            });
+
+            const columns = [
+                { title: 'Proveedor', key: 'name', sortable: true },
+                { title: 'Domicilio', key: 'address', sortable: true },
+                { title: 'Tipo de Malla', key: 'meshType', sortable: true },
+                { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
+                { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
+                { title: '', key: 'actions' },
+            ];
+
+            const actions = [
+                {
+                    label: 'Ver más',
+                    onlyMobile: true,
+                    callback: () => {
+                        console.log('Ver más');
+                    },
+                },
+                {
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/proveedores-de-arena/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+            ];
 
             onMounted(async () => {
                 loading.value = true;
@@ -232,6 +248,9 @@
                 openModalVisibility,
                 confirmModal,
                 tableColumns,
+                pagination,
+                columns,
+                actions,
             };
         },
     };
