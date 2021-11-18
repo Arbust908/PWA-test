@@ -1,91 +1,61 @@
 <template>
     <Layout>
-        <NoMobile class="md:hidden" />
-        <section class="hidden md:block">
-            <input id="" class="cajitaMagica" type="text" name="" />
-            <section class="grid grid-cols-8 gap-6">
-                <p class="col-span-full">About page.</p>
-                <p class="col-span-full">
-                    {{ storage.gipi.value }}
-                    {{ storage.gipi.get() }}
-                    {{ keys }}
-                </p>
-                <progress
-                    v-if="isLoading"
-                    class="fixed inset-x-0 top-0 z-50 w-full h-1 bg-green-500 shadow"
-                    :value="(progress * 100).toFixed(0)"
-                    max="100"
-                >
-                    50%
-                </progress>
-                <b v-if="isLoading" class="ml-2 col-span-full">{{ (progress * 100).toFixed(0) }}%</b>
-                <button
-                    class="
-                        px-3
-                        py-1
-                        rounded
-                        bg-green-500
-                        text-green-100
-                        hover:bg-green-700 hover:shadow
-                        mb-1
-                        col-span-2
-                    "
-                    @click="initProgrss"
-                >
-                    Load
-                </button>
-                <button
-                    class="
-                        px-3
-                        py-1
-                        rounded
-                        bg-green-500
-                        text-green-100
-                        hover:bg-green-700 hover:shadow
-                        mb-1
-                        col-span-2
-                    "
-                    @click="done"
-                >
-                    Finish
-                </button>
-                <button
-                    class="
-                        px-3
-                        py-1
-                        rounded-lg
-                        bg-green-500
-                        text-green-100
-                        hover:bg-green-700 hover:shadow
-                        mb-1
-                        col-span-2
-                    "
-                    @click="start"
-                >
-                    Start
-                </button>
-            </section>
+        <input id="" class="cajitaMagica" type="text" name="" />
+        <section class="flex flex-col gap-6">
+            <p class="col-span-full">About page.</p>
+            <p class="col-span-full">
+                {{ storage.gipi.value }}
+                {{ storage.gipi.get() }}
+                {{ keys }}
+            </p>
+            <nav class="flex gap-4">
+                <GhostBtn>Ghost</GhostBtn>
+                <SecondaryBtn>Secondary</SecondaryBtn>
+                <PrimaryBtn @click="toggleBD()">Primary</PrimaryBtn>
+            </nav>
         </section>
+        <Backdrop :open="showBD" title="Backdrop" @close="toggleBD()">
+            <template #body>
+                <p>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget ex maximus, porttitor nunc eu,
+                    congue nisl.s
+                </p>
+            </template>
+            <template #btn> </template>
+        </Backdrop>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { useLocalStorage } from '@/helpers/useLocalStorage';
+    import { ref } from 'vue';
     import { useNProgress } from '@vueuse/integrations/useNProgress';
     import { useTitle } from '@vueuse/core';
+    import Backdrop from '@/components/modal/Backdrop.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
-    import NoMobile from '@/components/ui/NoMobile.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import { useLocalStorage } from '@/helpers/useLocalStorage';
 
     export default {
         components: {
             Layout,
-            NoMobile,
+            GhostBtn,
+            SecondaryBtn,
+            PrimaryBtn,
+            Backdrop,
         },
         setup() {
             const { storage, keys } = useLocalStorage(['user', 'gipi']);
             const { gipi } = storage;
             const { progress, isLoading, start, done } = useNProgress();
             const title = useTitle(`  About <> Sandflow  `);
+            const showBD = ref(false);
+            const toggleBD = () => {
+                console.log('show BD', showBD.value);
+                showBD.value = !showBD.value;
+                console.log('show BD', showBD.value);
+            };
 
             setInterval(() => {
                 // Shift title string
@@ -115,6 +85,8 @@
                 initProgrss,
                 start,
                 done,
+                showBD,
+                toggleBD,
             };
         },
     };
