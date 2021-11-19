@@ -123,15 +123,15 @@
             </template>
             <template #btn>
                 <div v-if="!isNotificationConfirmed" class="flex gap-4 justify-end">
-                    <GhostBtn class="outline-none" @click.prevent="toggleModal"> Volver </GhostBtn>
+                    <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
                     <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
-                    <GhostBtn class="outline-none w-1/3" @click.prevent="$router.push('/')"> Cerrar </GhostBtn>
+                    <SecondaryBtn class="outline-none w-1/3" @click.prevent="$router.push('/')"> Cerrar </SecondaryBtn>
                     <PrimaryBtn btn="btn__warning" @click.prevent="createNew">Crear nueva</PrimaryBtn>
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
-                    <GhostBtn class="outline-none" @click.prevent="toggleModal"> Volver </GhostBtn>
+                    <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
                 </div>
             </template>
         </Modal>
@@ -393,7 +393,7 @@
 
             const filteredSandTypes = ref({});
 
-            const sandProviderHandler = (id: Number) => {
+            const sandProviderHandler = (id: number) => {
                 const selectedSandProviderId = id;
                 const [filtered] = sandProviders.value.filter((sandProvider) => {
                     return sandProvider.id == selectedSandProviderId;
