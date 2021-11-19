@@ -89,11 +89,36 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar centro de carga </PrimaryBtn>
+                    <GhostBtn btn="!text-gray-500" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="!bg-red-600" @click="confirmModal">Inhabilitar centro de carga </PrimaryBtn>
                 </div>
             </template>
         </Modal>
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
+            <template #body>
+                <p class="!text-lg !text-black">{{ selectedSandProvider.name }}</p>
+                <p class="mt-2">
+                    <strong>Malla: </strong>
+                    <span v-for="(meshType, index) in selectedSandProvider.meshType" :key="meshType">
+                        {{ meshType?.type || '-'
+                        }}<span v-if="index != selectedSandProvider.meshType.length - 1">, </span>
+                    </span>
+                </p>
+                <p class="mt-2">
+                    <strong>Domicilio: </strong>
+                    {{ selectedSandProvider.address }}
+                </p>
+                <p class="mt-2">
+                    <strong>Representante: </strong>
+                    {{ selectedSandProvider.companyRepresentative?.name || '-' }}
+                </p>
+                <p class="mt-2">
+                    <strong>Teléfono: </strong>
+                    {{ selectedSandProvider.companyRepresentative?.phone || '-' }}
+                </p>
+            </template>
+            <template #btn> </template>
+        </Backdrop>
     </Layout>
 </template>
 
@@ -110,6 +135,7 @@
     import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
+    import Backdrop from '@/components/modal/Backdrop.vue';
 
     export default {
         components: {
@@ -120,6 +146,7 @@
             Modal,
             FieldSelect,
             VTable,
+            Backdrop,
         },
         setup() {
             useTitle(`Centro de carga de Arena <> Sandflow`);
@@ -133,8 +160,8 @@
             const sandProviderId = ref(-1);
             const selectedsandProvider = ref(null);
             const showModal = ref(false);
-            const tableColumns = ['Proveedor', 'Domicilio', 'Tipo de Malla', 'Representante', 'Teléfono'];
-
+            const showBackdrop = ref(false);
+            const selectedSandProvider = ref(null);
             const pagination = ref({
                 sortKey: 'id',
                 sortDir: 'asc',
@@ -153,8 +180,9 @@
                 {
                     label: 'Ver más',
                     onlyMobile: true,
-                    callback: () => {
-                        console.log('Ver más');
+                    callback: (item) => {
+                        selectedSandProvider.value = item;
+                        showBackdrop.value = true;
                     },
                 },
                 {
@@ -247,10 +275,11 @@
                 showModal,
                 openModalVisibility,
                 confirmModal,
-                tableColumns,
                 pagination,
                 columns,
                 actions,
+                selectedSandProvider,
+                showBackdrop,
             };
         },
     };
