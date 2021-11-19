@@ -120,6 +120,8 @@
                 observations: '',
             });
 
+            const currentForkliftName = currentForklift.name;
+
             onMounted(async () => {
                 forklift.id = currentForklift.id;
                 forklift.name = currentForklift.name;
@@ -167,7 +169,9 @@
 
                     let types = createdForklifts.value.map((forklift) => forklift.name.toLowerCase());
 
-                    if (types.includes(forklift.name.toLowerCase())) {
+                    if (forklift.name.toLowerCase() == currentForkliftName.toLowerCase()) {
+                        update();
+                    } else if (types.includes(forklift.name.toLowerCase())) {
                         toggleErrorModal();
                     } else {
                         update();
