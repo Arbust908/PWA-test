@@ -15,12 +15,7 @@
             </nav>
         </section>
         <Backdrop :open="showBD" title="Backdrop" @close="toggleBD()">
-            <template #body>
-                <p>
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget ex maximus, porttitor nunc eu,
-                    congue nisl.s
-                </p>
-            </template>
+            <template #body> </template>
             <template #btn> </template>
         </Backdrop>
     </Layout>
