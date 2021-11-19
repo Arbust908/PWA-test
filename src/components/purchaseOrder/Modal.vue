@@ -30,7 +30,7 @@
             />
             <label for="checkbox">Descargar como .pdf</label>
             <div class="w-full flex gap-x-6 justify-end">
-                <NoneBtn @click.prevent="$emit('close')"> Volver </NoneBtn>
+                <SecondaryBtn @click.prevent="$emit('close')"> Volver </SecondaryBtn>
                 <PrimaryBtn @click.prevent="$emit('confirm')" @click="checked && downloadPDF(po)">
                     Confirmar
                 </PrimaryBtn>
@@ -46,14 +46,14 @@
     import { defineComponent, ref, watchEffect } from 'vue';
     import Modal from '@/components/modal/General.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import { isEven } from '@/helpers/iteretionHelpers';
     import jsPDF from 'jspdf';
     export default defineComponent({
         components: {
             Modal,
             PrimaryBtn,
-            NoneBtn,
+            SecondaryBtn,
         },
         props: {
             po: {

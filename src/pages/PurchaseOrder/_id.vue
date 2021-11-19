@@ -116,7 +116,7 @@
                 </FieldGroup>
             </form>
             <footer class="p-4 space-x-8 flex justify-end">
-                <NoneBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </NoneBtn>
+                <SecondaryBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
                 <PrimaryBtn
                     type="submit"
                     size="sm"
@@ -132,17 +132,14 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, watchEffect, computed, ComputedRef, watch } from 'vue';
+    import { ref, Ref, computed, ComputedRef, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
     import { useActions } from 'vuex-composition-helpers';
     import { useTitle } from '@vueuse/core';
 
-    import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -160,11 +157,6 @@
     export default {
         components: {
             Layout,
-            NoneBtn,
-            BookmarkIcon,
-            TrashIcon,
-            PlusIcon,
-            CircularBtn,
             PrimaryBtn,
             FieldGroup,
             FieldLegend,
@@ -173,6 +165,7 @@
             FieldSelect,
             ClientPitCombo,
             Icon,
+            SecondaryBtn,
         },
         setup() {
             // :: Init

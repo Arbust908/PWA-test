@@ -204,7 +204,6 @@
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import OrderModal from '@/components/purchaseOrder/Modal.vue';
-    import Modal from '@/components/modal/General.vue';
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
@@ -221,7 +220,6 @@
             ClientPitCombo,
             Icon,
             OrderModal,
-            Modal,
         },
         setup() {
             useTitle('Nueva orden de pedido <> Sandflow');
