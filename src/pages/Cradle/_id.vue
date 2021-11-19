@@ -142,6 +142,7 @@
                 observations: currentCradle.observations,
             });
 
+            const currentCradleName = cradleToUpdate.name;
             const createdCradles = ref([]);
 
             const isValidated = ref(false);
@@ -192,7 +193,9 @@
 
                     let names = createdCradles.value.map((cradle) => cradle.name.toLowerCase());
 
-                    if (names.includes(cradleToUpdate.name.toLowerCase())) {
+                    if (currentCradleName == cradleToUpdate.name) {
+                        update();
+                    } else if (names.includes(cradleToUpdate.name.toLowerCase())) {
                         toggleErrorModal();
                     } else {
                         update();
