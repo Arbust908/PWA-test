@@ -31,6 +31,7 @@
             :pagination="pagination"
             :items="filteredCradles"
             :actions="actions"
+            empty-text="No hay cradles cargados"
         >
             <template #item="{ item: cr }">
                 <!-- Desktop -->
@@ -42,12 +43,6 @@
                         {{ cr.observations || '-' }}
                     </p>
                 </td>
-
-                <tr v-if="filteredCradles && filteredCradles.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay cradles cargados</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
@@ -76,9 +71,8 @@
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
                 <span class="!text-lg !text-black">Cradle</span> <br />
-                <span>Observaciones: {{ selectedCradle.observations || '-' }}</span>
+                <span v-if="selectedCradle.observations">Observaciones: {{ selectedCradle.observations }}</span>
             </template>
-            <template #btn> </template>
         </Backdrop>
     </Layout>
 </template>
