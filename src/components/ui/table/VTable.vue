@@ -222,7 +222,7 @@
             & > div {
                 @apply align-middle inline-block min-w-full;
                 & > article {
-                    @apply shadow overflow-hidden border-b border-second-200 sm:rounded-lg;
+                    @apply shadow border-b border-second-200 sm:rounded-lg;
                 }
             }
         }
