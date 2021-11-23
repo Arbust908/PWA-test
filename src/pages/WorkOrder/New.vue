@@ -467,36 +467,18 @@
                             }
 
                             if (crews.value.length > 0) {
-                                const isCrewsFinished = ref([]);
-                                crews.value.forEach((crew) => {
+                                for (const crew of crews.value) {
                                     const { id, ...newCrew } = crew;
                                     newCrew.workOrderId = workOrderId;
-                                    console.log('crew', newCrew);
-                                    const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
-                                    isCrewsFinished.value.push(data);
-                                    watch(data, (newVal, _) => {
-                                        crew.resources.forEach((resource) => {
-                                            const crewId = newVal.data.id;
-                                            const { id, ...newResource } = resource;
-                                            newResource.crewId = crewId;
-                                            const { data: dataRH } = useAxios(
-                                                '/humanResource',
-                                                { method: 'POST', data: newResource },
-                                                instance
-                                            );
-                                        });
-                                    });
-                                });
-                                console.log(isCrewsFinished.value);
+                                    const createdCrew = await axios.post(api + '/crew', newCrew);
+                                    for (const rrhh of crew.resources) {
+                                        const crewId = createdCrew.data.data.id;
+                                        const { id, ...newResource } = rrhh;
+                                        newResource.crewId = crewId;
+                                        await axios.post(api + '/humanResource', newResource);
+                                    }
+                                }
                             }
-                            // store.dispatch('saveWorkOrder', newVal.data);
-                            // setTimeout(() => {
-                            //     toggleLoading(false);
-                            //     setTimeout(() => {
-                            //         // Modal de procesasando?
-                            //         router.push('/orden-de-trabajo');
-                            //     }, 100);
-                            // }, 1000);
                         }
                         toggleModal();
                     });

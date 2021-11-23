@@ -7,7 +7,7 @@
             :open="open"
             @close="$emit('close')"
         >
-            <div class="block min-h-screen pt-4 px-4 text-center flex justify-center items-end">
+            <div class="min-h-screen pt-4 px-4 text-center flex justify-center items-end">
                 <!-- <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"> -->
                 <TransitionChild
                     as="template"
@@ -79,9 +79,7 @@
                             </slot>
                         </div>
                         <footer>
-                            <slot name="btn">
-                                <SecondaryBtn @click="$emit('close')">Close</SecondaryBtn>
-                            </slot>
+                            <slot name="btn"> </slot>
                         </footer>
                     </div>
                 </TransitionChild>
