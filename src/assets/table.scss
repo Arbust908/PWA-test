@@ -3,14 +3,16 @@ th {
 }
 
 .body-row {
-    @apply hover:bg-second-200;
-
     &.odd {
         @apply bg-second-50;
     }
-
+    
     &.even {
         @apply bg-second-100;
+    }
+    &.odd ,
+    &.even {
+        @apply hover:bg-[#E5EEE5];
     }
 }
 
