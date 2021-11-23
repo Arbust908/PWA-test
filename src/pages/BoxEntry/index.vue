@@ -283,6 +283,7 @@
             let dimensions = ref('');
             let cradles = ref([]);
             let cleanCradles = ref([]);
+            const selectedPurchaseOrder = ref({});
 
             let idMessage = ref(false);
 
@@ -398,7 +399,7 @@
                 if (purchaseOrders.value.length > 0) {
                     if (clientId.value !== -1 && pitId.value !== -1) {
                         filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
-                            if (po.companyId == clientId.value && po.pitId == pitId.value) {
+                            if (po.companyId == clientId.value && po.pitId == pitId.value && po.isFullyAllocated == 0) {
                                 return po;
                             }
                         });
@@ -416,6 +417,8 @@
                             const purchaseOrderIndex = filteredPurchaseOrders.value.findIndex(
                                 (po) => po.id == purchaseOrderId.value
                             );
+
+                            selectedPurchaseOrder.value = filteredPurchaseOrders.value[purchaseOrderIndex];
 
                             boxes.value = filteredPurchaseOrders.value[purchaseOrderIndex].sandOrders.filter(
                                 (so) => so.boxId.length > 0
@@ -540,6 +543,11 @@
                     return;
                 }
 
+                choosedBox.value.location = {
+                    where: 'warehouse',
+                    where_id: warehouse.value.id,
+                };
+
                 if (box.category == 'empty' || box.category !== 'aisle') {
                     // if (visibleCategories.value.includes(box.category)) {
                     wasWarehouseModificated.value = true;
@@ -623,7 +631,16 @@
                 confirmModal.value = false;
             };
 
+            const checkIfIsFullyAllocated = (selected) => {
+                let status = false;
+                selected.sandOrders.forEach((order) => {
+                    return order.location !== null ? (status = true) : (status = false);
+                });
+                return status;
+            };
+
             const save = async () => {
+                const isFullyAllocated = checkIfIsFullyAllocated(selectedPurchaseOrder.value);
                 const warehouseDone = ref(false);
                 const warehouseId = warehouse.value.id;
                 const { createdAt, deletedAt, updatedAt, pit, clientCompany, ...wareData } = warehouse.value;
@@ -661,6 +678,7 @@
                         boxId: box.boxId,
                         sandTypeId: box.sandTypeId,
                         amount: box.amount,
+                        location: JSON.stringify(box.location),
                     };
                     await axios.put(`${apiUrl}/sandOrder/${data.id}`, data);
                 });
@@ -685,6 +703,13 @@
 
                 if (cradleDone.value && wasWarehouseModificated.value == false) {
                     confirmModal.value = true;
+                }
+
+                if (isFullyAllocated) {
+                    const selectedPurchaseOrderID = selectedPurchaseOrder.value.id;
+                    axios.put(`${apiUrl}/purchaseOrder/${selectedPurchaseOrderID}`, {
+                        isFullyAllocated: 1,
+                    });
                 }
             };
 
