@@ -12,14 +12,21 @@
                         </thead>
                         <tbody v-if="loading">
                             <td :colspan="[columns.length]" class="emptyState">
-                                <p>No hay datos cargados</p>
+                                <p>Cargando..</p>
                             </td>
+                        </tbody>
+                        <tbody v-else-if="paginatedItems.length === 0">
+                            <tr>
+                                <td :colspan="[columns.length]" class="emptyState">
+                                    <p>{{ emptyText }}</p>
+                                </td>
+                            </tr>
                         </tbody>
                         <tbody v-else>
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
                                 <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
                                     <slot name="item" :item="item" />
-                                    <td v-if="actions" class="">
+                                    <td v-if="desktopActions" class="p-0">
                                         <DropdownBtn :actions="desktopActions" :item="item">
                                             <CircularBtn size="xs" class="even">
                                                 <Icon
@@ -42,7 +49,7 @@
         <!-- TODO: Podría ir en un componente aparte  -->
         <div class="flex items-start lg:items-center justify-center mt-2 sm:hidden">
             <div class="mx-auto h-full">
-                <div class="shadow-md bg-gray-100 rounded-lg sm:shadow-lg text-sm sm:text-base">
+                <div class="shadow-md bg-gray-100 overflow-none rounded-lg sm:shadow-lg text-sm sm:text-base">
                     <div v-for="item in paginatedItems" :key="item.id" class="bg-white border-gray-400">
                         <div class="divide-y divide-black border-t-2">
                             <div class="grid grid-cols-12 p-6 pl-2 pr-2 items-center">
@@ -127,6 +134,10 @@
             showPagination: {
                 type: Boolean,
                 default: false,
+            },
+            emptyText: {
+                type: String,
+                default: 'No hay datos cargados',
             },
         },
         setup(props, { emit }) {

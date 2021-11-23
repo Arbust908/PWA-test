@@ -5,7 +5,7 @@
             class="col-span-full"
             title="Nombre y Apellido"
             field-name="sandRepName"
-            placeholder="Ingresar Nombre y Apellido"
+            placeholder=""
             :data="repName"
             require-validation
             entity="sandProvider"
@@ -15,7 +15,7 @@
             class="col-span-full"
             title="Teléfono"
             field-name="sandRepPhone"
-            placeholder="+11 1234 5678"
+            placeholder="Ingrese sólo números"
             mask="#*"
             :data="repPhone"
             require-validation
