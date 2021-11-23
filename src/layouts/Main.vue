@@ -280,6 +280,11 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Logo from '@/components/Logo.vue';
     import NavWrapper from '@/components/navigation/NavWrapper.vue';
+    import PermissionsManager from '@/helpers/canI';
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+    import { useAbility } from '@casl/vue';
+    import { Ability } from '@casl/ability';
 
     export default defineComponent({
         components: {
@@ -295,7 +300,7 @@
             NavWrapper,
             Icon,
         },
-        setup() {
+        async setup() {
             const store = useStore();
             const sidebarOpen = ref(false);
             const navigation = computed(() => {
@@ -311,6 +316,13 @@
             const goHome = () => {
                 router.push('/home');
             };
+            // const { can } = useAbility();
+
+            const { data } = await axios.post(`${api}/user/getRole`, { email: user.value.username });
+
+            const permissions = data.data.permissions;
+
+            PermissionsManager.setPermissions([permissions]);
 
             return {
                 navigation,

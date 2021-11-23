@@ -16,6 +16,8 @@
     "lint:markup": "vue-tsc --noEmit"
   },
   "dependencies": {
+    "@casl/ability": "^5.4.3",
+    "@casl/vue": "^2.1.2",
     "@headlessui/vue": "^1.2.0",
     "@heroicons/vue": "^1.0.1",
     "@vuelidate/core": "^2.0.0-alpha.26",

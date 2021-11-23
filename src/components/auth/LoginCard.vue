@@ -103,6 +103,7 @@
     import { Role } from '@/interfaces/sandflow';
     import Logo from '@/components/Logo.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import PermissionsManager from '@/helpers/canI';
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     import { useToggle } from '@vueuse/core';
@@ -161,6 +162,10 @@
                     })
                     .then((res) => {
                         if (res.status === 200) {
+                            const permissions = res.data.data.permissions;
+
+                            PermissionsManager.setPermissions([permissions]);
+
                             return res.data.data.token || res.data.token;
                         }
 
