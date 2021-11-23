@@ -23,7 +23,7 @@
                                 <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
                                     <slot name="item" :item="item" />
                                     <td v-if="actions" class="p-0">
-                                        <DropdownBtn :actions="actions" :item="item">
+                                        <DropdownBtn :actions="desktopActions" :item="item">
                                             <CircularBtn size="xs" class="even">
                                                 <Icon
                                                     icon="DotsVertical"
