@@ -10,15 +10,11 @@
                                 <TableHeader :columns="columns" :pagination="localPagination" />
                             </slot>
                         </thead>
-                        <tbody v-if="loading">
-                            <td :colspan="[columns.length]" class="emptyState">
-                                <p>Cargando..</p>
-                            </td>
-                        </tbody>
-                        <tbody v-else-if="paginatedItems.length === 0">
+                        <tbody v-if="loading || paginatedItems.length === 0">
                             <tr>
-                                <td :colspan="[columns.length]" class="emptyState">
-                                    <p>{{ emptyText }}</p>
+                                <td :colspan="columns.length" class="emptyState">
+                                    <p v-if="loading">Cargando...</p>
+                                    <p v-else>{{ emptyText }}</p>
                                 </td>
                             </tr>
                         </tbody>
