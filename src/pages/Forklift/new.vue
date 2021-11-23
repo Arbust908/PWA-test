@@ -6,36 +6,93 @@
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
 
-            <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
+            <!-- <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
                 <template #body>
                     <p>{{ errorMessage }}</p>
                     <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
                 </template>
-            </Modal>
+            </Modal> -->
         </section>
         <footer class="mt-[32px] gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
             <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="goToIndex">Cancelar</SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                <PrimaryBtn
+                    btn="wide"
+                    :disabled="!isValidated ? 'yes' : null"
+                    @click="isValidated && getForkliftsAndCheckIfNameExists()"
+                >
                     Finalizar
                 </PrimaryBtn>
             </section>
         </footer>
+        <Modal type="off" :open="showModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
+                    <span class="text-center text-base border-none text-gray-900"
+                        >¡El forklift fue guardado con éxito!</span
+                    >
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <PrimaryBtn @click.prevent="$router.push('/forklift')">Continuar</PrimaryBtn>
+                </div>
+            </template>
+        </Modal>
+        <Modal type="off" :open="showErrorModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
+                    <span class="text-center text-base border-none text-gray-900"> Ya existe este forklift </span>
+                    <span class="text-center text-sm border-none m-2">
+                        El forklift que intentas guardar fue creado anteriormente.
+                    </span>
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
+                </div>
+            </template>
+        </Modal>
+        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
+                    <span class="text-center text-base border-none text-gray-900">
+                        ¡Ups! Hubo un problema y no pudimos guardar el forklift.
+                    </span>
+                    <span class="text-center text-sm border-none m-2">
+                        Por favor, intentá nuevamente en unos minutos.
+                    </span>
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { watchEffect, reactive, ref } from 'vue';
+    import { watchEffect, reactive, defineAsyncComponent, ref } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
+    import { useTitle, useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import ForkliftForm from '@/components/forklift/Form.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import Modal from '@/components/modal/General.vue';
+    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     export default {
         components: {
@@ -44,12 +101,15 @@
             PrimaryBtn,
             ForkliftForm,
             Modal,
+            Icon,
+            WarningBtn,
         },
         setup() {
             useTitle('Nuevo Forklift <> Sandflow');
             const store = useStore();
             const router = useRouter();
 
+            const createdForklifts = ref([]);
             const forklift = reactive({
                 name: '',
                 observations: '',
@@ -65,17 +125,42 @@
                 isValidated.value = (await useValidator(store, 'forklift')) ? true : false;
             });
 
-            const notificationModalvisible = ref(false);
-            const errorMessage = ref('');
-            const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
 
             const save = async () => {
                 await useStoreLogic(router, store, 'forklift', 'create', forklift).then((res) => {
                     if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
+                        toggleApiErrorModal();
+                    } else {
+                        toggleModal();
                     }
                 });
+            };
+
+            const getForkliftsAndCheckIfNameExists = async () => {
+                try {
+                    const forkliftsFromApi = await axios.get(`${api}/forklift`);
+
+                    createdForklifts.value = forkliftsFromApi.data.data;
+
+                    let types = createdForklifts.value.map((forklift) => forklift.name.toLowerCase());
+
+                    if (types.includes(forklift.name.toLowerCase())) {
+                        toggleErrorModal();
+                    } else {
+                        save();
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
             };
 
             return {
@@ -83,9 +168,13 @@
                 goToIndex,
                 save,
                 isValidated,
-                notificationModalvisible,
-                toggleNotificationModal,
-                errorMessage,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
+                getForkliftsAndCheckIfNameExists,
             };
         },
     };
