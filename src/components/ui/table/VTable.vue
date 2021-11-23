@@ -10,17 +10,20 @@
                                 <TableHeader :columns="columns" :pagination="localPagination" />
                             </slot>
                         </thead>
-                        <tbody v-if="loading">
-                            <td :colspan="[columns.length]" class="emptyState">
-                                <p>No hay datos cargados</p>
-                            </td>
+                        <tbody v-if="loading || paginatedItems.length === 0">
+                            <tr>
+                                <td :colspan="columns.length" class="emptyState">
+                                    <p v-if="loading">Cargando...</p>
+                                    <p v-else>{{ emptyText }}</p>
+                                </td>
+                            </tr>
                         </tbody>
                         <tbody v-else>
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
                                 <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
                                     <slot name="item" :item="item" />
-                                    <td v-if="actions" class="">
-                                        <DropdownBtn :actions="desktopActions" :item="item">
+                                    <td v-if="actions" class="p-0">
+                                        <DropdownBtn :actions="actions" :item="item">
                                             <CircularBtn size="xs" class="even">
                                                 <Icon
                                                     icon="DotsVertical"
@@ -127,6 +130,10 @@
             showPagination: {
                 type: Boolean,
                 default: false,
+            },
+            emptyText: {
+                type: String,
+                default: 'No hay datos cargados',
             },
         },
         setup(props, { emit }) {
