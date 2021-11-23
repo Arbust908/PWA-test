@@ -6,12 +6,12 @@
                 <div>
                     <article>
                         <table>
-                            <thead>
+                            <thead class="rounded-lg">
                                 <slot name="header">
                                     <TableHeader :columns="columns" :pagination="localPagination" />
                                 </slot>
                             </thead>
-                            <tbody v-if="loading">
+                            <tbody v-if="loading" class="rounded-lg">
                                 <td :colspan="[columns.length]" class="emptyState">
                                     <p>No hay datos cargados</p>
                                 </td>
@@ -44,7 +44,7 @@
             <div class="flex items-start lg:items-center justify-center mt-2 sm:hidden">
                 <div class="mx-auto h-full">
                     <div class="shadow-md bg-gray-100 overflow-none rounded-lg sm:shadow-lg text-sm sm:text-base">
-                        <div v-for="item in paginatedItems" :key="item.id" class="bg-white border-gray-400">
+                        <div v-for="item in paginatedItems" :key="item.id" class="bg-white border-gray-400 rounded-lg">
                             <div class="divide-y divide-black border-t-2">
                                 <div class="grid grid-cols-12 p-6 pl-2 pr-2 items-center">
                                     <div class="col-span-10 bg-white rounded truncate pl-2">
@@ -228,7 +228,7 @@
         }
     }
     table {
-        @apply min-w-full divide-y divide-second-200;
+        @apply min-w-full divide-y divide-second-200 rounded-lg;
         thead {
             @apply bg-second-50;
         }

@@ -50,6 +50,7 @@
                             px-6
                             py-4
                             space-y-4
+                            font-body
                         "
                     >
                         <header class="flex justify-between">
@@ -70,7 +71,7 @@
                                 </svg>
                             </CircularBtn>
                         </header>
-                        <div class="text-sm text-second-500">
+                        <div>
                             <slot name="body">
                                 <p>
                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget ex maximus,

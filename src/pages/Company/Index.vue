@@ -166,6 +166,7 @@
             const actions = [
                 {
                     label: 'Ver más',
+                    onlyMobile: true,
                     callback: () => {
                         console.log('Ver más');
                     },
