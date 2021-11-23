@@ -13,8 +13,15 @@
                             </thead>
                             <tbody v-if="loading">
                                 <td :colspan="[columns.length]" class="emptyState">
-                                    <p>No hay datos cargados</p>
+                                    <p>Cargando..</p>
                                 </td>
+                            </tbody>
+                            <tbody v-else-if="paginatedItems.length === 0">
+                                <tr>
+                                    <td :colspan="[columns.length]" class="emptyState">
+                                        <p>{{ emptyText }}</p>
+                                    </td>
+                                </tr>
                             </tbody>
                             <tbody v-else>
                                 <template v-for="(item, index) in paginatedItems" :key="item.id">
@@ -129,6 +136,10 @@
             showPagination: {
                 type: Boolean,
                 default: false,
+            },
+            emptyText: {
+                type: String,
+                default: 'No hay datos cargados',
             },
         },
         setup(props, { emit }) {
