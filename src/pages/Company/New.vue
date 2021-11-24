@@ -94,6 +94,20 @@
                 </PrimaryBtn>
             </section>
         </footer>
+
+        <ErrorModal
+            :open="showErrorCuitModal"
+            title="Ya existe un cliente con este CUIT"
+            text="El cliente que intentas guardar fue creado anteriormente"
+            @close="showErrorCuitModal = false"
+            @action="showErrorCuitModal = false"
+        />
+        <SuccessModal
+            :open="showSuccessModal"
+            title="El cliente fue guardado con éxito"
+            @close="$router.push('/clientes')"
+            @action="$router.push('/clientes')"
+        />
     </Layout>
 </template>
 
@@ -117,6 +131,9 @@
     // TIPOS
     import { Company } from '@/interfaces/sandflow';
 
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+
     export default {
         components: {
             Layout,
@@ -126,6 +143,8 @@
             FieldInput,
             FieldLegend,
             Toggle,
+            ErrorModal,
+            SuccessModal,
         },
         setup() {
             useTitle('Nuevo Cliente <> Sandflow');
@@ -138,6 +157,9 @@
             const goToIndex = () => {
                 router.push('/clientes');
             };
+
+            const showErrorCuitModal = ref(false);
+            const showSuccessModal = ref(false);
 
             const newClient: Company = ref({
                 name: '',
@@ -164,6 +186,13 @@
             });
 
             const save = async () => {
+                const legalIdExists = await checkIfExists('legalId', newClient.value.legalId);
+
+                if (legalIdExists) {
+                    showErrorCuitModal.value = true;
+
+                    return;
+                }
                 const { data: CRdata } = useAxios(
                     '/companyRepresentative',
                     { method: 'POST', data: newClient.value.companyRepresentative },
@@ -188,12 +217,23 @@
                 });
             };
 
+            const checkIfExists = async (field: string, value: string) => {
+                //TODO: Refactor with useStoreLogic ? (useStoreLogic not accept filters)
+                const apiResponse = await axios.get(`${apiUrl}/company?${field}=${value}`);
+
+                const companies = apiResponse.data.data;
+
+                return companies.length > 0;
+            };
+
             return {
                 goToIndex,
                 save,
                 newClient,
                 isValidated,
                 handleToggleState,
+                showErrorCuitModal,
+                showSuccessModal,
             };
         },
     };
