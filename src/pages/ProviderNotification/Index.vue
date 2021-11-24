@@ -1,68 +1,269 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 px-3">
-            <h2 class="text-2xl font-semibold text-second-900">Notificaciones a Proveedores</h2>
-            <router-link to="/notificaciones-a-proveedores/nueva">
-                <PrimaryBtn>Nueva Notificacion</PrimaryBtn>
+        <header class="flex justify-start space-x-4 items-center mb-4">
+            <h2 class="text-2xl font-semibold text-gray-900">Notificaciones a Proveedores</h2>
+            <router-link to="/proveedores-de-transporte/nuevo">
+                <PrimaryBtn size="sm">
+                    <span> Crear </span>
+                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
+                </PrimaryBtn>
             </router-link>
         </header>
-        <UiTable>
-            <template #header>
-                <tr>
-                    <th scope="col">Proveedor</th>
-                    <th scope="col">Ordenes</th>
-                    <th scope="col" title="Cantidad de Arena">C° Arena</th>
-                    <th scope="col">Transportes</th>
-                    <th scope="col">C° de Camiones</th>
-                    <!-- <th scope="col">
-            <span class="sr-only">Acciones</span>
-          </th> -->
-                </tr>
-            </template>
-            <template #body>
-                <tr
-                    v-for="(pn, Key) in ProviderNotifications"
-                    :key="Key"
-                    :class="Key % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td>
-                        {{ pn.sandProvider.name }}
-                    </td>
-                    <td>{{ pn.sandOrder.amount }}t</td>
-                    <td>
-                        {{ pn.transportProviders ? pn.transportProviders.length : 'No hay transporte' }}
-                    </td>
-                    <td>
-                        {{ pn.transportProviders ? sumTransport(pn.transportProviders) : '-' }}
-                    </td>
-                    <!-- <td>
-            <div class="btn-panel">
-              <router-link
-                :to="`/notificaciones-a-proveedores/${pn.id}`"
-                class="edit"
-              >
-                <Icon icon="PencilAlt" class="w-5 h-5" />
-                <span> Editar </span>
-              </router-link>
-              <button class="delete" @click="deleteSP(pn.id)">
-                <Icon icon="Trash" class="w-5 h-5" />
-                <span> Eliminar </span>
-              </button>
+        <hr />
+        <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
+            <FieldSelect
+                title="Filtro"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
+                field-name="name"
+                placeholder="Seleccionar proveedor"
+                endpoint="/transportProvider"
+                :data="transportProviderId"
+                @update:data="transportProviderId = $event"
+            />
+            <div class="col-span-4 mt-7">
+                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
-          </td> -->
-                </tr>
-                <tr v-if="ProviderNotifications.length <= 0">
-                    <td colspan="5" class="emptyState">
+        </div>
+        <VTable
+            class="mt-5"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredTransportProviders"
+            :actions="actions"
+        >
+            <!-- Desktop -->
+            <template #item="{ item }">
+                <td :class="item.sandProvider.name ? null : 'empty'">
+                    {{ item.sandProvider.name || 'Sin cliente' }}
+                </td>
+                <td :class="item.sandOrder.amount ? null : 'empty'">
+                    {{ item.sandOrder.amount || 'Sin arena' }}
+                </td>
+                <td :class="item.transportProviders ? null : 'empty'">
+                    {{ item.transportProviders ? item.transportProviders.length : 'No hay transporte' }}
+                </td>
+                <td :class="item.companyRepresentative ? null : 'empty'">
+                    {{ item.transportProviders ? sumTransport(item.transportProviders) : '-' }}
+                </td>
+                <td>ESTADO</td>
+                <tr v-if="filteredTransportProviders && filteredTransportProviders.length <= 0">
+                    <td :colspan="columns.length" class="emptyState">
                         <p>No hay Notificaciones a Proveedores</p>
                     </td>
                 </tr>
             </template>
-        </UiTable>
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }">
+                {{ item.sandProvider.name || 'Sin cliente' }}
+            </template>
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Domicilio: </span>{{ item.address }}
+            </template>
+        </VTable>
+        <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
+            <template #body>
+                <BackdropCard :info="bdInfo" />
+            </template>
+        </Backdrop>
+        <Modal title="¿Desea inhabilitar este proveedor de transporte?" type="error" :open="showModal">
+            <template #body>
+                <div>
+                    Una vez inhabilitado, no podrá utilizar este proveedor de transporte en ninguna otra sección de la
+                    aplicación
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center gap-5 btn">
+                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <ErrorBtn @click="confirmModal">Inhabilitar proveedor </ErrorBtn>
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
 <script>
+    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
+    import { useStore } from 'vuex';
+    import { useTitle } from '@vueuse/core';
+    import { useRouter } from 'vue-router';
+
+    import BackdropCard from '@/components/transportProvider/BackdropCard.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
+    import Layout from '@/layouts/Main.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
+
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
+    const ErrorBtn = defineAsyncComponent(() => import('@/components/ui/buttons/ErrorBtn.vue'));
+
+    export default {
+        components: {
+            Backdrop,
+            BackdropCard,
+            FieldSelect,
+            GhostBtn,
+            Icon,
+            Layout,
+            Modal,
+            PrimaryBtn,
+            VTable,
+            ErrorBtn,
+        },
+        setup() {
+            useTitle('Notificaciones a Proveedores <> Sandflow');
+            const tpDB = ref([]);
+            const store = useStore();
+            const router = useRouter();
+            const loading = ref(false);
+            const notificationId = ref(-1);
+            const selectedNotification = ref(null);
+            const showModal = ref(false);
+            const showBD = ref(false);
+            const bdInfo = ref(null);
+            const toggleBD = () => (showBD.value = !showBD.value);
+
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+                // currentPage: 1,
+                // perPage: 10,
+            });
+
+            const columns = [
+                { title: 'Crto. de carga', key: 'name', sortable: true },
+                { title: 'Arena', key: 'legalId', sortable: true },
+                { title: 'Transporte', key: 'companyRepresentative.name', sortable: true },
+                { title: 'Camiones', key: 'companyRepresentative.phone', sortable: true },
+                { title: 'Estado', key: 'companyRepresentative.phone', sortable: true },
+                { title: 'Acciones', key: 'name' },
+            ];
+
+            const actions = [
+                {
+                    label: 'Ver más',
+                    onlyMobile: true,
+                    callback: (item) => {
+                        bdInfo.value = item;
+                        showBD.value = true;
+                    },
+                },
+                {
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/notificaciones-a-proveedores/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+            ];
+
+            const filteredTransportProviders = computed(() => {
+                if (notificationId.value > -1) {
+                    return tpDB.value.filter((tp) => tp.id == notificationId.value);
+                }
+
+                return tpDB.value;
+            });
+
+            const clearFilters = () => {
+                notificationId.value = -1;
+            };
+
+            const getTP = async () => {
+                const res = await axios.get(`${api}/providerNotification`).catch((err) => {
+                    console.log(err);
+                });
+
+                if (res.status === 200) {
+                    tpDB.value = res.data.data;
+                }
+
+                store.dispatch('setTransportProviders', tpDB.value);
+            };
+
+            onMounted(async () => {
+                loading.value = true;
+                await getTP();
+                loading.value = false;
+            });
+
+            const openModalVisibility = async (transportProvider) => {
+                selectedNotification.value = transportProvider;
+
+                if (transportProvider.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await updateVisibility(selectedNotification.value);
+            };
+
+            const confirmModal = async () => {
+                await updateVisibility(selectedNotification.value);
+                showModal.value = false;
+            };
+
+            const updateVisibility = async (tp) => {
+                const payload = {
+                    ...tp,
+                    visible: !tp.visible,
+                };
+
+                await store.dispatch('updateProviderNotification', payload);
+            };
+
+            return {
+                actions,
+                bdInfo,
+                clearFilters,
+                columns,
+                confirmModal,
+                filteredTransportProviders,
+                loading,
+                notificationId,
+                openModalVisibility,
+                pagination,
+                selectedNotification,
+                showBD,
+                showModal,
+                toggleBD,
+                tpDB,
+            };
+        },
+    };
+</script>
+
+<style lang="scss" scoped>
+    @import '@/assets/table.scss';
+    .outline-none {
+        outline: 0;
+    }
+</style>
+
+<!-- <script>
     import { ref, watch } from 'vue';
     import { useStore } from 'vuex';
     import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
@@ -130,8 +331,4 @@
             };
         },
     };
-</script>
-
-<style lang="scss" scoped>
-    @import '@/assets/table.scss';
-</style>
+</script> -->
