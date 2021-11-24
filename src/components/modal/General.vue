@@ -45,7 +45,7 @@
                             w-full
                             my-8
                             align-middle
-                            max-w-sm
+                            max-w-xl
                             p-6
                         "
                     >
