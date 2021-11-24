@@ -38,8 +38,8 @@
                 <td :class="cr.name ? null : 'empty'">
                     {{ cr.name || '-' }}
                 </td>
-                <td>
-                    <p class="w-52 truncate">
+                <td class="sm:w-52">
+                    <p class="w-52 truncate text-center">
                         {{ cr.observations || '-' }}
                     </p>
                 </td>
