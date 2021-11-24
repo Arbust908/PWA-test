@@ -72,8 +72,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
+                    <GhostBtn btn="!text-gray-500" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="!px-10 !bg-red-700" @click="confirmModal">Inhabilitar </PrimaryBtn>
                 </div>
             </template>
         </Modal>
