@@ -374,7 +374,7 @@
                     draft,
                 };
                 const { data: WODone } = useAxios(`/workOrder/${woID.value}`, { method: 'PUT', data: newWO }, instance);
-                watch(WODone, (newVal, _) => {
+                watch(WODone, async (newVal, _) => {
                     if (newVal && newVal.data && newVal.data.id) {
                         if (pits.value.length > 0) {
                             const isPitsFinished = ref([]);
@@ -469,90 +469,44 @@
                         }
 
                         if (crews.value.length > 0) {
-                            const isCrewsFinished = ref([]);
                             const comparedCrews = compareCrews(crews.value, backupCrew.value);
-                            console.log('edited', crews.value);
-                            console.log('backup', backupCrew.value);
-                            console.log('comparedCrews', comparedCrews);
-                            comparedCrews.changed.forEach((crewToUpdate) => {
+                            for (const crewToUpdate of comparedCrews.changed) {
                                 const { ...newCrew } = crewToUpdate;
-                                console.log('newCrew', newCrew);
-                                console.log('crewToUpdate', crewToUpdate);
                                 newCrew.workOrderId = newVal.data.id;
-                                const { data } = useAxios(
-                                    `/crew/${newCrew.id}`,
-                                    { method: 'PUT', data: newCrew },
-                                    instance
-                                );
-                                isCrewsFinished.value.push(data);
+                                const updatedCrew = await axios.put(api + `/crew/${newCrew.id}`, newCrew);
                                 const oldResources = backupCrew.value.find((crew) => crew.id === newCrew.id).resources;
                                 const comparedResources = compareResource(newCrew.resources, oldResources);
-                                console.log(comparedResources);
-                                comparedResources.new.forEach((resource) => {
-                                    const crewId = newCrew.id;
-                                    const { id: resourseId, ...newResource } = resource;
-                                    newResource.crewId = crewId;
-                                    useAxios('/humanResource', { method: 'POST', data: newResource }, instance);
-                                });
-                                comparedResources.changed.forEach((resource) => {
-                                    const crewId = newCrew.id;
-                                    const { ...newResource } = resource;
-                                    newResource.crewId = crewId;
-                                    useAxios(
-                                        `/humanResource/${newResource.id}`,
-                                        { method: 'PUT', data: newResource },
-                                        instance
-                                    );
-                                });
-                                comparedResources.deleted.forEach((resource) => {
-                                    useAxios(`/humanResource/${resource.id}`, { method: 'DELETE' }, instance);
-                                });
-                            });
-                            comparedCrews.deleted.forEach((crewToDelete) => {
-                                const { id: crewId } = crewToDelete;
-                                useAxios(`/crew/${crewId}`, { method: 'DELETE' }, instance);
-                            });
-                            comparedCrews.new.forEach((crewToCreate) => {
-                                const { id: innerCrewId, ...newCrew } = crewToCreate;
-                                newCrew.workOrderId = newVal.data.id;
-                                const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
-                                isCrewsFinished.value.push(data);
-                                watch(data, (newVal, _) => {
-                                    crew.value.resources.forEach((resource) => {
-                                        const crewId = newVal.data.id;
-                                        const { id, ...newResource } = resource;
-                                        newResource.crewId = crewId;
-                                        const { data: dataRH } = useAxios(
-                                            '/humanResource',
-                                            { method: 'POST', data: newResource },
-                                            instance
-                                        );
-                                    });
-                                });
-                            });
-                            // comparedCrews.unchanged Nothing to do
+                                const uCrewId = updatedCrew.data.data.id;
+                                for (const newRH of comparedResources.new) {
+                                    const { id, ...newResource } = newRH;
+                                    newResource.crewId = uCrewId;
+                                    await axios.post(api + '/humanResource', newResource);
+                                }
+                                for (const changedRH of comparedResources.changed) {
+                                    const { id, ...newResource } = changedRH;
+                                    newResource.crewId = uCrewId;
+                                    await axios.put(api + `/humanResource/${newResource.id}`, newResource);
+                                }
+                                for (const deleteRH of comparedResources.deleted) {
+                                    await axios.delete(api + `/humanResource/${deleteRH.id}`);
+                                }
+                            }
 
-                            crews.value.forEach((crew) => {
-                                const { id, ...newCrew } = crew;
-                                // console.log(newVal)
-                                // console.log(newVal.data)
+                            for (const crewToDelete of comparedCrews.deleted) {
+                                await axios.post(api + `/humanResource/${crewToDelete.id}`);
+                            }
+
+                            for (const crewToCreate of comparedCrews.new) {
+                                const { id, ...newCrew } = crewToCreate;
                                 newCrew.workOrderId = newVal.data.id;
-                                const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
-                                isCrewsFinished.value.push(data);
-                                watch(data, (newVal, _) => {
-                                    crew.resources.forEach((resource) => {
-                                        const crewId = newVal.data.id;
-                                        const { id, ...newResource } = resource;
-                                        newResource.crewId = crewId;
-                                        const { data: dataRH } = useAxios(
-                                            '/humanResource',
-                                            { method: 'POST', data: newResource },
-                                            instance
-                                        );
-                                    });
-                                });
-                            });
-                            console.log(isCrewsFinished.value);
+                                const createdCrew = await axios.post(api + '/crew', newCrew);
+                                for (const rrhh of crewToCreate.resources) {
+                                    const crewId = createdCrew.data.data.id;
+                                    const { id, ...newResource } = rrhh;
+                                    newResource.crewId = crewId;
+                                    await axios.post(api + '/humanResource', newResource);
+                                }
+                            }
                         }
 
                         store.dispatch('updateWorkOrder', newVal.data);

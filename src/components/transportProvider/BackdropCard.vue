@@ -32,21 +32,6 @@
 </template>
 
 <script lang="ts">
-    // address: "Calle Falsa 123"
-    // companyRepresentative: {id: 1, name: 'Orlan Gash', email: 'ogash@molis.inc', phone: '11123213123', createdAt: '2021-11-23T15:19:03.000Z', …}
-    // companyRepresentativeId: 1
-    // createdAt: "2021-11-23T15:19:04.000Z"
-    // deletedAt: null
-    // drivers: []
-    // id: 1
-    // legalId: 23363528279
-    // name: "Moils Inc"
-    // observations: ""
-    // providerNotification: null
-    // providerNotificationId: null
-    // purchaseOrders: []
-    // updatedAt: "2021-11-23T15:19:04.000Z"
-    // visible: true
     import { defineComponent } from 'vue';
     export default defineComponent({
         props: {
