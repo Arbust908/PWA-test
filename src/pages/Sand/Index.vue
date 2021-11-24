@@ -77,7 +77,11 @@
                 <span class="font-bold">Observaciones: </span> {{ item.observations }}
             </template>
         </VTable>
-
+        <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
+            <template #body>
+                <BackdropCard :info="bdInfo" />
+            </template>
+        </Backdrop>
         <Modal title="¿Desea inhabilitar este tipo de arena?" type="error" :open="showModal">
             <template #body>
                 <div>
@@ -96,7 +100,7 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
+    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
@@ -107,17 +111,23 @@
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import Modal from '@/components/modal/General.vue';
     import VTable from '@/components/ui/table/VTable.vue';
 
     import Badge from '@/components/ui/Badge.vue';
     import Popper from 'vue3-popper';
+
+    import BackdropCard from '@/components/sand/BackdropCard.vue';
+
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
+            Backdrop,
+            BackdropCard,
             Layout,
             PrimaryBtn,
             UiTable,
@@ -140,6 +150,10 @@
             const showModal = ref(false);
             const router = useRouter();
 
+            const showBD = ref(false);
+            const bdInfo = ref(null);
+            const toggleBD = () => (showBD.value = !showBD.value);
+
             const pagination = ref({
                 sortKey: 'id',
                 sortDir: 'asc',
@@ -156,8 +170,10 @@
             const actions = [
                 {
                     label: 'Ver más',
-                    callback: () => {
-                        console.log('Ver más');
+                    onlyMobile: true,
+                    callback: (item) => {
+                        bdInfo.value = item;
+                        showBD.value = true;
                     },
                 },
                 {
@@ -278,6 +294,9 @@
                 loading,
                 pagination,
                 actions,
+                toggleBD,
+                showBD,
+                bdInfo,
             };
         },
     };
