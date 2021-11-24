@@ -9,7 +9,7 @@
                     <FieldInput
                         class="col-span-full"
                         field-name="name"
-                        placeholder="Nombre del Cradle"
+                        placeholder=""
                         title="Nombre"
                         :data="name"
                         require-validation
@@ -19,7 +19,7 @@
                     <FieldTextArea
                         class="col-span-full"
                         field-name="observations"
-                        placeholder="Observaciones..."
+                        placeholder=""
                         title="Observaciones"
                         :rows="5"
                         is-optional
