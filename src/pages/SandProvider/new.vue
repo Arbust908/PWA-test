@@ -116,7 +116,7 @@
             const errorMessage = ref('');
 
             const showErrorModal = ref(false);
-            const showSuccessModal = ref(true);
+            const showSuccessModal = ref(false);
 
             const isNewRep: Ref<boolean> = ref(false);
             const toggleRepStatus = useToggle(isNewRep);
