@@ -1,6 +1,3 @@
-import axios from 'axios';
-const api = import.meta.env.VITE_API_URL || '/api';
-
 export default {
     state: () => ({
         all: [],
@@ -16,9 +13,6 @@ export default {
         },
     },
     mutations: {
-        SET_PURCHASEORDER(state, payload) {
-            state.all = payload;
-        },
         ADD_PURCHASEORDER(state, payload) {
             state.all.push(payload);
         },
@@ -36,33 +30,6 @@ export default {
         },
     },
     actions: {
-        purchaseOrderDataHandler: async ({ dispatch, getters }, methodAndPayload) => {
-            let { method, payload } = methodAndPayload;
-            method = `purchaseOrder_${method}`;
-            await dispatch('verifyInternetConnection');
-
-            if (!getters.getInternetConnection) {
-                return (response.err = 'Sin internet');
-            }
-
-            let response = await dispatch(method, payload);
-
-            return response;
-        },
-        purchaseOrder_getAll: async ({ commit }) => {
-            return await axios
-                .get(`${api}/purchaseOrder`)
-                .then((res) => {
-                    if (res.status == 200) {
-                        commit('SET_PURCHASEORDER', res.data.data);
-
-                        return res.data.data;
-                    }
-                })
-                .catch(() => {
-                    return { status: 'failed' };
-                });
-        },
         savePurchaseOrder({ commit }, purchaseOrder) {
             commit('ADD_PURCHASEORDER', purchaseOrder);
         },
