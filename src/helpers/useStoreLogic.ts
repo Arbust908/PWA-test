@@ -11,39 +11,39 @@ export async function useStoreLogic(router: any, store: any, entity: string, met
         };
         const routeName = entity.capitalize();
 
-        const redirectHandler = (responseNumber: any) => {
-            if (responseNumber == 200) {
-                router.push({ name: routeName });
-            } else if (responseNumber == 500) {
-                router.push({ name: 'Error-500' });
-            } else if (responseNumber == 503) {
-                router.push({ name: 'Error-503' });
-            } else if (responseNumber == 504) {
-                router.push({ name: 'Error-504' });
-            }
-        };
+        // const redirectHandler = (responseNumber: any) => {
+        //     if (responseNumber == 200) {
+        //         router.push({ name: routeName });
+        //     } else if (responseNumber == 500) {
+        //         router.push({ name: 'Error-500' });
+        //     } else if (responseNumber == 503) {
+        //         router.push({ name: 'Error-503' });
+        //     } else if (responseNumber == 504) {
+        //         router.push({ name: 'Error-504' });
+        //     }
+        // };
 
         if (res && method == 'create') {
-            redirectHandler(res.status);
+            // redirectHandler(res.status);
 
             return { type: 'success', res };
         }
 
         if (!res.createdAt && method == 'create') {
             const message = store.getters[`${entity}Message`](method);
-            redirectHandler(res.status);
+            // redirectHandler(res.status);
 
             return { type: 'failed', message };
         }
 
         if (method == 'get' || method == 'getAll') {
             if (res.status !== 'failed') {
-                redirectHandler(res.status);
+                // redirectHandler(res.status);
 
                 return { type: 'success', res };
             } else {
                 const message = store.getters[`${entity}Message`](method);
-                redirectHandler(res.status);
+                // redirectHandler(res.status);
 
                 return { type: 'failed', message };
             }
@@ -51,12 +51,12 @@ export async function useStoreLogic(router: any, store: any, entity: string, met
 
         if (method == 'delete') {
             if (res.status !== 'failed') {
-                redirectHandler(res.status);
+                // redirectHandler(res.status);
 
                 return { type: 'success', res };
             } else {
                 const message = store.getters[`${entity}Message`](method);
-                redirectHandler(res.status);
+                // redirectHandler(res.status);
 
                 return { type: 'failed', message };
             }
@@ -64,12 +64,12 @@ export async function useStoreLogic(router: any, store: any, entity: string, met
 
         if (method == 'update') {
             if (res.status !== 'failed') {
-                redirectHandler(res.status);
+                // redirectHandler(res.status);
 
                 return { type: 'success', res };
             } else {
                 const message = store.getters[`${entity}Message`](method);
-                redirectHandler(res.status);
+                // redirectHandler(res.status);
 
                 return { type: 'failed', message };
             }

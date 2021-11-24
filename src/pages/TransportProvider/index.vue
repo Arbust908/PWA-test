@@ -24,82 +24,57 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5">
-            <template #header>
-                <tr>
-                    <th v-for="column in tableColumns" :key="column" scope="col">
-                        <div class="flex justify-center">
-                            {{ column }}
-                            <Icon icon="ArrowUp" class="w-4 h-4" />
-                            <Icon icon="ArrowDown" class="w-4 h-4" />
-                        </div>
-                    </th>
-                    <th scope="col">Acciones</th>
+        <VTable
+            class="mt-5"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredTransportProviders"
+            :actions="actions"
+        >
+            <!-- Desktop -->
+            <template #item="{ item }">
+                <td :class="item.name ? null : 'empty'">
+                    {{ item.name || 'Sin cliente' }}
+                </td>
+                <td :class="item.address ? null : 'empty'">
+                    {{ item.address || 'Sin Direccion' }}
+                </td>
+                <td :class="item.companyRepresentative !== null ? null : 'empty'">
+                    {{ item.companyRepresentative?.name || 'Sin Representante' }}
+                </td>
+                <td :class="item.companyRepresentative ? null : 'empty'">
+                    {{ item.companyRepresentative?.phone || 'Sin observaciones' }}
+                </td>
+                <tr v-if="filteredTransportProviders && filteredTransportProviders.length <= 0">
+                    <td :colspan="columns.length" class="emptyState">
+                        <p>No hay proveedores</p>
+                    </td>
                 </tr>
             </template>
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }">
+                {{ item.name }}
+            </template>
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Domicilio: </span>{{ item.address }}
+            </template>
+        </VTable>
+        <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
             <template #body>
-                <tr
-                    v-for="(tp, tpKey) in filteredTransportProviders"
-                    :key="tp.id"
-                    :class="tpKey % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td :class="tp.name ? null : 'empty'">
-                        {{ tp.name || 'Sin cliente' }}
-                    </td>
-                    <td :class="tp.address ? null : 'empty'">
-                        {{ tp.address || 'Sin Direccion' }}
-                    </td>
-                    <td :class="tp.companyRepresentative !== null ? null : 'empty'">
-                        {{ tp.companyRepresentative?.name || 'Sin Representante' }}
-                    </td>
-                    <td :class="tp.companyRepresentative ? null : 'empty'">
-                        {{ tp.companyRepresentative?.phone || 'Sin observaciones' }}
-                    </td>
-                    <td>
-                        <div class="btn-panel">
-                            <router-link :to="`/proveedores-de-transporte/${tp.id}`">
-                                <Popper hover content="Editar">
-                                    <CircularBtn size="xs" class="bg-blue-500">
-                                        <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
-                                    </CircularBtn>
-                                </Popper>
-                            </router-link>
-
-                            <Popper hover :content="tp.visible ? 'Inhabilitar' : 'Habilitar'">
-                                <CircularBtn
-                                    class="ml-4"
-                                    :class="tp.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                    size="xs"
-                                    @click="openModalVisibility(tp)"
-                                >
-                                    <Icon v-if="tp.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                                </CircularBtn>
-                            </Popper>
-                        </div>
-                    </td>
-                </tr>
-                <tr v-if="tpDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay proveedores de transporte</p>
-                    </td>
-                </tr>
+                <BackdropCard :info="bdInfo" />
             </template>
-        </UiTable>
-
+        </Backdrop>
         <Modal title="¿Desea inhabilitar este proveedor de transporte?" type="error" :open="showModal">
             <template #body>
                 <div>
                     Una vez inhabilitado, no podrá utilizar este proveedor de transporte en ninguna otra sección de la
                     aplicación
                 </div>
-                <div></div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar proveedor </PrimaryBtn>
+                    <ErrorBtn @click="confirmModal">Inhabilitar proveedor </ErrorBtn>
                 </div>
             </template>
         </Modal>
@@ -107,43 +82,102 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
+    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
     import { useStore } from 'vuex';
     import { useTitle } from '@vueuse/core';
+    import { useRouter } from 'vue-router';
+
+    import BackdropCard from '@/components/transportProvider/BackdropCard.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import Modal from '@/components/modal/General.vue';
-    import Popper from 'vue3-popper';
+    import VTable from '@/components/ui/table/VTable.vue';
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
 
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
+    const ErrorBtn = defineAsyncComponent(() => import('@/components/ui/buttons/ErrorBtn.vue'));
+
     export default {
         components: {
-            Layout,
-            PrimaryBtn,
-            CircularBtn,
-            UiTable,
-            Icon,
-            GhostBtn,
+            Backdrop,
+            BackdropCard,
             FieldSelect,
+            GhostBtn,
+            Icon,
+            Layout,
             Modal,
-            Popper,
+            PrimaryBtn,
+            VTable,
+            ErrorBtn,
         },
         setup() {
             useTitle('Proveedores de Transporte <> Sandflow');
             const tpDB = ref([]);
             const store = useStore();
+            const router = useRouter();
             const loading = ref(false);
             const transportProviderId = ref(-1);
             const selectedtransportProvider = ref(null);
             const showModal = ref(false);
+            const showBD = ref(false);
+            const bdInfo = ref(null);
+            const toggleBD = () => (showBD.value = !showBD.value);
             const tableColumns = ['Proveedor', 'Domicilio', 'Representante', 'Teléfono'];
+
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+                // currentPage: 1,
+                // perPage: 10,
+            });
+
+            const columns = [
+                { title: 'Proveedor', key: 'name', sortable: true },
+                { title: 'Domicilio', key: 'legalId', sortable: true },
+                { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
+                { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
+                { title: 'Acciones', key: 'name' },
+            ];
+
+            const actions = [
+                {
+                    label: 'Ver más',
+                    onlyMobile: true,
+                    callback: (item) => {
+                        bdInfo.value = item;
+                        showBD.value = true;
+                    },
+                },
+                {
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/proveedores-de-transporte/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+            ];
 
             const filteredTransportProviders = computed(() => {
                 if (transportProviderId.value > -1) {
@@ -210,6 +244,12 @@
                 openModalVisibility,
                 confirmModal,
                 tableColumns,
+                pagination,
+                columns,
+                actions,
+                toggleBD,
+                showBD,
+                bdInfo,
             };
         },
     };

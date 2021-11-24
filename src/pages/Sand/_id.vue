@@ -122,6 +122,8 @@
                 observations: currentSand.observations,
             });
 
+            const currentSandType = currentSand.type;
+
             const isFull = computed(() => {
                 return !!(sandToUpdate.type.length > 0);
             });
@@ -161,7 +163,9 @@
 
                     let types = createdSands.value.map((sand) => sand.type.toLowerCase());
 
-                    if (types.includes(sandToUpdate.type.toLowerCase())) {
+                    if (sandToUpdate.type == currentSandType) {
+                        save();
+                    } else if (types.includes(sandToUpdate.type.toLowerCase())) {
                         toggleErrorModal();
                     } else {
                         save();
