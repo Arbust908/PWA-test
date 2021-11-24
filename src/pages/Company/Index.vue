@@ -25,7 +25,14 @@
             </div>
         </div>
 
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredClients" :actions="actions">
+        <VTable
+            class="mt-5"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredClients"
+            :actions="actions"
+            empty-text="No hay clientes cargados"
+        >
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item.name ? null : 'empty'">
@@ -48,12 +55,6 @@
                     <Badge v-if="item.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
                     <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
                 </td>
-
-                <tr v-if="clDB && clDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay clientes cargados</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
@@ -77,6 +78,27 @@
                 </div>
             </template>
         </Modal>
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
+            <template #body>
+                <p class="!text-lg !text-black">{{ selectedClient.name }}</p>
+                <p class="mt-2">
+                    <strong>CUIT: </strong>
+                    {{ selectedClient.legalId }}
+                </p>
+                <p class="mt-2">
+                    <strong>Representante: </strong>
+                    {{ selectedClient.companyRepresentative?.name }}
+                </p>
+                <p class="mt-2">
+                    <strong>Teléfono: </strong>
+                    {{ selectedClient.companyRepresentative?.phone }}
+                </p>
+                <p class="mt-2">
+                    <strong>Operadora: </strong>
+                    {{ selectedClient.isOperator ? 'SI' : 'NO' }}
+                </p>
+            </template>
+        </Backdrop>
     </Layout>
 </template>
 
@@ -95,6 +117,7 @@
     import Badge from '@/components/ui/Badge.vue';
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    import Backdrop from '@/components/modal/Backdrop.vue';
 
     export default {
         components: {
@@ -106,6 +129,7 @@
             Badge,
             Modal,
             VTable,
+            Backdrop,
         },
         setup() {
             useTitle('Clientes <> Sandflow');
@@ -116,6 +140,7 @@
             const selectedClient = ref(null);
             const showModal = ref(false);
             const router = useRouter();
+            const showBackdrop = ref(false);
 
             const pagination = ref({
                 sortKey: 'id',
@@ -137,8 +162,9 @@
                 {
                     label: 'Ver más',
                     onlyMobile: true,
-                    callback: () => {
-                        console.log('Ver más');
+                    callback: (item) => {
+                        selectedClient.value = item;
+                        showBackdrop.value = true;
                     },
                 },
                 {
@@ -245,6 +271,8 @@
                 columns,
                 pagination,
                 actions,
+                showBackdrop,
+                selectedClient,
             };
         },
     };
