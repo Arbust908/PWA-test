@@ -37,6 +37,44 @@
                 <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
             </template>
         </Modal>
+
+        <Modal type="off" :open="showErrorModal" @close="showErrorModal = false">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="ExclamationCircle" class="h-14 w-14 mb-4 text-red-700" />
+                </div>
+                <div class="text-center text-xl font-semibold mb-2 mx-10 text-gray-900">
+                    Ya existe un centro de carga con este CUIT
+                </div>
+                <br />
+                <span class="text-center text-base border-none m-2">
+                    El centro de carga que intenta registrar fue creado anteriormente
+                </span>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <PrimaryBtn btn="!px-16 !bg-red-700" @click.prevent="showErrorModal = false">Volver</PrimaryBtn>
+                </div>
+            </template>
+        </Modal>
+
+        <Modal type="off" :open="showSuccessModal" @close="$router.push('/proveedores-de-arena')">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="CheckCircle" class="h-14 w-14 mb-4 text-green-500" />
+                </div>
+                <div class="text-center text-xl font-semibold mb-4 mx-5 text-gray-900">
+                    ¡El centro de carga fue guardado con éxito!
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <PrimaryBtn btn="!px-14 !bg-green-700" @click.prevent="$router.push('/proveedores-de-arena')"
+                        >Continuar</PrimaryBtn
+                    >
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
@@ -54,10 +92,12 @@
     import Modal from '@/components/modal/General.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
+    import Icon from '@/components/icon/TheAllIcon.vue';
 
     // TIPOS
     import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
     import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
@@ -67,6 +107,7 @@
             SandProviderForm,
             SandProviderRep,
             Modal,
+            Icon,
         },
         setup() {
             const store = useStore();
@@ -80,6 +121,9 @@
             const errorMessage = ref('');
             const meshTypes = ref([]);
             const apiUrl = import.meta.env.VITE_API_URL || '/api';
+
+            const showErrorModal = ref(false);
+            const showSuccessModal = ref(false);
 
             const currentSandProvider: SandProvider = ref({
                 meshType: [],
@@ -105,6 +149,14 @@
                     return;
                 }
 
+                const legalIdExists = await checkIfExists('legalId', currentSandProvider.value.legalId);
+
+                if (legalIdExists) {
+                    showErrorModal.value = true;
+
+                    return;
+                }
+
                 loading.value = true;
                 const res = await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value);
 
@@ -114,7 +166,7 @@
                     errorMessage.value = res.message;
                     toggleNotificationModal();
                 } else if (res.type == 'success') {
-                    router.push('/proveedores-de-arena');
+                    showSuccessModal.value = true;
                 }
             };
 
@@ -139,6 +191,15 @@
                 loading.value = false;
             });
 
+            const checkIfExists = async (field: string, value: string) => {
+                //TODO: Refactor with useStoreLogic ? (useStoreLogic not accept filters)
+                const apiResponse = await axios.get(`${api}/sandProvider?${field}=${value}?id__`);
+
+                const sandProviders = apiResponse.data.data;
+
+                return sandProviders.filter((sp) => sp.id !== currentSandProvider.value.id).length > 0;
+            };
+
             return {
                 id,
                 isNewRep,
@@ -153,6 +214,8 @@
                 errorMessage,
                 meshTypes,
                 loading,
+                showErrorModal,
+                showSuccessModal,
             };
         },
     };
