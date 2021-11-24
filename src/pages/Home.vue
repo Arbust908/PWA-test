@@ -19,7 +19,7 @@
             PanelControlCard,
         },
         setup() {
-            const title = useTitle('Home <> Sandflow');
+            useTitle('Home <> Sandflow');
             const store = useStore();
             const navigation = computed(() => {
                 return store.state.global.navigation.filter((nav) => {
