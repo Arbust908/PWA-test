@@ -21,69 +21,62 @@
                 :data="sandId"
                 @update:data="sandId = $event"
             />
-            <div class="col-span-4 mt-7">
+            <div class="col-span-full sm:mt-7 sm:col-span-5">
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5 lg:w-7/12 min-w-min">
-            <template #header>
-                <tr>
-                    <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
-                        <div class="flex justify-center">
-                            {{ column.text }}
-                            <Icon icon="ArrowUp" class="w-4 h-4" />
-                            <Icon icon="ArrowDown" class="w-4 h-4" />
-                        </div>
-                    </th>
-                    <th scope="col">Acciones</th>
-                </tr>
-            </template>
-            <template #body>
-                <tr
-                    v-for="(st, sKey) in filteredSands"
-                    :key="st.id"
-                    :class="sKey % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td :class="st.type ? null : 'empty'">
-                        {{ st.type || 'Sin definir' }}
-                    </td>
-                    <td :class="st.observations ? null : 'empty'">
-                        <p class="w-52 truncate">
-                            {{ st.observations || 'Sin definir' }}
-                        </p>
-                    </td>
-                    <td>
-                        <div class="btn-panel">
-                            <router-link :to="`/tipos-de-arena/${st.id}`">
-                                <Popper hover content="Editar">
-                                    <CircularBtn size="xs" class="bg-blue-500">
-                                        <Icon icon="PencilAlt" type="outlined" class="w-5 h-5 icon text-white" />
-                                    </CircularBtn>
-                                </Popper>
-                            </router-link>
 
-                            <Popper hover :content="st.visible ? 'Inhabilitar' : 'Habilitar'">
-                                <CircularBtn
-                                    class="ml-4"
-                                    :class="st.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                    size="xs"
-                                    @click="openModalVisibility(st)"
-                                >
-                                    <Icon v-if="st.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredSands" :actions="actions">
+            <template #item="{ item }">
+                <!-- Desktop -->
+                <td :class="item.type ? null : 'empty'">
+                    {{ item.type || 'Sin definir' }}
+                </td>
+
+                <td :class="item.observations ? null : 'empty'">
+                    {{ item.observations || 'Sin definir' }}
+                </td>
+
+                <td v-if="false">
+                    <div class="btn-panel">
+                        <router-link :to="`/clientes/${item.id}`">
+                            <Popper hover content="Editar">
+                                <CircularBtn size="xs" class="btn__delete bg-blue-500">
+                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
                                 </CircularBtn>
                             </Popper>
-                        </div>
-                    </td>
-                </tr>
-                <tr v-if="stDB.length <= 0">
+                        </router-link>
+
+                        <Popper hover :content="item.visible ? 'Inhabilitar' : 'Habilitar'">
+                            <CircularBtn
+                                class="ml-4"
+                                :class="item.visible ? 'bg-red-500' : 'bg-blue-500'"
+                                size="xs"
+                                @click="openModalVisibility(item)"
+                            >
+                                <Icon v-if="item.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
+                                <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
+                            </CircularBtn>
+                        </Popper>
+                    </div>
+                </td>
+
+                <tr v-if="sandDB && sandDB.length <= 0">
                     <td colspan="5" class="emptyState">
-                        <p>No hay arenas cargadas</p>
+                        <p>No hay arenas cargados</p>
                     </td>
                 </tr>
             </template>
-        </UiTable>
+
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }">
+                {{ item.type }}
+            </template>
+
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Observaciones: </span> {{ item.observations }}
+            </template>
+        </VTable>
 
         <Modal title="¿Desea inhabilitar este tipo de arena?" type="error" :open="showModal">
             <template #body>
@@ -105,6 +98,7 @@
 <script>
     import { onMounted, ref, computed } from 'vue';
     import { useStore } from 'vuex';
+    import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -114,7 +108,9 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import Modal from '@/components/modal/General.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
 
+    import Badge from '@/components/ui/Badge.vue';
     import Popper from 'vue3-popper';
 
     import axios from 'axios';
@@ -131,61 +127,71 @@
             CircularBtn,
             Modal,
             Popper,
+            VTable,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');
             const store = useStore();
             const stDB = ref([]);
+            const loading = ref(false);
             const sandDB = JSON.parse(JSON.stringify(store.state.sand.all));
             const sandId = ref(-1);
-            const loading = ref(true);
             const selectedSand = ref(null);
             const showModal = ref(false);
+            const router = useRouter();
 
-            const tableColumns = [
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+                // currentPage: 1,
+                // perPage: 10,
+            });
+
+            const columns = [
+                { title: 'Tipo de Malla', key: 'name', sortable: true },
+                { title: 'Observaciones', key: 'observations', sortable: true },
+                { title: 'Acciones', key: 'name' },
+            ];
+
+            const actions = [
                 {
-                    text: 'Tipo de Malla',
-                    class: 'w-2/5',
+                    label: 'Ver más',
+                    callback: () => {
+                        console.log('Ver más');
+                    },
                 },
                 {
-                    text: 'Observaciones',
-                    class: 'w-1/5',
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/tipos-de-arena/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
                 },
             ];
 
-            const getSands = async () => {
-                loading.value = true;
-
-                const res = await axios.get(`${api}/sand`).catch((err) => {
-                    console.log(err);
-                });
-
-                if (res.status === 200) {
-                    stDB.value = res.data.data;
-                }
-
-                loading.value = false;
+            const headers = {
+                'Content-Type': 'Application/JSON',
             };
 
-            onMounted(async () => {
-                await getSands();
-
-                if (stDB.value && stDB.value.length > 0) {
-                    if (stDB.value.length > sandDB.length) {
-                        if (sandDB.length === 0) {
-                            stDB.value.forEach((st, sKey) => {
-                                store.dispatch('saveSand', st);
-                            });
-                        } else {
-                            const newsDB = stDB.value.filter((stFromApi, key) => {
-                                return stFromApi.id && sandDB[key] && stFromApi.id !== sandDB[key].id;
-                            });
-                            newsDB.forEach((st, stKey) => {
-                                store.dispatch('saveSand', st);
-                            });
-                        }
-                    }
-                }
+            const total = computed(() => {
+                return sandId.value;
             });
 
             const filteredSands = computed(() => {
@@ -196,8 +202,18 @@
                 return stDB.value;
             });
 
-            const clearFilters = () => {
-                sandId.value = -1;
+            const getSands = async () => {
+                loading.value = true;
+
+                const res = await axios.get(`${api}/sand`, headers).catch((err) => {
+                    console.log(err);
+                });
+
+                if (res.status === 200) {
+                    stDB.value = res.data.data;
+                }
+
+                loading.value = false;
             };
 
             const openModalVisibility = async (sand) => {
@@ -225,6 +241,31 @@
                 await getSands();
             };
 
+            onMounted(async () => {
+                await getSands();
+
+                if (stDB.value && stDB.value.length > 0) {
+                    if (stDB.value.length > sandDB.length) {
+                        if (sandDB.length === 0) {
+                            stDB.value.forEach((st, sKey) => {
+                                store.dispatch('saveSand', st);
+                            });
+                        } else {
+                            const newsDB = stDB.value.filter((stFromApi, key) => {
+                                return stFromApi.id && sandDB[key] && stFromApi.id !== sandDB[key].id;
+                            });
+                            newsDB.forEach((st, stKey) => {
+                                store.dispatch('saveSand', st);
+                            });
+                        }
+                    }
+                }
+            });
+
+            const clearFilters = () => {
+                sandId.value = -1;
+            };
+
             return {
                 stDB,
                 sandId,
@@ -233,7 +274,10 @@
                 showModal,
                 openModalVisibility,
                 confirmModal,
-                tableColumns,
+                columns,
+                loading,
+                pagination,
+                actions,
             };
         },
     };
