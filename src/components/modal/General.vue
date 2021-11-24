@@ -64,7 +64,18 @@
                                     sm:h-10 sm:w-10
                                 "
                             >
-                                <ExclamationIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
+                                <svg
+                                    width="48"
+                                    height="48"
+                                    viewBox="0 0 48 48"
+                                    fill="none"
+                                    xmlns="http://www.w3.org/2000/svg"
+                                >
+                                    <path
+                                        d="M24 0C10.752 0 0 10.752 0 24C0 37.248 10.752 48 24 48C37.248 48 48 37.248 48 24C48 10.752 37.248 0 24 0ZM26.4 36H21.6V31.2H26.4V36ZM26.4 26.4H21.6V12H26.4V26.4Z"
+                                        fill="#BE1A3B"
+                                    />
+                                </svg>
                             </div>
                             <div
                                 v-else-if="type === 'success'"

@@ -236,7 +236,7 @@
         }
     }
     table {
-        @apply min-w-full divide-y divide-second-200;
+        @apply min-w-full divide-y divide-second-200 rounded-lg;
         thead {
             @apply bg-second-50;
         }
