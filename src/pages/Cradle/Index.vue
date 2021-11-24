@@ -36,29 +36,28 @@
             <template #item="{ item: cr }">
                 <!-- Desktop -->
                 <td :class="cr.name ? null : 'empty'">
-                    {{ cr.name || '-' }}
+                    {{ cr.name || 'Sin nombre' }}
                 </td>
                 <td>
                     <p class="w-52 truncate">
-                        {{ cr.observations || '-' }}
+                        {{ cr.observations || 'Sin observaciones' }}
                     </p>
                 </td>
             </template>
 
             <!-- Mobile -->
             <template #mobileTitle="{ item }">
-                {{ item.name }}
+                {{ item.name || 'Sin nombre' }}
             </template>
 
             <template #mobileSubtitle="{ item }">
-                <span class="font-bold">Observaciones: </span>{{ item.observations }}
+                <span class="font-bold">Observaciones: </span>{{ item.observations || ' - ' }}
             </template>
         </VTable>
 
         <Modal title="¿Desea inhabilitar este cradle?" type="error" :open="showModal">
             <template #body>
                 <div>Una vez inhabilitado, no podrá utilizar este cradle en ninguna otra sección de la aplicación</div>
-                <div></div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
@@ -71,7 +70,9 @@
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
                 <span class="!text-lg !text-black">Cradle</span> <br />
-                <span v-if="selectedCradle.observations">Observaciones: {{ selectedCradle.observations }}</span>
+                <span v-if="selectedCradle.observations">
+                    Observaciones: {{ selectedCradle.observations || ' - ' }}
+                </span>
             </template>
         </Backdrop>
     </Layout>

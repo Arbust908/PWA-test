@@ -46,11 +46,11 @@
                     class="body-row"
                 >
                     <td :class="st.type ? null : 'empty'">
-                        {{ st.type || 'Sin definir' }}
+                        {{ st.type || 'Sin tipo' }}
                     </td>
                     <td :class="st.observations ? null : 'empty'">
                         <p class="w-52 truncate">
-                            {{ st.observations || 'Sin definir' }}
+                            {{ st.observations || 'Sin observaciones' }}
                         </p>
                     </td>
                     <td>
