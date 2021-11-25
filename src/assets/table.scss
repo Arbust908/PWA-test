@@ -19,6 +19,10 @@ th {
         color: #7D7D7D !important;
     }
   }
+  .disabled-mobile {
+    background: #F3F4F6;
+    color: #7D7D7D !important;
+  }
   
   td {
     @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-center;
