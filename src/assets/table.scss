@@ -3,19 +3,26 @@ th {
 }
 
 .body-row {
-    @apply hover:bg-second-200;
-
+    @apply text-second-700;
+    &:not(:disabled):not([disabled="true"]):hover {
+        @apply bg-[#E5EEE5];
+    }
     &.odd {
         @apply bg-second-50;
     }
-
     &.even {
         @apply bg-second-100;
+    }
+    &:disabled,
+    &[disabled="true"] {
+        background: #F3F4F6;
+        color: #7D7D7D !important;
     }
 }
 
 td {
-    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-second-700 text-center;
+    @apply px-6 py-4 whitespace-nowrap text-sm font-medium text-center;
+    color: inherit;
 
     &.empty {
         @apply text-second-400 italic;
