@@ -95,7 +95,7 @@
             const value = useVModel(props, 'data', emit);
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
-                const { read } = useApi(props.endpoint);
+                const { read } = useApi(props.endpoint + '?visible=1');
 
                 return read();
             };
