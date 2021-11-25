@@ -1,69 +1,94 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 px-3">
+        <header class="flex justify-between items-center mb-4 pr-3">
             <h2 class="text-2xl font-semibold text-second-900">Ordenes de Trabajo</h2>
             <router-link to="/orden-de-trabajo/nueva">
                 <PrimaryBtn>Crear nueva</PrimaryBtn>
             </router-link>
         </header>
-        <UiTable>
-            <template #header>
-                <tr>
-                    <th scope="col" title="Numero de Orden">N°</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Operadora</th>
-                    <th scope="col">Pozos</th>
-                    <th scope="col">
-                        <span class="sr-only">Acciones</span>
-                    </th>
-                </tr>
-            </template>
-            <template #body>
-                <tr
-                    v-for="(wo, woKey) in workOrders"
-                    :key="wo.id"
-                    :class="woKey % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td>
-                        {{ wo.id }}
-                    </td>
-                    <td :class="wo.client ? null : 'empty'">{{ wo.clientName }}</td>
-                    <td :class="wo.serviceCompany ? null : 'empty'">{{ wo.operatorName }}</td>
-                    <td>
-                        {{ listPits(wo.pits) }}
-                    </td>
-                    <td>
-                        <div class="btn-panel">
-                            <router-link :to="`/orden-de-trabajo/${wo.id}`" class="edit">
-                                <Icon icon="PencilAlt" class="w-5 h-5" />
-                                <span> Editar </span>
-                            </router-link>
-                            <button class="delete" @click="deleteWorkOrder(wo.id)">
-                                <Icon icon="Trash" class="w-5 h-5" />
-                                <span> Eliminar </span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr v-if="workOrders.length <= 0">
+        <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2 mb-8">
+            <FieldSelect
+                title="Filtro"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
+                field-name="name"
+                placeholder="Seleccionar cliente"
+                endpoint="/company"
+                :data="clientId"
+                @update:data="clientId = $event"
+            />
+        </div>
+
+        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredWorkOrders" :actions="actions">
+            <template #item="{ item }">
+                <!-- Desktop -->
+                <td :class="item.id ? null : 'empty'">
+                    {{ item.id || 'Sin definir' }}
+                </td>
+
+                <td :class="item.clientName ? null : 'empty'">
+                    {{ item.clientName || 'Sin definir' }}
+                </td>
+
+                <td :class="item.pits ? null : 'empty'">
+                    {{ listPits(item.pits) }}
+                </td>
+
+                <td class="text-center" :class="item ? null : 'empty'">
+                    <Badge v-if="isEquipmentFull(item) > 0" text="Completo" classes="bg-green-500 text-white" />
+                    <Badge v-else text="Incompleto" classes="bg-red-300 text-white" />
+                </td>
+
+                <td class="text-center" :class="item ? null : 'empty'">
+                    <Badge v-if="item.crew.length > 0" text="Completo" classes="bg-green-500 text-white" />
+                    <Badge v-else text="Incompleto" classes="bg-red-300 text-white" />
+                </td>
+
+                <tr v-if="clDB && clDB.length <= 0">
                     <td colspan="5" class="emptyState">
-                        <p>No hay Ordenes de Trabajo</p>
+                        <p>No hay clientes cargados</p>
                     </td>
                 </tr>
             </template>
-        </UiTable>
+
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }">
+                {{ item.name }}
+            </template>
+
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Domicilio: </span>{{ item.address }}
+            </template>
+        </VTable>
+
+        <!-- <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
+            <template #body>
+                <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center gap-5 btn">
+                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
+                </div>
+            </template>
+        </Modal> -->
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, watch, defineComponent, onMounted } from 'vue';
+    import { ref, computed, watch, defineComponent, onMounted } from 'vue';
     import { useStore } from 'vuex';
+    import { useRouter } from 'vue-router';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import axios from 'axios';
+    import Modal from '@/components/modal/General.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
+    import Badge from '@/components/ui/Badge.vue';
+
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     import { useTitle } from '@vueuse/core';
@@ -75,12 +100,60 @@
             PrimaryBtn,
             UiTable,
             Icon,
+            GhostBtn,
+            FieldSelect,
+            Modal,
+            VTable,
+            Badge,
         },
         setup() {
             useTitle('Ordenes de Trabajo <> Sandflow');
             const store = useStore();
+            const router = useRouter();
             const workOrders = ref([]);
             const companies = ref([]);
+            const clientId = ref(-1);
+
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+            });
+
+            const columns = [
+                { title: 'N°', key: 'id', sortable: true },
+                { title: 'Cliente', key: 'clientName', sortable: true },
+                { title: 'Pozos', key: 'pits', sortable: false },
+                { title: 'Equipamiento', key: 'cradle', sortable: false },
+                { title: 'RRHH', key: 'crew', sortable: false },
+                { title: 'Acciones', key: 'actions' },
+            ];
+
+            const actions = [
+                {
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/orden-de-trabajo/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+            ];
 
             watch(workOrders, (newValue, _) => {
                 if (newValue) {
@@ -115,6 +188,30 @@
                         });
                     }
                 });
+            };
+
+            const filteredWorkOrders = computed(() => {
+                if (clientId.value > -1) {
+                    return workOrders.value.filter((order) => {
+                        if (parseInt(order.client) == clientId.value) return order;
+                    });
+                }
+
+                return workOrders.value;
+            });
+
+            const isEquipmentFull = (order) => {
+                return (
+                    parseInt(order.operativeCradle) >= 0 &&
+                    parseInt(order.operativeForklift) >= 0 &&
+                    order.traktors.length > 0 &&
+                    order.pickups.length > 0 &&
+                    order.conex >= 0 &&
+                    order.generators >= 0 &&
+                    order.rigmats >= 0 &&
+                    order.tower >= 0 &&
+                    order.cabin >= 0
+                );
             };
 
             const getWorkOrders = async () => {
@@ -157,6 +254,12 @@
                 workOrders,
                 deleteWorkOrder,
                 listPits,
+                pagination,
+                columns,
+                actions,
+                filteredWorkOrders,
+                clientId,
+                isEquipmentFull,
             };
         },
     });
