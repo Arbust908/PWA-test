@@ -1,10 +1,10 @@
 <template>
-    <Modal type="off" :open="open" @close="$emit('close')">
+    <Modal v-bind="$attrs" type="off" :open="open" @close="$emit('close')">
         <template #body>
             <div class="text-center flex flex-col justify-center items-center">
                 <Icon icon="CheckCircle" class="h-14 w-14 mb-4 text-green-500" />
             </div>
-            <div class="text-center text-xl font-semibold mb-4 mx-5 text-gray-900">
+            <div class="text-center text-xl font-semibold text-gray-900">
                 {{ title }}
             </div>
             <span v-if="text" class="text-center text-base border-none m-2"> {{ text }} </span>
@@ -28,6 +28,7 @@
             Icon,
             PrimaryBtn,
         },
+        inheritAttrs: false,
         props: {
             title: {
                 type: String,
