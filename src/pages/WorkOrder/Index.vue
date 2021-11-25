@@ -21,29 +21,29 @@
         <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredWorkOrders" :actions="actions">
             <template #item="{ item }">
                 <!-- Desktop -->
-                <td :class="item.id ? null : 'empty'">
+                <td :class="[item.id ? null : 'empty', item.visible ? null : 'notallowed']">
                     {{ item.id || 'Sin definir' }}
                 </td>
 
-                <td :class="item.clientName ? null : 'empty'">
+                <td :class="[item.clientName ? null : 'empty', item.visible ? null : 'notallowed']">
                     {{ item.clientName || 'Sin definir' }}
                 </td>
 
-                <td :class="item.pits ? null : 'empty'">
+                <td :class="[item.pits ? null : 'empty', item.visible ? null : 'notallowed']">
                     {{ listPits(item.pits) }}
                 </td>
 
-                <td class="text-center" :class="item ? null : 'empty'">
+                <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
                     <Badge v-if="isEquipmentFull(item) > 0" text="Completo" classes="bg-green-500 text-white" />
                     <Badge v-else text="Incompleto" classes="bg-red-300 text-white" />
                 </td>
 
-                <td class="text-center" :class="item ? null : 'empty'">
+                <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
                     <Badge v-if="item.crew.length > 0" text="Completo" classes="bg-green-500 text-white" />
                     <Badge v-else text="Incompleto" classes="bg-red-300 text-white" />
                 </td>
 
-                <tr v-if="clDB && clDB.length <= 0">
+                <tr v-if="workOrders && workOrders.length <= 0">
                     <td colspan="5" class="emptyState">
                         <p>No hay clientes cargados</p>
                     </td>
@@ -52,17 +52,25 @@
 
             <!-- Mobile -->
             <template #mobileTitle="{ item }">
-                {{ item.name }}
+                {{ item.clientName }}
             </template>
 
             <template #mobileSubtitle="{ item }">
-                <span class="font-bold">Domicilio: </span>{{ item.address }}
+                <div class="flex items-center mt-1">
+                    <Icon
+                        :icon="isTotallyComplete(item) ? 'Check' : 'ExclamationCircle'"
+                        :type="solid"
+                        :class="isTotallyComplete(item) ? 'icon-complete' : 'icon-incomplete'"
+                    />
+                    <span class="font-bold">ID: </span>{{ item.id }} - <span class="font-bold"> Pozos: </span>
+                    {{ listPits(item.pits) }}
+                </div>
             </template>
         </VTable>
 
-        <!-- <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
+        <Modal title="¿Desea inhabilitar esta orden de trabajo?" type="error" :open="showModal">
             <template #body>
-                <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
+                <div>Una vez inhabilitada, no podrá utilizar este orden en ninguna otra sección de la aplicación</div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
@@ -70,7 +78,29 @@
                     <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
                 </div>
             </template>
-        </Modal> -->
+        </Modal>
+
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
+            <template #body>
+                <div class="flex items-center mt-1">
+                    <Icon
+                        :icon="isTotallyComplete(selectedWorkOrder) ? 'Check' : 'ExclamationCircle'"
+                        :type="solid"
+                        :class="isTotallyComplete(selectedWorkOrder) ? 'icon-complete' : 'icon-incomplete'"
+                    /><span class="font-bold">{{ selectedWorkOrder.clientName }}</span>
+                </div>
+                <div><span class="font-bold">ID: </span>{{ selectedWorkOrder.id }}</div>
+                <div><span class="font-bold">Pozos: </span>{{ listPits(selectedWorkOrder.pits) }}</div>
+                <div>
+                    <span class="font-bold">Equipamiento: </span
+                    >{{ isEquipmentFull(selectedWorkOrder) ? 'Completo' : 'Incompleto' }}
+                </div>
+                <div>
+                    <span class="font-bold">RRHH: </span
+                    >{{ selectedWorkOrder.crew.length > 0 ? 'Completo' : 'Incompleto' }}
+                </div>
+            </template>
+        </Backdrop>
     </Layout>
 </template>
 
@@ -87,6 +117,7 @@
     import axios from 'axios';
     import Modal from '@/components/modal/General.vue';
     import VTable from '@/components/ui/table/VTable.vue';
+    import Backdrop from '@/components/modal/Backdrop.vue';
     import Badge from '@/components/ui/Badge.vue';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -105,6 +136,7 @@
             Modal,
             VTable,
             Badge,
+            Backdrop,
         },
         setup() {
             useTitle('Ordenes de Trabajo <> Sandflow');
@@ -113,6 +145,9 @@
             const workOrders = ref([]);
             const companies = ref([]);
             const clientId = ref(-1);
+            const selectedWorkOrder = ref({});
+            const showModal = ref(false);
+            const showBackdrop = ref(false);
 
             const pagination = ref({
                 sortKey: 'id',
@@ -133,6 +168,14 @@
                     label: 'Editar',
                     callback: (item) => {
                         router.push(`/orden-de-trabajo/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Ver más',
+                    onlyMobile: true,
+                    callback: (item) => {
+                        selectedWorkOrder.value = item;
+                        showBackdrop.value = true;
                     },
                 },
                 {
@@ -161,6 +204,31 @@
                 }
             });
 
+            const openModalVisibility = async (workOrder) => {
+                selectedWorkOrder.value = workOrder;
+
+                if (workOrder.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await update(selectedWorkOrder.value);
+            };
+
+            const update = async (order) => {
+                const payload = {
+                    ...order,
+                    visible: !order.visible,
+                };
+                await store.dispatch('updateVisibilityClient', payload);
+                await getWorkOrders();
+            };
+
+            const confirmModal = async () => {
+                await update(selectedWorkOrder.value);
+                showModal.value = false;
+            };
+
             const listPits = (pits: Array<Pit>) => {
                 if (!pits || pits.length <= 0) {
                     return '-';
@@ -177,6 +245,10 @@
                 return wOs.map((wO) => {
                     store.dispatch('saveWorkOrder', wO);
                 });
+            };
+
+            const isTotallyComplete = (item) => {
+                return isEquipmentFull(item) && item.crew.length > 0 ? true : false;
             };
 
             const deleteWorkOrder = async (woId) => {
@@ -260,6 +332,12 @@
                 filteredWorkOrders,
                 clientId,
                 isEquipmentFull,
+                isTotallyComplete,
+                openModalVisibility,
+                showModal,
+                confirmModal,
+                showBackdrop,
+                selectedWorkOrder,
             };
         },
     });
@@ -267,4 +345,10 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
+    .icon-complete {
+        @apply h-4 w-4 mr-1 bg-green-500 rounded-full text-white;
+    }
+    .icon-incomplete {
+        @apply h-4 w-4 mr-1 bg-red-500 rounded-full text-white;
+    }
 </style>
