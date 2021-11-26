@@ -48,6 +48,12 @@
                     // toast.error("La caja ya est� ingresada")
                     return;
                 }
+
+                box.value.location = {
+                    where: 'cradle',
+                    where_id: cradle.value.id,
+                };
+
                 const id = box.value.boxId;
                 cradle.value.slots = cradle.value.slots.map((slot) => {
                     if (slot.boxId == id) {
