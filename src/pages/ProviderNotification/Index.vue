@@ -219,6 +219,9 @@
             };
 
             const listSandTypes = (sandOrders) => {
+                if (!sandOrders) {
+                    return ;
+                }
                 let names = '';
                 sandOrders.forEach((sand) => {
                     console.log(getSTName(sand.sandTypeId));
