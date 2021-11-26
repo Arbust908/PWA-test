@@ -34,7 +34,7 @@
                 </td>
 
                 <td :class="[item.observations ? null : 'empty', item.visible ? null : 'notallowed observations']">
-                    {{ item.observations || 'Sin observaciones' }}
+                    {{ `${item.observations.substring(0, 25)}...` || 'Sin observaciones' }}
                 </td>
 
                 <tr v-if="fDB && fDB.length <= 0">
@@ -70,6 +70,16 @@
                 </div>
             </template>
         </Modal>
+
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
+            <template #body>
+                <p class="!text-lg !text-black">{{ selectedForklift.name }}</p>
+                <p class="mt-2">
+                    <strong>Observaciones: </strong>
+                    {{ selectedForklift.observations !== '' ? selectedForklift.observations : ' -' }}
+                </p>
+            </template>
+        </Backdrop>
     </Layout>
 </template>
 
@@ -89,6 +99,7 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import Popper from 'vue3-popper';
     import VTable from '@/components/ui/table/VTable.vue';
+    import Backdrop from '@/components/modal/Backdrop.vue';
 
     export default {
         components: {
@@ -102,6 +113,7 @@
             FieldSelect,
             Popper,
             VTable,
+            Backdrop,
         },
         setup() {
             useTitle('Forklifts <> Sandflow');
@@ -115,6 +127,7 @@
             const forkliftId = ref(-1);
             const selectedForklift = ref(null);
             const showModal = ref(false);
+            const showBackdrop = ref(false);
 
             const pagination = ref({
                 sortKey: 'id',
@@ -133,8 +146,9 @@
                 {
                     label: 'Ver más',
                     onlyMobile: true,
-                    callback: () => {
-                        console.log('Ver más');
+                    callback: (item) => {
+                        selectedForklift.value = item;
+                        showBackdrop.value = true;
                     },
                 },
                 {
@@ -234,6 +248,8 @@
                 pagination,
                 actions,
                 columns,
+                showBackdrop,
+                selectedForklift,
             };
         },
     };
