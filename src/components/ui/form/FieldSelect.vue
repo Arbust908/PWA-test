@@ -112,12 +112,14 @@
 
             if (props.endpoint !== '/' && props.endpoint !== null && !props.filteredData) {
                 resources = getApiVal();
+                console.log(resources.value);
             }
 
             watchEffect(() => {
                 if (props.filteredData && props.filteredData.length > 0) {
                     resources.value = filteredData.value;
                 }
+                console.log(resources.value);
             });
 
             const noOptionSelected = computed(() => value.value === -1);
