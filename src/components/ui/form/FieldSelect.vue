@@ -13,7 +13,7 @@
             :disabled="isDisabled"
             @blur="$emit('is-blured')"
         >
-            <option value="-1">
+            <option selected value="-1">
                 {{ placeholder }}
             </option>
             <option v-for="(res, i) in resources" :key="res?.id + i" :value="res?.id">
