@@ -154,7 +154,7 @@
                 {
                     label: 'Editar',
                     callback: (item) => {
-                        router.push(`/clientes/${item.id}`);
+                        router.push(`/forklift/${item.id}`);
                     },
                 },
                 {

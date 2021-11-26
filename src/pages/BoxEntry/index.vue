@@ -66,7 +66,6 @@
                                 class="radio-button"
                                 @click.prevent="box.boxId ? setSelectedBox(box.boxId) : triggerCompleteIdMessage()"
                             ></button>
-                            <span>{{ box.boxId }}</span>
                             <div class="mx-2 flex items-center">
                                 <span> {{ box.category }} - {{ box.amount }}t - </span>
                                 <div
