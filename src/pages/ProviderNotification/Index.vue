@@ -1,11 +1,15 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 px-3">
-            <h2 class="text-2xl font-semibold text-second-900">Notificaciones a Proveedores</h2>
-            <router-link to="/notificaciones-a-proveedores/nueva">
-                <PrimaryBtn>Nueva Notificacion</PrimaryBtn>
+        <header class="flex justify-start space-x-4 items-center mb-4">
+            <h2 class="text-2xl font-semibold text-gray-900">Notificaciones a Proveedore</h2>
+            <router-link to="/planificacion-de-arena/nueva">
+                <PrimaryBtn size="sm">
+                    <span> Crear </span>
+                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
+                </PrimaryBtn>
             </router-link>
         </header>
+        <hr />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -20,7 +24,13 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="provNotifDB" :actions="actions">
+        <VTable
+            class="mt-5"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredNotifications"
+            :actions="actions"
+        >
             <template #item="{ item }">
                 <!-- Desktop -->
 
@@ -177,8 +187,15 @@
             });
 
             const filteredNotifications = computed(() => {
+                console.log(provNotifDB.value);
+                console.log(sandProviderId.value);
+
                 if (sandProviderId.value > -1) {
-                    return provNotifDB.value.filter((client) => client.sandProviderId == sandProviderId);
+                    return provNotifDB.value.filter((client) => {
+                        console.log(client);
+
+                        return client.sandProviderId == sandProviderId.value;
+                    });
                 }
 
                 return provNotifDB.value;
@@ -215,15 +232,20 @@
                 const st = sandTypesFromId.value.find((st) => {
                     return st.id == id;
                 });
+
                 return st ? st.type : '';
             };
 
             const listSandTypes = (sandOrders) => {
+                if (!sandOrders || !sandOrders.length) {
+                    return '';
+                }
                 let names = '';
                 sandOrders.forEach((sand) => {
                     console.log(getSTName(sand.sandTypeId));
                     names += getSTName(sand.sandTypeId) + ' ';
                 });
+
                 return names;
             };
 
