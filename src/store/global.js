@@ -17,19 +17,14 @@ export default {
                 icon: 'Bell',
             },
             {
-                name: 'Orden de Pedido',
-                to: '/orden-de-pedido',
-                icon: 'Tag',
-            },
-            {
-                name: 'Operación en Cradle',
-                to: '/operacion-en-cradle',
-                icon: 'Tag',
-            },
-            {
                 name: 'Diseño de Depósito',
                 to: '/diseno-de-deposito',
                 icon: 'ViewGridAdd',
+            },
+            {
+                name: 'Orden de Pedido',
+                to: '/orden-de-pedido',
+                icon: 'Tag',
             },
             {
                 name: 'Ingreso de cajas',
@@ -37,10 +32,15 @@ export default {
                 icon: 'Archive',
             },
             {
-                name: 'Stage Sheet',
-                to: '/stage-sheet',
-                icon: 'DocumentReport',
+                name: 'Operación en Cradle',
+                to: '/operacion-en-cradle',
+                icon: 'Tag',
             },
+            // {
+            //     name: 'Stage Sheet',
+            //     to: '/stage-sheet',
+            //     icon: 'DocumentReport',
+            // },
             {
                 name: 'LINE',
             },
@@ -70,7 +70,7 @@ export default {
                 icon: 'Cog',
                 subNav: [
                     {
-                        name: 'Arena',
+                        name: 'Tipo de malla',
                         to: '/tipos-de-arena',
                         icon: 'ClipboardList',
                     },
