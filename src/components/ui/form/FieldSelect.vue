@@ -89,13 +89,17 @@
                 type: Boolean,
                 default: false,
             },
+            onlyVisible: {
+                type: Boolean,
+                default: true,
+            },
         },
         setup(props, { emit }) {
             const { filteredData } = toRefs(props);
             const value = useVModel(props, 'data', emit);
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
-                const { read } = useApi(props.endpoint + '?visible=1');
+                const { read } = useApi(props.endpoint + (props.onlyVisible ? '?visible=1' : ''));
 
                 return read();
             };

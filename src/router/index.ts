@@ -272,6 +272,12 @@ const routes: Array<RouteRecordRaw> = [
         beforeEnter: isMobileAndLogged,
     },
     {
+        path: '/usuarios',
+        name: 'Asd',
+        component: () => import('@/pages/User/index.vue'),
+        beforeEnter: isMobileAndLogged,
+    },
+    {
         path: '/usuario/salir',
         name: 'UserLogout',
         component: () => import('@/pages/User/Logout.vue'),
