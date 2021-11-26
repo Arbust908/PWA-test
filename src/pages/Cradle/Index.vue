@@ -38,9 +38,9 @@
                 <td :class="cr.name ? null : 'empty'">
                     {{ cr.name || 'Sin nombre' }}
                 </td>
-                <td>
-                    <p class="w-52 truncate">
-                        {{ cr.observations || 'Sin observaciones' }}
+                <td class="sm:w-52">
+                    <p class="w-52 truncate text-center">
+                        {{ cr.observations || '-' }}
                     </p>
                 </td>
             </template>

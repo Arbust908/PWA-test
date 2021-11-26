@@ -3,9 +3,6 @@
     &__draft {
         @apply border-[#117E49] text-[#117E49] bg-transparent hover:bg-[#117E49] hover:bg-opacity-25 hover:shadow-lg;
     }
-    &[disabled='true'] {
-        @apply opacity-50 cursor-not-allowed;
-    }
 
     &__delete {
         @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
@@ -73,6 +70,9 @@
         @apply border-transparent text-white bg-red-700 hover:bg-red-800 hover:text-white mx-2 px-5 py-3 transition duration-150 ease-out;
     }
     &:disabled {
-        @apply bg-gray-400 cursor-not-allowed;
+        @apply opacity-50 cursor-not-allowed bg-yellow-400;
+    }
+    &[disabled='true'] {
+        @apply opacity-50 cursor-not-allowed;
     }
 }
