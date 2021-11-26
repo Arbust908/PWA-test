@@ -45,9 +45,10 @@
                             w-full
                             my-8
                             align-middle
-                            max-w-sm
+                            max-w-xl
                             p-6
                         "
+                        v-bind="$attrs"
                     >
                         <div>
                             <div
@@ -144,6 +145,7 @@
             QuestionMarkCircleIcon,
             ExclamationIcon,
         },
+        inheritAttrs: false,
         props: {
             title: String,
             type: {

@@ -15,7 +15,7 @@
                 field-name="serviceCompany"
                 placeholder="Seleccionar operadora"
                 title="Operadora / Empresa de Servicios"
-                endpoint="/company"
+                endpoint="/company?isOperator=1"
                 is-optional
                 :data="serviceCompanyId"
                 @update:data="serviceCompanyId = $event"

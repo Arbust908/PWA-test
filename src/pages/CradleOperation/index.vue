@@ -41,7 +41,7 @@
                         <span class="station-title">Estación {{ index + 1 }}</span>
                         <span class="copy">Seleccione cliente, etapa y cradle.</span>
                     </div>
-                    <button class="calibrate">Calibrar E{{ index + 1 }}</button>
+                    <!-- <button class="calibrate">Calibrar E{{ index + 1 }}</button> -->
                 </div>
             </section>
             <section v-else class="cradle-slots">
