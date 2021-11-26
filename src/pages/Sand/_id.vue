@@ -155,17 +155,20 @@
                 store.dispatch('updateSand', sandToUpdate);
             };
 
+            // TODO: Pasar a un useExist o algo asi
+            const checkIfExists = async (model: string, field: string, value: string) => {
+                const baseApiUrl = import.meta.env.VITE_API_URL || '/api';
+                const apiResponse = await axios.get(`${baseApiUrl}/${model}?${field}=${value}`);
+                const modelArray = apiResponse.data.data;
+
+                return modelArray.length > 0;
+            };
+
             const getSandsAndCheckIfTypeExists = async () => {
                 try {
-                    const sandsFromApi = await axios.get(`${api}/sand`);
-
-                    createdSands.value = sandsFromApi.data.data;
-
-                    let types = createdSands.value.map((sand) => sand.type.toLowerCase());
-
                     if (sandToUpdate.type == currentSandType) {
                         save();
-                    } else if (types.includes(sandToUpdate.type.toLowerCase())) {
+                    } else if (await checkIfExists('sand', 'type', sandToUpdate.type)) {
                         toggleErrorModal();
                     } else {
                         save();

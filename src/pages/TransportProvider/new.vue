@@ -47,14 +47,14 @@
                             :driver-email="newDriver.email"
                             :driver-t-type="newDriver.vehicleType"
                             :driver-t-id="newDriver.transportId"
-                            :driver-t-id2="newDriver.transportId2"
+                            :driver-t-id2="newDriver.transportProviderId2"
                             :driver-obs="newDriver.observations"
                             @update:driverName="newDriver.name = $event"
                             @update:driverPhone="newDriver.phone = $event"
                             @update:driverEmail="newDriver.email = $event"
                             @update:driverTType="newDriver.vehicleType = $event"
                             @update:driverTId="newDriver.transportId = $event"
-                            @update:driverTId2="newDriver.transportId2 = $event"
+                            @update:driverTId2="newDriver.transportProviderId2 = $event"
                             @update:driverObs="newDriver.observations = $event"
                             @add-driver="addDriver()"
                         />
@@ -69,7 +69,7 @@
                         :email="driver.email"
                         :vehicle-type="driver.vehicleType"
                         :transport-id="driver.transportId"
-                        :transport-id2="driver.transportId2"
+                        :transport-id2="driver.transportProviderId2"
                         :observations="driver.observations"
                         @delete-driver="deleteDriver(index)"
                         @edit-driver="editDriver(index)"
@@ -105,13 +105,29 @@
                     :email="driver.email"
                     :vehicle-type="driver.vehicleType"
                     :transport-id="driver.transportId"
-                    :transport-id2="driver.transportId2"
+                    :transport-id2="driver.transportProviderId2"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
                 />
             </section>
         </section>
+
+        <ErrorModal
+            class="xs:w-[480px] xs:h-[248] !py-4"
+            :open="showErrorCuitModal"
+            title="Ya existe un cliente con este CUIT"
+            text="El cliente que intentas guardar fue creado anteriormente"
+            @close="showErrorCuitModal = false"
+            @action="showErrorCuitModal = false"
+        />
+        <SuccessModal
+            class="xs:w-[480px] xs:h-[260] py-10"
+            :open="showSuccessModal"
+            title="El proveedor fue guardado con éxito"
+            @close="$router.push('/proveedores-de-transporte')"
+            @action="$router.push('/proveedores-de-transporte')"
+        />
     </Layout>
 </template>
 
@@ -129,6 +145,9 @@
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import SideBtn from '@/components/ui/buttons/SideBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -145,6 +164,8 @@
             SideBtn,
             TransportProviderDriverForm,
             TransportProviderFrom,
+            SuccessModal,
+            ErrorModal,
         },
         setup() {
             const store = useStore();
@@ -153,6 +174,8 @@
             const instance = axios.create({
                 baseURL: api,
             });
+            const showSuccessModal = ref(false);
+            const showErrorCuitModal = ref(false);
 
             let activeSection = ref('provider');
 
@@ -174,7 +197,8 @@
                 email: '',
                 vehicleType: '',
                 transportId: '',
-                transportId2: '',
+                // transportId2: '',
+                transportProviderId2: '',
                 observations: '',
             });
 
@@ -199,7 +223,8 @@
                 newDriver.email = driver.email;
                 newDriver.vehicleType = driver.vehicleType;
                 newDriver.transportId = driver.transportId;
-                newDriver.transportId2 = driver.transportId2;
+                // newDriver.transportId2 = driver.transportId2;
+                newDriver.transportProviderId2 = driver.transportProviderId2;
                 newDriver.observations = driver.observations;
             };
 
@@ -209,7 +234,8 @@
                 newDriver.email = '';
                 newDriver.vehicleType = '';
                 newDriver.transportId = '';
-                newDriver.transportId2 = '';
+                // newDriver.transportId2 = '';
+                newDriver.transportProviderId2 = '';
                 newDriver.observations = '';
             };
 
@@ -234,13 +260,12 @@
                     newDriver.email !== '' &&
                     newDriver.vehicleType !== '' &&
                     newDriver.transportId !== '' &&
-                    newDriver.transportId2 !== ''
+                    // newDriver.transportId2 !== '' &&
+                    newDriver.transportProviderId2 !== ''
                 );
             });
 
             const driverTabText = computed(() => {
-                console.log(drivers.length);
-
                 return `Transportista${drivers.length > 1 ? `s (${drivers.length})` : ''}`;
             });
 
@@ -267,11 +292,19 @@
                         representanteDone.value = true;
                     }
                 });
-                watch(compRepData, (apiData) => {
+                watch(compRepData, async (apiData) => {
                     console.log(apiData);
 
                     if (apiData && apiData.data) {
                         newTransportProvider.companyRepresentativeId = apiData.data.id;
+                        const legalIdExists = await checkIfExists('legalId', newTransportProvider.legalId);
+
+                        if (legalIdExists) {
+                            showErrorCuitModal.value = true;
+
+                            return;
+                        }
+
                         const { data, isFinished: transProvDone } = useAxios(
                             '/transportProvider',
                             { method: 'POST', data: newTransportProvider },
@@ -310,7 +343,7 @@
                                     ...tpSave,
                                     companyRepresentative,
                                 });
-                                router.push('/proveedores-de-transporte');
+                                showSuccessModal.value = true;
                             }
                         });
                     }
@@ -320,6 +353,14 @@
                         console.log('All done');
                     }
                 });
+            };
+
+            const checkIfExists = async (field: string, value: string) => {
+                const apiResponse = await axios.get(`${api}/transportProvider?${field}=${value}`);
+
+                const transportProviders = apiResponse.data.data;
+
+                return transportProviders.length > 0;
             };
 
             return {
@@ -338,6 +379,8 @@
                 driverTabText,
                 showDrivers,
                 driversShown,
+                showSuccessModal,
+                showErrorCuitModal,
             };
         },
     };
