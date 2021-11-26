@@ -233,12 +233,7 @@
         </section>
         <footer class="mt-[32px] space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn
-                btn="wide"
-                size="md"
-                :disabled="!isFull ? 'yes' : null"
-                @click.prevent="isFull ? save() : toggleErrorModal()"
-            >
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull" @click.prevent="isFull ? save() : toggleErrorModal()">
                 Guardar
             </PrimaryBtn>
         </footer>
