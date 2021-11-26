@@ -128,7 +128,7 @@
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
                     <SecondaryBtn class="outline-none w-1/3" @click.prevent="$router.push('/')"> Cerrar </SecondaryBtn>
-                    <PrimaryBtn btn="btn__warning" @click.prevent="createNew">Crear nueva</PrimaryBtn>
+                    <PrimaryBtn @click.prevent="$router.push('/notificaciones-a-proveedores')">Continuar</PrimaryBtn>
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
                     <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
