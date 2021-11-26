@@ -14,7 +14,7 @@
                 placeholder="Seleccionar depósito"
                 endpoint="/warehouse"
                 :data="selectedDeposit"
-                endpointKey="id"
+                endpoint-key="id"
                 @update:data="selectedDeposit = $event"
             />
         </div>
@@ -241,7 +241,10 @@
             };
 
             const filteredDeposits = computed(() => {
-                if (deposits.value == undefined) return;
+                if (deposits.value == undefined) {
+                    return;
+                }
+
                 if (selectedDeposit.value !== null) {
                     return deposits.value.filter((singleDeposit) => singleDeposit.id == selectedDeposit.value);
                 }
