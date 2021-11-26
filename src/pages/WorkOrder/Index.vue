@@ -165,17 +165,17 @@
 
             const actions = [
                 {
-                    label: 'Editar',
-                    callback: (item) => {
-                        router.push(`/orden-de-trabajo/${item.id}`);
-                    },
-                },
-                {
                     label: 'Ver más',
                     onlyMobile: true,
                     callback: (item) => {
                         selectedWorkOrder.value = item;
                         showBackdrop.value = true;
+                    },
+                },
+                {
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/orden-de-trabajo/${item.id}`);
                     },
                 },
                 {
@@ -265,7 +265,9 @@
             const filteredWorkOrders = computed(() => {
                 if (clientId.value > -1) {
                     return workOrders.value.filter((order) => {
-                        if (parseInt(order.client) == clientId.value) return order;
+                        if (parseInt(order.client) == clientId.value) {
+                            return order;
+                        }
                     });
                 }
 
