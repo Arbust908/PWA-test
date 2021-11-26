@@ -396,6 +396,7 @@
             };
 
             watchEffect(async () => {
+                // console.log('filteredPurchaseOrders', filteredPurchaseOrders.value);
                 if (purchaseOrders.value.length > 0) {
                     if (clientId.value !== -1 && pitId.value !== -1) {
                         filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
@@ -624,11 +625,12 @@
             const deposit = ref({});
             // << DEPOSIT
             const confirmModal = ref(false);
-            const resetBoxIn = async () => {
-                clientId.value = -1;
-                pitId.value = -1;
-                purchaseOrderId.value = -1;
-                confirmModal.value = false;
+            const resetBoxIn = () => {
+                router.go(0);
+                // clientId.value = -1;
+                // pitId.value = -1;
+                // purchaseOrderId.value = -1;
+                // confirmModal.value = false;
             };
 
             const checkIfIsFullyAllocated = (selected) => {
@@ -636,6 +638,7 @@
                 selected.sandOrders.forEach((order) => {
                     return order.location !== null ? (status = true) : (status = false);
                 });
+
                 return status;
             };
 
