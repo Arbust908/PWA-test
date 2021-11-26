@@ -6,72 +6,80 @@
                 <PrimaryBtn>Nueva Notificacion</PrimaryBtn>
             </router-link>
         </header>
-        <UiTable>
-            <template #header>
-                <tr>
-                    <th scope="col">Proveedor</th>
-                    <th scope="col">Ordenes</th>
-                    <th scope="col" title="Cantidad de Arena">C° Arena</th>
-                    <th scope="col">Transportes</th>
-                    <th scope="col">C° de Camiones</th>
-                    <!-- <th scope="col">
-            <span class="sr-only">Acciones</span>
-          </th> -->
-                </tr>
-            </template>
-            <template #body>
-                <tr
-                    v-for="(pn, Key) in ProviderNotifications"
-                    :key="Key"
-                    :class="Key % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td>
-                        {{ pn.sandProvider.name }}
-                    </td>
-                    <td>{{ pn.sandOrder.amount }}t</td>
-                    <td>
-                        {{ pn.transportProviders ? pn.transportProviders.length : 'No hay transporte' }}
-                    </td>
-                    <td>
-                        {{ pn.transportProviders ? sumTransport(pn.transportProviders) : '-' }}
-                    </td>
-                    <!-- <td>
-            <div class="btn-panel">
-              <router-link
-                :to="`/notificaciones-a-proveedores/${pn.id}`"
-                class="edit"
-              >
-                <Icon icon="PencilAlt" class="w-5 h-5" />
-                <span> Editar </span>
-              </router-link>
-              <button class="delete" @click="deleteSP(pn.id)">
-                <Icon icon="Trash" class="w-5 h-5" />
-                <span> Eliminar </span>
-              </button>
+        <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
+            <FieldSelect
+                title="Filtro"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
+                field-name="name"
+                placeholder="Seleccionar cliente"
+                endpoint="/sandProvider"
+                :data="sandProviderId"
+                @update:data="sandProviderId = $event"
+            />
+            <div class="col-span-full sm:mt-7 sm:col-span-5">
+                <GhostBtn size="sm" @click="listSandTypes()"> Borrar filtros </GhostBtn>
             </div>
-          </td> -->
-                </tr>
-                <tr v-if="ProviderNotifications.length <= 0">
+        </div>
+        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="provNotifDB" :actions="actions">
+            <template #item="{ item }">
+                <!-- Desktop -->
+
+                <td :class="item.sandProvider.name ? null : 'empty'">
+                    {{ item.sandProvider.name || 'Sin definir' }}
+                </td>
+
+                <td @click="listSandTypes(item.data?.sandOrders)" :class="item.sandProvider.name ? null : 'empty'">
+                    {{ item.sandProvider.name || 'Sin definir' }}
+                </td>
+
+                <td :class="item.data ? null : 'empty'">
+                    {{ listSandTypes(item.data?.sandOrders) || 'Sin definir' }}
+                </td>
+
+                <td :class="item.transportProvider ? null : 'empty'">
+                    {{ item.transportProvider?.name || 'Sin definir' }}
+                </td>
+
+                <td :class="item.data ? null : 'empty'">
+                    {{ item.data?.cantidadCamiones || 'Sin definir' }}
+                </td>
+
+                <td class="text-center" :class="item ? null : 'empty'">
+                    <Badge v-if="item.isOperator" text="Completado" classes="bg-gray-500 text-white px-5" />
+                    <Badge v-else text="En proceso" classes="bg-gray-300 text-gray-600" />
+                </td>
+
+                <tr v-if="provNotifDB && provNotifDB.length <= 0">
                     <td colspan="5" class="emptyState">
-                        <p>No hay Notificaciones a Proveedores</p>
+                        <p>No hay notificaciones cargadas</p>
                     </td>
                 </tr>
             </template>
-        </UiTable>
+
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }">
+                {{ item.name }}
+            </template>
+
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Domicilio: </span>{{ item.address }}
+            </template>
+        </VTable>
     </Layout>
 </template>
 
-<script>
-    import { ref, watch } from 'vue';
+<script lang="ts">
+    import { onMounted, ref, computed } from 'vue';
     import { useStore } from 'vuex';
-    import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-
+    import Modal from '@/components/modal/General.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
+    import Badge from '@/components/ui/Badge.vue';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -79,54 +87,132 @@
     export default {
         components: {
             Layout,
-            PencilAltIcon,
-            TrashIcon,
             PrimaryBtn,
-            UiTable,
+            GhostBtn,
             Icon,
+            FieldSelect,
+            Badge,
+            Modal,
+            VTable,
         },
         setup() {
             useTitle('Notificaciones a Proveedores <> Sandflow');
             const store = useStore();
+            const provNotifDB = ref([]);
+            const loading = ref(false);
+            const sandProviderId = ref(-1);
+
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+                // currentPage: 1,
+                // perPage: 10,
+            });
+
+            const columns = [
+                { title: 'Crto. de Carga', key: 'sandProvider.name', sortable: true },
+                { title: 'Arena', key: 'sandProvider.meshType.type', sortable: true },
+                { title: 'Transporte', key: 'transportProvider.name', sortable: true },
+                { title: 'Cant. Camiones', key: 'data.cantidadCamiones', sortable: true },
+                { title: 'Estado', key: 'status' },
+                { title: 'Acciones', key: '' },
+            ];
+
+            const actions = [
+                {
+                    label: 'Ver más',
+                    onlyMobile: true,
+                    callback: () => {
+                        console.log('Ver más');
+                    },
+                },
+                {
+                    label: 'Reenviar',
+                    callback: () => {
+                        console.log('Reenviar');
+                    },
+                },
+            ];
+
+            const headers = {
+                'Content-Type': 'Application/JSON',
+            };
+
+            const total = computed(() => {
+                return clientId.value;
+            });
+
+            const filteredNotifications = computed(() => {
+                if (sandProviderId.value > -1) {
+                    return provNotifDB.value.filter((client) => client.sandProviderId == sandProviderId);
+                }
+
+                return provNotifDB.value;
+            });
+
+            const getProviderNotifications = async () => {
+                loading.value = true;
+
+                const res = await axios.get(`${apiUrl}/providerNotification`, headers).catch((err) => {
+                    console.log(err);
+                });
+
+                if (res.status === 200) {
+                    provNotifDB.value = res.data.data;
+                }
+
+                loading.value = false;
+            };
+
             const instance = axios.create({
                 baseURL: apiUrl,
             });
 
-            const ProviderNotifications = ref([]);
-            const { data: pNData } = useAxios('/providerNotification', instance);
-            watch(pNData, (pNData, prevCount) => {
-                if (pNData && pNData.data) {
-                    ProviderNotifications.value = pNData.data;
-                    ProviderNotifications.value.forEach((pn) => {
-                        store.dispatch('saveProviderNotification', pn);
-                    });
-                }
-            });
-            const sumQty = (sandOrder) => {
-                return sandOrder.reduce((totalSum, sO) => {
-                    return totalSum + sO.amount;
-                }, 0);
-            };
-            const sumTransport = (transportProviders) => {
-                return transportProviders.reduce((totalSum, tP) => {
-                    return totalSum + tP.amount;
-                }, 0);
-            };
-            const deletePN = (id) => {
-                const loading = ref(true);
-                const { data } = useAxios('/providerNotification/' + id, { method: 'DELETE' }, instance);
-                store.dispatch('deleteProviderNotification', id);
-                ProviderNotifications.value = ProviderNotifications.value.filter((pn) => {
-                    return pn.id !== id;
+            const sandTypesFromId = ref([]);
+
+            const getSands = async () => {
+                const res = await axios.get(`${apiUrl}/sand`).catch((err) => {
+                    console.log(err);
                 });
-                loading.value = false;
+                sandTypesFromId.value = res.data.data;
+            };
+
+            const getSTName = (id) => {
+                const st = sandTypesFromId.value.find((st) => {
+                    return st.id == id;
+                });
+                return st ? st.type : '';
+            };
+
+            const listSandTypes = (sandOrders) => {
+                sandOrders.forEach((sand) => {
+                    console.log(getSTName(sand.sandTypeId));
+                    return getSTName(sand.sandTypeId);
+                });
+            };
+
+            onMounted(async () => {
+                await getProviderNotifications();
+                await getSands();
+            });
+
+            const clearFilters = () => {
+                sandProviderId.value = -1;
             };
 
             return {
-                ProviderNotifications,
-                deletePN,
-                sumQty,
-                sumTransport,
+                provNotifDB,
+                loading,
+                columns,
+                total,
+                actions,
+                clearFilters,
+                pagination,
+                getSands,
+                filteredNotifications,
+                getProviderNotifications,
+                getSTName,
+                listSandTypes,
             };
         },
     };
