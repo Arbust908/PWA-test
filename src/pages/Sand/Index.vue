@@ -63,7 +63,7 @@
 
                 <tr v-if="sandDB && sandDB.length <= 0">
                     <td colspan="5" class="emptyState">
-                        <p>No hay arenas cargados</p>
+                        <p>No hay arenas cargadas</p>
                     </td>
                 </tr>
             </template>
