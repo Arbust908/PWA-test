@@ -27,7 +27,7 @@
         </div>
 
         <VTable
-            class="mt-5"
+            class="mt-5 lg:w-8/12 min-w-min"
             :columns="columns"
             :pagination="pagination"
             :items="filteredSandPlans"
@@ -56,14 +56,19 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar esta planificación de arenas?" type="error" :open="showModal">
+        <Modal
+            class="sm:w-[440px] sm:h-[248] !py-8"
+            title="¿Desea inhabilitar esta planificación de arenas?"
+            type="error"
+            :open="showModal"
+        >
             <template #body>
                 <div>Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación</div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <GhostBtn btn="!text-gray-500" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!bg-red-600" @click="confirmModal">Inhabilitar </PrimaryBtn>
+                    <PrimaryBtn btn="!bg-red-700" @click="confirmModal">Inhabilitar </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -208,12 +213,18 @@
                 await update(selectedSandPlan.value);
             };
 
+            const confirmModal = async () => {
+                await update(selectedSandPlan.value);
+                showModal.value = false;
+            };
+
             const update = async (sandPlan) => {
                 const payload = {
                     ...sandPlan,
                     visible: !sandPlan.visible,
                 };
                 await store.dispatch('sandPlan_update', payload);
+                sandPlan.visible = payload.visible;
             };
 
             const sumQty = (sandStages) => {
@@ -246,6 +257,7 @@
                 showBackdrop,
                 showModal,
                 openModalVisibility,
+                confirmModal,
             };
         },
     };
