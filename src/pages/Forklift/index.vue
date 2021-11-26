@@ -264,13 +264,4 @@
     .outline-none {
         outline: 0;
     }
-
-    .notallowed {
-        background: #f2f2f2;
-        color: #898989;
-    }
-
-    .notallowed.observations + tr {
-        background: red;
-    }
 </style>

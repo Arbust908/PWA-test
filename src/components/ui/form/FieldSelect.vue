@@ -10,10 +10,10 @@
             class="input"
             :class="noOptionSelected && 'unselected'"
             :name="fieldName"
-            @blur="$emit('is-blured')"
             :disabled="isDisabled"
+            @blur="$emit('is-blured')"
         >
-            <option disabled value="-1">
+            <option value="-1">
                 {{ placeholder }}
             </option>
             <option v-for="(res, i) in resources" :key="res?.id + i" :value="res?.id">

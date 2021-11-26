@@ -20,7 +20,11 @@
                         </tbody>
                         <tbody v-else>
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
-                                <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
+                                <tr
+                                    class="body-row"
+                                    :class="index % 2 === 0 ? 'even' : 'odd'"
+                                    :disabled="!item.visible"
+                                >
                                     <slot name="item" :item="item" />
                                     <td v-if="desktopActions" class="p-0">
                                         <DropdownBtn :actions="desktopActions" :item="item">
@@ -48,8 +52,11 @@
                 <div class="shadow-md bg-gray-100 overflow-none rounded-lg sm:shadow-lg text-sm sm:text-base">
                     <div v-for="item in paginatedItems" :key="item.id" class="bg-white border-gray-400">
                         <div class="divide-y divide-black border-t-2">
-                            <div class="grid grid-cols-12 p-6 pl-2 pr-2 items-center">
-                                <div class="col-span-10 bg-white rounded truncate pl-2">
+                            <div
+                                class="grid grid-cols-12 p-6 pl-2 pr-2 items-center"
+                                :class="!item.visible ? 'disabled-mobile' : null"
+                            >
+                                <div class="col-span-10 rounded truncate pl-2">
                                     <span class="text-sm font-semibold">
                                         <slot name="mobileTitle" :item="item"></slot>
                                     </span>
@@ -59,9 +66,9 @@
                                     </p>
                                 </div>
 
-                                <div class="col-span-2 bg-white rounded flex flex-col justify-center items-center">
+                                <div class="col-span-2 rounded flex flex-col justify-center items-center">
                                     <DropdownBtn :actions="actions" :item="item">
-                                        <CircularBtn size="xs" class="bg-white">
+                                        <CircularBtn size="xs">
                                             <Icon
                                                 icon="DotsVertical"
                                                 type="outlined"
