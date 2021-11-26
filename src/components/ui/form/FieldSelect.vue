@@ -30,6 +30,7 @@
     import { defineComponent, computed, ref, toRefs, watchEffect } from 'vue';
     import { useVModel } from '@vueuse/core';
     import { useApi } from '@/helpers/useApi';
+    import { addVisibleFilter } from '@/helpers/useUrlHelpers';
     import FieldTitle from '@/components/ui/form/FieldTitle.vue';
 
     export default defineComponent({
@@ -72,6 +73,7 @@
             filteredData: {
                 type: Array,
                 required: false,
+                default: null,
             },
             requireValidation: {
                 type: Boolean,
@@ -80,10 +82,12 @@
             validationType: {
                 type: String,
                 required: false,
+                default: null,
             },
             entity: {
                 type: String,
                 required: false,
+                default: null,
             },
             isDisabled: {
                 type: Boolean,
@@ -95,7 +99,8 @@
             const value = useVModel(props, 'data', emit);
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
-                const { read } = useApi(props.endpoint + '?visible=1');
+                const endpoint = addVisibleFilter(props.endpoint);
+                const { read } = useApi(endpoint);
 
                 return read();
             };

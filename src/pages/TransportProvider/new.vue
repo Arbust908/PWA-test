@@ -47,14 +47,14 @@
                             :driver-email="newDriver.email"
                             :driver-t-type="newDriver.vehicleType"
                             :driver-t-id="newDriver.transportId"
-                            :driver-t-id2="newDriver.transportId2"
+                            :driver-t-id2="newDriver.transportProviderId2"
                             :driver-obs="newDriver.observations"
                             @update:driverName="newDriver.name = $event"
                             @update:driverPhone="newDriver.phone = $event"
                             @update:driverEmail="newDriver.email = $event"
                             @update:driverTType="newDriver.vehicleType = $event"
                             @update:driverTId="newDriver.transportId = $event"
-                            @update:driverTId2="newDriver.transportId2 = $event"
+                            @update:driverTId2="newDriver.transportProviderId2 = $event"
                             @update:driverObs="newDriver.observations = $event"
                             @add-driver="addDriver()"
                         />
@@ -69,7 +69,7 @@
                         :email="driver.email"
                         :vehicle-type="driver.vehicleType"
                         :transport-id="driver.transportId"
-                        :transport-id2="driver.transportId2"
+                        :transport-id2="driver.transportProviderId2"
                         :observations="driver.observations"
                         @delete-driver="deleteDriver(index)"
                         @edit-driver="editDriver(index)"
@@ -105,7 +105,7 @@
                     :email="driver.email"
                     :vehicle-type="driver.vehicleType"
                     :transport-id="driver.transportId"
-                    :transport-id2="driver.transportId2"
+                    :transport-id2="driver.transportProviderId2"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
@@ -174,7 +174,8 @@
                 email: '',
                 vehicleType: '',
                 transportId: '',
-                transportId2: '',
+                // transportId2: '',
+                transportProviderId2: '',
                 observations: '',
             });
 
@@ -199,7 +200,8 @@
                 newDriver.email = driver.email;
                 newDriver.vehicleType = driver.vehicleType;
                 newDriver.transportId = driver.transportId;
-                newDriver.transportId2 = driver.transportId2;
+                // newDriver.transportId2 = driver.transportId2;
+                newDriver.transportProviderId2 = driver.transportProviderId2;
                 newDriver.observations = driver.observations;
             };
 
@@ -209,7 +211,8 @@
                 newDriver.email = '';
                 newDriver.vehicleType = '';
                 newDriver.transportId = '';
-                newDriver.transportId2 = '';
+                // newDriver.transportId2 = '';
+                newDriver.transportProviderId2 = '';
                 newDriver.observations = '';
             };
 
@@ -234,13 +237,12 @@
                     newDriver.email !== '' &&
                     newDriver.vehicleType !== '' &&
                     newDriver.transportId !== '' &&
-                    newDriver.transportId2 !== ''
+                    // newDriver.transportId2 !== '' &&
+                    newDriver.transportProviderId2 !== ''
                 );
             });
 
             const driverTabText = computed(() => {
-                console.log(drivers.length);
-
                 return `Transportista${drivers.length > 1 ? `s (${drivers.length})` : ''}`;
             });
 
