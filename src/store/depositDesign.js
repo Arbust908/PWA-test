@@ -1,3 +1,6 @@
+import axios from 'axios';
+const api = import.meta.env.VITE_API_URL || '/api';
+
 export default {
     state: () => ({
         all: [],
@@ -33,6 +36,11 @@ export default {
         },
         deleteDeposit({ commit }, depositId) {
             commit('DELETE_DEPOSITDESIGN', depositId);
+        },
+        async updateVisibilityDeposit({ commit }, deposit) {
+            return await axios.put(`${api}/warehouse/${deposit.id}`, deposit).catch((error) => {
+                throw error.response.data;
+            });
         },
     },
 };
