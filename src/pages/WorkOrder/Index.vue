@@ -75,7 +75,7 @@
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
+                    <PrimaryBtn btn="!bg-red-700" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
                 </div>
             </template>
         </Modal>
@@ -220,7 +220,7 @@
                     ...order,
                     visible: !order.visible,
                 };
-                await store.dispatch('updateVisibilityClient', payload);
+                await axios.put(`${apiUrl}/workOrder/${order.id}`, payload);
                 await getWorkOrders();
             };
 
