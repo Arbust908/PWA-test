@@ -3,8 +3,8 @@
 ![Sandflow](./src/assets/logo.png)
 
 ```bash
-npm install
-npm run dev
+yarn install
+yarn run dev
 ```
 
 ## Stack
