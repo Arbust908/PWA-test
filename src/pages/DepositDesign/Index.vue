@@ -64,7 +64,7 @@
                 </div>
             </template>
             <template #btn>
-                <div class="flex justify-center gap-5 btn">
+                <div class="flex justify-center gap-5 btn items-center">
                     <GhostBtn btn="!text-gray-500" @click="showModal = false"> Volver </GhostBtn>
                     <PrimaryBtn btn="!px-10 !bg-red-700" @click="confirmModal">Inhabilitar </PrimaryBtn>
                 </div>
