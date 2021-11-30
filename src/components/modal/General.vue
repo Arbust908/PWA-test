@@ -3,7 +3,7 @@
         <Dialog
             as="div"
             static
-            class="fixed z-10 top-10 inset-x-0 md:inset-0 overflow-y-auto"
+            class="fixed w-1/2 mx-auto z-10 top-10 inset-x-0 md:inset-0 overflow-y-auto"
             :open="open"
             @close="$emit('close')"
         >
