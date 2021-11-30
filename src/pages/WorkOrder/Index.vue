@@ -34,7 +34,7 @@
                 </td>
 
                 <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
-                    <Badge v-if="isEquipmentFull(item) > 0" text="Completo" classes="bg-green-500 text-white" />
+                    <Badge v-if="isEquipmentFull(item)" text="Completo" classes="bg-green-500 text-white" />
                     <Badge v-else text="Incompleto" classes="bg-red-300 text-white" />
                 </td>
 
@@ -85,7 +85,7 @@
                 <div class="flex items-center mt-1">
                     <Icon
                         :icon="isTotallyComplete(selectedWorkOrder) ? 'Check' : 'ExclamationCircle'"
-                        :type="solid"
+                        type="solid"
                         :class="isTotallyComplete(selectedWorkOrder) ? 'icon-complete' : 'icon-incomplete'"
                     /><span class="font-bold">{{ selectedWorkOrder.clientName }}</span>
                 </div>
@@ -123,7 +123,7 @@
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     import { useTitle } from '@vueuse/core';
-    import { WorkOrder } from '@/interfaces/WorkOrder';
+    import { WorkOrder } from '@/interfaces/sandflow';
 
     export default defineComponent({
         components: {
@@ -145,7 +145,7 @@
             const workOrders = ref([]);
             const companies = ref([]);
             const clientId = ref(-1);
-            const selectedWorkOrder = ref({});
+            const selectedWorkOrder = ref({} as WorkOrder);
             const showModal = ref(false);
             const showBackdrop = ref(false);
 
@@ -204,7 +204,7 @@
                 }
             });
 
-            const openModalVisibility = async (workOrder) => {
+            const openModalVisibility = async (workOrder: WorkOrder) => {
                 selectedWorkOrder.value = workOrder;
 
                 if (workOrder.visible) {
