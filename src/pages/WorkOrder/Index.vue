@@ -34,8 +34,13 @@
                 </td>
 
                 <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
-                    <Badge v-if="isEquipmentFull(item)" text="Completo" classes="bg-green-500 text-white" />
-                    <Badge v-else text="Incompleto" classes="bg-red-300 text-white" />
+                    <Badge v-if="isEquipmentFull(item)" text="Completo" classes="bg-[#1AA532] text-white" />
+                    <Badge v-else text="Incompleto" classes="bg-[#BE1A3B] text-white" />
+                </td>
+
+                <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
+                    <Badge v-if="item.crew.length > 0" text="Completo" classes="bg-[#1AA532] text-white" />
+                    <Badge v-else text="Incompleto" classes="bg-[#BE1A3B] text-white" />
                 </td>
 
                 <tr v-if="workOrders && workOrders.length <= 0">
@@ -342,4 +347,10 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
+    .icon-complete {
+        @apply h-4 w-4 mr-1 bg-green-600 rounded-full text-white;
+    }
+    .icon-incomplete {
+        @apply h-4 w-4 mr-1 bg-[#BE1A3B] rounded-full text-white;
+    }
 </style>
