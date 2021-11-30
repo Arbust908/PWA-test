@@ -44,8 +44,8 @@ const LINE = {
 export default {
     state: () => ({
         navigation: [
-            Planificación,
             OrdenDeTrabajo,
+            Planificación,
             Notificaciones,
             Diseño_de_Depósito,
             Orden_de_Pedido,
