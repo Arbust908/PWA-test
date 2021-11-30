@@ -38,11 +38,6 @@
                     <Badge v-else text="Incompleto" classes="bg-red-300 text-white" />
                 </td>
 
-                <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
-                    <Badge v-if="item.crew.length > 0" text="Completo" classes="bg-green-500 text-white" />
-                    <Badge v-else text="Incompleto" classes="bg-red-300 text-white" />
-                </td>
-
                 <tr v-if="workOrders && workOrders.length <= 0">
                     <td colspan="5" class="emptyState">
                         <p>No hay clientes cargados</p>
