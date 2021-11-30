@@ -63,7 +63,7 @@
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="CheckCircle" class="h-14 w-14 mb-4 text-green-500" />
                 </div>
-                <div class="text-center text-xl font-semibold mb-4 mx-5 text-gray-900">
+                <div class="text-center text-[18px] font-semibold mb-4 mx-5 text-gray-900">
                     ¡El centro de carga fue guardado con éxito!
                 </div>
             </template>
