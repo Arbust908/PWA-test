@@ -65,8 +65,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar Forklift </PrimaryBtn>
+                    <BaseBtn class="outline-none text-gray-500" @click="showModal = false"> Volver </BaseBtn>
+                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar</ErrorBtn>
                 </div>
             </template>
         </Modal>
@@ -100,6 +100,8 @@
     import Popper from 'vue3-popper';
     import VTable from '@/components/ui/table/VTable.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
+    import ErrorBtn from '@/components/ui/buttons/ErrorBtn.vue';
+    import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
 
     export default {
         components: {
@@ -114,6 +116,8 @@
             Popper,
             VTable,
             Backdrop,
+            ErrorBtn,
+            BaseBtn,
         },
         setup() {
             useTitle('Forklifts <> Sandflow');
