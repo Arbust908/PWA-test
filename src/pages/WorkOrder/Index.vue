@@ -347,10 +347,4 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
-    .icon-complete {
-        @apply h-4 w-4 mr-1 bg-green-500 rounded-full text-white;
-    }
-    .icon-incomplete {
-        @apply h-4 w-4 mr-1 bg-red-500 rounded-full text-white;
-    }
 </style>
