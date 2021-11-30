@@ -91,8 +91,8 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar tipo de arena</PrimaryBtn>
+                    <BaseBtn class="text-gray-500" @click="showModal = false"> Volver </BaseBtn>
+                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar tipo de arena</ErrorBtn>
                 </div>
             </template>
         </Modal>
@@ -120,6 +120,8 @@
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
+    const ErrorBtn = defineAsyncComponent(() => import('@/components/ui/buttons/ErrorBtn.vue'));
+    const BaseBtn = defineAsyncComponent(() => import('@/components/ui/buttons/BaseBtn.vue'));
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
@@ -138,6 +140,8 @@
             Modal,
             Popper,
             VTable,
+            ErrorBtn,
+            BaseBtn,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');
