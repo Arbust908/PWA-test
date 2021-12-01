@@ -128,7 +128,7 @@
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
                     <SecondaryBtn class="outline-none w-1/3" @click.prevent="$router.push('/')"> Cerrar </SecondaryBtn>
-                    <PrimaryBtn btn="btn__warning" @click.prevent="createNew">Crear nueva</PrimaryBtn>
+                    <PrimaryBtn @click.prevent="$router.push('/notificaciones-a-proveedores')">Continuar</PrimaryBtn>
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
                     <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
@@ -180,7 +180,8 @@
                 baseURL: apiUrl,
             });
 
-            const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
+            // const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
+            const pN = ref([]);
 
             const sandProviders = ref([] as Array<Sand>);
             const { data: sPData } = useAxios('/sandProvider', instance);
@@ -288,15 +289,19 @@
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId < 0) {
                     pN.value = {
                         sandProviderId: Number(sandProviderIds.value[0].id),
-                        sandOrders: sandProviderIds.value[0].SandOrders,
+                        data: {
+                            sandOrders: sandProviderIds.value[0].SandOrders,
+                        },
                     };
                 }
 
                 if (transportOrder.value[0].transportProviderId > 0 && sandProviderIds.value[0].id < 0) {
                     pN.value = {
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
-                        cantidadCamiones: Number(transportOrder.value[0].amount),
-                        observations: transportOrder.value[0].observation,
+                        data: {
+                            cantidadCamiones: Number(transportOrder.value[0].amount),
+                            observations: transportOrder.value[0].observation,
+                        },
                     };
                 }
 
@@ -304,17 +309,19 @@
                     pN.value = {
                         textArena: 'Arena',
                         sandProviderId: Number(sandProviderIds.value[0].id),
-                        sandOrders: sandProviderIds.value[0].SandOrders,
                         textTransporte: 'Transporte',
+                        data: {
+                            sandOrders: sandProviderIds.value[0].SandOrders,
+                            cantidadCamiones: Number(transportOrder.value[0].amount),
+                            observations: transportOrder.value[0].observation,
+                        },
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
-                        cantidadCamiones: Number(transportOrder.value[0].amount),
-                        observations: transportOrder.value[0].observation,
                     };
                 }
 
                 const getSanitizedSandOrders = () => {
                     let sanitizedSandOrders = [];
-                    pN.value.sandOrders.forEach((order) => {
+                    pN.value.data.sandOrders.forEach((order) => {
                         return sanitizedSandOrders.push({
                             sandType: getSTName(order.sandTypeId),
                             amount: order.amount,
@@ -334,19 +341,19 @@
 
                 modalData.value = {
                     sandProvider: getSPName(pN.value.sandProviderId) || null,
-                    sandOrders: pN.value.sandOrders ? getSanitizedSandOrders() : null,
+                    sandOrders: pN.value.data.sandOrders ? getSanitizedSandOrders() : null,
                     transportProvider:
                         Number(transportOrder.value[0].transportProviderId) !== -1
                             ? getTranportProviderName(Number(transportOrder.value[0].transportProviderId))
                             : null,
-                    transportQuantity: pN.value.cantidadCamiones || null,
-                    transportObservations: pN.value.observations || null,
+                    transportQuantity: pN.value.data.cantidadCamiones || null,
+                    transportObservations: pN.value.data.observations || null,
                 };
-
                 toggleModal(true);
             };
 
             const confirmNotification = async () => {
+                console.log(pN.value);
                 const response = await axios
                     .post(`${apiUrl}/ProviderNotification`, pN.value)
                     .then((res) => {

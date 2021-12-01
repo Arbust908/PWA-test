@@ -38,9 +38,9 @@
                 <td :class="cr.name ? null : 'empty'">
                     {{ cr.name || 'Sin nombre' }}
                 </td>
-                <td>
-                    <p class="w-52 truncate">
-                        {{ cr.observations || 'Sin observaciones' }}
+                <td class="sm:w-52">
+                    <p class="w-52 truncate text-center">
+                        {{ cr.observations || '-' }}
                     </p>
                 </td>
             </template>
@@ -69,7 +69,7 @@
 
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
-                <span class="!text-lg !text-black">Cradle</span> <br />
+                <span class="!text-lg !text-black">{{ selectedCradle.name }}</span> <br />
                 <span v-if="selectedCradle.observations">
                     Observaciones: {{ selectedCradle.observations || ' - ' }}
                 </span>

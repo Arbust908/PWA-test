@@ -22,14 +22,16 @@
             </div>
         </template>
         <template #btn>
-            <input
-                id="checkbox"
-                v-model="checked"
-                type="checkbox"
-                class="outline-none appearance-none focus:outline-none"
-            />
-            <label for="checkbox">Descargar como .pdf</label>
-            <div class="w-full flex gap-x-6 justify-end">
+            <div class="flex items-center">
+                <input
+                    id="checkbox"
+                    v-model="checked"
+                    type="checkbox"
+                    class="outline-none focus:outline-none text-green-500 rounded mr-2"
+                />
+                <label for="checkbox">Enviar mail a proveedores</label>
+            </div>
+            <div class="w-full flex gap-x-6 justify-end mt-3">
                 <SecondaryBtn @click.prevent="$emit('close')"> Volver </SecondaryBtn>
                 <PrimaryBtn @click.prevent="$emit('confirm')" @click="checked && downloadPDF(po)">
                     Confirmar
@@ -44,7 +46,7 @@
 
 <script lang="ts">
     import { defineComponent, ref, watchEffect } from 'vue';
-    import Modal from '@/components/modal/General.vue';
+    import Modal from '@/components/modal/PurchaseOrderModal.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import { isEven } from '@/helpers/iteretionHelpers';

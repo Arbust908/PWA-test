@@ -2,7 +2,7 @@
     <Layout>
         <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Notificaciones a Proveedores</h2>
-            <router-link to="/proveedores-de-transporte/nuevo">
+            <router-link to="/notificaciones-a-proveedores/nueva">
                 <PrimaryBtn size="sm">
                     <span> Crear </span>
                     <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
@@ -15,12 +15,12 @@
                 title="Filtro"
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
-                placeholder="Seleccionar proveedor"
-                endpoint="/transportProvider"
-                :data="transportProviderId"
-                @update:data="transportProviderId = $event"
+                placeholder="Seleccionar cliente"
+                endpoint="/sandProvider"
+                :data="sandProviderId"
+                @update:data="sandProviderId = $event"
             />
-            <div class="col-span-4 mt-7">
+            <div class="col-span-full sm:mt-7 sm:col-span-5">
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
@@ -28,103 +28,119 @@
             class="mt-5"
             :columns="columns"
             :pagination="pagination"
-            :items="filteredTransportProviders"
+            :items="filteredNotifications"
             :actions="actions"
         >
-            <!-- Desktop -->
             <template #item="{ item }">
+                <!-- Desktop -->
+
                 <td :class="item.sandProvider.name ? null : 'empty'">
-                    {{ item.sandProvider.name || 'Sin cliente' }}
+                    {{ item.sandProvider.name || 'Sin definir' }}
                 </td>
-                <td :class="item.sandOrder.amount ? null : 'empty'">
-                    {{ item.sandOrder.amount || 'Sin arena' }}
+
+                <td :class="item.data ? null : 'empty'">
+                    {{ listSandTypes(item.data?.sandOrders) || 'Sin definir' }}
                 </td>
-                <td :class="item.transportProviders ? null : 'empty'">
-                    {{ item.transportProviders ? item.transportProviders.length : 'No hay transporte' }}
+
+                <td :class="item.transportProvider ? null : 'empty'">
+                    {{ item.transportProvider?.name || 'Sin definir' }}
                 </td>
-                <td :class="item.companyRepresentative ? null : 'empty'">
-                    {{ item.transportProviders ? sumTransport(item.transportProviders) : '-' }}
+
+                <td :class="item.data ? null : 'empty'">
+                    {{ item.data?.cantidadCamiones || 'Sin definir' }}
                 </td>
-                <td>ESTADO</td>
-                <tr v-if="filteredTransportProviders && filteredTransportProviders.length <= 0">
-                    <td :colspan="columns.length" class="emptyState">
-                        <p>No hay Notificaciones a Proveedores</p>
+
+                <td class="text-center" :class="item ? null : 'empty'">
+                    <Badge v-if="item.isOperator" text="Completado" classes="bg-gray-500 text-white px-5" />
+                    <Badge v-else text="En proceso" classes="bg-gray-300 text-gray-600" />
+                </td>
+
+                <tr v-if="provNotifDB && provNotifDB.length <= 0">
+                    <td colspan="5" class="emptyState">
+                        <p>No hay notificaciones cargadas</p>
                     </td>
                 </tr>
             </template>
+
             <!-- Mobile -->
             <template #mobileTitle="{ item }">
-                {{ item.sandProvider.name || 'Sin cliente' }}
+                <span class="font-bold">Carga: </span> {{ item.sandProvider.name }}
             </template>
+
             <template #mobileSubtitle="{ item }">
-                <span class="font-bold">Domicilio: </span>{{ item.address }}
+                <span class="font-bold">Transporte: </span>{{ item.transportProvider?.name }}
             </template>
         </VTable>
         <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
             <template #body>
-                <BackdropCard :info="bdInfo" />
+                <NotificationBackDropCard :info="bdInfo" />
             </template>
         </Backdrop>
-        <Modal title="¿Desea inhabilitar este proveedor de transporte?" type="error" :open="showModal">
+        <Modal type="off" :open="showModal" @close="togglemodal">
             <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este proveedor de transporte en ninguna otra sección de la
-                    aplicación
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="ArrowCircleUp" class="h-[60px] w-[60px] rotate-45 mb-5 text-gray-400" />
+                    <span class="text-center text-base border-none text-gray-900"
+                        >¡La notificación está en proceso de envío!
+                    </span>
+                    <span class="text-center text-sm border-none m-2">
+                        En breve lo verás reflejado en la columna “Estado”
+                    </span>
                 </div>
             </template>
             <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <ErrorBtn @click="confirmModal">Inhabilitar proveedor </ErrorBtn>
+                <div class="flex justify-center">
+                    <GhostBtn @click="toggleModal()">Volver </GhostBtn>
                 </div>
             </template>
         </Modal>
     </Layout>
 </template>
 
-<script>
+<script lang="ts">
     import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
     import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
-
-    import BackdropCard from '@/components/transportProvider/BackdropCard.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
+    import { useTitle, useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
-
+    import Badge from '@/components/ui/Badge.vue';
     import axios from 'axios';
-    const api = import.meta.env.VITE_API_URL || '/api';
+
+    import NotificationBackDropCard from '@/components/notifications/NotificationBackDropCard.vue';
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
     const ErrorBtn = defineAsyncComponent(() => import('@/components/ui/buttons/ErrorBtn.vue'));
 
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+
     export default {
         components: {
-            Backdrop,
-            BackdropCard,
-            FieldSelect,
+            Layout,
+            PrimaryBtn,
             GhostBtn,
             Icon,
-            Layout,
+            FieldSelect,
+            Badge,
             Modal,
-            PrimaryBtn,
             VTable,
-            ErrorBtn,
+            Backdrop,
+            NotificationBackDropCard,
+            WarningBtn,
         },
+
         setup() {
             useTitle('Notificaciones a Proveedores <> Sandflow');
-            const tpDB = ref([]);
             const store = useStore();
-            const router = useRouter();
+            const provNotifDB = ref([]);
             const loading = ref(false);
-            const notificationId = ref(-1);
-            const selectedNotification = ref(null);
-            const showModal = ref(false);
+            const sandProviderId = ref(-1);
+
             const showBD = ref(false);
             const bdInfo = ref(null);
             const toggleBD = () => (showBD.value = !showBD.value);
@@ -137,12 +153,12 @@
             });
 
             const columns = [
-                { title: 'Crto. de carga', key: 'name', sortable: true },
-                { title: 'Arena', key: 'legalId', sortable: true },
-                { title: 'Transporte', key: 'companyRepresentative.name', sortable: true },
-                { title: 'Camiones', key: 'companyRepresentative.phone', sortable: true },
-                { title: 'Estado', key: 'companyRepresentative.phone', sortable: true },
-                { title: 'Acciones', key: 'name' },
+                { title: 'Crto. de Carga', key: 'sandProvider.name', sortable: true },
+                { title: 'Arena', key: 'sandProvider.meshType.type', sortable: true },
+                { title: 'Transporte', key: 'transportProvider.name', sortable: true },
+                { title: 'Camiones', key: 'data.cantidadCamiones', sortable: true },
+                { title: 'Estado', key: 'status' },
+                { title: '', key: '' },
             ];
 
             const actions = [
@@ -155,102 +171,115 @@
                     },
                 },
                 {
-                    label: 'Editar',
-                    callback: (item) => {
-                        router.push(`/notificaciones-a-proveedores/${item.id}`);
-                    },
-                },
-                {
-                    label: 'Inhabilitar',
-                    hide: (item) => {
-                        return item.visible;
-                    },
-                    callback: (item) => {
-                        openModalVisibility(item);
-                    },
-                },
-                {
-                    label: 'Habilitar',
-                    hide: (item) => {
-                        return !item.visible;
-                    },
-                    callback: (item) => {
-                        openModalVisibility(item);
+                    label: 'Reenviar',
+                    callback: () => {
+                        toggleModal();
                     },
                 },
             ];
 
-            const filteredTransportProviders = computed(() => {
-                if (notificationId.value > -1) {
-                    return tpDB.value.filter((tp) => tp.id == notificationId.value);
-                }
-
-                return tpDB.value;
-            });
-
-            const clearFilters = () => {
-                notificationId.value = -1;
+            const headers = {
+                'Content-Type': 'Application/JSON',
             };
 
-            const getTP = async () => {
-                const res = await axios.get(`${api}/providerNotification`).catch((err) => {
+            const total = computed(() => {
+                return clientId.value;
+            });
+
+            const filteredNotifications = computed(() => {
+                console.log(provNotifDB.value);
+                console.log(sandProviderId.value);
+
+                if (sandProviderId.value > -1) {
+                    return provNotifDB.value.filter((client) => {
+                        console.log(client);
+
+                        return client.sandProviderId == sandProviderId.value;
+                    });
+                }
+
+                return provNotifDB.value;
+            });
+
+            const getProviderNotifications = async () => {
+                loading.value = true;
+
+                const res = await axios.get(`${apiUrl}/providerNotification`, headers).catch((err) => {
                     console.log(err);
                 });
 
                 if (res.status === 200) {
-                    tpDB.value = res.data.data;
+                    provNotifDB.value = res.data.data;
                 }
 
-                store.dispatch('setTransportProviders', tpDB.value);
+                loading.value = false;
+            };
+
+            const instance = axios.create({
+                baseURL: apiUrl,
+            });
+
+            const sandTypesFromId = ref([]);
+
+            const getSands = async () => {
+                const res = await axios.get(`${apiUrl}/sand`).catch((err) => {
+                    console.log(err);
+                });
+                sandTypesFromId.value = res.data.data;
+            };
+
+            const getSTName = (id) => {
+                const st = sandTypesFromId.value.find((st) => {
+                    return st.id == id;
+                });
+
+                return st ? st.type : '';
+            };
+
+            const listSandTypes = (sandOrders) => {
+                if (!sandOrders || !sandOrders.length) {
+                    return '';
+                }
+                let names = '';
+                sandOrders.forEach((sand) => {
+                    console.log(getSTName(sand.sandTypeId));
+                    names += getSTName(sand.sandTypeId) + ' ';
+                });
+
+                return names;
             };
 
             onMounted(async () => {
-                loading.value = true;
-                await getTP();
-                loading.value = false;
+                await getProviderNotifications();
+                await getSands();
             });
 
-            const openModalVisibility = async (transportProvider) => {
-                selectedNotification.value = transportProvider;
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
 
-                if (transportProvider.visible) {
-                    showModal.value = true;
-
-                    return;
-                }
-                await updateVisibility(selectedNotification.value);
-            };
-
-            const confirmModal = async () => {
-                await updateVisibility(selectedNotification.value);
-                showModal.value = false;
-            };
-
-            const updateVisibility = async (tp) => {
-                const payload = {
-                    ...tp,
-                    visible: !tp.visible,
-                };
-
-                await store.dispatch('updateProviderNotification', payload);
+            const clearFilters = () => {
+                sandProviderId.value = -1;
             };
 
             return {
-                actions,
-                bdInfo,
-                clearFilters,
-                columns,
-                confirmModal,
-                filteredTransportProviders,
+                provNotifDB,
                 loading,
-                notificationId,
-                openModalVisibility,
+                columns,
+                total,
+                actions,
+                clearFilters,
                 pagination,
-                selectedNotification,
-                showBD,
-                showModal,
+                getSands,
+                filteredNotifications,
+                getProviderNotifications,
+                getSTName,
+                listSandTypes,
                 toggleBD,
-                tpDB,
+                showBD,
+                bdInfo,
+                showModal,
+                toggleModal,
             };
         },
     };
@@ -258,77 +287,4 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
-    .outline-none {
-        outline: 0;
-    }
 </style>
-
-<!-- <script>
-    import { ref, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
-    import { useTitle } from '@vueuse/core';
-    import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
-
-    export default {
-        components: {
-            Layout,
-            PencilAltIcon,
-            TrashIcon,
-            PrimaryBtn,
-            UiTable,
-            Icon,
-        },
-        setup() {
-            useTitle('Notificaciones a Proveedores <> Sandflow');
-            const store = useStore();
-            const instance = axios.create({
-                baseURL: apiUrl,
-            });
-
-            const ProviderNotifications = ref([]);
-            const { data: pNData } = useAxios('/providerNotification', instance);
-            watch(pNData, (pNData, prevCount) => {
-                if (pNData && pNData.data) {
-                    ProviderNotifications.value = pNData.data;
-                    ProviderNotifications.value.forEach((pn) => {
-                        store.dispatch('saveProviderNotification', pn);
-                    });
-                }
-            });
-            const sumQty = (sandOrder) => {
-                return sandOrder.reduce((totalSum, sO) => {
-                    return totalSum + sO.amount;
-                }, 0);
-            };
-            const sumTransport = (transportProviders) => {
-                return transportProviders.reduce((totalSum, tP) => {
-                    return totalSum + tP.amount;
-                }, 0);
-            };
-            const deletePN = (id) => {
-                const loading = ref(true);
-                const { data } = useAxios('/providerNotification/' + id, { method: 'DELETE' }, instance);
-                store.dispatch('deleteProviderNotification', id);
-                ProviderNotifications.value = ProviderNotifications.value.filter((pn) => {
-                    return pn.id !== id;
-                });
-                loading.value = false;
-            };
-
-            return {
-                ProviderNotifications,
-                deletePN,
-                sumQty,
-                sumTransport,
-            };
-        },
-    };
-</script> -->
