@@ -31,7 +31,7 @@
                 </td>
 
                 <td :class="item.observations ? null : 'empty'">
-                    {{ item.observations || 'Sin definir' }}
+                    {{ item.observations === '' ? 'Sin observaciones' : `${item.observations.substring(0, 25)}` }}
                 </td>
 
                 <td v-if="false">
@@ -89,7 +89,7 @@
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <BaseBtn class="text-gray-500" @click="showModal = false"> Volver </BaseBtn>
-                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar tipo de arena</ErrorBtn>
+                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar</ErrorBtn>
                 </div>
             </template>
         </Modal>
