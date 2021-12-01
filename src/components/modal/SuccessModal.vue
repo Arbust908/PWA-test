@@ -7,7 +7,7 @@
             <div class="text-center text-xl font-semibold text-gray-900">
                 {{ title }}
             </div>
-            <span v-show="text" class="text-center text-base border-none m-2"> {{ text }} </span>
+            <span class="text-center text-base border-none m-2"> {{ text }} </span>
         </template>
         <template #btn>
             <div class="flex justify-center">

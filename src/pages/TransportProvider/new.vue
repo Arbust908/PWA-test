@@ -122,7 +122,7 @@
             @action="showErrorCuitModal = false"
         />
         <SuccessModal
-            class="xs:w-[480px] xs:h-[260px] py-10"
+            class="xs:w-[480px] xs:h-[260px] py-4"
             :open="showSuccessModal"
             title="¡El proveedor fue guardado con éxito!"
             @close="$router.push('/proveedores-de-transporte')"
