@@ -17,6 +17,9 @@
                 endpoint-key="id"
                 @update:data="selectedDeposit = $event"
             />
+            <div class="col-span-4 mt-7">
+                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
+            </div>
         </div>
         <VTable
             class="mt-5"
@@ -101,6 +104,7 @@
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -124,6 +128,7 @@
             VTable,
             Badge,
             Backdrop,
+            GhostBtn,
         },
         setup() {
             useTitle('Depósitos <> Sandflow');
@@ -131,7 +136,7 @@
             const instance = axios.create({
                 baseURL: apiUrl,
             });
-            const selectedDeposit = ref(null);
+            const selectedDeposit = ref(-1);
             const showModal = ref(false);
             const router = useRouter();
             const showBackdrop = ref(false);
@@ -219,7 +224,6 @@
                     visible: !deposit.visible,
                 };
                 await store.dispatch('updateVisibilityDeposit', payload);
-                selectedDeposit.value = null;
                 await getDeposits();
             };
 
@@ -241,16 +245,16 @@
             };
 
             const filteredDeposits = computed(() => {
-                if (deposits.value == undefined) {
-                    return;
-                }
-
-                if (selectedDeposit.value !== null) {
+                if (selectedDeposit.value > -1) {
                     return deposits.value.filter((singleDeposit) => singleDeposit.id == selectedDeposit.value);
                 }
 
                 return deposits.value;
             });
+
+            const clearFilters = () => {
+                selectedDeposit.value = -1;
+            };
 
             const formatedDeposit = (deposit) => {
                 const dimensions = Object.keys(deposit).reduce(
@@ -294,6 +298,7 @@
                 openModalVisibility,
                 update,
                 formatDeposit,
+                clearFilters,
             };
         },
     };
