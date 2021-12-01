@@ -21,9 +21,6 @@
                 :data="sandId"
                 @update:data="sandId = $event"
             />
-            <div class="col-span-full sm:mt-7 sm:col-span-5">
-                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
-            </div>
         </div>
 
         <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredSands" :actions="actions">
@@ -282,15 +279,10 @@
                 }
             });
 
-            const clearFilters = () => {
-                sandId.value = -1;
-            };
-
             return {
                 stDB,
                 sandId,
                 filteredSands,
-                clearFilters,
                 showModal,
                 openModalVisibility,
                 confirmModal,
