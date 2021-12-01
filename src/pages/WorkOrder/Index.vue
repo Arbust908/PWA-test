@@ -39,7 +39,7 @@
                 </td>
 
                 <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
-                    <Badge v-if="item.crew.length > 0" text="Completo" classes="bg-[#1AA532] text-white" />
+                    <Badge v-if="isCrewFull(item)" text="Completo" classes="bg-[#1AA532] text-white" />
                     <Badge v-else text="Incompleto" classes="bg-[#BE1A3B] text-white" />
                 </td>
 
@@ -58,8 +58,7 @@
             <template #mobileSubtitle="{ item }">
                 <div class="flex items-center mt-1">
                     <Icon
-                        :icon="isTotallyComplete(item) ? 'Check' : 'ExclamationCircle'"
-                        :type="solid"
+                        :icon="isTotallyComplete(item) ? 'CheckCircle' : 'ExclamationCircle'"
                         :class="isTotallyComplete(item) ? 'icon-complete' : 'icon-incomplete'"
                     />
                     <span class="font-bold">ID: </span>{{ item.id }} - <span class="font-bold"> Pozos: </span>
@@ -92,12 +91,12 @@
                 <div><span class="font-bold">ID: </span>{{ selectedWorkOrder.id }}</div>
                 <div><span class="font-bold">Pozos: </span>{{ listPits(selectedWorkOrder.pits) }}</div>
                 <div>
-                    <span class="font-bold">Equipamiento: </span
-                    >{{ isEquipmentFull(selectedWorkOrder) ? 'Completo' : 'Incompleto' }}
+                    <span class="font-bold">Equipamiento: </span>
+                    {{ isEquipmentFull(selectedWorkOrder) ? 'Completo' : 'Incompleto' }}
                 </div>
                 <div>
-                    <span class="font-bold">RRHH: </span
-                    >{{ selectedWorkOrder.crew.length > 0 ? 'Completo' : 'Incompleto' }}
+                    <span class="font-bold">RRHH: </span>
+                    {{ selectedWorkOrder.crew.length > 0 ? 'Completo' : 'Incompleto' }}
                 </div>
             </template>
         </Backdrop>
@@ -108,35 +107,34 @@
     import { ref, computed, watch, defineComponent, onMounted } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
-    import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import axios from 'axios';
-    import Modal from '@/components/modal/General.vue';
-    import VTable from '@/components/ui/table/VTable.vue';
+
     import Backdrop from '@/components/modal/Backdrop.vue';
     import Badge from '@/components/ui/Badge.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
+    import Layout from '@/layouts/Main.vue';
+    import Modal from '@/components/modal/General.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
+    import axios from 'axios';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     import { useTitle } from '@vueuse/core';
-    import { WorkOrder } from '@/interfaces/sandflow';
+    import { WorkOrder, Pit } from '@/interfaces/sandflow';
 
     export default defineComponent({
         components: {
-            Layout,
-            PrimaryBtn,
-            UiTable,
-            Icon,
-            GhostBtn,
-            FieldSelect,
-            Modal,
-            VTable,
-            Badge,
             Backdrop,
+            Badge,
+            FieldSelect,
+            GhostBtn,
+            Icon,
+            Layout,
+            Modal,
+            PrimaryBtn,
+            VTable,
         },
         setup() {
             useTitle('Ordenes de Trabajo <> Sandflow');
@@ -215,7 +213,7 @@
                 await update(selectedWorkOrder.value);
             };
 
-            const update = async (order) => {
+            const update = async (order: WorkOrder) => {
                 const payload = {
                     ...order,
                     visible: !order.visible,
@@ -247,11 +245,7 @@
                 });
             };
 
-            const isTotallyComplete = (item) => {
-                return isEquipmentFull(item) && item.crew.length > 0 ? true : false;
-            };
-
-            const deleteWorkOrder = async (woId) => {
+            const deleteWorkOrder = async (woId: number | string) => {
                 await axios.delete(`${apiUrl}/workOrder/${woId}`).then((res) => {
                     if (res.status == 200) {
                         store.dispatch('deleteWorkOrder', woId);
@@ -274,7 +268,7 @@
                 return workOrders.value;
             });
 
-            const isEquipmentFull = (order) => {
+            const isEquipmentFull = (order: WorkOrder) => {
                 return (
                     parseInt(order.operativeCradle) >= 0 &&
                     parseInt(order.operativeForklift) >= 0 &&
@@ -286,6 +280,25 @@
                     order.tower >= 0 &&
                     order.cabin >= 0
                 );
+            };
+            const isCrewFull = (order: WorkOrder) => {
+                return (
+                    order.crew.length > 0 &&
+                    order.crew.every((crew) => {
+                        return (
+                            crew.title &&
+                            crew.timeStart &&
+                            crew.timeEnd &&
+                            crew.resources?.every((resource) => {
+                                return resource.name && resource.role;
+                            })
+                        );
+                    })
+                );
+            };
+
+            const isTotallyComplete = (item: WorkOrder) => {
+                return isEquipmentFull(item) && isCrewFull(item);
             };
 
             const getWorkOrders = async () => {
@@ -334,6 +347,7 @@
                 filteredWorkOrders,
                 clientId,
                 isEquipmentFull,
+                isCrewFull,
                 isTotallyComplete,
                 openModalVisibility,
                 showModal,
@@ -348,9 +362,9 @@
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
     .icon-complete {
-        @apply h-4 w-4 mr-1 bg-green-600 rounded-full text-white;
+        @apply h-5 w-5 mr-1 bg-transparent rounded-full text-[#1AA532];
     }
     .icon-incomplete {
-        @apply h-4 w-4 mr-1 bg-[#BE1A3B] rounded-full text-white;
+        @apply h-5 w-5 mr-1 bg-transparent rounded-full text-[#BE1A3B];
     }
 </style>
