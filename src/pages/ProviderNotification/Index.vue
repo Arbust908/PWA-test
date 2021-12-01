@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Notificaciones a Proveedore</h2>
+            <h2 class="text-2xl font-semibold text-gray-900">Notificaciones a Proveedores</h2>
             <router-link to="/planificacion-de-arena/nueva">
                 <PrimaryBtn size="sm">
                     <span> Crear </span>
@@ -156,7 +156,7 @@
                 { title: 'Crto. de Carga', key: 'sandProvider.name', sortable: true },
                 { title: 'Arena', key: 'sandProvider.meshType.type', sortable: true },
                 { title: 'Transporte', key: 'transportProvider.name', sortable: true },
-                { title: 'Cant. Camiones', key: 'data.cantidadCamiones', sortable: true },
+                { title: 'Camiones', key: 'data.cantidadCamiones', sortable: true },
                 { title: 'Estado', key: 'status' },
                 { title: 'Acciones', key: '' },
             ];
