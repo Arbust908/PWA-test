@@ -156,7 +156,7 @@
                 { title: 'Crto. de Carga', key: 'sandProvider.name', sortable: true },
                 { title: 'Arena', key: 'sandProvider.meshType.type', sortable: true },
                 { title: 'Transporte', key: 'transportProvider.name', sortable: true },
-                { title: 'Cant. Camiones', key: 'data.cantidadCamiones', sortable: true },
+                { title: 'Camiones', key: 'data.cantidadCamiones', sortable: true },
                 { title: 'Estado', key: 'status' },
                 { title: 'Acciones', key: '' },
             ];
