@@ -17,9 +17,8 @@
             },
         },
         setup(props) {
-            const { icon, type } = props;
-            const name = icon + 'Icon';
-            const compo = type === 'solid' ? SolidIcons : OutlineIcons;
+            const name = props.icon + 'Icon';
+            const compo = props.type === 'solid' ? SolidIcons : OutlineIcons;
 
             return {
                 compo,
