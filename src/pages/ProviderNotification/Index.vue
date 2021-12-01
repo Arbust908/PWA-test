@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Notificaciones a Proveedore</h2>
+            <h2 class="text-2xl font-semibold text-gray-900">Notificaciones a Proveedores</h2>
             <router-link to="/notificaciones-a-proveedores/nueva">
                 <PrimaryBtn size="sm">
                     <span> Crear </span>
