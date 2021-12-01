@@ -18,7 +18,7 @@
                         :selected="activeSection === 'driver'"
                         @click.prevent="changeSection('driver')"
                     >
-                        <span> Transportista </span>
+                        <span> Unidades </span>
                     </button>
                 </nav>
                 <section v-if="activeSection === 'provider'" class="bg-white rounded-md max-w-2xl shadow-sm">
