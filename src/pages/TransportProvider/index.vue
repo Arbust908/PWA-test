@@ -73,7 +73,7 @@
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <GhostBtn btn="!text-gray-500" @click="showModal = false"> Volver </GhostBtn>
                     <ErrorBtn @click="confirmModal">Inhabilitar proveedor </ErrorBtn>
                 </div>
             </template>
