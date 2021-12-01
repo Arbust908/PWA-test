@@ -31,7 +31,7 @@
                 </td>
 
                 <td :class="item.observations ? null : 'empty'">
-                    {{ item.observations === '' ? 'Sin observaciones' : `${item.observations.substring(0, 25)}` }}
+                    {{ item.observations === '' ? 'Sin observaciones' : `${item.observations.substring(0, 25)} ...` }}
                 </td>
 
                 <td v-if="false">
