@@ -64,12 +64,7 @@
                 <BackdropCard :info="bdInfo" />
             </template>
         </Backdrop>
-        <Modal
-            title="¿Desea inhabilitar este proveedor?"
-            type="error"
-            :open="showModal"
-            class="xs:w-[440px] xs:h-[248] px-6"
-        >
+        <Modal title="¿Desea inhabilitar este proveedor?" type="error" :open="showModal" class="xs:w-[440px] px-6">
             <template #body>
                 <div>Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación.</div>
             </template>
