@@ -24,7 +24,7 @@
                 </PrimaryBtn>
             </section>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
+        <Modal type="off" :open="showModal" @close="toggleModal">
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
@@ -39,7 +39,7 @@
                 </div>
             </template>
         </Modal>
-        <Modal type="off" :open="showErrorModal" @close="togglemodal">
+        <Modal type="off" :open="showErrorModal" @close="toggleErrorModal">
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
@@ -55,7 +55,7 @@
                 </div>
             </template>
         </Modal>
-        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
+        <Modal type="off" :open="showApiErrorModal" @close="toggleApiErrorModal">
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
