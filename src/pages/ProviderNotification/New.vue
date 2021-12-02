@@ -229,7 +229,6 @@
                 sandOrders?: Array<SandOrder>;
             }
             const sandProviderIds: Ref<Array<sandProviderId>> = ref([]);
-            console.log('que vale aca', sandProviderIds.value);
 
             const sandOrder: Ref<Array<SandOrder>> = ref([]);
             const fillSandType = (soId) => {
@@ -384,9 +383,8 @@
             };
 
             const createNew = () => {
-                // console.log(sandProviderIds.value)
-                // isNotificationConfirmed.value = false;
-                // apiRequest.value = false;
+                isNotificationConfirmed.value = false;
+                apiRequest.value = false;
                 transportOrder.value = [];
                 transportOrder.value[0] = defaultTransportProvider;
                 sandProviderIds.value = [];
