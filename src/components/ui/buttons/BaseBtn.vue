@@ -18,8 +18,8 @@
                 default: 'md',
             },
             disabled: {
-                type: String,
-                default: '',
+                type: [String, Boolean],
+                default: false,
             },
             btn: {
                 type: String,

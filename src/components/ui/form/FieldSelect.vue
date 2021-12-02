@@ -40,6 +40,7 @@
         },
         props: {
             data: {
+                type: [Array, Object, Boolean, String, Number],
                 default: '',
             },
             fieldName: {
@@ -95,7 +96,6 @@
             },
         },
         setup(props, { emit }) {
-            const { filteredData } = toRefs(props);
             const value = useVModel(props, 'data', emit);
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
@@ -112,14 +112,12 @@
 
             if (props.endpoint !== '/' && props.endpoint !== null && !props.filteredData) {
                 resources = getApiVal();
-                console.log(resources.value);
             }
 
             watchEffect(() => {
                 if (props.filteredData && props.filteredData.length > 0) {
                     resources.value = filteredData.value;
                 }
-                console.log(resources.value);
             });
 
             const noOptionSelected = computed(() => value.value === -1);
@@ -128,7 +126,6 @@
                 value,
                 resources,
                 epData,
-                filteredData,
                 ...props,
                 noOptionSelected,
             };

@@ -44,7 +44,7 @@
             },
             category: {
                 type: String,
-                required: true,
+                default: '',
             },
             choosedBox: {
                 type: Object,

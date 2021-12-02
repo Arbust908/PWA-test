@@ -23,6 +23,10 @@
                 type: String,
                 default: 'secondary',
             },
+            disabled: {
+                type: [String, Boolean],
+                default: false,
+            },
         },
     };
 </script>
