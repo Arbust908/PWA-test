@@ -114,7 +114,7 @@
         </section>
 
         <ErrorModal
-            class="xs:w-[480px] xs:h-[248] !py-3"
+            class="xs:w-[480px] xs:h-[248]"
             :open="showErrorCuitModal"
             title="Ya existe un cliente con este CUIT"
             text="El cliente que intentas guardar fue creado anteriormente"
@@ -122,7 +122,7 @@
             @action="showErrorCuitModal = false"
         />
         <SuccessModal
-            class="xs:w-[480px] xs:h-[260px] py-4"
+            class="xs:w-[480px] xs:h-[260px]"
             :open="showSuccessModal"
             title="¡El proveedor fue guardado con éxito!"
             @close="$router.push('/proveedores-de-transporte')"
