@@ -90,7 +90,7 @@
             </template>
             <template #btn>
                 <div class="flex justify-center">
-                    <GhostBtn @click="toggleModal()">Volver </GhostBtn>
+                    <BaseBtn class="text-gray-500 cursor-pointer" @click="toggleModal()">Volver </BaseBtn>
                 </div>
             </template>
         </Modal>
@@ -116,6 +116,7 @@
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
     const ErrorBtn = defineAsyncComponent(() => import('@/components/ui/buttons/ErrorBtn.vue'));
+    const BaseBtn = defineAsyncComponent(() => import('@/components/ui/buttons/BaseBtn.vue'));
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
