@@ -233,15 +233,66 @@
         </section>
         <footer class="mt-[32px] space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull" @click.prevent="isFull ? save() : toggleErrorModal()">
                 Guardar
             </PrimaryBtn>
         </footer>
+        <Modal type="off" :open="showModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
+                    <span class="text-center text-base border-none text-gray-900"
+                        >La planificación de arenas ha sido guardada con éxito</span
+                    >
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <PrimaryBtn @click.prevent="$router.push('/planificacion-de-arena')">Continuar</PrimaryBtn>
+                </div>
+            </template>
+        </Modal>
+        <Modal type="off" :open="showErrorModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
+                    <span class="text-center text-base border-none text-gray-900">
+                        Hubo un problema al intentar guardar.
+                    </span>
+                    <span class="text-center text-sm border-none m-2">
+                        Por favor, verifica los datos ingresados e intenta nuevamente
+                    </span>
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center cursor-pointer">
+                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
+                </div>
+            </template>
+        </Modal>
+        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
+            <template #body>
+                <div class="text-center flex flex-col justify-center items-center">
+                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
+                    <span class="text-center text-base border-none text-gray-900">
+                        ¡Ups! Hubo un problema y no pudimos guardar la planificación.
+                    </span>
+                    <span class="text-center text-sm border-none m-2">
+                        Por favor, intentá nuevamente en unos minutos.
+                    </span>
+                </div>
+            </template>
+            <template #btn>
+                <div class="flex justify-center">
+                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
+                </div>
+            </template>
+        </Modal>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch, watchEffect } from 'vue';
+    import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch, watchEffect, defineAsyncComponent } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useActions } from 'vuex-composition-helpers';
@@ -265,6 +316,7 @@
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     export default {
         components: {
@@ -280,6 +332,7 @@
             FieldGroup,
             ClientPitCombo,
             ResposiveTableSandPlan,
+            Modal,
         },
         setup() {
             useTitle('Nueva Planificación de arenas <> Sandflow');
@@ -399,6 +452,7 @@
 
                 return currentSandPlan.pitId >= 0 ? pits.value.find((pit) => pit.id == currentSandPlan.pitId).name : '';
             });
+
             // << PITS
             // :: SAND
             const sands = ref([] as Array<Pit>);
@@ -408,8 +462,8 @@
                     sands.value = sandApi.data;
                 }
             });
-            // << SAND
 
+            // << SAND
             const isFull = computed(() => {
                 const noZeroSandTypeNull =
                     (currentSandPlan.stages[0].sandId1 !== null && currentSandPlan.stages[0].sandId1 !== -1) ||
@@ -429,7 +483,19 @@
                     noZeroSandTypeZero
                 );
             });
+
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
+
             const { saveSandPlan } = useActions(['saveSandPlan']);
+
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
                     if (stage.sandId1 === -1) {
@@ -446,6 +512,7 @@
 
                     return stage;
                 });
+
                 currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
                     const noSandTypeNull =
                         (stage.sandId1 !== null && stage.quantity1 > 0) ||
@@ -482,7 +549,7 @@
                         });
 
                         saveSandPlan({ ...currentSandPlan });
-                        router.push('/planificacion-de-arena');
+                        toggleModal();
                     }
                 });
             };
@@ -508,6 +575,12 @@
                 isFull,
                 addStage,
                 windowWidth,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
             };
         },
     };

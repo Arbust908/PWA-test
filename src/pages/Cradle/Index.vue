@@ -69,7 +69,7 @@
 
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
-                <span class="!text-lg !text-black">Cradle</span> <br />
+                <span class="!text-lg !text-black">{{ selectedCradle.name }}</span> <br />
                 <span v-if="selectedCradle.observations">
                     Observaciones: {{ selectedCradle.observations || ' - ' }}
                 </span>

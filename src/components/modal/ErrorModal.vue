@@ -1,11 +1,10 @@
 <template>
-    <Modal type="off" :open="open" @close="$emit('close')">
+    <Modal v-bind="$attrs" type="off" :open="open" @close="$emit('close')">
         <template #body>
             <div class="text-center flex flex-col justify-center items-center">
                 <Icon icon="ExclamationCircle" class="h-14 w-14 mb-4 text-red-700" />
             </div>
-            <div class="text-center text-xl font-semibold mb-2 mx-10 text-gray-900">{{ title }}</div>
-            <br />
+            <div class="text-center text-xl font-semibold mb-2 mx-5 text-gray-900">{{ title }}</div>
             <span class="text-center text-base border-none m-2"> {{ text }} </span>
         </template>
         <template #btn>
@@ -27,6 +26,7 @@
             Icon,
             PrimaryBtn,
         },
+        inheritAttrs: false,
         props: {
             title: {
                 type: String,
@@ -41,3 +41,9 @@
         emits: ['close', 'action'],
     };
 </script>
+
+<style lang="scss" scoped>
+    .modal {
+        @apply bg-green-600;
+    }
+</style>

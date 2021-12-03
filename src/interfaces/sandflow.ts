@@ -93,6 +93,7 @@ export interface WorkOrder {
     tower: number;
     cabin: number;
     draft?: boolean;
+    visible?: boolean;
 }
 
 export interface CompanyRepresentative {

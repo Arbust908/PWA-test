@@ -20,11 +20,7 @@
                         </tbody>
                         <tbody v-else>
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
-                                <tr
-                                    class="body-row"
-                                    :class="index % 2 === 0 ? 'even' : 'odd'"
-                                    :disabled="!item.visible"
-                                >
+                                <tr class="body-row" :class="index % 2 === 0 ? 'odd' : 'odd'" :disabled="!item.visible">
                                     <slot name="item" :item="item" />
                                     <td v-if="desktopActions" class="p-0">
                                         <DropdownBtn :actions="desktopActions" :item="item">

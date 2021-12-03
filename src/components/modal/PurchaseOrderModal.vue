@@ -42,11 +42,11 @@
                             shadow-xl
                             transform
                             transition-all
-                            w-full
+                            w-[315px]
+                            sm:w-[440px]
                             my-8
                             align-middle
-                            max-w-xl
-                            py-5
+                            p-6
                         "
                         v-bind="$attrs"
                     >
@@ -110,11 +110,11 @@
                             >
                                 <QuestionMarkCircleIcon class="h-6 w-6 text-second-600" aria-hidden="true" />
                             </div>
-                            <div class="mt-3 text-center sm:mt-5">
+                            <div class="text-center">
                                 <DialogTitle as="h3" class="text-lg leading-6 font-medium text-second-900">
                                     {{ title }}
                                 </DialogTitle>
-                                <div class="mt-2 text-sm text-second-500">
+                                <div class="text-sm text-second-500">
                                     <slot name="body"></slot>
                                 </div>
                             </div>

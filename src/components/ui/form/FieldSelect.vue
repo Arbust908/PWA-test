@@ -13,7 +13,7 @@
             :disabled="isDisabled"
             @blur="$emit('is-blured')"
         >
-            <option value="-1">
+            <option selected value="-1">
                 {{ placeholder }}
             </option>
             <option v-for="(res, i) in resources" :key="res?.id + i" :value="res?.id">
@@ -30,6 +30,7 @@
     import { defineComponent, computed, ref, toRefs, watchEffect } from 'vue';
     import { useVModel } from '@vueuse/core';
     import { useApi } from '@/helpers/useApi';
+    import { addVisibleFilter } from '@/helpers/useUrlHelpers';
     import FieldTitle from '@/components/ui/form/FieldTitle.vue';
 
     export default defineComponent({
@@ -72,6 +73,7 @@
             filteredData: {
                 type: Array,
                 required: false,
+                default: null,
             },
             requireValidation: {
                 type: Boolean,
@@ -80,10 +82,12 @@
             validationType: {
                 type: String,
                 required: false,
+                default: null,
             },
             entity: {
                 type: String,
                 required: false,
+                default: null,
             },
             isDisabled: {
                 type: Boolean,
@@ -99,7 +103,8 @@
             const value = useVModel(props, 'data', emit);
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
-                const { read } = useApi(props.endpoint + (props.onlyVisible ? '?visible=1' : ''));
+                const endpoint = addVisibleFilter(props.endpoint);
+                const { read } = useApi(endpoint);
 
                 return read();
             };
@@ -111,12 +116,14 @@
 
             if (props.endpoint !== '/' && props.endpoint !== null && !props.filteredData) {
                 resources = getApiVal();
+                console.log(resources.value);
             }
 
             watchEffect(() => {
                 if (props.filteredData && props.filteredData.length > 0) {
                     resources.value = filteredData.value;
                 }
+                console.log(resources.value);
             });
 
             const noOptionSelected = computed(() => value.value === -1);
