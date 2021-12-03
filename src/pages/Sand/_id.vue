@@ -25,9 +25,9 @@
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡El tipo de arena fue guardado con éxito!</span
-                    >
+                    <span class="text-center text-base border-none text-gray-900">
+                        ¡El tipo de arena fue guardado con éxito!
+                    </span>
                 </div>
             </template>
             <template #btn>
