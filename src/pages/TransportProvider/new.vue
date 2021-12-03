@@ -75,7 +75,8 @@
                         @edit-driver="editDriver(index)"
                     />
                 </section>
-                <footer class="mt-[32px] gap-3 flex flex-col justify-end max-w-2xl">
+                <!-- *** -->
+                <footer class="mt-8 gap-3 flex flex-col justify-end max-w-2xl">
                     <SideBtn v-if="drivers.length" class="md:hidden" btn="full" @click="driversShown = !driversShown">
                         {{ showDrivers ? driverTabText : 'Volver' }}
                     </SideBtn>
