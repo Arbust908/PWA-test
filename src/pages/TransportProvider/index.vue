@@ -20,9 +20,6 @@
                 :data="transportProviderId"
                 @update:data="transportProviderId = $event"
             />
-            <div class="col-span-4 mt-7">
-                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
-            </div>
         </div>
         <VTable
             class="mt-5"
