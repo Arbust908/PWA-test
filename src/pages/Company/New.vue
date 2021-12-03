@@ -210,7 +210,7 @@
                         watch(Cdata, (newVal, _) => {
                             if (newVal && newVal.data) {
                                 store.dispatch('saveClient', newClient.value);
-                                router.push('/clientes');
+                                showSuccessModal.value = true;
                             }
                         });
                     }

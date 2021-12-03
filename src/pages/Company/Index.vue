@@ -67,9 +67,16 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
+        <Modal
+            title="¿Desea inhabilitar este cliente?"
+            type="error"
+            :open="showModal"
+            class="sm:w-[440px] sm:h-[248] !py-8"
+        >
             <template #body>
-                <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
+                <div class="m-4">
+                    Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación
+                </div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
