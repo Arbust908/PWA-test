@@ -79,13 +79,17 @@
             </template>
         </Modal>
 
-        <Modal title="¿Desea inhabilitar este centro de carga de arena?" type="error" :open="showModal">
+        <Modal
+            title="¿Desea inhabilitar este centro de carga de arena?"
+            modal-classes="max-w-[480px]"
+            type="error"
+            :open="showModal"
+        >
             <template #body>
                 <div>
                     Una vez inhabilitado, no podrá utilizar este centro de carga de arena en ninguna otra sección de la
                     aplicación
                 </div>
-                <div></div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
@@ -123,10 +127,6 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';

@@ -36,16 +36,7 @@
                             <div class="mx-2 flex items-center">
                                 <span> {{ box.category }} - {{ box.amount }}t - </span>
                                 <div
-                                    class="
-                                        mx-2
-                                        w-48
-                                        flex
-                                        justify-between
-                                        text-center
-                                        border-2
-                                        rounded-md
-                                        border-warmGray-300
-                                    "
+                                    class="mx-2 w-48 flex justify-between text-center border-2 rounded-md border-warmGray-300"
                                 >
                                     <span class="px-2 w-1/2 bg-gray-200 border-r-2 border-gray-400">ID Caja</span>
                                     <input
@@ -69,16 +60,7 @@
                             <div class="mx-2 flex items-center">
                                 <span> {{ box.category }} - {{ box.amount }}t - </span>
                                 <div
-                                    class="
-                                        mx-2
-                                        w-48
-                                        flex
-                                        justify-between
-                                        text-center
-                                        border-2
-                                        rounded-md
-                                        border-warmGray-300
-                                    "
+                                    class="mx-2 w-48 flex justify-between text-center border-2 rounded-md border-warmGray-300"
                                 >
                                     <span class="px-2 w-1/2 bg-gray-200 border-r-2 border-gray-400">ID Caja</span>
                                     <input
@@ -176,19 +158,7 @@
                     </div>
                     <div
                         v-else
-                        class="
-                            w-full
-                            max-w-sm
-                            border border-dashed border-
-                            rounded-xl
-                            p-5
-                            my-3
-                            mx-auto
-                            flex
-                            items-center
-                            justify-center
-                            flex-col
-                        "
+                        class="w-full max-w-sm border border-dashed border- rounded-xl p-5 my-3 mx-auto flex items-center justify-center flex-col"
                         @click.prevent="$router.push('/diseno-de-deposito')"
                     >
                         Necesitás diseñar un depósito para continuar
@@ -202,7 +172,7 @@
                 </div>
             </form>
         </section>
-        <footer class="mt-[32px] space-x-3 flex justify-end items-center">
+        <footer class="space-x-3 flex justify-end items-center mt-8">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
             <PrimaryBtn btn="wide" @click.prevent="save()"> Guardar </PrimaryBtn>
         </footer>
