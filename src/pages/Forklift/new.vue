@@ -13,7 +13,8 @@
                 </template>
             </Modal> -->
         </section>
-        <footer class="mt-[32px] gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
             <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="goToIndex">Cancelar</SecondaryBtn>
                 <PrimaryBtn
@@ -40,22 +41,13 @@
                 </div>
             </template>
         </Modal>
-        <Modal type="off" :open="showErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
-                    <span class="text-center text-base border-none text-gray-900"> Ya existe este forklift </span>
-                    <span class="text-center text-sm border-none m-2">
-                        El forklift que intentas guardar fue creado anteriormente.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
+        <ErrorModal
+            :open="showErrorModal"
+            title="Ya existe este forklift"
+            text="El forklift que intentas guardar fue creado anteriormente."
+            @close="showErrorModal = false"
+            @action="showErrorModal = false"
+        />
         <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
@@ -93,6 +85,7 @@
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
 
     export default {
         components: {
@@ -103,6 +96,7 @@
             Modal,
             Icon,
             WarningBtn,
+            ErrorModal,
         },
         setup() {
             useTitle('Nuevo Forklift <> Sandflow');

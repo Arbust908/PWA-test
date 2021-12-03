@@ -37,6 +37,9 @@ module.exports = {
                     900: 'var(--second-900)',
                 },
             },
+            screens: {
+                xs: '480px',
+            },
         },
     },
     variants: {

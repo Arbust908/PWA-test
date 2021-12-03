@@ -1,9 +1,7 @@
 <template>
-    <div>
-        <BaseBtn :btn="`main ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
-            <slot></slot>
-        </BaseBtn>
-    </div>
+    <BaseBtn :btn="`main ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
+        <slot></slot>
+    </BaseBtn>
 </template>
 
 <script>
@@ -26,8 +24,8 @@
                 default: 'main',
             },
             disabled: {
-                type: String,
-                default: '',
+                type: [String, Boolean],
+                default: false,
             },
             isLoading: {
                 type: Boolean,

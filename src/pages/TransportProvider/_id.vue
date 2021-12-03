@@ -49,29 +49,58 @@
                             :driver-email="newDriver.email"
                             :driver-t-type="newDriver.vehicleType"
                             :driver-t-id="newDriver.transportId"
+                            :driver-t-id2="newDriver.transportProviderId2"
                             :driver-obs="newDriver.observations"
                             @update:driverName="newDriver.name = $event"
                             @update:driverPhone="newDriver.phone = $event"
                             @update:driverEmail="newDriver.email = $event"
                             @update:driverTType="newDriver.vehicleType = $event"
                             @update:driverTId="newDriver.transportId = $event"
+                            @update:driverTId2="newDriver.transportProviderId2 = $event"
                             @update:driverObs="newDriver.observations = $event"
                             @add-driver="addDriver()"
                         />
                     </form>
                 </section>
-                <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
-                    <section class="w-full space-x-3 flex items-center justify-end">
+                <section v-if="showDrivers" class="w-full md:w-4/12 mt-12 flex flex-col gap-y-4 md:hidden">
+                    <DriverCard
+                        v-for="(driver, index) in drivers"
+                        :key="index"
+                        :name="driver.name"
+                        :phone="driver.phone"
+                        :email="driver.email"
+                        :vehicle-type="driver.vehicleType"
+                        :transport-id="driver.transportId"
+                        :transport-id2="driver.transportProviderId2"
+                        :observations="driver.observations"
+                        @delete-driver="deleteDriver(index)"
+                        @edit-driver="editDriver(index)"
+                    />
+                </section>
+                <!-- *** -->
+                <footer class="mt-8 gap-3 flex flex-col justify-end max-w-2xl">
+                    <SideBtn v-if="drivers.length" class="md:hidden" btn="full" @click="driversShown = !driversShown">
+                        {{ showDrivers ? driverTabText : 'Volver' }}
+                    </SideBtn>
+                    <section v-if="!showDrivers" class="w-full space-x-3 flex items-center justify-end">
                         <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
                             Cancelar
                         </SecondaryBtn>
-                        <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click="isFull && update()">
+                        <PrimaryBtn
+                            btn="wide"
+                            :disabled="!isFull ? 'yes' : null"
+                            :is-loading="isLoading"
+                            @click="
+                                hasFullNewDriver && addDriver();
+                                isFull && update();
+                            "
+                        >
                             Finalizar
                         </PrimaryBtn>
                     </section>
                 </footer>
             </section>
-            <section class="w-4/12 mt-12 ml-4 flex flex-col gap-y-4">
+            <section class="hidden w-full md:w-4/12 mt-12 ml-4 md:flex flex-col gap-y-4">
                 <DriverCard
                     v-for="(driver, index) in drivers"
                     :key="index"
@@ -80,6 +109,7 @@
                     :email="driver.email"
                     :vehicle-type="driver.vehicleType"
                     :transport-id="driver.transportId"
+                    :transport-id2="driver.transportProviderId2"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
@@ -136,17 +166,21 @@
             const currentTransportProvider: TransportProvider = transportProviders.find((sp) => {
                 return sp.id == id;
             });
-            console.log('ctp', currentTransportProvider);
 
             let activeSection = ref('provider');
 
             const changeSection = (option: string) => {
-                return (activeSection.value = option);
+                activeSection.value = option;
             };
 
-            console.log(currentTransportProvider.drivers);
+            const driversShown = ref(false);
+            const showDrivers = computed(() => {
+                const windowWidth = window.innerWidth;
+
+                return driversShown.value && windowWidth > 768;
+            });
+
             const drivers: Array<Driver> = reactive(currentTransportProvider.drivers);
-            console.log(drivers);
 
             let newDriver = reactive({
                 name: '',
@@ -154,6 +188,8 @@
                 email: '',
                 vehicleType: '',
                 transportId: '',
+                // transportId2: '',
+                transportProviderId2: '',
                 observations: '',
             });
 
@@ -203,6 +239,8 @@
                 newDriver.email = driver.email;
                 newDriver.vehicleType = driver.vehicleType;
                 newDriver.transportId = driver.transportId;
+                // newDriver.transportId2 = driver.transportId2;
+                newDriver.transportProviderId2 = driver.transportProviderId2;
                 newDriver.observations = driver.observations;
             };
 
@@ -212,6 +250,8 @@
                 newDriver.email = '';
                 newDriver.vehicleType = '';
                 newDriver.transportId = '';
+                // newDriver.transportId2 = '';
+                newDriver.transportProviderId2 = '';
                 newDriver.observations = '';
             };
 
@@ -222,7 +262,9 @@
                 observations: currentTransportProvider.observations,
                 companyRepresentativeId: currentTransportProvider.companyRepresentativeId,
             });
-            console.log(newTransportProvider.legalId);
+            const driverTabText = computed(() => {
+                return `Transportista${drivers.length > 1 ? `s (${drivers.length})` : ''}`;
+            });
 
             const companyRepresentative: CompanyRepresentative = reactive({
                 name: currentTransportProvider.companyRepresentative.name,
@@ -244,7 +286,9 @@
                     newDriver.phone !== '0' &&
                     newDriver.email !== '' &&
                     newDriver.vehicleType !== '' &&
-                    newDriver.transportId !== ''
+                    newDriver.transportId !== '' &&
+                    // newDriver.transportId2 !== '' &&
+                    newDriver.transportProviderId2 !== ''
                 );
             });
 
@@ -259,8 +303,11 @@
             const isFull: ComputedRef<boolean> = computed(() => {
                 return transportProviderFull.value && repFull.value;
             });
-
+            const isLoading = ref(false);
             const update = async () => {
+                isLoading.value = true;
+                changeSection('provider');
+
                 if (hasFullNewDriver.value) {
                     addDriver();
                 }
@@ -291,6 +338,7 @@
                     }
                 });
                 setTimeout(() => {
+                    isLoading.value = false;
                     router.push('/proveedores-de-transporte');
                 }, 1000);
             };
@@ -311,6 +359,10 @@
                 id,
                 currentTransportProvider,
                 update,
+                driverTabText,
+                showDrivers,
+                driversShown,
+                isLoading,
             };
         },
     };

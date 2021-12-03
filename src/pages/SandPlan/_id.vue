@@ -204,7 +204,8 @@
             </form>
         </section>
 
-        <footer class="mt-[32px] space-x-3 flex justify-end">
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')">Cancelar</SecondaryBtn>
             <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                 Guardar
@@ -308,26 +309,20 @@
                         formatedStages.sort((a, b) => {
                             return a.stage - b.stage;
                         });
-
-                        console.log('stages', sp.stages);
                         currentSandPlan.stages = formatedStages;
-                        console.log('formatedStages', formatedStages);
                         buckupStages.value = sp.stages;
                     }
                 });
             } else {
                 const sp = { ...currentSandPlan, ...vuexSP };
-                // console.log('VUEX', sp);
                 currentSandPlan.companyId = sp.companyId;
                 currentSandPlan.pitId = sp.pitId;
                 currentSandPlan.stagesAmount = sp.stagesAmount;
                 currentSandPlan.stages = sp.stages;
                 currentSandPlan.id = sp.id;
-                console.log('SP Vuex', currentSandPlan);
             }
 
             const addStage = () => {
-                console.log('DEFAULT', defaultStage);
                 duplicateStage(defaultStage);
             };
 
@@ -352,16 +347,17 @@
                 const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
                 // SOLUCION TEMPORAL PARA DUPLICADO DE INNER ID
                 const lastStageId = { innerId: Number(lastStage.innerId) + 100000 || 0 };
+                const id = { id: null };
                 const lastStageStage = { stage: lastStage.stage + 1 };
                 const newStatus = { status: 0 };
-                console.log(lastStage, lastStageId, lastStageStage, newStatus);
                 const newStage = {
                     ...stage,
                     ...lastStageId,
                     ...lastStageStage,
                     ...newStatus,
+                    ...id,
                 };
-                console.log('NEWSTAGE', newStage);
+                console.log(newStage);
                 currentSandPlan.stages.push(newStage);
                 editStage(newStage);
             };
@@ -369,13 +365,10 @@
             const deleteStage = (stage) => {
                 const stageId = stage.innerId;
                 const isDB = stage.id ?? false;
-                console.log(isDB);
-                console.log(stageId, isDB);
                 currentSandPlan.stages = currentSandPlan.stages.filter((s) => s.innerId !== stageId);
 
                 if (isDB) {
                     stagesToDelete.value.push(stageId);
-                    console.log(stagesToDelete.value);
                 }
             };
             const upgrade = (stage) => {
@@ -410,8 +403,6 @@
                 }
             });
             const selectedPitName = computed(() => {
-                console.log('computed-pitId', currentSandPlan.pitId);
-
                 return Number(currentSandPlan.pitId) >= 0
                     ? pits.value.find((pit) => pit.id == currentSandPlan.pitId)?.name || 'Pit'
                     : '';
@@ -457,22 +448,24 @@
                 });
 
                 currentSandPlan.stages.forEach((stage) => {
-                    const { data } = useAxios(
-                        '/sandStage/' + stage.id,
-                        {
-                            method: 'PUT',
-                            data: {
-                                stage: stage.stage,
-                                sandId1: stage.sandId1,
-                                sandId2: stage.sandId2,
-                                sandId3: stage.sandId3,
-                                quantity1: stage.quantity1,
-                                quantity2: stage.quantity2,
-                                quantity3: stage.quantity3,
+                    if (stage.id) {
+                        const { data } = useAxios(
+                            '/sandStage/' + stage.id,
+                            {
+                                method: 'PUT',
+                                data: {
+                                    stage: stage.stage,
+                                    sandId1: stage.sandId1,
+                                    sandId2: stage.sandId2,
+                                    sandId3: stage.sandId3,
+                                    quantity1: stage.quantity1,
+                                    quantity2: stage.quantity2,
+                                    quantity3: stage.quantity3,
+                                },
                             },
-                        },
-                        instance
-                    );
+                            instance
+                        );
+                    }
                 });
 
                 const { data } = useAxios(
@@ -493,7 +486,6 @@
                     if (apiData && apiData.data) {
                         const sandPlanId = apiData.data.id;
                         currentSandPlan.id = sandPlanId;
-                        console.log('toDeltete', stagesToDelete.value);
                         const deletingStages = stagesToDelete.value;
                         deletingStages.map((id) => {
                             const { data } = useAxios('/sandStage/' + id, { method: 'DELETE' }, instance);
@@ -503,7 +495,6 @@
                             const { ...sandStage } = stage;
                             sandStage.sandPlanId = sandPlanId;
 
-                            // console.log('Sand Stage', sandStage);
                             if (sandStage.action === 'create') {
                                 sandStage.action = 'update';
                                 const { data } = useAxios(
@@ -524,7 +515,6 @@
                                 }
                             }
                         });
-                        console.log(currentSandPlan);
                         updateSandPlan(currentSandPlan);
                         router.push('/planificacion-de-arena');
                     }

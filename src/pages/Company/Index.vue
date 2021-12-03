@@ -25,7 +25,13 @@
             </div>
         </div>
 
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredClients" :actions="actions">
+        <VTable
+            class="mt-5"
+            :columns="columns"
+            :items="filteredClients"
+            :actions="actions"
+            empty-text="No hay clientes cargados"
+        >
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item.name ? null : 'empty'">
@@ -48,36 +54,6 @@
                     <Badge v-if="item.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
                     <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
                 </td>
-
-                <td v-if="false">
-                    <div class="btn-panel">
-                        <router-link :to="`/clientes/${item.id}`">
-                            <Popper hover content="Editar">
-                                <CircularBtn size="xs" class="btn__delete bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                </CircularBtn>
-                            </Popper>
-                        </router-link>
-
-                        <Popper hover :content="item.visible ? 'Inhabilitar' : 'Habilitar'">
-                            <CircularBtn
-                                class="ml-4"
-                                :class="item.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                size="xs"
-                                @click="openModalVisibility(item)"
-                            >
-                                <Icon v-if="item.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                                <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-                        </Popper>
-                    </div>
-                </td>
-
-                <tr v-if="clDB && clDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay clientes cargados</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
@@ -90,17 +66,40 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
+        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal" class="sm:w-[440px] !py-8">
             <template #body>
-                <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
+                <div class="m-4">
+                    Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación
+                </div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
+                    <GhostBtn btn="!text-gray-500" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="!px-10 !bg-red-700" @click="confirmModal">Inhabilitar </PrimaryBtn>
                 </div>
             </template>
         </Modal>
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
+            <template #body>
+                <p class="!text-lg !text-black">{{ selectedClient.name }}</p>
+                <p class="mt-2">
+                    <strong>CUIT: </strong>
+                    {{ selectedClient.legalId }}
+                </p>
+                <p class="mt-2">
+                    <strong>Representante: </strong>
+                    {{ selectedClient.companyRepresentative?.name }}
+                </p>
+                <p class="mt-2">
+                    <strong>Teléfono: </strong>
+                    {{ selectedClient.companyRepresentative?.phone }}
+                </p>
+                <p class="mt-2">
+                    <strong>Operadora: </strong>
+                    {{ selectedClient.isOperator ? 'SI' : 'NO' }}
+                </p>
+            </template>
+        </Backdrop>
     </Layout>
 </template>
 
@@ -108,34 +107,30 @@
     import { onMounted, ref, computed } from 'vue';
     import { useTitle } from '@vueuse/core';
     import { useRouter } from 'vue-router';
-
+    import { useStore } from 'vuex';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
-    import Popper from 'vue3-popper';
-
-    import { useStore } from 'vuex';
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    import Backdrop from '@/components/modal/Backdrop.vue';
 
     export default {
         components: {
             Layout,
             PrimaryBtn,
-            CircularBtn,
             GhostBtn,
             Icon,
             FieldSelect,
             Badge,
             Modal,
-            Popper,
             VTable,
+            Backdrop,
         },
         setup() {
             useTitle('Clientes <> Sandflow');
@@ -146,13 +141,7 @@
             const selectedClient = ref(null);
             const showModal = ref(false);
             const router = useRouter();
-
-            const pagination = ref({
-                sortKey: 'id',
-                sortDir: 'asc',
-                // currentPage: 1,
-                // perPage: 10,
-            });
+            const showBackdrop = ref(false);
 
             const columns = [
                 { title: 'Cliente', key: 'name', sortable: true },
@@ -166,8 +155,10 @@
             const actions = [
                 {
                     label: 'Ver más',
-                    callback: () => {
-                        console.log('Ver más');
+                    onlyMobile: true,
+                    callback: (item) => {
+                        selectedClient.value = item;
+                        showBackdrop.value = true;
                     },
                 },
                 {
@@ -272,8 +263,9 @@
                 confirmModal,
                 showModal,
                 columns,
-                pagination,
                 actions,
+                showBackdrop,
+                selectedClient,
             };
         },
     };

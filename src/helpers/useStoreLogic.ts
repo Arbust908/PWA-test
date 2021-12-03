@@ -3,8 +3,15 @@ declare global {
         capitalize(): string;
     }
 }
+export enum StoreLogicMethods {
+    CREATE = 'create',
+    GET = 'get',
+    GET_ALL = 'getAll',
+    DELETE = 'delete',
+    UPDATE = 'update',
+}
 
-export async function useStoreLogic(router: any, store: any, entity: string, method: string, payload?: any) {
+export async function useStoreLogic(router: any, store: any, entity: string, method: StoreLogicMethods, payload?: any) {
     return await store.dispatch(`${entity}DataHandler`, { method, payload }).then((res: any) => {
         String.prototype.capitalize = function () {
             return this.charAt(0).toUpperCase() + this.slice(1);
@@ -23,20 +30,20 @@ export async function useStoreLogic(router: any, store: any, entity: string, met
         //     }
         // };
 
-        if (res && method == 'create') {
+        if (res && method === StoreLogicMethods.CREATE) {
             // redirectHandler(res.status);
 
             return { type: 'success', res };
         }
 
-        if (!res.createdAt && method == 'create') {
+        if (!res.createdAt && method === StoreLogicMethods.CREATE) {
             const message = store.getters[`${entity}Message`](method);
             // redirectHandler(res.status);
 
             return { type: 'failed', message };
         }
 
-        if (method == 'get' || method == 'getAll') {
+        if (method === StoreLogicMethods.GET || method === StoreLogicMethods.GET_ALL) {
             if (res.status !== 'failed') {
                 // redirectHandler(res.status);
 
@@ -49,7 +56,7 @@ export async function useStoreLogic(router: any, store: any, entity: string, met
             }
         }
 
-        if (method == 'delete') {
+        if (method === StoreLogicMethods.DELETE) {
             if (res.status !== 'failed') {
                 // redirectHandler(res.status);
 
@@ -62,7 +69,7 @@ export async function useStoreLogic(router: any, store: any, entity: string, met
             }
         }
 
-        if (method == 'update') {
+        if (method === StoreLogicMethods.UPDATE) {
             if (res.status !== 'failed') {
                 // redirectHandler(res.status);
 

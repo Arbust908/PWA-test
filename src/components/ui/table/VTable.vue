@@ -1,65 +1,30 @@
 <template>
-    <div>
-        <section>
-            <!-- Desktop Table -->
-            <div class="hidden sm:block">
-                <div>
-                    <article>
-                        <table>
-                            <thead>
-                                <slot name="header">
-                                    <TableHeader :columns="columns" :pagination="localPagination" />
-                                </slot>
-                            </thead>
-                            <tbody v-if="loading">
-                                <td :colspan="[columns.length]" class="emptyState">
-                                    <p>No hay datos cargados</p>
+    <section>
+        <!-- Desktop Table -->
+        <div class="hidden sm:block">
+            <div>
+                <article>
+                    <table>
+                        <thead>
+                            <slot name="header">
+                                <TableHeader :columns="columns" :pagination="localPagination" />
+                            </slot>
+                        </thead>
+                        <tbody v-if="loading || paginatedItems.length === 0">
+                            <tr>
+                                <td :colspan="columns.length" class="emptyState">
+                                    <p v-if="loading">Cargando...</p>
+                                    <p v-else>{{ emptyText }}</p>
                                 </td>
-                            </tbody>
-                            <tbody v-else>
-                                <template v-for="(item, index) in paginatedItems" :key="item.id">
-                                    <tr class="body-row" :class="index % 2 === 0 ? 'even' : 'odd'">
-                                        <slot name="item" :item="item" />
-                                        <td v-if="actions" class="p-0">
-                                            <DropdownBtn :actions="actions" :item="item">
-                                                <CircularBtn size="xs" class="even">
-                                                    <Icon
-                                                        icon="DotsVertical"
-                                                        type="outlined"
-                                                        class="w-6 h-6 icon text-gray-800"
-                                                    />
-                                                </CircularBtn>
-                                            </DropdownBtn>
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </article>
-                </div>
-            </div>
-
-            <!-- Mobile Table -->
-            <!-- TODO: Podría ir en un componente aparte  -->
-            <div class="flex items-start lg:items-center justify-center mt-2 sm:hidden">
-                <div class="mx-auto h-full">
-                    <div class="shadow-md bg-gray-100 overflow-none rounded-lg sm:shadow-lg text-sm sm:text-base">
-                        <div v-for="item in paginatedItems" :key="item.id" class="bg-white border-gray-400">
-                            <div class="divide-y divide-black border-t-2">
-                                <div class="grid grid-cols-12 p-6 pl-2 pr-2 items-center">
-                                    <div class="col-span-10 bg-white rounded truncate pl-2">
-                                        <span class="text-sm font-semibold">
-                                            <slot name="mobileTitle" :item="item"></slot>
-                                        </span>
-
-                                        <p class="text-xs text-warmGray-500">
-                                            <slot name="mobileSubtitle" :item="item"></slot>
-                                        </p>
-                                    </div>
-
-                                    <div class="col-span-2 bg-white rounded flex flex-col justify-center items-center">
-                                        <DropdownBtn :actions="actions" :item="item">
-                                            <CircularBtn size="xs" class="bg-white">
+                            </tr>
+                        </tbody>
+                        <tbody v-else>
+                            <template v-for="(item, index) in paginatedItems" :key="item.id">
+                                <tr class="body-row" :class="index % 2 === 0 ? 'odd' : 'odd'" :disabled="!item.visible">
+                                    <slot name="item" :item="item" />
+                                    <td v-if="desktopActions" class="p-0 table--action">
+                                        <DropdownBtn :actions="desktopActions" :item="item">
+                                            <CircularBtn size="xs" class="even">
                                                 <Icon
                                                     icon="DotsVertical"
                                                     type="outlined"
@@ -67,22 +32,61 @@
                                                 />
                                             </CircularBtn>
                                         </DropdownBtn>
-                                    </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </article>
+            </div>
+        </div>
+
+        <!-- Mobile Table -->
+        <!-- TODO: Podría ir en un componente aparte  -->
+        <div class="flex items-start lg:items-center justify-center mt-2 sm:hidden">
+            <div class="mx-auto h-full">
+                <div class="shadow-md bg-gray-100 overflow-none rounded-lg sm:shadow-lg text-sm sm:text-base">
+                    <div v-for="item in paginatedItems" :key="item.id" class="bg-white border-gray-400">
+                        <div class="divide-y divide-black border-t-2">
+                            <div
+                                class="grid grid-cols-12 p-6 pl-2 pr-2 items-center"
+                                :class="!item.visible ? 'disabled-mobile' : null"
+                            >
+                                <div class="col-span-10 rounded truncate pl-2">
+                                    <span class="text-sm font-semibold">
+                                        <slot name="mobileTitle" :item="item"></slot>
+                                    </span>
+
+                                    <p class="text-xs text-warmGray-500">
+                                        <slot name="mobileSubtitle" :item="item"></slot>
+                                    </p>
+                                </div>
+
+                                <div class="col-span-2 rounded flex flex-col justify-center items-center">
+                                    <DropdownBtn :actions="actions" :item="item">
+                                        <CircularBtn size="xs">
+                                            <Icon
+                                                icon="DotsVertical"
+                                                type="outlined"
+                                                class="w-6 h-6 icon text-gray-800"
+                                            />
+                                        </CircularBtn>
+                                    </DropdownBtn>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Pagination -->
-            <TablePagination
-                v-if="localPagination.perPage"
-                :pagination="localPagination"
-                :total="filteredItems.length"
-            ></TablePagination>
-        </section>
-    </div>
+        <!-- Pagination -->
+        <TablePagination
+            v-if="localPagination.perPage"
+            :pagination="localPagination"
+            :total="filteredItems.length"
+        ></TablePagination>
+    </section>
 </template>
 
 <script lang="ts">
@@ -111,7 +115,12 @@
             pagination: {
                 type: Object,
                 default: () => {
-                    return {};
+                    return {
+                        sortKey: 'id',
+                        sortDir: 'asc',
+                        // currentPage: 1,
+                        // perPage: 10,
+                    };
                 },
             },
             items: {
@@ -129,6 +138,10 @@
             showPagination: {
                 type: Boolean,
                 default: false,
+            },
+            emptyText: {
+                type: String,
+                default: 'No hay datos cargados',
             },
         },
         setup(props, { emit }) {
@@ -204,12 +217,15 @@
                 return array.slice((pageNumber - 1) * length, pageNumber * length);
             };
 
+            const desktopActions = computed(() => props.actions.filter((action: any) => !action.onlyMobile));
+
             return {
                 localPagination,
                 filteredItems,
                 dropdown,
                 show,
                 paginatedItems,
+                desktopActions,
             };
         },
     });
@@ -228,7 +244,7 @@
         }
     }
     table {
-        @apply min-w-full divide-y divide-second-200;
+        @apply min-w-full divide-y divide-second-200 rounded-lg;
         thead {
             @apply bg-second-50;
         }

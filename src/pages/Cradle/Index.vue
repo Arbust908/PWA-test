@@ -24,78 +24,57 @@
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5 lg:w-7/12 min-w-min">
-            <template #header>
-                <tr>
-                    <th v-for="column in tableColumns" :key="column.name" :class="column.class" scope="col">
-                        <div class="flex justify-center">
-                            {{ column.text }}
-                            <Icon icon="ArrowUp" class="w-4 h-4" />
-                            <Icon icon="ArrowDown" class="w-4 h-4" />
-                        </div>
-                    </th>
 
-                    <th scope="col">Acciones</th>
-                </tr>
+        <VTable
+            class="mt-5 lg:w-7/12 min-w-min"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredCradles"
+            :actions="actions"
+            empty-text="No hay cradles cargados"
+        >
+            <template #item="{ item: cr }">
+                <!-- Desktop -->
+                <td :class="cr.name ? null : 'empty'">
+                    {{ cr.name || 'Sin nombre' }}
+                </td>
+                <td class="sm:w-52">
+                    <p class="w-52 truncate text-center">
+                        {{ cr.observations || '-' }}
+                    </p>
+                </td>
             </template>
-            <template #body>
-                <tr
-                    v-for="(cr, sKey) in filteredCradles"
-                    :key="cr.id"
-                    :class="sKey % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td :class="cr.name ? null : 'empty'">
-                        {{ cr.name || 'Sin definir' }}
-                    </td>
-                    <td>
-                        <p class="w-52 truncate">
-                            {{ cr.observations || 'Sin definir' }}
-                        </p>
-                    </td>
-                    <td>
-                        <div class="btn-panel">
-                            <router-link :to="`/cradle/${cr.id}`">
-                                <Popper hover content="Editar">
-                                    <CircularBtn size="xs" class="bg-blue-500">
-                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                    </CircularBtn>
-                                </Popper>
-                            </router-link>
 
-                            <Popper hover :content="cr.visible ? 'Inhabilitar' : 'Habilitar'">
-                                <CircularBtn
-                                    class="ml-4"
-                                    :class="cr.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                    size="xs"
-                                    @click="openModalVisibility(cr)"
-                                >
-                                    <Icon v-if="cr.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                                </CircularBtn>
-                            </Popper>
-                        </div>
-                    </td>
-                </tr>
-                <tr v-if="crDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay grúas cargadas</p>
-                    </td>
-                </tr>
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }">
+                {{ item.name || 'Sin nombre' }}
             </template>
-        </UiTable>
+
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Observaciones: </span>{{ item.observations || ' - ' }}
+            </template>
+        </VTable>
+
         <Modal title="¿Desea inhabilitar este cradle?" type="error" :open="showModal">
             <template #body>
                 <div>Una vez inhabilitado, no podrá utilizar este cradle en ninguna otra sección de la aplicación</div>
-                <div></div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cradle </PrimaryBtn>
+                    <GhostBtn btn="!text-gray-500" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
+                    <PrimaryBtn btn="!bg-red-700" @click="confirmModal">Inhabilitar cradle </PrimaryBtn>
                 </div>
             </template>
         </Modal>
+
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
+            <template #body>
+                <span class="!text-lg !text-black">{{ selectedCradle.name }}</span> <br />
+                <span v-if="selectedCradle.observations">
+                    Observaciones: {{ selectedCradle.observations || ' - ' }}
+                </span>
+            </template>
+        </Backdrop>
     </Layout>
 </template>
 
@@ -105,14 +84,13 @@
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import Modal from '@/components/modal/General.vue';
-    import Popper from 'vue3-popper';
-
+    import { useRouter } from 'vue-router';
+    import Backdrop from '@/components/modal/Backdrop.vue';
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
@@ -121,29 +99,68 @@
             Layout,
             PrimaryBtn,
             Icon,
-            UiTable,
+            VTable,
             FieldSelect,
             GhostBtn,
-            CircularBtn,
             Modal,
-            Popper,
+            Backdrop,
         },
         setup() {
             useTitle('Cradles <> Sandflow');
             const store = useStore();
+            const router = useRouter();
             const crDB = ref([]);
             const loading = ref(false);
             let cradleId = ref(-1);
             const selectedCradle = ref(null);
             const showModal = ref(false);
-            const tableColumns = [
+            const showBackdrop = ref(false);
+
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+                // currentPage: 1,
+                // perPage: 10,
+            });
+
+            const columns = [
+                { title: 'Nombre', key: 'name', sortable: true },
+                { title: 'Observaciones', key: 'observations', sortable: true },
+                { title: '', key: 'actions' },
+            ];
+
+            const actions = [
                 {
-                    text: 'Nombre',
-                    class: 'w-2/5',
+                    label: 'Ver más',
+                    onlyMobile: true,
+                    callback: (item) => {
+                        selectedCradle.value = item;
+                        showBackdrop.value = true;
+                    },
                 },
                 {
-                    text: 'Observaciones',
-                    class: 'w-1/5',
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/cradle/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
                 },
             ];
 
@@ -201,7 +218,6 @@
 
             onMounted(async () => {
                 await getCradles();
-                console.log(crDB.value);
             });
 
             return {
@@ -212,7 +228,11 @@
                 showModal,
                 openModalVisibility,
                 confirmModal,
-                tableColumns,
+                pagination,
+                columns,
+                actions,
+                selectedCradle,
+                showBackdrop,
             };
         },
     };

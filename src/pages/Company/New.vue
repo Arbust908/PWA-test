@@ -86,7 +86,9 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <!-- *** Cambiar todos por un componente de ABM Footer -->
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/clientes')"> Cancelar </SecondaryBtn>
                 <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
@@ -94,6 +96,20 @@
                 </PrimaryBtn>
             </section>
         </footer>
+
+        <ErrorModal
+            :open="showErrorCuitModal"
+            title="Ya existe un cliente con este CUIT"
+            text="El cliente que intentas guardar fue creado anteriormente"
+            @close="showErrorCuitModal = false"
+            @action="showErrorCuitModal = false"
+        />
+        <SuccessModal
+            :open="showSuccessModal"
+            title="El cliente fue guardado con éxito"
+            @close="$router.push('/clientes')"
+            @action="$router.push('/clientes')"
+        />
     </Layout>
 </template>
 
@@ -117,6 +133,9 @@
     // TIPOS
     import { Company } from '@/interfaces/sandflow';
 
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+
     export default {
         components: {
             Layout,
@@ -126,6 +145,8 @@
             FieldInput,
             FieldLegend,
             Toggle,
+            ErrorModal,
+            SuccessModal,
         },
         setup() {
             useTitle('Nuevo Cliente <> Sandflow');
@@ -138,6 +159,9 @@
             const goToIndex = () => {
                 router.push('/clientes');
             };
+
+            const showErrorCuitModal = ref(false);
+            const showSuccessModal = ref(false);
 
             const newClient: Company = ref({
                 name: '',
@@ -164,6 +188,13 @@
             });
 
             const save = async () => {
+                const legalIdExists = await checkIfExists('legalId', newClient.value.legalId);
+
+                if (legalIdExists) {
+                    showErrorCuitModal.value = true;
+
+                    return;
+                }
                 const { data: CRdata } = useAxios(
                     '/companyRepresentative',
                     { method: 'POST', data: newClient.value.companyRepresentative },
@@ -181,11 +212,20 @@
                         watch(Cdata, (newVal, _) => {
                             if (newVal && newVal.data) {
                                 store.dispatch('saveClient', newClient.value);
-                                router.push('/clientes');
+                                showSuccessModal.value = true;
                             }
                         });
                     }
                 });
+            };
+
+            const checkIfExists = async (field: string, value: string) => {
+                //TODO: Refactor with useStoreLogic ? (useStoreLogic not accept filters)
+                const apiResponse = await axios.get(`${apiUrl}/company?${field}=${value}`);
+
+                const companies = apiResponse.data.data;
+
+                return companies.length > 0;
             };
 
             return {
@@ -194,6 +234,8 @@
                 newClient,
                 isValidated,
                 handleToggleState,
+                showErrorCuitModal,
+                showSuccessModal,
             };
         },
     };

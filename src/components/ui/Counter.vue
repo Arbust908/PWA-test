@@ -3,7 +3,7 @@
         <button :disabled="count <= 0" @click.prevent="dec()">
             <MinusIcon class="icon" />
         </button>
-        <input v-model.number="count" type="text" />
+        <input v-model.number="count" type="text" @input="checkMax()" />
         <button :disabled="count >= max" @click.prevent="inc()">
             <PlusIcon class="icon" />
         </button>
@@ -27,11 +27,17 @@
             },
             max: {
                 type: Number,
+                default: Infinity,
             },
         },
         setup(props, { emit }) {
             const amount = useVModel(props, 'amount', emit);
             const { count, inc, dec } = useCounter(amount);
+            const checkMax = () => {
+                if (count.value > props.max) {
+                    count.value = props.max;
+                }
+            };
             watch(count, (data, oldData) => {
                 amount.value = data;
             });
@@ -40,6 +46,7 @@
                 count,
                 inc,
                 dec,
+                checkMax,
             };
         },
     });
