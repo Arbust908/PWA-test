@@ -23,7 +23,7 @@
             />
         </div>
 
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredSands" :actions="actions">
+        <VTable class="mt-5" :columns="columns" :items="filteredSands" :actions="actions">
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item.type ? null : 'empty'">
@@ -57,12 +57,6 @@
                         </Popper>
                     </div>
                 </td>
-
-                <tr v-if="sandDB && sandDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay arenas cargadas</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
@@ -97,15 +91,9 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
@@ -151,13 +139,6 @@
             const showBD = ref(false);
             const bdInfo = ref(null);
             const toggleBD = () => (showBD.value = !showBD.value);
-
-            const pagination = ref({
-                sortKey: 'id',
-                sortDir: 'asc',
-                // currentPage: 1,
-                // perPage: 10,
-            });
 
             const columns = [
                 { title: 'Tipo de Malla', key: 'name', sortable: true },
@@ -285,7 +266,6 @@
                 confirmModal,
                 columns,
                 loading,
-                pagination,
                 actions,
                 toggleBD,
                 showBD,

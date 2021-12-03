@@ -1,7 +1,8 @@
 <template>
-    <Layout>
-        <ABMTitle :title="`Arena - ${type}`" />
-        <section>
+    <Layout v-if="currentSand">
+        <ABMTitle :title="`Arena - ${currentSand.type}`" />
+        {{ currentSand }}
+        <!-- <section>
             <SandForm
                 :type="type"
                 :description="observations"
@@ -9,18 +10,16 @@
                 @update:description="observations = $event"
             />
         </section>
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
-            <section class="w-full space-x-3 flex items-center justify-end">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/tipos-de-arena')"> Cancelar </SecondaryBtn>
-                <PrimaryBtn
-                    btn="wide"
-                    :is-loading="loading"
-                    :disabled="!isFull ? 'yes' : null"
-                    @click="isFull && getSandsAndCheckIfTypeExists()"
-                >
-                    Finalizar
-                </PrimaryBtn>
-            </section>
+        <footer>
+            <SecondaryBtn btn="wide" type="a" @click="$router.push('/tipos-de-arena')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn
+                btn="wide"
+                :is-loading="loading"
+                :disabled="!isFull ? 'yes' : null"
+                @click="isFull && getSandsAndCheckIfTypeExists()"
+            >
+                Finalizar
+            </PrimaryBtn>
         </footer>
         <Modal type="off" :open="showModal" @close="toggleModal">
             <template #body>
@@ -70,22 +69,19 @@
                     <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
                 </div>
             </template>
-        </Modal>
+        </Modal> -->
     </Layout>
 </template>
 
 <script lang="ts">
-    import { reactive, ref, toRefs, defineAsyncComponent, computed } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle, useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import { useRouter, useRoute } from 'vue-router';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     import { Sand } from '@/interfaces/sandflow';
     import axios from 'axios';
+    import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
 
     const api = import.meta.env.VITE_API_URL || '/api';
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
@@ -105,27 +101,30 @@
             WarningBtn,
         },
         setup() {
+            const router = useRouter();
             const route = useRoute();
             const store = useStore();
-
-            const sands: Array<Sand> = JSON.parse(JSON.stringify(store.state.sand.all));
-            const currentSand: Sand = sands.find((sand) => {
-                return sand.id == route.params.id;
-            });
-            const router = useRouter();
+            const { GET } = StoreLogicMethods;
             const loading = ref(false);
 
-            const sandToUpdate = reactive({
-                id: currentSand.id,
-                type: currentSand.type,
-                observations: currentSand.observations,
+            const currentSand: Sand = ref(null as Sand);
+            onMounted(async () => {
+                loading.value = true;
+                const sandId = route.params.id;
+                const result = await useStoreLogic(router, store, 'sand', GET, sandId);
+                console.log(result);
+
+                if (result.type == 'success') {
+                    currentSand.value = result.res;
+                }
+                loading.value = false;
             });
 
             const currentSandType = currentSand.type;
             useTitle(`Arena ${currentSandType} <> Sandflow`);
 
             const isFull = computed(() => {
-                return !!(sandToUpdate.type.length > 0);
+                return !!(currentSand?.type?.length > 0);
             });
 
             const createdSands = ref([]);
@@ -179,12 +178,11 @@
             };
 
             return {
-                sands,
                 save,
-                sandToUpdate,
+                currentSand,
                 isFull,
                 loading,
-                ...toRefs(sandToUpdate),
+                ...toRefs(currentSand),
                 showModal,
                 showErrorModal,
                 showApiErrorModal,
@@ -200,5 +198,8 @@
 <style lang="scss" scoped>
     section {
         @apply bg-white rounded-md shadow-sm max-w-2xl pb-5;
+    }
+    footer {
+        @apply mt-[32px] gap-3 flex flex-row max-w-2xl w-full space-x-3 items-center justify-end;
     }
 </style>

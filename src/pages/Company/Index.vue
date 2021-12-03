@@ -28,7 +28,6 @@
         <VTable
             class="mt-5"
             :columns="columns"
-            :pagination="pagination"
             :items="filteredClients"
             :actions="actions"
             empty-text="No hay clientes cargados"
@@ -141,13 +140,6 @@
             const showModal = ref(false);
             const router = useRouter();
             const showBackdrop = ref(false);
-
-            const pagination = ref({
-                sortKey: 'id',
-                sortDir: 'asc',
-                // currentPage: 1,
-                // perPage: 10,
-            });
 
             const columns = [
                 { title: 'Cliente', key: 'name', sortable: true },
@@ -269,7 +261,6 @@
                 confirmModal,
                 showModal,
                 columns,
-                pagination,
                 actions,
                 showBackdrop,
                 selectedClient,

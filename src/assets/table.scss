@@ -1,5 +1,5 @@
 th {
-    @apply px-5 py-3 whitespace-nowrap text-center text-black text-sm font-medium uppercase tracking-wider w-[190px];
+    @apply px-5 py-3 whitespace-nowrap text-center text-black text-sm font-medium uppercase tracking-wider max-w-[190px];
   }
   
   .body-row {
@@ -25,8 +25,11 @@ th {
   }
   
   td {
-    @apply px-6 py-4 text-sm font-medium text-center truncate max-w-[190px];
+    @apply px-6 py-4 text-sm font-medium text-center;
     color: inherit;
+    &:not(.table--action) {
+        @apply truncate max-w-[190px];
+    }
   
     &.empty {
         @apply text-second-400 italic;
