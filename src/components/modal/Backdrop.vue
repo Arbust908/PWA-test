@@ -7,7 +7,7 @@
             :open="open"
             @close="$emit('close')"
         >
-            <div class="min-h-screen pt-4 px-4 text-center flex justify-center items-end">
+            <div class="min-h-screen pt-4 text-center flex justify-center items-end">
                 <!-- <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"> -->
                 <TransitionChild
                     as="template"
@@ -37,7 +37,7 @@
                             inline-block
                             bg-second-50
                             md:rounded-lg
-                            rounded-t-lg
+                            rounded-t-[20px]
                             text-left
                             overflow-hidden
                             shadow-xl
@@ -46,10 +46,10 @@
                             w-full
                             mt-8
                             align-middle
-                            max-w-sm
                             px-6
                             py-4
                             space-y-4
+                            font-body
                         "
                     >
                         <header class="flex justify-between">
@@ -70,7 +70,7 @@
                                 </svg>
                             </CircularBtn>
                         </header>
-                        <div class="text-sm text-second-500">
+                        <div>
                             <slot name="body">
                                 <p>
                                     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec eget ex maximus,

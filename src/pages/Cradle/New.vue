@@ -9,7 +9,7 @@
                     <FieldInput
                         class="col-span-full"
                         field-name="name"
-                        placeholder="Nombre del Cradle"
+                        placeholder=""
                         title="Nombre"
                         :data="name"
                         require-validation
@@ -19,7 +19,7 @@
                     <FieldTextArea
                         class="col-span-full"
                         field-name="observations"
-                        placeholder="Observaciones..."
+                        placeholder=""
                         title="Observaciones"
                         :rows="5"
                         is-optional
@@ -60,7 +60,9 @@
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
-                    <span class="text-center text-base border-none text-gray-900"> Ya existe este cradle </span>
+                    <span class="text-center text-base font-semibold border-none text-gray-900">
+                        Ya existe este cradle
+                    </span>
                     <span class="text-center text-sm border-none m-2">
                         El cradle que intentas guardar fue creado anteriormente.
                     </span>

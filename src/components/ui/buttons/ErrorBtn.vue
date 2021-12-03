@@ -1,6 +1,6 @@
 <template>
-    <BaseBtn :btn="`main ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
-        <slot></slot>
+    <BaseBtn :btn="`warning ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
+        <slot>Error</slot>
     </BaseBtn>
 </template>
 
@@ -24,8 +24,8 @@
                 default: 'main',
             },
             disabled: {
-                type: String,
-                default: '',
+                type: [String, Boolean],
+                default: false,
             },
             isLoading: {
                 type: Boolean,
