@@ -136,7 +136,7 @@
                         class="
                             w-full
                             max-w-sm
-                            border border-dashed border-
+                            border border-dashed
                             rounded-xl
                             p-5
                             my-3
