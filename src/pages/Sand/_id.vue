@@ -1,12 +1,11 @@
 <template>
     <Layout v-if="currentSand">
         <ABMTitle :title="`Arena - ${currentSand.type}`" />
-        {{ currentSand }}
-        <!-- <section>
+        <section>
             <SandForm
-                :type="type"
-                :description="observations"
-                @update:type="type = $event"
+                :type="currentSand.type"
+                :description="currentSand.observations"
+                @update:type="currentSand.type = $event"
                 @update:description="observations = $event"
             />
         </section>
@@ -69,7 +68,7 @@
                     <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
                 </div>
             </template>
-        </Modal> -->
+        </Modal>
     </Layout>
 </template>
 
