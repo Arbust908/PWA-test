@@ -67,12 +67,7 @@
             </template>
         </VTable>
 
-        <Modal
-            title="¿Desea inhabilitar este cliente?"
-            type="error"
-            :open="showModal"
-            class="sm:w-[440px] sm:h-[248] !py-8"
-        >
+        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal" class="sm:w-[440px] !py-8">
             <template #body>
                 <div class="m-4">
                     Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación
