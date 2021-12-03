@@ -2,6 +2,7 @@ import { defineConfig } from 'vite';
 import Vue from '@vitejs/plugin-vue';
 import AutoImport from 'unplugin-auto-import/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import { manifest } from './manijest';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,9 +14,7 @@ export default defineConfig({
         }),
         VitePWA({
             registerType: 'autoUpdate',
-            manifest: {
-                // content of manifest
-            },
+            manifest: manifest,
             workbox: {
                 // workbox options for generateSW
             },

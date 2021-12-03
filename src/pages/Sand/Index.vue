@@ -23,7 +23,7 @@
             />
         </div>
 
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredSands" :actions="actions">
+        <VTable class="mt-5" :columns="columns" :items="filteredSands" :actions="actions">
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item.type ? null : 'empty'">
@@ -57,12 +57,6 @@
                         </Popper>
                     </div>
                 </td>
-
-                <tr v-if="sandDB && sandDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay arenas cargadas</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
@@ -144,13 +138,6 @@
             const showBD = ref(false);
             const bdInfo = ref(null);
             const toggleBD = () => (showBD.value = !showBD.value);
-
-            const pagination = ref({
-                sortKey: 'id',
-                sortDir: 'asc',
-                // currentPage: 1,
-                // perPage: 10,
-            });
 
             const columns = [
                 { title: 'Tipo de Malla', key: 'name', sortable: true },
@@ -278,7 +265,6 @@
                 confirmModal,
                 columns,
                 loading,
-                pagination,
                 actions,
                 toggleBD,
                 showBD,

@@ -1,37 +1,33 @@
 <template>
-    <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Arena - {{ type }}</h1>
-        </header>
-        <section class="bg-white rounded-md shadow-sm max-w-2xl pb-5">
+    <Layout v-if="currentSand">
+        <ABMTitle :title="`Arena - ${currentSand.type}`" />
+        <section>
             <SandForm
-                :type="type"
-                :description="observations"
-                @update:type="type = $event"
+                :type="currentSand.type"
+                :description="currentSand.observations"
+                @update:type="currentSand.type = $event"
                 @update:description="observations = $event"
             />
         </section>
         <!-- *** -->
-        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
-            <section class="w-full space-x-3 flex items-center justify-end">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/tipos-de-arena')"> Cancelar </SecondaryBtn>
-                <PrimaryBtn
-                    btn="wide"
-                    :is-loading="loading"
-                    :disabled="!isFull ? 'yes' : null"
-                    @click="isFull && getSandsAndCheckIfTypeExists()"
-                >
-                    Finalizar
-                </PrimaryBtn>
-            </section>
+        <footer>
+            <SecondaryBtn btn="wide" type="a" @click="$router.push('/tipos-de-arena')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn
+                btn="wide"
+                :is-loading="loading"
+                :disabled="!isFull ? 'yes' : null"
+                @click="isFull && getSandsAndCheckIfTypeExists()"
+            >
+                Finalizar
+            </PrimaryBtn>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
+        <Modal type="off" :open="showModal" @close="toggleModal">
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡El tipo de arena fue guardado con éxito!</span
-                    >
+                    <span class="text-center text-base border-none text-gray-900">
+                        ¡El tipo de arena fue guardado con éxito!
+                    </span>
                 </div>
             </template>
             <template #btn>
@@ -40,7 +36,7 @@
                 </div>
             </template>
         </Modal>
-        <Modal type="off" :open="showErrorModal" @close="togglemodal">
+        <Modal type="off" :open="showErrorModal" @close="toggleErrorModal">
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
@@ -56,7 +52,7 @@
                 </div>
             </template>
         </Modal>
-        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
+        <Modal type="off" :open="showApiErrorModal" @close="toggleApiErrorModal">
             <template #body>
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
@@ -78,55 +74,57 @@
 </template>
 
 <script lang="ts">
-    import { reactive, ref, toRefs, defineAsyncComponent, computed } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle, useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import { useRouter, useRoute } from 'vue-router';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
-    import { Sand } from '@/interfaces/SandType';
+    import { Sand } from '@/interfaces/sandflow';
     import axios from 'axios';
+    import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
 
     const api = import.meta.env.VITE_API_URL || '/api';
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     import SandForm from '@/components/sand/SandForm.vue';
+    import ABMTitle from '@/components/ui/ABMTitle.vue';
 
     export default {
         components: {
-            PrimaryBtn,
-            SecondaryBtn,
-            Layout,
-            SandForm,
+            ABMTitle,
             Icon,
+            Layout,
             Modal,
+            PrimaryBtn,
+            SandForm,
+            SecondaryBtn,
             WarningBtn,
         },
         setup() {
+            const router = useRouter();
             const route = useRoute();
             const store = useStore();
-
-            const sands: Array<Sand> = JSON.parse(JSON.stringify(store.state.sand.all));
-            const currentSand: Sand = sands.find((sand) => {
-                return sand.id == route.params.id;
-            });
-            useTitle(`Arena ${currentSand.type} <> Sandflow`);
-            const router = useRouter();
+            const { GET } = StoreLogicMethods;
             const loading = ref(false);
 
-            const sandToUpdate = reactive({
-                id: currentSand.id,
-                type: currentSand.type,
-                observations: currentSand.observations,
+            const currentSand: Sand = ref(null as Sand);
+            onMounted(async () => {
+                loading.value = true;
+                const sandId = route.params.id;
+                const result = await useStoreLogic(router, store, 'sand', GET, sandId);
+                console.log(result);
+
+                if (result.type == 'success') {
+                    currentSand.value = result.res;
+                }
+                loading.value = false;
             });
 
             const currentSandType = currentSand.type;
+            useTitle(`Arena ${currentSandType} <> Sandflow`);
 
             const isFull = computed(() => {
-                return !!(sandToUpdate.type.length > 0);
+                return !!(currentSand?.type?.length > 0);
             });
 
             const createdSands = ref([]);
@@ -180,12 +178,11 @@
             };
 
             return {
-                sands,
                 save,
-                sandToUpdate,
+                currentSand,
                 isFull,
                 loading,
-                ...toRefs(sandToUpdate),
+                ...toRefs(currentSand),
                 showModal,
                 showErrorModal,
                 showApiErrorModal,
@@ -199,53 +196,10 @@
 </script>
 
 <style lang="scss" scoped>
-    .btn {
-        &__draft {
-            @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-        }
-        &__delete {
-            @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-            /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-        }
-        &__add {
-            @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-        }
-        &__add--special {
-            @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-        }
-        &__mobile-only {
-            @apply lg:hidden;
-        }
-        &__desktop-only {
-            @apply hidden lg:inline-flex;
-        }
+    section {
+        @apply bg-white rounded-md shadow-sm max-w-2xl pb-5;
     }
-    .section-tab {
-        @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
-    }
-    .section-tab[selected='true'] {
-        @apply border-main-500 text-main-500;
-    }
-    .input-block select,
-    .input-block input {
-        @apply w-full rounded mb-3 p-2;
-    }
-
-    .pit-block {
-        @apply flex mt-1 items-center w-full mb-3;
-        & select,
-        & input {
-            @apply rounded p-2 max-w-md inline-block w-full;
-        }
-    }
-
-    fieldset {
-        @apply mb-6;
-    }
-    label {
-        @apply text-sm;
-    }
-    .equip-grid {
-        @apply grid gap-4 grid-cols-2 md:grid-cols-3;
+    footer {
+        @apply mt-[32px] gap-3 flex flex-row max-w-2xl w-full space-x-3 items-center justify-end;
     }
 </style>
