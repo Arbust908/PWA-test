@@ -19,6 +19,10 @@
                 type: String,
                 default: 'md',
             },
+            disabled: {
+                type: [String, Boolean],
+                default: false,
+            },
         },
     };
 </script>
