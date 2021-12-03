@@ -64,17 +64,14 @@
                 <BackdropCard :info="bdInfo" />
             </template>
         </Backdrop>
-        <Modal title="¿Desea inhabilitar este proveedor de transporte?" type="error" :open="showModal">
+        <Modal title="¿Desea inhabilitar este proveedor?" type="error" :open="showModal" class="xs:w-[440px] px-6">
             <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este proveedor de transporte en ninguna otra sección de la
-                    aplicación
-                </div>
+                <div>Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación.</div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <ErrorBtn @click="confirmModal">Inhabilitar proveedor </ErrorBtn>
+                    <GhostBtn btn="!text-gray-500" @click="showModal = false"> Volver </GhostBtn>
+                    <ErrorBtn @click="confirmModal">Inhabilitar </ErrorBtn>
                 </div>
             </template>
         </Modal>

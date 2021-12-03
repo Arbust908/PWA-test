@@ -31,7 +31,7 @@
                 </td>
 
                 <td :class="item.observations ? null : 'empty'">
-                    {{ item.observations || 'Sin definir' }}
+                    {{ item.observations || 'Sin observaciones' }}
                 </td>
 
                 <td v-if="false">
@@ -89,7 +89,7 @@
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
                     <BaseBtn class="text-gray-500" @click="showModal = false"> Volver </BaseBtn>
-                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar tipo de arena</ErrorBtn>
+                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar</ErrorBtn>
                 </div>
             </template>
         </Modal>
@@ -110,7 +110,6 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
 
-    import Badge from '@/components/ui/Badge.vue';
     import Popper from 'vue3-popper';
 
     import BackdropCard from '@/components/sand/BackdropCard.vue';
@@ -127,18 +126,16 @@
         components: {
             Backdrop,
             BackdropCard,
-            Layout,
-            PrimaryBtn,
-            UiTable,
-            Icon,
-            GhostBtn,
-            FieldSelect,
+            BaseBtn,
             CircularBtn,
+            ErrorBtn,
+            FieldSelect,
+            Icon,
+            Layout,
             Modal,
             Popper,
+            PrimaryBtn,
             VTable,
-            ErrorBtn,
-            BaseBtn,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');
@@ -165,7 +162,7 @@
             const columns = [
                 { title: 'Tipo de Malla', key: 'name', sortable: true },
                 { title: 'Observaciones', key: 'observations', sortable: true },
-                { title: 'Acciones', key: 'name' },
+                { title: '', key: 'name' },
             ];
 
             const actions = [

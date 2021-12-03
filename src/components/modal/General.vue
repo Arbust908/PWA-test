@@ -46,7 +46,7 @@
                             my-8
                             align-middle
                             max-w-xl
-                            p-6
+                            py-5
                         "
                         v-bind="$attrs"
                     >

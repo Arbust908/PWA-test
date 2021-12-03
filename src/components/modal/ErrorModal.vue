@@ -4,7 +4,7 @@
             <div class="text-center flex flex-col justify-center items-center">
                 <Icon icon="ExclamationCircle" class="h-14 w-14 mb-4 text-red-700" />
             </div>
-            <div class="text-center text-xl font-semibold mb-2 mx-10 text-gray-900">{{ title }}</div>
+            <div class="text-center text-xl font-semibold mb-2 mx-5 text-gray-900">{{ title }}</div>
             <span class="text-center text-base border-none m-2"> {{ text }} </span>
         </template>
         <template #btn>
