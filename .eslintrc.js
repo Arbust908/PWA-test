@@ -5,6 +5,20 @@ module.exports = {
         es2021: true,
         node: true,
     },
+    overrides: [
+        {
+            files: ['*.vue'],
+            parser: 'vue-eslint-parser',
+            parserOptions: {
+                parser: '@typescript-eslint/parser',
+            },
+            rules: {
+                // 'no-unused-vars': 'off',
+                'no-undef': 'off',
+                '@typescript-eslint/no-unused-vars': 'off',
+            },
+        },
+    ],
     extends: [
         'plugin:vue/vue3-recommended',
         'eslint:recommended',
@@ -37,6 +51,8 @@ module.exports = {
         '@typescript-eslint/no-shadow': ['error'],
         'class-methods-use-this': 'off',
         'lines-between-class-members': 'off',
+        'vue/no-v-html': 'off',
+        'vue/max-attributes-per-line': ['warn', { singleline: 5 }],
         curly: 'error',
     },
     settings: {
