@@ -50,7 +50,8 @@
             </form>
         </section>
 
-        <footer class="mt-[32px] space-x-3 flex justify-end">
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"
@@ -67,15 +68,7 @@
                     <p class="text-base text-black font-bold">Notificación a proveedores</p>
                     <div
                         v-if="modalData.sandProvider"
-                        class="
-                            bg-gray-100
-                            mt-4
-                            rounded-r-md
-                            py-4
-                            pl-4
-                            mb-2
-                            border-l-4 border-green-500 border-opacity-50
-                        "
+                        class="bg-gray-100 mt-4 rounded-r-md py-4 pl-4 mb-2 border-l-4 border-green-500 border-opacity-50"
                     >
                         <p class="font-bold text-black text-base">Arenas {{ modalData.sandProvider }}</p>
                         <ul>

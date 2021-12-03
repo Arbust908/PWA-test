@@ -9,6 +9,7 @@
                 @update:description="observations = $event"
             />
         </section>
+        <!-- *** -->
         <footer>
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/tipos-de-arena')"> Cancelar </SecondaryBtn>
             <PrimaryBtn

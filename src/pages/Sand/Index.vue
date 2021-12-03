@@ -78,7 +78,6 @@
                 <div>
                     Una vez inhabilitado, no podrá utilizar este tipo de arena en ninguna otra sección de la aplicación
                 </div>
-                <div></div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">

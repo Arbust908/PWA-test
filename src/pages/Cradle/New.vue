@@ -29,7 +29,8 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-[32px] gap-3 flex justify-end max-w-2xl">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex justify-end max-w-2xl">
             <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click="goToIndex()">Cancelar</SecondaryBtn>
                 <PrimaryBtn
