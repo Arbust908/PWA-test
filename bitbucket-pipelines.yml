@@ -11,7 +11,7 @@ definitions:
                   - deploy.yml
               script:
                   - npm -g install n
-                  - n 12
+                  - n 14
                   - yarn
                   - yarn build
                   - rm -rf node_modules
