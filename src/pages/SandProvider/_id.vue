@@ -20,7 +20,8 @@
             </form>
         </section>
 
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-arena')">
                     Cancelar
@@ -63,7 +64,7 @@
                 <div class="text-center flex flex-col justify-center items-center">
                     <Icon icon="CheckCircle" class="h-14 w-14 mb-4 text-green-500" />
                 </div>
-                <div class="text-center text-xl font-semibold mb-4 mx-5 text-gray-900">
+                <div class="text-center text-lg font-semibold mb-4 mx-5 text-gray-900">
                     ¡El centro de carga fue guardado con éxito!
                 </div>
             </template>

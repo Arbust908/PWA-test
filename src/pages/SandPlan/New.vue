@@ -72,17 +72,7 @@
         <section class="bg-white rounded-md shadow-sm block sm:hidden">
             <form method="POST" action="/" class="flex flex-col rounded border-solid border-black">
                 <header
-                    class="
-                        flex
-                        justify-between
-                        px-3
-                        pb-3
-                        pt-4
-                        pr-3
-                        rounded-t-lg
-                        border-b-1 border-solid border-black
-                        bg-gray-100
-                    "
+                    class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded-t-lg border-b-1 border-solid border-black bg-gray-100"
                 >
                     <section class="flex space-x-4 pr-3">
                         <h2 class="font-semibold">
@@ -103,17 +93,7 @@
                                 outline
                                 :opened="currentOpened"
                                 :class="currentOpened ? 'rotate-180' : null"
-                                class="
-                                    w-8
-                                    h-8
-                                    text-gray-600
-                                    transition
-                                    transform
-                                    duration-300
-                                    ease-out
-                                    cursor-pointer
-                                    mr-1
-                                "
+                                class="w-8 h-8 text-gray-600 transition transform duration-300 ease-out cursor-pointer mr-1"
                             />
                         </button>
                     </section>
@@ -187,17 +167,7 @@
         <section class="bg-white rounded-md shadow-sm mt-4 block sm:hidden">
             <form method="POST" action="/" class="flex flex-col rounded border-solid border-black">
                 <header
-                    class="
-                        flex
-                        justify-between
-                        px-3
-                        pb-3
-                        pt-4
-                        pr-4
-                        rounded-t-lg
-                        border-b-1 border-solid border-black
-                        bg-gray-100
-                    "
+                    class="flex justify-between px-3 pb-3 pt-4 pr-4 rounded-t-lg border-b-1 border-solid border-black bg-gray-100"
                 >
                     <section class="flex space-x-4 pr-3 mt-2">
                         <h2 class="font-semibold">
@@ -231,7 +201,8 @@
                 </div>
             </form>
         </section>
-        <footer class="mt-[32px] space-x-3 flex justify-end">
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
             <PrimaryBtn btn="wide" size="md" :disabled="!isFull" @click.prevent="isFull ? save() : toggleErrorModal()">
                 Guardar

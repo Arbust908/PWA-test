@@ -22,7 +22,7 @@
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
                                 <tr class="body-row" :class="index % 2 === 0 ? 'odd' : 'odd'" :disabled="!item.visible">
                                     <slot name="item" :item="item" />
-                                    <td v-if="desktopActions" class="p-0">
+                                    <td v-if="desktopActions" class="p-0 table--action">
                                         <DropdownBtn :actions="desktopActions" :item="item">
                                             <CircularBtn size="xs" class="even">
                                                 <Icon
@@ -115,7 +115,12 @@
             pagination: {
                 type: Object,
                 default: () => {
-                    return {};
+                    return {
+                        sortKey: 'id',
+                        sortDir: 'asc',
+                        // currentPage: 1,
+                        // perPage: 10,
+                    };
                 },
             },
             items: {
