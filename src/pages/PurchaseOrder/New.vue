@@ -107,8 +107,18 @@
                         @update:data="transportProviderId = $event"
                     />
                     <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="col-span-full relative">
+                        <!--REVISAR FIELDNAME, ENDPOINT, DATA Y UPDATE DATA-->
+                        <FieldSelect
+                            class="col-span-12 md:col-span-6"
+                            field-name="transportProvider"
+                            title="Transportista (REVISAR)"
+                            placeholder="Seleccionar transportista"
+                            endpoint="/driver"
+                            :data="transportProviderId"
+                            @update:data="transportProviderId = $event"
+                        />
                         <FieldInput
-                            :title="useOnFirst(toKey, 'Patente')"
+                            :title="useOnFirst(toKey, 'Patente camión')"
                             class="col-span-6 sm:col-span-3"
                             field-name="trasportPatent"
                             placeholder="AA123AA"
@@ -117,8 +127,20 @@
                             :data="to.licensePlate"
                             @update:data="to.licensePlate = $event"
                         />
+                        <!--REVISAR FIELDNAME, ENDPOINT, DATA Y UPDATE DATA-->
                         <FieldInput
-                            :title="useOnFirst(toKey, 'Cantidad')"
+                            title="Patente acoplado"
+                            class="col-span-6 sm:col-span-3"
+                            field-name="trasportPatent"
+                            placeholder="101AA123AA"
+                            endpoint="/sand"
+                            endpoint-key="type"
+                            :data="to.licensePlate"
+                            @update:data="to.licensePlate = $event"
+                        />
+                        <div class="col-span-6 hidden sm:block md:hidden"></div>
+                        <FieldInput
+                            title="Cantidad de cajas"
                             class="col-span-6 sm:col-span-3"
                             field-name="boxAmount"
                             placeholder="0"
@@ -126,43 +148,40 @@
                             :data="to.boxAmount"
                             @update:data="to.boxAmount = $event"
                         />
+                        <div class="col-span-6 sm:block"></div>
                         <FieldInput
-                            :title="useOnFirst(toKey, 'Observaciones')"
-                            class="col-span-9 sm:col-span-4"
+                            title="Observaciones"
+                            class="col-span-12 sm:col-span-4"
                             field-name="observations"
                             placeholder="Ej: chasis chico"
                             is-optional
                             :data="to.observations"
                             @update:data="to.observations = $event"
                         />
-                        <div :class="isFirst(toKey) ? 'mt-7' : 'mt-3'" class="col-span-1 md:col-span-2 flex flex-row">
-                            <CircularBtn
-                                v-if="useIfNotLonly(TransportOrders)"
-                                size="md"
-                                @click="removeTransportOrder(to.innerId)"
-                            >
-                                <Icon icon="Trash" type="outline" class="w-7 h-7" />
-                            </CircularBtn>
-                            <div class="hidden sm:block">
-                                <CircularBtn
-                                    v-if="isLast(toKey, TransportOrders)"
-                                    size="md"
-                                    btn-class="bg-green-500"
-                                    @click.prevent="addTransportOrder()"
-                                >
-                                    <Icon icon="Plus" class="w-7 h-7 text-white" />
-                                </CircularBtn>
-                            </div>
-                        </div>
-                        <button
-                            v-if="isLast(toKey, TransportOrders)"
-                            class="mt-1 flex items-center col-span-6 sm:hidden"
-                            @click.prevent="addTransportOrder()"
-                        >
-                            <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
-                            <span class="font-bold"> Agregar</span>
-                        </button>
                     </FieldGroup>
+                </FieldGroup>
+                <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="col-span-full relative">
+                    <FieldLegend class="mt-2">Observaciones</FieldLegend>
+                    <section class="flex gap-2 sm:flex-row items-start col-span-12">
+                        <label class="col-span-3">
+                            <p class="text-sm mb-2">Fecha de entrega</p>
+                            <DatePicker v-model="delDate" />
+                        </label>
+                        <label class="col-span-3">
+                            <p class="text-sm mb-2">Hora de entrega</p>
+                            <TimePicker :timetrack="Number(1)" />
+                        </label>
+                    </section>
+
+                    <FieldTextArea
+                        title="Observaciones"
+                        class="col-span-12 sm:col-span-6"
+                        field-name="observations"
+                        placeholder=""
+                        is-optional
+                        :data="to.observations"
+                        @update:data="to.observations = $event"
+                    />
                 </FieldGroup>
             </form>
         </section>
@@ -204,6 +223,9 @@
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import OrderModal from '@/components/purchaseOrder/Modal.vue';
+    import TimePicker from '@/components/ui/form/TimePicker.vue';
+    import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
+    import DatePicker from '@/components/ui/form/DatePicker.vue';
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
@@ -220,6 +242,9 @@
             ClientPitCombo,
             Icon,
             OrderModal,
+            TimePicker,
+            FieldTextArea,
+            DatePicker,
         },
         setup() {
             useTitle('Nueva orden de pedido <> Sandflow');
