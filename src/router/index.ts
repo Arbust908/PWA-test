@@ -273,8 +273,20 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/usuarios',
-        name: 'Asd',
+        name: 'User',
         component: () => import('@/pages/User/index.vue'),
+        beforeEnter: isMobileAndLogged,
+    },
+    {
+        path: '/usuarios/:id',
+        name: 'UsuerById',
+        component: () => import('@/pages/User/_id.vue'),
+        beforeEnter: isMobileAndLogged,
+    },
+    {
+        path: '/usuarios/nuevo',
+        name: 'NewUser',
+        component: () => import('@/pages/User/new.vue'),
         beforeEnter: isMobileAndLogged,
     },
     {
