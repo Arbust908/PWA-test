@@ -93,7 +93,7 @@
         @apply text-4xl text-second-300;
     }
     .single-slot {
-        @apply w-[100px] h-[100px] justify-center items-center flex m-2 cursor-pointer  rounded;
+        @apply w-[100px] h-[100px] justify-center items-center flex m-2 cursor-pointer rounded;
     }
     .aisle {
         @apply bg-second-300;

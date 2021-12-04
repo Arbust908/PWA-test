@@ -18,7 +18,9 @@
       <StatusOnlineIcon v-if="isOnline" class="h-5 w-5 text-second-50" />
       <StatusOfflineIcon v-else class="h-5 w-5 text-second-50" />
     </aside> -->
-        <router-view class="w-full"></router-view>
+        <Suspense>
+            <router-view class="w-full"></router-view>
+        </Suspense>
     </div>
 </template>
 
@@ -27,6 +29,7 @@
     import { useActions } from 'vuex-composition-helpers';
     // import { useRouter } from 'vue-router';
     import { useDark, useToggle, useOnline } from '@vueuse/core';
+
     // import { StatusOnlineIcon, StatusOfflineIcon } from '@heroicons/vue/outline';
 
     export default defineComponent({
@@ -47,7 +50,9 @@
             // const router = useRouter();
             if (localStorage.getItem('user')) {
                 const user = JSON.parse(localStorage.getItem('user'));
+
                 const { setUser } = useActions(['setUser']);
+
                 setUser(user);
             }
 

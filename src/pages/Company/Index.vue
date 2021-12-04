@@ -28,7 +28,6 @@
         <VTable
             class="mt-5"
             :columns="columns"
-            :pagination="pagination"
             :items="filteredClients"
             :actions="actions"
             empty-text="No hay clientes cargados"
@@ -67,9 +66,11 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
+        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal" class="sm:w-[440px] !py-8">
             <template #body>
-                <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
+                <div class="m-4">
+                    Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación
+                </div>
             </template>
             <template #btn>
                 <div class="flex justify-center gap-5 btn">
@@ -141,13 +142,6 @@
             const showModal = ref(false);
             const router = useRouter();
             const showBackdrop = ref(false);
-
-            const pagination = ref({
-                sortKey: 'id',
-                sortDir: 'asc',
-                // currentPage: 1,
-                // perPage: 10,
-            });
 
             const columns = [
                 { title: 'Cliente', key: 'name', sortable: true },
@@ -269,7 +263,6 @@
                 confirmModal,
                 showModal,
                 columns,
-                pagination,
                 actions,
                 showBackdrop,
                 selectedClient,

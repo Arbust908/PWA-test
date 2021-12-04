@@ -40,16 +40,7 @@
                         >
                             <div class="absolute top-0 right-0 -mr-12 pt-2">
                                 <button
-                                    class="
-                                        ml-1
-                                        flex
-                                        items-center
-                                        justify-center
-                                        h-10
-                                        w-10
-                                        rounded-full
-                                        focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white
-                                    "
+                                    class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                                     @click="sidebarOpen = false"
                                 >
                                     <span class="sr-only">Close sidebar</span>
@@ -113,13 +104,7 @@
         <div class="flex flex-col w-0 flex-1 overflow-hidden">
             <div class="relative z-10 flex-shrink-0 flex h-16 bg-second-50 shadow">
                 <button
-                    class="
-                        px-4
-                        border-r border-second-200
-                        text-second-500
-                        focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500
-                        md:hidden
-                    "
+                    class="px-4 border-r border-second-200 text-second-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
                     @click="sidebarOpen = true"
                 >
                     <span class="sr-only">Open sidebar</span>
@@ -174,15 +159,7 @@
                         <Menu as="div" class="ml-3 relative">
                             <div>
                                 <MenuButton
-                                    class="
-                                        max-w-xs
-                                        bg-second-50
-                                        flex
-                                        items-center
-                                        text-sm
-                                        rounded-full
-                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                                    "
+                                    class="max-w-xs bg-second-50 flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     <span class="sr-only">Open user menu</span>
                                     <!-- <img
@@ -191,19 +168,7 @@
                     alt=""
                   /> -->
                                     <span
-                                        class="
-                                            flex
-                                            justify-center
-                                            items-center
-                                            h-8
-                                            w-8
-                                            rounded-full
-                                            bg-main-600
-                                            uppercase
-                                            text-second-50
-                                            font-bold
-                                            hover:bg-gradient-br hover:from-main-400 hover:to-main-700 hover:shadow-lg
-                                        "
+                                        class="flex justify-center items-center h-8 w-8 rounded-full bg-main-600 uppercase text-second-50 font-bold hover:bg-gradient-br hover:from-main-400 hover:to-main-700 hover:shadow-lg"
                                     >
                                         <!-- {{ user.username.split('')[0] }} -->
                                         <svg
@@ -232,19 +197,7 @@
                                 leave-to-class="transform opacity-0 scale-95"
                             >
                                 <MenuItems
-                                    class="
-                                        origin-top-right
-                                        absolute
-                                        right-0
-                                        mt-2
-                                        w-48
-                                        rounded-md
-                                        shadow-lg
-                                        py-1
-                                        bg-second-50
-                                        ring-1 ring-black ring-opacity-5
-                                        focus:outline-none
-                                    "
+                                    class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-second-50 ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 >
                                     <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
                                         <router-link
@@ -278,8 +231,6 @@
 </template>
 
 <script lang="ts">
-    import { ref, computed, defineComponent } from 'vue';
-    import { useStore } from 'vuex';
     import {
         Dialog,
         DialogOverlay,
@@ -290,10 +241,14 @@
         TransitionChild,
         TransitionRoot,
     } from '@headlessui/vue';
-    import { useRouter } from 'vue-router';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Logo from '@/components/Logo.vue';
     import NavWrapper from '@/components/navigation/NavWrapper.vue';
+    import PermissionsManager from '@/helpers/canI';
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+    // import { useAbility } from '@casl/vue';
+    // import { Ability } from '@casl/ability';
 
     export default defineComponent({
         components: {
@@ -309,7 +264,7 @@
             NavWrapper,
             Icon,
         },
-        setup() {
+        async setup() {
             const store = useStore();
             const sidebarOpen = ref(false);
             const navigation = computed(() => {
@@ -325,6 +280,15 @@
             const goHome = () => {
                 router.push('/home');
             };
+
+            onMounted(async () => {
+                const { data } = await axios.post(`${api}/user/getRole`, { email: user.value.username });
+
+                const permissions = data.data.permissions;
+                console.log(permissions);
+
+                PermissionsManager.setPermissions([permissions]);
+            });
 
             return {
                 navigation,

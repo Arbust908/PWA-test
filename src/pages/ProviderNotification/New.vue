@@ -50,7 +50,8 @@
             </form>
         </section>
 
-        <footer class="mt-[32px] space-x-3 flex justify-end">
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"
@@ -67,15 +68,7 @@
                     <p class="text-base text-black font-bold">Notificación a proveedores</p>
                     <div
                         v-if="modalData.sandProvider"
-                        class="
-                            bg-gray-100
-                            mt-4
-                            rounded-r-md
-                            py-4
-                            pl-4
-                            mb-2
-                            border-l-4 border-green-500 border-opacity-50
-                        "
+                        class="bg-gray-100 mt-4 rounded-r-md py-4 pl-4 mb-2 border-l-4 border-green-500 border-opacity-50"
                     >
                         <p class="font-bold text-black text-base">Arenas {{ modalData.sandProvider }}</p>
                         <ul>
@@ -106,9 +99,12 @@
                     v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
                     class="divide-y text-center flex flex-col justify-center text-xl items-center"
                 >
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡La notificación fue enviada con éxito!
+                    <Icon icon="ArrowCircleUp" class="h-[60px] w-[60px] rotate-45 mb-5 text-gray-400" />
+                    <span class="text-center text-base border-none text-gray-900"
+                        >¡La notificación está en proceso de envío!
+                    </span>
+                    <span class="text-center text-sm border-none m-2">
+                        En breve lo verás reflejado en la columna “Estado”
                     </span>
                 </div>
                 <div
@@ -127,8 +123,12 @@
                     <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
-                    <SecondaryBtn class="outline-none w-1/3" @click.prevent="$router.push('/')"> Cerrar </SecondaryBtn>
-                    <PrimaryBtn @click.prevent="$router.push('/notificaciones-a-proveedores')">Continuar</PrimaryBtn>
+                    <BaseBtn
+                        class="border-2 text-gray-500 rounded"
+                        @click.prevent="$router.push('/notificaciones-a-proveedores')"
+                    >
+                        Continuar
+                    </BaseBtn>
                 </div>
                 <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
                     <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
@@ -147,8 +147,9 @@
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import { ProviderNotification, SandOrder, TransportProvider, Sand } from '@/interfaces/sandflow';
+    import { ProviderNotification, SandOrder, TransportProvider, Sand, SandProvider } from '@/interfaces/sandflow';
     import { useToggle } from '@vueuse/core';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -171,6 +172,7 @@
             FieldSelect,
             SandProviderPack,
             Icon,
+            BaseBtn,
         },
         setup() {
             useTitle('Notificación a Proveedores <> Sandflow');
@@ -250,6 +252,7 @@
                 amount: null,
                 observation: '',
             };
+
             const addTransportProvider = () => {
                 const lastTransportProvider = transportOrder.value[transportOrder.value.length - 1];
                 const lastTransportProviderId = lastTransportProvider ? lastTransportProvider.id : -2;
@@ -353,7 +356,6 @@
             };
 
             const confirmNotification = async () => {
-                console.log(pN.value);
                 const response = await axios
                     .post(`${apiUrl}/ProviderNotification`, pN.value)
                     .then((res) => {
@@ -390,7 +392,6 @@
                         },
                     ],
                 };
-
                 toggleModal(false);
             };
 
