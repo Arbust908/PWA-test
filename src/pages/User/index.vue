@@ -2,7 +2,7 @@
     <Layout>
         <header class="flex justify-start space-x-4 items-center mb-4">
             <h2 class="text-2xl font-semibold text-gray-900">Usuarios</h2>
-            <router-link to="/usuario/nuevo">
+            <router-link to="/usuarios/nuevo">
                 <PrimaryBtn size="sm">
                     <span> Crear </span>
                     <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
@@ -130,9 +130,9 @@
             });
 
             const columns = [
-                { title: 'Nombre', key: 'name', sortable: true },
+                { title: 'Nombre', key: 'fullName', sortable: true },
                 { title: 'Rol', key: 'observations', sortable: true },
-                { title: 'Mail', key: 'observations', sortable: true },
+                { title: 'Mail', key: 'email', sortable: true },
                 { title: '', key: 'actions' },
             ];
 
@@ -148,7 +148,7 @@
                 {
                     label: 'Editar',
                     callback: (item) => {
-                        router.push(`/cradle/${item.id}`);
+                        router.push(`/usuarios/${item.id}`);
                     },
                 },
                 {
@@ -193,14 +193,6 @@
                         };
                     });
                 }
-
-                // const res = await axios.get(`${apiUrl}/cradle`).catch((err) => {
-                //     console.log(err);
-                // });
-
-                // if (res.status === 200) {
-                //     users.value = res.data.data;
-                // }
 
                 // store.dispatch('setUsers', users.value);
                 loading.value = false;
