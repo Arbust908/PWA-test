@@ -7,7 +7,7 @@
                 :name="id"
                 type="radio"
                 :value="option.value"
-                :checked="option.value === value"
+                :checked="option.value === modelValue"
                 :class="inputClass"
                 :disabled="disabled"
                 :required="required"
@@ -15,7 +15,7 @@
                 @change="updateValue(option.value)"
             />
             <label :for="id + index" class="ml-3">{{ option.text }}</label>
-            <slot v-if="option.value === value" :name="option.value" />
+            <slot v-if="option.value === modelValue" :name="option.value" />
         </div>
     </fieldset>
 </template>
@@ -34,7 +34,7 @@
                 type: String,
                 required: true,
             },
-            value: {
+            modelValue: {
                 type: [String, Number, Boolean, Object],
                 default: null,
             },
