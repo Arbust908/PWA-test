@@ -275,7 +275,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/usuarios',
         name: 'User',
         component: () => import('@/pages/User/index.vue'),
-        beforeEnter: isMobileAndLogged,
+        beforeEnter: isLogged,
     },
     {
         path: '/usuarios/:id',
