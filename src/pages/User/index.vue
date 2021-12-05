@@ -17,6 +17,7 @@
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
                 endpoint="/user"
+                endpoint-key="firstName"
                 :only-visible="false"
                 :data="cradleId"
                 @update:data="cradleId = $event"
@@ -39,7 +40,7 @@
                 <td>
                     {{ user.fullName }}
                 </td>
-                <td>rol</td>
+                <td>{{ user.Role?.name }}</td>
                 <td>
                     {{ user.email }}
                 </td>
@@ -50,7 +51,7 @@
                 {{ item.fullName || 'Sin nombre' }}
             </template>
 
-            <template #mobileSubtitle="{ item }"> <span class="font-bold">Rol: </span>ROL </template>
+            <template #mobileSubtitle="{ item }"> <span class="font-bold">Rol: </span> {{ item.Role?.name }} </template>
         </VTable>
 
         <Modal title="¿Desea inhabilitar este cradle?" type="error" :open="showModal">
@@ -70,7 +71,7 @@
                 <p class="!text-lg !text-black">{{ selectedUser.fullName }}</p>
                 <p class="mt-2">
                     <strong>Rol: </strong>
-                    ROLE
+                    {{ selectedUser.Role?.name }}
                 </p>
                 <p class="mt-2">
                     <strong>Email: </strong>
@@ -131,7 +132,7 @@
 
             const columns = [
                 { title: 'Nombre', key: 'fullName', sortable: true },
-                { title: 'Rol', key: 'observations', sortable: true },
+                { title: 'Rol', key: 'Role.name', sortable: true },
                 { title: 'Mail', key: 'email', sortable: true },
                 { title: '', key: 'actions' },
             ];
@@ -185,7 +186,7 @@
                 const result = await useStoreLogic(router, store, 'user', 'getAll');
 
                 if (result.type == 'success') {
-                    users.value = result.res.users.map((user) => {
+                    users.value = result.res.map((user) => {
                         return {
                             ...user,
                             visible: true,
