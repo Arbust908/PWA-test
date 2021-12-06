@@ -20,6 +20,9 @@ export default defineConfig({
             },
         }),
     ],
+    server: {
+        host: true,
+    },
     resolve: {
         alias: [{ find: '@', replacement: '/src' }],
     },
