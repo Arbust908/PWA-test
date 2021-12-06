@@ -331,6 +331,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Error-504',
         component: () => import('@/pages/Error/504.vue'),
     },
+    {
+        path: '/tests',
+        name: 'TestIndex',
+        component: () => import('@/pages/Tests/Modales.vue'),
+    },
 ];
 
 const router = createRouter({

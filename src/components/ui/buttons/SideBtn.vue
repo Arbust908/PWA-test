@@ -1,6 +1,6 @@
 <template>
     <BaseBtn :btn="`side ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
-        <slot></slot>
+        <slot>Side</slot>
     </BaseBtn>
 </template>
 

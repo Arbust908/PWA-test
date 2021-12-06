@@ -1,5 +1,5 @@
 <template>
-    <div :class="isDark ? 'dark' : null" class="h-screen w-full flex overflow-hidden font-body">
+    <div :class="isDark ? 'dark' : null" class="h-screen w-full flex flex-col overflow-hidden font-body">
         <!-- <aside
       :class="isOnline ? 'bg-green-500' : 'bg-red-500'"
       class="
