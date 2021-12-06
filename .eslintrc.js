@@ -35,7 +35,6 @@ module.exports = {
     rules: {
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         '@typescript-eslint/no-explicit-any': 'off',
-        'css.lint.unknownAtRules': 'off',
         'consistent-return': 'off',
         'import/no-cycle': 'off',
         'import/prefer-default-export': 'off',

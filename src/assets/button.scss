@@ -1,7 +1,9 @@
 .btn {
+    // Puntos base de BTNs
     @apply border-transparent inline-flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500 space-x-2 transition duration-150 ease-out cursor-pointer;
     // Esto es para que en Safari no aparezca un degrade
     -webkit-appearance: none;
+
     &__draft {
         @apply border-[#117E49] text-[#117E49] bg-transparent hover:bg-[#117E49] hover:bg-opacity-25 hover:shadow-lg;
     }
@@ -22,13 +24,7 @@
         @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
     }
 
-    &__mobile-only {
-        @apply lg:hidden;
-    }
-
-    &__desktop-only {
-        @apply hidden lg:inline-flex;
-    }
+    
     &[size='xs'] {
         @apply text-xs rounded px-2.5 py-1.5;
     }
@@ -44,6 +40,27 @@
     &[size='xl'] {
         @apply text-lg leading-6 font-light rounded-xl px-8 py-4;
     }
+    &.circular {
+        @apply inline-flex justify-center items-center transition duration-150 ease-out rounded-full m-auto;
+        &:hover {
+            @apply bg-opacity-75 shadow-lg;
+        }
+    }
+    &.circular[size='xs'] {
+        @apply w-8 h-8;
+    }
+    &.circular[size='sm'] {
+        @apply w-10 h-10;
+    }
+    &.circular[size='md'] {
+        @apply w-12 h-12;
+    }
+    &.circular[size='lg'] {
+        @apply w-14 h-14;
+    }
+    &.circular[size='xl'] {
+        @apply w-16 h-16;
+    }
     &.main {
         @apply text-white bg-main-600 hover:bg-main-700 border shadow-sm hover:shadow-lg;
     }
@@ -54,27 +71,47 @@
         @apply text-main-600 border shadow-sm hover:text-main-400 hover:shadow-lg;
     }
     &.side {
-        @apply text-main-500 bg-white hover:bg-second-200 text-center font-semibold border border-transparent shadow-lg hover:shadow justify-center p-4;
+        @apply text-main-500 bg-white hover:bg-second-200 text-center font-semibold border border-transparent shadow-lg hover:shadow justify-center;
     }
-    &.none:hover {
-        @apply bg-second-100 bg-opacity-50;
+    &.none {
+        @apply border-transparent border hover:opacity-75 hover:border-gray-200;
     }
+
+    // Estilos de Ancho
     &.wide {
         @apply px-8;
     }
     &.narrow {
         @apply px-2;
     }
+    &.extra-wide {
+        @apply px-14;
+    }
+    &.extra-narrow {
+        @apply px-1;
+    }
     &.full {
         @apply w-full;
     }
+
+    // Estios de Color
     &.warning {
-        @apply border-transparent text-white bg-red-700 hover:bg-red-800 hover:text-white mx-2 px-5 py-3 transition duration-150 ease-out;
+        @apply border-transparent text-white bg-red-700 hover:bg-red-800 hover:text-white transition duration-150 ease-out;
+    }
+    &.success {
+        @apply border-transparent text-white bg-green-700 hover:bg-green-800 hover:text-white transition duration-150 ease-out;
     }
     &:disabled {
         @apply opacity-50 cursor-not-allowed bg-yellow-400;
     }
     &[disabled='true'] {
         @apply opacity-50 cursor-not-allowed;
+    }
+
+    &__mobile-only {
+        @apply lg:hidden;
+    }
+    &__desktop-only {
+        @apply hidden lg:inline-flex;
     }
 }
