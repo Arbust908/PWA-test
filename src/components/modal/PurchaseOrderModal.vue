@@ -1,164 +1,112 @@
 <template>
-    <TransitionRoot as="template" :show="open">
-        <Dialog
-            as="div"
-            static
-            class="fixed z-10 top-10 inset-x-0 md:inset-0 overflow-y-auto"
-            :open="open"
-            @close="$emit('close')"
-        >
-            <div class="block min-h-screen pt-4 px-4 text-center">
-                <!-- <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"> -->
-                <TransitionChild
-                    as="template"
-                    enter="ease-out duration-200"
-                    enter-from="opacity-0"
-                    enter-to="opacity-100"
-                    leave="ease-in duration-200"
-                    leave-from="opacity-100"
-                    leave-to="opacity-0"
-                >
-                    <DialogOverlay class="fixed inset-0 bg-gray-600 bg-opacity-50 transition-opacity" />
-                </TransitionChild>
-
-                <!-- This element is to trick the browser into centering the modal contents. -->
-                <span class="hidden sm:inline-block align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                <TransitionChild
-                    as="template"
-                    enter="ease-out duration-200"
-                    enter-from="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                    enter-to="opacity-100 translate-y-0 sm:scale-100"
-                    leave="ease-in duration-200"
-                    leave-from="opacity-100 translate-y-0 sm:scale-100"
-                    leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
-                >
-                    <div
-                        class="
-                            inline-block
-                            bg-second-50
-                            rounded-lg
-                            text-left
-                            overflow-hidden
-                            shadow-xl
-                            transform
-                            transition-all
-                            w-[315px]
-                            sm:w-[440px]
-                            my-8
-                            align-middle
-                            p-6
-                        "
-                        v-bind="$attrs"
-                    >
-                        <div>
-                            <div
-                                v-if="type === 'error'"
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    h-12
-                                    w-12
-                                    rounded-full
-                                    bg-red-100
-                                    sm:h-10 sm:w-10
-                                "
-                            >
-                                <svg
-                                    width="48"
-                                    height="48"
-                                    viewBox="0 0 48 48"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M24 0C10.752 0 0 10.752 0 24C0 37.248 10.752 48 24 48C37.248 48 48 37.248 48 24C48 10.752 37.248 0 24 0ZM26.4 36H21.6V31.2H26.4V36ZM26.4 26.4H21.6V12H26.4V26.4Z"
-                                        fill="#BE1A3B"
-                                    />
-                                </svg>
-                            </div>
-                            <div
-                                v-else-if="type === 'success'"
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    h-12
-                                    w-12
-                                    rounded-full
-                                    sm:h-10 sm:w-10
-                                    bg-green-100
-                                "
-                            >
-                                <CheckIcon class="h-6 w-6 text-green-600" aria-hidden="true" />
-                            </div>
-                            <div v-else-if="type === 'off'"></div>
-                            <div
-                                v-else
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    h-10
-                                    w-10
-                                    bg-second-200
-                                "
-                            >
-                                <QuestionMarkCircleIcon class="h-6 w-6 text-second-600" aria-hidden="true" />
-                            </div>
-                            <div class="text-center">
-                                <DialogTitle as="h3" class="text-lg leading-6 font-medium text-second-900">
-                                    {{ title }}
-                                </DialogTitle>
-                                <div class="text-sm text-second-500">
-                                    <slot name="body"></slot>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-5 sm:mt-6">
-                            <slot name="btn"></slot>
-                        </div>
-                    </div>
-                </TransitionChild>
+    <Modal :open="open" @close="$emit('close')">
+        <h2 class="text-base text-black font-bold text-left">Orden de pedido</h2>
+        <div class="w-full max-w-sm text-left text-gray-800">
+            <div class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
+                <h3 class="font-bold text-black text-base">Arenas {{ po.sandProvider.name }}</h3>
+                <ul>
+                    <li v-for="(so, index) in po.sandOrders" :key="index" class="ml-2 text-black text-sm list-none">
+                        {{ so.amount }}t - {{ getSandType(so?.sandTypeId) }} -
+                        {{ so.boxId !== '' ? so.boxId : 'Sin ID de caja' }}
+                    </li>
+                </ul>
             </div>
-        </Dialog>
-    </TransitionRoot>
+            <div class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
+                <h3 class="font-bold text-black text-base">Transporte {{ po.transportProvider.name }}</h3>
+                <li v-for="(tp, i) in po.transportOrders" :key="i" class="ml-2 text-black text-sm list-none mt-2">
+                    <p>Patente: {{ tp.licensePlate }} - Cantidad: {{ tp.boxAmount }}</p>
+                    <p>Observaciones: {{ tp.observations !== '' ? ' - ' + tp.observations : null }}</p>
+                </li>
+            </div>
+        </div>
+        <div class="flex items-center">
+            <input
+                id="checkbox"
+                v-model="checked"
+                type="checkbox"
+                class="outline-none focus:outline-none text-green-500 rounded mr-2"
+            />
+            <label for="checkbox">Enviar mail a proveedores</label>
+        </div>
+        <div class="w-full flex gap-x-6 justify-end mt-3">
+            <SecondaryBtn @click.prevent="$emit('close')"> Volver </SecondaryBtn>
+            <PrimaryBtn @click.prevent="$emit('confirm')" @click="checked && downloadPDF(po)"> Confirmar </PrimaryBtn>
+        </div>
+    </Modal>
 </template>
 
 <script lang="ts">
-    import { ref, toRefs } from 'vue';
-    import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-    import { CheckIcon, QuestionMarkCircleIcon, ExclamationIcon } from '@heroicons/vue/outline';
-
-    export default {
+    import { defineComponent, ref, watchEffect } from 'vue';
+    import Modal from '@/components/modal/General.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import { isEven } from '@/helpers/iteretionHelpers';
+    import jsPDF from 'jspdf';
+    export default defineComponent({
         components: {
-            Dialog,
-            DialogOverlay,
-            DialogTitle,
-            TransitionChild,
-            TransitionRoot,
-            CheckIcon,
-            QuestionMarkCircleIcon,
-            ExclamationIcon,
+            Modal,
+            PrimaryBtn,
+            SecondaryBtn,
         },
-        inheritAttrs: false,
         props: {
-            title: String,
-            type: {
-                type: String,
-                default: 'info',
-                validate: (value) => ['error', 'success', 'info', 'off'].includes(value),
+            po: {
+                type: Object,
+                required: true,
             },
-            open: Boolean,
+            open: {
+                type: Boolean,
+                required: true,
+            },
         },
+        emits: ['close'],
         setup(props) {
+            const getSandType = (sandTypeId: number) => {
+                const sandType = props.po.sands.find((st) => st.id === sandTypeId);
+
+                return sandType ? sandType.type : 'Sin tipo de arena';
+            };
+            const content = ref(null);
+            watchEffect(() => {
+                console.log(content.value);
+            });
+
+            const checked = ref(false);
+
+            const downloadPDF = (po) => {
+                const doc = new jsPDF();
+                console.log('po', po);
+
+                const id = 'ID-123';
+                const spName = po.sandProvider.name;
+                const sandOrder = JSON.stringify(po.sandOrders);
+
+                const tpName = po.transportProvider.name;
+                const transportOrder = JSON.stringify(po.transportOrders);
+
+                doc.text('Orden de pedido', 10, 10);
+
+                doc.text('Provedor de Arena: ' + spName, 10, 20);
+                doc.text(sandOrder, 10, 26);
+
+                doc.text('Provedoor de Transporte: ' + tpName, 10, 35);
+                doc.text(transportOrder, 10, 41);
+
+                doc.save('OrdenDePedido' + id + '.pdf');
+            };
+
             return {
-                ...toRefs(props),
+                checked,
+                downloadPDF,
+                getSandType,
+                isEven,
             };
         },
-    };
+    });
 </script>
+
+<style scoped>
+    #checkbox {
+        outline: none;
+        text-decoration: none;
+    }
+</style>
