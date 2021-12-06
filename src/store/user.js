@@ -78,7 +78,6 @@ export default {
                 middleName: '',
                 lastName: '',
                 email: payload.value.email,
-                password: 'Password123!', //hardcoded
                 ...payload.value,
             };
 
