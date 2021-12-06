@@ -1,6 +1,13 @@
 <template>
     <div class="flex gap-2 items-center p-1 rounded border border-second-300">
-        <input type="text" v-maska="'##/##/####'" class="sel calendar" v-model="fecha" @blur="imprimir" />
+        <input
+            type="text"
+            placeholder="--/--/----"
+            v-maska="'##/##/####'"
+            class="sel calendar"
+            v-model="date"
+            @blur="getDate"
+        />
     </div>
 </template>
 
@@ -14,18 +21,25 @@
     export default {
         name: 'DatePicker',
         directives: { maska },
-        props: {
-            delDate: {
-                type: Date,
-                required: true,
-            },
-        },
         setup(props: any) {
-            const fecha = ref('');
-            function imprimir() {
-                console.log(fecha.value);
+            const date = ref('');
+            let dateSplit = [];
+            let day = 0;
+            let month = 0;
+            let year = 0;
+            function getDate() {
+                dateSplit = date.value.split('/');
+                day = parseInt(dateSplit[0]);
+                month = parseInt(dateSplit[1]);
+                year = parseInt(dateSplit[2]);
+                console.log(date.value);
+                console.log(date.value);
+                console.log(dateSplit);
+                console.log(day);
+                console.log(month);
+                console.log(year);
             }
-            return { fecha, imprimir };
+            return { date, getDate };
         },
     };
 </script>

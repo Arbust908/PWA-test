@@ -95,7 +95,7 @@
                         </button>
                     </FieldGroup>
                 </template>
-                <FieldGroup>
+                <FieldGroup class="max-w-3xl relative">
                     <FieldLegend class="mt-2">Transporte</FieldLegend>
                     <FieldSelect
                         class="col-span-12 md:col-span-6"
@@ -160,12 +160,12 @@
                         />
                     </FieldGroup>
                 </FieldGroup>
-                <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="col-span-full relative">
+                <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="max-w-3xl relative">
                     <FieldLegend class="mt-2">Observaciones</FieldLegend>
                     <section class="flex gap-2 sm:flex-row items-start col-span-12">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
-                            <DatePicker v-model="delDate" />
+                            <DatePicker />
                         </label>
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Hora de entrega</p>
