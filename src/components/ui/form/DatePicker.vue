@@ -1,11 +1,11 @@
 <template>
-    <div class="flex gap-2 items-center p-1 rounded border border-second-300">
+    <div class="flex p-1 items-center rounded border border-second-300">
         <input
+            v-model="date"
+            v-maska="'##/##/####'"
             type="text"
             placeholder="--/--/----"
-            v-maska="'##/##/####'"
-            class="sel calendar"
-            v-model="date"
+            class="sel w-40"
             @blur="getDate"
         />
     </div>
@@ -27,6 +27,7 @@
             let day = 0;
             let month = 0;
             let year = 0;
+
             function getDate() {
                 dateSplit = date.value.split('/');
                 day = parseInt(dateSplit[0]);
@@ -39,6 +40,7 @@
                 console.log(month);
                 console.log(year);
             }
+
             return { date, getDate };
         },
     };
@@ -71,9 +73,5 @@
         button {
             @apply relative z-10;
         }
-    }
-    .calendar::-webkit-calendar-picker-indicator {
-        display: none;
-        -webkit-appearance: none;
     }
 </style>

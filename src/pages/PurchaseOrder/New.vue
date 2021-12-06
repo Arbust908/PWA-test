@@ -15,7 +15,7 @@
                 </FieldGroup>
                 <FieldLegend>Arena</FieldLegend>
                 <template v-for="(providerId, sandProvidersKey) in sandProvidersIds" :key="sandProvidersKey">
-                    <div class="w-full grid grid-cols-12 gap-6 mb-4">
+                    <div class="max-w-2xl w-full grid grid-cols-12 gap-6 mb-4">
                         <FieldSelect
                             class="col-span-12 mt-5 md:col-span-6"
                             field-name="sandProvider"
@@ -160,12 +160,12 @@
                         />
                     </FieldGroup>
                 </FieldGroup>
-                <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="max-w-3xl relative">
+                <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="max-w-3xl relative flex-wrap">
                     <FieldLegend class="mt-2">Observaciones</FieldLegend>
-                    <section class="flex gap-2 sm:flex-row items-start col-span-12">
+                    <section class="flex gap-2 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
-                            <DatePicker />
+                            <DatePicker class="mr-6 md:mr-8" />
                         </label>
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Hora de entrega</p>
@@ -175,8 +175,9 @@
 
                     <FieldTextArea
                         title="Observaciones"
-                        class="col-span-12 sm:col-span-6"
+                        class="col-span-12 sm:col-span-8"
                         field-name="observations"
+                        rows="3"
                         placeholder=""
                         is-optional
                         :data="to.observations"
@@ -192,11 +193,14 @@
             </PrimaryBtn>
         </footer>
         <OrderModal v-if="showModal" :show-modal="showModal" :po="po" @close="showModal = false" @confirm="save()" />
+        <SuccessModal :open="false" :title="titleSuccess" />
+        <ErrorModal :open="false" :title="titleErrorGral" :text="textErrorGral" />
+        <ErrorModal :open="false" :title="titleError" :text="textError" />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, watch, watchEffect } from 'vue';
+    import { ref, Ref, reactive, computed, ComputedRef, watch, watchEffect, defineAsyncComponent } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
@@ -226,6 +230,10 @@
     import TimePicker from '@/components/ui/form/TimePicker.vue';
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import DatePicker from '@/components/ui/form/DatePicker.vue';
+    // import SuccessModal from '@/components/modal/SuccessModal.vue';
+    const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
+    const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
+    const GhostBtn = defineAsyncComponent(() => import('@/components/ui/buttons/GhostBtn.vue'));
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
@@ -245,6 +253,9 @@
             TimePicker,
             FieldTextArea,
             DatePicker,
+            SuccessModal,
+            ErrorModal,
+            GhostBtn,
         },
         setup() {
             useTitle('Nueva orden de pedido <> Sandflow');
@@ -503,6 +514,12 @@
                     });
                 }
             };
+            // >> Success y Error Modal
+            const titleSuccess = 'La orden de pedido #numero ha sido generada con éxito';
+            const titleError = '¡Ups! Hubo un problema y no pudimos guardar la orden de pedido.';
+            const textError = 'Por favor, intentá nuevamente en unos minutos.';
+            const titleErrorGral = 'Hubo un problema al intentar generar la orden.';
+            const textErrorGral = 'Por favor, verifica los datos ingresados e intenta nuevamente';
 
             return {
                 sandOrder,
@@ -534,6 +551,12 @@
                 isNotLastAndNotLonly,
                 changeProvider,
                 filteredSandTypes,
+                titleSuccess,
+                titleError,
+                textError,
+                titleErrorGral,
+                textErrorGral,
+                GhostBtn,
             };
         },
     };

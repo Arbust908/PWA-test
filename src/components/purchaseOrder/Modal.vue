@@ -78,7 +78,7 @@
                 console.log(content.value);
             });
 
-            const checked = ref(false);
+            const checked = ref(true);
 
             const downloadPDF = (po) => {
                 const doc = new jsPDF();
