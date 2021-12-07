@@ -7,6 +7,7 @@
         :icon="{ type: 'ExclamationCircle', classes: 'text-red-700' }"
         :btn="{ text: 'Volver', classes: 'warning' }"
         @close="$emit('close')"
+        @main="$emit('close')"
     />
 </template>
 
