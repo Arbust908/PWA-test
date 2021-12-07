@@ -31,8 +31,12 @@
                             <FieldInput
                                 class="col-span-full sm:col-span-3"
                                 :field-name="`transportAmount${tO.id}`"
+                                title="Camiones"
                                 placeholder="Camiones"
-                                title="Cantidad de camiones"
+                                mask="####"
+                                required-validation
+                                validation-type="extension"
+                                :char-amount="{ min: 1, max: 4 }"
                                 :data="tO.amount"
                                 @update:data="tO.amount = $event"
                             />
@@ -66,6 +70,9 @@
             <template #body>
                 <div v-if="!isNotificationConfirmed" class="text-left">
                     <p class="text-base text-black font-bold">Notificación a proveedores</p>
+                    <p class="text-center text-base border-none m-2">
+                        Se está por enviar una notificación a los siguientes proveedores:
+                    </p>
                     <div
                         v-if="modalData.sandProvider"
                         class="bg-gray-100 mt-4 rounded-r-md py-4 pl-4 mb-2 border-l-4 border-green-500 border-opacity-50"

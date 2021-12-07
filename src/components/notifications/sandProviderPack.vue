@@ -30,10 +30,14 @@
                 />
                 <FieldWithSides
                     class="col-span-5 sm:col-span-3"
-                    :title="Key === 0 ? 'Peso' : ''"
+                    :title="Key === 0 ? 'Cantidad' : ''"
                     :field-name="`sandQuantity${Key}`"
-                    placeholder="0 t"
+                    placeholder="0"
                     type="number"
+                    mask="####"
+                    require-validation
+                    validation-type="extension"
+                    :char-amount="{ min: 1, max: 4 }"
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
                     :data="so.amount"
                     @update:data="so.amount = $event"
@@ -137,6 +141,7 @@
                 newSandOrder.innerId = ++sandOrderInnerId.value;
                 const currSP = getCurrentSandProvider(spId);
                 currSP?.SandOrders?.push(newSandOrder);
+                console.log(newSandOrder);
             };
             const removeSandOrder = (spId: number, soInid: number) => {
                 const currSP = getCurrentSandProvider(spId);
