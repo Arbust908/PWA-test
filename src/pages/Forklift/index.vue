@@ -34,7 +34,7 @@
                 </td>
 
                 <td :class="[item.observations ? null : 'empty', item.visible ? null : 'notallowed observations']">
-                    {{ `${item.observations.substring(0, 25)}...` || 'Sin observaciones' }}
+                    {{ item.observations || 'Sin observaciones' }}
                 </td>
 
                 <tr v-if="fDB && fDB.length <= 0">
@@ -56,20 +56,13 @@
                 <div v-else>Sin observaciones</div>
             </template>
         </VTable>
-
-        <Modal title="¿Desea inhabilitar este forklift?" type="error" :open="showModal">
-            <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este forklift en ninguna otra sección de la aplicación
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <BaseBtn class="outline-none text-gray-500" @click="showModal = false"> Volver </BaseBtn>
-                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar</ErrorBtn>
-                </div>
-            </template>
-        </Modal>
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este forklift?"
+            text="Una vez inhabilitado, no podrá utilizar este forklift en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
 
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
@@ -102,6 +95,7 @@
     import Backdrop from '@/components/modal/Backdrop.vue';
     import ErrorBtn from '@/components/ui/buttons/ErrorBtn.vue';
     import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
 
     export default {
         components: {
@@ -118,6 +112,7 @@
             Backdrop,
             ErrorBtn,
             BaseBtn,
+            DisableModal,
         },
         setup() {
             useTitle('Forklifts <> Sandflow');

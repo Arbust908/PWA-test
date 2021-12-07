@@ -79,25 +79,15 @@
             </template>
         </Modal>
 
-        <Modal
-            title="¿Desea inhabilitar este centro de carga de arena?"
-            modal-classes="max-w-[480px]"
-            type="error"
+        <DisableModal
             :open="showModal"
-        >
-            <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este centro de carga de arena en ninguna otra sección de la
-                    aplicación
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn btn="!text-gray-500" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!bg-red-600" @click="confirmModal">Inhabilitar centro de carga </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
+            title="¿Desea inhabilitar este centro de carga de arena?"
+            text="Una vez inhabilitado, no podrá utilizar este centro de carga de arena en ninguna otra sección de la
+                    aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
                 <p class="!text-lg !text-black">{{ selectedSandProvider.name }}</p>
@@ -136,6 +126,7 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
 
     export default {
         components: {
@@ -147,6 +138,7 @@
             FieldSelect,
             VTable,
             Backdrop,
+            DisableModal,
         },
         setup() {
             useTitle(`Centro de carga de Arena <> Sandflow`);

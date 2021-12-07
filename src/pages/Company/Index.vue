@@ -66,19 +66,14 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal" class="sm:w-[440px] !py-8">
-            <template #body>
-                <div class="m-4">
-                    Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn btn="!text-gray-500" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!px-10 !bg-red-700" @click="confirmModal">Inhabilitar </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este cliente?"
+            text="Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
                 <p class="!text-lg !text-black">{{ selectedClient.name }}</p>
@@ -104,33 +99,30 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
-    import { useStore } from 'vuex';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
+    import Backdrop from '@/components/modal/Backdrop.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
+
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
-    import Backdrop from '@/components/modal/Backdrop.vue';
 
     export default {
         components: {
-            Layout,
-            PrimaryBtn,
+            Backdrop,
+            Badge,
+            DisableModal,
+            FieldSelect,
             GhostBtn,
             Icon,
-            FieldSelect,
-            Badge,
-            Modal,
+            Layout,
+            PrimaryBtn,
             VTable,
-            Backdrop,
         },
         setup() {
             useTitle('Clientes <> Sandflow');

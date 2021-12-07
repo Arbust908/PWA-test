@@ -56,22 +56,13 @@
             </template>
         </VTable>
 
-        <Modal
-            class="sm:w-[440px] sm:h-[248] !py-8"
-            title="¿Desea inhabilitar esta planificación de arenas?"
-            type="error"
+        <DisableModal
             :open="showModal"
-        >
-            <template #body>
-                <div>Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación</div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn btn="!text-gray-500" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!bg-red-700" @click="confirmModal">Inhabilitar </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
+            title="¿Desea inhabilitar esta planificación de arenas?"
+            text="Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
 
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
