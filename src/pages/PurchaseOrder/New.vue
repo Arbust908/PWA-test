@@ -74,9 +74,10 @@
                             >
                                 <Icon icon="Trash" type="outline" class="w-7 h-7" />
                             </CircularBtn>
+                            <!-- Arena Section -->
                             <div class="hidden sm:block">
                                 <CircularBtn
-                                    v-if="isLast(orderKey, providerId.sandOrders)"
+                                    v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
                                     size="md"
                                     btn-class="bg-green-500"
                                     @click.prevent="addOrder(providerId.innerId)"
@@ -293,7 +294,7 @@
 
             const defaultTransportOrder = {
                 innerId: 0,
-                boxAmount: 0,
+                boxAmount: 1,
                 licensePlate: '',
                 observations: '',
                 purchaseOrderId: -1,
@@ -370,11 +371,15 @@
                     sandTypes.value = sOData.data;
                 }
             });
+            const soLength = ref(0);
 
             const removeOrder = (id: number, providerOrderId): void => {
                 const currentSPI = sandProvidersIds.value.find((spi) => spi.innerId === providerOrderId);
                 currentSPI.sandOrders = currentSPI.sandOrders.filter((order) => order.id !== id);
+                soLength.value -= 1;
+                TransportOrders.value[0].boxAmount = soLength.value;
             };
+
             const addOrder = (providerOrderId: number): void => {
                 const currentSPI = sandProvidersIds.value.find((spi) => spi.innerId === providerOrderId);
                 const sandOrder = currentSPI.sandOrders;
@@ -386,6 +391,8 @@
                     amount: null,
                     boxId: '',
                 });
+                soLength.value = sandOrder.length;
+                TransportOrders.value[0].boxAmount = soLength.value;
             };
             // :: TransportProvider
             const transportProviders = ref([]);
@@ -557,6 +564,7 @@
                 titleErrorGral,
                 textErrorGral,
                 GhostBtn,
+                soLength,
             };
         },
     };
