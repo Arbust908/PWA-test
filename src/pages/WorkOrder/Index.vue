@@ -67,18 +67,13 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar esta orden de trabajo?" type="error" :open="showModal">
-            <template #body>
-                <div>Una vez inhabilitada, no podrá utilizar este orden en ninguna otra sección de la aplicación</div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!bg-red-700" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
-
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar esta orden de trabajo?"
+            text="Una vez inhabilitada, no podrá utilizar este orden en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
                 <div class="flex items-center mt-1">
@@ -117,6 +112,7 @@
     import Modal from '@/components/modal/General.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import VTable from '@/components/ui/table/VTable.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
     import axios from 'axios';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -135,6 +131,7 @@
             Modal,
             PrimaryBtn,
             VTable,
+            DisableModal,
         },
         setup() {
             useTitle('Ordenes de Trabajo <> Sandflow');

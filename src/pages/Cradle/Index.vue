@@ -55,17 +55,13 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar este cradle?" type="error" :open="showModal">
-            <template #body>
-                <div>Una vez inhabilitado, no podrá utilizar este cradle en ninguna otra sección de la aplicación</div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn btn="!text-gray-500" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!bg-red-700" @click="confirmModal">Inhabilitar cradle </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este cradle?"
+            text="Una vez inhabilitado, no podrá utilizar este cradle en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
 
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
@@ -91,6 +87,7 @@
     import Modal from '@/components/modal/General.vue';
     import { useRouter } from 'vue-router';
     import Backdrop from '@/components/modal/Backdrop.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
@@ -104,6 +101,7 @@
             GhostBtn,
             Modal,
             Backdrop,
+            DisableModal,
         },
         setup() {
             useTitle('Cradles <> Sandflow');

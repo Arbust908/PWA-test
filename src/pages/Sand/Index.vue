@@ -68,24 +68,20 @@
                 <span class="font-bold">Observaciones: </span> {{ item.observations }}
             </template>
         </VTable>
+
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este tipo de arena?"
+            text="Una vez inhabilitado, no podrá utilizar este tipo de arena en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
         <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
             <template #body>
                 <BackdropCard :info="bdInfo" />
             </template>
         </Backdrop>
-        <Modal title="¿Desea inhabilitar este tipo de arena?" type="error" :open="showModal">
-            <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este tipo de arena en ninguna otra sección de la aplicación
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <BaseBtn class="text-gray-500" @click="showModal = false"> Volver </BaseBtn>
-                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar</ErrorBtn>
-                </div>
-            </template>
-        </Modal>
     </Layout>
 </template>
 
@@ -100,6 +96,8 @@
     import Popper from 'vue3-popper';
 
     import BackdropCard from '@/components/sand/BackdropCard.vue';
+
+    import DisableModal from '@/components/modal/DisableModal.vue';
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
@@ -123,6 +121,7 @@
             Popper,
             PrimaryBtn,
             VTable,
+            DisableModal,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');

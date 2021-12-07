@@ -56,22 +56,20 @@
                 <span class="font-bold">Domicilio: </span>{{ item.address }}
             </template>
         </VTable>
+
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este proveedor?"
+            text="Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación."
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
         <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
             <template #body>
                 <BackdropCard :info="bdInfo" />
             </template>
         </Backdrop>
-        <Modal title="¿Desea inhabilitar este proveedor?" type="error" :open="showModal" class="xs:w-[440px] px-6">
-            <template #body>
-                <div>Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación.</div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn btn="!text-gray-500" @click="showModal = false"> Volver </GhostBtn>
-                    <ErrorBtn @click="confirmModal">Inhabilitar </ErrorBtn>
-                </div>
-            </template>
-        </Modal>
     </Layout>
 </template>
 
@@ -88,6 +86,7 @@
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import VTable from '@/components/ui/table/VTable.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
@@ -108,6 +107,7 @@
             PrimaryBtn,
             VTable,
             ErrorBtn,
+            DisableModal,
         },
         setup() {
             useTitle('Proveedores de Transporte <> Sandflow');
