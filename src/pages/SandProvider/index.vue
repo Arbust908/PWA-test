@@ -1,15 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Centro de carga de arena</h2>
-            <router-link :to="{ name: 'NewSandProvider' }">
-                <PrimaryBtn size="sm">
-                    <span> Crear </span>
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
+        <ABMHeader title="Centro de carga de arena" link="/proveedores-de-arena/nuevo" />
 
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
@@ -127,6 +118,7 @@
     import VTable from '@/components/ui/table/VTable.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import DisableModal from '@/components/modal/DisableModal.vue';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
 
     export default {
         components: {
@@ -139,6 +131,7 @@
             VTable,
             Backdrop,
             DisableModal,
+            ABMHeader,
         },
         setup() {
             useTitle(`Centro de carga de Arena <> Sandflow`);
