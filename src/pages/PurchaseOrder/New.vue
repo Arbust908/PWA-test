@@ -130,6 +130,10 @@
                             placeholder="AA123AA"
                             endpoint="/sand"
                             endpoint-key="type"
+                            required-validation
+                            validation-type="extension"
+                            :maxlength="10"
+                            :isReadonly="true"
                             :data="to.licensePlate"
                             @update:data="to.licensePlate = $event"
                         />
@@ -141,6 +145,10 @@
                             placeholder="101AA123AA"
                             endpoint="/sand"
                             endpoint-key="type"
+                            required-validation
+                            validation-type="extension"
+                            :maxlength="10"
+                            :isReadonly="true"
                             :data="to.licensePlate"
                             @update:data="to.licensePlate = $event"
                         />
@@ -151,6 +159,7 @@
                             field-name="boxAmount"
                             placeholder="0"
                             type="number"
+                            :isReadonly="true"
                             :data="to.boxAmount"
                             @update:data="to.boxAmount = $event"
                         />
