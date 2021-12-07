@@ -62,13 +62,12 @@
             </template>
         </VTable>
 
-        <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
-            <template #body>
-                <p>{{ errorMessage }}</p>
-                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
-            </template>
-        </Modal>
-
+        <ErrorModal
+            :open="notificationModalvisible"
+            :text="errorMessage"
+            @close="toggleNotificationModal()"
+            @main="toggleNotificationModal()"
+        />
         <DisableModal
             :open="showModal"
             title="¿Desea inhabilitar este centro de carga de arena?"
@@ -101,36 +100,32 @@
                     {{ selectedSandProvider.companyRepresentative?.phone || '-' }}
                 </p>
             </template>
-            <template #btn> </template>
         </Backdrop>
     </Layout>
 </template>
 
 <script>
     import { useStoreLogic } from '@/helpers/useStoreLogic';
-    import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import Modal from '@/components/modal/General.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import VTable from '@/components/ui/table/VTable.vue';
+    // Components
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import DisableModal from '@/components/modal/DisableModal.vue';
-    import ABMHeader from '@/components/ui/ABMHeader.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import Layout from '@/layouts/Main.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
 
     export default {
         components: {
-            Layout,
-            PrimaryBtn,
-            GhostBtn,
-            Icon,
-            Modal,
-            FieldSelect,
-            VTable,
+            ABMHeader,
             Backdrop,
             DisableModal,
-            ABMHeader,
+            ErrorModal,
+            FieldSelect,
+            GhostBtn,
+            Layout,
+            VTable,
         },
         setup() {
             useTitle(`Centro de carga de Arena <> Sandflow`);

@@ -46,35 +46,30 @@
 </template>
 
 <script lang="ts">
-    import Layout from '@/layouts/Main.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
-    import { Sand } from '@/interfaces/sandflow';
     import axios from 'axios';
+    import { Sand } from '@/interfaces/sandflow';
     import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
 
-    const api = import.meta.env.VITE_API_URL || '/api';
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
-
-    import SandForm from '@/components/sand/SandForm.vue';
     import ABMTitle from '@/components/ui/ABMFormTitle.vue';
-    import SuccessModal from '@/components/modal/SuccessModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import Layout from '@/layouts/Main.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SandForm from '@/components/sand/SandForm.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+
+    const api = import.meta.env.VITE_API_URL || '/api';
+    // const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     export default {
         components: {
             ABMTitle,
-            Icon,
+            ErrorModal,
             Layout,
-            Modal,
             PrimaryBtn,
             SandForm,
             SecondaryBtn,
-            WarningBtn,
             SuccessModal,
-            ErrorModal,
         },
         setup() {
             const router = useRouter();

@@ -87,41 +87,30 @@
 </template>
 
 <script lang="ts">
-    import { ref, computed, watch, defineComponent, onMounted } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
+    import { WorkOrder, Pit } from '@/interfaces/sandflow';
+    import axios from 'axios';
 
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import Badge from '@/components/ui/Badge.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
-    import Modal from '@/components/modal/General.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import VTable from '@/components/ui/table/VTable.vue';
-    import DisableModal from '@/components/modal/DisableModal.vue';
-    import axios from 'axios';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-    import { useTitle } from '@vueuse/core';
-    import { WorkOrder, Pit } from '@/interfaces/sandflow';
-    import ABMHeader from '@/components/ui/ABMHeader.vue';
-
     export default defineComponent({
         components: {
+            ABMHeader,
             Backdrop,
             Badge,
+            DisableModal,
             FieldSelect,
-            GhostBtn,
             Icon,
             Layout,
-            Modal,
-            PrimaryBtn,
             VTable,
-            DisableModal,
-            ABMHeader,
         },
         setup() {
             useTitle('Ordenes de Trabajo <> Sandflow');

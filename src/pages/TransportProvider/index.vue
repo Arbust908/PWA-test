@@ -65,42 +65,27 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
-
-    import BackdropCard from '@/components/transportProvider/BackdropCard.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import VTable from '@/components/ui/table/VTable.vue';
-    import DisableModal from '@/components/modal/DisableModal.vue';
-
     import axios from 'axios';
-    import ABMHeader from '@/components/ui/ABMHeader.vue';
-    const api = import.meta.env.VITE_API_URL || '/api';
 
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
+    import BackdropCard from '@/components/transportProvider/BackdropCard.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Layout from '@/layouts/Main.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
+
+    const api = import.meta.env.VITE_API_URL || '/api';
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
-    const ErrorBtn = defineAsyncComponent(() => import('@/components/ui/buttons/ErrorBtn.vue'));
 
     export default {
         components: {
+            ABMHeader,
             Backdrop,
             BackdropCard,
-            FieldSelect,
-            GhostBtn,
-            Icon,
-            Layout,
-            Modal,
-            PrimaryBtn,
-            VTable,
-            ErrorBtn,
             DisableModal,
-            ABMHeader,
+            FieldSelect,
+            Layout,
+            VTable,
         },
         setup() {
             useTitle('Proveedores de Transporte <> Sandflow');
