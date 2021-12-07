@@ -101,28 +101,27 @@
         </footer>
         <SuccessModal
             :open="showModal"
-            title="¡La orden de trabajo fue guardada con éxito!"
+            text="¡La orden de trabajo fue guardada con éxito!"
             @close="$router.push('/orden-de-trabajo')"
-            @action="$router.push('/orden-de-trabajo')"
+            @main="$router.push('/orden-de-trabajo')"
         />
         <ErrorModal
             :open="showErrorModal"
             text="Hubo un problema al intentar guardar."
             @close="toggleErrorModal()"
-            @action="toggleErrorModal()"
+            @main="toggleErrorModal()"
         />
         <ErrorModal
             :open="showApiErrorModal"
             text="¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo."
             @close="toggleApiErrorModal()"
-            @action="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
         />
     </Layout>
 </template>
 
 <script lang="ts">
     import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import OrderSection from '@/components/workOrder/Order.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
@@ -130,7 +129,6 @@
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -138,25 +136,22 @@
     // TIPOS
     import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/sandflow';
     // MODAL
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
-    import ErrorModal from '@/components/modal/ErrorModal.vue';
-    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    // const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
+    const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
 
     export default {
         components: {
             BookmarkIcon,
+            CheckCircleIcon,
+            EquipmentSection,
+            ErrorModal,
             GhostBtn,
             Layout,
-            CheckCircleIcon,
-            PrimaryBtn,
-            SecondaryBtn,
             OrderSection,
-            EquipmentSection,
+            PrimaryBtn,
             RRHHSection,
-            Modal,
-            Icon,
-            WarningBtn,
-            ErrorModal,
+            SecondaryBtn,
             SuccessModal,
         },
         setup() {

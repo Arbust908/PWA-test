@@ -1,15 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Tipos de arena</h2>
-            <router-link to="/tipos-de-arena/nueva">
-                <PrimaryBtn size="sm">
-                    <span> Crear </span>
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
+        <ABMHeader title="Tipos de arena" link="/tipos-de-arena/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -105,6 +96,7 @@
     const BaseBtn = defineAsyncComponent(() => import('@/components/ui/buttons/BaseBtn.vue'));
 
     import axios from 'axios';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
@@ -122,6 +114,7 @@
             PrimaryBtn,
             VTable,
             DisableModal,
+            ABMHeader,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');

@@ -1,11 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 pr-3">
-            <h2 class="text-2xl font-semibold text-second-900">Ordenes de Trabajo</h2>
-            <router-link to="/orden-de-trabajo/nueva">
-                <PrimaryBtn>Crear nueva</PrimaryBtn>
-            </router-link>
-        </header>
+        <ABMHeader title="Ordenes de Trabajo" link="/orden-de-trabajo/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2 mb-8">
             <FieldSelect
                 title="Filtro"
@@ -92,39 +87,30 @@
 </template>
 
 <script lang="ts">
-    import { ref, computed, watch, defineComponent, onMounted } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
+    import { WorkOrder, Pit } from '@/interfaces/sandflow';
+    import axios from 'axios';
 
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import Badge from '@/components/ui/Badge.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
-    import Modal from '@/components/modal/General.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import VTable from '@/components/ui/table/VTable.vue';
-    import DisableModal from '@/components/modal/DisableModal.vue';
-    import axios from 'axios';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-    import { useTitle } from '@vueuse/core';
-    import { WorkOrder, Pit } from '@/interfaces/sandflow';
-
     export default defineComponent({
         components: {
+            ABMHeader,
             Backdrop,
             Badge,
+            DisableModal,
             FieldSelect,
-            GhostBtn,
             Icon,
             Layout,
-            Modal,
-            PrimaryBtn,
             VTable,
-            DisableModal,
         },
         setup() {
             useTitle('Ordenes de Trabajo <> Sandflow');

@@ -1,15 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Proveedores de transporte</h2>
-            <router-link to="/proveedores-de-transporte/nuevo">
-                <PrimaryBtn size="sm">
-                    <span> Crear </span>
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
+        <ABMHeader title="Proveedores de transporte" link="/proveedores-de-transporte/nuevo" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -74,40 +65,27 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
-
-    import BackdropCard from '@/components/transportProvider/BackdropCard.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import VTable from '@/components/ui/table/VTable.vue';
-    import DisableModal from '@/components/modal/DisableModal.vue';
-
     import axios from 'axios';
-    const api = import.meta.env.VITE_API_URL || '/api';
 
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
+    import BackdropCard from '@/components/transportProvider/BackdropCard.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Layout from '@/layouts/Main.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
+
+    const api = import.meta.env.VITE_API_URL || '/api';
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
-    const ErrorBtn = defineAsyncComponent(() => import('@/components/ui/buttons/ErrorBtn.vue'));
 
     export default {
         components: {
+            ABMHeader,
             Backdrop,
             BackdropCard,
-            FieldSelect,
-            GhostBtn,
-            Icon,
-            Layout,
-            Modal,
-            PrimaryBtn,
-            VTable,
-            ErrorBtn,
             DisableModal,
+            FieldSelect,
+            Layout,
+            VTable,
         },
         setup() {
             useTitle('Proveedores de Transporte <> Sandflow');
