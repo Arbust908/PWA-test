@@ -50,6 +50,10 @@
                             field-name="sandQuantity"
                             placeholder="Arena"
                             type="number"
+                            mask="####"
+                            required-validation
+                            validation-type="extension"
+                            :char-amount="{ min: 1, max: 4 }"
                             :post="{ title: '0', value: 't', width: '3rem' }"
                             :data="order.amount"
                             @update:data="order.amount = $event"
@@ -59,6 +63,7 @@
                             class="col-span-9 sm:col-span-4"
                             field-name="sandBoxId"
                             placeholder="ID"
+                            :maxlength="10"
                             is-optional
                             :data="order.boxId"
                             @update:data="order.boxId = $event"
