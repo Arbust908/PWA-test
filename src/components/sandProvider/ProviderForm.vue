@@ -138,9 +138,10 @@
             const meshTypes = ref([]);
 
             const filteredMeshTypes = computed(() => {
-                console.log(sandProvider.value.meshType);
+                console.log('Mesh Types', sandProvider.value.meshType);
                 const selectedMeshTypes = sandProvider.value.meshType?.map((mesh) => mesh.id);
 
+                // *** Problemas. Asyncronismo
                 return meshTypes.value.filter((m: any) => !selectedMeshTypes.includes(m.id));
             });
 
