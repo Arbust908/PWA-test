@@ -120,14 +120,14 @@
             title="Ya existe un cliente con este CUIT"
             text="El cliente que intentas guardar fue creado anteriormente"
             @close="showErrorCuitModal = false"
-            @action="showErrorCuitModal = false"
+            @main="showErrorCuitModal = false"
         />
         <SuccessModal
             class="xs:w-[480px]"
             :open="showSuccessModal"
             title="¡El proveedor fue guardado con éxito!"
             @close="$router.push('/proveedores-de-transporte')"
-            @action="$router.push('/proveedores-de-transporte')"
+            @main="$router.push('/proveedores-de-transporte')"
         />
     </Layout>
 </template>

@@ -138,6 +138,7 @@
             const meshTypes = ref([]);
 
             const filteredMeshTypes = computed(() => {
+                console.log(sandProvider.value.meshType);
                 const selectedMeshTypes = sandProvider.value.meshType?.map((mesh) => mesh.id);
 
                 return meshTypes.value.filter((m: any) => !selectedMeshTypes.includes(m.id));

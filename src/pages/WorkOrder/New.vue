@@ -101,21 +101,21 @@
         </footer>
         <SuccessModal
             :open="showModal"
-            title="¡La orden de trabajo fue guardada con éxito!"
+            text="¡La orden de trabajo fue guardada con éxito!"
             @close="$router.push('/orden-de-trabajo')"
-            @action="$router.push('/orden-de-trabajo')"
+            @main="$router.push('/orden-de-trabajo')"
         />
         <ErrorModal
             :open="showErrorModal"
             text="Hubo un problema al intentar guardar."
             @close="toggleErrorModal()"
-            @action="toggleErrorModal()"
+            @main="toggleErrorModal()"
         />
         <ErrorModal
             :open="showApiErrorModal"
             text="¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo."
             @close="toggleApiErrorModal()"
-            @action="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
         />
     </Layout>
 </template>

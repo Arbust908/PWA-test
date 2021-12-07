@@ -1,11 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 pr-3">
-            <h2 class="text-2xl font-semibold text-second-900">Ordenes de Trabajo</h2>
-            <router-link to="/orden-de-trabajo/nueva">
-                <PrimaryBtn>Crear nueva</PrimaryBtn>
-            </router-link>
-        </header>
+        <ABMHeader title="Ordenes de Trabajo" link="/orden-de-trabajo/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2 mb-8">
             <FieldSelect
                 title="Filtro"
@@ -112,6 +107,7 @@
 
     import { useTitle } from '@vueuse/core';
     import { WorkOrder, Pit } from '@/interfaces/sandflow';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
 
     export default defineComponent({
         components: {
@@ -125,6 +121,7 @@
             PrimaryBtn,
             VTable,
             DisableModal,
+            ABMHeader,
         },
         setup() {
             useTitle('Ordenes de Trabajo <> Sandflow');

@@ -46,7 +46,7 @@
             title="Ya existe este forklift"
             text="El forklift que intentas guardar fue creado anteriormente."
             @close="showErrorModal = false"
-            @action="showErrorModal = false"
+            @main="showErrorModal = false"
         />
         <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
             <template #body>
