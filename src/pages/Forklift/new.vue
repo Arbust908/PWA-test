@@ -5,13 +5,6 @@
         </header>
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
-
-            <!-- <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
-                <template #body>
-                    <p>{{ errorMessage }}</p>
-                    <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
-                </template>
-            </Modal> -->
         </section>
         <!-- *** -->
         <footer class="mt-8 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
@@ -19,28 +12,20 @@
                 <SecondaryBtn btn="wide" @click.prevent="goToIndex">Cancelar</SecondaryBtn>
                 <PrimaryBtn
                     btn="wide"
-                    :disabled="!isValidated ? 'yes' : null"
+                    :disabled="!isValidated"
                     @click="isValidated && getForkliftsAndCheckIfNameExists()"
                 >
                     Finalizar
                 </PrimaryBtn>
             </section>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡El forklift fue guardado con éxito!</span
-                    >
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <PrimaryBtn @click.prevent="$router.push('/forklift')">Continuar</PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
+
+        <SuccessModal
+            :open="showModal"
+            title="¡El forklift fue guardado con éxito!"
+            @close="$router.push('/forklift')"
+            @main="$router.push('/forklift')"
+        />
         <ErrorModal
             :open="showErrorModal"
             title="Ya existe este forklift"
@@ -48,24 +33,13 @@
             @close="showErrorModal = false"
             @main="showErrorModal = false"
         />
-        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡Ups! Hubo un problema y no pudimos guardar el forklift.
-                    </span>
-                    <span class="text-center text-sm border-none m-2">
-                        Por favor, intentá nuevamente en unos minutos.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar el forklift."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="showApiErrorModal = false"
+            @main="showApiErrorModal = false"
+        />
     </Layout>
 </template>
 
@@ -86,6 +60,7 @@
     const api = import.meta.env.VITE_API_URL || '/api';
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     export default {
         components: {
@@ -97,6 +72,7 @@
             Icon,
             WarningBtn,
             ErrorModal,
+            SuccessModal,
         },
         setup() {
             useTitle('Nuevo Forklift <> Sandflow');

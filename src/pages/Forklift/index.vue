@@ -56,6 +56,7 @@
                 <div v-else>Sin observaciones</div>
             </template>
         </VTable>
+
         <DisableModal
             :open="showModal"
             title="¿Desea inhabilitar este forklift?"
