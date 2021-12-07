@@ -197,7 +197,6 @@
 
                 if (workOrder.visible) {
                     showModal.value = true;
-
                     return;
                 }
                 await update(selectedWorkOrder.value);
@@ -210,6 +209,7 @@
                 };
                 await axios.put(`${apiUrl}/workOrder/${order.id}`, payload);
                 await getWorkOrders();
+                workOrders.value = populateInfo(workOrders.value);
             };
 
             const confirmModal = async () => {
