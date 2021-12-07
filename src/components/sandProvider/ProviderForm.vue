@@ -16,7 +16,7 @@
             title="CUIT / CUIL"
             field-name="sandProvId"
             placeholder="Ingrese sólo números"
-            mask="#*"
+            mask="###########"
             :data="sandProvider.legalId"
             require-validation
             validation-type="extension"

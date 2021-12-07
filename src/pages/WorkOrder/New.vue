@@ -99,59 +99,28 @@
                 </PrimaryBtn>
             </section>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡La orden de trabajo fue guardada con éxito!</span
-                    >
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <PrimaryBtn @click.prevent="$router.push('/orden-de-trabajo')">Continuar</PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        Hubo un problema al intentar guardar.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
+        <SuccessModal
+            :open="showModal"
+            title="¡La orden de trabajo fue guardada con éxito!"
+            @close="$router.push('/orden-de-trabajo')"
+            @action="$router.push('/orden-de-trabajo')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            text="Hubo un problema al intentar guardar."
+            @close="toggleErrorModal()"
+            @action="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            text="¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo."
+            @close="toggleApiErrorModal()"
+            @action="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, ComputedRef, defineAsyncComponent, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useToggle, useTitle } from '@vueuse/core';
     import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import OrderSection from '@/components/workOrder/Order.vue';
@@ -170,6 +139,8 @@
     import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/sandflow';
     // MODAL
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     export default {
         components: {
@@ -185,6 +156,8 @@
             Modal,
             Icon,
             WarningBtn,
+            ErrorModal,
+            SuccessModal,
         },
         setup() {
             // Init
