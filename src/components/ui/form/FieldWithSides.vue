@@ -11,6 +11,12 @@
                 :type="type"
                 :name="fieldName"
                 :placeholder="placeholder"
+                @blur="checkValidation(false)"
+            />
+            <InvalidInputLabel
+                v-if="v$.$invalid && wasInputEntered"
+                :validation-type="validationType"
+                :char-amount="charAmount"
             />
             <span v-if="post" class="post text-center" :title="post.title">{{ post.value }}</span>
         </div>
@@ -18,14 +24,19 @@
 </template>
 
 <script>
-    import { defineComponent, watch } from 'vue';
+    import { defineComponent, ref, toRefs, watch } from 'vue';
     import { useVModel, useCssVar } from '@vueuse/core';
     import { maska } from 'maska';
     import FieldTitle from '@/components/ui/form/FieldTitle.vue';
+    import useVuelidate from '@vuelidate/core';
+    import InvalidInputLabel from '../InvalidInputLabel.vue';
     export default defineComponent({
         name: 'FieldInput',
         directives: { maska },
-        components: { FieldTitle },
+        components: {
+            FieldTitle,
+            InvalidInputLabel,
+        },
         props: {
             data: {
                 default: '',
@@ -67,7 +78,89 @@
             const value = useVModel(props, 'data', emit);
             const cssPre = useCssVar('--pre', 0);
             const cssPost = useCssVar('--post', 0);
+            //Validation settings
+            const { fieldName, entity, silenced } = toRefs(props);
+            const requireValidation = ref(props.requireValidation) || false;
+            const wasInputEntered = ref(false);
+            const validationType = ref(props.validationType || 'empty');
+            const charAmount = ref(props.charAmount || null);
+            const validationRules = ref({});
+            const state = {
+                [fieldName.value]: value,
+            };
 
+            const getCharsAmountRule = (charsRule) => {
+                if (charsRule.min && charsRule.max) {
+                    return { minLength: minLength(charsRule.min), maxLength: maxLength(charsRule.max), required };
+                }
+
+                if (charsRule.min && !charsRule.max) {
+                    return { minLength: minLength(charsRule.min), required };
+                }
+
+                if (!charsRule.min && charsRule.max) {
+                    return { maxLength: maxLength(charsRule.max), required };
+                }
+            };
+
+            if (requireValidation.value) {
+                if (validationType.value == 'empty') {
+                    validationRules.value = {
+                        [`${fieldName.value}`]: { required },
+                    };
+                }
+
+                if (validationType.value == 'numeric') {
+                    validationRules.value = {
+                        [`${fieldName.value}`]: { required, numeric },
+                    };
+                }
+
+                if (validationType.value == 'email') {
+                    validationRules.value = {
+                        [`${fieldName.value}`]: { required, email },
+                    };
+                }
+
+                if (validationType.value == 'extension') {
+                    validationRules.value = {
+                        [`${fieldName.value}`]: getCharsAmountRule(charAmount.value),
+                    };
+                }
+            }
+
+            const v$ = useVuelidate(validationRules, state);
+
+            const updateValidationState = (fieldName, validationsPassed, entity) => {
+                if (silenced.value) {
+                    return;
+                }
+                store.dispatch(`${entity}UpdateValidation`, { fieldName, validationsPassed, entity });
+            };
+
+            const checkValidation = (isTheFirstUse) => {
+                if (!requireValidation.value) {
+                    return;
+                }
+
+                if (!isTheFirstUse && !wasInputEntered.value) {
+                    wasInputEntered.value = true;
+                }
+                updateValidationState(fieldName.value, !v$.value.$invalid, entity.value);
+            };
+
+            watch(silenced, (newSilencedVal, oldSilencedVal) => {
+                if (oldSilencedVal == true && newSilencedVal == false) {
+                    updateValidationState(fieldName.value, !v$.value.$invalid, entity.value);
+                }
+
+                if (oldSilencedVal == false && newSilencedVal == true) {
+                    wasInputEntered.value = false;
+                    store.dispatch(`${entity.value}DeleteValidation`, fieldName.value);
+                }
+            });
+
+            //Props
             if (props.pre) {
                 cssPre.value = props.pre.width ?? '20%';
             }
@@ -79,6 +172,12 @@
             return {
                 value,
                 ...props,
+                v$,
+                wasInputEntered,
+                validationType,
+                charAmount,
+                checkValidation,
+                silenced,
             };
         },
     });

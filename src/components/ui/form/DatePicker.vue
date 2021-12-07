@@ -1,7 +1,7 @@
 <template>
     <div class="flex p-1 items-center rounded border border-second-300">
         <input
-            v-model="date"
+            v-model="localDate"
             v-maska="'##/##/####'"
             type="text"
             placeholder="--/--/----"
@@ -12,7 +12,8 @@
 </template>
 
 <script lang="ts">
-    import { ref } from 'vue';
+    import { ref, computed } from 'vue';
+    import axios from 'axios';
     /* import { defineComponent, watch } from 'vue';
     import { useVModels, useToggle } from '@vueuse/core';
     import { createFromDate, createToDate } from '@/helpers/useChronos';
@@ -21,7 +22,20 @@
     export default {
         name: 'DatePicker',
         directives: { maska },
-        setup(props: any) {
+
+        props: {
+            modelValue: {
+                type: Object,
+                required: true,
+            },
+        },
+
+        setup(props: any, { emit }) {
+            const localDate = computed({
+                get: () => props.modelValue,
+                set: (value) => emit('update:modelValue', value),
+            });
+
             const date = ref('');
             let dateSplit = [];
             let day = 0;
@@ -33,15 +47,9 @@
                 day = parseInt(dateSplit[0]);
                 month = parseInt(dateSplit[1]);
                 year = parseInt(dateSplit[2]);
-                console.log(date.value);
-                console.log(date.value);
-                console.log(dateSplit);
-                console.log(day);
-                console.log(month);
-                console.log(year);
             }
 
-            return { date, getDate };
+            return { date, getDate, localDate };
         },
     };
 </script>

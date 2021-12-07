@@ -180,11 +180,13 @@
                     <section class="flex gap-2 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
-                            <DatePicker class="mr-6 md:mr-8" />
+                            <DatePicker class="mr-6 md:mr-8" v-model="lafecha" />
+                            lafecha {{ lafecha }}
                         </label>
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Hora de entrega</p>
-                            <TimePicker :timetrack="Number(1)" />
+                            <TimePicker :timetrack="elTime" @update:timetrack="elTime = $event" />
+                            el tiempo {{ elTime }}
                         </label>
                     </section>
 
@@ -203,9 +205,7 @@
         </section>
         <footer class="mt-[32px] space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && confirm()">
-                Crear Orden
-            </PrimaryBtn>
+            <PrimaryBtn btn="wide" @click.prevent="save()"> Crear Orden </PrimaryBtn>
         </footer>
         <OrderModal v-if="showModal" :show-modal="showModal" :po="po" @close="showModal = false" @confirm="save()" />
         <SuccessModal :open="false" :title="titleSuccess" />
@@ -274,6 +274,10 @@
         },
         setup() {
             useTitle('Nueva orden de pedido <> Sandflow');
+
+            const lafecha = ref('');
+            const elTime = ref('');
+
             const router = useRouter();
             const instance = axios.create({
                 baseURL: api,
@@ -407,6 +411,8 @@
                 });
                 soLength.value = sandOrder.length;
                 TransportOrders.value[0].boxAmount = soLength.value;
+                const { data: prueba } = useAxios('/transportOrder', instance);
+                console.log(prueba);
             };
             // :: TransportProvider
             const transportProviders = ref([]);
@@ -506,34 +512,38 @@
                     pitId: pitId.value,
                     sandProviderId: sandProvidersIds.value[0].id,
                     transportProviderId: transportProviderId.value,
+
+                    // dates
+                    deliveryDate: lafecha.value,
+                    deliveryTime: elTime.value,
                 };
 
                 return purchaseOrder;
             };
             const save = (): void => {
-                if (isFull.value) {
-                    // Formateamos la orden de pedido
-                    const purchaseOrder = _formatPO();
-                    console.log(purchaseOrder);
-                    // Creamos via API la orden de pedido
-                    const { data: pODone } = useAxios(
-                        '/purchaseOrder',
-                        { method: 'POST', data: purchaseOrder },
-                        instance
-                    );
-                    const sOisDone = ref([]);
-                    watch(pODone, (newVal, _) => {
-                        if (newVal && newVal.data) {
-                            // Recorremos los proveedores de sand
-                            const poId = newVal.data.id;
-                            _saveTO(poId);
-                            _saveSO(poId);
-                            setTimeout(() => {
-                                router.push('/orden-de-pedido');
-                            }, 1000);
-                        }
-                    });
-                }
+                // if (isFull.value) {
+                // Formateamos la orden de pedido
+                const purchaseOrder = _formatPO();
+                console.log('PURCHASEORDER', purchaseOrder);
+                // Creamos via API la orden de pedido
+                // const { data: pODone } = useAxios(
+                //     '/purchaseOrder',
+                //     { method: 'POST', data: purchaseOrder },
+                //     instance
+                // );
+                // const sOisDone = ref([]);
+                // watch(pODone, (newVal, _) => {
+                //     if (newVal && newVal.data) {
+                //         // Recorremos los proveedores de sand
+                //         const poId = newVal.data.id;
+                //         _saveTO(poId);
+                //         _saveSO(poId);
+                //         setTimeout(() => {
+                //             router.push('/orden-de-pedido');
+                //         }, 1000);
+                //     }
+                // });
+                // }
             };
             // >> Success y Error Modal
             const titleSuccess = 'La orden de pedido #numero ha sido generada con éxito';
@@ -579,6 +589,8 @@
                 textErrorGral,
                 GhostBtn,
                 soLength,
+                lafecha,
+                elTime,
             };
         },
     };
