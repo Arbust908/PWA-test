@@ -99,35 +99,30 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
-    import { useStore } from 'vuex';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
-    import axios from 'axios';
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import DisableModal from '@/components/modal/DisableModal.vue';
 
+    import axios from 'axios';
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+
     export default {
         components: {
-            Layout,
-            PrimaryBtn,
+            Backdrop,
+            Badge,
+            DisableModal,
+            FieldSelect,
             GhostBtn,
             Icon,
-            FieldSelect,
-            Badge,
-            Modal,
+            Layout,
+            PrimaryBtn,
             VTable,
-            Backdrop,
-            DisableModal,
         },
         setup() {
             useTitle('Clientes <> Sandflow');
