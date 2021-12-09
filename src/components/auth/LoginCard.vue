@@ -70,23 +70,7 @@
             <template #btn>
                 <button
                     type="button"
-                    class="
-                        inline-flex
-                        justify-center
-                        w-full
-                        rounded-md
-                        border border-transparent
-                        shadow-sm
-                        px-4
-                        py-2
-                        bg-red-600
-                        text-base
-                        font-medium
-                        text-second-50
-                        hover:bg-red-700
-                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
-                        sm:text-sm
-                    "
+                    class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-second-50 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm"
                     @click.prevent="toggleModal(false)"
                 >
                     Ok
@@ -153,34 +137,30 @@
                 const loading = ref(true);
                 const email = username.value;
                 const loggedUser = { email, password: password.value };
-                let fullUser = await axios
-                    .post(`${api}/auth/login`, loggedUser)
-                    .catch((err) => {
-                        console.log(err);
+                let response = await axios.post(`${api}/auth/login`, loggedUser).catch((err) => {
+                    console.log(err);
+                    alert(err);
 
-                        return false;
-                    })
-                    .then((res) => {
-                        if (res.status === 200) {
-                            const permissions = res.data.data.permissions;
+                    return false;
+                });
 
-                            PermissionsManager.setPermissions([permissions]);
+                let fullUser;
 
-                            return res.data.data.token || res.data.token;
-                        }
+                if (response.status === 200) {
+                    const permissions = response.data.data.permissions;
 
-                        return false;
-                    })
-                    .finally(() => {
-                        loading.value = false;
-                    });
+                    PermissionsManager.setPermissions([permissions]);
+
+                    fullUser = response.data.data;
+                }
 
                 if (fullUser) {
                     fullUser = {
                         id: 99,
                         username: username.value,
                         role: Role.Logged,
-                        token: fullUser,
+                        permissions: fullUser.permissions,
+                        token: fullUser.token,
                     };
 
                     if (shouldRemember.value) {
@@ -191,6 +171,8 @@
                 } else {
                     toggleModal(true);
                 }
+
+                loading.value = false;
             };
 
             return {
