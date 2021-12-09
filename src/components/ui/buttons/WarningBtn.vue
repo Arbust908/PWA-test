@@ -1,30 +1,14 @@
 <template>
-    <BaseBtn btn="warning" :type="type" :size="size">
-        <slot></slot>
+    <BaseBtn :btn="`warning ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
+        <slot>Warning</slot>
     </BaseBtn>
 </template>
 
-<script>
+<script setup lang="ts">
     import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
-    export default {
-        components: {
-            BaseBtn,
-        },
-        props: {
-            type: {
-                type: String,
-                default: 'button',
-            },
-            size: {
-                type: String,
-                default: 'md',
-            },
-            disabled: {
-                type: [String, Boolean],
-                default: false,
-            },
-        },
-    };
+    defineProps({
+        ...BaseBtn.props,
+    });
 </script>
 
 <style lang="scss" scoped>
