@@ -24,16 +24,11 @@
             </nav>
             <OrderSection
                 v-if="WO_section === 'orden'"
-                :client-id="clientId"
-                :service-company-id="serviceCompanyId"
-                :pad="pad"
-                :pits="pits"
-                :is-full="isOrderFull"
-                @update:clientId="clientId = $event"
-                @update:serviceCompanyId="serviceCompanyId = $event"
-                @update:pad="pad = $event"
-                @update:pits="pits = $event"
-                @update:isFull="isOrderFull = $event"
+                v-model:client-id="clientId"
+                v-model:service-company-id="serviceCompanyId"
+                v-model:pad="pad"
+                v-model:pits="pits"
+                v-model:is-full="isOrderFull"
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
