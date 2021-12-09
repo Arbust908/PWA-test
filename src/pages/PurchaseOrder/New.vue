@@ -41,7 +41,7 @@
                             endpoint="/sand"
                             endpoint-key="type"
                             :data="order.sandTypeId"
-                            :filtered-data="filteredSandTypes"
+                            :endpoint-data="filteredSandTypes"
                             @update:data="order.sandTypeId = $event"
                         />
                         <FieldWithSides
