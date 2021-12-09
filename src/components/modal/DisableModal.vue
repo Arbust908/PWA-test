@@ -6,8 +6,8 @@
         <h2>{{ title }}</h2>
         <span> {{ text }} </span>
         <footer>
-            <NoneBtn @click="$emit('close')"> Volver </NoneBtn>
-            <PrimaryBtn :btn="`extra-wide warning`" @click="$emit('main')"> Inhabilitar </PrimaryBtn>
+            <NoneBtn class="" @click="$emit('close')"> Volver </NoneBtn>
+            <PrimaryBtn :btn="`ml-3 wide warning`" @click="$emit('main')"> Inhabilitar </PrimaryBtn>
         </footer>
     </Modal>
 </template>
