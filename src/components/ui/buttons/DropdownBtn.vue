@@ -1,8 +1,10 @@
 <template>
     <div class="group relative">
         <!-- btn slot -->
-        <slot></slot>
-        <nav tabindex="0" class="dropwdown-menu">
+        <button @click="change">
+            <slot></slot>
+        </button>
+        <nav tabindex="0" class="dropwdown-menu" :class="getClass">
             <ul class="py-1">
                 <li v-for="action in actions" :key="action">
                     <a
@@ -19,13 +21,10 @@
         </nav>
     </div>
 </template>
-
 <script>
     import { defineComponent } from 'vue';
-
     export default defineComponent({
         name: 'DropdownBtn',
-
         props: {
             actions: {
                 type: Array,
@@ -36,11 +35,28 @@
                 default: () => ({}),
             },
         },
+        setup() {
+            const show = ref(true);
+            const getClass = computed(() => {
+                if (show.value) {
+                    return 'invisible opacity-0';
+                }
+                return 'visible opacity-100 translate-y-1';
+            });
+            const change = () => {
+                show.value = !show.value;
+            };
+            return {
+                change,
+                show,
+                getClass,
+            };
+        },
     });
+    // invisible opacity-0    group-focus-within:visible  group-focus-within:opacity-100 group-focus-within:translate-y-1
 </script>
-
 <style lang="scss" scoped>
     .dropwdown-menu {
-        @apply shadow-lg border border-gray-200 bg-white text-gray-700 invisible rounded w-auto absolute right-0 top-full transition-all opacity-0 group-focus-within:visible group-focus-within:opacity-100 group-focus-within:translate-y-1 z-20;
+        @apply shadow-lg border border-gray-200 bg-white text-gray-700 rounded w-auto absolute right-0 top-full transition-all z-10;
     }
 </style>
