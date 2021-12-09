@@ -18,7 +18,7 @@
                         class="col-span-4"
                         title="Orden de pedido"
                         field-name="sandType3"
-                        placeholder="Seleccionar orden de pedido"
+                        placeholder="Seleccionar"
                         endpoint-key="id"
                         :endpoint-data="filteredPurchaseOrders"
                         :data="purchaseOrderId"
@@ -26,72 +26,28 @@
                     />
                 </FieldGroup>
                 <fieldset v-if="selectionsAreDone" class="w-full pt-1 pb-5 px-2">
-                    <div v-if="boxes.length > 0 || boxesWithoutId.length > 0" class="mt-2">
-                        <div v-for="box in boxes" :key="box.id" class="available-box">
-                            <button
-                                :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
-                                class="radio-button"
-                                @click.prevent="setSelectedBox(box.boxId)"
-                            ></button>
-                            <div class="mx-2 flex items-center">
-                                <span> {{ box.category }} - {{ box.amount }}t - </span>
-                                <div
-                                    class="
-                                        mx-2
-                                        w-48
-                                        flex
-                                        justify-between
-                                        text-center
-                                        border-2
-                                        rounded-md
-                                        border-warmGray-300
-                                    "
-                                >
-                                    <span class="px-2 w-1/2 bg-gray-200 border-r-2 border-gray-400">ID Caja</span>
-                                    <input
-                                        v-model="box.boxId"
-                                        :name="`boxId-${box.id}`"
-                                        type="text"
-                                        placeholder="Ej: S-0001"
-                                        class="input-read-only"
-                                        disabled
-                                    />
-                                </div>
-                            </div>
+                    <div v-if="boxes.length > 0 || boxesWithoutId.length > 0" class="space-y-4">
+                        <BoxIdCard
+                            v-for="box in boxes"
+                            :key="box.id"
+                            :box="box"
+                            :box-id="box.boxId"
+                            :choosen-box-id="choosedBox.boxId"
+                            @select-box="box.boxId ? setSelectedBox(box.boxId) : triggerCompleteIdMessage()"
+                            @update:box-id="box.boxId = $event"
+                        />
+                        <div v-if="boxesWithoutId.length > 0">
+                            <span class="text-xs text-green-600"> *Complete los ids de caja faltantes </span>
                         </div>
-                        <span v-if="idMessage" class="text-xs text-green-600">*Complete los ids de caja faltantes</span>
-                        <div v-for="box in boxesWithoutId" :key="box.id" class="available-box mt-2">
-                            <button
-                                :class="[choosedBox.boxId == box.boxId ? 'active' : null]"
-                                class="radio-button"
-                                @click.prevent="box.boxId ? setSelectedBox(box.boxId) : triggerCompleteIdMessage()"
-                            ></button>
-                            <span>{{ box.boxId }}</span>
-                            <div class="mx-2 flex items-center">
-                                <span> {{ box.category }} - {{ box.amount }}t - </span>
-                                <div
-                                    class="
-                                        mx-2
-                                        w-48
-                                        flex
-                                        justify-between
-                                        text-center
-                                        border-2
-                                        rounded-md
-                                        border-warmGray-300
-                                    "
-                                >
-                                    <span class="px-2 w-1/2 bg-gray-200 border-r-2 border-gray-400">ID Caja</span>
-                                    <input
-                                        v-model="box.boxId"
-                                        :name="`boxId-${box.id}`"
-                                        type="text"
-                                        placeholder="Ej: S-0001"
-                                        class="input"
-                                    />
-                                </div>
-                            </div>
-                        </div>
+                        <BoxIdCard
+                            v-for="box in boxesWithoutId"
+                            :key="box.id"
+                            :box="box"
+                            :box-id="box.boxId"
+                            :choosen-box-id="choosedBox.boxId"
+                            @select-box="box.boxId ? setSelectedBox(box.boxId) : triggerCompleteIdMessage()"
+                            @update:box-id="box.boxId = $event"
+                        />
                     </div>
                     <div v-else>No hay cajas asociadas.</div>
                 </fieldset>
@@ -153,7 +109,7 @@
                                 :rows="row"
                                 :cols="col"
                                 :floor="floor"
-                                :deposit="warehouse.layout"
+                                :deposit="warehouse.layout || {}"
                                 :visible-categories="visibleCategories"
                                 @select-box="selectBox"
                             />
@@ -177,19 +133,7 @@
                     </div>
                     <div
                         v-else
-                        class="
-                            w-full
-                            max-w-sm
-                            border border-dashed border-
-                            rounded-xl
-                            p-5
-                            my-3
-                            mx-auto
-                            flex
-                            items-center
-                            justify-center
-                            flex-col
-                        "
+                        class="w-full max-w-sm border border-dashed rounded-xl p-5 my-3 mx-auto flex items-center justify-center flex-col"
                         @click.prevent="$router.push('/diseno-de-deposito')"
                     >
                         Necesitás diseñar un depósito para continuar
@@ -198,14 +142,17 @@
                         </button>
                     </div>
                 </div>
-                <div v-else class="w-full max-w-sm border border-dashed border- rounded-xl p-5 my-3 mx-auto">
+                <div
+                    v-else
+                    class="w-full max-w-sm border border-dashed rounded-xl p-6 my-3 mx-auto tracking-wide leading-relaxed"
+                >
                     Seleccionar cliente, pozo y orden de pedido para comenzar.
                 </div>
             </form>
         </section>
-        <footer class="mt-[32px] space-x-3 flex justify-end items-center">
+        <footer class="space-x-3 flex justify-end items-center mt-8">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn btn="wide" @click.prevent="save()"> Guardar </PrimaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!canSave" @click.prevent="save()"> Guardar </PrimaryBtn>
         </footer>
         <Modal type="success" :open="confirmModal" class="modal" @close="resetBoxIn">
             <template #body>
@@ -221,7 +168,7 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, onMounted, watchEffect } from 'vue';
+    import { ref, computed, defineComponent, onMounted, watchEffect } from 'vue';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
 
@@ -234,6 +181,7 @@
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
     import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
     import CradleRow from './CradleRow.vue';
+    import BoxIdCard from '@/components/BoxEntry/BoxIdCard.vue';
 
     import { Company, Pit, Box } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -259,6 +207,7 @@
             Modal,
             NoneBtn,
             PrimaryBtn,
+            BoxIdCard,
         },
         setup() {
             useTitle('Ingreso de Cajas <> Sandflow');
@@ -275,12 +224,13 @@
             const purchaseOrderId = ref(-1);
             const pitId = ref(-1);
             const warehouses = ref([]);
-            let floor = ref('');
-            let row = ref('');
-            let col = ref('');
+            let floor = ref(0);
+            let row = ref(0);
+            let col = ref(0);
             let dimensions = ref('');
             let cradles = ref([]);
             let cleanCradles = ref([]);
+            const selectedPurchaseOrder = ref({});
 
             let idMessage = ref(false);
 
@@ -393,10 +343,11 @@
             };
 
             watchEffect(async () => {
+                // console.log('filteredPurchaseOrders', filteredPurchaseOrders.value);
                 if (purchaseOrders.value.length > 0) {
                     if (clientId.value !== -1 && pitId.value !== -1) {
                         filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
-                            if (po.companyId == clientId.value && po.pitId == pitId.value) {
+                            if (po.companyId == clientId.value && po.pitId == pitId.value && po.isFullyAllocated == 0) {
                                 return po;
                             }
                         });
@@ -414,6 +365,8 @@
                             const purchaseOrderIndex = filteredPurchaseOrders.value.findIndex(
                                 (po) => po.id == purchaseOrderId.value
                             );
+
+                            selectedPurchaseOrder.value = filteredPurchaseOrders.value[purchaseOrderIndex];
 
                             boxes.value = filteredPurchaseOrders.value[purchaseOrderIndex].sandOrders.filter(
                                 (so) => so.boxId.length > 0
@@ -458,12 +411,13 @@
                 }
             });
 
-            const choosedBox: Ref<Box> = ref({
+            const choosedBox = ref({
                 floor: 1,
                 col: 0,
                 row: 0,
                 category: '',
                 id: '',
+                boxId: '',
                 wasOriginallyOnDeposit: false,
                 wasOriginallyOnCradle: false,
             });
@@ -538,6 +492,11 @@
                     return;
                 }
 
+                choosedBox.value.location = {
+                    where: 'warehouse',
+                    where_id: warehouse.value.id,
+                };
+
                 if (box.category == 'empty' || box.category !== 'aisle') {
                     // if (visibleCategories.value.includes(box.category)) {
                     wasWarehouseModificated.value = true;
@@ -610,18 +569,25 @@
                 const box = choosedBox.value;
                 deposit.value[`${box.floor}|${box.row}|${box.col}`].category = box.category;
             };
-            // :: DEPOSIT
+
             const deposit = ref({});
-            // << DEPOSIT
+
             const confirmModal = ref(false);
-            const resetBoxIn = async () => {
-                clientId.value = -1;
-                pitId.value = -1;
-                purchaseOrderId.value = -1;
-                confirmModal.value = false;
+            const resetBoxIn = () => {
+                router.go(0);
+            };
+
+            const checkIfIsFullyAllocated = (selected) => {
+                let status = false;
+                selected.sandOrders.forEach((order) => {
+                    return order.location !== null ? (status = true) : (status = false);
+                });
+
+                return status;
             };
 
             const save = async () => {
+                const isFullyAllocated = checkIfIsFullyAllocated(selectedPurchaseOrder.value);
                 const warehouseDone = ref(false);
                 const warehouseId = warehouse.value.id;
                 const { createdAt, deletedAt, updatedAt, pit, clientCompany, ...wareData } = warehouse.value;
@@ -659,6 +625,7 @@
                         boxId: box.boxId,
                         sandTypeId: box.sandTypeId,
                         amount: box.amount,
+                        location: JSON.stringify(box.location),
                     };
                     await axios.put(`${apiUrl}/sandOrder/${data.id}`, data);
                 });
@@ -684,7 +651,18 @@
                 if (cradleDone.value && wasWarehouseModificated.value == false) {
                     confirmModal.value = true;
                 }
+
+                if (isFullyAllocated) {
+                    const selectedPurchaseOrderID = selectedPurchaseOrder.value.id;
+                    axios.put(`${apiUrl}/purchaseOrder/${selectedPurchaseOrderID}`, {
+                        isFullyAllocated: 1,
+                    });
+                }
             };
+
+            const canSave = computed(() => {
+                return clientId.value >= 0 && purchaseOrderId.value >= 0 && pitId.value >= 0;
+            });
 
             return {
                 activeSection,
@@ -721,6 +699,7 @@
                 resetBoxIn,
                 idMessage,
                 triggerCompleteIdMessage,
+                canSave,
             };
         },
     });
@@ -764,9 +743,6 @@
             @apply text-second-200 text-second-200;
         }
     }
-    input:read-only {
-        @apply bg-second-200 border cursor-not-allowed;
-    }
     fieldset:not(:last-of-type) {
         @apply border-b pb-6;
     }
@@ -801,31 +777,6 @@
     }
     .type-select {
         @apply flex items-center gap-2;
-    }
-
-    .available-box {
-        @apply flex items-center mb-2;
-
-        .radio-button {
-            @apply border border-gray-800 w-5 h-5 cursor-pointer rounded-full;
-            &.active {
-                @apply relative;
-                &::after {
-                    content: '';
-                    @apply absolute inset-0 w-3 h-3 rounded-full m-auto bg-gray-900;
-                    animation: pop_in 150ms ease-out;
-                }
-            }
-        }
-        .box-id {
-            @apply mx-2 flex items-center;
-        }
-        .input {
-            @apply border-none inline text-center p-0.5 w-1/2 bg-gray-200 focus:ring-main-500 focus:border-main-500;
-        }
-        .input-read-only {
-            @apply cursor-not-allowed text-center border-none bg-white inline p-0.5 w-1/2 focus:ring-main-500 focus:border-main-500;
-        }
     }
     @keyframes pop_in {
         from {

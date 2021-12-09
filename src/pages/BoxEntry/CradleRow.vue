@@ -1,11 +1,6 @@
 <template>
-    <div>
-        <CradleCard
-            :id="id"
-            class="max-w-[170px] lg:max-w-[260px]"
-            :selected="selected"
-            @click="handleSelectedCradle"
-        />
+    <div class="flex flex-wrap">
+        <CradleCard :id="id" class="max-w-[260px]" :selected="selected" @click="handleSelectedCradle" />
         <CradleSlots v-if="selected" :cradle="cradle" :box="choosedBox" @clear-box-in-deposit="clearBoxInDeposit" />
     </div>
 </template>
@@ -14,7 +9,7 @@
     import CradleCard from '@/components/depositDesign/CradleCard.vue';
     import CradleSlots from '@/components/depositDesign/CradleSlots.vue';
 
-    import { toRef, ref, watch, watchEffect } from 'vue';
+    import { ref, watchEffect } from 'vue';
 
     export default {
         components: {
@@ -35,7 +30,7 @@
                 required: true,
             },
             id: {
-                type: String,
+                type: Number,
                 required: true,
             },
         },

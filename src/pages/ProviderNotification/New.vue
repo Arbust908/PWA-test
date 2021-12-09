@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Notificación a proveedores</h1>
-        </header>
+        <ABMFormTitle title="Notificación a proveedores" />
         <section class="bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-4 flex-col gap-4">
                 <SandProviderPack
@@ -50,7 +48,8 @@
             </form>
         </section>
 
-        <footer class="mt-[32px] space-x-3 flex justify-end">
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"
@@ -61,116 +60,107 @@
                 Finalizar
             </PrimaryBtn>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
-            <template #body>
-                <div v-if="!isNotificationConfirmed" class="text-left">
-                    <p class="text-base text-black font-bold">Notificación a proveedores</p>
-                    <div
-                        v-if="modalData.sandProvider"
-                        class="
-                            bg-gray-100
-                            mt-4
-                            rounded-r-md
-                            py-4
-                            pl-4
-                            mb-2
-                            border-l-4 border-green-500 border-opacity-50
-                        "
-                    >
-                        <p class="font-bold text-black text-base">Arenas {{ modalData.sandProvider }}</p>
-                        <ul>
-                            <li
-                                v-for="(order, index) in modalData.sandOrders"
-                                :key="index"
-                                class="text-black text-base list-none mt-1"
-                            >
-                                {{ order.amount }}t - {{ order.sandType }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div
-                        v-if="modalData.transportProvider"
-                        class="bg-gray-100 mt-3 rounded-r-md py-4 pl-4 border-l-4 border-green-500 border-opacity-50"
-                    >
-                        <p class="font-bold text-black text-base">Transporte {{ modalData.transportProvider }}</p>
-                        <ul>
-                            <li class="text-black text-base list-none mt-2">
-                                {{ modalData.transportQuantity }} camion(es){{
-                                    ` - ${modalData.transportObservations}`
-                                }}
-                            </li>
-                        </ul>
-                    </div>
+
+        <Modal :open="showModal" @close="showModal = false">
+            <div v-if="!isNotificationConfirmed" class="text-left">
+                <p class="text-base text-black font-bold">Notificación a proveedores</p>
+                <div
+                    v-if="modalData.sandProvider"
+                    class="bg-gray-100 mt-4 rounded-r-md py-4 pl-4 mb-2 border-l-4 border-green-500 border-opacity-50"
+                >
+                    <p class="font-bold text-black text-base">Arenas {{ modalData.sandProvider }}</p>
+                    <ul>
+                        <li
+                            v-for="(order, index) in modalData.sandOrders"
+                            :key="index"
+                            class="text-black text-base list-none mt-1"
+                        >
+                            {{ order.amount }}t - {{ order.sandType }}
+                        </li>
+                    </ul>
                 </div>
                 <div
-                    v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
-                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
+                    v-if="modalData.transportProvider"
+                    class="bg-gray-100 mt-3 rounded-r-md py-4 pl-4 border-l-4 border-green-500 border-opacity-50"
                 >
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡La notificación fue enviada con éxito!
-                    </span>
+                    <p class="font-bold text-black text-base">Transporte {{ modalData.transportProvider }}</p>
+                    <ul>
+                        <li class="text-black text-base list-none mt-2">
+                            {{ modalData.transportQuantity }} camion(es){{ ` - ${modalData.transportObservations}` }}
+                        </li>
+                    </ul>
                 </div>
-                <div
-                    v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess"
-                    class="divide-y text-center flex flex-col justify-center text-xl items-center"
+            </div>
+            <div
+                v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
+                class="divide-y text-center flex flex-col justify-center text-xl items-center"
+            >
+                <Icon icon="ArrowCircleUp" class="h-[60px] w-[60px] rotate-45 mb-5 text-gray-400" />
+                <span class="text-center text-base border-none text-gray-900"
+                    >¡La notificación está en proceso de envío!
+                </span>
+                <span class="text-center text-sm border-none m-2">
+                    En breve lo verás reflejado en la columna “Estado”
+                </span>
+            </div>
+            <div
+                v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess"
+                class="divide-y text-center flex flex-col justify-center text-xl items-center"
+            >
+                <Icon icon="exclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
+                <span class="text-center text-base border-none text-gray-900">
+                    Hubo un problema con el envío de la notificación. <br />Por favor, intenta nuevamente
+                </span>
+            </div>
+            <div v-if="!isNotificationConfirmed" class="flex gap-4 justify-end">
+                <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
+                <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
+            </div>
+            <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
+                <BaseBtn
+                    class="border-2 text-gray-500 rounded"
+                    @click.prevent="$router.push('/notificaciones-a-proveedores')"
                 >
-                    <Icon icon="exclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        Hubo un problema con el envío de la notificación. <br />Por favor, intenta nuevamente
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div v-if="!isNotificationConfirmed" class="flex gap-4 justify-end">
-                    <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
-                    <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
-                </div>
-                <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
-                    <SecondaryBtn class="outline-none w-1/3" @click.prevent="$router.push('/')"> Cerrar </SecondaryBtn>
-                    <PrimaryBtn btn="btn__warning" @click.prevent="createNew">Crear nueva</PrimaryBtn>
-                </div>
-                <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
-                    <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
-                </div>
-            </template>
+                    Continuar
+                </BaseBtn>
+            </div>
+            <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
+                <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
+            </div>
         </Modal>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, defineAsyncComponent, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import Layout from '@/layouts/Main.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import { ProviderNotification, SandOrder, TransportProvider, Sand } from '@/interfaces/sandflow';
-    import { useToggle } from '@vueuse/core';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import SandProviderPack from '@/components/notifications/sandProviderPack.vue';
-
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
-
+    import { SandOrder, TransportProvider, Sand } from '@/interfaces/sandflow';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
+
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
+    import FieldInput from '@/components/ui/form/FieldInput.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
+    import Layout from '@/layouts/Main.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SandProviderPack from '@/components/notifications/sandProviderPack.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
         components: {
-            SecondaryBtn,
+            ABMFormTitle,
+            BaseBtn,
+            FieldInput,
+            FieldSelect,
+            Icon,
             Layout,
             Modal,
             PrimaryBtn,
-            GhostBtn,
-            FieldInput,
-            FieldSelect,
             SandProviderPack,
-            Icon,
+            SecondaryBtn,
         },
         setup() {
             useTitle('Notificación a Proveedores <> Sandflow');
@@ -180,7 +170,8 @@
                 baseURL: apiUrl,
             });
 
-            const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
+            // const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
+            const pN = ref([]);
 
             const sandProviders = ref([] as Array<Sand>);
             const { data: sPData } = useAxios('/sandProvider', instance);
@@ -249,6 +240,7 @@
                 amount: null,
                 observation: '',
             };
+
             const addTransportProvider = () => {
                 const lastTransportProvider = transportOrder.value[transportOrder.value.length - 1];
                 const lastTransportProviderId = lastTransportProvider ? lastTransportProvider.id : -2;
@@ -288,15 +280,19 @@
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId < 0) {
                     pN.value = {
                         sandProviderId: Number(sandProviderIds.value[0].id),
-                        sandOrders: sandProviderIds.value[0].SandOrders,
+                        data: {
+                            sandOrders: sandProviderIds.value[0].SandOrders,
+                        },
                     };
                 }
 
                 if (transportOrder.value[0].transportProviderId > 0 && sandProviderIds.value[0].id < 0) {
                     pN.value = {
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
-                        cantidadCamiones: Number(transportOrder.value[0].amount),
-                        observations: transportOrder.value[0].observation,
+                        data: {
+                            cantidadCamiones: Number(transportOrder.value[0].amount),
+                            observations: transportOrder.value[0].observation,
+                        },
                     };
                 }
 
@@ -304,17 +300,19 @@
                     pN.value = {
                         textArena: 'Arena',
                         sandProviderId: Number(sandProviderIds.value[0].id),
-                        sandOrders: sandProviderIds.value[0].SandOrders,
                         textTransporte: 'Transporte',
+                        data: {
+                            sandOrders: sandProviderIds.value[0].SandOrders,
+                            cantidadCamiones: Number(transportOrder.value[0].amount),
+                            observations: transportOrder.value[0].observation,
+                        },
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
-                        cantidadCamiones: Number(transportOrder.value[0].amount),
-                        observations: transportOrder.value[0].observation,
                     };
                 }
 
                 const getSanitizedSandOrders = () => {
                     let sanitizedSandOrders = [];
-                    pN.value.sandOrders.forEach((order) => {
+                    pN.value.data.sandOrders.forEach((order) => {
                         return sanitizedSandOrders.push({
                             sandType: getSTName(order.sandTypeId),
                             amount: order.amount,
@@ -334,15 +332,14 @@
 
                 modalData.value = {
                     sandProvider: getSPName(pN.value.sandProviderId) || null,
-                    sandOrders: pN.value.sandOrders ? getSanitizedSandOrders() : null,
+                    sandOrders: pN.value.data.sandOrders ? getSanitizedSandOrders() : null,
                     transportProvider:
                         Number(transportOrder.value[0].transportProviderId) !== -1
                             ? getTranportProviderName(Number(transportOrder.value[0].transportProviderId))
                             : null,
-                    transportQuantity: pN.value.cantidadCamiones || null,
-                    transportObservations: pN.value.observations || null,
+                    transportQuantity: pN.value.data.cantidadCamiones || null,
+                    transportObservations: pN.value.data.observations || null,
                 };
-
                 toggleModal(true);
             };
 
@@ -383,7 +380,6 @@
                         },
                     ],
                 };
-
                 toggleModal(false);
             };
 

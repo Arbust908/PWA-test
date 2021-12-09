@@ -7,8 +7,8 @@
         title="Cliente"
         :endpoint-data="clients"
         :data="clientId"
+        :is-disabled="isDisabled"
         @update:data="clientId = $event"
-        :isDisabled="isDisabled"
     />
     <FieldLoading v-else class="col-span-6" />
     <FieldSelect
@@ -19,8 +19,8 @@
         title="Pozo"
         :endpoint-data="pits"
         :data="pitId"
+        :is-disabled="isDisabled"
         @update:data="pitId = $event"
-        :isDisabled="isDisabled"
     />
     <FieldLoading v-else class="col-span-6" />
 </template>
@@ -67,8 +67,6 @@
 
             const { read: getPits } = useApi('/pit');
             const backupPits = getPits();
-            console.log(getPits());
-            console.log(backupPits.value);
             const pits = ref([] as Array<Pit>);
             watch(backupPits, (newVal) => {
                 if (newVal) {
@@ -76,14 +74,14 @@
                 }
             });
 
-            const filterPitsByClient = (clientId: number) => {
+            const filterPitsByClient = (idOfClient: number) => {
                 pits.value = [];
                 setTimeout(() => {
                     const proxyPitId = pitId.value ? pitId.value : 0;
                     const waiter = setInterval(() => {
                         if (backupPits.value) {
                             pits.value = backupPits.value.filter((pit: Pit) => {
-                                return pit.companyId == clientId;
+                                return pit.companyId == idOfClient;
                             });
 
                             if (pits.value.length === 1) {
@@ -99,9 +97,9 @@
                     }, 1000);
                 }, 100);
             };
-            const selectClientByPit = (pitId: number) => {
+            const selectClientByPit = (idOfPit: number) => {
                 const curPit = backupPits.value.find((pit: Pit) => {
-                    return pit.id == pitId;
+                    return pit.id == idOfPit;
                 });
 
                 if (curPit) {

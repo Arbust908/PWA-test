@@ -90,7 +90,8 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/clientes')"> Cancelar </SecondaryBtn>
 
@@ -99,6 +100,20 @@
                 </PrimaryBtn>
             </section>
         </footer>
+
+        <ErrorModal
+            :open="showErrorCuitModal"
+            title="Ya existe un cliente con este CUIT"
+            text="El cliente que intentas guardar fue creado anteriormente."
+            @close="showErrorCuitModal = false"
+            @main="showErrorCuitModal = false"
+        />
+        <SuccessModal
+            :open="showSuccessModal"
+            title="El cliente fue guardado con éxito."
+            @close="$router.push('/clientes')"
+            @main="$router.push('/clientes')"
+        />
     </Layout>
 </template>
 
@@ -119,6 +134,8 @@
     // AXIOS
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     export default {
         components: {
@@ -129,6 +146,8 @@
             FieldGroup,
             FieldInput,
             FieldLegend,
+            ErrorModal,
+            SuccessModal,
         },
         setup() {
             const route = useRoute();
@@ -160,7 +179,18 @@
                 isValidated.value = (await useValidator(store, 'client')) ? true : false;
             });
 
+            const showErrorCuitModal = ref(false);
+            const showSuccessModal = ref(false);
+
             const update = async () => {
+                const legalIdExists = await checkIfExists('legalId', editedCompany.value.legalId);
+
+                if (legalIdExists) {
+                    showErrorCuitModal.value = true;
+
+                    return;
+                }
+
                 const loading = ref(true);
                 let companyData = {
                     id: Number(id),
@@ -209,7 +239,15 @@
                     });
 
                 store.dispatch('updateClient', editedCompany.value);
-                router.push('/clientes');
+                showSuccessModal.value = true;
+            };
+
+            const checkIfExists = async (field: string, value: string) => {
+                const apiResponse = await axios.get(`${apiUrl}/company?${field}=${value}`);
+
+                const companies = apiResponse.data.data;
+
+                return companies.filter((company) => company.legalId !== editedCompany.value.legalId).length > 0;
             };
 
             return {
@@ -218,6 +256,8 @@
                 editedCompany,
                 handleToggleState,
                 isValidated,
+                showErrorCuitModal,
+                showSuccessModal,
             };
         },
     };

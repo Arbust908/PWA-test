@@ -9,7 +9,7 @@
                     <FieldInput
                         class="col-span-full"
                         field-name="name"
-                        placeholder="Nombre del Cradle"
+                        placeholder=""
                         title="Nombre"
                         :data="name"
                         require-validation
@@ -19,7 +19,7 @@
                     <FieldTextArea
                         class="col-span-full"
                         field-name="observations"
-                        placeholder="Observaciones..."
+                        placeholder=""
                         title="Observaciones"
                         :rows="5"
                         is-optional
@@ -29,67 +29,39 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-[32px] gap-3 flex justify-end max-w-2xl">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex justify-end max-w-2xl">
             <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click="goToIndex()">Cancelar</SecondaryBtn>
                 <PrimaryBtn
                     btn="wide"
-                    :disabled="!isValidated ? 'yes' : null"
+                    :disabled="!isValidated"
                     @click="isValidated && getCradlesAndCheckIfNameExists()"
                 >
                     Finalizar
                 </PrimaryBtn>
             </section>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡El cradle fue guardado con éxito!</span
-                    >
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <PrimaryBtn @click.prevent="$router.push('/cradle')">Continuar</PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
-                    <span class="text-center text-base border-none text-gray-900"> Ya existe este cradle </span>
-                    <span class="text-center text-sm border-none m-2">
-                        El cradle que intentas guardar fue creado anteriormente.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡Ups! Hubo un problema y no pudimos guardar el cradle.
-                    </span>
-                    <span class="text-center text-sm border-none m-2">
-                        Por favor, intentá nuevamente en unos minutos.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
+        <ErrorModal
+            :open="showErrorModal"
+            title="Ya existe este cradle"
+            text="El cradle que intentas guardar fue creado anteriormente."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar el cradle."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
+        <SuccessModal
+            :open="showModal"
+            text="¡El cradle fue guardado con éxito!"
+            @close="$router.push('/cradle')"
+            @main="$router.push('/cradle')"
+        />
     </Layout>
 </template>
 
@@ -110,6 +82,8 @@
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     export default {
         components: {
@@ -122,6 +96,8 @@
             Layout,
             Icon,
             Modal,
+            ErrorModal,
+            SuccessModal,
         },
         setup() {
             useTitle('Nuevo Cradle <> Sandflow');

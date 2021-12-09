@@ -49,6 +49,20 @@ export default {
 
             return response;
         },
+        sand_get: async ({ commit }, sandId) => {
+            return await axios
+                .get(`${api}/sand/${sandId}`)
+                .then((res) => {
+                    if (res.status == 200) {
+                        commit('SET_SAND', res.data.data);
+
+                        return res.data.data;
+                    }
+                })
+                .catch(() => {
+                    return { status: 'failed' };
+                });
+        },
         sand_getAll: async ({ commit }) => {
             return await axios
                 .get(`${api}/sand`)
@@ -64,8 +78,6 @@ export default {
                 });
         },
         saveSand({ commit }, sand) {
-            // console.log('>>Adding Sand', sand);
-            console.table(sand);
             const baseS = {
                 id: 0,
                 type: '',
@@ -75,12 +87,6 @@ export default {
                 observations: '',
             };
             commit('ADD_SAND', { ...baseS, ...sand });
-
-            if (sand.isFull) {
-                // Axios POST to api to create sand
-            } else {
-                // Axios POST to incomplete sand
-            }
         },
         updateSand({ commit }, sand) {
             commit('UPDATE_SAND', sand);

@@ -1,10 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">
-                Centro de carga de arena - {{ id }}
-            </h1>
-        </header>
+        <ABMFormTitle :title="`Centro de carga de arena - ${id}`" />
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
                 <SandProviderForm v-if="currentSandProvider" v-model="currentSandProvider" />
@@ -20,7 +16,8 @@
             </form>
         </section>
 
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-arena')">
                     Cancelar
@@ -31,42 +28,55 @@
             </section>
         </footer>
 
-        <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
-            <template #body>
-                <p>{{ errorMessage }}</p>
-                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
-            </template>
-        </Modal>
+        <SuccessModal
+            :open="showSuccessModal"
+            text="¡El centro de carga fue guardado con éxito!"
+            @close="$router.push('/proveedores-de-arena')"
+            @main="$router.push('/proveedores-de-arena')"
+        />
+        <ErrorModal
+            :open="notificationModalvisible"
+            :text="errorMessage"
+            @close="toggleNotificationModal()"
+            @main="toggleNotificationModal()"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="Ya existe un centro de carga con este CUIT."
+            text="El centro de carga que intenta registrar fue creado anteriormente."
+            @close="showErrorModal = false"
+            @main="showErrorModal = false"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, watchEffect, onMounted } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-    import Layout from '@/layouts/Main.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import { useToggle } from '@vueuse/core';
-    import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
-    import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
-    import Modal from '@/components/modal/General.vue';
+    import axios from 'axios';
+    import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
 
-    // TIPOS
-    import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
-    import axios from 'axios';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import Layout from '@/layouts/Main.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
+    import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+
+    const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
+            ABMFormTitle,
+            ErrorModal,
             Layout,
-            SecondaryBtn,
             PrimaryBtn,
             SandProviderForm,
             SandProviderRep,
-            Modal,
+            SecondaryBtn,
+            SuccessModal,
         },
         setup() {
             const store = useStore();
@@ -80,6 +90,9 @@
             const errorMessage = ref('');
             const meshTypes = ref([]);
             const apiUrl = import.meta.env.VITE_API_URL || '/api';
+
+            const showErrorModal = ref(false);
+            const showSuccessModal = ref(false);
 
             const currentSandProvider: SandProvider = ref({
                 meshType: [],
@@ -105,6 +118,14 @@
                     return;
                 }
 
+                const legalIdExists = await checkIfExists('legalId', currentSandProvider.value.legalId);
+
+                if (legalIdExists) {
+                    showErrorModal.value = true;
+
+                    return;
+                }
+
                 loading.value = true;
                 const res = await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value);
 
@@ -114,7 +135,7 @@
                     errorMessage.value = res.message;
                     toggleNotificationModal();
                 } else if (res.type == 'success') {
-                    router.push('/proveedores-de-arena');
+                    showSuccessModal.value = true;
                 }
             };
 
@@ -139,6 +160,15 @@
                 loading.value = false;
             });
 
+            const checkIfExists = async (field: string, value: string) => {
+                //TODO: Refactor with useStoreLogic ? (useStoreLogic not accept filters)
+                const apiResponse = await axios.get(`${api}/sandProvider?${field}=${value}?id__`);
+
+                const sandProviders = apiResponse.data.data;
+
+                return sandProviders.filter((sp) => sp.id !== currentSandProvider.value.id).length > 0;
+            };
+
             return {
                 id,
                 isNewRep,
@@ -153,6 +183,8 @@
                 errorMessage,
                 meshTypes,
                 loading,
+                showErrorModal,
+                showSuccessModal,
             };
         },
     };

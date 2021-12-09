@@ -25,7 +25,13 @@
             </div>
         </div>
 
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredClients" :actions="actions">
+        <VTable
+            class="mt-5"
+            :columns="columns"
+            :items="filteredClients"
+            :actions="actions"
+            empty-text="No hay clientes cargados"
+        >
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item.name ? null : 'empty'">
@@ -48,12 +54,6 @@
                     <Badge v-if="item.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
                     <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
                 </td>
-
-                <tr v-if="clDB && clDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay clientes cargados</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
@@ -66,45 +66,62 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este cliente?"
+            text="Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
-                <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
+                <p class="!text-lg !text-black">{{ selectedClient.name }}</p>
+                <p class="mt-2">
+                    <strong>CUIT: </strong>
+                    {{ selectedClient.legalId }}
+                </p>
+                <p class="mt-2">
+                    <strong>Representante: </strong>
+                    {{ selectedClient.companyRepresentative?.name }}
+                </p>
+                <p class="mt-2">
+                    <strong>Teléfono: </strong>
+                    {{ selectedClient.companyRepresentative?.phone }}
+                </p>
+                <p class="mt-2">
+                    <strong>Operadora: </strong>
+                    {{ selectedClient.isOperator ? 'SI' : 'NO' }}
+                </p>
             </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
+        </Backdrop>
     </Layout>
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
-    import { useStore } from 'vuex';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
+    import Backdrop from '@/components/modal/Backdrop.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
+
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
-            Layout,
-            PrimaryBtn,
+            Backdrop,
+            Badge,
+            DisableModal,
+            FieldSelect,
             GhostBtn,
             Icon,
-            FieldSelect,
-            Badge,
-            Modal,
+            Layout,
+            PrimaryBtn,
             VTable,
         },
         setup() {
@@ -116,13 +133,7 @@
             const selectedClient = ref(null);
             const showModal = ref(false);
             const router = useRouter();
-
-            const pagination = ref({
-                sortKey: 'id',
-                sortDir: 'asc',
-                // currentPage: 1,
-                // perPage: 10,
-            });
+            const showBackdrop = ref(false);
 
             const columns = [
                 { title: 'Cliente', key: 'name', sortable: true },
@@ -137,8 +148,9 @@
                 {
                     label: 'Ver más',
                     onlyMobile: true,
-                    callback: () => {
-                        console.log('Ver más');
+                    callback: (item) => {
+                        selectedClient.value = item;
+                        showBackdrop.value = true;
                     },
                 },
                 {
@@ -243,8 +255,9 @@
                 confirmModal,
                 showModal,
                 columns,
-                pagination,
                 actions,
+                showBackdrop,
+                selectedClient,
             };
         },
     };

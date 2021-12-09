@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo proveedor de transporte</h1>
-        </header>
+        <ABMFormTitle title="Nuevo proveedor de transporte" />
         <section class="flex flex-wrap md:flex-nowrap">
             <section class="w-full md:w-8/12">
                 <nav class="flex justify-between max-w-2xl bg-white">
@@ -18,7 +16,7 @@
                         :selected="activeSection === 'driver'"
                         @click.prevent="changeSection('driver')"
                     >
-                        <span> Transportista </span>
+                        <span> Unidades </span>
                     </button>
                 </nav>
                 <section v-if="activeSection === 'provider'" class="bg-white rounded-md max-w-2xl shadow-sm">
@@ -47,14 +45,14 @@
                             :driver-email="newDriver.email"
                             :driver-t-type="newDriver.vehicleType"
                             :driver-t-id="newDriver.transportId"
-                            :driver-t-id2="newDriver.transportId2"
+                            :driver-t-id2="newDriver.transportProviderId2"
                             :driver-obs="newDriver.observations"
                             @update:driverName="newDriver.name = $event"
                             @update:driverPhone="newDriver.phone = $event"
                             @update:driverEmail="newDriver.email = $event"
                             @update:driverTType="newDriver.vehicleType = $event"
                             @update:driverTId="newDriver.transportId = $event"
-                            @update:driverTId2="newDriver.transportId2 = $event"
+                            @update:driverTId2="newDriver.transportProviderId2 = $event"
                             @update:driverObs="newDriver.observations = $event"
                             @add-driver="addDriver()"
                         />
@@ -69,13 +67,14 @@
                         :email="driver.email"
                         :vehicle-type="driver.vehicleType"
                         :transport-id="driver.transportId"
-                        :transport-id2="driver.transportId2"
+                        :transport-id2="driver.transportProviderId2"
                         :observations="driver.observations"
                         @delete-driver="deleteDriver(index)"
                         @edit-driver="editDriver(index)"
                     />
                 </section>
-                <footer class="mt-[32px] gap-3 flex flex-col justify-end max-w-2xl">
+                <!-- *** -->
+                <footer class="mt-8 gap-3 flex flex-col justify-end max-w-2xl">
                     <SideBtn v-if="drivers.length" class="md:hidden" btn="full" @click="driversShown = !driversShown">
                         {{ showDrivers ? driverTabText : 'Volver' }}
                     </SideBtn>
@@ -105,44 +104,60 @@
                     :email="driver.email"
                     :vehicle-type="driver.vehicleType"
                     :transport-id="driver.transportId"
-                    :transport-id2="driver.transportId2"
+                    :transport-id2="driver.transportProviderId2"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
                 />
             </section>
         </section>
+
+        <ErrorModal
+            :open="showErrorCuitModal"
+            title="Ya existe un cliente con este CUIT"
+            text="El cliente que intentas guardar fue creado anteriormente"
+            @close="showErrorCuitModal = false"
+            @main="showErrorCuitModal = false"
+        />
+        <SuccessModal
+            :open="showSuccessModal"
+            title="¡El proveedor fue guardado con éxito!"
+            @close="$router.push('/proveedores-de-transporte')"
+            @main="$router.push('/proveedores-de-transporte')"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { computed, reactive, watch, ref, watchEffect } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
+    import axios from 'axios';
+    import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
+    import { useAxios } from '@vueuse/integrations/useAxios';
     import { useValidator } from '@/helpers/useValidator';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
-    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import DriverCard from '@/components/transportProvider/DriverCard.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import SideBtn from '@/components/ui/buttons/SideBtn.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    // AXIOS
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
+
     const api = import.meta.env.VITE_API_URL || '/api';
-    // TIPOS
-    import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
 
     export default {
         components: {
+            ABMFormTitle,
             DriverCard,
+            ErrorModal,
             Layout,
             PrimaryBtn,
             SecondaryBtn,
             SideBtn,
+            SuccessModal,
             TransportProviderDriverForm,
             TransportProviderFrom,
         },
@@ -153,6 +168,8 @@
             const instance = axios.create({
                 baseURL: api,
             });
+            const showSuccessModal = ref(false);
+            const showErrorCuitModal = ref(false);
 
             let activeSection = ref('provider');
 
@@ -174,7 +191,8 @@
                 email: '',
                 vehicleType: '',
                 transportId: '',
-                transportId2: '',
+                // transportId2: '',
+                transportProviderId2: '',
                 observations: '',
             });
 
@@ -199,7 +217,8 @@
                 newDriver.email = driver.email;
                 newDriver.vehicleType = driver.vehicleType;
                 newDriver.transportId = driver.transportId;
-                newDriver.transportId2 = driver.transportId2;
+                // newDriver.transportId2 = driver.transportId2;
+                newDriver.transportProviderId2 = driver.transportProviderId2;
                 newDriver.observations = driver.observations;
             };
 
@@ -209,7 +228,8 @@
                 newDriver.email = '';
                 newDriver.vehicleType = '';
                 newDriver.transportId = '';
-                newDriver.transportId2 = '';
+                // newDriver.transportId2 = '';
+                newDriver.transportProviderId2 = '';
                 newDriver.observations = '';
             };
 
@@ -234,13 +254,12 @@
                     newDriver.email !== '' &&
                     newDriver.vehicleType !== '' &&
                     newDriver.transportId !== '' &&
-                    newDriver.transportId2 !== ''
+                    // newDriver.transportId2 !== '' &&
+                    newDriver.transportProviderId2 !== ''
                 );
             });
 
             const driverTabText = computed(() => {
-                console.log(drivers.length);
-
                 return `Transportista${drivers.length > 1 ? `s (${drivers.length})` : ''}`;
             });
 
@@ -267,11 +286,19 @@
                         representanteDone.value = true;
                     }
                 });
-                watch(compRepData, (apiData) => {
+                watch(compRepData, async (apiData) => {
                     console.log(apiData);
 
                     if (apiData && apiData.data) {
                         newTransportProvider.companyRepresentativeId = apiData.data.id;
+                        const legalIdExists = await checkIfExists('legalId', newTransportProvider.legalId);
+
+                        if (legalIdExists) {
+                            showErrorCuitModal.value = true;
+
+                            return;
+                        }
+
                         const { data, isFinished: transProvDone } = useAxios(
                             '/transportProvider',
                             { method: 'POST', data: newTransportProvider },
@@ -310,7 +337,7 @@
                                     ...tpSave,
                                     companyRepresentative,
                                 });
-                                router.push('/proveedores-de-transporte');
+                                showSuccessModal.value = true;
                             }
                         });
                     }
@@ -320,6 +347,14 @@
                         console.log('All done');
                     }
                 });
+            };
+
+            const checkIfExists = async (field: string, value: string) => {
+                const apiResponse = await axios.get(`${api}/transportProvider?${field}=${value}`);
+
+                const transportProviders = apiResponse.data.data;
+
+                return transportProviders.length > 0;
             };
 
             return {
@@ -338,6 +373,8 @@
                 driverTabText,
                 showDrivers,
                 driversShown,
+                showSuccessModal,
+                showErrorCuitModal,
             };
         },
     };

@@ -214,8 +214,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/notificaciones-a-proveedores',
         name: 'ProviderNotifications',
-        // component: () => import('@/pages/ProviderNotification/Index.vue'),
-        component: () => import('@/pages/ProviderNotification/New.vue'),
+        component: () => import('@/pages/ProviderNotification/Index.vue'),
         beforeEnter: isLogged,
     },
     {
@@ -313,6 +312,16 @@ const routes: Array<RouteRecordRaw> = [
         path: '/error504',
         name: 'Error-504',
         component: () => import('@/pages/Error/504.vue'),
+    },
+    {
+        path: '/tests',
+        name: 'TestIndex',
+        component: () => import('@/pages/Tests/Modales.vue'),
+    },
+    {
+        path: '/tests/eventos',
+        name: 'TestEventos',
+        component: () => import('@/pages/Tests/Eventos.vue'),
     },
 ];
 

@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Orden de trabajo - {{ woID }}</h1>
-        </header>
+        <ABMFormTitle :title="`Orden de trabajo - ${woID}`" />
         <section class="bg-second-0 rounded-md shadow-sm">
             <nav class="flex justify-between">
                 <button class="section-tab" :selected="WO_section === 'orden'" @click="changeSection('orden')">
@@ -69,7 +67,7 @@
                 @update:crews="crews = $event"
                 @update:isFull="isRRHHFull = $event"
             />
-            <section class="mt-[32px] p-4">
+            <section class="mt-8 p-4">
                 <GhostBtn
                     v-if="isLastSection()"
                     btn="text-green-700 border !border-green-700 hover:bg-second-200"
@@ -79,7 +77,8 @@
                 </GhostBtn>
             </section>
         </section>
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
             <section class="gap-6 flex flex-wrap items-center">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </SecondaryBtn>
                 <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
@@ -96,38 +95,35 @@
 </template>
 
 <script lang="ts">
-    import { ref, watch, computed, onMounted, reactive } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useToggle, useTitle } from '@vueuse/core';
-    import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+    import axios from 'axios';
+    import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/sandflow';
+    import { compareCrews, compareResource } from '@/helpers/compareCrews';
+    import { useAxios } from '@vueuse/integrations/useAxios';
+
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import OrderSection from '@/components/workOrder/Order.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
 
-    // AXIOS
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
     const api = import.meta.env.VITE_API_URL || '/api';
-    // TIPOS
-    import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/sandflow';
-    import { compareCrews, compareResource } from '@/helpers/compareCrews';
 
     export default {
         components: {
+            ABMFormTitle,
             BookmarkIcon,
             CheckCircleIcon,
             EquipmentSection,
             GhostBtn,
             Layout,
-            SecondaryBtn,
             OrderSection,
             PrimaryBtn,
             RRHHSection,
+            SecondaryBtn,
         },
         setup() {
             // Init

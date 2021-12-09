@@ -1,8 +1,6 @@
 <template>
     <Layout class="bg-white sm:bg-gray-100">
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0 sm:mt-4">Planificación de arenas</h1>
-        </header>
+        <ABMFormTitle title="Planificación de arenas" />
         <section>
             <form method="POST" action="/" class="py-4">
                 <FieldGroup class="grid-cols-6 md:grid-cols-12 max-w-2xl">
@@ -72,17 +70,7 @@
         <section class="bg-white rounded-md shadow-sm block sm:hidden">
             <form method="POST" action="/" class="flex flex-col rounded border-solid border-black">
                 <header
-                    class="
-                        flex
-                        justify-between
-                        px-3
-                        pb-3
-                        pt-4
-                        pr-3
-                        rounded-t-lg
-                        border-b-1 border-solid border-black
-                        bg-gray-100
-                    "
+                    class="flex justify-between px-3 pb-3 pt-4 pr-3 rounded-t-lg border-b-1 border-solid border-black bg-gray-100"
                 >
                     <section class="flex space-x-4 pr-3">
                         <h2 class="font-semibold">
@@ -103,17 +91,7 @@
                                 outline
                                 :opened="currentOpened"
                                 :class="currentOpened ? 'rotate-180' : null"
-                                class="
-                                    w-8
-                                    h-8
-                                    text-gray-600
-                                    transition
-                                    transform
-                                    duration-300
-                                    ease-out
-                                    cursor-pointer
-                                    mr-1
-                                "
+                                class="w-8 h-8 text-gray-600 transition transform duration-300 ease-out cursor-pointer mr-1"
                             />
                         </button>
                     </section>
@@ -187,17 +165,7 @@
         <section class="bg-white rounded-md shadow-sm mt-4 block sm:hidden">
             <form method="POST" action="/" class="flex flex-col rounded border-solid border-black">
                 <header
-                    class="
-                        flex
-                        justify-between
-                        px-3
-                        pb-3
-                        pt-4
-                        pr-4
-                        rounded-t-lg
-                        border-b-1 border-solid border-black
-                        bg-gray-100
-                    "
+                    class="flex justify-between px-3 pb-3 pt-4 pr-4 rounded-t-lg border-b-1 border-solid border-black bg-gray-100"
                 >
                     <section class="flex space-x-4 pr-3 mt-2">
                         <h2 class="font-semibold">
@@ -231,55 +199,70 @@
                 </div>
             </form>
         </section>
-        <footer class="mt-[32px] space-x-3 flex justify-end">
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull" @click.prevent="isFull ? save() : toggleErrorModal()">
                 Guardar
             </PrimaryBtn>
         </footer>
+
+        <SuccessModal
+            :open="showModal"
+            text="La planificación de arenas ha sido guardada con éxito"
+            @close="$router.push('/planificacion-de-arena')"
+            @main="$router.push('/planificacion-de-arena')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="Hubo un problema al intentar guardar."
+            text="Por favor, verifica los datos ingresados e intenta nuevamente."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar la planificación."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch, watchEffect } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
+    import axios from 'axios';
+    import { Pit, Company, SandPlan } from '@/interfaces/sandflow';
     import { useActions } from 'vuex-composition-helpers';
-    import { useTitle } from '@vueuse/core';
+    import { useAxios } from '@vueuse/integrations/useAxios';
 
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
     import SandPlanStage from '@/components/sandPlan/StageRow.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
     import StageHeader from '@/components/sandPlan/StageHeader.vue';
-    import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
-    import { Pit, Company, SandPlan } from '@/interfaces/sandflow';
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
-    import { useToggle } from '@vueuse/core';
-    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
-            Layout,
-            GhostBtn,
-            CircularBtn,
-            PrimaryBtn,
-            SecondaryBtn,
+            ABMFormTitle,
+            ClientPitCombo,
+            FieldGroup,
             Icon,
+            Layout,
+            PrimaryBtn,
+            ResposiveTableSandPlan,
             SandPlanStage,
+            SecondaryBtn,
             StageEmptyState,
             StageHeader,
-            FieldGroup,
-            ClientPitCombo,
-            ResposiveTableSandPlan,
         },
         setup() {
             useTitle('Nueva Planificación de arenas <> Sandflow');
@@ -399,6 +382,7 @@
 
                 return currentSandPlan.pitId >= 0 ? pits.value.find((pit) => pit.id == currentSandPlan.pitId).name : '';
             });
+
             // << PITS
             // :: SAND
             const sands = ref([] as Array<Pit>);
@@ -408,8 +392,8 @@
                     sands.value = sandApi.data;
                 }
             });
-            // << SAND
 
+            // << SAND
             const isFull = computed(() => {
                 const noZeroSandTypeNull =
                     (currentSandPlan.stages[0].sandId1 !== null && currentSandPlan.stages[0].sandId1 !== -1) ||
@@ -429,7 +413,19 @@
                     noZeroSandTypeZero
                 );
             });
+
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
+
             const { saveSandPlan } = useActions(['saveSandPlan']);
+
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
                     if (stage.sandId1 === -1) {
@@ -446,6 +442,7 @@
 
                     return stage;
                 });
+
                 currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
                     const noSandTypeNull =
                         (stage.sandId1 !== null && stage.quantity1 > 0) ||
@@ -482,7 +479,7 @@
                         });
 
                         saveSandPlan({ ...currentSandPlan });
-                        router.push('/planificacion-de-arena');
+                        toggleModal();
                     }
                 });
             };
@@ -508,6 +505,12 @@
                 isFull,
                 addStage,
                 windowWidth,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
             };
         },
     };
