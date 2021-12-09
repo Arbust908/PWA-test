@@ -25,18 +25,11 @@
 </template>
 
 <script lang="ts">
-    import { ref, defineComponent, defineAsyncComponent } from 'vue';
+    import { defineComponent } from 'vue';
     import { useActions } from 'vuex-composition-helpers';
-    // import { useRouter } from 'vue-router';
     import { useDark, useToggle, useOnline } from '@vueuse/core';
 
-    // import { StatusOnlineIcon, StatusOfflineIcon } from '@heroicons/vue/outline';
-
     export default defineComponent({
-        components: {
-            // StatusOnlineIcon,
-            // StatusOfflineIcon,
-        },
         setup() {
             const isDark = useDark();
             const toggleDark = useToggle(isDark);
@@ -47,12 +40,10 @@
 
             const isOnline = useOnline();
 
-            // const router = useRouter();
             if (localStorage.getItem('user')) {
                 const user = JSON.parse(localStorage.getItem('user'));
 
                 const { setUser } = useActions(['setUser']);
-
                 setUser(user);
             }
 

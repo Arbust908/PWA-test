@@ -5,10 +5,14 @@ export default {
     state: () => ({
         all: [],
         validations: {},
+        user_permissions: [],
     }),
     getters: {
         userValidation: (state) => {
             return state.validations;
+        },
+        userPermissions: (state) => {
+            return state.user_permissions;
         },
     },
     mutations: {
