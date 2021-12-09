@@ -75,7 +75,7 @@
                     placeholder="Ingrese tipo de malla"
                     endpoint-key="type"
                     :data="selectedMesh"
-                    :filtered-data="filteredMeshTypes"
+                    :endpoint-data="filteredMeshTypes"
                     require-validation
                     entity="sandProvider"
                     @is-blured="checkMeshValidation"

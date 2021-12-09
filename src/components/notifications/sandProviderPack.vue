@@ -25,7 +25,7 @@
                     endpoint="/sand"
                     endpoint-key="type"
                     :data="so.sandTypeId"
-                    :filtered-data="filteredSandTypes"
+                    :endpoint-data="filteredSandTypes"
                     @update:data="so.sandTypeId = $event"
                 />
                 <FieldWithSides
@@ -100,9 +100,7 @@
     };
     export default defineComponent({
         components: {
-            CircularBtn,
             FieldGroup,
-            FieldInput,
             FieldLegend,
             FieldSelect,
             FieldWithSides,
@@ -169,7 +167,7 @@
                 addSandProvider();
             }
 
-            const handleSandProviderUpdate = (id: Number) => {
+            const handleSandProviderUpdate = (id: number) => {
                 emit('sand-provider-handler', id);
                 cleanSandOrders();
             };
