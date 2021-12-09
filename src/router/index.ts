@@ -247,28 +247,28 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/Forklift/new.vue'),
         beforeEnter: isMobileAndLogged,
     },
-    {
-        path: '/stage-sheet',
-        name: 'StageSheet',
-        component: () => import('@/pages/StageSheet/index.vue'),
-        beforeEnter: isMobileAndLogged,
-    },
-    {
-        path: '/stage-sheet/:id',
-        name: 'StageSheetById',
-        component: () => import('@/pages/StageSheet/_id/index.vue'),
-        beforeEnter: isMobileAndLogged,
-    },
-    {
-        path: '/stage-sheet/:id/nueva',
-        name: 'StageSheetNewStage',
-        component: () => import('@/pages/StageSheet/_id/new.vue'),
-        beforeEnter: isMobileAndLogged,
-    },
+    // {
+    //     path: '/stage-sheet',
+    //     name: 'StageSheet',
+    //     component: () => import('@/pages/StageSheet/index.vue'),
+    //     beforeEnter: isMobileAndLogged,
+    // },
+    // {
+    //     path: '/stage-sheet/:id',
+    //     name: 'StageSheetById',
+    //     component: () => import('@/pages/StageSheet/_id/index.vue'),
+    //     beforeEnter: isMobileAndLogged,
+    // },
+    // {
+    //     path: '/stage-sheet/:id/nueva',
+    //     name: 'StageSheetNewStage',
+    //     component: () => import('@/pages/StageSheet/_id/new.vue'),
+    //     beforeEnter: isMobileAndLogged,
+    // },
     {
         path: '/stage-sheet/nuevo',
         name: 'NewStageSheet',
-        component: () => import('@/pages/StageSheet/new.vue'),
+        component: () => import('@/pages/StageSheet/New.vue'),
         beforeEnter: isMobileAndLogged,
     },
     {
