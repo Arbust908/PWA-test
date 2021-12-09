@@ -9,7 +9,10 @@
                 title="Centro de Carga de Arena"
                 endpoint="/sandProvider"
                 :data="sPov.id"
-                @update:data="(sPov.id = $event), handleSandProviderUpdate($event)"
+                @update:data="
+                    sPov.id = $event;
+                    handleSandProviderUpdate($event);
+                "
             />
 
             <div
@@ -22,7 +25,6 @@
                     :title="Key === 0 ? 'Tipo' : ''"
                     field-name="sandType"
                     placeholder="Arena"
-                    endpoint="/sand"
                     endpoint-key="type"
                     :data="so.sandTypeId"
                     :endpoint-data="filteredSandTypes"
@@ -38,12 +40,6 @@
                     :data="so.amount"
                     @update:data="so.amount = $event"
                 />
-                <!-- <AmountInput
-                    :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
-                    :title="Key === 0"
-                    :amount="so.amount"
-                    @update:amount="so.amount = $event"
-                /> -->
                 <div
                     v-if="sPov.SandOrders.length > 0 && Key + 1 === sPov.SandOrders.length"
                     class="col-span-1 my-auto mx-auto hidden sm:block"
@@ -116,6 +112,7 @@
                 required: true,
             },
         },
+        emits: ['update:sandProviders', 'update:sandOrders', 'sandProviderHandler'],
         setup(props, { emit }) {
             const sandProviders = useVModel(props, 'sandProviders', emit);
 
@@ -168,7 +165,7 @@
             }
 
             const handleSandProviderUpdate = (id: number) => {
-                emit('sand-provider-handler', id);
+                emit('sandProviderHandler', id);
                 cleanSandOrders();
             };
 
