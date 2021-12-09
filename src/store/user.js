@@ -25,6 +25,9 @@ export default {
         UPDATE_USER_VALIDATION(state, payload) {
             state.validations[payload.fieldName] = payload.validationsPassed;
         },
+        SET_USER_PERMISSIONS(state, payload) {
+            state.user_permissions = payload;
+        },
     },
     actions: {
         setUser({ commit }, usr) {
@@ -121,6 +124,9 @@ export default {
                 .catch(() => {
                     return { status: 'failed' };
                 });
+        },
+        setUserPermissions: async ({ commit }, payload) => {
+            commit('SET_USER_PERMISSIONS', payload);
         },
     },
 };

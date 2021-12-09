@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 import Home from '@/pages/Home.vue';
-import { isLogged, isAdmin, isGuest, goToLogin, isMobileAndLogged } from '@/router/guards';
+import { isLogged, isAdmin, isGuest, goToLogin, isMobileAndLogged, checkPermission, multiple } from '@/router/guards';
 
 const routes: Array<RouteRecordRaw> = [
     {
@@ -119,19 +119,19 @@ const routes: Array<RouteRecordRaw> = [
         path: '/clientes',
         name: 'Clients',
         component: () => import('@/pages/Company/Index.vue'),
-        beforeEnter: isLogged,
+        beforeEnter: checkPermission,
     },
     {
         path: '/clientes/:id',
         name: 'ClientsById',
         component: () => import('@/pages/Company/_id.vue'),
-        beforeEnter: isLogged,
+        beforeEnter: checkPermission,
     },
     {
         path: '/clientes/nuevo',
         name: 'NewClient',
         component: () => import('@/pages/Company/New.vue'),
-        beforeEnter: isLogged,
+        beforeEnter: checkPermission,
     },
     {
         path: '/cradle',
