@@ -1,12 +1,6 @@
 <template>
     <TransitionRoot as="template" :show="open">
-        <Dialog
-            as="div"
-            static
-            class="fixed z-10 top-10 inset-x-0 md:inset-0 overflow-y-auto"
-            :open="open"
-            @close="$emit('close')"
-        >
+        <Dialog as="div" static class="fixed z-10 inset-0 overflow-y-auto" :open="open" @close="$emit('close')">
             <div class="block min-h-screen pt-4 px-4 text-center">
                 <!-- <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"> -->
                 <TransitionChild
@@ -33,36 +27,12 @@
                     leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
                     <div
-                        class="
-                            inline-block
-                            bg-second-50
-                            rounded-lg
-                            text-left
-                            overflow-hidden
-                            shadow-xl
-                            transform
-                            transition-all
-                            w-full
-                            my-8
-                            align-middle
-                            max-w-sm
-                            p-6
-                        "
+                        class="inline-block bg-second-50 rounded-lg text-left overflow-hidden shadow-xl transform transition-all w-full my-8 align-middle max-w-sm p-6"
                     >
                         <div>
                             <div
                                 v-if="type === 'error'"
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    h-12
-                                    w-12
-                                    rounded-full
-                                    bg-red-100
-                                    sm:h-10 sm:w-10
-                                "
+                                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:h-10 sm:w-10"
                             >
                                 <svg
                                     width="48"
@@ -79,33 +49,14 @@
                             </div>
                             <div
                                 v-else-if="type === 'success'"
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    h-12
-                                    w-12
-                                    rounded-full
-                                    sm:h-10 sm:w-10
-                                    bg-green-100
-                                "
+                                class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:h-10 sm:w-10 bg-green-100"
                             >
                                 <CheckIcon class="h-6 w-6 text-green-600" aria-hidden="true" />
                             </div>
                             <div v-else-if="type === 'off'"></div>
                             <div
                                 v-else
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    h-10
-                                    w-10
-                                    bg-second-200
-                                "
+                                class="mx-auto flex-shrink-0 flex items-center justify-center rounded-full h-10 w-10 bg-second-200"
                             >
                                 <QuestionMarkCircleIcon class="h-6 w-6 text-second-600" aria-hidden="true" />
                             </div>
@@ -160,3 +111,14 @@
         },
     };
 </script>
+
+<style lang="scss">
+    .modal {
+        &__card {
+            @apply inline-flex flex-col bg-second-50 rounded-lg shadow-xl transform transition-all w-full mb-20 align-middle p-5;
+        }
+        &__icon-circle {
+            @apply mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:h-10 sm:w-10;
+        }
+    }
+</style>
