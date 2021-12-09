@@ -42,57 +42,27 @@
                 </PrimaryBtn>
             </section>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡El cradle fue guardado con éxito!</span
-                    >
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <PrimaryBtn @click.prevent="$router.push('/cradle')">Continuar</PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
-                    <span class="text-center text-base font-semibold border-none text-gray-900">
-                        Ya existe este cradle
-                    </span>
-                    <span class="text-center text-sm border-none m-2">
-                        El cradle que intentas guardar fue creado anteriormente.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡Ups! Hubo un problema y no pudimos guardar el cradle.
-                    </span>
-                    <span class="text-center text-sm border-none m-2">
-                        Por favor, intentá nuevamente en unos minutos.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
+
+        <ErrorModal
+            :open="showErrorModal"
+            title="Ya existe este cradle"
+            text="El cradle que intentas guardar fue creado anteriormente."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar el cradle."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
+        <SuccessModal
+            :open="showModal"
+            text="¡El cradle fue guardado con éxito!"
+            @close="$router.push('/cradle')"
+            @main="$router.push('/cradle')"
+        />
     </Layout>
 </template>
 
@@ -102,7 +72,7 @@
     import { useRouter, useRoute } from 'vue-router';
     import { useStore } from 'vuex';
     import { useTitle, useToggle } from '@vueuse/core';
-    import { Cradle } from '@/interfaces/SandProvider';
+    import { Cradle } from '@/interfaces/sandflow';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
@@ -112,6 +82,8 @@
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import { useValidator } from '@/helpers/useValidator';
     import axios from 'axios';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
@@ -127,6 +99,8 @@
             WarningBtn,
             Icon,
             Modal,
+            SuccessModal,
+            ErrorModal,
         },
         setup() {
             const route = useRoute();

@@ -1,6 +1,6 @@
 <template>
     <BaseBtn :btn="`main ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
-        <slot></slot>
+        <slot>Primary</slot>
     </BaseBtn>
 </template>
 
@@ -11,26 +11,7 @@
             BaseBtn,
         },
         props: {
-            type: {
-                type: String,
-                default: 'button',
-            },
-            size: {
-                type: String,
-                default: 'md',
-            },
-            btn: {
-                type: String,
-                default: 'main',
-            },
-            disabled: {
-                type: [String, Boolean],
-                default: false,
-            },
-            isLoading: {
-                type: Boolean,
-                default: false,
-            },
+            ...BaseBtn.props,
         },
     };
 </script>

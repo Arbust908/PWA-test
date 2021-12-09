@@ -1,8 +1,6 @@
 <template>
     <Layout class="bg-white sm:bg-gray-100">
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0 sm:mt-4">Planificación de arenas</h1>
-        </header>
+        <ABMFormTitle title="Planificación de arenas" />
         <section>
             <form method="POST" action="/" class="py-4">
                 <FieldGroup class="grid-cols-6 md:grid-cols-12 max-w-2xl">
@@ -208,102 +206,63 @@
                 Guardar
             </PrimaryBtn>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >La planificación de arenas ha sido guardada con éxito</span
-                    >
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <PrimaryBtn @click.prevent="$router.push('/planificacion-de-arena')">Continuar</PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        Hubo un problema al intentar guardar.
-                    </span>
-                    <span class="text-center text-sm border-none m-2">
-                        Por favor, verifica los datos ingresados e intenta nuevamente
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center cursor-pointer">
-                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡Ups! Hubo un problema y no pudimos guardar la planificación.
-                    </span>
-                    <span class="text-center text-sm border-none m-2">
-                        Por favor, intentá nuevamente en unos minutos.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
+
+        <SuccessModal
+            :open="showModal"
+            text="La planificación de arenas ha sido guardada con éxito"
+            @close="$router.push('/planificacion-de-arena')"
+            @main="$router.push('/planificacion-de-arena')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="Hubo un problema al intentar guardar."
+            text="Por favor, verifica los datos ingresados e intenta nuevamente."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar la planificación."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch, watchEffect, defineAsyncComponent } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
+    import axios from 'axios';
+    import { Pit, Company, SandPlan } from '@/interfaces/sandflow';
     import { useActions } from 'vuex-composition-helpers';
-    import { useTitle } from '@vueuse/core';
+    import { useAxios } from '@vueuse/integrations/useAxios';
 
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
     import SandPlanStage from '@/components/sandPlan/StageRow.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
     import StageHeader from '@/components/sandPlan/StageHeader.vue';
-    import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
-    import { Pit, Company, SandPlan } from '@/interfaces/sandflow';
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
-    import { useToggle } from '@vueuse/core';
-    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     export default {
         components: {
-            Layout,
-            GhostBtn,
-            CircularBtn,
-            PrimaryBtn,
-            SecondaryBtn,
+            ABMFormTitle,
+            ClientPitCombo,
+            FieldGroup,
             Icon,
+            Layout,
+            PrimaryBtn,
+            ResposiveTableSandPlan,
             SandPlanStage,
+            SecondaryBtn,
             StageEmptyState,
             StageHeader,
-            FieldGroup,
-            ClientPitCombo,
-            ResposiveTableSandPlan,
-            Modal,
         },
         setup() {
             useTitle('Nueva Planificación de arenas <> Sandflow');

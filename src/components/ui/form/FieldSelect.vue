@@ -71,11 +71,6 @@
                 type: Boolean,
                 default: false,
             },
-            filteredData: {
-                type: Array,
-                required: false,
-                default: null,
-            },
             requireValidation: {
                 type: Boolean,
                 required: false,
@@ -114,15 +109,9 @@
                 return props.endpoint === '/' ? endpointData.value : null;
             });
 
-            if (props.endpoint !== '/' && props.endpoint !== null && !props.filteredData) {
+            if (props.endpoint !== '/' && props.endpoint !== null) {
                 resources = getApiVal();
             }
-
-            watchEffect(() => {
-                if (props.filteredData && props.filteredData.length > 0) {
-                    resources.value = filteredData.value;
-                }
-            });
 
             const noOptionSelected = computed(() => value.value === -1);
 

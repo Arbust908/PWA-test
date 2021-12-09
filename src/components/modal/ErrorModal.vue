@@ -7,7 +7,7 @@
         :icon="{ type: 'ExclamationCircle', classes: 'text-red-700' }"
         :btn="{ text: 'Volver', classes: 'warning' }"
         @close="$emit('close')"
-        @main="$emit('close')"
+        @main="$emit('main')"
     />
 </template>
 
@@ -33,6 +33,6 @@
                 default: false,
             },
         },
-        emits: ['close', 'action'],
+        emits: ['close', 'main'],
     };
 </script>

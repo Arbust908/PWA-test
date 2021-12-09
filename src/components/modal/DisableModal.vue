@@ -58,6 +58,6 @@
         @apply text-base;
     }
     footer {
-        @apply flex justify-center;
+        @apply flex justify-center gap-3;
     }
 </style>

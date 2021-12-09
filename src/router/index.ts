@@ -336,6 +336,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'TestIndex',
         component: () => import('@/pages/Tests/Modales.vue'),
     },
+    {
+        path: '/tests/eventos',
+        name: 'TestEventos',
+        component: () => import('@/pages/Tests/Eventos.vue'),
+    },
 ];
 
 const router = createRouter({

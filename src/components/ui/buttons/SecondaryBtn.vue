@@ -1,6 +1,6 @@
 <template>
-    <BaseBtn :btn="`secondary ${btn}`" :type="type" :size="size">
-        <slot></slot>
+    <BaseBtn :btn="`secondary ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
+        <slot>Second</slot>
     </BaseBtn>
 </template>
 
@@ -11,22 +11,7 @@
             BaseBtn,
         },
         props: {
-            type: {
-                type: String,
-                default: 'button',
-            },
-            size: {
-                type: String,
-                default: 'md',
-            },
-            btn: {
-                type: String,
-                default: 'secondary',
-            },
-            disabled: {
-                type: [String, Boolean],
-                default: false,
-            },
+            ...BaseBtn.props,
         },
     };
 </script>
