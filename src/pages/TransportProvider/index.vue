@@ -99,7 +99,6 @@
             const showBD = ref(false);
             const bdInfo = ref(null);
             const toggleBD = () => (showBD.value = !showBD.value);
-            const tableColumns = ['Proveedor', 'Domicilio', 'Representante', 'Teléfono'];
 
             const pagination = ref({
                 sortKey: 'id',
@@ -215,7 +214,6 @@
                 showModal,
                 openModalVisibility,
                 confirmModal,
-                tableColumns,
                 pagination,
                 columns,
                 actions,

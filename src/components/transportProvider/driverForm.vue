@@ -4,7 +4,7 @@
             class="col-span-full"
             title="Nombre y apellido"
             field-name="driverName"
-            placeholder="Ingresar conductor"
+            placeholder=""
             :data="driverName"
             require-validation
             :silenced="silenced"
@@ -15,7 +15,7 @@
         <FieldInput
             class="col-span-full"
             field-name="driverPhone"
-            placeholder="+11 1234 5678"
+            placeholder="Ingrese sólo números"
             mask="#*"
             title="Teléfono"
             :data="driverPhone"
@@ -27,7 +27,7 @@
         <FieldInput
             class="col-span-full"
             field-name="driverEmail"
-            placeholder="empresa@mail.com"
+            placeholder="transportista@gmail.com"
             title="Email"
             :data="driverEmail"
             require-validation
@@ -40,7 +40,7 @@
             class="col-span-full"
             title="Tipo de transporte"
             field-name="driverVehicleType"
-            placeholder="Doble carga"
+            placeholder=""
             :data="driverTType"
             require-validation
             :silenced="silenced"
@@ -51,7 +51,7 @@
             class="col-span-6"
             title="Patente camión"
             field-name="driverVehicleId"
-            placeholder="patente del camion"
+            placeholder=""
             :data="driverTId"
             require-validation
             :silenced="silenced"
@@ -62,7 +62,7 @@
             class="col-span-6"
             title="Patente acoplado"
             field-name="driverVehicleId"
-            placeholder="patente del acoplado"
+            placeholder=""
             :data="driverTId2"
             require-validation
             :silenced="silenced"
@@ -73,7 +73,7 @@
             class="col-span-full"
             title="Observaciones"
             field-name="observations"
-            placeholder="Observaciones..."
+            placeholder=""
             :rows="5"
             is-fixed
             is-optional
@@ -81,11 +81,17 @@
             @update:data="driverObs = $event"
         />
         <button
-            :class="['flex items-center w-[250px]', driverFull ? null : 'text-gray-200 cursor-not-allowed']"
+            :class="['flex items-center w-[250px] gap-2', driverFull ? null : 'text-gray-200 cursor-not-allowed']"
             @click.prevent="driverFull && addDriver()"
         >
-            <Icon icon="Plus" type="outline" class="w-5 h-5" />
-            <h2>Agregar Transportista</h2>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path
+                    d="M12 0C5.37097 0 0 5.37097 0 12C0 18.629 5.37097 24 12 24C18.629 24 24 18.629 24 12C24 5.37097 18.629 0 12 0ZM18.9677 13.3548C18.9677 13.6742 18.7065 13.9355 18.3871 13.9355H13.9355V18.3871C13.9355 18.7065 13.6742 18.9677 13.3548 18.9677H10.6452C10.3258 18.9677 10.0645 18.7065 10.0645 18.3871V13.9355H5.6129C5.29355 13.9355 5.03226 13.6742 5.03226 13.3548V10.6452C5.03226 10.3258 5.29355 10.0645 5.6129 10.0645H10.0645V5.6129C10.0645 5.29355 10.3258 5.03226 10.6452 5.03226H13.3548C13.6742 5.03226 13.9355 5.29355 13.9355 5.6129V10.0645H18.3871C18.7065 10.0645 18.9677 10.3258 18.9677 10.6452V13.3548Z"
+                    fill="#8DC881"
+                />
+            </svg>
+
+            <h2 class="font-semibold">Agregar Transportista</h2>
         </button>
     </FieldGroup>
 </template>
