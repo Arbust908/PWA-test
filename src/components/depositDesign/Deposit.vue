@@ -126,7 +126,7 @@
     .deposit {
         grid-template-columns: repeat(var(--cols), 3rem);
         grid-template-rows: repeat(var(--rows), 3rem);
-        @apply grid gap-[17px];
+        @apply grid gap-4; // gap-[17px]
     }
     .floor {
         @apply border-b-4 border-transparent pb-2;

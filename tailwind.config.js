@@ -1,7 +1,6 @@
-const colors = require('tailwindcss/colors');
 module.exports = {
     mode: 'jit',
-    purge: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+    content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
     darkMode: 'class',
     theme: {
         extend: {
@@ -10,7 +9,6 @@ module.exports = {
                 body: ['Rubik', 'sans-serif'],
             },
             colors: {
-                ...colors,
                 main: {
                     50: 'var(--primary-50)',
                     100: 'var(--primary-50)',
@@ -45,5 +43,10 @@ module.exports = {
     variants: {
         extend: {},
     },
-    plugins: [require('@tailwindcss/aspect-ratio'), require('@tailwindcss/forms'), require('@tailwindcss/typography')],
+    plugins: [
+        require('@tailwindcss/aspect-ratio'),
+        require('@tailwindcss/forms'),
+        require('@tailwindcss/typography'),
+        require('@tailwindcss/line-clamp'),
+    ],
 };

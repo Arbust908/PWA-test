@@ -127,7 +127,7 @@
                 @update:model-value="user.numero = Number($event)"
             />
             <input v-model="user.nombre" type="text" />
-            <hr class="col-span-full" />
+            <hr class="col-span-full border-gray-300" />
             <div class="col-span-full">
                 {{ user.nombre }} - {{ user.mail }} -
                 {{ user.numero + 1 }}

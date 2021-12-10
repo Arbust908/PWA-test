@@ -18,7 +18,7 @@
                 </datalist>
             </label>
             <template v-for="(order, orderKey) in sandProvider.sandOrder" :key="orderKey">
-                <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
+                <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full border-gray-300" />
                 <label class="col-span-10" for="sandType">
                     <span>Tipo</span>
                     <input
@@ -47,20 +47,7 @@
                             v-model="order.quantity"
                             type="number"
                             name="sandQuantity"
-                            class="
-                                flex-1
-                                min-w-0
-                                block
-                                w-full
-                                px-3
-                                py-2
-                                rounded-none
-                                border-r-0
-                                rounded-l
-                                focus:ring-indigo-500 focus:border-indigo-500
-                                border-gray-300
-                                sm:text-sm
-                            "
+                            class="flex-1 min-w-0 block w-full px-3 py-2 rounded-none border-r-0 rounded-l focus:ring-indigo-500 focus:border-indigo-500 border-gray-300 sm:text-sm"
                             placeholder="22"
                             list="sandQuantity"
                         />
@@ -71,16 +58,7 @@
                             <option value="88">88</option>
                         </datalist>
                         <span
-                            class="
-                                inline-flex
-                                items-center
-                                px-3
-                                rounded-r
-                                border border-gray-300
-                                bg-gray-50
-                                text-gray-500
-                                sm:text-sm
-                            "
+                            class="inline-flex items-center px-3 rounded-r border border-gray-300 bg-gray-50 text-gray-500 sm:text-sm"
                             title="Peso en Toneladas"
                         >
                             t

@@ -57,7 +57,7 @@
                                         <slot name="mobileTitle" :item="item"></slot>
                                     </span>
 
-                                    <p class="text-xs text-warmGray-500">
+                                    <p class="text-xs text-gray-500">
                                         <slot name="mobileSubtitle" :item="item"></slot>
                                     </p>
                                 </div>
