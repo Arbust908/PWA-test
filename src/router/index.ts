@@ -323,6 +323,11 @@ const routes: Array<RouteRecordRaw> = [
         name: 'TestEventos',
         component: () => import('@/pages/Tests/Eventos.vue'),
     },
+    {
+        path: '/tests/pdf',
+        name: 'TestPDF',
+        component: () => import('@/pages/Tests/PDF.vue'),
+    },
 ];
 
 const router = createRouter({
