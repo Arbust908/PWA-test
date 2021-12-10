@@ -21,14 +21,14 @@
             title="Ya existe un usuario con este mail"
             text="El usuario que intentas guardar fue creado anteriormente"
             @close="showErrorModal = false"
-            @action="showErrorModal = false"
+            @main="showErrorModal = false"
         />
         <SuccessModal
             class="sm:w-[440px] sm:h-[248] !py-8"
             :open="showSuccessModal"
             title="¡El usuario fue guardado con éxito!"
             @close="$router.push('/usuarios')"
-            @action="$router.push('/usuarios')"
+            @main="$router.push('/usuarios')"
         />
     </Layout>
 </template>
@@ -94,7 +94,7 @@
 
                 const response = await axios.post(`${apiUrl}/register`, user.value);
 
-                if (response.type === 'success') {
+                if (response.status === 200) {
                     showSuccessModal.value = true;
                 }
 
