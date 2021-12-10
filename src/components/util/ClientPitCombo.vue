@@ -1,7 +1,7 @@
 <template class="gap-2">
     <FieldSelect
         v-if="clients.length > 0"
-        class="col-span-full md:col-span-6"
+        :class="sharedClasses"
         field-name="client"
         placeholder="Seleccionar cliente"
         title="Cliente"
@@ -10,10 +10,10 @@
         :is-disabled="isDisabled"
         @update:data="clientId = $event"
     />
-    <FieldLoading v-else class="col-span-6" />
+    <FieldLoading v-else :class="sharedClasses" />
     <FieldSelect
         v-if="pits.length > 0"
-        class="col-span-full md:col-span-6"
+        :class="sharedClasses"
         field-name="pit"
         placeholder="Seleccionar pozo"
         title="Pozo"
@@ -22,7 +22,7 @@
         :is-disabled="isDisabled"
         @update:data="pitId = $event"
     />
-    <FieldLoading v-else class="col-span-6" />
+    <FieldLoading v-else :class="sharedClasses" />
 </template>
 
 <script lang="ts">
@@ -52,6 +52,10 @@
             isDisabled: {
                 type: Boolean,
                 default: false,
+            },
+            sharedClasses: {
+                type: String,
+                default: 'col-span-full md:col-span-6',
             },
         },
         setup(props, { emit }) {
