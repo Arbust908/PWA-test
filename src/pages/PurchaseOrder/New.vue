@@ -110,20 +110,18 @@
                         placeholder="Selecciona proveedor"
                         endpoint="/transportProvider"
                         :data="transportProviderId"
-                        @update:data="
-                            transportProviderId = $event;
-                            conLog();
-                        "
+                        @update:data="transportProviderId = $event"
                     />
+
                     <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="col-span-full relative">
                         <FieldSelect
-                            class="col-span-12 md:col-span-6"
-                            field-name="transportProvider"
-                            title="Transportista"
-                            placeholder="Seleccionar transportista"
-                            endpoint="/driver"
-                            :data="transportProviderId"
-                            @update:data="transportProviderId = $event"
+                            class="col-span-5 sm:col-span-5"
+                            title="Conductores "
+                            field-name="transportProvider2"
+                            placeholder="Seleccionar Conductor"
+                            :endpoint-data="filteredDrivers"
+                            :data="driverId"
+                            @update:data="driverId = $event"
                         />
 
                         <FieldInput
@@ -229,7 +227,17 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, watch, watchEffect, defineAsyncComponent } from 'vue';
+    import {
+        ref,
+        Ref,
+        reactive,
+        computed,
+        ComputedRef,
+        watch,
+        watchEffect,
+        defineAsyncComponent,
+        onMounted,
+    } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
@@ -287,16 +295,25 @@
             GhostBtn,
         },
         setup() {
-            function conLog() {
-                console.log(TransportOrders.value.length);
-                console.log(
-                    TransportOrders.value.every((to) => {
-                        return to.boxAmount > 0;
-                    })
-                );
-            }
-            console.log(axios.get(`${api}/driver`));
-            console.log(axios.get(`${api}/transportProvider`));
+            const filteredDrivers = computed(() => {
+                if (transportProviderId.value > -1) {
+                    console.log('filtrar drivers');
+
+                    return drivers.value.filter((driver) => driver.transportProviderId === transportProviderId.value);
+                }
+
+                return [];
+            });
+
+            const drivers = ref([]);
+            const driverId = ref(-1);
+
+            onMounted(async () => {
+                // TODO: StoreLogic
+                const result = await axios.get(`${api}/driver`);
+                console.log('rESULT', result);
+                drivers.value = result.data.data;
+            });
 
             useTitle('Nueva orden de pedido <> Sandflow');
             const localDate = ref('');
@@ -564,6 +581,7 @@
                     transportProviderId: transportProviderId.value,
                     deliveryTime: newDate,
                     packageObservations: pObs,
+                    driverId: driverId.value,
                 };
 
                 return purchaseOrder;
@@ -645,7 +663,11 @@
                 dateObject,
                 packageObservations,
                 pObservations,
-                conLog,
+                filteredDrivers,
+                drivers,
+                driverId,
+
+                /*       conLog, */
             };
         },
     };
