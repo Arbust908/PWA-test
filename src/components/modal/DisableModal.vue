@@ -6,7 +6,7 @@
         <h2>{{ title }}</h2>
         <span> {{ text }} </span>
         <footer>
-            <NoneBtn class="" @click="$emit('close')"> Volver </NoneBtn>
+            <NoneBtn @click="$emit('close')"> Volver </NoneBtn>
             <PrimaryBtn btn="wide warning" @click="$emit('main')"> Inhabilitar </PrimaryBtn>
         </footer>
     </Modal>
