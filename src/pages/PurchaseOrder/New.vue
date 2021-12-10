@@ -110,19 +110,22 @@
                         placeholder="Selecciona proveedor"
                         endpoint="/transportProvider"
                         :data="transportProviderId"
-                        @update:data="transportProviderId = $event"
+                        @update:data="
+                            transportProviderId = $event;
+                            conLog();
+                        "
                     />
                     <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="col-span-full relative">
-                        <!--REVISAR FIELDNAME, ENDPOINT, DATA Y UPDATE DATA-->
                         <FieldSelect
                             class="col-span-12 md:col-span-6"
                             field-name="transportProvider"
-                            title="Transportista (REVISAR)"
+                            title="Transportista"
                             placeholder="Seleccionar transportista"
                             endpoint="/driver"
                             :data="transportProviderId"
                             @update:data="transportProviderId = $event"
                         />
+
                         <FieldInput
                             :title="useOnFirst(toKey, 'Patente camión')"
                             class="col-span-6 sm:col-span-3"
@@ -137,7 +140,6 @@
                             :data="to.licensePlate"
                             @update:data="to.licensePlate = $event"
                         />
-                        <!--REVISAR FIELDNAME, ENDPOINT, DATA Y UPDATE DATA-->
                         <FieldInput
                             title="Patente acoplado"
                             class="col-span-6 sm:col-span-3"
@@ -180,13 +182,22 @@
                     <section class="flex gap-2 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
-                            <DatePicker class="mr-6 md:mr-8" v-model="lafecha" />
-                            lafecha {{ lafecha }}
+                            <DatePicker
+                                class="mr-6 md:mr-8"
+                                v-model="localDate"
+                                validation-type="numeric"
+                                @date-object="dateObject = $event"
+                            />
                         </label>
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Hora de entrega</p>
-                            <TimePicker :timetrack="elTime" @update:timetrack="elTime = $event" />
-                            el tiempo {{ elTime }}
+                            <TimePicker
+                                :timetrack="localTime"
+                                @update:timetrack="
+                                    localTime = $event;
+                                    time();
+                                "
+                            />
                         </label>
                     </section>
 
@@ -194,11 +205,14 @@
                         title="Observaciones"
                         class="col-span-12 sm:col-span-8"
                         field-name="observations"
-                        rows="3"
+                        :rows="3"
                         placeholder=""
                         is-optional
-                        :data="to.observations"
-                        @update:data="to.observations = $event"
+                        :data="packageObservations"
+                        @update:data="
+                            packageObservations = $event;
+                            pObservations();
+                        "
                     />
                 </FieldGroup>
             </form>
@@ -273,10 +287,31 @@
             GhostBtn,
         },
         setup() {
-            useTitle('Nueva orden de pedido <> Sandflow');
+            function conLog() {
+                console.log(TransportOrders.value.length);
+                console.log(
+                    TransportOrders.value.every((to) => {
+                        return to.boxAmount > 0;
+                    })
+                );
+            }
+            console.log(axios.get(`${api}/driver`));
+            console.log(axios.get(`${api}/transportProvider`));
 
-            const lafecha = ref('');
-            const elTime = ref('');
+            useTitle('Nueva orden de pedido <> Sandflow');
+            const localDate = ref('');
+            const localTime = ref(1609416000000); //09:00 AM
+            const dateObject = ref('');
+            const packageObservations = ref('');
+
+            let dateTime = { hours: 9, minutes: 0 };
+
+            function time() {
+                let date = new Date(localTime.value);
+                let hours = date.getHours();
+                let minutes = date.getMinutes();
+                dateTime = { hours: hours, minutes: minutes };
+            }
 
             const router = useRouter();
             const instance = axios.create({
@@ -505,45 +540,59 @@
                     });
                 });
             };
+
+            let pObs = '';
+            function pObservations() {
+                pObs = packageObservations.value;
+                console.log(pObs);
+            }
+
             const _formatPO = () => {
+                const newDate = new Date(
+                    dateObject.value.year,
+                    dateObject.value.month,
+                    dateObject.value.day,
+                    dateTime.hours,
+                    dateTime.minutes
+                );
+
                 const purchaseOrder: PurchaseOrder = {
                     companyId: companyClientId.value,
                     companyClientId: companyClientId.value,
                     pitId: pitId.value,
                     sandProviderId: sandProvidersIds.value[0].id,
                     transportProviderId: transportProviderId.value,
-
-                    // dates
-                    deliveryDate: lafecha.value,
-                    deliveryTime: elTime.value,
+                    deliveryTime: newDate,
+                    packageObservations: pObs,
                 };
 
                 return purchaseOrder;
             };
             const save = (): void => {
-                // if (isFull.value) {
-                // Formateamos la orden de pedido
-                const purchaseOrder = _formatPO();
-                console.log('PURCHASEORDER', purchaseOrder);
-                // Creamos via API la orden de pedido
-                // const { data: pODone } = useAxios(
-                //     '/purchaseOrder',
-                //     { method: 'POST', data: purchaseOrder },
-                //     instance
-                // );
-                // const sOisDone = ref([]);
-                // watch(pODone, (newVal, _) => {
-                //     if (newVal && newVal.data) {
-                //         // Recorremos los proveedores de sand
-                //         const poId = newVal.data.id;
-                //         _saveTO(poId);
-                //         _saveSO(poId);
-                //         setTimeout(() => {
-                //             router.push('/orden-de-pedido');
-                //         }, 1000);
-                //     }
-                // });
-                // }
+                if (isFull.value) {
+                    console.log('hola');
+                    // Formateamos la orden de pedido
+                    const purchaseOrder = _formatPO();
+                    console.log('PURCHASEORDER', purchaseOrder);
+                    // Creamos via API la orden de pedido
+                    const { data: pODone } = useAxios(
+                        '/purchaseOrder',
+                        { method: 'POST', data: purchaseOrder },
+                        instance
+                    );
+                    const sOisDone = ref([]);
+                    watch(pODone, (newVal, _) => {
+                        if (newVal && newVal.data) {
+                            // Recorremos los proveedores de sand
+                            const poId = newVal.data.id;
+                            _saveTO(poId);
+                            _saveSO(poId);
+                            setTimeout(() => {
+                                router.push('/orden-de-pedido');
+                            }, 1000);
+                        }
+                    });
+                }
             };
             // >> Success y Error Modal
             const titleSuccess = 'La orden de pedido #numero ha sido generada con éxito';
@@ -589,8 +638,14 @@
                 textErrorGral,
                 GhostBtn,
                 soLength,
-                lafecha,
-                elTime,
+                localDate,
+                localTime,
+                dateTime,
+                time,
+                dateObject,
+                packageObservations,
+                pObservations,
+                conLog,
             };
         },
     };

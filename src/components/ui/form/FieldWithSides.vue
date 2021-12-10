@@ -7,24 +7,28 @@
                 :id="fieldName"
                 v-model="value"
                 v-maska="mask"
+                :maxlength="maxlength"
                 :class="[pre ? null : 'n-pre', post ? null : 'n-post']"
                 :type="type"
                 :name="fieldName"
                 :placeholder="placeholder"
                 @blur="checkValidation(false)"
             />
-            <InvalidInputLabel
-                v-if="v$.$invalid && wasInputEntered"
-                :validation-type="validationType"
-                :char-amount="charAmount"
-            />
             <span v-if="post" class="post text-center" :title="post.title">{{ post.value }}</span>
         </div>
+        <InvalidInputLabel
+            v-if="v$.$invalid && wasInputEntered"
+            :validation-type="validationType"
+            :char-amount="charAmount"
+        />
+        <!-- v-if con la validacion -->
+        <!-- Lo dejamos -->
     </label>
 </template>
 
 <script>
-    import { defineComponent, ref, toRefs, watch } from 'vue';
+    import { defineComponent, ref, toRefs, watch, onMounted, onUpdated } from 'vue';
+    import { useRoute } from 'vue-router';
     import { useVModel, useCssVar } from '@vueuse/core';
     import { maska } from 'maska';
     import FieldTitle from '@/components/ui/form/FieldTitle.vue';
@@ -73,8 +77,39 @@
                 type: Object,
                 default: null,
             },
+            maxlength: {
+                type: Number,
+                required: false,
+                default: null,
+            },
+            isReadonly: {
+                type: Boolean,
+                default: false,
+            },
+            requireValidation: {
+                type: Boolean,
+                required: false,
+            },
+            validationType: {
+                type: String,
+                required: false,
+            },
+            charAmount: {
+                type: Object,
+                required: false,
+            },
+            entity: {
+                type: String,
+                required: false,
+            },
+            silenced: {
+                type: Boolean,
+                required: false,
+                default: null,
+            },
         },
         setup(props, { emit }) {
+            const route = useRoute();
             const value = useVModel(props, 'data', emit);
             const cssPre = useCssVar('--pre', 0);
             const cssPost = useCssVar('--post', 0);
@@ -168,6 +203,20 @@
             if (props.post) {
                 cssPost.value = props.post.width ?? '20%';
             }
+
+            onMounted(() => {
+                // Si es new, ejecuta.
+                if (route.path.includes('nuevo') || route.path.includes('nueva')) {
+                    checkValidation(true);
+                }
+            });
+
+            onUpdated(() => {
+                // Si es edit, ejecuta.
+                if (!route.path.includes('nuevo') && !route.path.includes('nueva')) {
+                    checkValidation(true);
+                }
+            });
 
             return {
                 value,
