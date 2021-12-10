@@ -90,7 +90,9 @@
 
                 isLoading.value = true;
 
-                const response = await useStoreLogic(router, store, 'user', 'create', user);
+                user.value.password = user.value.email;
+
+                const response = await axios.post(`${apiUrl}/register`, user.value);
 
                 if (response.type === 'success') {
                     showSuccessModal.value = true;
