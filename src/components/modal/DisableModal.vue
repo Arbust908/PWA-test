@@ -7,7 +7,7 @@
         <span> {{ text }} </span>
         <footer>
             <NoneBtn class="" @click="$emit('close')"> Volver </NoneBtn>
-            <PrimaryBtn :btn="`ml-3 wide warning`" @click="$emit('main')"> Inhabilitar </PrimaryBtn>
+            <PrimaryBtn btn="wide warning" @click="$emit('main')"> Inhabilitar </PrimaryBtn>
         </footer>
     </Modal>
 </template>
@@ -58,6 +58,6 @@
         @apply text-base;
     }
     footer {
-        @apply flex justify-center gap-3;
+        @apply flex justify-center gap-5;
     }
 </style>

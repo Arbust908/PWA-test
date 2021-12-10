@@ -6,7 +6,7 @@
         <h2>{{ title }}</h2>
         <span> {{ text }} </span>
         <footer>
-            <PrimaryBtn :btn="`extra-wide ${btnClass}`" @click="$emit('main')">
+            <PrimaryBtn :btn="`wide ${btnClass}`" @click="$emit('main')">
                 {{ btnText }}
             </PrimaryBtn>
         </footer>
