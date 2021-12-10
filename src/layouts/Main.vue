@@ -207,9 +207,12 @@
                 //Filtramos los items por permiso
                 const navigationItems = store.state.global.navigation;
                 //TODO: usar el permissionManager
-                // const filteredNavigation = [];
-                // const storePermissions = store.state.loggedUser.permissions;
-                // const permissions = JSON.parse(JSON.stringify(storePermissions));
+                const filteredNavigation = [];
+                const storePermissions = store.state.loggedUser.permissions || [];
+                const permissions = JSON.parse(JSON.stringify(storePermissions));
+                console.log('filteredNavigation', filteredNavigation);
+                console.log('storePermissions', storePermissions);
+                console.log('permissions', permissions);
 
                 // navigationItems.forEach((item) => {
                 //     if (item.subNav) {
