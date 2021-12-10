@@ -22,12 +22,10 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref } from 'vue';
     import LoginCard from '@/components/auth/LoginCard.vue';
     import PassRecover from '@/components/auth/PassRecover.vue';
     import Success from '@/components/auth/Success.vue';
     import Error from '@/components/auth/Error.vue';
-    import { useTitle } from '@vueuse/core';
     export default defineComponent({
         components: {
             LoginCard,
