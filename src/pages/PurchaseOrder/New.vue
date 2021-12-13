@@ -116,41 +116,31 @@
                     <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="col-span-full relative">
                         <FieldSelect
                             class="col-span-5 sm:col-span-5"
-                            title="Conductores "
+                            title="Conductores"
                             field-name="transportProvider2"
                             placeholder="Seleccionar Conductor"
                             :endpoint-data="filteredDrivers"
                             :data="driverId"
-                            @update:data="driverId = $event"
+                            @update:data="
+                                driverId = $event;
+                                filteredPlates = $event;
+                            "
                         />
-
                         <FieldInput
-                            :title="useOnFirst(toKey, 'Patente camión')"
+                            title="Patente camión"
                             class="col-span-6 sm:col-span-3"
                             field-name="trasportPatent"
                             placeholder="AA123AA"
-                            endpoint="/sand"
-                            endpoint-key="type"
-                            required-validation
-                            validation-type="extension"
-                            :maxlength="10"
-                            :isReadonly="true"
-                            :data="to.licensePlate"
-                            @update:data="to.licensePlate = $event"
+                            is-readonly
+                            :data="filteredPlates[0]"
                         />
                         <FieldInput
                             title="Patente acoplado"
                             class="col-span-6 sm:col-span-3"
                             field-name="trasportPatent"
                             placeholder="101AA123AA"
-                            endpoint="/sand"
-                            endpoint-key="type"
-                            required-validation
-                            validation-type="extension"
-                            :maxlength="10"
-                            :isReadonly="true"
-                            :data="to.licensePlate"
-                            @update:data="to.licensePlate = $event"
+                            is-readonly
+                            :data="filteredPlates[1]"
                         />
                         <div class="col-span-6 hidden sm:block md:hidden"></div>
                         <FieldInput
@@ -159,7 +149,7 @@
                             field-name="boxAmount"
                             placeholder="0"
                             type="number"
-                            :isReadonly="true"
+                            is-readonly
                             :data="to.boxAmount"
                             @update:data="to.boxAmount = $event"
                         />
@@ -217,11 +207,31 @@
         </section>
         <footer class="mt-[32px] space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn btn="wide" @click.prevent="save()"> Crear Orden </PrimaryBtn>
+            <PrimaryBtn
+                btn="wide"
+                @click.prevent="
+                    isFull && confirm();
+                    incomplete();
+                "
+            >
+                Crear Orden
+            </PrimaryBtn>
         </footer>
-        <OrderModal v-if="showModal" :show-modal="showModal" :po="po" @close="showModal = false" @confirm="save()" />
-        <SuccessModal :open="false" :title="titleSuccess" />
-        <ErrorModal :open="false" :title="titleErrorGral" :text="textErrorGral" />
+
+        <OrderModal
+            v-if="showModal"
+            :show-modal="showModal"
+            :driver="driverName"
+            :po="po"
+            @close="showModal = false"
+            @confirm="
+                save();
+                openSuccess = true;
+            "
+        />
+
+        <SuccessModal :open="openSuccess" :title="titleSuccess" @action="openSuccess = false" />
+        <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @action="openError = false" />
         <ErrorModal :open="false" :title="titleError" :text="textError" />
     </Layout>
 </template>
@@ -297,9 +307,10 @@
         setup() {
             const filteredDrivers = computed(() => {
                 if (transportProviderId.value > -1) {
-                    console.log('filtrar drivers');
-
-                    return drivers.value.filter((driver) => driver.transportProviderId === transportProviderId.value);
+                    const driversFiltered = drivers.value.filter(
+                        (driver) => driver.transportProviderId === transportProviderId.value
+                    );
+                    return driversFiltered;
                 }
 
                 return [];
@@ -307,12 +318,38 @@
 
             const drivers = ref([]);
             const driverId = ref(-1);
+            let platesFiltered = ref('');
+
+            const filteredPlates = computed(() => {
+                if (driverId.value > -1) {
+                    platesFiltered = filteredDrivers.value.filter((plate) => plate.id === driverId.value);
+                    const platesArray = [platesFiltered[0].transportId, platesFiltered[0].transportId2];
+
+                    return platesArray;
+                }
+
+                return [];
+            });
+
+            const driverName = ref('');
+
+            watch(driverId, (newValue) => {
+                if (newValue > -1) {
+                    TransportOrders.value[0].transportId = filteredPlates.value[0];
+                    TransportOrders.value[0].transportId2 = filteredPlates.value[1];
+                    TransportOrders.value[0].driverId = newValue;
+                    const driverIndex = drivers.value.findIndex((driver) => driver.id === newValue);
+                    driverName.value = drivers.value[driverIndex].name;
+                }
+            });
 
             onMounted(async () => {
                 // TODO: StoreLogic
                 const result = await axios.get(`${api}/driver`);
-                console.log('rESULT', result);
                 drivers.value = result.data.data;
+                console.log('api driver: ', axios.get(`${api}/driver`));
+                console.log('transport Order: ', axios.get(`${api}/transportOrder`));
+                console.log('transport Provider: ', axios.get(`${api}/transportProvider`));
             });
 
             useTitle('Nueva orden de pedido <> Sandflow');
@@ -365,10 +402,11 @@
             const defaultTransportOrder = {
                 innerId: 0,
                 boxAmount: 1,
-                licensePlate: '',
+                transportId: '',
+                transportId2: '',
                 observations: '',
                 purchaseOrderId: -1,
-                drvierId: null,
+                driverId: null,
             };
 
             const TransportOrders: Ref<Array<TransportOrder>> = ref([
@@ -464,7 +502,6 @@
                 soLength.value = sandOrder.length;
                 TransportOrders.value[0].boxAmount = soLength.value;
                 const { data: prueba } = useAxios('/transportOrder', instance);
-                console.log(prueba);
             };
             // :: TransportProvider
             const transportProviders = ref([]);
@@ -509,7 +546,12 @@
                         return to.boxAmount > 0;
                     }) &&
                     TransportOrders.value.every((to) => {
-                        return to.licensePlate !== '' && to.licensePlate.length > 0;
+                        return (
+                            to.transportId !== '' &&
+                            to.transportId.length > 0 &&
+                            to.transportId2 !== '' &&
+                            to.transportId2.length > 0
+                        );
                     })
                 );
 
@@ -537,6 +579,7 @@
                     transportProvider: { ...tp },
                     transportOrders: TransportOrders.value,
                 };
+                console.log(po.value);
                 showModal.value = true;
             };
 
@@ -559,9 +602,9 @@
             };
 
             let pObs = '';
+
             function pObservations() {
                 pObs = packageObservations.value;
-                console.log(pObs);
             }
 
             const _formatPO = () => {
@@ -582,13 +625,14 @@
                     deliveryTime: newDate,
                     packageObservations: pObs,
                     driverId: driverId.value,
+                    transportId: filteredPlates[0],
+                    transportId2: filteredPlates[1],
                 };
 
                 return purchaseOrder;
             };
             const save = (): void => {
                 if (isFull.value) {
-                    console.log('hola');
                     // Formateamos la orden de pedido
                     const purchaseOrder = _formatPO();
                     console.log('PURCHASEORDER', purchaseOrder);
@@ -613,10 +657,22 @@
                 }
             };
             // >> Success y Error Modal
+            const openSuccess = ref(false);
+            const openError = ref(false);
+            const incomplete = () => {
+                if (!isFull.value) {
+                    openError.value = true;
+                    console.log('incomplete');
+                    console.log('openError dentro', openError.value);
+                }
+                console.log('openError', openError.value);
+
+                return openError.value;
+            };
             const titleSuccess = 'La orden de pedido #numero ha sido generada con éxito';
-            const titleError = '¡Ups! Hubo un problema y no pudimos guardar la orden de pedido.';
+            const titleError = '¡Ups! Hubo un problema y no pudimos guardar la orden de pedido.'; //error interno
             const textError = 'Por favor, intentá nuevamente en unos minutos.';
-            const titleErrorGral = 'Hubo un problema al intentar generar la orden.';
+            const titleErrorGral = 'Hubo un problema al intentar generar la orden.'; //error Usuario
             const textErrorGral = 'Por favor, verifica los datos ingresados e intenta nuevamente';
 
             return {
@@ -666,8 +722,12 @@
                 filteredDrivers,
                 drivers,
                 driverId,
-
-                /*       conLog, */
+                filteredPlates,
+                platesFiltered,
+                driverName,
+                openSuccess,
+                openError,
+                incomplete,
             };
         },
     };
