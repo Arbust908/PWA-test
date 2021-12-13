@@ -89,6 +89,10 @@
                 type: Boolean,
                 default: false,
             },
+            onlyVisible: {
+                type: Boolean,
+                default: true,
+            },
         },
         setup(props, { emit }) {
             const value = useVModel(props, 'data', emit);

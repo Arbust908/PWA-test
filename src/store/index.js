@@ -12,29 +12,30 @@ import sandPlan from '@/store/sandPlan';
 import sandProviders from '@/store/sandProviders';
 import transportProviders from '@/store/transportProviders';
 import workOrders from '@/store/workOrders';
+import role from '@/store/roles';
+import user from '@/store/user';
 
 const store = createStore({
     state: {
-        user: { username: '', role: 0 },
-        // workOrders: { all: [] },
+        loggedUser: { username: '', role: 0 },
     },
     getters: {
         isAdmin(state) {
-            return state.user.role == 99;
+            return state.loggedUser.role == 99;
         },
         isLogged(state) {
-            return state.user.role > 0;
+            return state.loggedUser.role > 0;
         },
         isGuest(state) {
-            return state.user.role === 0;
+            return state.loggedUser.role === 0;
         },
         getUserToken(state) {
-            return state.user.token || null;
+            return state.loggedUser.token || null;
         },
     },
     actions: {
-        setUser({ commit }, user) {
-            commit('SET_USER', user);
+        setUser({ commit }, payload) {
+            commit('SET_USER', payload);
         },
         logOutUser({ commit }) {
             commit('SET_USER', { username: '', role: 0 });
@@ -42,7 +43,7 @@ const store = createStore({
     },
     mutations: {
         SET_USER(state, payload) {
-            state.user = payload;
+            state.loggedUser = payload;
         },
     },
     modules: {
@@ -58,6 +59,8 @@ const store = createStore({
         sandProviders,
         transportProviders,
         workOrders,
+        role,
+        user,
     },
     strict: true,
 });

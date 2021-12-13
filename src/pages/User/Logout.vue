@@ -10,7 +10,7 @@
             const router = useRouter();
 
             const user = computed(() => {
-                return store.state.user;
+                return store.state.loggedUser;
             });
 
             if (user.value) {
