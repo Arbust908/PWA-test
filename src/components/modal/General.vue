@@ -69,7 +69,7 @@
 <style lang="scss">
     .modal {
         &__card {
-            @apply inline-flex flex-col bg-second-50 rounded-lg shadow-xl transform transition-all w-full mb-20 align-middle p-5;
+            @apply inline-flex flex-col bg-second-50 rounded-lg shadow-xl transform transition-all w-full mb-20 align-middle p-5 relative;
         }
         &__icon-circle {
             @apply mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:h-10 sm:w-10;
