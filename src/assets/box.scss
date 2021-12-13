@@ -24,26 +24,44 @@
   &__1 {
     background-color: #FFD19B;
     color: #974A08;
+    &.bubble {
+      @apply border border-[#974A08]
+    }
   }
   &__2 {
     background-color: #AFDCC6;
     color: #106843;
+    &.bubble {
+      @apply border border-[#106843]
+    }
   }
   &__3 {
     background-color: #C3EDFF;
     color: #015072;
+    &.bubble {
+      @apply border border-[#015072]
+    }
   }
   &__4 {
     background-color: #E8D7F5;
     color: #510092;
+    &.bubble {
+      @apply border border-[#510092]
+    }
   }
   &__5 {
     background-color: #FBE1D9;
     color: #AB2A03;
+    &.bubble {
+      @apply border border-[#AB2A03]
+    }
   }
   &__empty {
     background-color: #C0BFBF;
     color: #FFFFFF;
+    &.bubble {
+      @apply border border-[#FFFFFF]
+    }
   }
   &__taken {
     color: #FFFFFF;

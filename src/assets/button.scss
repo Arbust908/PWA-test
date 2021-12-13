@@ -66,7 +66,7 @@
         @apply text-white bg-main-600 hover:bg-main-700;
     }
     &.inverse {
-        @apply text-main-600 bg-transparent border-main-600 hover:bg-main-200;
+        @apply text-main-600 bg-transparent border-main-600 hover:bg-main-600 hover:text-white;
     }
     &.secondary {
         @apply text-second-700 bg-second-100 hover:bg-second-200 border-second-400 ;

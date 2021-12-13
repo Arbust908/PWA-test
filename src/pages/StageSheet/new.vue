@@ -3,10 +3,8 @@
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+    import StageSheetStage from '@/components/stageSheet/stageSheetStage.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import ChevronIcon from '@/components/stageSheet/ChevronIcon.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-    import InverseBtn from '@/components/ui/buttons/InverseBtn.vue';
 
     const clientId = ref(-1);
     const pitId = ref(-1);
@@ -38,8 +36,8 @@
     const pendingStages = computed(() => {
         return stages.value.filter((stage) => stage.done < stage.weight);
     });
-    const calcPorcent = (done: number, total: number) => {
-        return Math.round((done / total) * 100);
+    const isSageSelected = (stage: number, selected: number): boolean => {
+        return selected === stage;
     };
 </script>
 
@@ -65,105 +63,66 @@
             >
                 Etapas finalizadas
             </button>
-            {{ selectedStage }}
         </nav>
         <section class="mt-4 panel">
             <div v-if="isTabSelected(_TABS.PENDING)" class="stage--panel">
-                <article v-for="{ stage, weight, done } in pendingStages" :key="`stage-${stage}`" class="stage--row">
-                    <header class="flex justify-between">
-                        <h2>Etapa {{ stage }}/20</h2>
-                        <p>Total: {{ weight }} Toneladas</p>
-                        <div class="flex gap-x-1 items-center">
-                            <progress max="100" :value="calcPorcent(done, weight)">
-                                {{ calcPorcent(done, weight) }}%
-                            </progress>
-                            <span>{{ calcPorcent(done, weight) }}%</span>
-                        </div>
-                        <i
-                            :class="stage == selectedStage ? 'rotate-180' : 'rotate-0'"
-                            class="expand-btn"
-                            @click="setStage(stage)"
-                        >
-                            <ChevronIcon />
-                        </i>
-                    </header>
-                    <div
-                        :class="stage == selectedStage ? 'opened' : 'scale-y-0 h-0'"
-                        class="flex gap-5 border-t border-gray-200 transform transition ease-in-out duration-300 overflow-hidden origin-top flex-wrap"
-                    >
-                        <section
-                            class="max-w-[244px] w-full rounded border border-gray-200 shadow-sm px-5 py-7 flex items-start self-start"
-                        >
-                            <i class="w-3 h-3 inline-block rounded-full mesh-box__1 m-2"></i>
-                            <article>
-                                <h4>Arena 30/70</h4>
-                                <p class="text-gray-400">15 toneladas</p>
-                            </article>
-                            <article class="w-[70px] rounded flex justify-center items-center ml-auto">
-                                <div class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center">
-                                    <p
-                                        class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]"
-                                    >
-                                        x%
-                                    </p>
-                                </div>
-                            </article>
-                        </section>
-                        <section class="grid grid-cols-5 gap-4">
-                            <article
-                                v-for="place in 14"
-                                :key="place + 'place'"
-                                class="w-[70px] h-[70px] rounded-lg border border-dashed border-gray-400 flex justify-center items-center hover:shadow-md cursor-pointer"
-                            >
-                                {{ place }}
-                            </article>
-                            <article
-                                class="w-[70px] h-[70px] rounded-lg flex justify-center items-center hover:shadow-md cursor-pointer"
-                            >
-                                <svg
-                                    width="25"
-                                    height="25"
-                                    viewBox="0 0 25 25"
-                                    fill="none"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M12.9805 0.549805C6.35144 0.549805 0.980469 5.92077 0.980469 12.5498C0.980469 19.1788 6.35144 24.5498 12.9805 24.5498C19.6095 24.5498 24.9805 19.1788 24.9805 12.5498C24.9805 5.92077 19.6095 0.549805 12.9805 0.549805ZM19.9482 13.9046C19.9482 14.224 19.6869 14.4853 19.3676 14.4853H14.916V18.9369C14.916 19.2563 14.6547 19.5175 14.3353 19.5175H11.6256C11.3063 19.5175 11.045 19.2563 11.045 18.9369V14.4853H6.59337C6.27402 14.4853 6.01273 14.224 6.01273 13.9046V11.195C6.01273 10.8756 6.27402 10.6143 6.59337 10.6143H11.045V6.16271C11.045 5.84335 11.3063 5.58206 11.6256 5.58206H14.3353C14.6547 5.58206 14.916 5.84335 14.916 6.16271V10.6143H19.3676C19.6869 10.6143 19.9482 10.8756 19.9482 11.195V13.9046Z"
-                                        fill="#8DC881"
-                                    />
-                                </svg>
-                            </article>
-                        </section>
-                        <footer class="w-full flex justify-end gap-3">
-                            <NoneBtn btn="wide"> Cancelar </NoneBtn>
-                            <InverseBtn btn="wide"> Guardar </InverseBtn>
-                        </footer>
-                    </div>
-                </article>
+                <StageSheetStage
+                    v-for="sheet in pendingStages"
+                    :key="`stage-${sheet.stage}`"
+                    v-bind="sheet"
+                    :is-selected-stage="isSageSelected(sheet.stage, selectedStage)"
+                    @set-stage="setStage($event)"
+                />
             </div>
             <div v-else-if="isTabSelected(_TABS.COMPLETED)" class="stage--panel">
-                <article v-for="{ stage, weight } in finalizedStages" :key="`stage-${stage}`" class="stage--row">
-                    <header class="flex justify-between">
-                        <h2>Etapa {{ stage }}/20</h2>
-                        <p>Total: {{ weight }} Toneladas</p>
-                        <div class="flex gap-x-1 items-center justify-center">
-                            <span class="italic">Finalizada</span>
-                        </div>
-                        <i
-                            :class="stage === selectedStage ? 'opened' : null"
-                            class="expand-btn"
-                            @click="setStage(stage)"
-                        >
-                            <ChevronIcon />
-                        </i>
-                    </header>
-                    <div></div>
-                </article>
+                <StageSheetStage
+                    v-for="sheet in finalizedStages"
+                    :key="`stage-${sheet.stage}`"
+                    v-bind="sheet"
+                    :is-selected-stage="isSageSelected(sheet.stage, selectedStage)"
+                    @set-stage="setStage($event)"
+                />
             </div>
             <aside>
                 <h3 class="text-3xl font-bold">Detalle</h3>
-                <article class="px-4 py-6 border rounded-[10px]">
+                <article v-if="selectedStage === -1" class="px-4 py-6 border rounded-[10px]">
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
+                </article>
+                <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
+                    <div class="text-semibold space-y-3">
+                        <p>
+                            <span>Total Arena A:</span>
+                            <span>-</span>
+                        </p>
+                        <p>
+                            <span>Total Arena B:</span>
+                            <span>-</span>
+                        </p>
+                        <p>
+                            <span>Total Arena C:</span>
+                            <span>-</span>
+                        </p>
+                    </div>
+                    <hr class="border-white border mt-1" />
+                    <p class="text-bold text-lg mt-4">
+                        <span>Total General:</span>
+                        <span>-</span>
+                    </p>
+                </article>
+                <article v-if="false" class="px-3 py-4 rounded-[10px] bg-gray-100 border border-gray-400 shadow">
+                    <p class="text-sm flex gap-x-1">
+                        <svg width="17" height="18" viewBox="0 0 17 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M8.323 12.5452L8.323 9.21191M8.323 5.87858L8.31466 5.87858M0.822998 9.21192C0.822997 5.06978 4.18086 1.71192 8.323 1.71192C12.4651 1.71191 15.823 5.06978 15.823 9.21191C15.823 13.354 12.4651 16.7119 8.323 16.7119C4.18086 16.7119 0.822998 13.3541 0.822998 9.21192Z"
+                                stroke="#374151"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                            />
+                        </svg>
+
+                        <span>No coincide con el total de la planificación</span>
+                    </p>
                 </article>
             </aside>
         </section>
@@ -206,20 +165,5 @@
     }
     aside {
         @apply bg-white px-4 py-6 rounded-md border border-gray-200 shadow self-start flex flex-col gap-6;
-    }
-    progress {
-        @apply rounded-full h-2.5;
-    }
-    progress::-webkit-progress-bar {
-        @apply bg-[#E5E7EB] rounded-full;
-    }
-    progress::-webkit-progress-value {
-        @apply bg-main-500 rounded-full;
-    }
-    progress::-moz-progress-bar {
-        @apply bg-gray-200 rounded-full;
-    }
-    .expand-btn {
-        @apply flex justify-center items-center w-8 cursor-pointer transition-all duration-300 ease-in-out transform;
     }
 </style>
