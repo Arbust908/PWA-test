@@ -170,9 +170,7 @@
                 baseURL: apiUrl,
             });
 
-            // const pN: Ref<ProviderNotification> = ref({} as ProviderNotification);
             const pN = ref([]);
-
             const sandProviders = ref([] as Array<Sand>);
             const { data: sPData } = useAxios('/sandProvider', instance);
             watch(sPData, (sPData) => {
@@ -355,7 +353,6 @@
                     isNotificationConfirmed.value = true;
                     apiRequest.value = true;
                     hasSaveSuccess.value = true;
-                    // store.dispatch('saveProviderNotification', pN.value);
                 } else {
                     isNotificationConfirmed.value = true;
                     apiRequest.value = true;
@@ -387,7 +384,7 @@
                 return str.charAt(0).toUpperCase() + str.slice(1);
             };
 
-            const filteredSandTypes = ref({});
+            const filteredSandTypes = ref([]);
 
             const sandProviderHandler = (id: number) => {
                 const selectedSandProviderId = id;
@@ -399,37 +396,33 @@
             };
 
             return {
-                // sandProviderId,
-                filteredSandTypes,
-                sandProviderHandler,
-                sandOrder,
-                transportProviders,
-                // addSandOrder,
-                // removeSandOrder,
                 addTransportProvider,
-                removeTransportProvider,
-                fillTransportType,
-                save,
-                showModal,
-                toggleModal,
-                isSandFull,
-                isTransportFull,
-                sandProviders,
-                toCapitalize,
-                sandTypes,
-                transportOrder,
-                // sandProvider,
+                apiRequest,
+                confirmNotification,
+                createNew,
                 fillSandType,
-                sandProviderIds,
+                fillTransportType,
+                filteredSandTypes,
                 getSPName,
                 getSTName,
                 hasSaveSuccess,
-                createNew,
-                router,
                 isNotificationConfirmed,
-                apiRequest,
+                isSandFull,
+                isTransportFull,
                 modalData,
-                confirmNotification,
+                removeTransportProvider,
+                router,
+                sandOrder,
+                sandProviderHandler,
+                sandProviderIds,
+                sandProviders,
+                sandTypes,
+                save,
+                showModal,
+                toCapitalize,
+                toggleModal,
+                transportOrder,
+                transportProviders,
             };
         },
     });

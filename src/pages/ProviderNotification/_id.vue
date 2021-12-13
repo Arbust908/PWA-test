@@ -3,6 +3,7 @@
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
             <h1 class="font-bold text-second-900 text-xl self-start mb-3 md:mb-0">Notificación a proveedores</h1>
         </header>
+        <h1 class="text-4xl text-pink-400 p-8 bg-pink-100">DEPRECADO</h1>
         <section class="bg-second-50 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4">
                 <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
@@ -156,23 +157,7 @@
             <template #btn>
                 <div class="flex gap-4">
                     <SecondaryBtn
-                        class="
-                            inline-flex
-                            justify-center
-                            w-full
-                            rounded-md
-                            border border-transparent
-                            shadow-sm
-                            px-4
-                            py-2
-                            bg-transparent
-                            text-base
-                            font-medium
-                            text-second-400
-                            hover:bg-gray-100
-                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
-                            sm:text-sm
-                        "
+                        class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-transparent text-base font-medium text-second-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm"
                         @click.prevent="toggleModal"
                     >
                         Volver

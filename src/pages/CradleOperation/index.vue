@@ -74,7 +74,7 @@
                                 No disponible
                             </span>
                         </div>
-                        <hr />
+                        <hr class="border-gray-300" />
                         <div class="cradle-data-wrapper">
                             <span class="cradle-data">
                                 <Icon icon="InformationCircle" class="icon" />
