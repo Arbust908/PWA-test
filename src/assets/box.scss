@@ -1,26 +1,26 @@
-&.aisle {
+.aisle {
   @apply bg-second-300 text-second-300;
 }
-&.fina {
+.fina {
   @apply bg-orange-600 text-orange-800 font-medium;
 }
-&.gruesa {
+.gruesa {
   @apply bg-green-600 text-green-800 font-medium;
 }
-&.cortada {
+.cortada {
   @apply bg-blue-600 text-blue-800 font-medium;
 }
-&.blocked {
+.blocked {
   @apply bg-second-800 text-second-800;
 }
-&.empty {
+.empty {
   @apply bg-second-200 text-second-200;
 }
-&.selected {
+.selected {
   @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
 }
 
-&.mesh-box {
+.mesh-box {
   &__1 {
     background-color: #FFD19B;
     color: #974A08;
