@@ -1,15 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Usuarios</h2>
-            <router-link to="/usuarios/nuevo">
-                <PrimaryBtn size="sm">
-                    <span> Crear </span>
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
+        <ABMHeader title="Usuarios" link="/usuarios/nuevos" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -93,6 +84,7 @@
     import { useRouter } from 'vue-router';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import DisableModal from '@/components/modal/DisableModal.vue';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
 
     export default {
         components: {
@@ -104,6 +96,7 @@
             GhostBtn,
             Backdrop,
             DisableModal,
+            ABMHeader,
         },
         setup() {
             useTitle('Usuarios <> Sandflow');

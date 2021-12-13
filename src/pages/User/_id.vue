@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo usuario</h1>
-        </header>
+        <ABMFormTitle :title="`Usuario n°${currentUser?.id}`" />
         <section class="bg-white rounded-md shadow-sm max-w-2xl pb-5">
             <UserForm v-model="currentUser" />
         </section>
@@ -21,7 +19,6 @@
         </footer>
 
         <ErrorModal
-            class="sm:w-[440px] sm:h-[248] !py-8"
             :open="showErrorModal"
             title="Ya existe un usuario con este mail"
             text="El usuario que intentas guardar fue creado anteriormente"
@@ -29,7 +26,6 @@
             @action="showErrorModal = false"
         />
         <SuccessModal
-            class="sm:w-[440px] sm:h-[248] !py-8"
             :open="showSuccessModal"
             title="¡El usuario fue guardado con éxito!"
             @close="$router.push('/usuarios')"
@@ -53,6 +49,7 @@
     import { useValidator } from '@/helpers/useValidator';
 
     import UserForm from '@/components/user/Form.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
 
     export default {
         components: {
@@ -62,14 +59,16 @@
             UserForm,
             ErrorModal,
             SuccessModal,
+            ABMFormTitle,
         },
         setup() {
-            useTitle(`Usuario ${2} <> Sandflow`);
-            const apiUrl = import.meta.env.VITE_API_URL || '/api';
-
             const router = useRouter();
             const route = useRoute();
             const store = useStore();
+            const { id } = route.params;
+
+            useTitle(`Usuario ${id} <> Sandflow`);
+            const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
             const showErrorModal = ref(false);
             const showSuccessModal = ref(false);

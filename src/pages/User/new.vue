@@ -1,9 +1,8 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo usuario</h1>
-        </header>
+        <ABMFormTitle title="Nuevo usuario" />
         <section class="bg-white rounded-md shadow-sm max-w-2xl pb-5">
+            panciiad
             <UserForm v-model="user" />
         </section>
         <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl m">
@@ -16,7 +15,6 @@
         </footer>
 
         <ErrorModal
-            class="sm:w-[460px] sm:h-[248] !py-8"
             :open="showErrorModal"
             title="Ya existe un usuario con este mail"
             text="El usuario que intentas guardar fue creado anteriormente"
@@ -24,7 +22,6 @@
             @main="showErrorModal = false"
         />
         <SuccessModal
-            class="sm:w-[440px] sm:h-[248] !py-8"
             :open="showSuccessModal"
             title="¡El usuario fue guardado con éxito!"
             @close="$router.push('/usuarios')"
@@ -34,10 +31,6 @@
 </template>
 
 <script lang="ts">
-    import { ref, watchEffect } from 'vue';
-    import { useRouter } from 'vue-router';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
@@ -48,6 +41,7 @@
     import { useValidator } from '@/helpers/useValidator';
 
     import UserForm from '@/components/user/Form.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
 
     export default {
         components: {
@@ -57,15 +51,16 @@
             UserForm,
             ErrorModal,
             SuccessModal,
+            ABMFormTitle,
         },
         setup() {
-            useTitle('Nuevo tipo de arena <> Sandflow');
+            useTitle('Nuevo usuario <> Sandflow');
             const apiUrl = import.meta.env.VITE_API_URL || '/api';
             const router = useRouter();
             const store = useStore();
 
             const goToIndex = () => {
-                router.push('/tipos-de-arena');
+                router.push('/usuarios');
             };
 
             const user = ref({});
