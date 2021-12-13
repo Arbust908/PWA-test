@@ -5,7 +5,8 @@
       class="
         block
         absolute
-        left-[57px]
+        left-14
+        
         rounded-br-lg
         md:rounded-none md:bottom-0 md:left-0
         pl-1

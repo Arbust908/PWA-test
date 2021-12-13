@@ -31,7 +31,7 @@
             </PrimaryBtn>
         </router-link>
     </header>
-    <hr class="mb-4" />
+    <hr class="mb-4 border-gray-300" />
 </template>
 
 <style scoped>
