@@ -2,7 +2,6 @@
     <Layout>
         <ABMFormTitle title="Nuevo usuario" />
         <section class="bg-white rounded-md shadow-sm max-w-2xl pb-5">
-            panciiad
             <UserForm v-model="user" />
         </section>
         <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl m">
