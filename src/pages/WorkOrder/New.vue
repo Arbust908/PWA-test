@@ -24,16 +24,11 @@
             </nav>
             <OrderSection
                 v-if="WO_section === 'orden'"
-                :client-id="clientId"
-                :service-company-id="serviceCompanyId"
-                :pad="pad"
-                :pits="pits"
-                :is-full="isOrderFull"
-                @update:clientId="clientId = $event"
-                @update:serviceCompanyId="serviceCompanyId = $event"
-                @update:pad="pad = $event"
-                @update:pits="pits = $event"
-                @update:isFull="isOrderFull = $event"
+                v-model:client-id="clientId"
+                v-model:service-company-id="serviceCompanyId"
+                v-model:pad="pad"
+                v-model:pits="pits"
+                v-model:is-full="isOrderFull"
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
@@ -71,7 +66,7 @@
             />
             <footer
                 :class="isLastSection() ? 'justify-between' : 'justify-end'"
-                class="mt-[32px] p-4 gap-3 flex flex-col md:flex-row"
+                class="mt-8 p-4 gap-3 flex flex-col md:flex-row"
             >
                 <section v-if="isLastSection()" class="pb-4 mb-2 border-b md:pb-0 md:mb-0 md:border-none">
                     <GhostBtn
@@ -83,7 +78,8 @@
                 </section>
             </footer>
         </section>
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
             <section class="gap-6 flex flex-wrap items-right">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')">Cancelar</SecondaryBtn>
                 <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
@@ -98,61 +94,29 @@
                 </PrimaryBtn>
             </section>
         </footer>
-        <Modal type="off" :open="showModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡La orden de trabajo fue guardada con éxito!</span
-                    >
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <PrimaryBtn @click.prevent="$router.push('/orden-de-trabajo')">Continuar</PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        Hubo un problema al intentar guardar.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showApiErrorModal" @close="togglemodal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
+        <SuccessModal
+            :open="showModal"
+            text="¡La orden de trabajo fue guardada con éxito!"
+            @close="$router.push('/orden-de-trabajo')"
+            @main="$router.push('/orden-de-trabajo')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            text="Hubo un problema al intentar guardar."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            text="¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, ComputedRef, defineAsyncComponent, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useToggle, useTitle } from '@vueuse/core';
     import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import OrderSection from '@/components/workOrder/Order.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
@@ -160,7 +124,6 @@
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -168,22 +131,23 @@
     // TIPOS
     import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/sandflow';
     // MODAL
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    // const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
+    const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
 
     export default {
         components: {
             BookmarkIcon,
+            CheckCircleIcon,
+            EquipmentSection,
+            ErrorModal,
             GhostBtn,
             Layout,
-            CheckCircleIcon,
-            PrimaryBtn,
-            SecondaryBtn,
             OrderSection,
-            EquipmentSection,
+            PrimaryBtn,
             RRHHSection,
-            Modal,
-            Icon,
-            WarningBtn,
+            SecondaryBtn,
+            SuccessModal,
         },
         setup() {
             // Init

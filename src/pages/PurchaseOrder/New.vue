@@ -38,10 +38,9 @@
                             class="col-span-12 sm:col-span-3"
                             field-name="sandType"
                             placeholder="Tipo de Arena"
-                            endpoint="/sand"
                             endpoint-key="type"
                             :data="order.sandTypeId"
-                            :filtered-data="filteredSandTypes"
+                            :endpoint-data="filteredSandTypes"
                             @update:data="order.sandTypeId = $event"
                         />
                         <FieldWithSides
@@ -197,15 +196,10 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-[32px] space-x-3 flex justify-end">
-            <SecondaryBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn
-                btn="wide"
-                @click.prevent="
-                    isFull && confirm();
-                    incomplete();
-                "
-            >
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && confirm()">
                 Crear Orden
             </PrimaryBtn>
         </footer>

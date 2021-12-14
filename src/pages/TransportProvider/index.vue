@@ -1,15 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Proveedores de transporte</h2>
-            <router-link to="/proveedores-de-transporte/nuevo">
-                <PrimaryBtn size="sm">
-                    <span> Crear </span>
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
+        <ABMHeader title="Proveedores de transporte" link="/proveedores-de-transporte/nuevo" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -20,9 +11,6 @@
                 :data="transportProviderId"
                 @update:data="transportProviderId = $event"
             />
-            <div class="col-span-4 mt-7">
-                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
-            </div>
         </div>
         <VTable
             class="mt-5"
@@ -59,61 +47,45 @@
                 <span class="font-bold">Domicilio: </span>{{ item.address }}
             </template>
         </VTable>
+
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este proveedor?"
+            text="Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación."
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
         <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
             <template #body>
                 <BackdropCard :info="bdInfo" />
             </template>
         </Backdrop>
-        <Modal title="¿Desea inhabilitar este proveedor de transporte?" type="error" :open="showModal">
-            <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este proveedor de transporte en ninguna otra sección de la
-                    aplicación
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <ErrorBtn @click="confirmModal">Inhabilitar proveedor </ErrorBtn>
-                </div>
-            </template>
-        </Modal>
     </Layout>
 </template>
 
 <script>
-    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
+    import axios from 'axios';
 
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     import BackdropCard from '@/components/transportProvider/BackdropCard.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import VTable from '@/components/ui/table/VTable.vue';
 
-    import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
-
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
-    const ErrorBtn = defineAsyncComponent(() => import('@/components/ui/buttons/ErrorBtn.vue'));
 
     export default {
         components: {
+            ABMHeader,
             Backdrop,
             BackdropCard,
+            DisableModal,
             FieldSelect,
-            GhostBtn,
-            Icon,
             Layout,
-            Modal,
-            PrimaryBtn,
             VTable,
-            ErrorBtn,
         },
         setup() {
             useTitle('Proveedores de Transporte <> Sandflow');
@@ -127,7 +99,6 @@
             const showBD = ref(false);
             const bdInfo = ref(null);
             const toggleBD = () => (showBD.value = !showBD.value);
-            const tableColumns = ['Proveedor', 'Domicilio', 'Representante', 'Teléfono'];
 
             const pagination = ref({
                 sortKey: 'id',
@@ -243,7 +214,6 @@
                 showModal,
                 openModalVisibility,
                 confirmModal,
-                tableColumns,
                 pagination,
                 columns,
                 actions,

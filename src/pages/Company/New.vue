@@ -86,7 +86,9 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <!-- *** Cambiar todos por un componente de ABM Footer -->
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/clientes')"> Cancelar </SecondaryBtn>
                 <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
@@ -100,13 +102,13 @@
             title="Ya existe un cliente con este CUIT"
             text="El cliente que intentas guardar fue creado anteriormente"
             @close="showErrorCuitModal = false"
-            @action="showErrorCuitModal = false"
+            @main="showErrorCuitModal = false"
         />
         <SuccessModal
             :open="showSuccessModal"
             title="El cliente fue guardado con éxito"
             @close="$router.push('/clientes')"
-            @action="$router.push('/clientes')"
+            @main="$router.push('/clientes')"
         />
     </Layout>
 </template>
@@ -210,7 +212,7 @@
                         watch(Cdata, (newVal, _) => {
                             if (newVal && newVal.data) {
                                 store.dispatch('saveClient', newClient.value);
-                                router.push('/clientes');
+                                showSuccessModal.value = true;
                             }
                         });
                     }

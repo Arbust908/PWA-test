@@ -1,26 +1,14 @@
 <template>
-    <BaseBtn btn="ghost" :type="type" :size="size">
+    <BaseBtn :btn="`ghost ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
         <slot>Fantasma</slot>
     </BaseBtn>
 </template>
 
-<script>
+<script setup lang="ts">
     import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
-    export default {
-        components: {
-            BaseBtn,
-        },
-        props: {
-            type: {
-                type: String,
-                default: 'button',
-            },
-            size: {
-                type: String,
-                default: 'md',
-            },
-        },
-    };
+    defineProps({
+        ...BaseBtn.props,
+    });
 </script>
 
 <style lang="scss" scoped>

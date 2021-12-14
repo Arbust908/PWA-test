@@ -41,6 +41,41 @@ const Stage_Sheet = {
 const LINE = {
     name: 'LINE',
 };
+const Arena = {
+    name: 'Arena',
+    to: '/proveedores-de-arena',
+    icon: 'UserGroup',
+};
+const Transporte = {
+    name: 'Transporte',
+    to: '/proveedores-de-transporte',
+    icon: 'Truck',
+};
+const Clientes = {
+    name: 'Clientes',
+    to: '/clientes',
+    icon: 'UserCircle',
+};
+const Tipo_de_malla = {
+    name: 'Tipo de malla',
+    to: '/tipos-de-arena',
+    icon: 'ClipboardList',
+};
+const Forklift = {
+    name: 'Forklift',
+    to: '/forklift',
+    icon: 'ClipboardList',
+};
+const Cradle = {
+    name: 'Cradle',
+    to: '/cradle',
+    icon: 'ClipboardList',
+};
+const Usuarios = {
+    name: 'Usuarios',
+    to: '/usuarios',
+    icon: 'UserGroup',
+};
 export default {
     state: () => ({
         navigation: [
@@ -56,45 +91,15 @@ export default {
             {
                 name: 'Proveedores',
                 icon: 'ChevronRight',
-                subNav: [
-                    {
-                        name: 'Arena',
-                        to: '/proveedores-de-arena',
-                        icon: 'UserGroup',
-                    },
-                    {
-                        name: 'Transporte',
-                        to: '/proveedores-de-transporte',
-                        icon: 'Truck',
-                    },
-                ],
+                subNav: [Arena, Transporte],
             },
-            {
-                name: 'Clientes',
-                to: '/clientes',
-                icon: 'UserCircle',
-            },
+            Clientes,
             {
                 name: 'Configuración',
                 icon: 'Cog',
-                subNav: [
-                    {
-                        name: 'Tipo de malla',
-                        to: '/tipos-de-arena',
-                        icon: 'ClipboardList',
-                    },
-                    {
-                        name: 'Forklift',
-                        to: '/forklift',
-                        icon: 'ClipboardList',
-                    },
-                    {
-                        name: 'Cradle',
-                        to: '/cradle',
-                        icon: 'ClipboardList',
-                    },
-                ],
+                subNav: [Tipo_de_malla, Forklift, Cradle],
             },
+            Usuarios,
         ],
         user_navigation: [{ name: 'Salir', to: '/usuario/salir', icon: 'Logout' }],
         areWeConnected: false,

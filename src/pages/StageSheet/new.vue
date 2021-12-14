@@ -36,17 +36,7 @@
                         <div class="text-center">
                             <span
                                 v-if="warehouse && warehouse.error"
-                                class="
-                                    inline-block
-                                    px-5
-                                    py-8
-                                    rounded-lg
-                                    border-2 border-second-300 border-dashed
-                                    text-center
-                                    mx-6
-                                    my-12
-                                    xl:mx-16 xl:my-20
-                                "
+                                class="inline-block px-5 py-8 rounded-lg border-2 border-second-300 border-dashed text-center mx-6 my-12 xl:mx-16 xl:my-20"
                             >
                                 {{ warehouse.error }}
                             </span>
@@ -64,17 +54,7 @@
                             </span>
                             <span
                                 v-else
-                                class="
-                                    inline-block
-                                    px-5
-                                    py-8
-                                    rounded-lg
-                                    border-2 border-second-300 border-dashed
-                                    text-center
-                                    mx-6
-                                    my-12
-                                    xl:mx-16 xl:my-20
-                                "
+                                class="inline-block px-5 py-8 rounded-lg border-2 border-second-300 border-dashed text-center mx-6 my-12 xl:mx-16 xl:my-20"
                             >
                                 Selecciones cliente y pozo para comenzar
                             </span>
@@ -117,7 +97,8 @@
             </section>
         </div>
 
-        <footer class="mt-[32px] space-x-3 flex justify-end">
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/stage-sheet')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"

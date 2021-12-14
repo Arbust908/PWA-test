@@ -1,15 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Tipos de arena</h2>
-            <router-link to="/tipos-de-arena/nueva">
-                <PrimaryBtn size="sm">
-                    <span> Crear </span>
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
+        <ABMHeader title="Tipos de arena" link="/tipos-de-arena/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -23,7 +14,7 @@
             />
         </div>
 
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredSands" :actions="actions">
+        <VTable class="mt-5" :columns="columns" :items="filteredSands" :actions="actions">
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item.type ? null : 'empty'">
@@ -31,7 +22,7 @@
                 </td>
 
                 <td :class="item.observations ? null : 'empty'">
-                    {{ item.observations || 'Sin definir' }}
+                    {{ item.observations || 'Sin observaciones' }}
                 </td>
 
                 <td v-if="false">
@@ -57,12 +48,6 @@
                         </Popper>
                     </div>
                 </td>
-
-                <tr v-if="sandDB && sandDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay arenas cargadas</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
@@ -74,46 +59,36 @@
                 <span class="font-bold">Observaciones: </span> {{ item.observations }}
             </template>
         </VTable>
+
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este tipo de arena?"
+            text="Una vez inhabilitado, no podrá utilizar este tipo de arena en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
         <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
             <template #body>
                 <BackdropCard :info="bdInfo" />
             </template>
         </Backdrop>
-        <Modal title="¿Desea inhabilitar este tipo de arena?" type="error" :open="showModal">
-            <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este tipo de arena en ninguna otra sección de la aplicación
-                </div>
-                <div></div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <BaseBtn class="text-gray-500" @click="showModal = false"> Volver </BaseBtn>
-                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar tipo de arena</ErrorBtn>
-                </div>
-            </template>
-        </Modal>
     </Layout>
 </template>
 
 <script>
-    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
 
-    import Badge from '@/components/ui/Badge.vue';
     import Popper from 'vue3-popper';
 
     import BackdropCard from '@/components/sand/BackdropCard.vue';
+
+    import DisableModal from '@/components/modal/DisableModal.vue';
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
@@ -121,24 +96,25 @@
     const BaseBtn = defineAsyncComponent(() => import('@/components/ui/buttons/BaseBtn.vue'));
 
     import axios from 'axios';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
             Backdrop,
             BackdropCard,
-            Layout,
-            PrimaryBtn,
-            UiTable,
-            Icon,
-            GhostBtn,
-            FieldSelect,
+            BaseBtn,
             CircularBtn,
+            ErrorBtn,
+            FieldSelect,
+            Icon,
+            Layout,
             Modal,
             Popper,
+            PrimaryBtn,
             VTable,
-            ErrorBtn,
-            BaseBtn,
+            DisableModal,
+            ABMHeader,
         },
         setup() {
             useTitle('Tipos de Arena <> Sandflow');
@@ -155,17 +131,10 @@
             const bdInfo = ref(null);
             const toggleBD = () => (showBD.value = !showBD.value);
 
-            const pagination = ref({
-                sortKey: 'id',
-                sortDir: 'asc',
-                // currentPage: 1,
-                // perPage: 10,
-            });
-
             const columns = [
                 { title: 'Tipo de Malla', key: 'name', sortable: true },
                 { title: 'Observaciones', key: 'observations', sortable: true },
-                { title: 'Acciones', key: 'name' },
+                { title: '', key: 'name' },
             ];
 
             const actions = [
@@ -288,7 +257,6 @@
                 confirmModal,
                 columns,
                 loading,
-                pagination,
                 actions,
                 toggleBD,
                 showBD,

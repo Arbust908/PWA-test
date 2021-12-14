@@ -1,11 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 pr-3">
-            <h2 class="text-2xl font-semibold text-second-900">Ordenes de Trabajo</h2>
-            <router-link to="/orden-de-trabajo/nueva">
-                <PrimaryBtn>Crear nueva</PrimaryBtn>
-            </router-link>
-        </header>
+        <ABMHeader title="Ordenes de Trabajo" link="/orden-de-trabajo/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2 mb-8">
             <FieldSelect
                 title="Filtro"
@@ -17,37 +12,30 @@
                 @update:data="clientId = $event"
             />
         </div>
-
         <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredWorkOrders" :actions="actions">
             <template #item="{ item }">
                 <!-- Desktop -->
-                <td :class="[item.id ? null : 'empty', item.visible ? null : 'notallowed']">
+                <td :class="item.id ? null : 'empty'">
                     {{ item.id || 'Sin definir' }}
                 </td>
 
-                <td :class="[item.clientName ? null : 'empty', item.visible ? null : 'notallowed']">
+                <td :class="item.clientName ? null : 'empty'">
                     {{ item.clientName || 'Sin definir' }}
                 </td>
 
-                <td :class="[item.pits ? null : 'empty', item.visible ? null : 'notallowed']">
-                    {{ listPits(item.pits) }}
+                <td :class="item.pits && item.pits.length ? null : 'empty'">
+                    {{ listPits(item.pits) || 'Sin pozo' }}
                 </td>
 
-                <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
+                <td class="text-center" :class="item ? null : 'empty'">
                     <Badge v-if="isEquipmentFull(item)" text="Completo" classes="bg-[#1AA532] text-white" />
                     <Badge v-else text="Incompleto" classes="bg-[#BE1A3B] text-white" />
                 </td>
 
-                <td class="text-center" :class="[item ? null : 'empty', item.visible ? null : 'notallowed']">
+                <td class="text-center" :class="item ? null : 'empty'">
                     <Badge v-if="isCrewFull(item)" text="Completo" classes="bg-[#1AA532] text-white" />
                     <Badge v-else text="Incompleto" classes="bg-[#BE1A3B] text-white" />
                 </td>
-
-                <tr v-if="workOrders && workOrders.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay clientes cargados</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
@@ -67,18 +55,13 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar esta orden de trabajo?" type="error" :open="showModal">
-            <template #body>
-                <div>Una vez inhabilitada, no podrá utilizar este orden en ninguna otra sección de la aplicación</div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!bg-red-700" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
-
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar esta orden de trabajo?"
+            text="Una vez inhabilitada, no podrá utilizar este orden en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
                 <div class="flex items-center mt-1">
@@ -104,36 +87,29 @@
 </template>
 
 <script lang="ts">
-    import { ref, computed, watch, defineComponent, onMounted } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
+    import { WorkOrder, Pit } from '@/interfaces/sandflow';
+    import axios from 'axios';
 
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import Badge from '@/components/ui/Badge.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
-    import Modal from '@/components/modal/General.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import VTable from '@/components/ui/table/VTable.vue';
-    import axios from 'axios';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-    import { useTitle } from '@vueuse/core';
-    import { WorkOrder, Pit } from '@/interfaces/sandflow';
-
     export default defineComponent({
         components: {
+            ABMHeader,
             Backdrop,
             Badge,
+            DisableModal,
             FieldSelect,
-            GhostBtn,
             Icon,
             Layout,
-            Modal,
-            PrimaryBtn,
             VTable,
         },
         setup() {
@@ -207,7 +183,6 @@
 
                 if (workOrder.visible) {
                     showModal.value = true;
-
                     return;
                 }
                 await update(selectedWorkOrder.value);
@@ -220,39 +195,31 @@
                 };
                 await axios.put(`${apiUrl}/workOrder/${order.id}`, payload);
                 await getWorkOrders();
+                workOrders.value = populateInfo(workOrders.value);
             };
 
             const confirmModal = async () => {
                 await update(selectedWorkOrder.value);
+                workOrders.value = populateInfo(workOrders.value);
                 showModal.value = false;
             };
 
             const listPits = (pits: Array<Pit>) => {
                 if (!pits || pits.length <= 0) {
-                    return '-';
+                    return null;
                 }
 
-                return pits.reduce((list, pit) => {
-                    list += list === '' ? pit.name : `, ${pit.name}`;
+                return pits.reduce((list: string, pit: Pit) => {
+                    let result = list;
+                    result += list === '' ? pit.name : `, ${pit.name}`;
 
-                    return list;
+                    return result;
                 }, '');
             };
 
             const storeToState = (wOs: Array<WorkOrder>) => {
                 return wOs.map((wO) => {
                     store.dispatch('saveWorkOrder', wO);
-                });
-            };
-
-            const deleteWorkOrder = async (woId: number | string) => {
-                await axios.delete(`${apiUrl}/workOrder/${woId}`).then((res) => {
-                    if (res.status == 200) {
-                        store.dispatch('deleteWorkOrder', woId);
-                        workOrders.value = workOrders.value.filter((woFromApi) => {
-                            return woFromApi.id !== woId;
-                        });
-                    }
                 });
             };
 
@@ -314,32 +281,35 @@
             };
 
             const idToName = (id: number) => {
-                if (id == -1) {
-                    return 'Sin operadora';
+                if (isNaN(id) || id == -1) {
+                    return null;
                 }
-                let company = companies.value.filter((company) => {
-                    if (company.id == id) {
-                        return company;
-                    }
-                })[0];
+                let firstCompany = companies.value.find((company) => {
+                    return company.id == id;
+                });
 
-                return company.name;
+                return firstCompany.name;
             };
 
-            onMounted(async () => {
-                await getWorkOrders();
-                await getCompanies();
-                workOrders.value.forEach((workOrder) => {
+            const populateInfo = (items: WorkOrder[]) => {
+                const things = items.map((workOrder: WorkOrder) => {
                     workOrder.clientName = idToName(parseInt(workOrder.client));
                     workOrder.operatorName = idToName(parseInt(workOrder.serviceCompany));
 
                     return workOrder;
                 });
+
+                return things;
+            };
+
+            onMounted(async () => {
+                await getWorkOrders();
+                await getCompanies();
+                workOrders.value = await populateInfo(workOrders.value);
             });
 
             return {
                 workOrders,
-                deleteWorkOrder,
                 listPits,
                 pagination,
                 columns,

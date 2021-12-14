@@ -1,16 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Centro de carga de arena</h2>
-            <router-link :to="{ name: 'NewSandProvider' }">
-                <PrimaryBtn size="sm">
-                    <span> Crear </span>
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
-
+        <ABMHeader title="Centro de carga de arena" link="/proveedores-de-arena/nuevo" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -72,28 +62,21 @@
             </template>
         </VTable>
 
-        <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
-            <template #body>
-                <p>{{ errorMessage }}</p>
-                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
-            </template>
-        </Modal>
+        <ErrorModal
+            :open="notificationModalvisible"
+            :text="errorMessage"
+            @close="toggleNotificationModal()"
+            @main="toggleNotificationModal()"
+        />
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este centro de carga de arena?"
+            text="Una vez inhabilitado, no podrá utilizar este centro de carga de arena en ninguna otra sección de la
+                    aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
 
-        <Modal title="¿Desea inhabilitar este centro de carga de arena?" type="error" :open="showModal">
-            <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este centro de carga de arena en ninguna otra sección de la
-                    aplicación
-                </div>
-                <div></div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn btn="!text-gray-500" class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!bg-red-600" @click="confirmModal">Inhabilitar centro de carga </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
                 <p class="!text-lg !text-black">{{ selectedSandProvider.name }}</p>
@@ -117,36 +100,32 @@
                     {{ selectedSandProvider.companyRepresentative?.phone || '-' }}
                 </p>
             </template>
-            <template #btn> </template>
         </Backdrop>
     </Layout>
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter } from 'vue-router';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
-    import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import Modal from '@/components/modal/General.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import VTable from '@/components/ui/table/VTable.vue';
+    // Components
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
+    import Layout from '@/layouts/Main.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
 
     export default {
         components: {
-            Layout,
-            PrimaryBtn,
-            GhostBtn,
-            Icon,
-            Modal,
-            FieldSelect,
-            VTable,
+            ABMHeader,
             Backdrop,
+            DisableModal,
+            ErrorModal,
+            FieldSelect,
+            GhostBtn,
+            Layout,
+            VTable,
         },
         setup() {
             useTitle(`Centro de carga de Arena <> Sandflow`);

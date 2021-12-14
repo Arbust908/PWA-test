@@ -90,7 +90,8 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/clientes')"> Cancelar </SecondaryBtn>
 
@@ -103,15 +104,15 @@
         <ErrorModal
             :open="showErrorCuitModal"
             title="Ya existe un cliente con este CUIT"
-            text="El cliente que intentas guardar fue creado anteriormente"
+            text="El cliente que intentas guardar fue creado anteriormente."
             @close="showErrorCuitModal = false"
-            @action="showErrorCuitModal = false"
+            @main="showErrorCuitModal = false"
         />
         <SuccessModal
             :open="showSuccessModal"
-            title="El cliente fue guardado con éxito"
+            title="El cliente fue guardado con éxito."
             @close="$router.push('/clientes')"
-            @action="$router.push('/clientes')"
+            @main="$router.push('/clientes')"
         />
     </Layout>
 </template>

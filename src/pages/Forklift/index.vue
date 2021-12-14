@@ -1,16 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Forklift</h2>
-            <router-link to="/forklift/nuevo">
-                <PrimaryBtn size="sm"
-                    >Crear
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
-
+        <ABMHeader title="Forklift" link="/forklift/nuevo" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -34,7 +24,7 @@
                 </td>
 
                 <td :class="[item.observations ? null : 'empty', item.visible ? null : 'notallowed observations']">
-                    {{ `${item.observations.substring(0, 25)}...` || 'Sin observaciones' }}
+                    {{ item.observations || 'Sin observaciones' }}
                 </td>
 
                 <tr v-if="fDB && fDB.length <= 0">
@@ -57,19 +47,13 @@
             </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar este forklift?" type="error" :open="showModal">
-            <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este forklift en ninguna otra sección de la aplicación
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <BaseBtn class="outline-none text-gray-500" @click="showModal = false"> Volver </BaseBtn>
-                    <ErrorBtn btn="btn__warning" @click="confirmModal">Inhabilitar</ErrorBtn>
-                </div>
-            </template>
-        </Modal>
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este forklift?"
+            text="Una vez inhabilitado, no podrá utilizar este forklift en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
 
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
@@ -102,6 +86,8 @@
     import Backdrop from '@/components/modal/Backdrop.vue';
     import ErrorBtn from '@/components/ui/buttons/ErrorBtn.vue';
     import BaseBtn from '@/components/ui/buttons/BaseBtn.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
 
     export default {
         components: {
@@ -118,6 +104,8 @@
             Backdrop,
             ErrorBtn,
             BaseBtn,
+            DisableModal,
+            ABMHeader,
         },
         setup() {
             useTitle('Forklifts <> Sandflow');

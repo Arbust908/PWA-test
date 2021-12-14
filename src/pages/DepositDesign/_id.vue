@@ -118,7 +118,8 @@
             </form>
         </section>
 
-        <footer class="mt-[32px] space-x-3 flex justify-end items-center">
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end items-center">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
             <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
                 Guardar

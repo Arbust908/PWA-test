@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo proveedor de transporte</h1>
-        </header>
+        <ABMFormTitle title="Nuevo proveedor de transporte" />
         <section class="flex flex-wrap md:flex-nowrap">
             <section class="w-full md:w-8/12">
                 <nav class="flex justify-between max-w-2xl bg-white">
@@ -75,7 +73,8 @@
                         @edit-driver="editDriver(index)"
                     />
                 </section>
-                <footer class="mt-[32px] gap-3 flex flex-col justify-end max-w-2xl">
+                <!-- *** -->
+                <footer class="mt-8 gap-3 flex flex-col justify-end max-w-2xl">
                     <SideBtn v-if="drivers.length" class="md:hidden" btn="full" @click="driversShown = !driversShown">
                         {{ showDrivers ? driverTabText : 'Volver' }}
                     </SideBtn>
@@ -114,58 +113,53 @@
         </section>
 
         <ErrorModal
-            class="xs:w-[480px] xs:h-[248] !py-4"
             :open="showErrorCuitModal"
             title="Ya existe un cliente con este CUIT"
             text="El cliente que intentas guardar fue creado anteriormente"
             @close="showErrorCuitModal = false"
-            @action="showErrorCuitModal = false"
+            @main="showErrorCuitModal = false"
         />
         <SuccessModal
-            class="xs:w-[480px] xs:h-[260] py-10"
             :open="showSuccessModal"
-            title="El proveedor fue guardado con éxito"
+            title="¡El proveedor fue guardado con éxito!"
             @close="$router.push('/proveedores-de-transporte')"
-            @action="$router.push('/proveedores-de-transporte')"
+            @main="$router.push('/proveedores-de-transporte')"
         />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { computed, reactive, watch, ref, watchEffect } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
+    import axios from 'axios';
+    import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
+    import { useAxios } from '@vueuse/integrations/useAxios';
     import { useValidator } from '@/helpers/useValidator';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
-    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import DriverCard from '@/components/transportProvider/DriverCard.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import SideBtn from '@/components/ui/buttons/SideBtn.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
-    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
 
-    // AXIOS
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
     const api = import.meta.env.VITE_API_URL || '/api';
-    // TIPOS
-    import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
 
     export default {
         components: {
+            ABMFormTitle,
             DriverCard,
+            ErrorModal,
             Layout,
             PrimaryBtn,
             SecondaryBtn,
             SideBtn,
+            SuccessModal,
             TransportProviderDriverForm,
             TransportProviderFrom,
-            SuccessModal,
-            ErrorModal,
         },
         setup() {
             const store = useStore();

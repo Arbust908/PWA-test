@@ -40,16 +40,7 @@
                         >
                             <div class="absolute top-0 right-0 -mr-12 pt-2">
                                 <button
-                                    class="
-                                        ml-1
-                                        flex
-                                        items-center
-                                        justify-center
-                                        h-10
-                                        w-10
-                                        rounded-full
-                                        focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white
-                                    "
+                                    class="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                                     @click="sidebarOpen = false"
                                 >
                                     <span class="sr-only">Close sidebar</span>
@@ -67,6 +58,7 @@
                         </div>
                     </div>
                 </TransitionChild>
+
                 <div class="flex-shrink-0 w-14" aria-hidden="true">
                     <!-- Dummy element to force sidebar to shrink to fit close icon -->
                 </div>
@@ -84,27 +76,6 @@
                     <div class="mt-5 flex-grow flex flex-col">
                         <nav class="flex-1 px-2 bg-second-50 space-y-1">
                             <NavWrapper v-for="item in navigation" :key="item.to" v-bind="item" mode="desk" />
-                            <!-- <router-link
-                v-for="item in navigation"
-                :key="item.name"
-                :to="item.to"
-                :class="
-                  item.to === $route.fullPath
-                    ? 'bg-second-100 text-second-900'
-                    : 'text-second-600 hover:bg-second-50 hover:text-second-900'
-                "
-                class="group flex items-center px-2 py-2 text-sm font-medium rounded-md cursor-pointer"
-              >
-                <component
-                  :is="item.icon"
-                  :class="item.to === $route.fullPath ? 'text-second-500' : 'text-second-400 group-hover:text-second-500'"
-                  class="mr-3 flex-shrink-0 h-6 w-6"
-                  aria-hidden="true"
-                />
-                <span>
-                  {{ item.name }}
-                </span>
-              </router-link> -->
                         </nav>
                     </div>
                 </div>
@@ -113,13 +84,7 @@
         <div class="flex flex-col w-0 flex-1 overflow-hidden">
             <div class="relative z-10 flex-shrink-0 flex h-16 bg-second-50 shadow">
                 <button
-                    class="
-                        px-4
-                        border-r border-second-200
-                        text-second-500
-                        focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500
-                        md:hidden
-                    "
+                    class="px-4 border-r border-second-200 text-second-500 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500 md:hidden"
                     @click="sidebarOpen = true"
                 >
                     <span class="sr-only">Open sidebar</span>
@@ -133,79 +98,20 @@
                                 <div class="absolute inset-y-0 left-0 flex items-center pointer-events-none">
                                     <!-- <SearchIcon class="h-5 w-5" aria-hidden="true" /> -->
                                 </div>
-                                <!-- <input
-                  id="search_field"
-                  class="
-                    block
-                    w-full
-                    h-full
-                    pl-8
-                    pr-3
-                    py-2
-                    border-transparent
-                    text-second-900
-                    placeholder-second-500
-                    focus:outline-none focus:placeholder-second-400 focus:ring-0 focus:border-transparent
-                    sm:text-sm
-                  "
-                  placeholder="Search"
-                  type="search"
-                  name="search"
-                /> -->
                             </div>
                         </form>
                     </div>
                     <div class="ml-4 flex items-center md:ml-6">
-                        <!-- <button
-              class="
-                bg-second-50
-                p-1
-                rounded-full
-                text-second-400
-                hover:text-second-500
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-              "
-            >
-              <span class="sr-only">View notifications</span>
-              <BellIcon class="h-6 w-6" aria-hidden="true" />
-            </button> -->
-
                         <!-- Profile dropdown -->
                         <Menu as="div" class="ml-3 relative">
                             <div>
                                 <MenuButton
-                                    class="
-                                        max-w-xs
-                                        bg-second-50
-                                        flex
-                                        items-center
-                                        text-sm
-                                        rounded-full
-                                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-                                    "
+                                    class="max-w-xs bg-second-50 flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                                 >
                                     <span class="sr-only">Open user menu</span>
-                                    <!-- <img
-                    class="h-8 w-8 rounded-full"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    alt=""
-                  /> -->
                                     <span
-                                        class="
-                                            flex
-                                            justify-center
-                                            items-center
-                                            h-8
-                                            w-8
-                                            rounded-full
-                                            bg-main-600
-                                            uppercase
-                                            text-second-50
-                                            font-bold
-                                            hover:bg-gradient-br hover:from-main-400 hover:to-main-700 hover:shadow-lg
-                                        "
+                                        class="flex justify-center items-center h-8 w-8 rounded-full bg-main-600 uppercase text-second-50 font-bold hover:bg-gradient-br hover:from-main-400 hover:to-main-700 hover:shadow-lg"
                                     >
-                                        <!-- {{ user.username.split('')[0] }} -->
                                         <svg
                                             xmlns="http://www.w3.org/2000/svg"
                                             class="h-6 w-6"
@@ -232,19 +138,7 @@
                                 leave-to-class="transform opacity-0 scale-95"
                             >
                                 <MenuItems
-                                    class="
-                                        origin-top-right
-                                        absolute
-                                        right-0
-                                        mt-2
-                                        w-48
-                                        rounded-md
-                                        shadow-lg
-                                        py-1
-                                        bg-second-50
-                                        ring-1 ring-black ring-opacity-5
-                                        focus:outline-none
-                                    "
+                                    class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-second-50 ring-1 ring-black ring-opacity-5 focus:outline-none"
                                 >
                                     <MenuItem v-for="item in userNavigation" :key="item.name" v-slot="{ active }">
                                         <router-link
@@ -278,8 +172,6 @@
 </template>
 
 <script lang="ts">
-    import { ref, computed, defineComponent } from 'vue';
-    import { useStore } from 'vuex';
     import {
         Dialog,
         DialogOverlay,
@@ -290,7 +182,6 @@
         TransitionChild,
         TransitionRoot,
     } from '@headlessui/vue';
-    import { useRouter } from 'vue-router';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Logo from '@/components/Logo.vue';
     import NavWrapper from '@/components/navigation/NavWrapper.vue';
@@ -309,17 +200,51 @@
             NavWrapper,
             Icon,
         },
-        setup() {
+        async setup() {
             const store = useStore();
             const sidebarOpen = ref(false);
             const navigation = computed(() => {
-                return store.state.global.navigation;
+                //Filtramos los items por permiso
+                const navigationItems = store.state.global.navigation;
+                //TODO: usar el permissionManager
+                const filteredNavigation = [];
+                const storePermissions = store.state.loggedUser.permissions || [];
+                const permissions = JSON.parse(JSON.stringify(storePermissions));
+                console.log('filteredNavigation', filteredNavigation);
+                console.log('storePermissions', storePermissions);
+                console.log('permissions', permissions);
+
+                // navigationItems.forEach((item) => {
+                //     if (item.subNav) {
+                //         const subnav = [];
+                //         item.subNav.forEach((subitem) => {
+                //             // if (PermissionsManager.canI(subitem.permission, 'view')) {
+                //             if (permissions.view.includes(JSON.parse(JSON.stringify(subitem.name)))) {
+                //                 subnav.push(subitem);
+                //             }
+                //         });
+
+                //         if (subnav.length > 0) {
+                //             filteredNavigation.push({
+                //                 ...item,
+                //                 subNav: subnav,
+                //             });
+                //         }
+                //     } else {
+                //         // if (PermissionsManager.canI(item.permission, 'view')) {
+                //         if (permissions.view.includes(JSON.parse(JSON.stringify(item.name)))) {
+                //             filteredNavigation.push(item);
+                //         }
+                //     }
+                // });
+
+                return navigationItems;
             });
             const userNavigation = computed(() => {
                 return store.state.global.user_navigation;
             });
             const user = computed(() => {
-                return store.state.user;
+                return store.state.loggedUser;
             });
             const router = useRouter();
             const goHome = () => {

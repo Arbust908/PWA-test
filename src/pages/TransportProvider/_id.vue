@@ -1,10 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">
-                Proveedor de transporte - ID {{ id }}
-            </h1>
-        </header>
+        <ABMFormTitle :title="`Proveedor de transporte - ID ${id}`" />
         <section class="flex">
             <section class="w-8/12">
                 <nav class="flex justify-between max-w-2xl bg-white">
@@ -77,7 +73,8 @@
                         @edit-driver="editDriver(index)"
                     />
                 </section>
-                <footer class="mt-[32px] gap-3 flex flex-col justify-end max-w-2xl">
+                <!-- *** -->
+                <footer class="mt-8 gap-3 flex flex-col justify-end max-w-2xl">
                     <SideBtn v-if="drivers.length" class="md:hidden" btn="full" @click="driversShown = !driversShown">
                         {{ showDrivers ? driverTabText : 'Volver' }}
                     </SideBtn>
@@ -119,35 +116,29 @@
 </template>
 
 <script lang="ts">
-    import { computed, reactive, ref } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
-    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+    import axios from 'axios';
+    import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
+    import { useAxios } from '@vueuse/integrations/useAxios';
+
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import DriverCard from '@/components/transportProvider/DriverCard.vue';
     import Layout from '@/layouts/Main.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    // AXIOS
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
+
     const api = import.meta.env.VITE_API_URL || '/api';
-    // TIPOS
-    import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
 
     export default {
         components: {
-            CircularBtn,
+            ABMFormTitle,
             DriverCard,
-            Icon,
             Layout,
-            SecondaryBtn,
             PrimaryBtn,
-            TransportProviderFrom,
+            SecondaryBtn,
             TransportProviderDriverForm,
+            TransportProviderFrom,
         },
         setup() {
             const store = useStore();
@@ -349,7 +340,6 @@
                 activeSection,
                 changeSection,
                 drivers,
-                Icon,
                 addDriver,
                 newDriver,
                 hasFullNewDriver,

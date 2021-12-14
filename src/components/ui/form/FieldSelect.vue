@@ -40,6 +40,7 @@
         },
         props: {
             data: {
+                type: [Array, Object, Boolean, String, Number],
                 default: '',
             },
             fieldName: {
@@ -70,11 +71,6 @@
                 type: Boolean,
                 default: false,
             },
-            filteredData: {
-                type: Array,
-                required: false,
-                default: null,
-            },
             requireValidation: {
                 type: Boolean,
                 required: false,
@@ -93,9 +89,12 @@
                 type: Boolean,
                 default: false,
             },
+            onlyVisible: {
+                type: Boolean,
+                default: true,
+            },
         },
         setup(props, { emit }) {
-            const { filteredData } = toRefs(props);
             const value = useVModel(props, 'data', emit);
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
@@ -110,17 +109,9 @@
                 return props.endpoint === '/' ? endpointData.value : null;
             });
 
-            if (props.endpoint !== '/' && props.endpoint !== null && !props.filteredData) {
+            if (props.endpoint !== '/' && props.endpoint !== null) {
                 resources = getApiVal();
-                console.log(resources.value);
             }
-
-            watchEffect(() => {
-                if (props.filteredData && props.filteredData.length > 0) {
-                    resources.value = filteredData.value;
-                }
-                console.log(resources.value);
-            });
 
             const noOptionSelected = computed(() => value.value === -1);
 
@@ -128,7 +119,6 @@
                 value,
                 resources,
                 epData,
-                filteredData,
                 ...props,
                 noOptionSelected,
             };

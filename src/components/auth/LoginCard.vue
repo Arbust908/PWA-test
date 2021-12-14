@@ -60,59 +60,33 @@
                 </div>
             </form>
         </article>
-        <Modal title="Hubo un error" type="error" :open="showModal" @close="toggleModal(false)">
-            <template #body>
-                <div>
-                    Alguno de los datos no coinciden con los datos que tenemos registrados. Volve a ingresar los datos
-                    correctos.
-                </div>
-            </template>
-            <template #btn>
-                <button
-                    type="button"
-                    class="
-                        inline-flex
-                        justify-center
-                        w-full
-                        rounded-md
-                        border border-transparent
-                        shadow-sm
-                        px-4
-                        py-2
-                        bg-red-600
-                        text-base
-                        font-medium
-                        text-second-50
-                        hover:bg-red-700
-                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
-                        sm:text-sm
-                    "
-                    @click.prevent="toggleModal(false)"
-                >
-                    Ok
-                </button>
-            </template>
-        </Modal>
+        <ErrorModal
+            :open="showModal"
+            title="Hubo un error"
+            text="Alguno de los datos no coinciden con los datos que tenemos registrados. Volve a ingresar los datos
+                    correctos."
+            @close="toggleModal(false)"
+            @main="toggleModal(false)"
+        />
     </section>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, defineAsyncComponent, defineComponent } from 'vue';
-    import { useRouter } from 'vue-router';
+    import axios from 'axios';
     import { useActions } from 'vuex-composition-helpers';
     import { Role } from '@/interfaces/sandflow';
     import Logo from '@/components/Logo.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import PermissionsManager from '@/helpers/canI';
 
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
-    import { useToggle } from '@vueuse/core';
-    import axios from 'axios';
+    const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
     const api = import.meta.env.VITE_API_URL || '/api';
+
     export default defineComponent({
         components: {
             Logo,
             PrimaryBtn,
-            Modal,
+            ErrorModal,
         },
         setup() {
             const usernameError: Ref<boolean> = ref(false);
@@ -152,30 +126,30 @@
                 const loading = ref(true);
                 const email = username.value;
                 const loggedUser = { email, password: password.value };
-                let fullUser = await axios
-                    .post(`${api}/auth/login`, loggedUser)
-                    .catch((err) => {
-                        console.log(err);
+                let response = await axios.post(`${api}/auth/login`, loggedUser).catch((err) => {
+                    console.log(err);
+                    // alert(err);
 
-                        return false;
-                    })
-                    .then((res) => {
-                        if (res.status === 200) {
-                            return res.data.data.token || res.data.token;
-                        }
+                    return false;
+                });
 
-                        return false;
-                    })
-                    .finally(() => {
-                        loading.value = false;
-                    });
+                let fullUser;
+
+                if (response.status === 200) {
+                    const permissions = response.data.data.permissions;
+
+                    PermissionsManager.setPermissions([permissions]);
+
+                    fullUser = response.data.data;
+                }
 
                 if (fullUser) {
                     fullUser = {
                         id: 99,
                         username: username.value,
                         role: Role.Logged,
-                        token: fullUser,
+                        permissions: fullUser.permissions,
+                        token: fullUser.token,
                     };
 
                     if (shouldRemember.value) {
@@ -186,6 +160,8 @@
                 } else {
                     toggleModal(true);
                 }
+
+                loading.value = false;
             };
 
             return {

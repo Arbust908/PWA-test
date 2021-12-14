@@ -36,7 +36,7 @@
                             :key="orderKey"
                             class="border-none"
                         >
-                            <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
+                            <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full border-gray-300" />
                             <FieldSelect
                                 :title="orderKey === 0 ? 'Tipo' : ''"
                                 class="col-span-4"

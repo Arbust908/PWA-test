@@ -57,19 +57,13 @@
             <template #mobileSubtitle="{ item }"> <span class="font-bold">Pozo: </span>{{ item.pit.name }} </template>
         </VTable>
 
-        <Modal title="¿Desea inhabilitar este depósito?" type="error" :open="showModal">
-            <template #body>
-                <div>
-                    Una vez inhabilitado, no podrá utilizar este depósito en ninguna otra sección de la aplicación
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn items-center">
-                    <GhostBtn btn="!text-gray-500" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="!px-10 !bg-red-700" @click="confirmModal">Inhabilitar </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este depósito?"
+            text="Una vez inhabilitado, no podrá utilizar este depósito en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
 
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
@@ -101,12 +95,14 @@
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import UiTable from '@/components/ui/TableWrapper.vue';
     import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -124,6 +120,8 @@
             VTable,
             Badge,
             Backdrop,
+            GhostBtn,
+            DisableModal,
         },
         setup() {
             useTitle('Depósitos <> Sandflow');
@@ -131,7 +129,7 @@
             const instance = axios.create({
                 baseURL: apiUrl,
             });
-            const selectedDeposit = ref(null);
+            const selectedDeposit = ref(-1);
             const showModal = ref(false);
             const router = useRouter();
             const showBackdrop = ref(false);
@@ -219,7 +217,6 @@
                     visible: !deposit.visible,
                 };
                 await store.dispatch('updateVisibilityDeposit', payload);
-                selectedDeposit.value = null;
                 await getDeposits();
             };
 
@@ -241,16 +238,16 @@
             };
 
             const filteredDeposits = computed(() => {
-                if (deposits.value == undefined) {
-                    return;
-                }
-
-                if (selectedDeposit.value !== null) {
+                if (selectedDeposit.value > -1) {
                     return deposits.value.filter((singleDeposit) => singleDeposit.id == selectedDeposit.value);
                 }
 
                 return deposits.value;
             });
+
+            const clearFilters = () => {
+                selectedDeposit.value = -1;
+            };
 
             const formatedDeposit = (deposit) => {
                 const dimensions = Object.keys(deposit).reduce(
@@ -294,6 +291,7 @@
                 openModalVisibility,
                 update,
                 formatDeposit,
+                clearFilters,
             };
         },
     };

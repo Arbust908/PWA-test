@@ -22,7 +22,7 @@
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
                                 <tr class="body-row" :class="index % 2 === 0 ? 'odd' : 'odd'" :disabled="!item.visible">
                                     <slot name="item" :item="item" />
-                                    <td v-if="desktopActions" class="p-0">
+                                    <td v-if="desktopActions" class="p-0 table--action">
                                         <DropdownBtn :actions="desktopActions" :item="item">
                                             <CircularBtn size="xs" class="even">
                                                 <Icon
@@ -57,7 +57,7 @@
                                         <slot name="mobileTitle" :item="item"></slot>
                                     </span>
 
-                                    <p class="text-xs text-warmGray-500">
+                                    <p class="text-xs text-gray-500">
                                         <slot name="mobileSubtitle" :item="item"></slot>
                                     </p>
                                 </div>
@@ -115,7 +115,12 @@
             pagination: {
                 type: Object,
                 default: () => {
-                    return {};
+                    return {
+                        sortKey: 'id',
+                        sortDir: 'asc',
+                        // currentPage: 1,
+                        // perPage: 10,
+                    };
                 },
             },
             items: {
@@ -177,11 +182,14 @@
                         modifier = -1;
                     }
 
-                    if (getDescendantProp(a, sortKey) < getDescendantProp(b, sortKey)) {
+                    const propA = getDescendantProp(a, sortKey).toString().toLowerCase();
+                    const propB = getDescendantProp(b, sortKey).toString().toLowerCase();
+
+                    if (propA < propB) {
                         return -1 * modifier;
                     }
 
-                    if (getDescendantProp(a, sortKey) > getDescendantProp(b, sortKey)) {
+                    if (propA > propB) {
                         return 1 * modifier;
                     }
 
