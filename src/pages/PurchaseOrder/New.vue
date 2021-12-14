@@ -73,22 +73,20 @@
                         >
                             <CircularBtn
                                 v-if="useIfNotLonly(providerId.sandOrders)"
-                                size="md"
+                                size="sm"
                                 @click="removeOrder(order.id, providerId.innerId)"
                             >
                                 <Icon icon="Trash" type="outline" class="w-7 h-7" />
                             </CircularBtn>
                             <!-- Arena Section -->
-                            <div>
-                                <CircularBtn
-                                    v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
-                                    size="md"
-                                    btn-class="bg-green-500"
-                                    @click.prevent="addOrder(providerId.innerId)"
-                                >
-                                    <Icon icon="Plus" class="w-7 h-7 text-white" />
-                                </CircularBtn>
-                            </div>
+                            <CircularBtn
+                                v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
+                                size="sm"
+                                btn="bg-green-500"
+                                @click.prevent="addOrder(providerId.innerId)"
+                            >
+                                <Icon icon="Plus" class="w-7 h-7 text-white" />
+                            </CircularBtn>
                         </div>
                     </FieldGroup>
                 </template>
@@ -162,8 +160,8 @@
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
                             <DatePicker
-                                class="mr-6 md:mr-8"
                                 v-model="localDate"
+                                class="mr-6 md:mr-8"
                                 validation-type="numeric"
                                 @date-object="dateObject = $event"
                             />
@@ -208,7 +206,7 @@
             v-if="showModal"
             :show-modal="showModal"
             :driver="driverName"
-            :poId="purchaseId"
+            :po-id="purchaseId"
             :po="po"
             :plates="filteredPlates"
             @close="showModal = false"
@@ -298,6 +296,7 @@
                     const driversFiltered = drivers.value.filter(
                         (driver) => driver.transportProviderId === transportProviderId.value
                     );
+
                     return driversFiltered;
                 }
 
@@ -311,7 +310,7 @@
             const filteredPlates = computed(() => {
                 if (driverId.value > -1) {
                     platesFiltered = filteredDrivers.value.filter((plate) => plate.id === driverId.value);
-                    const platesArray = [platesFiltered[0].transportId, platesFiltered[0].transportId2];
+                    const platesArray = [platesFiltered.value[0].transportId, platesFiltered.value[0].transportId2];
 
                     return platesArray;
                 }
@@ -728,7 +727,7 @@
         @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 mt-1 flex shadow-sm;
     }
     fieldset:not(:last-of-type) {
-        @apply border-b pb-6;
+        @apply border-b border-gray-200 pb-6;
     }
     label {
         @apply flex flex-col;
