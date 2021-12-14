@@ -1,20 +1,15 @@
 <script setup lang="ts">
+    import { SandStage } from '@/interfaces/sandflow';
+
+    import { OnClickOutside } from '@vueuse/components';
     import ChevronIcon from '@/components/stageSheet/ChevronIcon.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import InverseBtn from '@/components/ui/buttons/InverseBtn.vue';
     import PlusIcon from './PlusIcon.vue';
     const props = defineProps({
-        stage: {
-            type: Number,
-            default: 1,
-        },
-        weight: {
-            type: Number,
-            default: 1,
-        },
-        done: {
-            type: Number,
-            default: 0,
+        sandStage: {
+            type: Object,
+            required: true,
         },
         isSelectedStage: {
             type: Boolean,
@@ -22,7 +17,33 @@
         },
     });
     defineEmits(['set-stage']);
-    const stagePorcentage = ref(Math.round((props.done / props.weight) * 100));
+    const sands = computed(() => {
+        if (!props.sandStage) {
+            return [];
+        }
+        const sand1 = {
+            ...props.sandStage.sand1,
+            ...(props.sandStage.sand1 && { quantity: props.sandStage.quantity1 }),
+        };
+        const sand2 = {
+            ...props.sandStage.sand2,
+            ...(props.sandStage.sand2 && { quantity: props.sandStage.quantity2 }),
+        };
+        const sand3 = {
+            ...props.sandStage.sand3,
+            ...(props.sandStage.sand3 && { quantity: props.sandStage.quantity3 }),
+        };
+
+        return [sand1, sand2, sand3].filter((sand) => {
+            return Object.keys(sand).length !== 0;
+        });
+    });
+    const weigth = computed(() => {
+        return sands.value.reduce((acc, sand) => {
+            return acc + sand.quantity;
+        }, 0);
+    });
+    const stagePorcentage = ref(Math.round((1 / weigth.value) * 100));
     const progress = ref(null);
     const stagePorcentageVariable = useCssVar('--progress', progress);
     stagePorcentageVariable.value = '0%';
@@ -37,13 +58,30 @@
     const showProgress = computed(() => {
         return stagePorcentage.value > 0 && stagePorcentage.value < 100;
     });
+    const boxQueue = ref([]);
+    const selectedBox = ref(null as any);
+    const isSelectedBox = (boxId: number) => {
+        return selectedBox.value?.id === boxId;
+    };
+    const popUpCords = reactive({
+        x: 0,
+        y: 0,
+    });
+    const fillBox = (boxId: number, event) => {
+        selectedBox.value = { id: boxId };
+        console.log(event);
+        console.log(event.clientX, event.clientY);
+        popUpCords.x = event.clientX;
+        popUpCords.y = event.clientY;
+        console.log(popUpCords);
+    };
 </script>
 
 <template>
     <article class="stage--row">
         <header class="flex justify-between">
-            <h2>Etapa {{ stage }}/20</h2>
-            <p>Total: {{ weight }} Toneladas</p>
+            <h2>Etapa {{ sandStage.stage }}/20</h2>
+            <p>Total: {{ weigth }} Toneladas</p>
             <div class="flex gap-x-1 items-center">
                 <progress v-if="showProgress" max="100" :value="stagePorcentage">{{ stagePorcentage }}%</progress>
                 <span v-if="showProgress">{{ stagePorcentage + '%' }}</span>
@@ -54,7 +92,7 @@
             <i
                 :class="isSelectedStage ? 'rotate-180' : 'rotate-0'"
                 class="expand-btn"
-                @click="$emit('set-stage', stage)"
+                @click="$emit('set-stage', sandStage.id)"
             >
                 <ChevronIcon />
             </i>
@@ -64,20 +102,24 @@
             class="flex gap-5 border-t border-gray-200 transform transition ease-in-out duration-300 overflow-hidden origin-top flex-wrap"
         >
             <section
-                class="max-w-[244px] w-full rounded border border-gray-200 shadow-sm px-5 py-7 flex items-start self-start"
+                class="max-w-[16rem] w-full rounded border border-gray-200 shadow-sm px-5 py-7 self-start space-y-6"
             >
-                <i class="w-3 h-3 inline-block rounded-full mesh-box__1 m-2 bubble"></i>
-                <article>
-                    <h4>Arena 30/70</h4>
-                    <p class="text-gray-400">15 toneladas</p>
-                </article>
-                <article ref="progress" class="w-[70px] rounded flex justify-center items-center ml-auto">
-                    <div class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center circle-progress">
-                        <p class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]">
-                            {{ stagePorcentage }}%
-                        </p>
-                    </div>
-                </article>
+                <div v-for="sand in sands" :key="sand.id + sand.type" class="flex items-start">
+                    <i class="w-3 h-3 inline-block rounded-full mesh-box__1 m-2 bubble"></i>
+                    <article>
+                        <h4>Arena {{ sand.type }}</h4>
+                        <p class="text-gray-400">{{ sand.quantity }} toneladas</p>
+                    </article>
+                    <article ref="progress" class="w-[70px] rounded flex justify-center items-center ml-auto">
+                        <div
+                            class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center circle-progress"
+                        >
+                            <p class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]">
+                                {{ stagePorcentage }}%
+                            </p>
+                        </div>
+                    </article>
+                </div>
             </section>
             <section v-if="!showProgress" class="flex justify-center items-center max-w-md">
                 <p class="leading-wider leading-loose text-center w-full px-4">
@@ -85,8 +127,29 @@
                 </p>
             </section>
             <section v-else class="grid grid-cols-5 gap-4 max-w-md mx-auto">
-                <article v-for="place in 14" :key="place + 'place'" class="stage--box not-filled">
+                <article
+                    v-for="place in 14"
+                    :key="place + 'place'"
+                    :class="isSelectedBox(place) ? 'selected' : null"
+                    class="stage--box not-filled"
+                    @click="fillBox(place, $event)"
+                >
                     {{ place }}
+                    <teleport to="#modal">
+                        <OnClickOutside v-if="isSelectedBox(place)" @trigger="selectedBox = null">
+                            <div
+                                :style="`top: ${popUpCords.y}px; left: ${popUpCords.x}px`"
+                                class="top-0 left-0 absolute rounded bg-gray-100 z-40 w-[309px] max-h-[390px] p-6 shadow-md"
+                            >
+                                <div>
+                                    <h2>Depósito</h2>
+
+                                    I'm a teleported modal! (My parent is "body")
+                                    <button @click="selectedBox = null">Close</button>
+                                </div>
+                            </div>
+                        </OnClickOutside>
+                    </teleport>
                 </article>
                 <article class="stage--box">
                     <PlusIcon />
@@ -145,7 +208,7 @@
             @apply border border-dashed border-gray-400;
         }
         &.selected {
-            @apply text-blue-600 bg-blue-100 border-blue-600;
+            @apply text-blue-600 bg-blue-100 border-blue-600 border-solid;
         }
     }
     .circle-progress {
