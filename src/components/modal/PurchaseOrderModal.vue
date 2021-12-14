@@ -1,5 +1,5 @@
 <template>
-    <Modal :open="open" @close="$emit('close')">
+    <Modal :open="showModal" @close="$emit('close')">
         <h2 class="text-base text-black font-bold text-left">Orden de pedido</h2>
         <div class="w-full max-w-sm text-left text-gray-800">
             <div class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
@@ -53,8 +53,20 @@
                 type: Object,
                 required: true,
             },
-            open: {
+            showModal: {
                 type: Boolean,
+                required: true,
+            },
+            driver: {
+                type: String,
+                required: true,
+            },
+            poId: {
+                type: Number,
+                required: true,
+            },
+            plates: {
+                type: Array,
                 required: true,
             },
         },

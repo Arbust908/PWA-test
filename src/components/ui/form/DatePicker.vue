@@ -10,7 +10,6 @@
                 getDate();
                 checkDate();
                 formatDate();
-                emitDate;
             "
         />
     </div>
@@ -109,14 +108,17 @@
                 let currentYear = new Date();
                 leapYear(year);
                 monthLength(month);
+
                 if (year > currentYear.getFullYear() + 10 || year < currentYear.getFullYear()) {
                     localDate.value = '';
                     error.value = true;
                 }
+
                 if (month < 1 || month > 12) {
                     localDate.value = '';
                     error.value = true;
                 }
+
                 if (
                     day < 1 ||
                     (dayLimit === 31 && day > 31) ||
@@ -130,10 +132,12 @@
                 }
             }
             let dateObject = {};
+
             function formatDate() {
                 dateObject = { year: year, month: month - 1, day: day };
                 emit('date-object', dateObject);
             }
+
             return { date, getDate, localDate, checkDate, formatDate, error, Icon };
         },
     };

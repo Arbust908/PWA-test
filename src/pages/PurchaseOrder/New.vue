@@ -112,7 +112,6 @@
                             :data="driverId"
                             @update:data="
                                 driverId = $event;
-                                filteredPlates = $event;
                                 to.driverId = $event;
                             "
                         />
@@ -159,12 +158,7 @@
                     <section class="flex gap-2 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
-                            <DatePicker
-                                v-model="localDate"
-                                class="mr-6 md:mr-8"
-                                validation-type="numeric"
-                                @date-object="dateObject = $event"
-                            />
+                            <DatePicker v-model="localDate" class="mr-6 md:mr-8" @date-object="dateObject = $event" />
                         </label>
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Hora de entrega</p>
@@ -197,9 +191,7 @@
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && confirm()">
-                Crear Orden
-            </PrimaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull" @click.prevent="isFull && confirm()"> Crear Orden </PrimaryBtn>
         </footer>
 
         <OrderModal
@@ -263,7 +255,7 @@
     import TimePicker from '@/components/ui/form/TimePicker.vue';
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import DatePicker from '@/components/ui/form/DatePicker.vue';
-    // import SuccessModal from '@/components/modal/SuccessModal.vue';
+
     const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
     const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
     const GhostBtn = defineAsyncComponent(() => import('@/components/ui/buttons/GhostBtn.vue'));
@@ -305,12 +297,11 @@
 
             const drivers = ref([]);
             const driverId = ref(-1);
-            let platesFiltered = ref('');
 
             const filteredPlates = computed(() => {
                 if (driverId.value > -1) {
-                    platesFiltered = filteredDrivers.value.filter((plate) => plate.id === driverId.value);
-                    const platesArray = [platesFiltered.value[0].transportId, platesFiltered.value[0].transportId2];
+                    let platesFiltered = filteredDrivers.value.filter((plate) => plate.id === driverId.value);
+                    const platesArray = [platesFiltered[0].transportId, platesFiltered[0].transportId2];
 
                     return platesArray;
                 }
@@ -707,7 +698,6 @@
                 drivers,
                 driverId,
                 filteredPlates,
-                platesFiltered,
                 driverName,
                 openSuccess,
                 openError,
