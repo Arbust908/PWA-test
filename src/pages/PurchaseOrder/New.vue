@@ -4,7 +4,7 @@
             <h1 class="font-bold text-gray-900 text-[24px] self-start mb-3 md:mb-0">Orden de Pedido</h1>
         </header>
         <section class="bg-white rounded-md shadow-sm">
-            <form method="POST" action="/" class="p-4 flex-col gap-4">
+            <form method="POST" action="/" class="p-3 sm:p-4 flex-col gap-4">
                 <FieldGroup class="max-w-2xl border-none">
                     <ClientPitCombo
                         :client-id="companyClientId"
@@ -35,7 +35,7 @@
                     >
                         <FieldSelect
                             :title="orderKey === 0 ? 'Tipo' : ''"
-                            class="col-span-6 sm:col-span-3"
+                            class="col-span-12 sm:col-span-3"
                             field-name="sandType"
                             placeholder="Tipo de Arena"
                             endpoint="/sand"
@@ -46,7 +46,7 @@
                         />
                         <FieldWithSides
                             :title="orderKey === 0 ? 'Cantidad' : ''"
-                            class="col-span-6 sm:col-span-3"
+                            class="col-span-7 sm:col-span-3"
                             field-name="sandQuantity"
                             placeholder="Arena"
                             type="number"
@@ -60,7 +60,7 @@
                         />
                         <FieldInput
                             :title="orderKey === 0 ? 'ID de caja' : ''"
-                            class="col-span-9 sm:col-span-4"
+                            class="col-span-7 sm:col-span-4"
                             field-name="sandBoxId"
                             placeholder="ID"
                             :maxlength="10"
@@ -80,7 +80,7 @@
                                 <Icon icon="Trash" type="outline" class="w-7 h-7" />
                             </CircularBtn>
                             <!-- Arena Section -->
-                            <div class="hidden sm:block">
+                            <div>
                                 <CircularBtn
                                     v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
                                     size="md"
@@ -91,14 +91,6 @@
                                 </CircularBtn>
                             </div>
                         </div>
-                        <button
-                            v-if="isLast(orderKey, providerId.sandOrders)"
-                            class="mt-1 flex items-center col-span-6 sm:hidden"
-                            @click.prevent="addOrder(providerId.innerId)"
-                        >
-                            <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
-                            <span class="font-bold"> Agregar</span>
-                        </button>
                     </FieldGroup>
                 </template>
                 <FieldGroup class="max-w-3xl relative">
@@ -115,7 +107,7 @@
 
                     <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="col-span-full relative">
                         <FieldSelect
-                            class="col-span-5 sm:col-span-5"
+                            class="col-span-12 sm:col-span-5 md:col-span-6"
                             title="Conductores"
                             field-name="transportProvider2"
                             placeholder="Seleccionar Conductor"
@@ -124,6 +116,7 @@
                             @update:data="
                                 driverId = $event;
                                 filteredPlates = $event;
+                                to.driverId = $event;
                             "
                         />
                         <FieldInput
@@ -142,7 +135,6 @@
                             is-readonly
                             :data="filteredPlates[1]"
                         />
-                        <div class="col-span-6 hidden sm:block md:hidden"></div>
                         <FieldInput
                             title="Cantidad de cajas"
                             class="col-span-6 sm:col-span-3"
@@ -156,7 +148,7 @@
                         <div class="col-span-6 sm:block"></div>
                         <FieldInput
                             title="Observaciones"
-                            class="col-span-12 sm:col-span-4"
+                            class="col-span-12 md:col-span-6"
                             field-name="observations"
                             placeholder="Ej: chasis chico"
                             is-optional
@@ -167,7 +159,7 @@
                 </FieldGroup>
                 <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="max-w-3xl relative flex-wrap">
                     <FieldLegend class="mt-2">Observaciones</FieldLegend>
-                    <section class="flex gap-2 sm:flex-row items-start col-span-12 flex-wrap">
+                    <section class="flex gap-2 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
                             <DatePicker
@@ -191,7 +183,7 @@
 
                     <FieldTextArea
                         title="Observaciones"
-                        class="col-span-12 sm:col-span-8"
+                        class="col-span-12 sm:col-span-8 xl:col-span-7"
                         field-name="observations"
                         :rows="3"
                         placeholder=""
@@ -206,7 +198,7 @@
             </form>
         </section>
         <footer class="mt-[32px] space-x-3 flex justify-end">
-            <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
+            <SecondaryBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"
                 @click.prevent="
@@ -222,17 +214,19 @@
             v-if="showModal"
             :show-modal="showModal"
             :driver="driverName"
+            :poId="purchaseId"
             :po="po"
+            :plates="filteredPlates"
             @close="showModal = false"
             @confirm="
                 save();
-                openSuccess = true;
+                showModal = false;
             "
         />
 
         <SuccessModal :open="openSuccess" :title="titleSuccess" @action="openSuccess = false" />
         <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @action="openError = false" />
-        <ErrorModal :open="false" :title="titleError" :text="textError" />
+        <ErrorModal :open="openErrorGral" :title="titleError" :text="textError" @action="openErrorGral = false" />
     </Layout>
 </template>
 
@@ -335,8 +329,6 @@
 
             watch(driverId, (newValue) => {
                 if (newValue > -1) {
-                    TransportOrders.value[0].transportId = filteredPlates.value[0];
-                    TransportOrders.value[0].transportId2 = filteredPlates.value[1];
                     TransportOrders.value[0].driverId = newValue;
                     const driverIndex = drivers.value.findIndex((driver) => driver.id === newValue);
                     driverName.value = drivers.value[driverIndex].name;
@@ -347,9 +339,7 @@
                 // TODO: StoreLogic
                 const result = await axios.get(`${api}/driver`);
                 drivers.value = result.data.data;
-                console.log('api driver: ', axios.get(`${api}/driver`));
-                console.log('transport Order: ', axios.get(`${api}/transportOrder`));
-                console.log('transport Provider: ', axios.get(`${api}/transportProvider`));
+                console.log(axios.get(`${api}/transportOrder`));
             });
 
             useTitle('Nueva orden de pedido <> Sandflow');
@@ -402,11 +392,9 @@
             const defaultTransportOrder = {
                 innerId: 0,
                 boxAmount: 1,
-                transportId: '',
-                transportId2: '',
                 observations: '',
                 purchaseOrderId: -1,
-                driverId: null,
+                driverId: 0,
             };
 
             const TransportOrders: Ref<Array<TransportOrder>> = ref([
@@ -501,7 +489,6 @@
                 });
                 soLength.value = sandOrder.length;
                 TransportOrders.value[0].boxAmount = soLength.value;
-                const { data: prueba } = useAxios('/transportOrder', instance);
             };
             // :: TransportProvider
             const transportProviders = ref([]);
@@ -544,14 +531,6 @@
                     TransportOrders.value.length > 0 &&
                     TransportOrders.value.every((to) => {
                         return to.boxAmount > 0;
-                    }) &&
-                    TransportOrders.value.every((to) => {
-                        return (
-                            to.transportId !== '' &&
-                            to.transportId.length > 0 &&
-                            to.transportId2 !== '' &&
-                            to.transportId2.length > 0
-                        );
                     })
                 );
 
@@ -579,7 +558,6 @@
                     transportProvider: { ...tp },
                     transportOrders: TransportOrders.value,
                 };
-                console.log(po.value);
                 showModal.value = true;
             };
 
@@ -625,33 +603,48 @@
                     deliveryTime: newDate,
                     packageObservations: pObs,
                     driverId: driverId.value,
-                    transportId: filteredPlates[0],
-                    transportId2: filteredPlates[1],
                 };
 
                 return purchaseOrder;
             };
+
+            const purchaseId = ref(0);
+            onMounted(async () => {
+                const result = await axios.get(`${api}/purchaseOrder`);
+                purchaseId.value = result.data.data.at(-1).id + 1;
+            });
+
             const save = (): void => {
                 if (isFull.value) {
                     // Formateamos la orden de pedido
                     const purchaseOrder = _formatPO();
-                    console.log('PURCHASEORDER', purchaseOrder);
                     // Creamos via API la orden de pedido
-                    const { data: pODone } = useAxios(
+                    const { data: pODone, error } = useAxios(
                         '/purchaseOrder',
                         { method: 'POST', data: purchaseOrder },
                         instance
                     );
+                    setTimeout(() => {
+                        if (error.value != undefined) {
+                            showModal.value = false;
+                            openErrorGral.value = true;
+                        } else {
+                            showModal.value = false;
+                            openSuccess.value = true;
+                        }
+                    }, 1000);
                     const sOisDone = ref([]);
                     watch(pODone, (newVal, _) => {
                         if (newVal && newVal.data) {
                             // Recorremos los proveedores de sand
                             const poId = newVal.data.id;
+                            purchaseId.value = poId;
+                            titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
                             _saveTO(poId);
                             _saveSO(poId);
                             setTimeout(() => {
                                 router.push('/orden-de-pedido');
-                            }, 1000);
+                            }, 2000);
                         }
                     });
                 }
@@ -659,17 +652,15 @@
             // >> Success y Error Modal
             const openSuccess = ref(false);
             const openError = ref(false);
+            const openErrorGral = ref(false);
             const incomplete = () => {
                 if (!isFull.value) {
                     openError.value = true;
-                    console.log('incomplete');
-                    console.log('openError dentro', openError.value);
                 }
-                console.log('openError', openError.value);
 
                 return openError.value;
             };
-            const titleSuccess = 'La orden de pedido #numero ha sido generada con éxito';
+            const titleSuccess = ref('');
             const titleError = '¡Ups! Hubo un problema y no pudimos guardar la orden de pedido.'; //error interno
             const textError = 'Por favor, intentá nuevamente en unos minutos.';
             const titleErrorGral = 'Hubo un problema al intentar generar la orden.'; //error Usuario
@@ -727,7 +718,9 @@
                 driverName,
                 openSuccess,
                 openError,
+                openErrorGral,
                 incomplete,
+                purchaseId,
             };
         },
     };

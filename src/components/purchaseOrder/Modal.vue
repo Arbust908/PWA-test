@@ -1,23 +1,23 @@
 <template>
     <Modal type="off" :open="showModal" @close="$emit('close')">
         <template #body>
-            <h2 class="text-base text-black font-bold text-left">Orden de pedido</h2>
+            <h2 class="text-base text-black font-bold text-left">Orden de pedido - #{{ poId }}</h2>
             <div class="w-full max-w-sm text-left text-gray-800">
                 <div class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
-                    <h3 class="font-bold text-black text-base">Arenas {{ po.sandProvider.name }}</h3>
+                    <h3 class="font-bold text-black text-base mb-2">Arenas {{ po.sandProvider.name }}</h3>
                     <ul>
-                        <li v-for="(so, index) in po.sandOrders" :key="index" class="ml-2 text-black text-sm list-none">
-                            {{ so.amount }}t - {{ getSandType(so?.sandTypeId) }} -
+                        Pedido:
+                        <li v-for="(so, index) in po.sandOrders" :key="index" class="ml-0 text-black text-sm list-none">
+                            {{ so.amount }}t - arena #{{ getSandType(so?.sandTypeId) }} - ID
                             {{ so.boxId !== '' ? so.boxId : 'Sin ID de caja' }}
                         </li>
                     </ul>
                 </div>
                 <div class="bg-gray-100 mt-3 rounded-r-md pt-3 pl-4 pb-4 border-l-4 border-green-500 border-t-0">
                     <h3 class="font-bold text-black text-base">Transporte: {{ po.transportProvider.name }}</h3>
-                    <li v-for="(tp, i) in po.transportOrders" :key="i" class="ml-2 text-black text-sm list-none mt-2">
+                    <li v-for="(tp, i) in po.transportOrders" :key="i" class="ml-0 text-black text-sm list-none mt-2">
                         <p>{{ driver }} - Cantidad: {{ tp.boxAmount }}</p>
-                        <p>Patente: {{ tp.transportId }} - Patente acoplado: {{ tp.transportId2 }}</p>
-                        <p v-if="tp.observations">Observaciones: {{ tp.observations }}</p>
+                        <p>Patente: {{ plates[0] }} - Acoplado: {{ plates[1] }} - {{ tp.observations }}</p>
                     </li>
                 </div>
             </div>
@@ -69,6 +69,14 @@
             },
             driver: {
                 type: String,
+                required: true,
+            },
+            poId: {
+                type: Number,
+                required: true,
+            },
+            plates: {
+                type: Array,
                 required: true,
             },
         },
