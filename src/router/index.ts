@@ -16,6 +16,16 @@ const routes: Array<RouteRecordRaw> = [
         beforeEnter: isLogged,
     },
     {
+        path: '/register',
+        name: 'LoginValidation',
+        component: () => import('@/pages/LoginValidation.vue'),
+    },
+    {
+        path: '/register-new-password',
+        name: 'Register',
+        component: () => import('@/pages/Register.vue'),
+    },
+    {
         path: '/login',
         name: 'Login',
         component: () => import('@/pages/Login.vue'),
