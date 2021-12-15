@@ -627,7 +627,7 @@
         },
     ]);
 
-    const setWareHouseBoxes = ({ layout }: Warehouse) => {
+    const setWareHouseBoxes = async ({ layout }: Warehouse) => {
         const whBoxes = [];
         for (const key in layout) {
             if (Object.prototype.hasOwnProperty.call(layout, key)) {
@@ -640,16 +640,20 @@
             }
         }
 
-        let result = whBoxes.filter((box) => box.id);
-        // .map(async (box) => {
-        //     const boxInfo = await getBoxInfo(box.id);
-        //     console.log(boxInfo);
+        let result = await Promise.all(
+            whBoxes
+                .filter((box) => box.id)
+                .map(async (box) => {
+                    const boxInfo = await getBoxInfo(box.id);
+                    console.log(boxInfo);
 
-        //     return {
-        //         ...box,
-        //         ...boxInfo,
-        //     };
-        // });
+                    return {
+                        ...box,
+                        ...boxInfo,
+                    };
+                })
+        );
+        console.log('Result: ', result);
 
         return result;
     };
@@ -663,11 +667,13 @@
         return box;
     };
     const stageSheetDetails = computed(() => {
-        console.log(selectedStage);
+        console.log('selectedStage', selectedStage.value);
 
-        return {
-            ...selectedStage,
-        };
+        return selectedStage.value === -1
+            ? {}
+            : {
+                  ...selectedStage.value,
+              };
     });
     const setStage = (stage: number) => {
         if (selectedStage.value.id === stage) {
