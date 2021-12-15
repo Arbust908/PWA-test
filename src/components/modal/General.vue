@@ -1,12 +1,6 @@
 <template>
     <TransitionRoot as="template" :show="open">
-        <Dialog
-            as="div"
-            static
-            class="fixed z-10 top-10 inset-x-0 md:inset-0 overflow-y-auto"
-            :open="open"
-            @close="$emit('close')"
-        >
+        <Dialog as="div" static class="fixed z-10 inset-0 overflow-y-auto" :open="open" @close="$emit('close')">
             <!-- <div class="block min-h-screen pt-4 px-4 text-center"> -->
             <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <TransitionChild
@@ -75,7 +69,7 @@
 <style lang="scss">
     .modal {
         &__card {
-            @apply inline-flex flex-col bg-second-50 rounded-lg shadow-xl transform transition-all w-full my-8 align-middle p-5;
+            @apply inline-flex flex-col bg-second-50 rounded-lg shadow-xl transform transition-all w-full mb-20 align-middle p-5 relative;
         }
         &__icon-circle {
             @apply mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:h-10 sm:w-10;

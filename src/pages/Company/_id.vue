@@ -104,15 +104,15 @@
         <ErrorModal
             :open="showErrorCuitModal"
             title="Ya existe un cliente con este CUIT"
-            text="El cliente que intentas guardar fue creado anteriormente"
+            text="El cliente que intentas guardar fue creado anteriormente."
             @close="showErrorCuitModal = false"
-            @action="showErrorCuitModal = false"
+            @main="showErrorCuitModal = false"
         />
         <SuccessModal
             :open="showSuccessModal"
-            title="El cliente fue guardado con éxito"
+            title="El cliente fue guardado con éxito."
             @close="$router.push('/clientes')"
-            @action="$router.push('/clientes')"
+            @main="$router.push('/clientes')"
         />
     </Layout>
 </template>

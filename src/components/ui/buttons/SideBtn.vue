@@ -11,27 +11,7 @@
             BaseBtn,
         },
         props: {
-            type: {
-                type: String,
-                default: 'button',
-            },
-            size: {
-                type: String,
-                default: 'md',
-            },
-            // btn Classes
-            btn: {
-                type: String,
-                default: 'main',
-            },
-            disabled: {
-                type: [String, Boolean],
-                default: false,
-            },
-            isLoading: {
-                type: Boolean,
-                default: false,
-            },
+            ...BaseBtn.props,
         },
     };
 </script>

@@ -71,6 +71,11 @@ const Cradle = {
     to: '/cradle',
     icon: 'ClipboardList',
 };
+const Usuarios = {
+    name: 'Usuarios',
+    to: '/usuarios',
+    icon: 'UserGroup',
+};
 export default {
     state: () => ({
         navigation: [
@@ -94,6 +99,7 @@ export default {
                 icon: 'Cog',
                 subNav: [Tipo_de_malla, Forklift, Cradle],
             },
+            Usuarios,
         ],
         user_navigation: [{ name: 'Salir', to: '/usuario/salir', icon: 'Logout' }],
         areWeConnected: false,

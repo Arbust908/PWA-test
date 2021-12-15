@@ -21,55 +21,27 @@
                 Finalizar
             </PrimaryBtn>
         </footer>
-        <Modal type="off" :open="showModal" @close="toggleModal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="CheckCircle" class="h-[60px] w-[60px] mb-5 text-green-400" />
-                    <span class="text-center text-base border-none text-gray-900"
-                        >¡El tipo de arena fue guardado con éxito!</span
-                    >
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <PrimaryBtn @click.prevent="$router.push('/tipos-de-arena')">Continuar</PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showErrorModal" @close="toggleErrorModal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-700" />
-                    <span class="text-center text-base border-none text-gray-900"> Ya existe este tipo de malla </span>
-                    <span class="text-center text-sm border-none m-2">
-                        El tipo de arena que intentas guardar fue creado anteriormente.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
-        <Modal type="off" :open="showApiErrorModal" @close="toggleApiErrorModal">
-            <template #body>
-                <div class="text-center flex flex-col justify-center items-center">
-                    <Icon icon="ExclamationCircle" class="h-[54px] w-[54px] mb-4 text-red-400" />
-                    <span class="text-center text-base border-none text-gray-900">
-                        ¡Ups! Hubo un problema y no pudimos guardar el tipo de arena.
-                    </span>
-                    <span class="text-center text-sm border-none m-2">
-                        Por favor, intentá nuevamente en unos minutos.
-                    </span>
-                </div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center">
-                    <WarningBtn @click.prevent="toggleApiErrorModal()">Volver</WarningBtn>
-                </div>
-            </template>
-        </Modal>
+
+        <SuccessModal
+            :open="showModal"
+            text="¡El tipo de arena fue guardado con éxito!"
+            @close="$router.push('/tipos-de-arena')"
+            @main="$router.push('/tipos-de-arena')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="Ya existe este tipo de malla"
+            text="El tipo de arena que intentas guardar fue creado anteriormente."
+            @close="showErrorModal = false"
+            @main="showErrorModal = false"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar el tipo de arena."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
@@ -79,13 +51,15 @@
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
-    import ABMTitle from '@/components/ui/ABMTitle.vue';
+    import ABMTitle from '@/components/ui/ABMFormTitle.vue';
     import { useValidator } from '@/helpers/useValidator';
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     import SandForm from '@/components/sand/SandForm.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     export default {
         components: {
@@ -97,6 +71,8 @@
             SandForm,
             SecondaryBtn,
             WarningBtn,
+            ErrorModal,
+            SuccessModal,
         },
         setup() {
             useTitle('Nuevo tipo de arena <> Sandflow');

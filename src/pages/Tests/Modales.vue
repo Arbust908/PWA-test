@@ -43,13 +43,13 @@
         <section class="flex gap-4 flex-wrap">
             <BaseBtn btn="extra-wide warning" @click="closeErrorModal()">Error</BaseBtn>
             <BaseBtn btn="extra-wide success" @click="closeSuccessModal()">Exito</BaseBtn>
-            <BaseBtn btn="extra-wide" @click="closePOModal()">Purchase Order</BaseBtn>
+            <BaseBtn btn="extra-wide bg-indigo-200" @click="closePOModal()">Purchase Order</BaseBtn>
             <CircularBtn btn="bg-red-700" />
             <CircularBtn btn="bg-green-700" />
             <PrimaryBtn />
             <SecondaryBtn />
-            <ErrorBtn />
-            <GhostBtn />
+            <ErrorBtn :disbaled="true" />
+            <GhostBtn :disabled="true" />
             <NoneBtn />
             <SideBtn />
             <WarningBtn />

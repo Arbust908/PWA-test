@@ -38,10 +38,9 @@
                             class="col-span-6 sm:col-span-3"
                             field-name="sandType"
                             placeholder="Tipo de Arena"
-                            endpoint="/sand"
                             endpoint-key="type"
                             :data="order.sandTypeId"
-                            :filtered-data="filteredSandTypes"
+                            :endpoint-data="filteredSandTypes"
                             @update:data="order.sandTypeId = $event"
                         />
                         <FieldWithSides

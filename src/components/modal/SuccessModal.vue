@@ -7,6 +7,7 @@
         :icon="{ type: 'CheckCircle', classes: 'text-green-700' }"
         :btn="{ text: 'Continuar', classes: 'success' }"
         @close="$emit('close')"
+        @main="$emit('main')"
     />
 </template>
 
@@ -32,6 +33,6 @@
                 default: false,
             },
         },
-        emits: ['close'],
+        emits: ['close', 'main'],
     };
 </script>

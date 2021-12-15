@@ -4,7 +4,7 @@
             <FieldInput
                 class="col-span-full"
                 field-name="transportName"
-                placeholder="Ingresar Nombre / Razón Social"
+                placeholder=""
                 title="Nombre / Razón Social"
                 :data="tpName"
                 require-validation
@@ -14,7 +14,7 @@
             <FieldInput
                 class="col-span-full"
                 field-name="transportId"
-                placeholder="Ingresar CUIT / CUIL"
+                placeholder="Ingresar sólo números"
                 title="CUIT / CUIL"
                 mask="#*"
                 :data="tpId"
@@ -35,7 +35,7 @@
             <FieldTextArea
                 class="col-span-full"
                 field-name="observations"
-                placeholder="Observaciones..."
+                placeholder=""
                 title="Observaciones"
                 :rows="5"
                 is-fixed
@@ -50,7 +50,7 @@
                 class="col-span-full"
                 title="Nombre y Apellido"
                 field-name="repName"
-                placeholder="Ingresar Nombre y Apellido"
+                placeholder=""
                 :data="crName"
                 require-validation
                 entity="transportProvider"
@@ -60,7 +60,7 @@
                 class="col-span-full"
                 title="Teléfono"
                 field-name="repTel"
-                placeholder="+11 1234 5678"
+                placeholder="Ingresar sólo números"
                 mask="#*"
                 :data="crPhone"
                 require-validation
@@ -69,7 +69,7 @@
             />
             <FieldInput
                 class="col-span-full"
-                title="Email"
+                title="Mail"
                 field-name="repEmail"
                 placeholder="empresa@mail.com"
                 :data="crEmail"
