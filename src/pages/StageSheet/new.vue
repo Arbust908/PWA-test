@@ -9,9 +9,11 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import StageSheetStage from '@/components/stageSheet/stageSheetStage.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import StageSheetStageBox from '@/components/stageSheet/stageSheetStageBox.vue';
 
     const clientId = ref(-1);
     const pitId = ref(-1);
+    const boxes: Ref<any[]> = ref([]);
 
     const _TABS = { PENDING: 0, COMPLETED: 1 };
     const selectedTab = ref(0);
@@ -626,27 +628,56 @@
     ]);
 
     const setWareHouseBoxes = ({ layout }: Warehouse) => {
-        const boxes = [];
+        const whBoxes = [];
         for (const key in layout) {
             if (Object.prototype.hasOwnProperty.call(layout, key)) {
                 const element = layout[key];
                 const location = formatLocation(key);
-                console.log(element);
-                console.log(location);
-                boxes.push({
+                whBoxes.push({
                     ...element,
                     ...location,
                 });
             }
         }
-        console.log(boxes);
-        boxes.filter((box) => box.id);
+
+        let result = whBoxes.filter((box) => box.id);
+        // .map(async (box) => {
+        //     const boxInfo = await getBoxInfo(box.id);
+        //     console.log(boxInfo);
+
+        //     return {
+        //         ...box,
+        //         ...boxInfo,
+        //     };
+        // });
+
+        return result;
     };
+    const getBoxInfo = async (boxId: string) => {
+        console.log(`/sandOrder?boxId=${boxId}`);
+        const { read } = useApi(`/sandOrder?boxId=${boxId}`);
+        const box = await read();
+        console.log('Caja', box);
+        console.log('Caja 2', box.value);
+
+        return box;
+    };
+    const stageSheetDetails = computed(() => {
+        console.log(selectedStage);
+
+        return {
+            ...selectedStage,
+        };
+    });
     const setStage = (stage: number) => {
-        selectedStage.value = selectedStage.value === stage ? -1 : stage;
+        if (selectedStage.value.id === stage) {
+            selectedStage.value = -1;
+        } else {
+            selectedStage.value = stages.value.find((s) => s.id === stage);
+        }
     };
     const finalizedStages = computed(() => {
-        return stages.value.filter((stage) => stage.done === stage.weight);
+        return stages.value.filter((stage) => stage.done);
     });
     const pendingStages = computed(() => {
         // return stages.value.filter((stage) => stage.done < stage.weight);
@@ -657,7 +688,7 @@
     };
 
     console.log(warehouse.value);
-    setWareHouseBoxes(warehouse.value);
+    boxes.value = setWareHouseBoxes(warehouse.value);
 </script>
 
 <template>
@@ -671,8 +702,6 @@
             />
             <PrimaryBtn class="col-span-6 md:col-span-3 max-h-12">Finalizar Stage</PrimaryBtn>
         </FieldGroup>
-        {{ clientId }}
-        {{ pitId }}
         <nav class="flex gap-8 mt-10">
             <button
                 :class="isTabSelected(_TABS.PENDING) ? 'selected' : null"
@@ -693,27 +722,36 @@
             <div v-if="isTabSelected(_TABS.PENDING)" class="stage--panel">
                 <StageSheetStage
                     v-for="sheet in pendingStages"
-                    :key="`stage-${sheet.stage}`"
+                    :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
-                    :is-selected-stage="isSageSelected(sheet.id, selectedStage)"
+                    :boxes="boxes"
+                    :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
                     @set-stage="setStage($event)"
                 />
+                <StageSheetStageBox v-if="pendingStages.length <= 0">
+                    <p class="text-center">No hay etapas pendientes</p>
+                </StageSheetStageBox>
             </div>
             <div v-else-if="isTabSelected(_TABS.COMPLETED)" class="stage--panel">
                 <StageSheetStage
                     v-for="sheet in finalizedStages"
-                    :key="`stage-${sheet.stage}`"
+                    :key="`stage-${sheet.id}`"
                     v-bind="sheet"
-                    :is-selected-stage="isSageSelected(sheet.id, selectedStage)"
+                    :boxes="boxes"
+                    :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
                     @set-stage="setStage($event)"
                 />
+                <StageSheetStageBox v-if="finalizedStages.length <= 0">
+                    <p class="text-center p-6">No hay etapas finalizadas</p>
+                </StageSheetStageBox>
             </div>
             <aside>
                 <h3 class="text-3xl font-bold">Detalle</h3>
-                <article v-if="selectedStage === -1" class="px-4 py-6 border rounded-[10px]">
+                <article v-if="selectedStage.id === -1" class="px-4 py-6 border rounded-[10px]">
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
                 </article>
                 <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
+                    {{ stageSheetDetails }}
                     <div class="text-semibold space-y-3">
                         <p>
                             <span>Total Arena A:</span>

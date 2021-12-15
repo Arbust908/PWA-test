@@ -11,6 +11,10 @@
             type: Object,
             required: true,
         },
+        boxes: {
+            type: Array,
+            default: () => [],
+        },
         isSelectedStage: {
             type: Boolean,
             default: false,
@@ -139,13 +143,31 @@
                         <OnClickOutside v-if="isSelectedBox(place)" @trigger="selectedBox = null">
                             <div
                                 :style="`top: ${popUpCords.y}px; left: ${popUpCords.x}px`"
-                                class="top-0 left-0 absolute rounded bg-gray-100 z-40 w-[309px] max-h-[390px] p-6 shadow-md"
+                                class="top-0 left-0 absolute rounded bg-gray-50 z-40 w-[309px] max-h-[390px] p-6 shadow-md"
                             >
                                 <div>
-                                    <h2>Depósito</h2>
-
-                                    I'm a teleported modal! (My parent is "body")
-                                    <button @click="selectedBox = null">Close</button>
+                                    <h2 class="text-xl font-bold">Depósito</h2>
+                                    <nav class="mt-5 mb-4 space-x-6">
+                                        <button
+                                            class="text-sm font-medium text-main-500 pb-3 border-b-2 border-main-500"
+                                        >
+                                            Nivel x
+                                        </button>
+                                        <button class="text-sm text-main-500 pb-3 border-b-2 border-transparent">
+                                            Nivel xx
+                                        </button>
+                                    </nav>
+                                    <button
+                                        v-for="({ id, category, floor, row, col }, index) in boxes"
+                                        :key="index + '_' + id"
+                                        :class="`mesh-box__1 mesh-box__${category} bubble`"
+                                        class="p-3 rounded shadow-sm text-sm w-full text-left"
+                                    >
+                                        {{ id }}::{{ category }} - {{ floor }} - {{ row }} - {{ col }}
+                                    </button>
+                                    <button v-for="(box, index) in boxes" :key="index">
+                                        {{ box }}
+                                    </button>
                                 </div>
                             </div>
                         </OnClickOutside>

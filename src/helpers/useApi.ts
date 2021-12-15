@@ -30,6 +30,8 @@ export function useApi(endpoint: string) {
         watch(data, (newValue) => {
             if (newValue && newValue.data) {
                 entity.value = newValue.data;
+                console.log('Vino Data');
+                console.log(entity.value);
             }
         });
 
