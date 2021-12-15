@@ -9,6 +9,7 @@
                     <ClientPitCombo
                         :client-id="companyClientId"
                         :pit-id="pitId"
+                        validation-type="empty"
                         @update:clientId="companyClientId = $event"
                         @update:pitId="pitId = $event"
                     />
@@ -208,9 +209,9 @@
             "
         />
 
-        <SuccessModal :open="openSuccess" :title="titleSuccess" @action="openSuccess = false" />
-        <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @action="openError = false" />
-        <ErrorModal :open="openErrorGral" :title="titleError" :text="textError" @action="openErrorGral = false" />
+        <SuccessModal :open="openSuccess" :title="titleSuccess" @main="openSuccess = false" />
+        <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @main="openError = false" />
+        <ErrorModal :open="openErrorGral" :title="titleError" :text="textError" @main="openErrorGral = false" />
     </Layout>
 </template>
 
@@ -255,6 +256,7 @@
     import TimePicker from '@/components/ui/form/TimePicker.vue';
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import DatePicker from '@/components/ui/form/DatePicker.vue';
+    import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
 
     const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
     const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
@@ -262,6 +264,7 @@
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
+        emits: ['firstUse'],
         components: {
             Layout,
             SecondaryBtn,
@@ -281,6 +284,7 @@
             SuccessModal,
             ErrorModal,
             GhostBtn,
+            InvalidInputLabel,
         },
         setup() {
             const filteredDrivers = computed(() => {
@@ -686,6 +690,7 @@
                 titleErrorGral,
                 textErrorGral,
                 GhostBtn,
+                InvalidInputLabel,
                 soLength,
                 localDate,
                 localTime,

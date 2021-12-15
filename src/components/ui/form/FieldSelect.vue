@@ -8,7 +8,7 @@
             :id="fieldName"
             v-model.number="value"
             class="input"
-            :class="noOptionSelected && 'unselected'"
+            :class="noOptionSelected && 'unselected' && selectClass ? 'error' : 'input'"
             :name="fieldName"
             :disabled="isDisabled"
             @blur="$emit('is-blured')"
@@ -93,6 +93,10 @@
                 type: Boolean,
                 default: true,
             },
+            selectClass: {
+                type: Boolean,
+                default: false,
+            },
         },
         setup(props, { emit }) {
             const value = useVModel(props, 'data', emit);
@@ -115,12 +119,17 @@
 
             const noOptionSelected = computed(() => value.value === -1);
 
+            function conLog() {
+                console.log(selectClass.value);
+            }
+
             return {
                 value,
                 resources,
                 epData,
                 ...props,
                 noOptionSelected,
+                conLog,
             };
         },
     });
@@ -139,5 +148,8 @@
     }
     .unselected option:first-child {
         color: #a6a6a6;
+    }
+    .error {
+        @apply border-red-500;
     }
 </style>
