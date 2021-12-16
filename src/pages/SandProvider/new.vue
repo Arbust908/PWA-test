@@ -18,8 +18,7 @@
             </form>
         </section>
 
-        <!-- *** -->
-        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-arena')">
                     Cancelar
@@ -31,41 +30,50 @@
         </footer>
 
         <SuccessModal
-            :open="showSuccessModal"
-            text="¡El centro de carga fue guardado con éxito!"
+            :open="showModal"
+            title="¡El centro de carga fue guardado con éxito!"
             @close="$router.push('/proveedores-de-arena')"
             @main="$router.push('/proveedores-de-arena')"
         />
         <ErrorModal
-            :open="notificationModalvisible"
-            :text="errorMessage"
-            @close="toggleNotificationModal()"
-            @main="toggleNotificationModal()"
+            :open="showNameErrorModal"
+            title="Ya existe un centro de carga con este nombre."
+            text="El forklift que intentas guardar fue creado anteriormente."
+            @close="showNameErrorModal = false"
+            @main="showNameErrorModal = false"
         />
         <ErrorModal
-            :open="showErrorModal"
+            :open="showCuilErrorModal"
             title="Ya existe un centro de carga con este CUIT."
             text="El centro de carga que intenta registrar fue creado anteriormente."
-            @close="showErrorModal = false"
-            @main="showErrorModal = false"
+            @close="showCuilErrorModal = false"
+            @main="showCuilErrorModal = false"
         />
     </Layout>
 </template>
 
 <script lang="ts">
-    import axios from 'axios';
-    import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
-    import { useStoreLogic } from '@/helpers/useStoreLogic';
-    import { useValidator } from '@/helpers/useValidator';
-
-    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import { ref, Ref, watchEffect } from 'vue';
+    import { useStore } from 'vuex';
+    import { useRouter } from 'vue-router';
+    import { useTitle } from '@vueuse/core';
+    import { useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
     import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import Modal from '@/components/modal/General.vue';
+    import { useStoreLogic } from '@/helpers/useStoreLogic';
+    import { useValidator } from '@/helpers/useValidator';
+    import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
+
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
 
+    import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
@@ -75,6 +83,8 @@
             PrimaryBtn,
             SandProviderForm,
             SandProviderRep,
+            Modal,
+            Icon,
             ErrorModal,
             SuccessModal,
         },
@@ -95,6 +105,15 @@
             const loading = ref(false);
 
             const isValidated = ref(false);
+
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showNameErrorModal = ref(false);
+            const toggleNameErrorModal = useToggle(showNameErrorModal);
+
+            const showCuilErrorModal = ref(false);
+            const toggleCuilErrorModal = useToggle(showCuilErrorModal);
 
             const companyRepresentative: CompanyRepresentative = ref({
                 companyRepresentativeName: '',
@@ -117,12 +136,19 @@
 
             const save = async () => {
                 const legalIdExists = await checkIfExists('legalId', sandProvider.value.legalId);
-
                 if (legalIdExists) {
-                    showErrorModal.value = true;
-
+                    console.log('id existe');
+                    toggleCuilErrorModal();
                     return;
                 }
+
+                const nameExists = await checkIfExists('name', sandProvider.value.name);
+                if (nameExists) {
+                    console.log('nombre existe');
+                    toggleNameErrorModal();
+                    return;
+                }
+
                 loading.value = true;
                 sandProvider.value.companyRepresentative = companyRepresentative.value;
 
@@ -136,7 +162,7 @@
 
                     return;
                 }
-                showSuccessModal.value = true;
+                toggleModal();
             };
 
             const checkIfExists = async (field: string, value: string) => {
@@ -149,18 +175,23 @@
             };
 
             return {
-                companyRepresentative,
-                errorMessage,
                 isNewRep,
-                isValidated,
-                loading,
-                notificationModalvisible,
-                sandProvider,
-                save,
-                showErrorModal,
-                showSuccessModal,
-                toggleNotificationModal,
                 toggleRepStatus,
+                companyRepresentative,
+                sandProvider,
+                isValidated,
+                save,
+                notificationModalvisible,
+                toggleNotificationModal,
+                errorMessage,
+                loading,
+                showModal,
+                showNameErrorModal,
+                showCuilErrorModal,
+                toggleModal,
+                toggleCuilErrorModal,
+                toggleNameErrorModal,
+                showSuccessModal,
             };
         },
     };

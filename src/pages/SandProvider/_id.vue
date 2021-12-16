@@ -29,23 +29,24 @@
         </footer>
 
         <SuccessModal
-            :open="showSuccessModal"
-            text="¡El centro de carga fue guardado con éxito!"
+            :open="showModal"
+            title="¡El centro de carga fue guardado con éxito!"
             @close="$router.push('/proveedores-de-arena')"
             @main="$router.push('/proveedores-de-arena')"
         />
         <ErrorModal
-            :open="notificationModalvisible"
-            :text="errorMessage"
-            @close="toggleNotificationModal()"
-            @main="toggleNotificationModal()"
+            :open="showNameErrorModal"
+            title="Ya existe un centro de carga con este nombre."
+            text="El forklift que intentas guardar fue creado anteriormente."
+            @close="showNameErrorModal = false"
+            @main="showNameErrorModal = false"
         />
         <ErrorModal
-            :open="showErrorModal"
+            :open="showCuilErrorModal"
             title="Ya existe un centro de carga con este CUIT."
             text="El centro de carga que intenta registrar fue creado anteriormente."
-            @close="showErrorModal = false"
-            @main="showErrorModal = false"
+            @close="showCuilErrorModal = false"
+            @main="showCuilErrorModal = false"
         />
     </Layout>
 </template>
@@ -57,12 +58,14 @@
     import { useValidator } from '@/helpers/useValidator';
 
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
-    import ErrorModal from '@/components/modal/ErrorModal.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
     import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
@@ -91,8 +94,14 @@
             const meshTypes = ref([]);
             const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-            const showErrorModal = ref(false);
-            const showSuccessModal = ref(false);
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showNameErrorModal = ref(false);
+            const toggleNameErrorModal = useToggle(showNameErrorModal);
+
+            const showCuilErrorModal = ref(false);
+            const toggleCuilErrorModal = useToggle(showCuilErrorModal);
 
             const currentSandProvider: SandProvider = ref({
                 meshType: [],
@@ -119,10 +128,16 @@
                 }
 
                 const legalIdExists = await checkIfExists('legalId', currentSandProvider.value.legalId);
-
                 if (legalIdExists) {
-                    showErrorModal.value = true;
+                    console.log('id existe');
+                    toggleCuilErrorModal();
+                    return;
+                }
 
+                const nameExists = await checkIfExists('name', currentSandProvider.value.name);
+                if (nameExists) {
+                    console.log('nombre existe');
+                    toggleNameErrorModal();
                     return;
                 }
 
@@ -135,7 +150,7 @@
                     errorMessage.value = res.message;
                     toggleNotificationModal();
                 } else if (res.type == 'success') {
-                    showSuccessModal.value = true;
+                    toggleModal();
                 }
             };
 
@@ -183,8 +198,12 @@
                 errorMessage,
                 meshTypes,
                 loading,
-                showErrorModal,
-                showSuccessModal,
+                showModal,
+                showNameErrorModal,
+                showCuilErrorModal,
+                toggleModal,
+                toggleCuilErrorModal,
+                toggleNameErrorModal,
             };
         },
     };
