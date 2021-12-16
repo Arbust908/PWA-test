@@ -4,7 +4,7 @@
         <section class="bg-white rounded-md shadow-sm max-w-2xl pb-5">
             <UserForm v-model="user" />
         </section>
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl m">
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl m">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/usuarios')"> Cancelar </SecondaryBtn>
                 <PrimaryBtn btn="wide" :is-loading="isLoading" :disabled="!isValidated" @click="isValidated && save()">

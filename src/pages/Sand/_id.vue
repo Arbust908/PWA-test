@@ -171,6 +171,6 @@
         @apply bg-white rounded-md shadow-sm max-w-2xl pb-5;
     }
     footer {
-        @apply mt-[32px] gap-3 flex flex-row max-w-2xl w-full space-x-3 items-center justify-end;
+        @apply mt-8 gap-3 flex flex-row max-w-2xl w-full space-x-3 items-center justify-end;
     }
 </style>

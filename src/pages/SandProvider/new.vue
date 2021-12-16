@@ -8,17 +8,14 @@
                 <SandProviderForm v-model="sandProvider" />
 
                 <SandProviderRep
-                    :rep-name="companyRepresentative.name"
-                    :rep-phone="companyRepresentative.phone"
-                    :rep-email="companyRepresentative.email"
-                    @update:repName="companyRepresentative.name = $event"
-                    @update:repPhone="companyRepresentative.phone = $event"
-                    @update:repEmail="companyRepresentative.email = $event"
+                    v-model:rep-name="companyRepresentative.name"
+                    v-model:rep-phone="companyRepresentative.phone"
+                    v-model:rep-email="companyRepresentative.email"
                 />
             </form>
         </section>
 
-        <footer class="mt-[32px] gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-arena')">
                     Cancelar
@@ -53,18 +50,12 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, watchEffect } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-    import { useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
     import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
-    import Modal from '@/components/modal/General.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
     import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
@@ -83,8 +74,6 @@
             PrimaryBtn,
             SandProviderForm,
             SandProviderRep,
-            Modal,
-            Icon,
             ErrorModal,
             SuccessModal,
         },
@@ -136,16 +125,18 @@
 
             const save = async () => {
                 const legalIdExists = await checkIfExists('legalId', sandProvider.value.legalId);
+
                 if (legalIdExists) {
-                    console.log('id existe');
                     toggleCuilErrorModal();
+
                     return;
                 }
 
                 const nameExists = await checkIfExists('name', sandProvider.value.name);
+
                 if (nameExists) {
-                    console.log('nombre existe');
                     toggleNameErrorModal();
+
                     return;
                 }
 
@@ -175,23 +166,23 @@
             };
 
             return {
-                isNewRep,
-                toggleRepStatus,
                 companyRepresentative,
-                sandProvider,
-                isValidated,
-                save,
-                notificationModalvisible,
-                toggleNotificationModal,
                 errorMessage,
+                isNewRep,
+                isValidated,
                 loading,
+                notificationModalvisible,
+                sandProvider,
+                save,
+                showCuilErrorModal,
                 showModal,
                 showNameErrorModal,
-                showCuilErrorModal,
-                toggleModal,
-                toggleCuilErrorModal,
-                toggleNameErrorModal,
                 showSuccessModal,
+                toggleCuilErrorModal,
+                toggleModal,
+                toggleNameErrorModal,
+                toggleNotificationModal,
+                toggleRepStatus,
             };
         },
     };
