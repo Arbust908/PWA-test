@@ -9,13 +9,14 @@
                     <ClientPitCombo
                         :client-id="companyClientId"
                         :pit-id="pitId"
+                        validation-type="empty"
                         @update:clientId="companyClientId = $event"
                         @update:pitId="pitId = $event"
                     />
                 </FieldGroup>
                 <FieldLegend>Arena</FieldLegend>
                 <template v-for="(providerId, sandProvidersKey) in sandProvidersIds" :key="sandProvidersKey">
-                    <div class="max-w-2xl w-full grid grid-cols-12 gap-6 mb-4">
+                    <div class="max-w-2xl w-full grid grid-cols-12 gap-6 gap-y-0 mb-4">
                         <FieldSelect
                             class="col-span-12 mt-5 md:col-span-6"
                             field-name="sandProvider"
@@ -23,9 +24,17 @@
                             placeholder="Seleccionar centro de carga"
                             endpoint="/sandProvider"
                             :data="providerId.id"
+                            :select-class="useFirstSP"
                             @update:data="providerId.id = $event"
                             @change="changeProvider"
+                            @click="useFirstSP = true"
                         />
+                        <div class="col-span-12 m-0 p-0 gap-0">
+                            <InvalidInputLabel
+                                v-if="providerId.id === -1 && useFirstSP === true"
+                                validation-type="empty"
+                            />
+                        </div>
                     </div>
                     <FieldGroup
                         v-for="(order, orderKey) in providerId.sandOrders"
@@ -33,16 +42,24 @@
                         class="max-w-3xl relative"
                         :class="isFirst(orderKey) ? null : ' mt-5'"
                     >
-                        <FieldSelect
-                            :title="orderKey === 0 ? 'Tipo' : ''"
-                            class="col-span-12 sm:col-span-3"
-                            field-name="sandType"
-                            placeholder="Tipo de Arena"
-                            endpoint-key="type"
-                            :data="order.sandTypeId"
-                            :endpoint-data="filteredSandTypes"
-                            @update:data="order.sandTypeId = $event"
-                        />
+                        <div class="col-span-12 sm:col-span-3">
+                            <FieldSelect
+                                :title="orderKey === 0 ? 'Tipo' : ''"
+                                field-name="sandType"
+                                placeholder="Tipo de Arena"
+                                endpoint-key="type"
+                                :data="order.sandTypeId"
+                                :endpoint-data="filteredSandTypes"
+                                :select-class="useFirstST"
+                                @update:data="order.sandTypeId = $event"
+                                @click="useFirstST = true"
+                            />
+                            <InvalidInputLabel
+                                v-if="order.sandTypeId === -1 && useFirstST === true"
+                                validation-type="empty"
+                                class="text-xs"
+                            />
+                        </div>
                         <FieldWithSides
                             :title="orderKey === 0 ? 'Cantidad' : ''"
                             class="col-span-7 sm:col-span-3"
@@ -50,12 +67,12 @@
                             placeholder="Arena"
                             type="number"
                             mask="####"
-                            required-validation
-                            validation-type="extension"
-                            :char-amount="{ min: 1, max: 4 }"
+                            validation-type="empty"
+                            :number-validation="useFirstSQ"
                             :post="{ title: '0', value: 't', width: '3rem' }"
                             :data="order.amount"
                             @update:data="order.amount = $event"
+                            @click="useFirstSQ = true"
                         />
                         <FieldInput
                             :title="orderKey === 0 ? 'ID de caja' : ''"
@@ -73,6 +90,7 @@
                         >
                             <CircularBtn
                                 v-if="useIfNotLonly(providerId.sandOrders)"
+                                class="flex self-start"
                                 size="sm"
                                 @click="removeOrder(order.id, providerId.innerId)"
                             >
@@ -81,6 +99,7 @@
                             <!-- Arena Section -->
                             <CircularBtn
                                 v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
+                                class="flex self-start"
                                 size="sm"
                                 btn="bg-green-500"
                                 @click.prevent="addOrder(providerId.innerId)"
@@ -92,29 +111,44 @@
                 </template>
                 <FieldGroup class="max-w-3xl relative">
                     <FieldLegend class="mt-2">Transporte</FieldLegend>
-                    <FieldSelect
-                        class="col-span-12 md:col-span-6"
-                        field-name="transportProvider"
-                        title="Proveedor"
-                        placeholder="Selecciona proveedor"
-                        endpoint="/transportProvider"
-                        :data="transportProviderId"
-                        @update:data="transportProviderId = $event"
-                    />
+                    <div class="col-span-12 md:col-span-6">
+                        <FieldSelect
+                            field-name="transportProvider"
+                            title="Proveedor"
+                            placeholder="Selecciona proveedor"
+                            endpoint="/transportProvider"
+                            :data="transportProviderId"
+                            :select-class="useFirstTP"
+                            @update:data="transportProviderId = $event"
+                            @click="useFirstTP = true"
+                        />
+                        <InvalidInputLabel
+                            v-if="transportProviderId === -1 && useFirstTP === true"
+                            validation-type="empty"
+                        />
+                    </div>
 
                     <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="col-span-full relative">
-                        <FieldSelect
-                            class="col-span-12 sm:col-span-5 md:col-span-6"
-                            title="Conductores"
-                            field-name="transportProvider2"
-                            placeholder="Seleccionar Conductor"
-                            :endpoint-data="filteredDrivers"
-                            :data="driverId"
-                            @update:data="
-                                driverId = $event;
-                                to.driverId = $event;
-                            "
-                        />
+                        <div class="col-span-12 sm:col-span-5 md:col-span-6">
+                            <FieldSelect
+                                title="Conductores"
+                                field-name="transportProvider2"
+                                placeholder="Seleccionar Conductor"
+                                :endpoint-data="filteredDrivers"
+                                :data="driverId"
+                                :select-class="useFirstDriver"
+                                @update:data="
+                                    driverId = $event;
+                                    to.driverId = $event;
+                                "
+                                @click="useFirstDriver = true"
+                            />
+                            <InvalidInputLabel
+                                v-if="driverId === -1 && useFirstDriver === true"
+                                validation-type="empty"
+                            />
+                        </div>
+
                         <FieldInput
                             title="Patente camión"
                             class="col-span-6 sm:col-span-3"
@@ -158,7 +192,12 @@
                     <section class="flex gap-2 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
-                            <DatePicker v-model="localDate" class="mr-6 md:mr-8" @date-object="dateObject = $event" />
+                            <DatePicker
+                                v-model="localDate"
+                                validation-type="empty"
+                                class="mr-6 md:mr-8"
+                                @date-object="dateObject = $event"
+                            />
                         </label>
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Hora de entrega</p>
@@ -208,9 +247,9 @@
             "
         />
 
-        <SuccessModal :open="openSuccess" :title="titleSuccess" @action="openSuccess = false" />
-        <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @action="openError = false" />
-        <ErrorModal :open="openErrorGral" :title="titleError" :text="textError" @action="openErrorGral = false" />
+        <SuccessModal :open="openSuccess" :title="titleSuccess" @main="openSuccess = false" />
+        <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @main="openError = false" />
+        <ErrorModal :open="openErrorGral" :title="titleError" :text="textError" @main="openErrorGral = false" />
     </Layout>
 </template>
 
@@ -255,6 +294,7 @@
     import TimePicker from '@/components/ui/form/TimePicker.vue';
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import DatePicker from '@/components/ui/form/DatePicker.vue';
+    import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
 
     const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
     const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
@@ -281,6 +321,7 @@
             SuccessModal,
             ErrorModal,
             GhostBtn,
+            InvalidInputLabel,
         },
         setup() {
             const filteredDrivers = computed(() => {
@@ -373,6 +414,8 @@
                 filteredSandTypes.value = provider.meshType;
             };
 
+            const useFirstSP = ref(false);
+
             const defaultTransportOrder = {
                 innerId: 0,
                 boxAmount: 1,
@@ -445,6 +488,7 @@
 
             const sandTypes = ref([] as Array<Sand>);
             const { data: sandTypesData } = useAxios('/sand', instance);
+            const useFirstST = ref(false);
 
             watch(sandTypesData, (sOData, prevCount) => {
                 if (sOData && sOData.data) {
@@ -474,6 +518,9 @@
                 soLength.value = sandOrder.length;
                 TransportOrders.value[0].boxAmount = soLength.value;
             };
+
+            const useFirstSQ = ref(false);
+
             // :: TransportProvider
             const transportProviders = ref([]);
             const { data: tPData } = useAxios('/transportProvider', instance);
@@ -492,6 +539,9 @@
                 amount: null,
             });
             // >> TransportProvider
+            const useFirstTP = ref(false);
+            const useFirstDriver = ref(false);
+
             const isFull: ComputedRef<boolean> = computed(() => {
                 const hasPit = pitId.value >= 0;
                 const hasClient = companyClientId.value >= 0;
@@ -686,6 +736,7 @@
                 titleErrorGral,
                 textErrorGral,
                 GhostBtn,
+                InvalidInputLabel,
                 soLength,
                 localDate,
                 localTime,
@@ -704,6 +755,11 @@
                 openErrorGral,
                 incomplete,
                 purchaseId,
+                useFirstSP,
+                useFirstST,
+                useFirstTP,
+                useFirstDriver,
+                useFirstSQ,
             };
         },
     };
