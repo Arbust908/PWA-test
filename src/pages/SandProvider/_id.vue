@@ -64,7 +64,6 @@
     import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
 
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     import ErrorModal from '@/components/modal/ErrorModal.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
 
@@ -128,16 +127,18 @@
                 }
 
                 const legalIdExists = await checkIfExists('legalId', currentSandProvider.value.legalId);
+
                 if (legalIdExists) {
-                    console.log('id existe');
                     toggleCuilErrorModal();
+
                     return;
                 }
 
                 const nameExists = await checkIfExists('name', currentSandProvider.value.name);
+
                 if (nameExists) {
-                    console.log('nombre existe');
                     toggleNameErrorModal();
+
                     return;
                 }
 
@@ -178,7 +179,6 @@
             const checkIfExists = async (field: string, value: string) => {
                 //TODO: Refactor with useStoreLogic ? (useStoreLogic not accept filters)
                 const apiResponse = await axios.get(`${api}/sandProvider?${field}=${value}?id__`);
-
                 const sandProviders = apiResponse.data.data;
 
                 return sandProviders.filter((sp) => sp.id !== currentSandProvider.value.id).length > 0;
@@ -208,48 +208,3 @@
         },
     };
 </script>
-
-<style lang="scss" scoped>
-    .btn {
-        &__draft {
-            @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-        }
-        &__delete {
-            @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-            /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-        }
-        &__add {
-            @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-        }
-        &__add--special {
-            @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-        }
-        &__mobile-only {
-            @apply lg:hidden;
-        }
-        &__desktop-only {
-            @apply hidden lg:inline-flex;
-        }
-    }
-    .input {
-        @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
-    }
-    input:read-only {
-        @apply bg-second-200 border cursor-not-allowed;
-    }
-    fieldset:not(:last-of-type) {
-        @apply border-b pb-6;
-    }
-    label:not(.toggle) {
-        @apply flex flex-col;
-        span {
-            @apply text-sm;
-        }
-    }
-    .toggle {
-        @apply flex space-x-3 items-center;
-    }
-    .equip-grid {
-        @apply grid gap-4 grid-cols-2 md:grid-cols-3;
-    }
-</style>
