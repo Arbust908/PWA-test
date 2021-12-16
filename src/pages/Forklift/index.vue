@@ -199,11 +199,13 @@
 
             const updateVisibility = async (forklift) => {
                 const payload = {
-                    ...forklift,
+                    name: forklift.name,
+                    id: forklift.id,
                     visible: !forklift.visible,
                 };
-                delete payload.owned;
+                // delete payload.owned;
                 await store.dispatch('forklift_update', payload);
+                await getForklifts();
             };
 
             const getForklifts = async () => {
