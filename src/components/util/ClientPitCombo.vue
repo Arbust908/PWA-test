@@ -10,12 +10,11 @@
             :data="clientId"
             :is-disabled="isDisabled"
             :select-class="useFirstClient"
-            @update:select-class="useFirstClient = $event"
             @update:data="clientId = $event"
             @click="useFirstClient = true"
         />
         <FieldLoading v-else class="col-span-6" />
-        <InvalidInputLabel v-if="clientId == -1 && useFirstClient == true" :validation-type="validationType" />
+        <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" :validation-type="validationType" />
     </div>
     <div class="col-span-full md:col-span-6">
         <FieldSelect
@@ -26,11 +25,12 @@
             :endpoint-data="pits"
             :data="pitId"
             :is-disabled="isDisabled"
+            :select-class="useFirstPit"
             @update:data="pitId = $event"
             @click="useFirstPit = true"
         />
         <FieldLoading v-else class="col-span-6" />
-        <InvalidInputLabel v-if="pitId == -1 && useFirstPit == true" :validation-type="validationType" />
+        <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" :validation-type="validationType" />
     </div>
 </template>
 
@@ -144,6 +144,10 @@
             });
 
             const useFirstClient = ref(false);
+            watch(useFirstClient, (newVal) => {
+                useFirstClient.value = newVal;
+                console.log(useFirstClient.value);
+            });
             const useFirstPit = ref(false);
 
             return {

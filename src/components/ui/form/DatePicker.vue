@@ -10,9 +10,11 @@
                 getDate();
                 checkDate();
                 formatDate();
+                conLog();
             "
         />
     </div>
+    <InvalidInputLabel v-if="localDate.length === 0 && error != true" validation-type="empty" />
     <div v-if="error">
         <span class="label-wrapper">
             <div class="icon-wrapper">
@@ -27,11 +29,13 @@
     import { ref, computed } from 'vue';
     import { maska } from 'maska';
     import Icon from '@/components/icon/TheAllIcon.vue';
+    import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
     export default {
         name: 'DatePicker',
 
         components: {
             Icon,
+            InvalidInputLabel,
         },
 
         directives: { maska },
@@ -43,6 +47,9 @@
             },
             error: {
                 type: Boolean,
+            },
+            validationType: {
+                type: String,
             },
         },
 
@@ -70,6 +77,10 @@
                 day = parseInt(dateSplit[0]);
                 month = parseInt(dateSplit[1]);
                 year = parseInt(dateSplit[2]);
+            }
+
+            function conLog() {
+                console.log(props.modelValue.length);
             }
 
             function leapYear(year: number) {
@@ -138,7 +149,7 @@
                 emit('date-object', dateObject);
             }
 
-            return { date, getDate, localDate, checkDate, formatDate, error, Icon };
+            return { date, getDate, localDate, checkDate, formatDate, error, Icon, conLog };
         },
     };
 </script>
