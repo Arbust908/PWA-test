@@ -57,6 +57,7 @@
                             <InvalidInputLabel
                                 v-if="order.sandTypeId === -1 && useFirstST === true"
                                 validation-type="empty"
+                                class="text-xs"
                             />
                         </div>
                         <FieldWithSides
@@ -66,12 +67,12 @@
                             placeholder="Arena"
                             type="number"
                             mask="####"
-                            required-validation
                             validation-type="empty"
-                            :char-amount="{ min: 1, max: 4 }"
+                            :number-validation="useFirstSQ"
                             :post="{ title: '0', value: 't', width: '3rem' }"
                             :data="order.amount"
                             @update:data="order.amount = $event"
+                            @click="useFirstSQ = true"
                         />
                         <FieldInput
                             :title="orderKey === 0 ? 'ID de caja' : ''"
@@ -89,6 +90,7 @@
                         >
                             <CircularBtn
                                 v-if="useIfNotLonly(providerId.sandOrders)"
+                                class="flex self-start"
                                 size="sm"
                                 @click="removeOrder(order.id, providerId.innerId)"
                             >
@@ -97,6 +99,7 @@
                             <!-- Arena Section -->
                             <CircularBtn
                                 v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
+                                class="flex self-start"
                                 size="sm"
                                 btn="bg-green-500"
                                 @click.prevent="addOrder(providerId.innerId)"
@@ -299,7 +302,6 @@
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
-        emits: ['firstUse'],
         components: {
             Layout,
             SecondaryBtn,
@@ -516,6 +518,9 @@
                 soLength.value = sandOrder.length;
                 TransportOrders.value[0].boxAmount = soLength.value;
             };
+
+            const useFirstSQ = ref(false);
+
             // :: TransportProvider
             const transportProviders = ref([]);
             const { data: tPData } = useAxios('/transportProvider', instance);
@@ -754,6 +759,7 @@
                 useFirstST,
                 useFirstTP,
                 useFirstDriver,
+                useFirstSQ,
             };
         },
     };

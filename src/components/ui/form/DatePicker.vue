@@ -1,5 +1,5 @@
 <template>
-    <div class="flex p-1 items-center rounded border border-second-300">
+    <div class="flex p-1 items-center rounded border border-second-300" :class="errorBorder">
         <input
             v-model="localDate"
             v-maska="'##/##/####'"
@@ -10,17 +10,17 @@
                 getDate();
                 checkDate();
                 formatDate();
-                conLog();
+                usedInput();
             "
         />
     </div>
-    <InvalidInputLabel v-if="localDate.length === 0 && error != true" validation-type="empty" />
-    <div v-if="error">
+    <InvalidInputLabel v-if="localDate.length === 0 && used === true" validation-type="empty" class="text-xs" />
+    <div v-if="error && localDate.length > 0">
         <span class="label-wrapper">
             <div class="icon-wrapper">
                 <Icon icon="ExclamationCircle" type="solid" class="icon" />
             </div>
-            <div class="message-wrapper">Fecha Incorrecta</div>
+            <div class="message-wrapper text-xs">Fecha Incorrecta</div>
         </span>
     </div>
 </template>
@@ -70,6 +70,15 @@
             let year = 0;
 
             const error = ref(false);
+            const used = ref(false);
+
+            const usedInput = () => {
+                used.value = true;
+            };
+
+            const errorBorder = computed(() => {
+                return (used.value && localDate.value.length === 0) || error.value ? 'border-red-500' : null;
+            });
 
             function getDate() {
                 date = props.modelValue;
@@ -77,10 +86,6 @@
                 day = parseInt(dateSplit[0]);
                 month = parseInt(dateSplit[1]);
                 year = parseInt(dateSplit[2]);
-            }
-
-            function conLog() {
-                console.log(props.modelValue.length);
             }
 
             function leapYear(year: number) {
@@ -115,31 +120,30 @@
             }
 
             function checkDate() {
-                error.value = false;
-                let currentYear = new Date();
-                leapYear(year);
-                monthLength(month);
+                if (localDate.value.length > 0) {
+                    error.value = false;
+                    let currentYear = new Date();
+                    leapYear(year);
+                    monthLength(month);
 
-                if (year > currentYear.getFullYear() + 10 || year < currentYear.getFullYear()) {
-                    localDate.value = '';
-                    error.value = true;
-                }
+                    if (year > currentYear.getFullYear() + 10 || year < currentYear.getFullYear()) {
+                        error.value = true;
+                    }
 
-                if (month < 1 || month > 12) {
-                    localDate.value = '';
-                    error.value = true;
-                }
+                    if (month < 1 || month > 12) {
+                        error.value = true;
+                    }
 
-                if (
-                    day < 1 ||
-                    (dayLimit === 31 && day > 31) ||
-                    (dayLimit === 30 && day > 30) ||
-                    (dayLimit === 28 && day > 28 && leap == false) ||
-                    (dayLimit === 28 && day > 29 && leap == true) ||
-                    dayLimit === 1
-                ) {
-                    localDate.value = '';
-                    error.value = true;
+                    if (
+                        day < 1 ||
+                        (dayLimit === 31 && day > 31) ||
+                        (dayLimit === 30 && day > 30) ||
+                        (dayLimit === 28 && day > 28 && leap == false) ||
+                        (dayLimit === 28 && day > 29 && leap == true) ||
+                        dayLimit === 1
+                    ) {
+                        error.value = true;
+                    }
                 }
             }
             let dateObject = {};
@@ -149,7 +153,18 @@
                 emit('date-object', dateObject);
             }
 
-            return { date, getDate, localDate, checkDate, formatDate, error, Icon, conLog };
+            return {
+                date,
+                getDate,
+                localDate,
+                checkDate,
+                formatDate,
+                error,
+                Icon,
+                used,
+                usedInput,
+                errorBorder,
+            };
         },
     };
 </script>
