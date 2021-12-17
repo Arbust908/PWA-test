@@ -9,7 +9,10 @@
                 title="Centro de Carga de Arena"
                 endpoint="/sandProvider"
                 :data="sPov.id"
-                @update:data="(sPov.id = $event), handleSandProviderUpdate($event)"
+                @update:data="
+                    sPov.id = $event;
+                    handleSandProviderUpdate($event);
+                "
             />
 
             <div
@@ -22,52 +25,53 @@
                     :title="Key === 0 ? 'Tipo' : ''"
                     field-name="sandType"
                     placeholder="Arena"
-                    endpoint="/sand"
                     endpoint-key="type"
                     :data="so.sandTypeId"
-                    :filtered-data="filteredSandTypes"
+                    :endpoint-data="filteredSandTypes"
                     @update:data="so.sandTypeId = $event"
                 />
                 <FieldWithSides
                     class="col-span-5 sm:col-span-3"
-                    :title="Key === 0 ? 'Peso' : ''"
+                    :title="Key === 0 ? 'Cantidad' : ''"
                     :field-name="`sandQuantity${Key}`"
-                    placeholder="0 t"
+                    placeholder="0"
                     type="number"
+                    mask="####"
+                    require-validation
+                    validation-type="extension"
+                    :char-amount="{ min: 1, max: 4 }"
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
                     :data="so.amount"
                     @update:data="so.amount = $event"
                 />
-                <!-- <AmountInput
-                    :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
-                    :title="Key === 0"
-                    :amount="so.amount"
-                    @update:amount="so.amount = $event"
-                /> -->
-                <div
-                    v-if="sPov.SandOrders.length > 0 && Key + 1 === sPov.SandOrders.length"
-                    class="col-span-1 my-auto mx-auto hidden sm:block"
-                >
-                    <Icon
-                        icon="PlusCircle"
-                        outline
-                        class="w-7 h-7 text-green-500 mr-1"
-                        :class="sPov.SandOrders.length == 1 ? 'mt-7' : 'mt-2'"
-                        @click.prevent="addSandOrder(sPov.innerId)"
-                    />
-                </div>
-                <div class="col-span-2 ml-2 my-auto">
-                    <Icon
+                <div class="flex flex-row content-evenly">
+                    <div
                         v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length"
-                        icon="Trash"
-                        outline
-                        class="w-6 h-6"
-                        :class="Key + 1 === sPov.SandOrders.length ? 'mt-2' : 'mt-6'"
-                        @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
-                    />
+                        class="ml-2 mr-6 my-auto mx-auto"
+                    >
+                        <Icon
+                            icon="Trash"
+                            outline
+                            class="w-6 h-6 align-middle"
+                            :class="isFirst(Key, sPov.SandOrders) ? 'mt-6' : 'mt-2'"
+                            @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
+                        />
+                    </div>
+                    <div
+                        v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4 && isLast(Key, sPov.SandOrders)"
+                        class="ml-4 my-auto hidden sm:block"
+                    >
+                        <Icon
+                            icon="PlusCircle"
+                            outline
+                            class="w-7 h-7 text-green-500"
+                            :class="sPov.SandOrders.length == 1 ? 'mt-7' : 'mt-2'"
+                            @click.prevent="addSandOrder(sPov.innerId)"
+                        />
+                    </div>
                 </div>
             </div>
-            <div class="col-span-full mt-2 sm:hidden">
+            <div v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4" class="col-span-full mt-2 sm:hidden">
                 <button class="flex items-center" @click.prevent="addSandOrder(sPov.innerId)">
                     <Icon icon="PlusCircle" outline class="w-6 h-6 text-green-500" />
                     <span class="font-semibold text pl-1">Agregar</span>
@@ -88,6 +92,8 @@
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
     import { useVModel } from '@vueuse/core';
     import { SandProvider, SandOrder } from '@/interfaces/sandflow';
+    import { isFirst, isLast } from '@/helpers/iteretionHelpers';
+
     const defaultSandOrder: SandOrder = {
         innerId: 0,
         sandTypeId: -1,
@@ -100,9 +106,7 @@
     };
     export default defineComponent({
         components: {
-            CircularBtn,
             FieldGroup,
-            FieldInput,
             FieldLegend,
             FieldSelect,
             FieldWithSides,
@@ -118,6 +122,7 @@
                 required: true,
             },
         },
+        emits: ['update:sandProviders', 'update:sandOrders', 'sandProviderHandler'],
         setup(props, { emit }) {
             const sandProviders = useVModel(props, 'sandProviders', emit);
 
@@ -137,6 +142,7 @@
                 newSandOrder.innerId = ++sandOrderInnerId.value;
                 const currSP = getCurrentSandProvider(spId);
                 currSP?.SandOrders?.push(newSandOrder);
+                console.log(newSandOrder);
             };
             const removeSandOrder = (spId: number, soInid: number) => {
                 const currSP = getCurrentSandProvider(spId);
@@ -169,8 +175,8 @@
                 addSandProvider();
             }
 
-            const handleSandProviderUpdate = (id: Number) => {
-                emit('sand-provider-handler', id);
+            const handleSandProviderUpdate = (id: number) => {
+                emit('sandProviderHandler', id);
                 cleanSandOrders();
             };
 
@@ -184,6 +190,8 @@
                 filteredSandTypes,
                 cleanSandOrders,
                 handleSandProviderUpdate,
+                isLast,
+                isFirst,
             };
         },
     });

@@ -8,7 +8,7 @@
             :id="fieldName"
             v-model.number="value"
             class="input"
-            :class="noOptionSelected && 'unselected'"
+            :class="selectClasses"
             :name="fieldName"
             :disabled="isDisabled"
             @blur="$emit('is-blured')"
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-    import { defineComponent, computed, ref, toRefs, watchEffect } from 'vue';
+    import { defineComponent, computed, ref, toRefs, watch, watchEffect } from 'vue';
     import { useVModel } from '@vueuse/core';
     import { useApi } from '@/helpers/useApi';
     import { addVisibleFilter } from '@/helpers/useUrlHelpers';
@@ -71,11 +71,6 @@
                 type: Boolean,
                 default: false,
             },
-            filteredData: {
-                type: Array,
-                required: false,
-                default: null,
-            },
             requireValidation: {
                 type: Boolean,
                 required: false,
@@ -94,6 +89,13 @@
                 type: Boolean,
                 default: false,
             },
+            onlyVisible: {
+                type: Boolean,
+                default: true,
+            },
+            selectClass: {
+                type: Boolean,
+            },
         },
         setup(props, { emit }) {
             const value = useVModel(props, 'data', emit);
@@ -110,17 +112,15 @@
                 return props.endpoint === '/' ? endpointData.value : null;
             });
 
-            if (props.endpoint !== '/' && props.endpoint !== null && !props.filteredData) {
+            if (props.endpoint !== '/' && props.endpoint !== null) {
                 resources = getApiVal();
             }
 
-            watchEffect(() => {
-                if (props.filteredData && props.filteredData.length > 0) {
-                    resources.value = filteredData.value;
-                }
-            });
-
             const noOptionSelected = computed(() => value.value === -1);
+
+            const selectClasses = computed(() => {
+                return props.selectClass && value.value === -1 ? 'error' : null;
+            });
 
             return {
                 value,
@@ -128,6 +128,7 @@
                 epData,
                 ...props,
                 noOptionSelected,
+                selectClasses,
             };
         },
     });
@@ -146,5 +147,8 @@
     }
     .unselected option:first-child {
         color: #a6a6a6;
+    }
+    .error {
+        @apply border-red-500;
     }
 </style>

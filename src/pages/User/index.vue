@@ -1,13 +1,15 @@
 <template>
     <Layout>
-        <ABMHeader title="Cradle" link="/cradle/nuevo" />
+        <ABMHeader title="Usuarios" link="/usuarios/nuevo" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
-                placeholder="Seleccionar cradle"
+                placeholder="Seleccionar usuario"
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 field-name="name"
-                endpoint="/cradle"
+                endpoint="/user"
+                endpoint-key="firstName"
+                :only-visible="false"
                 :data="cradleId"
                 @update:data="cradleId = $event"
             />
@@ -20,46 +22,48 @@
             class="mt-5 lg:w-7/12 min-w-min"
             :columns="columns"
             :pagination="pagination"
-            :items="filteredCradles"
+            :items="filteredUsers"
             :actions="actions"
-            empty-text="No hay cradles cargados"
+            empty-text="No hay users cargados"
         >
-            <template #item="{ item: cr }">
+            <template #item="{ item: user }">
                 <!-- Desktop -->
-                <td :class="cr.name ? null : 'empty'">
-                    {{ cr.name || 'Sin nombre' }}
+                <td>
+                    {{ user.fullName }}
                 </td>
-                <td class="sm:w-52">
-                    <p class="w-52 truncate text-center">
-                        {{ cr.observations || '-' }}
-                    </p>
+                <td>{{ user.Role?.name }}</td>
+                <td>
+                    {{ user.email }}
                 </td>
             </template>
 
             <!-- Mobile -->
             <template #mobileTitle="{ item }">
-                {{ item.name || 'Sin nombre' }}
+                {{ item.fullName || 'Sin nombre' }}
             </template>
 
-            <template #mobileSubtitle="{ item }">
-                <span class="font-bold">Observaciones: </span>{{ item.observations || ' - ' }}
-            </template>
+            <template #mobileSubtitle="{ item }"> <span class="font-bold">Rol: </span> {{ item.Role?.name }} </template>
         </VTable>
 
         <DisableModal
             :open="showModal"
-            title="¿Desea inhabilitar este cradle?"
-            text="Una vez inhabilitado, no podrá utilizar este cradle en ninguna otra sección de la aplicación"
+            title="¿Desea inhabilitar este usuario?"
+            text="Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación"
             @close="showModal = false"
             @main="confirmModal"
         />
 
         <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
-                <span class="!text-lg !text-black">{{ selectedCradle.name }}</span> <br />
-                <span v-if="selectedCradle.observations">
-                    Observaciones: {{ selectedCradle.observations || ' - ' }}
-                </span>
+                <p class="!text-lg !text-black">{{ selectedUser.fullName }}</p>
+                <p class="mt-2">
+                    <strong>Rol: </strong>
+                    {{ selectedUser.Role?.name }}
+                </p>
+                <p class="mt-2">
+                    <strong>Email: </strong>
+                    {{ selectedUser.email }}
+                </p>
             </template>
         </Backdrop>
     </Layout>
@@ -69,43 +73,38 @@
     import { onMounted, ref, computed } from 'vue';
     import { useStore } from 'vuex';
     import { useTitle } from '@vueuse/core';
+    import { useStoreLogic } from '@/helpers/useStoreLogic';
+
     import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import VTable from '@/components/ui/table/VTable.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import Modal from '@/components/modal/General.vue';
     import { useRouter } from 'vue-router';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import DisableModal from '@/components/modal/DisableModal.vue';
-    import axios from 'axios';
     import ABMHeader from '@/components/ui/ABMHeader.vue';
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
             Layout,
-            PrimaryBtn,
-            Icon,
             VTable,
             FieldSelect,
             GhostBtn,
-            Modal,
             Backdrop,
             DisableModal,
             ABMHeader,
         },
         setup() {
-            useTitle('Cradles <> Sandflow');
+            useTitle('Usuarios <> Sandflow');
             const store = useStore();
             const router = useRouter();
-            const crDB = ref([]);
             const loading = ref(false);
             let cradleId = ref(-1);
-            const selectedCradle = ref(null);
+            const selectedUser = ref(null);
             const showModal = ref(false);
             const showBackdrop = ref(false);
+
+            const users = ref([]);
 
             const pagination = ref({
                 sortKey: 'id',
@@ -115,8 +114,9 @@
             });
 
             const columns = [
-                { title: 'Nombre', key: 'name', sortable: true },
-                { title: 'Observaciones', key: 'observations', sortable: true },
+                { title: 'Nombre', key: 'fullName', sortable: true },
+                { title: 'Rol', key: 'Role.name', sortable: true },
+                { title: 'Mail', key: 'email', sortable: true },
                 { title: '', key: 'actions' },
             ];
 
@@ -125,14 +125,14 @@
                     label: 'Ver más',
                     onlyMobile: true,
                     callback: (item) => {
-                        selectedCradle.value = item;
+                        selectedUser.value = item;
                         showBackdrop.value = true;
                     },
                 },
                 {
                     label: 'Editar',
                     callback: (item) => {
-                        router.push(`/cradle/${item.id}`);
+                        router.push(`/usuarios/${item.id}`);
                     },
                 },
                 {
@@ -155,52 +155,58 @@
                 },
             ];
 
-            const filteredCradles = computed(() => {
+            const filteredUsers = computed(() => {
                 if (cradleId.value > -1) {
-                    return crDB.value.filter((cradle) => cradle.id == cradleId.value);
+                    return users.value.filter((cradle) => cradle.id == cradleId.value);
                 }
 
-                return crDB.value;
+                return users.value;
             });
 
-            const getCradles = async () => {
+            const getUsers = async () => {
                 loading.value = true;
 
-                const res = await axios.get(`${apiUrl}/cradle`).catch((err) => {
-                    console.log(err);
-                });
+                const result = await useStoreLogic(router, store, 'user', 'getAll');
 
-                if (res.status === 200) {
-                    crDB.value = res.data.data;
+                if (result.type == 'success') {
+                    users.value = result.res.map((user) => {
+                        return {
+                            ...user,
+                            fullName: `${user.firstName || ''} ${user.midName || ''} ${user.lastName || ''} `,
+                        };
+                    });
                 }
 
-                store.dispatch('setCradles', crDB.value);
+                // store.dispatch('setUsers', users.value);
                 loading.value = false;
             };
 
             const openModalVisibility = async (cradle) => {
-                selectedCradle.value = cradle;
+                selectedUser.value = cradle;
 
                 if (cradle.visible) {
                     showModal.value = true;
 
                     return;
                 }
-                await updateVisibility(selectedCradle.value);
+                await updateVisibility(selectedUser.value);
             };
 
             const confirmModal = async () => {
-                await updateVisibility(selectedCradle.value);
+                await updateVisibility(selectedUser.value);
                 showModal.value = false;
             };
 
-            const updateVisibility = async (cradle) => {
+            const updateVisibility = async (user) => {
                 const payload = {
-                    ...cradle,
-                    visible: !cradle.visible,
+                    ...user,
+                    visible: !user.visible,
                 };
-                await store.dispatch('updateVisibilityCradle', payload);
-                await getCradles();
+
+                const data = ref(payload);
+
+                await store.dispatch('user_update', data);
+                await getUsers();
             };
 
             const clearFilters = () => {
@@ -208,21 +214,21 @@
             };
 
             onMounted(async () => {
-                await getCradles();
+                await getUsers();
             });
 
             return {
-                crDB,
+                users,
                 cradleId,
                 clearFilters,
-                filteredCradles,
+                filteredUsers,
                 showModal,
                 openModalVisibility,
                 confirmModal,
                 pagination,
                 columns,
                 actions,
-                selectedCradle,
+                selectedUser,
                 showBackdrop,
             };
         },

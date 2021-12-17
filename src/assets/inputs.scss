@@ -27,6 +27,9 @@ label {
     &.n-post {
       @apply border-r rounded-r;
     }
+    &.error {
+      @apply border-red-500;
+    }
   }
 }
 .pre,

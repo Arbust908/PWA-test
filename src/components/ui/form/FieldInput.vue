@@ -6,6 +6,7 @@
             v-model="value"
             v-maska="mask"
             class="input"
+            :maxlength="maxlength"
             :type="type"
             :name="fieldName"
             :placeholder="placeholder"
@@ -88,6 +89,11 @@
             },
             silenced: {
                 type: Boolean,
+                required: false,
+                default: null,
+            },
+            maxlength: {
+                type: Number,
                 required: false,
                 default: null,
             },

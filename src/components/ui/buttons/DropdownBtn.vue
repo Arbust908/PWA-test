@@ -1,30 +1,37 @@
 <template>
     <div class="group relative">
         <!-- btn slot -->
-        <button @click="change">
+        <button @click="toggleShow">
             <slot></slot>
         </button>
-        <nav tabindex="0" class="dropwdown-menu" :class="getClass">
-            <ul class="py-1">
-                <li v-for="action in actions" :key="action">
-                    <a
-                        v-if="action.hide ? action.hide(item) : true"
-                        role="button"
-                        tab-index="0"
-                        class="block pl-4 pr-16 py-2 hover:bg-gray-100 font-medium text-left"
-                        @click="action.callback(item)"
-                    >
-                        {{ action.label }}
-                    </a>
-                </li>
-            </ul>
-        </nav>
+        <OnClickOutside @trigger="closeIfOpen">
+            <nav tabindex="0" class="dropwdown-menu" :class="getClass">
+                <ul class="py-1">
+                    <li v-for="action in actions" :key="action">
+                        <a
+                            v-if="action.hide ? action.hide(item) : true"
+                            role="button"
+                            tab-index="0"
+                            class="block pl-4 pr-16 py-2 hover:bg-gray-100 font-medium text-left"
+                            @click="action.callback(item)"
+                        >
+                            {{ action.label }}
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </OnClickOutside>
     </div>
 </template>
 <script>
     import { defineComponent } from 'vue';
+    import { OnClickOutside } from '@vueuse/components';
+
     export default defineComponent({
         name: 'DropdownBtn',
+        components: {
+            OnClickOutside,
+        },
         props: {
             actions: {
                 type: Array,
@@ -36,24 +43,25 @@
             },
         },
         setup() {
-            const show = ref(true);
+            const show = ref(false);
             const getClass = computed(() => {
-                if (show.value) {
-                    return 'invisible opacity-0';
-                }
-                return 'visible opacity-100 translate-y-1';
+                return show.value ? 'visible opacity-100 translate-y-1' : 'invisible opacity-0';
             });
-            const change = () => {
-                show.value = !show.value;
+            const toggleShow = useToggle(show);
+            const closeIfOpen = () => {
+                if (show.value) {
+                    toggleShow();
+                }
             };
+
             return {
-                change,
-                show,
                 getClass,
+                show,
+                toggleShow,
+                closeIfOpen,
             };
         },
     });
-    // invisible opacity-0    group-focus-within:visible  group-focus-within:opacity-100 group-focus-within:translate-y-1
 </script>
 <style lang="scss" scoped>
     .dropwdown-menu {

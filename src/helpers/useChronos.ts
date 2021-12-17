@@ -22,11 +22,13 @@ export function createFromDate(datetime: number) {
     };
 }
 
-export function createToDate(hour: number, minute: number, time: boolean) {
+export function createToDate(hour: number, minute: number, isAM: boolean) {
     const hours: Ref<number> = ref(hour);
 
-    if (!time) {
-        hours.value = hour + 12;
+    if (!isAM) {
+        hours.value = hour === 12 ? hour : hour + 12;
+    } else {
+        hours.value = hour === 12 ? 0 : hour;
     }
 
     const date = Date.parse(new Date(2020, 11, 31, hours.value, minute).toString());
