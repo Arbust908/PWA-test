@@ -95,7 +95,7 @@
                 loading.value = false;
             });
 
-            const currentSandType = currentSand.type;
+            const currentSandType = currentSand.value.type;
             useTitle(`Arena ${currentSandType} <> Sandflow`);
 
             const isFull = computed(() => {
@@ -144,10 +144,10 @@
 
             const getSandsAndCheckIfTypeExists = async () => {
                 try {
-                    if (currentSand.type == currentSandType) {
+                    if (currentSand.value.type == currentSandType) {
                         console.log('llega aca');
                         save();
-                    } else if (await checkIfExists('sand', 'type', currentSand.type)) {
+                    } else if (await checkIfExists('sand', 'type', currentSand.value.type)) {
                         console.log('llega aca2');
                         toggleErrorModal();
                     } else {
