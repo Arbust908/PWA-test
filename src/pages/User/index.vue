@@ -76,9 +76,7 @@
     import { useStoreLogic } from '@/helpers/useStoreLogic';
 
     import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import VTable from '@/components/ui/table/VTable.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import { useRouter } from 'vue-router';
@@ -89,8 +87,6 @@
     export default {
         components: {
             Layout,
-            PrimaryBtn,
-            Icon,
             VTable,
             FieldSelect,
             GhostBtn,
@@ -176,7 +172,6 @@
                     users.value = result.res.map((user) => {
                         return {
                             ...user,
-                            visible: true,
                             fullName: `${user.firstName || ''} ${user.midName || ''} ${user.lastName || ''} `,
                         };
                     });
@@ -202,12 +197,15 @@
                 showModal.value = false;
             };
 
-            const updateVisibility = async (cradle) => {
+            const updateVisibility = async (user) => {
                 const payload = {
-                    ...cradle,
-                    visible: !cradle.visible,
+                    ...user,
+                    visible: !user.visible,
                 };
-                await store.dispatch('updateVisibilityCradle', payload);
+
+                const data = ref(payload);
+
+                await store.dispatch('user_update', data);
                 await getUsers();
             };
 
