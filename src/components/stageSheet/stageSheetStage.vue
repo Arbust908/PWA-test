@@ -157,16 +157,16 @@
                                             Nivel xx
                                         </button>
                                     </nav>
-                                    <button
-                                        v-for="({ id, category, floor, row, col }, index) in boxes"
-                                        :key="index + '_' + id"
-                                        :class="`mesh-box__1 mesh-box__${category} bubble`"
-                                        class="p-3 rounded shadow-sm text-sm w-full text-left"
-                                    >
-                                        {{ id }}::{{ category }} - {{ floor }} - {{ row }} - {{ col }}
-                                    </button>
                                     <button v-for="(box, index) in boxes" :key="index">
                                         {{ box }}
+                                    </button>
+                                    <button
+                                        v-for="(box, index) in boxes"
+                                        :key="index + '_' + box.id"
+                                        :class="`mesh-box__1 mesh-box__${box.category} bubble`"
+                                        class="p-3 rounded shadow-sm text-sm w-full text-left"
+                                    >
+                                        {{ box.id }}::{{ box.category }} - {{ box }}
                                     </button>
                                 </div>
                             </div>

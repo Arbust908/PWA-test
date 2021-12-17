@@ -645,7 +645,9 @@
                 .filter((box) => box.id)
                 .map(async (box) => {
                     const boxInfo = await getBoxInfo(box.id);
-                    console.log(boxInfo);
+                    console.log('-------------------------------------');
+                    console.log('-------------------------------------');
+                    console.log('BoxInfo', boxInfo);
 
                     return {
                         ...box,
@@ -654,6 +656,7 @@
                 })
         );
         console.log('Result: ', result);
+        boxes.value = result;
 
         return result;
     };
@@ -664,7 +667,7 @@
         console.log('Caja', box);
         console.log('Caja 2', box.value);
 
-        return box;
+        return box.value;
     };
     const stageSheetDetails = computed(() => {
         console.log('selectedStage', selectedStage.value);
