@@ -115,6 +115,15 @@
         },
     });
 
+    const getLayoutDimensions = computed(() => {
+        const layout = warehouse.value.layout;
+        console.log('Layout', layout);
+        const dimensions = formatLocation(layout);
+        console.log('dimensions', dimensions);
+
+        return dimensions;
+    });
+
     watch(clientId, (newVal) => {
         if (newVal !== -1) {
             console.log('Val', newVal);
@@ -155,10 +164,10 @@
         console.log('Get deposit', { pozoId, companyId });
 
         const { read } = useApi(`/warehouse?pitId=${pozoId}`);
-        const warehouse = await read();
-        console.log('warehouse', warehouse.value);
+        const depo = await read();
+        console.log('warehouse', depo.value);
 
-        return warehouse;
+        return depo;
     };
 
     const selectedStage = ref(-1);
@@ -627,7 +636,7 @@
         },
     ]);
 
-    const setWareHouseBoxes = async ({ layout }: Warehouse) => {
+    const setWareHouseBoxes = ({ layout }: Warehouse) => {
         const whBoxes = [];
         for (const key in layout) {
             if (Object.prototype.hasOwnProperty.call(layout, key)) {
@@ -640,35 +649,9 @@
             }
         }
 
-        let result = await Promise.all(
-            whBoxes
-                .filter((box) => box.id)
-                .map(async (box) => {
-                    const boxInfo = await getBoxInfo(box.id);
-                    console.log('-------------------------------------');
-                    console.log('-------------------------------------');
-                    console.log('BoxInfo', boxInfo);
-
-                    return {
-                        ...box,
-                        ...boxInfo,
-                    };
-                })
-        );
-        console.log('Result: ', result);
-        boxes.value = result;
-
-        return result;
+        return whBoxes.filter((box) => box.id);
     };
-    const getBoxInfo = async (boxId: string) => {
-        console.log(`/sandOrder?boxId=${boxId}`);
-        const { read } = useApi(`/sandOrder?boxId=${boxId}`);
-        const box = await read();
-        console.log('Caja', box);
-        console.log('Caja 2', box.value);
 
-        return box.value;
-    };
     const stageSheetDetails = computed(() => {
         console.log('selectedStage', selectedStage.value);
 
@@ -727,6 +710,7 @@
                 Etapas finalizadas
             </button>
         </nav>
+        {{ getLayoutDimensions }}
         <section class="mt-4 panel">
             <div v-if="isTabSelected(_TABS.PENDING)" class="stage--panel">
                 <StageSheetStage

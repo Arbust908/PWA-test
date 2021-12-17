@@ -6,6 +6,7 @@
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import InverseBtn from '@/components/ui/buttons/InverseBtn.vue';
     import PlusIcon from './PlusIcon.vue';
+    import SheetDepoBox from './sheetDepoBox.vue';
     const props = defineProps({
         sandStage: {
             type: Object,
@@ -79,6 +80,17 @@
         popUpCords.y = event.clientY;
         console.log(popUpCords);
     };
+
+    const boxesByFloor = computed(() => {
+        return props.boxes.reduce((pallet, box) => {
+            console.groupCollapsed('Boxes by floor');
+            console.log('Cajita!', box);
+            pallet.push(box);
+            console.groupEnd();
+
+            return pallet;
+        }, []);
+    });
 </script>
 
 <template>
@@ -157,17 +169,12 @@
                                             Nivel xx
                                         </button>
                                     </nav>
-                                    <button v-for="(box, index) in boxes" :key="index">
-                                        {{ box }}
-                                    </button>
-                                    <button
-                                        v-for="(box, index) in boxes"
-                                        :key="index + '_' + box.id"
-                                        :class="`mesh-box__1 mesh-box__${box.category} bubble`"
-                                        class="p-3 rounded shadow-sm text-sm w-full text-left"
-                                    >
-                                        {{ box.id }}::{{ box.category }} - {{ box }}
-                                    </button>
+                                    <SheetDepoBox
+                                        v-for="(box, index) in boxesByFloor"
+                                        :key="index"
+                                        :box-id="box.id"
+                                        :category="box.category"
+                                    />
                                 </div>
                             </div>
                         </OnClickOutside>
