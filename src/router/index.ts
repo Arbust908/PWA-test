@@ -317,14 +317,24 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/Error/NoMobile.vue'),
     },
     {
-        path: '/:catchAll(.*)',
-        name: 'PageNotFound',
-        component: () => import('@/pages/Error/404.vue'),
-    },
-    {
         path: '/notLogged',
         name: 'NotLogged',
         component: () => import('@/pages/Error/401.vue'),
+    },
+    {
+        path: '/error401',
+        name: 'Error-401',
+        component: () => import('@/pages/Error/401.vue'),
+    },
+    {
+        path: '/error403',
+        name: 'Error-403',
+        component: () => import('@/pages/Error/403.vue'),
+    },
+    {
+        path: '/error404',
+        name: 'Error-404',
+        component: () => import('@/pages/Error/404.vue'),
     },
     {
         path: '/error500',
@@ -355,6 +365,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/tests/pdf',
         name: 'TestPDF',
         component: () => import('@/pages/Tests/PDF.vue'),
+    },
+    {
+        path: '/:catchAll(.*)',
+        name: 'PageNotFound',
+        component: () => import('@/pages/Error/404.vue'),
     },
 ];
 

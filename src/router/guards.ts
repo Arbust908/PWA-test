@@ -122,6 +122,6 @@ export const checkPermission = (to: any, from: any, next: any) => {
     if (permissions.view.includes(actualRoute)) {
         next();
     } else {
-        next({ path: '/notLogged' });
+        next({ name: 'Error-403' });
     }
 };
