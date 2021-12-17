@@ -21,42 +21,34 @@
         >
             <template #item="{ item }">
                 <!-- Desktop -->
-
-                <td :class="item.sandProvider.name ? null : 'empty'">
-                    {{ item.sandProvider.name || 'Sin definir' }}
+                <td :class="item?.sandProvider?.name ? null : 'empty'">
+                    {{ item?.sandProvider?.name || 'Sin definir' }}
                 </td>
-
-                <td :class="item.data ? null : 'empty'">
+                <td :class="item?.data ? null : 'empty'">
                     {{ listSandTypes(item.data?.sandOrders) || 'Sin definir' }}
                 </td>
 
-                <td :class="item.transportProvider ? null : 'empty'">
-                    {{ item.transportProvider?.name || 'Sin definir' }}
+                <td :class="item?.transportProvider ? null : 'empty'">
+                    {{ item?.transportProvider?.name || 'Sin definir' }}
                 </td>
 
                 <td :class="item.data ? null : 'empty'">
-                    {{ item.data?.cantidadCamiones || 'Sin definir' }}
+                    {{ item?.data?.cantidadCamiones || 'Sin definir' }}
                 </td>
 
                 <td class="text-center" :class="item ? null : 'empty'">
                     <Badge v-if="item.isOperator" text="Completado" classes="bg-gray-500 text-white px-5" />
                     <Badge v-else text="En proceso" classes="bg-gray-300 text-gray-600" />
                 </td>
-
-                <tr v-if="provNotifDB && provNotifDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay notificaciones cargadas</p>
-                    </td>
-                </tr>
             </template>
 
             <!-- Mobile -->
             <template #mobileTitle="{ item }">
-                <span class="font-bold">Carga: </span> {{ item.sandProvider.name }}
+                <span class="font-bold">Carga: </span> {{ item?.sandProvider?.name }}
             </template>
 
             <template #mobileSubtitle="{ item }">
-                <span class="font-bold">Transporte: </span>{{ item.transportProvider?.name }}
+                <span class="font-bold">Transporte: </span>{{ item?.transportProvider?.name }}
             </template>
         </VTable>
         <Backdrop :open="showBD" title="Ver más" @close="toggleBD()">
@@ -86,13 +78,7 @@
 </template>
 
 <script lang="ts">
-    import { onMounted, ref, computed, defineAsyncComponent } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle, useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
@@ -112,8 +98,6 @@
     export default {
         components: {
             Layout,
-            PrimaryBtn,
-            GhostBtn,
             Icon,
             FieldSelect,
             Badge,
@@ -121,8 +105,8 @@
             VTable,
             Backdrop,
             NotificationBackDropCard,
-            WarningBtn,
             ABMHeader,
+            BaseBtn,
         },
 
         setup() {
@@ -233,7 +217,6 @@
                 }
                 let names = '';
                 sandOrders.forEach((sand) => {
-                    console.log(getSTName(sand.sandTypeId));
                     names += getSTName(sand.sandTypeId) + ' ';
                 });
 
@@ -249,17 +232,12 @@
             const showModal = ref(false);
             const toggleModal = useToggle(showModal);
 
-            const clearFilters = () => {
-                sandProviderId.value = -1;
-            };
-
             return {
                 provNotifDB,
                 loading,
                 columns,
                 total,
                 actions,
-                clearFilters,
                 pagination,
                 getSands,
                 filteredNotifications,

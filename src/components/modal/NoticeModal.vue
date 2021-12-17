@@ -5,7 +5,7 @@
         </div>
         <h2>{{ title }}</h2>
         <span> {{ text }} </span>
-        <footer>
+        <footer v-if="btnText">
             <PrimaryBtn :btn="`wide ${btnClass}`" @click="$emit('main')">
                 {{ btnText }}
             </PrimaryBtn>
