@@ -141,3 +141,9 @@
         },
     });
 </script>
+
+<style lang="scss" scoped>
+    fieldset:not(:last-of-type) {
+        @apply border-b border-gray-200 pb-6;
+    }
+</style>

@@ -464,7 +464,7 @@
         @apply bg-second-200 border cursor-not-allowed;
     }
     fieldset:not(:last-of-type) {
-        @apply border-b pb-6;
+        @apply border-b border-gray-200 pb-6;
     }
     label:not(.toggle) {
         @apply flex flex-col;
