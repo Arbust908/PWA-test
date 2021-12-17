@@ -2,12 +2,7 @@
     <Layout>
         <ABMTitle title="Nuevo tipo de arena" />
         <section class="bg-white rounded-md shadow-sm max-w-2xl pb-5">
-            <SandForm
-                :type="type"
-                :observations="observations"
-                @update:type="type = $event"
-                @update:observations="observations = $event"
-            />
+            <SandForm v-model:type="type" v-model:observations="observations" />
         </section>
         <!-- *** -->
         <footer>
@@ -15,7 +10,7 @@
             <PrimaryBtn
                 btn="wide"
                 :is-loading="isLoading"
-                :disabled="!isValidated ? 'yes' : null"
+                :disabled="!isValidated"
                 @click="isValidated && getSandsAndCheckIfTypeExists()"
             >
                 Finalizar
@@ -47,15 +42,12 @@
 
 <script lang="ts">
     import Layout from '@/layouts/Main.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     import ABMTitle from '@/components/ui/ABMFormTitle.vue';
     import { useValidator } from '@/helpers/useValidator';
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     import SandForm from '@/components/sand/SandForm.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
@@ -64,13 +56,10 @@
     export default {
         components: {
             ABMTitle,
-            Icon,
             Layout,
-            Modal,
             PrimaryBtn,
             SandForm,
             SecondaryBtn,
-            WarningBtn,
             ErrorModal,
             SuccessModal,
         },
@@ -146,18 +135,18 @@
             };
 
             return {
-                goToIndex,
-                save,
                 ...toRefs(newSand),
-                isValidated,
-                isLoading,
-                showModal,
-                showErrorModal,
-                showApiErrorModal,
-                toggleModal,
-                toggleErrorModal,
-                toggleApiErrorModal,
                 getSandsAndCheckIfTypeExists,
+                goToIndex,
+                isLoading,
+                isValidated,
+                save,
+                showApiErrorModal,
+                showErrorModal,
+                showModal,
+                toggleApiErrorModal,
+                toggleErrorModal,
+                toggleModal,
             };
         },
     };

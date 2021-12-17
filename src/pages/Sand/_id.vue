@@ -2,12 +2,7 @@
     <Layout v-if="currentSand">
         <ABMTitle :title="`Arena - ${currentSand.type}`" />
         <section>
-            <SandForm
-                :type="currentSand.type"
-                :observations="currentSand.observations"
-                @update:type="currentSand.type = $event"
-                @update:observations="currentSand.observations = $event"
-            />
+            <SandForm v-model:type="currentSand.type" v-model:observations="currentSand.observations" />
         </section>
         <!-- *** -->
         <footer>
@@ -15,7 +10,7 @@
             <PrimaryBtn
                 btn="wide"
                 :is-loading="loading"
-                :disabled="!isFull ? 'yes' : null"
+                :disabled="!isFull"
                 @click="isFull && getSandsAndCheckIfTypeExists()"
             >
                 Finalizar
@@ -59,7 +54,6 @@
     import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
-    // const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     export default {
         components: {
@@ -159,18 +153,18 @@
             };
 
             return {
-                save,
+                ...toRefs(currentSand),
                 currentSand,
+                getSandsAndCheckIfTypeExists,
                 isFull,
                 loading,
-                ...toRefs(currentSand),
-                showModal,
-                showErrorModal,
+                save,
                 showApiErrorModal,
-                toggleModal,
-                toggleErrorModal,
+                showErrorModal,
+                showModal,
                 toggleApiErrorModal,
-                getSandsAndCheckIfTypeExists,
+                toggleErrorModal,
+                toggleModal,
             };
         },
     };
