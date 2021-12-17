@@ -243,19 +243,19 @@ const routes: Array<RouteRecordRaw> = [
         path: '/forklift',
         name: 'Forklift',
         component: () => import('@/pages/Forklift/index.vue'),
-        beforeEnter: [isMobileAndLogged, checkPermission],
+        beforeEnter: [isLogged, checkPermission],
     },
     {
         path: '/forklift/:id',
         name: 'ForkliftById',
         component: () => import('@/pages/Forklift/_id.vue'),
-        beforeEnter: [isMobileAndLogged, checkPermission],
+        beforeEnter: [isLogged, checkPermission],
     },
     {
         path: '/forklift/nuevo',
         name: 'NewForklift',
         component: () => import('@/pages/Forklift/new.vue'),
-        beforeEnter: [isMobileAndLogged, checkPermission],
+        beforeEnter: [isLogged, checkPermission],
     },
     {
         path: '/stage-sheet',
