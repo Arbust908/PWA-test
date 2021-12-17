@@ -205,22 +205,18 @@
             const sidebarOpen = ref(false);
             const navigation = computed(() => {
                 const hasCustom = store.state.global.isCustom;
-                console.log(hasCustom);
 
-                if (hasCustom) {
-                    console.log('Ya estoy armado', store.state.global.navigation);
+                // if (hasCustom) {
+                //     console.log('has custom');
 
-                    return store.state.global.navigation;
-                }
+                //     return store.state.global.navigation;
+                // }
                 //Filtramos los items por permiso
                 const navigationItems = JSON.parse(JSON.stringify(store.state.global.navigation));
                 //TODO: usar el permissionManager
-                const filteredNavigation = [];
                 const storePermissions = store.state.loggedUser.permissions || [];
                 const permissions = JSON.parse(JSON.stringify(storePermissions));
-                console.log('filteredNavigation', filteredNavigation);
-                console.log('storePermissions', storePermissions);
-                console.log('permissions', permissions);
+                // console.log('permissions', permissions);
 
                 const fN = navigationItems.filter((nav) => {
                     if (nav.name === 'LINE') {
@@ -229,22 +225,18 @@
 
                     if (nav.subNav) {
                         nav.subNav = nav.subNav.filter((subNav) => {
-                            console.log(subNav);
-
                             return permissions.view.includes(subNav.title);
                         });
-                        console.log(nav.subNav);
-                        console.log(nav);
 
                         return nav.subNav.length > 0;
                     }
 
                     return permissions.view.includes(nav.title);
                 });
+                // store.commit('SET_NEW_NAVIGATION', fN);
+                // store.commit('SET_CUSTOM');
 
-                console.log('filteredNavigation', fN);
-                store.commit('SET_NEW_NAVIGATION', fN);
-                store.commit('SET_CUSTOM');
+                // console.log('Custome', fN);
 
                 return fN;
             });

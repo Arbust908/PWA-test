@@ -131,8 +131,8 @@ export default {
         SET_INTERNET_CONNECTION(state) {
             state.areWeConnected = navigator.onLine;
         },
-        SET_CUSTOM(state) {
-            state.isCustom = true;
+        SET_CUSTOM(state, payload = true) {
+            state.isCustom = payload;
         },
         SET_NEW_NAVIGATION(state, payload) {
             state.navigation = payload;

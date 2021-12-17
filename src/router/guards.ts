@@ -117,11 +117,6 @@ export const checkPermission = (to: any, from: any, next: any) => {
     const permissions = JSON.parse(JSON.stringify(storePermissions));
 
     const actualRoute = to.name;
-    console.groupCollapsed();
-    console.log(actualRoute);
-    console.log(permissions.view);
-    console.log(permissions.view.includes(actualRoute));
-    console.groupEnd();
 
     // check if has permissions
     if (permissions.view.includes(actualRoute)) {
