@@ -5,7 +5,7 @@
         </header>
         <section class="deposit bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
-                <FieldGroup class="grid grid-cols-12 gap-4 max-w-4xl">
+                <FieldGroup class="border-hidden grid grid-cols-12 gap-4 max-w-4xl">
                     <span class="col-span-8 grid grid-cols-12 gap-4">
                         <ClientPitCombo
                             :client-id="Number(clientId)"
@@ -89,8 +89,14 @@
                                             <EyeIconOff v-else class="icon" />
                                             Caja cortada</span
                                         >
-                                        <span class="select-category aisle">Pasillo</span>
-                                        <span class="select-category full">Ocupado</span>
+                                        <span class="select-category aisle">
+                                            <div class="w-4 h-4 mr-3 rounded-full bg-gray-300" />
+                                            Pasillo
+                                        </span>
+                                        <span class="select-category full">
+                                            <div class="w-4 h-4 mr-3 rounded-full bg-gray-600" />
+                                            Ocupado
+                                        </span>
                                     </div>
                                     <BoxCard
                                         v-if="choosedBox.category !== ''"
@@ -144,7 +150,7 @@
                 </div>
                 <div
                     v-else
-                    class="w-full max-w-sm border border-dashed rounded-xl p-6 my-3 mx-auto tracking-wide leading-relaxed"
+                    class="w-full max-w-sm border-2 border-dashed rounded-xl p-6 my-3 mx-auto tracking-wide leading-relaxed"
                 >
                     Seleccionar cliente, pozo y orden de pedido para comenzar.
                 </div>
