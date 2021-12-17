@@ -24,6 +24,7 @@
             :pagination="pagination"
             :items="filteredUsers"
             :actions="actions"
+            disable-key="active"
             empty-text="No hay users cargados"
         >
             <template #item="{ item: user }">
@@ -135,24 +136,24 @@
                         router.push(`/usuarios/${item.id}`);
                     },
                 },
-                {
-                    label: 'Inhabilitar',
-                    hide: (item) => {
-                        return item.visible;
-                    },
-                    callback: (item) => {
-                        openModalVisibility(item);
-                    },
-                },
-                {
-                    label: 'Habilitar',
-                    hide: (item) => {
-                        return !item.visible;
-                    },
-                    callback: (item) => {
-                        openModalVisibility(item);
-                    },
-                },
+                // {
+                //     label: 'Inhabilitar',
+                //     hide: (item) => {
+                //         return item.visible;
+                //     },
+                //     callback: (item) => {
+                //         openModalVisibility(item);
+                //     },
+                // },
+                // {
+                //     label: 'Habilitar',
+                //     hide: (item) => {
+                //         return !item.visible;
+                //     },
+                //     callback: (item) => {
+                //         openModalVisibility(item);
+                //     },
+                // },
             ];
 
             const filteredUsers = computed(() => {

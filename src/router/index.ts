@@ -295,7 +295,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/usuarios/:id',
-        name: 'UsuerById',
+        name: 'UserById',
         component: () => import('@/pages/User/_id.vue'),
         beforeEnter: [isLogged, checkPermission],
     },

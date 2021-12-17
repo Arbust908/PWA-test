@@ -20,7 +20,11 @@
                         </tbody>
                         <tbody v-else>
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
-                                <tr class="body-row" :class="index % 2 === 0 ? 'odd' : 'odd'" :disabled="!item.visible">
+                                <tr
+                                    class="body-row"
+                                    :class="index % 2 === 0 ? 'odd' : 'odd'"
+                                    :disabled="!item[disableKey]"
+                                >
                                     <slot name="item" :item="item" />
                                     <td v-if="desktopActions" class="p-0 table--action">
                                         <DropdownBtn :actions="desktopActions" :item="item">
@@ -50,7 +54,7 @@
                         <div class="divide-y divide-black border-t-2">
                             <div
                                 class="grid grid-cols-12 p-6 pl-2 pr-2 items-center"
-                                :class="!item.visible ? 'disabled-mobile' : null"
+                                :class="!item[disableKey] ? 'disabled-mobile' : null"
                             >
                                 <div class="col-span-10 rounded truncate pl-2">
                                     <span class="text-sm font-semibold">
@@ -138,6 +142,10 @@
             showPagination: {
                 type: Boolean,
                 default: false,
+            },
+            disableKey: {
+                type: String,
+                default: 'visible',
             },
             emptyText: {
                 type: String,
