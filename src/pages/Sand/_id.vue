@@ -16,7 +16,7 @@
                 btn="wide"
                 :is-loading="loading"
                 :disabled="!isFull ? 'yes' : null"
-                @click="!isFull && getSandsAndCheckIfTypeExists()"
+                @click="isFull && getSandsAndCheckIfTypeExists()"
             >
                 Finalizar
             </PrimaryBtn>
@@ -83,11 +83,15 @@
                 observations: '',
             });
 
+            const currentSandType = ref('');
+
             onMounted(async () => {
                 loading.value = true;
                 const sandId = route.params.id;
                 const result = await useStoreLogic(router, store, 'sand', GET, sandId);
                 console.log(result);
+                currentSandType.value = result.res.type;
+                console.log('segundo', currentSandType.value);
 
                 if (result.type == 'success') {
                     currentSand.value = result.res;
@@ -95,11 +99,10 @@
                 loading.value = false;
             });
 
-            const currentSandType = currentSand.value.type;
             useTitle(`Arena ${currentSandType} <> Sandflow`);
 
             const isFull = computed(() => {
-                return !!(currentSand?.type?.length > 0);
+                return !!(currentSand?.value.type?.length > 0);
             });
 
             const createdSands = ref([]);
@@ -116,7 +119,6 @@
 
             const save = async () => {
                 loading.value = true;
-                console.log('cS', currentSand.value);
                 const response = await axios
                     .put(`${api}/sand/${currentSand.value.id}`, currentSand.value)
 
@@ -144,11 +146,9 @@
 
             const getSandsAndCheckIfTypeExists = async () => {
                 try {
-                    if (currentSand.value.type == currentSandType) {
-                        console.log('llega aca');
+                    if (currentSand.value.type == currentSandType.value) {
                         save();
                     } else if (await checkIfExists('sand', 'type', currentSand.value.type)) {
-                        console.log('llega aca2');
                         toggleErrorModal();
                     } else {
                         save();
