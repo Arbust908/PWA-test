@@ -113,7 +113,7 @@
             const columns = [
                 { title: 'Nombre', key: 'name', sortable: true },
                 { title: 'Observaciones', key: 'observations', sortable: false },
-                { title: 'Acciones', style: 'asd' },
+                { title: '', style: 'asd' },
             ];
 
             const actions = [

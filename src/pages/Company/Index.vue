@@ -134,7 +134,7 @@
                 { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
                 { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
                 { title: 'Operadora', key: 'operadora' },
-                { title: 'Acciones', key: 'name' },
+                { title: '', key: 'name' },
             ];
 
             const actions = [

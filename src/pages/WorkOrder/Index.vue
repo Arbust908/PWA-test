@@ -134,7 +134,7 @@
                 { title: 'Pozos', key: 'pits', sortable: false },
                 { title: 'Equipamiento', key: 'cradle', sortable: false },
                 { title: 'RRHH', key: 'crew', sortable: false },
-                { title: 'Acciones', key: 'actions' },
+                { title: '', key: 'actions' },
             ];
 
             const actions = [
