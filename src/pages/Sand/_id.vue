@@ -4,9 +4,9 @@
         <section>
             <SandForm
                 :type="currentSand.type"
-                :description="currentSand.observations"
+                :observations="currentSand.observations"
                 @update:type="currentSand.type = $event"
-                @update:description="observations = $event"
+                @update:observations="currentSand.observations = $event"
             />
         </section>
         <!-- *** -->
@@ -16,7 +16,7 @@
                 btn="wide"
                 :is-loading="loading"
                 :disabled="!isFull ? 'yes' : null"
-                @click="isFull && getSandsAndCheckIfTypeExists()"
+                @click="!isFull && getSandsAndCheckIfTypeExists()"
             >
                 Finalizar
             </PrimaryBtn>
@@ -78,7 +78,11 @@
             const { GET } = StoreLogicMethods;
             const loading = ref(false);
 
-            const currentSand: Sand = ref(null as Sand);
+            const currentSand = ref({
+                type: '',
+                observations: '',
+            });
+
             onMounted(async () => {
                 loading.value = true;
                 const sandId = route.params.id;
@@ -112,9 +116,13 @@
 
             const save = async () => {
                 loading.value = true;
-                const response = await axios.put(`${api}/sand/${currentSand.id}`, sandToUpdate).catch((err) => {
-                    console.log(err);
-                });
+                console.log('cS', currentSand.value);
+                const response = await axios
+                    .put(`${api}/sand/${currentSand.value.id}`, currentSand.value)
+
+                    .catch((err) => {
+                        console.log(err);
+                    });
                 loading.value = false;
 
                 if (response.status === 200) {
@@ -122,7 +130,7 @@
                 } else {
                     toggleApiErrorModal();
                 }
-                store.dispatch('updateSand', sandToUpdate);
+                store.dispatch('updateSand', currentSand.value);
             };
 
             // TODO: Pasar a un useExist o algo asi
@@ -136,9 +144,11 @@
 
             const getSandsAndCheckIfTypeExists = async () => {
                 try {
-                    if (sandToUpdate.type == currentSandType) {
+                    if (currentSand.type == currentSandType) {
+                        console.log('llega aca');
                         save();
-                    } else if (await checkIfExists('sand', 'type', sandToUpdate.type)) {
+                    } else if (await checkIfExists('sand', 'type', currentSand.type)) {
+                        console.log('llega aca2');
                         toggleErrorModal();
                     } else {
                         save();

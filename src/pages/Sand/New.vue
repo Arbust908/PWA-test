@@ -4,9 +4,9 @@
         <section class="bg-white rounded-md shadow-sm max-w-2xl pb-5">
             <SandForm
                 :type="type"
-                :description="observations"
+                :observations="observations"
                 @update:type="type = $event"
-                @update:description="observations = $event"
+                @update:observations="observations = $event"
             />
         </section>
         <!-- *** -->
@@ -118,7 +118,7 @@
 
             const save = async () => {
                 isLoading.value = true;
-
+                console.log(newSand);
                 const response = await axios.post(`${api}/sand`, newSand).catch((err) => {
                     console.log(err);
                     toggleApiErrorModal;

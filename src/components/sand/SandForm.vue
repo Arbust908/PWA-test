@@ -18,8 +18,8 @@
                 title="Observaciones"
                 :rows="5"
                 is-optional
-                :data="description"
-                @update:data="description = $event"
+                :data="observations"
+                @update:data="observations = $event"
             />
         </FieldGroup>
     </form>
@@ -42,17 +42,17 @@
                 type: String,
                 default: '',
             },
-            description: {
+            observations: {
                 type: String,
                 default: '',
             },
         },
         setup(props, { emit }) {
-            const { type, description } = useVModels(props, emit);
+            const { type, observations } = useVModels(props, emit);
 
             return {
                 type,
-                description,
+                observations,
             };
         },
     });
