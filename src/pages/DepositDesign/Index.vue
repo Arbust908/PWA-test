@@ -157,7 +157,7 @@
                 { title: 'Columnas', key: 'col' },
                 { title: 'Filas', key: 'row' },
                 { title: 'Niveles', key: 'floor' },
-                { title: 'Acciones', key: 'name' },
+                { title: '', key: 'name' },
             ];
 
             const actions = [
