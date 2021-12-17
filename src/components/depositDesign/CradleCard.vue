@@ -1,8 +1,8 @@
 <template>
-    <article :class="['card', 'items-center', category, !selected ? 'w-100 bg-[#374151]' : 'w-80 bg-green-800']">
+    <article :class="['card', 'items-center', category, !selected ? 'w-100 bg-gray-800' : 'w-80 bg-green-800']">
         <div v-if="!selected" :class="['check-radio-button', !selected ? '' : 'w-80 border-green-800']"></div>
         <CheckCircleIcon v-else class="w-5 h-5" />
-        <ExcavatorIcon :class="['icon', 'p-2 rounded-md', !selected ? 'bg-[#87878733]' : 'bg-green-700']" />
+        <ExcavatorIcon :class="['icon', 'p-2 rounded-md', !selected ? 'bg-gray-700' : 'bg-green-700']" />
         <div class="flex flex-col justify-between">
             <div>
                 Cradle<br />
