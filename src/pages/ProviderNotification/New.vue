@@ -27,10 +27,14 @@
                         </div>
                         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
                             <FieldInput
-                                class="col-span-full sm:col-span-3"
+                                class="col-span-full sm:col-span-3 bg-transparent"
                                 :field-name="`transportAmount${tO.id}`"
+                                title="Camiones"
                                 placeholder="Camiones"
-                                title="Cantidad de camiones"
+                                mask="####"
+                                required-validation
+                                validation-type="extension"
+                                :char-amount="{ min: 1, max: 4 }"
                                 :data="tO.amount"
                                 @update:data="tO.amount = $event"
                             />
@@ -64,6 +68,7 @@
         <Modal :open="showModal" @close="showModal = false">
             <div v-if="!isNotificationConfirmed" class="text-left">
                 <p class="text-base text-black font-bold">Notificación a proveedores</p>
+                <p class="mt-3">Se está por enviar una notificación a los siguientes proveedores:</p>
                 <div
                     v-if="modalData.sandProvider"
                     class="bg-gray-100 mt-4 rounded-r-md py-4 pl-4 mb-2 border-l-4 border-green-500 border-opacity-50"
@@ -443,7 +448,7 @@
         @apply bg-second-200 border cursor-not-allowed;
     }
     fieldset:not(:last-of-type) {
-        @apply border-b pb-6;
+        @apply border-b pb-6 border-gray-200;
     }
     label:not(.toggle) {
         @apply flex flex-col;

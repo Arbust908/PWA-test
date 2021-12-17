@@ -121,7 +121,7 @@ export const checkPermission = (to: any, from: any, next: any) => {
     // check if has permissions
     if (permissions.view.includes(actualRoute)) {
         next();
+    } else {
+        next({ path: '/notLogged' });
     }
-
-    next({ path: '/notLogged' });
 };

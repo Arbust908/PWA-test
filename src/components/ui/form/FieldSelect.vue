@@ -8,7 +8,7 @@
             :id="fieldName"
             v-model.number="value"
             class="input"
-            :class="noOptionSelected && 'unselected'"
+            :class="selectClasses"
             :name="fieldName"
             :disabled="isDisabled"
             @blur="$emit('is-blured')"
@@ -27,7 +27,7 @@
 </template>
 
 <script>
-    import { defineComponent, computed, ref, toRefs, watchEffect } from 'vue';
+    import { defineComponent, computed, ref, toRefs, watch, watchEffect } from 'vue';
     import { useVModel } from '@vueuse/core';
     import { useApi } from '@/helpers/useApi';
     import { addVisibleFilter } from '@/helpers/useUrlHelpers';
@@ -93,6 +93,9 @@
                 type: Boolean,
                 default: true,
             },
+            selectClass: {
+                type: Boolean,
+            },
         },
         setup(props, { emit }) {
             const value = useVModel(props, 'data', emit);
@@ -115,12 +118,17 @@
 
             const noOptionSelected = computed(() => value.value === -1);
 
+            const selectClasses = computed(() => {
+                return props.selectClass && value.value === -1 ? 'error' : null;
+            });
+
             return {
                 value,
                 resources,
                 epData,
                 ...props,
                 noOptionSelected,
+                selectClasses,
             };
         },
     });
@@ -139,5 +147,8 @@
     }
     .unselected option:first-child {
         color: #a6a6a6;
+    }
+    .error {
+        @apply border-red-500;
     }
 </style>
