@@ -7,7 +7,7 @@
                     <table>
                         <thead>
                             <slot name="header">
-                                <TableHeader :columns="columns" :pagination="localPagination" />
+                                <TableHeader v-model:pagination="localPagination" :columns="columns" />
                             </slot>
                         </thead>
                         <tbody v-if="loading || paginatedItems.length === 0">
@@ -184,6 +184,10 @@
 
                     const propA = getDescendantProp(a, sortKey).toString().toLowerCase();
                     const propB = getDescendantProp(b, sortKey).toString().toLowerCase();
+
+                    if (!isNaN(Number(propA)) && !isNaN(Number(propA))) {
+                        return Number(propA) - Number(propB);
+                    }
 
                     if (propA < propB) {
                         return -1 * modifier;
