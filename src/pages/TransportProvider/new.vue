@@ -2,8 +2,9 @@
     <Layout>
         <ABMFormTitle title="Nuevo proveedor de transporte" />
         <section class="flex flex-wrap md:flex-nowrap">
+            <!-- main Section -->
             <section class="w-full md:w-8/12">
-                <nav class="flex justify-between max-w-2xl bg-white">
+                <nav v-if="!isClicked" class="flex justify-between max-w-2xl bg-white">
                     <button
                         :class="['section-tab', activeSection === 'provider' ? 'active' : '']"
                         :selected="activeSection === 'provider'"
@@ -19,7 +20,10 @@
                         <span> Unidades </span>
                     </button>
                 </nav>
-                <section v-if="activeSection === 'provider'" class="bg-white rounded-md max-w-2xl shadow-sm">
+                <section
+                    v-if="activeSection === 'provider' && !isClicked"
+                    class="bg-white rounded-md max-w-2xl shadow-sm"
+                >
                     <TransportProviderFrom
                         :tp-name="newTransportProvider.name"
                         :tp-id="newTransportProvider.legalId"
@@ -37,7 +41,10 @@
                         @update:crEmail="companyRepresentative.email = $event"
                     />
                 </section>
-                <section v-if="activeSection === 'driver'" class="bg-white rounded-md max-w-2xl shadow-sm">
+                <section
+                    v-if="activeSection === 'driver' && !isClicked"
+                    class="bg-white rounded-md max-w-2xl shadow-sm"
+                >
                     <form method="POST" action="/" class="p-4 max-w-lg">
                         <TransportProviderDriverForm
                             :driver-name="newDriver.name"
@@ -58,7 +65,24 @@
                         />
                     </form>
                 </section>
+                <!-- mobile transportProviders Cards -->
                 <section v-if="showDrivers" class="w-full md:w-4/12 mt-12 flex flex-col gap-y-4 md:hidden">
+                    <button
+                        :class="'flex items-center w-[250px] gap-2'"
+                        @click="
+                            driversShown = !driversShown;
+                            isClicked = !isClicked;
+                        "
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 0C5.37097 0 0 5.37097 0 12C0 18.629 5.37097 24 12 24C18.629 24 24 18.629 24 12C24 5.37097 18.629 0 12 0ZM18.9677 13.3548C18.9677 13.6742 18.7065 13.9355 18.3871 13.9355H13.9355V18.3871C13.9355 18.7065 13.6742 18.9677 13.3548 18.9677H10.6452C10.3258 18.9677 10.0645 18.7065 10.0645 18.3871V13.9355H5.6129C5.29355 13.9355 5.03226 13.6742 5.03226 13.3548V10.6452C5.03226 10.3258 5.29355 10.0645 5.6129 10.0645H10.0645V5.6129C10.0645 5.29355 10.3258 5.03226 10.6452 5.03226H13.3548C13.6742 5.03226 13.9355 5.29355 13.9355 5.6129V10.0645H18.3871C18.7065 10.0645 18.9677 10.3258 18.9677 10.6452V13.3548Z"
+                                fill="#8DC881"
+                            />
+                        </svg>
+
+                        <h2 class="font-semibold">Agregar Transportista</h2>
+                    </button>
                     <DriverCard
                         v-for="(driver, index) in drivers"
                         :key="index"
@@ -70,14 +94,38 @@
                         :transport-id2="driver.transportProviderId2"
                         :observations="driver.observations"
                         @delete-driver="deleteDriver(index)"
-                        @edit-driver="editDriver(index)"
+                        @edit-driver="
+                            editDriver(index);
+                            driversShown = !driversShown;
+                            isClicked = !isClicked;
+                        "
                     />
                 </section>
                 <!-- *** -->
                 <footer class="mt-8 gap-3 flex flex-col justify-end max-w-2xl">
-                    <SideBtn v-if="drivers.length" class="md:hidden" btn="full" @click="driversShown = !driversShown">
-                        {{ showDrivers ? driverTabText : 'Volver' }}
+                    <SideBtn
+                        v-if="drivers.length && !isClicked"
+                        class="md:hidden"
+                        btn="full"
+                        @click="
+                            driversShown = !driversShown;
+                            isClicked = !isClicked;
+                        "
+                    >
+                        {{ driverTabText }}
                     </SideBtn>
+                    <SecondaryBtn
+                        v-if="isClicked"
+                        class="md:hidden"
+                        btn="wide"
+                        @click="
+                            driversShown = !driversShown;
+                            isClicked = !isClicked;
+                        "
+                    >
+                        Volver
+                    </SecondaryBtn>
+                    <!-- button Section -->
                     <section v-if="!showDrivers" class="w-full space-x-3 flex items-center justify-end">
                         <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
                             Cancelar
@@ -95,6 +143,7 @@
                     </section>
                 </footer>
             </section>
+            <!-- desktop transportProvider Card -->
             <section class="hidden w-full md:w-4/12 mt-12 ml-4 md:flex flex-col gap-y-4">
                 <DriverCard
                     v-for="(driver, index) in drivers"
@@ -178,9 +227,9 @@
             };
             const driversShown = ref(false);
             const showDrivers = computed(() => {
-                const windowWidth = window.innerWidth;
-
-                return driversShown.value && windowWidth > 768;
+                if (driversShown.value === true) {
+                    return driversShown.value;
+                }
             });
 
             const drivers: Array<Driver> = reactive([]);
@@ -206,7 +255,7 @@
             };
 
             const deleteDriver = (index: number) => {
-                drivers.splice(index);
+                drivers.splice(index, 1);
             };
 
             const editDriver = (index: number) => {
@@ -258,10 +307,20 @@
                     newDriver.transportProviderId2 !== ''
                 );
             });
-
+            const isClicked = ref(false);
             const driverTabText = computed(() => {
-                return `Transportista${drivers.length > 1 ? `s (${drivers.length})` : ''}`;
+                if (drivers.length > 1 && !isClicked.value) {
+                    return `Ver Transportistas (${drivers.length})`;
+                } else if (drivers.length == 1 && !isClicked.value) {
+                    return `Ver Transportista`;
+                }
             });
+
+            function conLog() {
+                console.log(driverTabText.value);
+                console.log('drivers shown: ', driversShown.value);
+                console.log('isClicked: ', isClicked.value);
+            }
 
             const isValidated = ref(false);
             watchEffect(async () => {
@@ -310,8 +369,6 @@
                             }
                         });
                         watch(data, (newData, _) => {
-                            console.log(newData);
-
                             if (newData && newData.data) {
                                 const tpId = newData.data.id;
                                 const tpSave = reactive({ ...newData.data });
@@ -319,8 +376,6 @@
                                 drivers.forEach((driver) => {
                                     const { id, ...newDriver } = driver;
                                     newDriver.transportProviderId = tpId;
-                                    console.log('newDriver.transportProviderId', newDriver.transportProviderId);
-                                    console.log('new Driver', newDriver);
                                     const { data } = useAxios(
                                         `/driver/`,
                                         { method: 'POST', data: newDriver },
@@ -375,6 +430,8 @@
                 driversShown,
                 showSuccessModal,
                 showErrorCuitModal,
+                isClicked,
+                conLog,
             };
         },
     };
