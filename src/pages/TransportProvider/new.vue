@@ -25,20 +25,13 @@
                     class="bg-white rounded-md max-w-2xl shadow-sm"
                 >
                     <TransportProviderFrom
-                        :tp-name="newTransportProvider.name"
-                        :tp-id="newTransportProvider.legalId"
-                        :tp-address="newTransportProvider.address"
-                        :tp-observations="newTransportProvider.observations"
-                        :cr-name="companyRepresentative.name"
-                        :cr-phone="companyRepresentative.phone"
-                        :cr-email="companyRepresentative.email"
-                        @update:tpName="newTransportProvider.name = $event"
-                        @update:tpId="newTransportProvider.legalId = $event"
-                        @update:tpAddress="newTransportProvider.address = $event"
-                        @update:tpObservations="newTransportProvider.observations = $event"
-                        @update:crName="companyRepresentative.name = $event"
-                        @update:crPhone="companyRepresentative.phone = $event"
-                        @update:crEmail="companyRepresentative.email = $event"
+                        v-model:tp-name="newTransportProvider.name"
+                        v-model:tp-id="newTransportProvider.legalId"
+                        v-model:tp-address="newTransportProvider.address"
+                        v-model:tp-observations="newTransportProvider.observations"
+                        v-model:cr-name="companyRepresentative.name"
+                        v-model:cr-phone="companyRepresentative.phone"
+                        v-model:cr-email="companyRepresentative.email"
                     />
                 </section>
                 <section
@@ -47,20 +40,13 @@
                 >
                     <form method="POST" action="/" class="p-4 max-w-lg">
                         <TransportProviderDriverForm
-                            :driver-name="newDriver.name"
-                            :driver-phone="newDriver.phone"
-                            :driver-email="newDriver.email"
-                            :driver-t-type="newDriver.vehicleType"
-                            :driver-t-id="newDriver.transportId"
-                            :driver-t-id2="newDriver.transportProviderId2"
-                            :driver-obs="newDriver.observations"
-                            @update:driverName="newDriver.name = $event"
-                            @update:driverPhone="newDriver.phone = $event"
-                            @update:driverEmail="newDriver.email = $event"
-                            @update:driverTType="newDriver.vehicleType = $event"
-                            @update:driverTId="newDriver.transportId = $event"
-                            @update:driverTId2="newDriver.transportProviderId2 = $event"
-                            @update:driverObs="newDriver.observations = $event"
+                            v-model:driver-name="newDriver.name"
+                            v-model:driver-phone="newDriver.phone"
+                            v-model:driver-email="newDriver.email"
+                            v-model:driver-t-type="newDriver.vehicleType"
+                            v-model:driver-t-id="newDriver.transportId"
+                            v-model:driver-t-id2="newDriver.transportId2"
+                            v-model:driver-obs="newDriver.observations"
                             @add-driver="addDriver()"
                         />
                     </form>
@@ -91,7 +77,7 @@
                         :email="driver.email"
                         :vehicle-type="driver.vehicleType"
                         :transport-id="driver.transportId"
-                        :transport-id2="driver.transportProviderId2"
+                        :transport-id2="driver.transportId2"
                         :observations="driver.observations"
                         @delete-driver="deleteDriver(index)"
                         @edit-driver="
@@ -132,7 +118,7 @@
                         </SecondaryBtn>
                         <PrimaryBtn
                             btn="wide"
-                            :disabled="!isValidated ? 'yes' : null"
+                            :disabled="!isValidated"
                             @click="
                                 hasFullNewDriver && addDriver();
                                 isValidated && save();
@@ -153,7 +139,7 @@
                     :email="driver.email"
                     :vehicle-type="driver.vehicleType"
                     :transport-id="driver.transportId"
-                    :transport-id2="driver.transportProviderId2"
+                    :transport-id2="driver.transportId2"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
@@ -212,7 +198,6 @@
         },
         setup() {
             const store = useStore();
-            const router = useRouter();
             useTitle(`Nuevo Proveedor de Transporte <> Sandflow`);
             const instance = axios.create({
                 baseURL: api,
@@ -240,8 +225,7 @@
                 email: '',
                 vehicleType: '',
                 transportId: '',
-                // transportId2: '',
-                transportProviderId2: '',
+                transportId2: '',
                 observations: '',
             });
 
@@ -266,8 +250,7 @@
                 newDriver.email = driver.email;
                 newDriver.vehicleType = driver.vehicleType;
                 newDriver.transportId = driver.transportId;
-                // newDriver.transportId2 = driver.transportId2;
-                newDriver.transportProviderId2 = driver.transportProviderId2;
+                newDriver.transportId2 = driver.transportId2;
                 newDriver.observations = driver.observations;
             };
 
@@ -277,8 +260,7 @@
                 newDriver.email = '';
                 newDriver.vehicleType = '';
                 newDriver.transportId = '';
-                // newDriver.transportId2 = '';
-                newDriver.transportProviderId2 = '';
+                newDriver.transportId2 = '';
                 newDriver.observations = '';
             };
 
@@ -303,8 +285,7 @@
                     newDriver.email !== '' &&
                     newDriver.vehicleType !== '' &&
                     newDriver.transportId !== '' &&
-                    // newDriver.transportId2 !== '' &&
-                    newDriver.transportProviderId2 !== ''
+                    newDriver.transportId2 !== ''
                 );
             });
             const isClicked = ref(false);
@@ -315,12 +296,6 @@
                     return `Ver Transportista`;
                 }
             });
-
-            function conLog() {
-                console.log(driverTabText.value);
-                console.log('drivers shown: ', driversShown.value);
-                console.log('isClicked: ', isClicked.value);
-            }
 
             const isValidated = ref(false);
             watchEffect(async () => {
@@ -346,8 +321,6 @@
                     }
                 });
                 watch(compRepData, async (apiData) => {
-                    console.log(apiData);
-
                     if (apiData && apiData.data) {
                         newTransportProvider.companyRepresentativeId = apiData.data.id;
                         const legalIdExists = await checkIfExists('legalId', newTransportProvider.legalId);
@@ -395,11 +368,6 @@
                                 showSuccessModal.value = true;
                             }
                         });
-                    }
-                });
-                watchEffect(() => {
-                    if (representanteDone.value && transportProviderDone.value) {
-                        console.log('All done');
                     }
                 });
             };

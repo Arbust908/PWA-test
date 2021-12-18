@@ -35,7 +35,7 @@
                 <SecondaryBtn btn="wide" @click="goToIndex">Cancelar</SecondaryBtn>
                 <PrimaryBtn
                     btn="wide"
-                    :disabled="!isValidated ? 'yes' : null"
+                    :disabled="!isValidated"
                     @click="isValidated && getCradlesAndCheckIfNameExists()"
                 >
                     Finalizar
