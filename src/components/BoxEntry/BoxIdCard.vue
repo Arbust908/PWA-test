@@ -65,7 +65,7 @@
             @apply relative;
             &::after {
                 content: '';
-                @apply absolute inset-0 w-3 h-3 rounded-full m-auto bg-gray-900;
+                @apply absolute inset-0 w-3 h-3 rounded-full m-auto bg-green-600;
                 animation: pop_in 150ms ease-out;
             }
         }
@@ -76,7 +76,7 @@
             @apply p-2 w-1/2 bg-gray-100 border-r border-gray-300;
         }
         .input {
-            @apply w-1/2 border-none inline focus:ring-main-500 focus:border-main-500;
+            @apply w-1/2 border-none inline text-center focus:ring-main-500 focus:border-main-500;
             &:read-only {
                 @apply cursor-not-allowed bg-gray-100;
             }

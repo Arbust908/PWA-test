@@ -21,18 +21,18 @@
                 class="relative grid grid-cols-12 col-span-full gap-4 my-2"
             >
                 <FieldSelect
+                    v-model:data="so.sandTypeId"
                     class="col-span-5 sm:col-span-5"
-                    :title="Key === 0 ? 'Tipo' : ''"
+                    :title="Key === 0 ? 'Tipo' : null"
                     field-name="sandType"
                     placeholder="Arena"
                     endpoint-key="type"
-                    :data="so.sandTypeId"
-                    :endpoint-data="filteredSandTypes"
-                    @update:data="so.sandTypeId = $event"
+                    :endpoint-data="sandTypes"
                 />
                 <FieldWithSides
+                    v-model:data="so.amount"
                     class="col-span-5 sm:col-span-3"
-                    :title="Key === 0 ? 'Cantidad' : ''"
+                    :title="Key === 0 ? 'Cantidad' : null"
                     :field-name="`sandQuantity${Key}`"
                     placeholder="0"
                     type="number"
@@ -41,8 +41,6 @@
                     validation-type="extension"
                     :char-amount="{ min: 1, max: 4 }"
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
-                    :data="so.amount"
-                    @update:data="so.amount = $event"
                 />
                 <div class="flex flex-row content-evenly">
                     <div
@@ -82,15 +80,11 @@
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent, ref, watchEffect, onMounted } from 'vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
-    import { useVModel } from '@vueuse/core';
     import { SandProvider, SandOrder } from '@/interfaces/sandflow';
     import { isFirst, isLast } from '@/helpers/iteretionHelpers';
 
@@ -126,14 +120,14 @@
         setup(props, { emit }) {
             const sandProviders = useVModel(props, 'sandProviders', emit);
 
-            const filteredSandTypes = ref([]);
+            const sandTypes = ref([]);
 
             const getCurrentSandProvider = (Inid: number): SandProvider => {
                 return sandProviders.value.find((s) => s.innerId === Inid);
             };
 
             watchEffect(() => {
-                filteredSandTypes.value = props.filteredSandTypes;
+                sandTypes.value = props.filteredSandTypes;
             });
 
             const sandOrderInnerId = ref(0);
@@ -142,7 +136,6 @@
                 newSandOrder.innerId = ++sandOrderInnerId.value;
                 const currSP = getCurrentSandProvider(spId);
                 currSP?.SandOrders?.push(newSandOrder);
-                console.log(newSandOrder);
             };
             const removeSandOrder = (spId: number, soInid: number) => {
                 const currSP = getCurrentSandProvider(spId);
@@ -181,17 +174,17 @@
             };
 
             return {
-                sandProviders,
                 addSandOrder,
-                removeSandOrder,
                 addSandProvider,
-                removeSandProvider,
-                lastSandProviderInner,
-                filteredSandTypes,
                 cleanSandOrders,
+                sandTypes,
                 handleSandProviderUpdate,
-                isLast,
                 isFirst,
+                isLast,
+                lastSandProviderInner,
+                removeSandOrder,
+                removeSandProvider,
+                sandProviders,
             };
         },
     });

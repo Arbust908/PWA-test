@@ -2,12 +2,7 @@
     <Layout v-if="currentSand">
         <ABMTitle :title="`Arena - ${currentSand.type}`" />
         <section>
-            <SandForm
-                :type="currentSand.type"
-                :description="currentSand.observations"
-                @update:type="currentSand.type = $event"
-                @update:description="observations = $event"
-            />
+            <SandForm v-model:type="currentSand.type" v-model:observations="currentSand.observations" />
         </section>
         <!-- *** -->
         <footer>
@@ -15,7 +10,7 @@
             <PrimaryBtn
                 btn="wide"
                 :is-loading="loading"
-                :disabled="!isFull ? 'yes' : null"
+                :disabled="!isFull"
                 @click="isFull && getSandsAndCheckIfTypeExists()"
             >
                 Finalizar
@@ -59,7 +54,6 @@
     import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
-    // const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     export default {
         components: {
@@ -78,12 +72,20 @@
             const { GET } = StoreLogicMethods;
             const loading = ref(false);
 
-            const currentSand: Sand = ref(null as Sand);
+            const currentSand = ref({
+                type: '',
+                observations: '',
+            });
+
+            const currentSandType = ref('');
+
             onMounted(async () => {
                 loading.value = true;
                 const sandId = route.params.id;
                 const result = await useStoreLogic(router, store, 'sand', GET, sandId);
                 console.log(result);
+                currentSandType.value = result.res.type;
+                console.log('segundo', currentSandType.value);
 
                 if (result.type == 'success') {
                     currentSand.value = result.res;
@@ -91,11 +93,10 @@
                 loading.value = false;
             });
 
-            const currentSandType = currentSand.type;
             useTitle(`Arena ${currentSandType} <> Sandflow`);
 
             const isFull = computed(() => {
-                return !!(currentSand?.type?.length > 0);
+                return !!(currentSand?.value.type?.length > 0);
             });
 
             const createdSands = ref([]);
@@ -112,9 +113,12 @@
 
             const save = async () => {
                 loading.value = true;
-                const response = await axios.put(`${api}/sand/${currentSand.id}`, sandToUpdate).catch((err) => {
-                    console.log(err);
-                });
+                const response = await axios
+                    .put(`${api}/sand/${currentSand.value.id}`, currentSand.value)
+
+                    .catch((err) => {
+                        console.log(err);
+                    });
                 loading.value = false;
 
                 if (response.status === 200) {
@@ -122,7 +126,7 @@
                 } else {
                     toggleApiErrorModal();
                 }
-                store.dispatch('updateSand', sandToUpdate);
+                store.dispatch('updateSand', currentSand.value);
             };
 
             // TODO: Pasar a un useExist o algo asi
@@ -136,9 +140,9 @@
 
             const getSandsAndCheckIfTypeExists = async () => {
                 try {
-                    if (sandToUpdate.type == currentSandType) {
+                    if (currentSand.value.type == currentSandType.value) {
                         save();
-                    } else if (await checkIfExists('sand', 'type', sandToUpdate.type)) {
+                    } else if (await checkIfExists('sand', 'type', currentSand.value.type)) {
                         toggleErrorModal();
                     } else {
                         save();
@@ -149,18 +153,18 @@
             };
 
             return {
-                save,
+                ...toRefs(currentSand),
                 currentSand,
+                getSandsAndCheckIfTypeExists,
                 isFull,
                 loading,
-                ...toRefs(currentSand),
-                showModal,
-                showErrorModal,
+                save,
                 showApiErrorModal,
-                toggleModal,
-                toggleErrorModal,
+                showErrorModal,
+                showModal,
                 toggleApiErrorModal,
-                getSandsAndCheckIfTypeExists,
+                toggleErrorModal,
+                toggleModal,
             };
         },
     };

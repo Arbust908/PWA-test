@@ -243,19 +243,19 @@ const routes: Array<RouteRecordRaw> = [
         path: '/forklift',
         name: 'Forklift',
         component: () => import('@/pages/Forklift/index.vue'),
-        beforeEnter: [isMobileAndLogged, checkPermission],
+        beforeEnter: [isLogged, checkPermission],
     },
     {
         path: '/forklift/:id',
         name: 'ForkliftById',
         component: () => import('@/pages/Forklift/_id.vue'),
-        beforeEnter: [isMobileAndLogged, checkPermission],
+        beforeEnter: [isLogged, checkPermission],
     },
     {
         path: '/forklift/nuevo',
         name: 'NewForklift',
         component: () => import('@/pages/Forklift/new.vue'),
-        beforeEnter: [isMobileAndLogged, checkPermission],
+        beforeEnter: [isLogged, checkPermission],
     },
     {
         path: '/stage-sheet',
@@ -295,7 +295,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: '/usuarios/:id',
-        name: 'UsuerById',
+        name: 'UserById',
         component: () => import('@/pages/User/_id.vue'),
         beforeEnter: [isLogged, checkPermission],
     },
@@ -322,10 +322,20 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/Error/401.vue'),
     },
     {
+        path: '/error401',
+        name: 'Error-401',
+        component: () => import('@/pages/Error/401.vue'),
+    },
+    {
         path: '/error403',
         name: 'Error-403',
         component: () => import('@/pages/Error/403.vue'),
         beforeEnter: [isLogged],
+    },
+    {
+        path: '/error404',
+        name: 'Error-404',
+        component: () => import('@/pages/Error/404.vue'),
     },
     {
         path: '/error500',

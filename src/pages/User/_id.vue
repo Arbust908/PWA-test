@@ -23,13 +23,13 @@
             title="Ya existe un usuario con este mail"
             text="El usuario que intentas guardar fue creado anteriormente"
             @close="showErrorModal = false"
-            @action="showErrorModal = false"
+            @main="showErrorModal = false"
         />
         <SuccessModal
             :open="showSuccessModal"
             title="¡El usuario fue guardado con éxito!"
             @close="$router.push('/usuarios')"
-            @action="$router.push('/usuarios')"
+            @main="$router.push('/usuarios')"
         />
     </Layout>
 </template>
