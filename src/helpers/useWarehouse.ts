@@ -45,3 +45,76 @@ export const formatLocation = (location: any) => {
 
     return dimensions;
 };
+
+// {
+//     "1|1|1": {
+//         "id": "SDG85",
+//         "category": "fina"
+//     },
+//     "1|1|2": {
+//         "category": "empty"
+//     },
+//     "1|1|3": {
+//         "category": "gruesa"
+//     },
+//     "1|1|4": {
+//         "category": "empty"
+//     },
+//     "1|1|5": {
+//         "category": "cortada"
+//     },
+//     "1|2|1": {
+//         "category": "fina"
+//     },
+//     "1|2|2": {
+//         "category": "empty"
+//     },
+//     "1|2|3": {
+//         "category": "gruesa"
+//     },
+//     "1|2|4": {
+//         "category": "empty"
+//     },
+//     "1|2|5": {
+//         "category": "cortada"
+//     },
+//     "1|3|1": {
+//         "category": "fina"
+//     },
+//     "1|3|2": {
+//         "category": "empty"
+//     },
+//     "1|3|3": {
+//         "category": "gruesa"
+//     },
+//     "1|3|4": {
+//         "category": "empty"
+//     },
+//     "1|3|5": {
+//         "category": "cortada"
+//     }
+// }
+export const boxesByFloor = (location: any) => {
+    const boxes = Object.keys(location).reduce((bxs: any, currentCell) => {
+        const box = location[currentCell];
+
+        if (box && !box.id) {
+            return bxs;
+        }
+        const { floor, row, col } = formatCell(currentCell);
+        box.floor = floor;
+        box.row = row;
+        box.col = col;
+        const floorIndex = Number(floor) - 1;
+
+        if (!bxs[floorIndex]) {
+            bxs[floorIndex] = [];
+        }
+        bxs[floorIndex].push(box);
+
+        return bxs;
+    }, []);
+    console.log(boxes);
+
+    return boxes;
+};

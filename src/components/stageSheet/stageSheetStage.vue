@@ -63,7 +63,16 @@
     const showProgress = computed(() => {
         return stagePorcentage.value > 0 && stagePorcentage.value < 100;
     });
-    const boxQueue = ref([]);
+    const boxQueue = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    const addBoxToQueue = (place: null | number = null, box: any = null) => {
+        if (place !== null && box !== null) {
+            console.info('addBoxToQueue', place, box);
+            boxQueue.value[place] = box;
+            selectedBox.value = null;
+        } else {
+            boxQueue.value.push(boxQueue.value.length + 1);
+        }
+    };
     const selectedBox = ref(null as any);
     const isSelectedBox = (boxId: number) => {
         return selectedBox.value?.id === boxId;
@@ -74,22 +83,59 @@
     });
     const fillBox = (boxId: number, event) => {
         selectedBox.value = { id: boxId };
-        console.log(event);
-        console.log(event.clientX, event.clientY);
         popUpCords.x = event.clientX;
         popUpCords.y = event.clientY;
-        console.log(popUpCords);
     };
 
-    const boxesByFloor = computed(() => {
-        return props.boxes.reduce((pallet, box) => {
-            console.groupCollapsed('Boxes by floor');
-            console.log('Cajita!', box);
-            pallet.push(box);
+    const selectedFloor = ref(1);
+    const floors = computed(() => {
+        return props.boxes.length;
+    });
+    const selectFloor = (floor: number) => {
+        selectedFloor.value = floor;
+    };
+    const boxesByFloorAndFiltered = computed(() => {
+        const filteredBoxes = [];
+        props.boxes[selectedFloor.value - 1].map((box) => {
+            console.groupCollapsed('boxesByFloorAndFiltered');
+            console.info('box', box);
+            const compareQueue = boxQueue.value.filter((box) => {
+                return box.id;
+            });
+            console.log('compareQueue', compareQueue);
+
+            if (compareQueue.length <= 0) {
+                console.groupEnd();
+                filteredBoxes.push(box);
+
+                return true;
+            }
+
+            if (box && box.id) {
+                console.info('boxId', box.id);
+                const isOnQueue = compareQueue.some((queuedBox) => {
+                    console.info('queuedBox', queuedBox.boxId);
+                    console.info('compare box', box.id);
+
+                    return queuedBox.boxId === box.id;
+                });
+                console.log('isOnQueue', isOnQueue);
+                console.warn(!compareQueue.some((queuedBox) => queuedBox.boxId === box.id));
+                console.groupEnd();
+
+                if (!isOnQueue) {
+                    filteredBoxes.push(box);
+                }
+
+                return !compareQueue.some((queuedBox) => queuedBox.boxId === box.boxId);
+            }
             console.groupEnd();
 
-            return pallet;
-        }, []);
+            return box;
+        });
+        console.log('filteredBoxes', filteredBoxes);
+
+        return filteredBoxes;
     });
 </script>
 
@@ -144,43 +190,55 @@
             </section>
             <section v-else class="grid grid-cols-5 gap-4 max-w-md mx-auto">
                 <article
-                    v-for="place in 14"
+                    v-for="(box, place) in boxQueue"
                     :key="place + 'place'"
-                    :class="isSelectedBox(place) ? 'selected' : null"
+                    :class="[
+                        isSelectedBox(place) ? 'selected' : null,
+                        box.boxId ? `mesh-box__1 mesh-box__${box.category} filled` : null,
+                    ]"
                     class="stage--box not-filled"
                     @click="fillBox(place, $event)"
                 >
-                    {{ place }}
+                    <p>{{ box.boxId ? box.boxId : box }}</p>
+                    <p v-if="box.amount" class="text-black">{{ box.amount }} ton</p>
                     <teleport to="#modal">
                         <OnClickOutside v-if="isSelectedBox(place)" @trigger="selectedBox = null">
                             <div
                                 :style="`top: ${popUpCords.y}px; left: ${popUpCords.x}px`"
-                                class="top-0 left-0 absolute rounded bg-gray-50 z-40 w-[309px] max-h-[390px] p-6 shadow-md"
+                                class="top-0 left-0 absolute rounded bg-gray-50 z-40 w-[309px] max-h-[390px] pt-6 shadow-md"
                             >
                                 <div>
-                                    <h2 class="text-xl font-bold">Depósito</h2>
-                                    <nav class="mt-5 mb-4 space-x-6">
+                                    <h2 class="text-xl font-bold px-6">Depósito</h2>
+                                    <nav class="mt-5 mb-4 space-x-6 px-6">
                                         <button
-                                            class="text-sm font-medium text-main-500 pb-3 border-b-2 border-main-500"
+                                            v-for="flor in floors"
+                                            :key="`Floor${flor}`"
+                                            :class="`${
+                                                flor === selectedFloor
+                                                    ? 'border-main-500 font-medium'
+                                                    : 'border-transparent font-normal'
+                                            }`"
+                                            class="text-sm text-main-500 pb-3 border-b-2"
+                                            @click="selectFloor(flor)"
                                         >
-                                            Nivel x
-                                        </button>
-                                        <button class="text-sm text-main-500 pb-3 border-b-2 border-transparent">
-                                            Nivel xx
+                                            Nivel {{ flor }}
                                         </button>
                                     </nav>
-                                    <SheetDepoBox
-                                        v-for="(box, index) in boxesByFloor"
-                                        :key="index"
-                                        :box-id="box.id"
-                                        :category="box.category"
-                                    />
+                                    <section class="overflow-y-auto gutter-stable-both max-h-[220px] pb-6 space-y-2">
+                                        <SheetDepoBox
+                                            v-for="(box, index) in boxesByFloorAndFiltered"
+                                            :key="index"
+                                            :box-id="box.id"
+                                            :category="box.category"
+                                            @set-box="addBoxToQueue(place, $event)"
+                                        />
+                                    </section>
                                 </div>
                             </div>
                         </OnClickOutside>
                     </teleport>
                 </article>
-                <article class="stage--box">
+                <article class="stage--box" @click="addBoxToQueue()">
                     <PlusIcon />
                 </article>
             </section>
@@ -232,15 +290,21 @@
     .stage--box {
         width: 70px;
         height: 70px;
-        @apply rounded-lg flex justify-center items-center hover:shadow-md cursor-pointer transition duration-300 ease-in-out;
+        @apply rounded-lg flex flex-col justify-center items-center hover:shadow-md cursor-pointer transition duration-300 ease-in-out;
         &.not-filled {
             @apply border border-dashed border-gray-400;
         }
         &.selected {
             @apply text-blue-600 bg-blue-100 border-blue-600 border-solid;
         }
+        &.filled {
+            @apply border-solid border-2 text-sm;
+        }
     }
     .circle-progress {
         background-image: conic-gradient(#00a75d 0%, #00a75d var(--progress), #c4c4c4 var(--progress), #c4c4c4 100%);
+    }
+    .gutter-stable-both {
+        scrollbar-gutter: stable both-edges;
     }
 </style>

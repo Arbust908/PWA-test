@@ -1,7 +1,7 @@
 <script setup lang="ts">
     import { StageSheet, SandStage, Warehouse } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
-    import { formatLocation } from '@/helpers/useWarehouse';
+    import { boxesByFloor, formatLocation } from '@/helpers/useWarehouse';
 
     import Layout from '@/layouts/Main.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
@@ -13,7 +13,6 @@
 
     const clientId = ref(-1);
     const pitId = ref(-1);
-    const boxes: Ref<any[]> = ref([]);
 
     const _TABS = { PENDING: 0, COMPLETED: 1 };
     const selectedTab = ref(0);
@@ -43,6 +42,7 @@
                 category: 'fina',
             },
             '1|1|2': {
+                id: '4602',
                 category: 'empty',
             },
             '1|1|3': {
@@ -82,6 +82,53 @@
                 category: 'empty',
             },
             '1|3|5': {
+                category: 'cortada',
+            },
+            '2|1|1': {
+                id: '6789',
+                category: 'fina',
+            },
+            '2|1|2': {
+                id: '123',
+                category: 'empty',
+            },
+            '2|1|3': {
+                category: 'gruesa',
+            },
+            '2|1|4': {
+                category: 'empty',
+            },
+            '2|1|5': {
+                category: 'cortada',
+            },
+            '2|2|1': {
+                category: 'fina',
+            },
+            '2|2|2': {
+                category: 'empty',
+            },
+            '2|2|3': {
+                category: 'gruesa',
+            },
+            '2|2|4': {
+                category: 'empty',
+            },
+            '2|2|5': {
+                category: 'cortada',
+            },
+            '2|3|1': {
+                category: 'fina',
+            },
+            '2|3|2': {
+                category: 'empty',
+            },
+            '2|3|3': {
+                category: 'gruesa',
+            },
+            '2|3|4': {
+                category: 'empty',
+            },
+            '2|3|5': {
                 category: 'cortada',
             },
         },
@@ -680,7 +727,11 @@
     };
 
     console.log(warehouse.value);
-    boxes.value = setWareHouseBoxes(warehouse.value);
+    // boxes.value = setWareHouseBoxes(warehouse.value);
+    const boxes = computed(() => {
+        return boxesByFloor(warehouse.value.layout);
+        // return setWareHouseBoxes(warehouse.value);
+    });
 </script>
 
 <template>
