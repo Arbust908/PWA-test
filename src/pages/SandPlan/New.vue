@@ -5,10 +5,8 @@
             <form method="POST" action="/" class="py-4">
                 <FieldGroup class="grid-cols-6 md:grid-cols-12 max-w-2xl">
                     <ClientPitCombo
-                        :client-id="currentSandPlan.companyId"
-                        :pit-id="currentSandPlan.pitId"
-                        @update:clientId="currentSandPlan.companyId = $event"
-                        @update:pitId="currentSandPlan.pitId = $event"
+                        v-model:client-id="currentSandPlan.companyId"
+                        v-model:pit-id="currentSandPlan.pitId"
                     />
                 </FieldGroup>
             </form>
@@ -248,6 +246,9 @@
     import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
     import StageHeader from '@/components/sandPlan/StageHeader.vue';
 
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+
     const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
@@ -263,13 +264,12 @@
             SecondaryBtn,
             StageEmptyState,
             StageHeader,
+            SuccessModal,
+            ErrorModal,
         },
         setup() {
             useTitle('Nueva Planificación de arenas <> Sandflow');
             // Init
-            const windowWidth = window.innerWidth;
-            const store = useStore();
-            const router = useRouter();
             const instance = axios.create({
                 baseURL: api,
             });
@@ -504,7 +504,6 @@
                 save,
                 isFull,
                 addStage,
-                windowWidth,
                 showModal,
                 showErrorModal,
                 showApiErrorModal,
