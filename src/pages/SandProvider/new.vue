@@ -20,9 +20,7 @@
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-arena')">
                     Cancelar
                 </SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
-                    Finalizar
-                </PrimaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isValidated" @click="isValidated && save()"> Finalizar </PrimaryBtn>
             </section>
         </footer>
 
@@ -53,14 +51,12 @@
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
     import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
     import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
 
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     import ErrorModal from '@/components/modal/ErrorModal.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
 
@@ -86,7 +82,6 @@
             const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
             const errorMessage = ref('');
 
-            const showErrorModal = ref(false);
             const showSuccessModal = ref(false);
 
             const isNewRep: Ref<boolean> = ref(false);
@@ -159,7 +154,6 @@
             const checkIfExists = async (field: string, value: string) => {
                 //TODO: Refactor with useStoreLogic ? (useStoreLogic not accept filters)
                 const apiResponse = await axios.get(`${api}/sandProvider?${field}=${value}`);
-
                 const sandProviders = apiResponse.data.data;
 
                 return sandProviders.length > 0;
