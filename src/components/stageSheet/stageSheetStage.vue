@@ -25,7 +25,7 @@
             default: false,
         },
     });
-    const emits = defineEmits(['set-stage', 'update-queue']);
+    const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
     const sands = computed(() => {
         if (!props.sandStage) {
             return [];
@@ -52,13 +52,17 @@
             return acc + sand.quantity;
         }, 0);
     });
-    const stagePorcentage = ref(0);
+
     const progress = ref(null);
+    const progress2 = ref(null);
+    const progress3 = ref(null);
     const stagePorcentageVariable = useCssVar('--progress', progress);
+    const stagePorcentageVariable2 = useCssVar('--progress', progress2);
+    const stagePorcentageVariable3 = useCssVar('--progress', progress3);
     stagePorcentageVariable.value = '0%';
     const progression = setInterval(() => {
         if (parseInt(stagePorcentageVariable.value) < stagePorcentage.value) {
-            stagePorcentageVariable.value = parseInt(stagePorcentageVariable.value) + 1 + '%';
+            stagePorcentageVariable.value = parseInt(stagePorcentageVariable.value) + '%';
         } else {
             clearInterval(progression);
         }
@@ -152,6 +156,59 @@
 
         return filteredBoxes;
     });
+    onMounted(() => {
+        emits('update-queue', boxQueue.value);
+    });
+    const queueDetail = computed(() => {
+        return boxQueue.value.reduce((acc, item) => {
+            if (item?.sandType?.id) {
+                const sandId = item?.sandType?.id;
+                const sandType = item?.sandType?.type;
+
+                acc[sandType] = acc[sandType] ? acc[sandType] + item?.amount : item?.amount;
+            }
+
+            return acc;
+        }, {});
+    });
+    const queueDetailTotal = computed(() => {
+        let total = 0;
+        for (const key in queueDetail.value) {
+            if (Object.prototype.hasOwnProperty.call(queueDetail.value, key)) {
+                const element = queueDetail.value[key];
+                total += element;
+            }
+        }
+
+        return total;
+    });
+    const getPorcentage = (total: number, value = 0, index = 0) => {
+        console.log('getPorcentage', total, value);
+
+        if (index !== null) {
+            if (index >= 1) {
+                [`stagePorcentageVariable${index}`].value = (value * 100) / total + '%';
+            } else {
+                stagePorcentageVariable.value = (value * 100) / total + '%';
+            }
+        }
+
+        return (value * 100) / total;
+    };
+
+    const stagePorcentage = computed(() => {
+        console.log('stagePorcentage');
+        console.log(weigth.value);
+        console.log(queueDetailTotal.value);
+        console.log('Total ' + getPorcentage(weigth.value, queueDetailTotal.value, null) + '%');
+
+        return getPorcentage(weigth.value, queueDetailTotal.value, null);
+    });
+    watch(stagePorcentage, () => {
+        if (stagePorcentage.value >= 100) {
+            emits('set-stage-full');
+        }
+    });
 </script>
 
 <template>
@@ -181,25 +238,28 @@
             <section
                 class="max-w-[16rem] w-full rounded border border-gray-200 shadow-sm px-5 py-7 self-start space-y-6"
             >
-                <div v-for="sand in sands" :key="sand.id + sand.type" class="flex items-start">
+                <div v-for="(sand, index) in sands" :key="sand.id + sand.type" class="flex items-start">
                     <i class="w-3 h-3 inline-block rounded-full mesh-box__1 m-2 bubble"></i>
                     <article>
                         <h4>Arena {{ sand.type }}</h4>
                         <p class="text-gray-400">{{ sand.quantity }} toneladas</p>
                     </article>
-                    <article ref="progress" class="w-[70px] rounded flex justify-center items-center ml-auto">
+                    <article
+                        :ref="`progress${index >= 1 ? index + 1 : null}`"
+                        class="w-[70px] rounded flex justify-center items-center ml-auto"
+                    >
                         <div
                             class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center circle-progress"
                         >
                             <p class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]">
-                                {{ stagePorcentage }}%
+                                {{ getPorcentage(sand.quantity, queueDetail[sand.type], index) }}%
                             </p>
                         </div>
                     </article>
                 </div>
             </section>
             <section v-if="!isActiveStage" class="flex justify-center items-center max-w-md">
-                <p class="leading-wider leading-loose text-center w-full px-4">
+                <p class="leading-wider leading-loose text-center max-w-sm mx-auto">
                     Debés completar al menos un 70% de la etapa anterior para continuar con la siguiente
                 </p>
             </section>
@@ -209,9 +269,9 @@
                     :key="place + 'place'"
                     :class="[
                         isSelectedBox(place) ? 'selected' : null,
-                        box.boxId ? `mesh-box__1 mesh-box__${box.category} filled` : null,
+                        box.boxId ? `mesh-box__1 mesh-box__${box.category} filled` : 'not-filled',
                     ]"
-                    class="stage--box not-filled"
+                    class="stage--box"
                     @click="fillBox(place, $event)"
                 >
                     <p>{{ box.boxId ? box.boxId : box }}</p>

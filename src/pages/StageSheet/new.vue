@@ -715,8 +715,38 @@
         // return setWareHouseBoxes(warehouse.value);
     });
 
-    const updateQueue = (queue: array<any>) => {
+    const selectedQueue = ref([]);
+    const updateQueue = (queue: Array<any>) => {
         console.log('updateQueue', queue);
+        selectedQueue.value = queue;
+    };
+    const queueDetail = computed(() => {
+        return selectedQueue.value.reduce((acc, item) => {
+            if (item?.sandType?.id) {
+                const sandId = item?.sandType?.id;
+                const sandIndex = acc.indexOf(sandId);
+
+                if (sandIndex === -1) {
+                    acc.push(item?.amount);
+                } else {
+                    acc[sandIndex] = acc[sandIndex] + item?.amount;
+                }
+            }
+
+            return acc;
+        }, []);
+    });
+    const sumQueueDetail = computed(() => {
+        return queueDetail.value.reduce((acc, item) => {
+            return acc + item;
+        }, 0);
+    });
+    const setStageFull = (sheetId: number) => {
+        const stage = stages.value.find((stage) => stage.stageSheetId === sheetId);
+
+        if (stage) {
+            stage.done = stage.weight;
+        }
     };
 </script>
 
@@ -758,6 +788,7 @@
                     :is-active="pendingStages[0].id === sheet.id"
                     @set-stage="setStage($event)"
                     @update-queue="updateQueue($event)"
+                    @set-stage-full="setStageFull(sheet.id)"
                 />
                 <StageSheetStageBox v-if="pendingStages.length <= 0">
                     <p class="text-center">No hay etapas pendientes</p>
@@ -779,28 +810,28 @@
             </div>
             <aside>
                 <h3 class="text-3xl font-bold">Detalle</h3>
-                <article v-if="selectedStage.id === -1" class="px-4 py-6 border rounded-[10px]">
+                <article v-if="selectedStage?.id === -1" class="px-4 py-6 border rounded-[10px]">
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
                 </article>
                 <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
                     <div class="text-semibold space-y-3">
                         <p>
-                            <span>Total Arena A:</span>
-                            <span>-</span>
+                            <span class="mr-2">Total Arena A:</span>
+                            <span>{{ (queueDetail && queueDetail[0]) || '-' }}</span>
                         </p>
                         <p>
-                            <span>Total Arena B:</span>
-                            <span>-</span>
+                            <span class="mr-2">Total Arena B:</span>
+                            <span>{{ (queueDetail && queueDetail[1]) || '-' }}</span>
                         </p>
                         <p>
-                            <span>Total Arena C:</span>
-                            <span>-</span>
+                            <span class="mr-2">Total Arena C:</span>
+                            <span>{{ (queueDetail && queueDetail[2]) || '-' }}</span>
                         </p>
                     </div>
                     <hr class="border-white border mt-1" />
                     <p class="text-bold text-lg mt-4">
-                        <span>Total General:</span>
-                        <span>-</span>
+                        <span class="mr-2">Total General:</span>
+                        <span>{{ sumQueueDetail || '-' }}</span>
                     </p>
                 </article>
                 <article v-if="false" class="px-3 py-4 rounded-[10px] bg-gray-100 border border-gray-400 shadow">

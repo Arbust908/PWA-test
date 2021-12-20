@@ -160,15 +160,11 @@
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
             <PrimaryBtn btn="wide" :disabled="!canSave" @click.prevent="save()"> Guardar </PrimaryBtn>
         </footer>
-        <Modal type="success" :open="confirmModal" class="modal" @close="resetBoxIn">
-            <template #body>
-                <p class="font-bold text-black">El ingreso de cajas ha sido guardado con éxito</p>
-            </template>
-            <template #btn>
-                <div class="w-full flex justify-center gap-5">
-                    <PrimaryBtn @click.prevent="resetBoxIn">Continuar</PrimaryBtn>
-                </div>
-            </template>
+        <Modal :open="confirmModal" class="modal" @close="resetBoxIn">
+            <p class="font-bold text-black">El ingreso de cajas ha sido guardado con éxito</p>
+            <div class="w-full flex justify-center gap-5">
+                <PrimaryBtn @click.prevent="resetBoxIn">Continuar</PrimaryBtn>
+            </div>
         </Modal>
     </Layout>
 </template>
