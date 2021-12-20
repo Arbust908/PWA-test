@@ -399,7 +399,6 @@
                 showSuccessModal,
                 showErrorCuitModal,
                 isClicked,
-                conLog,
             };
         },
     };

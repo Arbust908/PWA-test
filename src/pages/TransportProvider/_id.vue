@@ -65,7 +65,10 @@
                         {{ showDrivers ? driverTabText : 'Volver' }}
                     </SideBtn>
                     <section v-if="!showDrivers" class="w-full space-x-3 flex items-center justify-end">
-                        <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
+                        <SecondaryBtn
+                            btn="wide"
+                            @click.prevent="driverRestore(), $router.push('/proveedores-de-transporte')"
+                        >
                             Cancelar
                         </SecondaryBtn>
                         <PrimaryBtn
@@ -202,8 +205,13 @@
                 };
             };
 
+            const backUpDriver = ref(false);
+
             const editDriver = (index: number) => {
                 const driver = { ...drivers[index] };
+                backUpDriver.value = true;
+                console.log('Driver', driver);
+                console.log('backUpDriver', backUpDriver);
                 deleteDriver(index);
 
                 if (activeSection.value === 'provider') {
@@ -217,6 +225,17 @@
                 newDriver.transportId2 = driver.transportId2;
                 newDriver.observations = driver.observations;
             };
+
+            const driverRestore = () => {
+                if (backUpDriver.value === true) {
+                    addDriver();
+                    update();
+                } else {
+                    console.log('Nothing to push');
+                }
+            };
+
+            console.log(axios.get(`${api}/transportProvider`));
 
             const cleanNewDriver = () => {
                 newDriver.name = '';
@@ -327,6 +346,7 @@
                 hasFullNewDriver,
                 deleteDriver,
                 editDriver,
+                driverRestore,
                 id,
                 currentTransportProvider,
                 update,
