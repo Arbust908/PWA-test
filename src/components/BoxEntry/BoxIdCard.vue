@@ -1,8 +1,9 @@
 !
 <template>
     <div class="available-box">
+        {{ choosedBoxId }} / {{ box.boxId }}
         <button
-            :class="choosedBoxId == box.boxId ? 'active' : null"
+            :class="choosedBoxId === box.boxId ? 'active' : null"
             class="radio-button"
             type="button"
             @click="$emit('select-box', box.boxId)"
@@ -39,7 +40,7 @@
             },
             choosedBoxId: {
                 type: String,
-                default: '',
+                default: null,
             },
         },
         emits: ['select-box', 'update:boxId'],

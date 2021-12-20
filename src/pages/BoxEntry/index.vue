@@ -26,6 +26,7 @@
                     />
                 </FieldGroup>
                 <fieldset v-if="selectionsAreDone" class="w-full pt-1 pb-5 px-2">
+                    {{ choosedBox }}
                     <div v-if="boxes.length > 0 || boxesWithoutId.length > 0" class="space-y-4">
                         <BoxIdCard
                             v-for="box in boxes"
@@ -423,7 +424,7 @@
                 row: 0,
                 category: '',
                 id: '',
-                boxId: '',
+                boxId: '*****',
                 wasOriginallyOnDeposit: false,
                 wasOriginallyOnCradle: false,
             });
