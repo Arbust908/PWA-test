@@ -364,7 +364,6 @@
                 // TODO: StoreLogic
                 const result = await axios.get(`${api}/driver`);
                 drivers.value = result.data.data;
-                console.log(axios.get(`${api}/transportOrder`));
             });
 
             useTitle('Nueva orden de pedido <> Sandflow');
