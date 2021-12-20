@@ -160,12 +160,12 @@
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
             <PrimaryBtn btn="wide" :disabled="!canSave" @click.prevent="save()"> Guardar </PrimaryBtn>
         </footer>
-        <Modal :open="confirmModal" class="modal" @close="resetBoxIn">
-            <p class="font-bold text-black">El ingreso de cajas ha sido guardado con éxito</p>
-            <div class="w-full flex justify-center gap-5">
-                <PrimaryBtn @click.prevent="resetBoxIn">Continuar</PrimaryBtn>
-            </div>
-        </Modal>
+        <SuccessModal
+            :open="confirmModal"
+            title="El ingreso de cajas ha sido guardado con éxito."
+            @close="resetBoxIn"
+            @main="resetBoxIn"
+        />
     </Layout>
 </template>
 
@@ -178,7 +178,6 @@
     import EyeIconOff from './EyeIconOff.vue';
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
     import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
@@ -189,7 +188,7 @@
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import Modal from '@/components/modal/General.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -206,10 +205,9 @@
             FieldSelect,
             SecondaryBtn,
             Layout,
-            Modal,
-            NoneBtn,
             PrimaryBtn,
             BoxIdCard,
+            SuccessModal,
         },
         setup() {
             useTitle('Ingreso de Cajas <> Sandflow');
