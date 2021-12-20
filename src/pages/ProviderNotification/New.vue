@@ -13,46 +13,6 @@
                     v-model:amount="transportOrder[0].amount"
                     v-model:observation="transportOrder[0].observation"
                 />
-                <!-- <fieldset class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
-                    <h2 class="col-span-full text-xl mt-4">Transporte</h2>
-                    <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
-                        <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
-                        <FieldSelect
-                            :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full sm:col-span-5'"
-                            title="Proveedor"
-                            :field-name="`transportProvider${tO.id}`"
-                            placeholder="Seleccionar"
-                            endpoint="/transportProvider"
-                            :data="tO.transportProviderId"
-                            @update:data="tO.transportProviderId = $event"
-                        />
-                        <div v-if="transportOrder.length > 1" class="col-span-2 flex mx-auto items-end pb-2">
-                            <Icon icon="Trash" outline class="w-5 h-5" @click="removeTransportProvider(tO.id)" />
-                        </div>
-                        <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
-                            <FieldInput
-                                class="col-span-full sm:col-span-3 bg-transparent"
-                                :field-name="`transportAmount${tO.id}`"
-                                title="Camiones"
-                                placeholder="Camiones"
-                                mask="####"
-                                required-validation
-                                validation-type="extension"
-                                :char-amount="{ min: 1, max: 4 }"
-                                :data="tO.amount"
-                                @update:data="tO.amount = $event"
-                            />
-                            <FieldInput
-                                v-model:data="tO.observation"
-                                class="col-span-full sm:col-span-5"
-                                :field-name="`transportObservations${tO.id}`"
-                                placeholder="Observaciones"
-                                title="Observaciones"
-                                is-optional
-                            />
-                        </div>
-                    </template>
-                </fieldset> -->
             </form>
         </section>
 
@@ -80,9 +40,15 @@
         />
         <ErrorModal
             :open="isNotificationConfirmed && apiRequest && !hasSaveSuccess"
-            :text="`Hubo un problema con el envío de la notificación. <br />Por favor, intenta nuevamente`"
-            @close="showModal = false"
-            @main="showModal = false"
+            text="Hubo un problema con el envío de la notificación. Por favor, intenta nuevamente."
+            @close="
+                showModal = false;
+                isNotificationConfirmed = false;
+            "
+            @main="
+                showModal = false;
+                isNotificationConfirmed = false;
+            "
         />
         <Modal :open="showModal" modal-classes="max-w-md" @close="showModal = false">
             <div v-if="!isNotificationConfirmed" class="text-left">
@@ -122,30 +88,6 @@
                 <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
                 <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
             </div>
-            <!-- <div
-                v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
-                class="divide-y text-center flex flex-col justify-center text-xl items-center"
-            >
-                <Icon icon="ArrowCircleUp" class="h-[60px] w-[60px] rotate-45 mb-5 text-gray-400" />
-                <span class="text-center text-base border-none text-gray-900">
-                    ¡La notificación está en proceso de envío!
-                </span>
-                <span class="text-center text-sm border-none m-2">
-                    En breve lo verás reflejado en la columna “Estado”
-                </span>
-            </div> -->
-            <!-- 
-            <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
-                <BaseBtn
-                    class="border-2 text-gray-500 rounded"
-                    @click.prevent="$router.push('/notificaciones-a-proveedores')"
-                >
-                    Continuar
-                </BaseBtn>
-            </div>
-            <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
-                <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
-            </div> -->
         </Modal>
     </Layout>
 </template>

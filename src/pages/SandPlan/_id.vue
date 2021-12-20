@@ -546,7 +546,7 @@
                             }
                         });
                         updateSandPlan(currentSandPlan);
-                        router.push('/planificacion-de-arena');
+                        showModal.value = true;
                     }
                 });
             };

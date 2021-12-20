@@ -157,7 +157,7 @@
             </form>
         </section>
         <footer class="space-x-3 flex justify-end items-center mt-8">
-            <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn>
+            <!-- <SecondaryBtn btn="wide" @click.prevent="$router.push('/')"> Cancelar </SecondaryBtn> -->
             <PrimaryBtn btn="wide" :disabled="!canSave" @click.prevent="save()"> Guardar </PrimaryBtn>
         </footer>
         <Modal type="success" :open="confirmModal" class="modal" @close="resetBoxIn">
