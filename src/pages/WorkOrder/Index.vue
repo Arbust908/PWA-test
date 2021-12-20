@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <ABMHeader title="Ordenes de Trabajo" link="/orden-de-trabajo/nueva" />
+        <ABMHeader title="Ordenes de trabajo" link="/orden-de-trabajo/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2 mb-8">
             <FieldSelect
                 title="Filtro"

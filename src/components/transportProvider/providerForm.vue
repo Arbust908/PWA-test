@@ -5,7 +5,7 @@
                 class="col-span-full"
                 field-name="transportName"
                 placeholder=""
-                title="Nombre / Razón Social"
+                title="Nombre / Razón social"
                 :data="tpName"
                 require-validation
                 entity="transportProvider"
@@ -48,7 +48,7 @@
             <FieldLegend>Contacto principal</FieldLegend>
             <FieldInput
                 class="col-span-full"
-                title="Nombre y Apellido"
+                title="Nombre y apellido"
                 field-name="repName"
                 placeholder=""
                 :data="crName"

@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de Pedido</h1>
+            <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de pedido</h1>
         </header>
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4">
