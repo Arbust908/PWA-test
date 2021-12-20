@@ -95,7 +95,7 @@
             <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/clientes')"> Cancelar </SecondaryBtn>
 
-                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
+                <PrimaryBtn btn="wide" :disabled="!isValidated" @click="isValidated && update()">
                     Finalizar
                 </PrimaryBtn>
             </section>
