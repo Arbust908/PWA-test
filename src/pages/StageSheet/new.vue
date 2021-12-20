@@ -162,15 +162,6 @@
         },
     });
 
-    const getLayoutDimensions = computed(() => {
-        const layout = warehouse.value.layout;
-        console.log('Layout', layout);
-        const dimensions = formatLocation(layout);
-        console.log('dimensions', dimensions);
-
-        return dimensions;
-    });
-
     watch(clientId, (newVal) => {
         if (newVal !== -1) {
             console.log('Val', newVal);
@@ -699,15 +690,6 @@
         return whBoxes.filter((box) => box.id);
     };
 
-    const stageSheetDetails = computed(() => {
-        console.log('selectedStage', selectedStage.value);
-
-        return selectedStage.value === -1
-            ? {}
-            : {
-                  ...selectedStage.value,
-              };
-    });
     const setStage = (stage: number) => {
         if (selectedStage.value.id === stage) {
             selectedStage.value = -1;
@@ -732,6 +714,10 @@
         return boxesByFloor(warehouse.value.layout);
         // return setWareHouseBoxes(warehouse.value);
     });
+
+    const updateQueue = (queue: array<any>) => {
+        console.log('updateQueue', queue);
+    };
 </script>
 
 <template>
@@ -761,7 +747,6 @@
                 Etapas finalizadas
             </button>
         </nav>
-        {{ getLayoutDimensions }}
         <section class="mt-4 panel">
             <div v-if="isTabSelected(_TABS.PENDING)" class="stage--panel">
                 <StageSheetStage
@@ -770,7 +755,9 @@
                     :sand-stage="sheet"
                     :boxes="boxes"
                     :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
+                    :is-active="pendingStages[0].id === sheet.id"
                     @set-stage="setStage($event)"
+                    @update-queue="updateQueue($event)"
                 />
                 <StageSheetStageBox v-if="pendingStages.length <= 0">
                     <p class="text-center">No hay etapas pendientes</p>
@@ -784,6 +771,7 @@
                     :boxes="boxes"
                     :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
                     @set-stage="setStage($event)"
+                    @update-queue="updateQueue($event)"
                 />
                 <StageSheetStageBox v-if="finalizedStages.length <= 0">
                     <p class="text-center p-6">No hay etapas finalizadas</p>
@@ -795,7 +783,6 @@
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
                 </article>
                 <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
-                    {{ stageSheetDetails }}
                     <div class="text-semibold space-y-3">
                         <p>
                             <span>Total Arena A:</span>

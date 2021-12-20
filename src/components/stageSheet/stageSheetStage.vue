@@ -20,8 +20,12 @@
             type: Boolean,
             default: false,
         },
+        isActive: {
+            type: Boolean,
+            default: false,
+        },
     });
-    defineEmits(['set-stage']);
+    const emits = defineEmits(['set-stage', 'update-queue']);
     const sands = computed(() => {
         if (!props.sandStage) {
             return [];
@@ -48,7 +52,7 @@
             return acc + sand.quantity;
         }, 0);
     });
-    const stagePorcentage = ref(Math.round((1 / weigth.value) * 100));
+    const stagePorcentage = ref(0);
     const progress = ref(null);
     const stagePorcentageVariable = useCssVar('--progress', progress);
     stagePorcentageVariable.value = '0%';
@@ -69,10 +73,21 @@
             console.info('addBoxToQueue', place, box);
             boxQueue.value[place] = box;
             selectedBox.value = null;
+            emits('update-queue', boxQueue.value);
         } else {
             boxQueue.value.push(boxQueue.value.length + 1);
         }
     };
+    const isActiveStage = computed(() => {
+        return props.isActive;
+    });
+    watch(isActiveStage, (newValue) => {
+        console.log('isActiveStage', newValue);
+
+        if (newValue) {
+            emits('update-queue', boxQueue.value);
+        }
+    });
     const selectedBox = ref(null as any);
     const isSelectedBox = (boxId: number) => {
         return selectedBox.value?.id === boxId;
@@ -183,7 +198,7 @@
                     </article>
                 </div>
             </section>
-            <section v-if="!showProgress" class="flex justify-center items-center max-w-md">
+            <section v-if="!isActiveStage" class="flex justify-center items-center max-w-md">
                 <p class="leading-wider leading-loose text-center w-full px-4">
                     Debés completar al menos un 70% de la etapa anterior para continuar con la siguiente
                 </p>
