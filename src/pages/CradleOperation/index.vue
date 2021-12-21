@@ -86,7 +86,6 @@
                     <div v-else class="slot without-box">
                         <span class="station-title">Estación {{ index + 1 }} - Sin caja</span>
                     </div>
-                    {{ slot.sandType }}
                 </div>
             </section>
             <!-- empty cradles -->
