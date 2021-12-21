@@ -110,8 +110,6 @@
                 return deposit.value[`${floorNum}|${row}|${col}`];
             };
 
-            ref(props.visibleCategories);
-
             return {
                 currentFloor,
                 getBoxData,

@@ -41,7 +41,7 @@
                 default: ref({}),
             },
         },
-        emits: { 'select-box': null },
+        emits: ['select-box'],
         setup(props, { emit }) {
             let { floor, row, col, selectedBox, boxData } = toRefs(props);
 
@@ -117,7 +117,11 @@
             @apply bg-[#A6AFFE] text-[#2E36AF] font-medium;
         }
         &.blocked {
-            @apply bg-second-800 text-second-800;
+            @apply relative z-10;
+            &:after {
+                content: '';
+                @apply absolute z-40 inset-0 border-none opacity-75 border bg-slate-700 m-1 rounded;
+            }
         }
         &.empty {
             @apply bg-second-200 text-second-200;
