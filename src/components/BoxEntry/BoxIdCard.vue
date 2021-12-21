@@ -1,9 +1,11 @@
 !
 <template>
-    <div class="available-box">
+    <article class="available-box">
+        <TheAllIcon v-if="isActiveBox" type="outline" icon="CheckCircle" class="w-6 h-6 text-green-600" />
         <button
-            :class="choosedBoxId == box.boxId ? 'active' : null"
+            v-else
             class="radio-button"
+            :disabled="box.boxId?.length <= 0"
             type="button"
             @click="$emit('select-box', box.boxId)"
         />
@@ -12,47 +14,34 @@
             <div class="box-id">
                 <span> ID Caja </span>
                 <input
-                    v-model="boxyId"
+                    :value="boxy.boxId"
                     :name="`boxId-${box.id}`"
-                    :readonly="hasId"
+                    :readonly="hadId"
                     type="text"
-                    placeholder="Ej: S-0001"
+                    placeholder="Ej: S-0908"
                     class="input"
+                    @blur="boxy.boxId = $event.target.value"
                 />
             </div>
         </div>
-    </div>
+    </article>
 </template>
 
-<script lang="ts">
-    import { defineComponent } from 'vue';
-    import { useVModel } from '@vueuse/core';
-    export default defineComponent({
-        props: {
-            box: {
-                type: Object,
-                required: true,
-            },
-            boxId: {
-                type: String,
-                required: true,
-            },
-            choosedBoxId: {
-                type: String,
-                default: '',
-            },
+<script setup lang="ts">
+    import TheAllIcon from '@/components/icon/TheAllIcon.vue';
+    const props = defineProps({
+        box: {
+            type: Object,
+            required: true,
         },
-        emits: ['select-box', 'update:boxId'],
-        setup(props, { emit }) {
-            const boxyId = useVModel(props, 'boxId', emit);
-            const hasId = boxyId.value.length > 0;
-
-            return {
-                boxyId,
-                hasId,
-            };
+        isActiveBox: {
+            type: Boolean,
+            default: false,
         },
     });
+    const emit = defineEmits(['select-box', 'update:box']);
+    const boxy = useVModel(props, 'box', emit);
+    const hadId = props?.box?.boxId.length > 0;
 </script>
 
 <style lang="scss" scoped>
@@ -60,23 +49,23 @@
         @apply flex items-center;
     }
     .radio-button {
-        @apply border border-gray-800 w-5 h-5 cursor-pointer rounded-full;
-        &.active {
-            @apply relative;
+        @apply border border-gray-800 w-5 h-5 m-1 cursor-pointer rounded-full;
+        &:disabled {
+            @apply opacity-50 flex justify-center items-center cursor-not-allowed;
             &::after {
                 content: '';
-                @apply absolute inset-0 w-3 h-3 rounded-full m-auto bg-green-600;
-                animation: pop_in 150ms ease-out;
+                @apply bg-slate-400 absolute w-3 h-3 rounded-full;
             }
         }
     }
+
     .box-id {
         @apply mx-2 w-48 flex justify-between text-center border rounded-md overflow-hidden border-gray-300;
         span {
             @apply p-2 w-1/2 bg-gray-100 border-r border-gray-300;
         }
         .input {
-            @apply w-1/2 border-none inline text-center focus:ring-main-500 focus:border-main-500;
+            @apply w-1/2 border-none inline text-center focus:ring-main-500 focus:border-main-500 px-2;
             &:read-only {
                 @apply cursor-not-allowed bg-gray-100;
             }

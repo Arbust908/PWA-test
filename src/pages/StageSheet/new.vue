@@ -32,7 +32,7 @@
         stages: [],
     });
 
-    const warehouse: Ref<Warehouse> = ref({});
+    let warehouse: Ref<Warehouse> = ref({});
 
     const fillSheet = async (currentSheet: any) => {
         if (currentSheet.companyId !== -1 && currentSheet.pitId !== -1) {
@@ -42,40 +42,36 @@
     };
 
     watch(clientId, (newVal) => {
-        if (newVal !== -1) {
-            console.log('Val', newVal);
-            actualSheet.companyId = newVal;
-            console.log('Actual', actualSheet);
-            fillSheet(actualSheet);
-        }
+        console.log('Val', newVal);
+        actualSheet.companyId = newVal;
+        console.log('Actual', actualSheet);
+        fillSheet(actualSheet);
     });
     watch(pitId, (newVal) => {
-        if (newVal !== -1) {
-            console.log('Val', newVal);
-            actualSheet.pitId = newVal;
-            console.log('Actual', actualSheet);
-            fillSheet(actualSheet);
-        }
+        console.log('Val', newVal);
+        actualSheet.pitId = newVal;
+        console.log('Actual', actualSheet);
+        fillSheet(actualSheet);
     });
 
-    const getSandPlan = async ({ pitId: pozoId, companyId }: StageSheet) => {
+    const getSandPlan = ({ pitId: pozoId, companyId }: StageSheet) => {
         console.log('Get sand plan', { pozoId, companyId });
 
-        console.log('https://sandflow-qa.bitpatagonia.com/api' + `/sandPlan?pitId=${pozoId}&companyId=${companyId}`);
-        const { read } = useApi(`/sandPlan?pitId=${pozoId}&companyId=${companyId}`);
-        stages.value = await read();
+        console.log('https://sandflow-qa.bitpatagonia.com/api' + `/sandPlan?pitId=${pozoId}`);
+        const { read } = useApi(`/sandPlan?pitId=${pozoId}`);
+        stages = read();
     };
 
-    const getDeposit = async ({ pitId: pozoId, companyId }: StageSheet) => {
+    const getDeposit = ({ pitId: pozoId, companyId }: StageSheet) => {
         console.log('Get deposit', { pozoId, companyId });
 
         console.log('https://sandflow-qa.bitpatagonia.com/api' + `/warehouse?pitId=${pozoId}`);
         const { read } = useApi(`/warehouse?pitId=${pozoId}`);
-        warehouse.value = await read();
+        warehouse.value = read();
     };
 
     const selectedStage = ref(-1);
-    const stages: Ref<Array<SandStage>> = ref([]);
+    let stages: Ref<Array<SandStage>> = ref([]);
 
     const setWareHouseBoxes = ({ layout }: Warehouse) => {
         const whBoxes = [];
