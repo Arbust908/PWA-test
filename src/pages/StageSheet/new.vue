@@ -1,7 +1,8 @@
 <script setup lang="ts">
+    import axios from 'axios';
     import { StageSheet, SandStage, Warehouse } from '@/interfaces/sandflow';
-    import { useApi } from '@/helpers/useApi';
     import { boxesByFloor, formatLocation } from '@/helpers/useWarehouse';
+    import { useAxios } from '@vueuse/integrations/useAxios';
 
     import Layout from '@/layouts/Main.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
@@ -10,6 +11,11 @@
     import StageSheetStage from '@/components/stageSheet/stageSheetStage.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import StageSheetStageBox from '@/components/stageSheet/stageSheetStageBox.vue';
+
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    const instance = axios.create({
+        baseURL: apiUrl,
+    });
 
     const clientId = ref(-1);
     const pitId = ref(-1);
@@ -42,32 +48,33 @@
     };
 
     watch(clientId, (newVal) => {
-        console.log('Val', newVal);
         actualSheet.companyId = newVal;
-        console.log('Actual', actualSheet);
         fillSheet(actualSheet);
     });
     watch(pitId, (newVal) => {
-        console.log('Val', newVal);
         actualSheet.pitId = newVal;
-        console.log('Actual', actualSheet);
         fillSheet(actualSheet);
     });
 
-    const getSandPlan = ({ pitId: pozoId, companyId }: StageSheet) => {
+    const getSandPlan = async ({ pitId: pozoId, companyId }: StageSheet) => {
         console.log('Get sand plan', { pozoId, companyId });
-
         console.log('https://sandflow-qa.bitpatagonia.com/api' + `/sandPlan?pitId=${pozoId}`);
-        const { read } = useApi(`/sandPlan?pitId=${pozoId}`);
-        stages = read();
+        const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
+        watch(data, (newVal) => {
+            console.log('Sand plan', newVal.data);
+            console.log('Sand plan', newVal.data.stages);
+            stages.value = newVal.data[0].stages;
+        });
     };
 
-    const getDeposit = ({ pitId: pozoId, companyId }: StageSheet) => {
+    const getDeposit = async ({ pitId: pozoId, companyId }: StageSheet) => {
         console.log('Get deposit', { pozoId, companyId });
-
         console.log('https://sandflow-qa.bitpatagonia.com/api' + `/warehouse?pitId=${pozoId}`);
-        const { read } = useApi(`/warehouse?pitId=${pozoId}`);
-        warehouse.value = read();
+        const { data } = useAxios(`/warehouse?pitId=${pozoId}`, instance);
+        watch(data, (newVal) => {
+            console.log('Warehouse', newVal.data);
+            warehouse.value = newVal.data[0];
+        });
     };
 
     const selectedStage = ref(-1);
@@ -97,21 +104,17 @@
         }
     };
     const finalizedStages = computed(() => {
-        return stages.value.filter((stage) => stage.done);
+        return stages.value.sort((a, b) => b.stage - a.stage);
     });
     const pendingStages = computed(() => {
         // return stages.value.filter((stage) => stage.done < stage.weight);
-        return stages.value;
+        return stages.value.sort((a, b) => a.stage - b.stage);
     });
     const isSageSelected = (stage: number, selected: number): boolean => {
         return selected === stage;
     };
-
-    console.log(warehouse.value);
-    // boxes.value = setWareHouseBoxes(warehouse.value);
     const boxes = computed(() => {
-        return boxesByFloor(warehouse.value.layout);
-        // return setWareHouseBoxes(warehouse.value);
+        return boxesByFloor(warehouse.value.layout || {});
     });
 
     const selectedQueue = ref([]);
@@ -152,14 +155,15 @@
 <template>
     <Layout>
         <ABMFormTitle title="Stage sheet" />
-        <FieldGroup class="max-w-4xl items-end">
+        <FieldGroup class="max-w-4xl items-start">
             <ClientPitCombo
                 v-model:client-id="clientId"
                 v-model:pit-id="pitId"
                 shared-classes="col-span-full md:col-span-4"
             />
-            <PrimaryBtn class="col-span-6 md:col-span-3 max-h-12">Finalizar Stage</PrimaryBtn>
+            <PrimaryBtn class="col-span-6 md:col-span-3 max-h-12 mt-7">Finalizar Stage</PrimaryBtn>
         </FieldGroup>
+        {{}}
         <nav class="flex gap-8 mt-10">
             <button
                 :class="isTabSelected(_TABS.PENDING) ? 'selected' : null"
@@ -192,7 +196,7 @@
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
                 />
-                <StageSheetStageBox v-if="pendingStages.length <= 0">
+                <StageSheetStageBox v-if="pendingStages?.length <= 0">
                     <p class="text-center p-6">No hay etapas pendientes</p>
                 </StageSheetStageBox>
             </div>

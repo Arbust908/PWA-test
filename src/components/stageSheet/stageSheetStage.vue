@@ -1,5 +1,6 @@
 <script setup lang="ts">
-    import { SandStage } from '@/interfaces/sandflow';
+    import { SandStage, Sand } from '@/interfaces/sandflow';
+    import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
 
     import { OnClickOutside } from '@vueuse/components';
     import ChevronIcon from '@/components/stageSheet/ChevronIcon.vue';
@@ -26,27 +27,9 @@
         },
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
-    const sands = computed(() => {
-        if (!props.sandStage) {
-            return [];
-        }
-        const sand1 = {
-            ...props.sandStage.sand1,
-            ...(props.sandStage.sand1 && { quantity: props.sandStage.quantity1 }),
-        };
-        const sand2 = {
-            ...props.sandStage.sand2,
-            ...(props.sandStage.sand2 && { quantity: props.sandStage.quantity2 }),
-        };
-        const sand3 = {
-            ...props.sandStage.sand3,
-            ...(props.sandStage.sand3 && { quantity: props.sandStage.quantity3 }),
-        };
-
-        return [sand1, sand2, sand3].filter((sand) => {
-            return Object.keys(sand).length !== 0;
-        });
-    });
+    const router = getRouter();
+    const store = getStore();
+    const sands = ref([]);
     const weigth = computed(() => {
         return sands.value.reduce((acc, sand) => {
             return acc + sand.quantity;
@@ -156,9 +139,7 @@
 
         return filteredBoxes;
     });
-    onMounted(() => {
-        emits('update-queue', boxQueue.value);
-    });
+
     const queueDetail = computed(() => {
         return boxQueue.value.reduce((acc, item) => {
             if (item?.sandType?.id) {
@@ -209,10 +190,28 @@
             emits('set-stage-full');
         }
     });
+
+    const getSandLogic = async (sandId: number) => {
+        const { GET } = StoreLogicMethods;
+        const result = await useStoreLogic(router, store, 'sand', GET, sandId);
+        sands.value.push(result);
+    };
+
+    onMounted(async () => {
+        emits('update-queue', boxQueue.value);
+
+        console.log(props.sandStage);
+        console.log(props.sandStage.sandId1);
+        console.log(props.sandStage.sandId2);
+        console.log(props.sandStage.sandId3);
+
+        const result = await useStoreLogic(router, store, 'sand', GET, sandId);
+    });
 </script>
 
 <template>
     <article class="stage--row">
+        {{ sandStage }}
         <header class="flex justify-between">
             <h2>Etapa {{ sandStage.stage }}/20</h2>
             <p>Total: {{ weigth }} Toneladas</p>

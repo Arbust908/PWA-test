@@ -95,6 +95,7 @@ export const formatLocation = (location: any) => {
 //     }
 // }
 export const boxesByFloor = (location: any) => {
+    console.log('boxesByFloor', location);
     const boxes = Object.keys(location).reduce((bxs: any, currentCell) => {
         const box = location[currentCell];
 

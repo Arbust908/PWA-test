@@ -79,9 +79,10 @@
                 @leave="leave"
             >
                 <BoxIdCard
-                    v-for="box in definedBoxes"
+                    v-for="(box, index) in definedBoxes"
                     :key="box.id"
                     :box="box"
+                    :data-stagger-index="index"
                     :is-active-box="isActiveBox(box?.boxId || null)"
                     @select-box="$emit('select-box', $event)"
                 />
@@ -106,9 +107,10 @@
                 @leave="leave"
             >
                 <BoxIdCard
-                    v-for="box in undefinedBoxes"
+                    v-for="(box, index) in undefinedBoxes"
                     :key="box.id"
                     :box="box"
+                    :data-stagger-index="index"
                     @update:box="box = $event"
                     @select-box="$emit('select-box', $event)"
                 />

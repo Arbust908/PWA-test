@@ -61,7 +61,7 @@
         <FieldInput
             class="col-span-6"
             title="Patente acoplado"
-            field-name="driverVehicleId"
+            field-name="driverVehicleId2"
             placeholder=""
             :data="driverTId2"
             require-validation
