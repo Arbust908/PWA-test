@@ -35,16 +35,9 @@
                     />
                 </fieldset>
             </form>
-            <section v-if="cradleId < 0" class="cradle-slots">
-                <div v-for="(slot, index) in cradleSlots" :key="index">
-                    <div class="slot empty">
-                        <span class="station-title">Estación {{ index + 1 }}</span>
-                        <span class="copy">Seleccione cliente, etapa y cradle.</span>
-                    </div>
-                    <!-- <button class="calibrate">Calibrar E{{ index + 1 }}</button> -->
-                </div>
-            </section>
-            <section v-else class="cradle-slots">
+
+            <!-- selected cradles -->
+            <section v-if="cradleId > 0" class="cradle-slots">
                 <div v-for="(slot, index) in cradleSlots" :key="index">
                     <div v-if="slot.boxId" class="slot">
                         <span class="station-title">Estación {{ index + 1 }} - {{ slot.boxId }}</span>
@@ -93,22 +86,24 @@
                     <div v-else class="slot without-box">
                         <span class="station-title">Estación {{ index + 1 }} - Sin caja</span>
                     </div>
-                    <button class="calibrate">Calibrar E{{ index + 1 }}</button>
+                    {{ slot.sandType }}
+                </div>
+            </section>
+            <!-- empty cradles -->
+            <section v-else class="cradle-slots">
+                <div v-for="(slot, index) in cradleSlots" :key="index">
+                    <div class="slot empty">
+                        <span class="station-title">Estación {{ index + 1 }}</span>
+                        <span class="copy">Seleccione cliente, etapa y cradle.</span>
+                    </div>
                 </div>
             </section>
         </section>
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
-            <SecondaryBtn btn="wide" @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</SecondaryBtn>
-            <PrimaryBtn btn="wide" type="submit" @click.prevent="completeStageHandle"> Finalizar </PrimaryBtn>
+            <PrimaryBtn btn="wide" type="submit" @click.prevent="completeStageHandle"> Solicitar retiro </PrimaryBtn>
         </footer>
-        <Modal type="off" :open="isModalVisible" class="modal" @close="toggleModal">
-            <template #body>
-                <Icon icon="check" class="mx-auto mb-4 w-16 h-16 text-green-400" />
-                <p class="mb-4 text-lg text-gray-600">{{ modalMessage }}</p>
-                <PrimaryBtn btn="confirm-button" @click.prevent="toggleModal">{{ modalButtonText }}</PrimaryBtn>
-            </template>
-        </Modal>
+        <SuccessModal :open="isModalVisible" :title="ModalText" @main="toggleModal" @close="toggleModal" />
     </Layout>
 </template>
 
@@ -121,6 +116,7 @@
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import Modal from '@/components/modal/General.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
     import { Company, Pit } from '@/interfaces/sandflow';
@@ -140,6 +136,7 @@
             FieldGroup,
             FieldSelect,
             Modal,
+            SuccessModal,
             Icon,
         },
         setup() {
@@ -159,11 +156,14 @@
             const isModalVisible = ref(false);
             const selectedCradle = ref({});
             const sandTypes = ref([]);
+            const openSuccess = ref(false);
+            const ModalText = 'La solicitud de retiro de cajas fue enviada con éxito';
 
             const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
                 await axios
                     .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
                     .catch((err) => console.error(err));
+                console.log(selectedCradle.value);
 
                 return (cradleSlots.value[slotIndex].status = newStatus);
             };
@@ -280,8 +280,6 @@
             });
 
             const requestEmptyBoxHandle = () => {
-                modalMessage.value = 'La solicitud de retiro de caja vacía fue enviada con éxito.';
-                modalButtonText.value = 'Continuar';
                 toggleModal();
             };
 
@@ -317,6 +315,10 @@
                 toggleModal,
                 isModalVisible,
                 changeCradleSlotStatus,
+                SuccessModal,
+                openSuccess,
+                ModalText,
+                selectedCradle,
             };
         },
     });
