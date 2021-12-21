@@ -54,7 +54,7 @@ export interface Traktor {
 }
 export interface Pickup {
     id?: number;
-    pickupId: number; // Esto va como string
+    pickupId: string;
     description: string;
     workOrderId: number;
 }

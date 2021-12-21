@@ -22,51 +22,28 @@
             </nav>
             <OrderSection
                 v-if="WO_section === 'orden'"
-                :client-id="clientId"
-                :service-company-id="serviceCompanyId"
-                :pad="pad"
-                :pits="pits"
-                :is-full="isOrderFull"
-                @update:clientId="clientId = $event"
-                @update:serviceCompanyId="serviceCompanyId = $event"
-                @update:pad="pad = $event"
-                @update:pits="pits = $event"
-                @update:isFull="isOrderFull = $event"
+                v-model:clientId="clientId"
+                v-model:service-company-id="serviceCompanyId"
+                v-model:pad="pad"
+                v-model:pits="pits"
+                v-model:isFull="isOrderFull"
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
-                :operative-cradle-id="operativeCradleId"
-                :backup-cradle-id="backupCradleId"
-                :operative-forklift-id="operativeForkliftId"
-                :backup-forklift-id="backupForkliftId"
-                :traktors="traktors"
-                :pickups="pickups"
-                :rigmats="rigmats"
-                :conex="conex"
-                :generators="generators"
-                :tower="tower"
-                :cabin="cabin"
-                :is-full="isEquipmentFull"
-                @update:operativeCradleId="operativeCradleId = $event"
-                @update:backupCradleId="backupCradleId = $event"
-                @update:operativeForkliftId="operativeForkliftId = $event"
-                @update:backupForkliftId="backupForkliftId = $event"
-                @update:traktors="traktors = $event"
-                @update:pickups="pickups = $event"
-                @update:rigmats="rigmats = $event"
-                @update:conex="conex = $event"
-                @update:generators="generators = $event"
-                @update:tower="tower = $event"
-                @update:cabin="cabin = $event"
-                @update:isFull="isEquipmentFull = $event"
+                v-model:operativeCradleId="operativeCradleId"
+                v-model:backupCradleId="backupCradleId"
+                v-model:operativeForkliftId="operativeForkliftId"
+                v-model:backupForkliftId="backupForkliftId"
+                v-model:traktors="traktors"
+                v-model:pickups="pickups"
+                v-model:rigmats="rigmats"
+                v-model:conex="conex"
+                v-model:generators="generators"
+                v-model:tower="tower"
+                v-model:cabin="cabin"
+                v-model:isFull="isEquipmentFull"
             />
-            <RRHHSection
-                v-else-if="WO_section === 'rrhh'"
-                :crews="crews"
-                :is-full="isRRHHFull"
-                @update:crews="crews = $event"
-                @update:isFull="isRRHHFull = $event"
-            />
+            <RRHHSection v-else-if="WO_section === 'rrhh'" v-model:crews="crews" v-model:isFull="isRRHHFull" />
             <section class="mt-8 p-4">
                 <GhostBtn
                     v-if="isLastSection()"
@@ -143,9 +120,9 @@
             let currentWorkOrder = workOrders.find((wo) => {
                 return wo.id == id;
             });
+
             onMounted(async () => {
                 const { data } = await useAxios(`/workOrder/${id}`, instance);
-                console.log(data);
                 currentWorkOrder = data;
             });
             let newCWO = ref(currentWorkOrder);
@@ -197,6 +174,7 @@
                     name: '',
                 } as HumanResource);
             };
+
             const addCrew = (): void => {
                 const lastCrew = crews.value[crews.value.length - 1];
                 const lastId = lastCrew.id + 1 || 1;
@@ -249,8 +227,21 @@
             };
             // Is the Order section is full
             const isOrderFull = ref(false);
+
             // Is the Equipment section is full
-            const isEquipmentFull = ref(false);
+            const isEquipmentFull = computed(() => {
+                return !!(
+                    operativeCradleId.value > -1 &&
+                    backupCradleId.value > -1 &&
+                    operativeForkliftId.value > -1 &&
+                    backupForkliftId.value > -1 &&
+                    traktors.value[0].chassis !== '' &&
+                    traktors.value[0].supplier !== '' &&
+                    pickups.value[0].pickupId !== '' &&
+                    pickups.value[0].description !== ''
+                );
+            });
+
             // Is the RRHH section is full
             const isRRHHFull = computed(() => {
                 return !!(
@@ -352,15 +343,15 @@
                 // removeAllEmptys();
                 const newWO = {
                     id: woID.value,
-                    client: client.value,
+                    client: clientId.value,
                     serviceCompany: serviceCompany.value,
-                    clientId: clientId.value,
+                    // clientId: clientId.value,
                     serviceCompanyId: serviceCompanyId.value,
                     pad: pad.value,
-                    operativeCradleId: operativeCradleId.value,
-                    backupCradleId: backupCradleId.value,
-                    operativeForkliftId: operativeForkliftId.value,
-                    backupForkliftId: backupForkliftId.value,
+                    operativeCradle: operativeCradleId.value,
+                    backupCradle: backupCradleId.value,
+                    operativeForklift: operativeForkliftId.value,
+                    backupForklift: backupForkliftId.value,
                     crews: crews.value,
                     rigmats: rigmats.value,
                     conex: conex.value,
@@ -481,7 +472,8 @@
                                 for (const changedRH of comparedResources.changed) {
                                     const { id, ...newResource } = changedRH;
                                     newResource.crewId = uCrewId;
-                                    await axios.put(api + `/humanResource/${newResource.id}`, newResource);
+                                    console.log('aaa', id);
+                                    await axios.put(api + `/humanResource/${id}`, newResource);
                                 }
                                 for (const deleteRH of comparedResources.deleted) {
                                     await axios.delete(api + `/humanResource/${deleteRH.id}`);

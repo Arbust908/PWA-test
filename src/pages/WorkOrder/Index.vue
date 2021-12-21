@@ -239,8 +239,10 @@
                 return (
                     parseInt(order.operativeCradle) >= 0 &&
                     parseInt(order.operativeForklift) >= 0 &&
-                    order.traktors.length > 0 &&
-                    order.pickups.length > 0 &&
+                    order.traktors[0].chassis !== '' &&
+                    order.traktors[0].supplier !== '' &&
+                    order.pickups[0].pickupId !== '' &&
+                    order.pickups[0].description !== '' &&
                     order.conex >= 0 &&
                     order.generators >= 0 &&
                     order.rigmats >= 0 &&
@@ -248,6 +250,7 @@
                     order.cabin >= 0
                 );
             };
+
             const isCrewFull = (order: WorkOrder) => {
                 return (
                     order.crew.length > 0 &&
