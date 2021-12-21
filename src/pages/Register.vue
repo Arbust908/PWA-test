@@ -67,7 +67,6 @@
             @close="toggleErrorModal(false)"
             @main="toggleErrorModal(false)"
         />
-        <SuccessModal />
     </section>
 </template>
 
