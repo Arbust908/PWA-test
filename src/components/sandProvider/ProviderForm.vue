@@ -2,7 +2,7 @@
     <FieldGroup>
         <FieldInput
             class="col-span-full"
-            title="Nombre / Razón Social"
+            title="Nombre / Razón social"
             field-name="sandProvName"
             placeholder=""
             :data="sandProvider.name"

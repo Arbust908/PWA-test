@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo Cliente</h1>
+            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo cliente</h1>
         </header>
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4 max-w-md">

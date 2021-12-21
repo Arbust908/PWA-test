@@ -9,11 +9,11 @@
             </FieldLegend>
             <section class="flex gap-2 flex-col sm:flex-row items-start mb-4 col-span-full">
                 <label class="flex flex-col" :for="`crew-${crew.id}-start-time`">
-                    <p>Hora de Inicio</p>
+                    <p>Hora de inicio</p>
                     <TimePicker :timetrack="Number(crew.timeStart)" @update:timetrack="crew.timeStart = $event" />
                 </label>
                 <label class="flex flex-col" :for="`crew-${crew.id}-end-time`">
-                    <p>Hora de Fin</p>
+                    <p>Hora de fin</p>
                     <TimePicker :timetrack="Number(crew.timeEnd)" @update:timetrack="crew.timeEnd = $event" />
                 </label>
             </section>
