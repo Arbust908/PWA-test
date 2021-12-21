@@ -57,22 +57,15 @@
     });
 
     const getSandPlan = async ({ pitId: pozoId, companyId }: StageSheet) => {
-        console.log('Get sand plan', { pozoId, companyId });
-        console.log('https://sandflow-qa.bitpatagonia.com/api' + `/sandPlan?pitId=${pozoId}`);
         const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
         watch(data, (newVal) => {
-            console.log('Sand plan', newVal.data);
-            console.log('Sand plan', newVal.data.stages);
             stages.value = newVal.data[0].stages;
         });
     };
 
     const getDeposit = async ({ pitId: pozoId, companyId }: StageSheet) => {
-        console.log('Get deposit', { pozoId, companyId });
-        console.log('https://sandflow-qa.bitpatagonia.com/api' + `/warehouse?pitId=${pozoId}`);
         const { data } = useAxios(`/warehouse?pitId=${pozoId}`, instance);
         watch(data, (newVal) => {
-            console.log('Warehouse', newVal.data);
             warehouse.value = newVal.data[0];
         });
     };
@@ -104,11 +97,10 @@
         }
     };
     const finalizedStages = computed(() => {
-        return stages.value.sort((a, b) => b.stage - a.stage);
+        return stages.value?.filter((s) => s.status === 'finalized');
     });
     const pendingStages = computed(() => {
-        // return stages.value.filter((stage) => stage.done < stage.weight);
-        return stages.value.sort((a, b) => a.stage - b.stage);
+        return stages.value?.sort((a, b) => a.stage - b.stage);
     });
     const isSageSelected = (stage: number, selected: number): boolean => {
         return selected === stage;
@@ -119,7 +111,6 @@
 
     const selectedQueue = ref([]);
     const updateQueue = (queue: Array<any>) => {
-        console.log('updateQueue', queue);
         selectedQueue.value = queue;
     };
     const queueDetail = computed(() => {
@@ -143,6 +134,13 @@
             return acc + item;
         }, 0);
     });
+    const queueDetailFormated = (info: any) => {
+        if (info) {
+            return info + ' toneladas';
+        }
+
+        return '-';
+    };
     const setStageFull = (sheetId: number) => {
         const stage = stages.value.find((stage) => stage.stageSheetId === sheetId);
 
@@ -180,9 +178,6 @@
                 Etapas finalizadas
             </button>
         </nav>
-        {{ stages }}
-        <hr />
-        {{ warehouse }}
         <section class="mt-4 panel">
             <div v-if="isTabSelected(_TABS.PENDING)" class="stage--panel">
                 <StageSheetStage
@@ -204,11 +199,13 @@
                 <StageSheetStage
                     v-for="sheet in finalizedStages"
                     :key="`stage-${sheet.id}`"
-                    v-bind="sheet"
+                    :sand-stage="sheet"
                     :boxes="boxes"
                     :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
+                    :is-active="pendingStages[0].id === sheet.id"
                     @set-stage="setStage($event)"
                     @update-queue="updateQueue($event)"
+                    @set-stage-full="setStageFull(sheet.id)"
                 />
                 <StageSheetStageBox v-if="finalizedStages.length <= 0">
                     <p class="text-center p-6">No hay etapas finalizadas</p>
@@ -223,15 +220,15 @@
                     <div class="text-semibold space-y-3">
                         <p>
                             <span class="mr-2">Total Arena A:</span>
-                            <span>{{ (queueDetail && queueDetail[0]) || '-' }}</span>
+                            <span>{{ queueDetailFormated(queueDetail && queueDetail[0]) }}</span>
                         </p>
                         <p>
                             <span class="mr-2">Total Arena B:</span>
-                            <span>{{ (queueDetail && queueDetail[1]) || '-' }}</span>
+                            <span>{{ queueDetailFormated(queueDetail && queueDetail[1]) }}</span>
                         </p>
                         <p>
                             <span class="mr-2">Total Arena C:</span>
-                            <span>{{ (queueDetail && queueDetail[2]) || '-' }}</span>
+                            <span>{{ queueDetailFormated(queueDetail && queueDetail[2]) }}</span>
                         </p>
                     </div>
                     <hr class="border-white border mt-1" />

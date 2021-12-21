@@ -1,6 +1,7 @@
 <script setup lang="ts">
     import { SandStage, Sand } from '@/interfaces/sandflow';
     import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
+    import { useClone } from '@/helpers/useClone';
 
     import { OnClickOutside } from '@vueuse/components';
     import ChevronIcon from '@/components/stageSheet/ChevronIcon.vue';
@@ -27,8 +28,8 @@
         },
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
-    const router = getRouter();
-    const store = getStore();
+    const router = useRouter();
+    const store = useStore();
     const sands = ref([]);
     const weigth = computed(() => {
         return sands.value.reduce((acc, sand) => {
@@ -57,7 +58,6 @@
     const boxQueue = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
     const addBoxToQueue = (place: null | number = null, box: any = null) => {
         if (place !== null && box !== null) {
-            console.info('addBoxToQueue', place, box);
             boxQueue.value[place] = box;
             selectedBox.value = null;
             emits('update-queue', boxQueue.value);
@@ -69,8 +69,6 @@
         return props.isActive;
     });
     watch(isActiveStage, (newValue) => {
-        console.log('isActiveStage', newValue);
-
         if (newValue) {
             emits('update-queue', boxQueue.value);
         }
@@ -99,31 +97,20 @@
     const boxesByFloorAndFiltered = computed(() => {
         const filteredBoxes = [];
         props.boxes[selectedFloor.value - 1].map((box) => {
-            console.groupCollapsed('boxesByFloorAndFiltered');
-            console.info('box', box);
             const compareQueue = boxQueue.value.filter((box) => {
                 return box.id;
             });
-            console.log('compareQueue', compareQueue);
 
             if (compareQueue.length <= 0) {
-                console.groupEnd();
                 filteredBoxes.push(box);
 
                 return true;
             }
 
             if (box && box.id) {
-                console.info('boxId', box.id);
                 const isOnQueue = compareQueue.some((queuedBox) => {
-                    console.info('queuedBox', queuedBox.boxId);
-                    console.info('compare box', box.id);
-
                     return queuedBox.boxId === box.id;
                 });
-                console.log('isOnQueue', isOnQueue);
-                console.warn(!compareQueue.some((queuedBox) => queuedBox.boxId === box.id));
-                console.groupEnd();
 
                 if (!isOnQueue) {
                     filteredBoxes.push(box);
@@ -131,11 +118,9 @@
 
                 return !compareQueue.some((queuedBox) => queuedBox.boxId === box.boxId);
             }
-            console.groupEnd();
 
             return box;
         });
-        console.log('filteredBoxes', filteredBoxes);
 
         return filteredBoxes;
     });
@@ -164,13 +149,17 @@
         return total;
     });
     const getPorcentage = (total: number, value = 0, index = 0) => {
-        console.log('getPorcentage', total, value);
-
         if (index !== null) {
-            if (index >= 1) {
-                [`stagePorcentageVariable${index}`].value = (value * 100) / total + '%';
-            } else {
-                stagePorcentageVariable.value = (value * 100) / total + '%';
+            switch (index) {
+                case 0:
+                    stagePorcentageVariable.value = (value * 100) / total + '%';
+                    break;
+                case 1:
+                    stagePorcentageVariable2.value = (value * 100) / total + '%';
+                    break;
+                case 2:
+                    stagePorcentageVariable3.value = (value * 100) / total + '%';
+                    break;
             }
         }
 
@@ -178,11 +167,6 @@
     };
 
     const stagePorcentage = computed(() => {
-        console.log('stagePorcentage');
-        console.log(weigth.value);
-        console.log(queueDetailTotal.value);
-        console.log('Total ' + getPorcentage(weigth.value, queueDetailTotal.value, null) + '%');
-
         return getPorcentage(weigth.value, queueDetailTotal.value, null);
     });
     watch(stagePorcentage, () => {
@@ -194,24 +178,40 @@
     const getSandLogic = async (sandId: number) => {
         const { GET } = StoreLogicMethods;
         const result = await useStoreLogic(router, store, 'sand', GET, sandId);
-        sands.value.push(result);
+
+        if (result?.res) {
+            return result.res;
+        }
+
+        return {};
+    };
+
+    const updateSand = (sand: Sand, sandQuantity: number) => {
+        const { clone: sandInfo } = useClone(sand);
+        sandInfo.quantity = sandQuantity;
+        sands.value.push(sandInfo);
     };
 
     onMounted(async () => {
         emits('update-queue', boxQueue.value);
+        const { sandId1, sandId2, sandId3, quantity1, quantity2, quantity3 } = props.sandStage;
 
-        console.log(props.sandStage);
-        console.log(props.sandStage.sandId1);
-        console.log(props.sandStage.sandId2);
-        console.log(props.sandStage.sandId3);
+        if (sandId1) {
+            updateSand(await getSandLogic(sandId1), quantity1);
+        }
 
-        const result = await useStoreLogic(router, store, 'sand', GET, sandId);
+        if (sandId2) {
+            updateSand(await getSandLogic(sandId2), quantity2);
+        }
+
+        if (sandId3) {
+            updateSand(await getSandLogic(sandId3), quantity3);
+        }
     });
 </script>
 
 <template>
     <article class="stage--row">
-        {{ sandStage }}
         <header class="flex justify-between">
             <h2>Etapa {{ sandStage.stage }}/20</h2>
             <p>Total: {{ weigth }} Toneladas</p>
