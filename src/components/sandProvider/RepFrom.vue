@@ -1,6 +1,6 @@
 <template>
     <FieldGroup>
-        <FieldLegend>Contacto principal</FieldLegend>
+        <FieldLegend class="font-semibold">Contacto principal</FieldLegend>
         <FieldInput
             class="col-span-full"
             title="Nombre y apellido"
