@@ -3,7 +3,7 @@
         <FieldLegend>Arena</FieldLegend>
         <template v-for="(sPov, i) in sandProviders" :key="i">
             <FieldSelect
-                class="col-span-full sm:col-span-5"
+                class="col-span-full sm:col-span-5 max-w-[336px]"
                 field-name="sandProvider"
                 placeholder="Seleccionar centro de carga"
                 title="Centro de carga de arena"
