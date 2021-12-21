@@ -52,22 +52,20 @@
             title="Patente camión"
             field-name="driverVehicleId"
             placeholder=""
-            :data="driverTId"
+            v-model:data.trim="driverTId"
             require-validation
             :silenced="silenced"
             entity="transportProvider"
-            @update:data="driverTId = $event"
         />
         <FieldInput
             class="col-span-6"
             title="Patente acoplado"
-            field-name="driverVehicleId"
+            field-name="driverVehicleId2"
             placeholder=""
-            :data="driverTId2"
+            v-model:data.trim="driverTId2"
             require-validation
             :silenced="silenced"
             entity="transportProvider"
-            @update:data="driverTId2 = $event"
         />
         <FieldTextArea
             class="col-span-full"
