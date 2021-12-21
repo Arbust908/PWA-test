@@ -1,17 +1,13 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Planificación de arenas</h1>
-        </header>
+        <ABMFormTitle title="Planificación de arenas" />
         <section>
             <form method="POST" action="/" class="py-4">
                 <FieldGroup class="grid-cols-6 md:grid-cols-12 max-w-2xl">
                     <ClientPitCombo
-                        :client-id="currentSandPlan.companyId"
-                        :pit-id="currentSandPlan.pitId"
+                        v-model:client-id="currentSandPlan.companyId"
+                        v-model:pit-id="currentSandPlan.pitId"
                         :is-disabled="true"
-                        @update:clientId="currentSandPlan.companyId = $event"
-                        @update:pitId="currentSandPlan.pitId = $event"
                     />
                 </FieldGroup>
             </form>
@@ -207,19 +203,36 @@
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')">Cancelar</SecondaryBtn>
-            <PrimaryBtn btn="wide" size="md" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull" @click.prevent="isFull ? save() : toggleErrorModal()">
                 Guardar
             </PrimaryBtn>
         </footer>
+
+        <SuccessModal
+            :open="showModal"
+            text="La planificación de arenas ha sido guardada con éxito"
+            @close="$router.push('/planificacion-de-arena')"
+            @main="$router.push('/planificacion-de-arena')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="Hubo un problema al intentar guardar."
+            text="Por favor, verifica los datos ingresados e intenta nuevamente."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar la planificación."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
     import { useActions } from 'vuex-composition-helpers';
-    import { useTitle } from '@vueuse/core';
 
     import Layout from '@/layouts/Main.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
@@ -238,6 +251,10 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
 
     export default {
         components: {
@@ -253,10 +270,12 @@
             Icon,
             SecondaryBtn,
             ResposiveTableSandPlan,
+            ABMFormTitle,
+            SuccessModal,
+            ErrorModal,
         },
         setup() {
             // Init
-            const windowWidth = window.innerWidth;
             const store = useStore();
             const router = useRouter();
             const route = useRoute();
@@ -421,6 +440,17 @@
             const isFull = computed(() => {
                 return true;
             });
+
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
+
             const { updateSandPlan } = useActions(['updateSandPlan']);
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
@@ -516,7 +546,7 @@
                             }
                         });
                         updateSandPlan(currentSandPlan);
-                        router.push('/planificacion-de-arena');
+                        showModal.value = true;
                     }
                 });
             };
@@ -541,8 +571,13 @@
                 save,
                 isFull,
                 addStage,
-                // upgrade,
-                windowWidth,
+                upgrade,
+                showModal,
+                toggleModal,
+                showErrorModal,
+                toggleErrorModal,
+                showApiErrorModal,
+                toggleApiErrorModal,
             };
         },
     };
