@@ -89,6 +89,7 @@
                 type: Boolean,
                 default: false,
             },
+            // ***
             onlyVisible: {
                 type: Boolean,
                 default: true,
