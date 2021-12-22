@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <ABMHeader title="Notificaciones a Proveedores" link="/notificaciones-a-proveedores/nueva" />
+        <ABMHeader title="Notificaciones a proveedores" link="/notificaciones-a-proveedores/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"

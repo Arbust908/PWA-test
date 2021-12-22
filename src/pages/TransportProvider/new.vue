@@ -398,6 +398,7 @@
                 driversShown,
                 showSuccessModal,
                 showErrorCuitModal,
+                hasFullNewDriver,
                 isClicked,
             };
         },

@@ -3,7 +3,7 @@
         <FieldLegend>Contacto principal</FieldLegend>
         <FieldInput
             class="col-span-full"
-            title="Nombre y Apellido"
+            title="Nombre y apellido"
             field-name="sandRepName"
             placeholder=""
             :data="repName"

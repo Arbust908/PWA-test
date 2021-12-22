@@ -6,7 +6,7 @@
                 class="col-span-full sm:col-span-5"
                 field-name="sandProvider"
                 placeholder="Seleccionar centro de carga"
-                title="Centro de Carga de Arena"
+                title="Centro de carga de arena"
                 endpoint="/sandProvider"
                 :data="sPov.id"
                 @update:data="

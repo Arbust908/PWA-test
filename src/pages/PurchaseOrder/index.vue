@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <ABMHeader title="Ordenes de Pedido" link="/orden-de-pedido/nueva" />
+        <ABMHeader title="Ordenes de pedido" link="/orden-de-pedido/nueva" />
         <!-- <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"

@@ -14,7 +14,7 @@
                 class="col-span-full"
                 field-name="serviceCompany"
                 placeholder="Seleccionar operadora"
-                title="Operadora / Empresa de Servicios"
+                title="Operadora / Empresa de servicios"
                 endpoint="/company?isOperator=1"
                 is-optional
                 :data="serviceCompanyId"

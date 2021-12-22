@@ -25,7 +25,7 @@
                 id="rol"
                 v-model="user.roleId"
                 class="col-span-full sm:col-span-9 mt-3"
-                title="Asignar Rol"
+                title="Asignar rol"
                 :options="roles"
             />
         </FieldGroup>
