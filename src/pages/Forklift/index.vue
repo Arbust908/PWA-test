@@ -16,7 +16,13 @@
             </div>
         </div>
 
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredForklifts" :actions="actions">
+        <VTable
+            class="mt-5 lg:w-1/2"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredForklifts"
+            :actions="actions"
+        >
             <template #item="{ item }" class="asddaads">
                 <!-- Desktop -->
                 <td :class="[item.name ? null : 'empty', item.visible ? null : 'notallowed']">
