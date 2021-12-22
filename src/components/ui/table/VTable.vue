@@ -18,7 +18,7 @@
                                 </td>
                             </tr>
                         </tbody>
-                        <tbody v-else>
+                        <tbody v-else class="divide-y divide-gray-200">
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
                                 <tr
                                     class="body-row"

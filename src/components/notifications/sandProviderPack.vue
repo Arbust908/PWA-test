@@ -3,7 +3,7 @@
         <FieldLegend>Arena</FieldLegend>
         <template v-for="(sPov, i) in sandProviders" :key="i">
             <FieldSelect
-                class="col-span-full sm:col-span-5 max-w-[336px]"
+                class="col-span-full sm:col-span-4"
                 field-name="sandProvider"
                 placeholder="Seleccionar centro de carga"
                 title="Centro de carga de arena"
@@ -22,7 +22,7 @@
             >
                 <FieldSelect
                     v-model:data="so.sandTypeId"
-                    class="col-span-5 sm:col-span-5"
+                    class="col-span-5 sm:col-span-4"
                     :title="Key === 0 ? 'Tipo' : null"
                     field-name="sandType"
                     placeholder="Arena"
@@ -43,30 +43,23 @@
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
                 />
                 <div class="flex flex-row content-evenly">
-                    <div
+                    <CircularBtn
                         v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length"
-                        class="ml-2 mr-6 my-auto mx-auto"
+                        class="flex self-end"
+                        size="sm"
+                        @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
                     >
-                        <Icon
-                            icon="Trash"
-                            outline
-                            class="w-6 h-6 align-middle"
-                            :class="isFirst(Key, sPov.SandOrders) ? 'mt-6' : 'mt-2'"
-                            @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
-                        />
-                    </div>
-                    <div
+                        <Icon icon="Trash" type="outline" class="w-7 h-7" />
+                    </CircularBtn>
+                    <CircularBtn
                         v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4 && isLast(Key, sPov.SandOrders)"
-                        class="ml-4 my-auto hidden sm:block"
+                        class="flex self-end"
+                        size="sm"
+                        btn="bg-green-500"
+                        @click.prevent="addSandOrder(sPov.innerId)"
                     >
-                        <Icon
-                            icon="PlusCircle"
-                            outline
-                            class="w-7 h-7 text-green-500"
-                            :class="sPov.SandOrders.length == 1 ? 'mt-7' : 'mt-2'"
-                            @click.prevent="addSandOrder(sPov.innerId)"
-                        />
-                    </div>
+                        <Icon icon="Plus" class="w-7 h-7 text-white" />
+                    </CircularBtn>
                 </div>
             </div>
             <div v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4" class="col-span-full mt-2 sm:hidden">
@@ -87,6 +80,7 @@
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
     import { SandProvider, SandOrder } from '@/interfaces/sandflow';
     import { isFirst, isLast } from '@/helpers/iteretionHelpers';
+    import CircularBtn from '../ui/buttons/CircularBtn.vue';
 
     const defaultSandOrder: SandOrder = {
         innerId: 0,
@@ -105,6 +99,7 @@
             FieldSelect,
             FieldWithSides,
             Icon,
+            CircularBtn,
         },
         props: {
             sandProviders: {

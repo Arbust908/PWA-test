@@ -1,14 +1,19 @@
 <template>
-    <Modal v-bind="$attrs" :open="open" modal-classes="gap-4 text-center max-w-md" @close="$emit('close')">
+    <Modal
+        v-bind="$attrs"
+        :open="open"
+        modal-classes="gap-4 text-center max-w-[444px] font-body"
+        @close="$emit('close')"
+    >
         <div class="icon--box">
             <Icon :icon="iconType" :class="iconClass" class="icon" />
         </div>
         <h2>{{ title }}</h2>
         <span> {{ text }} </span>
         <footer v-if="btnText">
-            <PrimaryBtn :btn="`wide ${btnClass}`" @click="$emit('main')">
+            <SecondaryBtn :btn="`wide`" @click="$emit('main')">
                 {{ btnText }}
-            </PrimaryBtn>
+            </SecondaryBtn>
         </footer>
     </Modal>
 </template>
@@ -16,13 +21,13 @@
 <script lang="ts">
     import Modal from '@/components/modal/General.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
 
     export default {
         components: {
             Modal,
             Icon,
-            PrimaryBtn,
+            SecondaryBtn,
         },
         inheritAttrs: false,
         props: {
@@ -80,16 +85,16 @@
 
 <style lang="scss" scoped>
     .icon {
-        @apply h-14 w-14;
+        @apply h-11 w-11 text-zinc-400;
         &--box {
             @apply flex flex-col justify-center items-center;
         }
     }
     h2 {
-        @apply text-xl font-semibold mx-5 text-gray-900;
+        @apply text-lg font-medium mx-5 text-gray-900;
     }
     span {
-        @apply text-base;
+        @apply text-base text-sm;
     }
     footer {
         @apply flex justify-center;

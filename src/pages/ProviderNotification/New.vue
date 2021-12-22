@@ -18,7 +18,9 @@
 
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
-            <SecondaryBtn btn="wide" @click.prevent="$router.push('/')"> Cancelar </SecondaryBtn>
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/notificaciones-a-proveedores')">
+                Cancelar
+            </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"
                 :class="!someFull && 'opacity-50 cursor-not-allowed'"
@@ -34,7 +36,7 @@
             title="¡La notificación está en proceso de envío!"
             text="En breve lo verás reflejado en la columna “Estado”"
             :icon="{ type: 'ArrowCircleUp', classes: 'rotate-45 text-gray-700' }"
-            :btn="{ text: 'Continuar', classes: 'indefinite' }"
+            :btn="{ text: 'Volver', classes: 'indefinite' }"
             @close="$router.push('/notificaciones-a-proveedores')"
             @main="$router.push('/notificaciones-a-proveedores')"
         />
@@ -50,7 +52,7 @@
                 isNotificationConfirmed = false;
             "
         />
-        <Modal :open="showModal" modal-classes="max-w-md" @close="showModal = false">
+        <Modal :open="showModal" modal-classes="max-w-[440px] font-body" @close="showModal = false">
             <div v-if="!isNotificationConfirmed" class="text-left">
                 <p class="text-lg text-black font-bold">Notificación a proveedores</p>
                 <!-- <p class="mt-3">Se está por enviar una notificación a los siguientes proveedores:</p> -->
@@ -63,7 +65,7 @@
                         <li
                             v-for="(order, index) in modalData.sandOrders"
                             :key="index"
-                            class="text-black text-base list-none mt-1"
+                            class="text-black text-base font-light list-none mt-1"
                         >
                             {{ order.amount }}t - {{ order.sandType }}
                         </li>
@@ -75,7 +77,7 @@
                 >
                     <p class="font-bold text-black text-base">Transporte {{ modalData.transportProvider }}</p>
                     <ul>
-                        <li class="text-black text-base list-none mt-2">
+                        <li class="text-black text-base font-light list-none mt-2">
                             {{ modalData.transportQuantity }} camion{{
                                 modalData.transportQuantity > 1 ? '(es)' : null
                             }}
@@ -85,8 +87,8 @@
                 </div>
             </div>
             <div v-if="!isNotificationConfirmed" class="flex gap-4 justify-end mt-6">
-                <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
-                <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
+                <SecondaryBtn :btn="'wide'" class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
+                <PrimaryBtn :btn="'wide'" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
             </div>
         </Modal>
     </Layout>
