@@ -144,6 +144,9 @@
 
 <style lang="scss" scoped>
     fieldset:not(:last-of-type) {
-        @apply border-b border-gray-200 pb-6;
+        @apply border-b border-transparent pb-6;
+    }
+    h2 {
+        @apply text-lg font-medium;
     }
 </style>

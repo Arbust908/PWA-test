@@ -32,10 +32,10 @@
         </footer>
 
         <NoticeModal
-            :open="isNotificationConfirmed && apiRequest && hasSaveSuccess"
+            :open="true /*isNotificationConfirmed && apiRequest && hasSaveSuccess*/"
             title="¡La notificación está en proceso de envío!"
             text="En breve lo verás reflejado en la columna “Estado”"
-            :icon="{ type: 'ArrowCircleUp', classes: 'rotate-45 text-gray-700' }"
+            :icon="{ type: 'ArrowCircleUp', classes: 'text-zinc-400 rotate-45 text-gray-700' }"
             :btn="{ text: 'Volver', classes: 'indefinite' }"
             @close="$router.push('/notificaciones-a-proveedores')"
             @main="$router.push('/notificaciones-a-proveedores')"
