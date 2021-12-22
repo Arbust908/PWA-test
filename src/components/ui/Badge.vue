@@ -1,5 +1,5 @@
 <template>
-    <span :class="classes" class="badge px-4 font-medium rounded-full py-1.5">
+    <span :class="classes" class="badge px-4 font-medium rounded-md py-1">
         {{ text }}
     </span>
 </template>
