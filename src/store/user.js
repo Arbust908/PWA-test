@@ -101,15 +101,16 @@ export default {
                     return { status: 'failed' };
                 });
         },
-        user_update: async ({ commit }, payload) => {
+        user_update: async (_, payload) => {
             let user = {
+                ...payload.value,
                 id: payload.value.id,
                 firstName: payload.value.firstName,
                 roleId: payload.value.roleId,
                 middleName: '',
                 lastName: '',
                 email: payload.value.email,
-                ...payload,
+                visible: payload.value.visible,
             };
 
             return await axios
