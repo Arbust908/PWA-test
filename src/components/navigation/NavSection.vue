@@ -19,68 +19,60 @@
                 v-bind="item"
                 :data-stagger-index="index"
                 :mode="mode"
+                is-sub-nav
             />
         </transition-group>
     </div>
 </template>
 
-<script lang="ts">
-    import { defineComponent, Ref, ref } from 'vue';
-    import { useToggle } from '@vueuse/core';
+<script setup lang="ts">
     import gsap from 'gsap';
 
     import MobileNavLink from '@/components/navigation/NavLink.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
-    export default defineComponent({
-        components: {
-            Icon,
-            MobileNavLink,
+    const props = defineProps({
+        icon: {
+            type: String,
+            required: true,
         },
-        props: {
-            icon: {
-                type: String,
-                required: true,
-            },
-            name: {
-                type: String,
-                required: true,
-            },
-            subNav: {
-                type: Array,
-                required: true,
-            },
-            mode: {
-                type: String,
-                default: '',
-            },
+        name: {
+            type: String,
+            required: true,
         },
-        setup() {
-            const isSectionOpen: Ref<boolean> = ref(false);
-            const toggleSection = useToggle(isSectionOpen);
-            const beforeEnter = (el) => {
-                el.style.opacity = 0;
-                el.style.transform = 'translateX(50%)';
-            };
-            const enter = (el, done) => {
-                const staggerIndex = el.dataset.staggerIndex;
-                gsap.to(el, {
-                    opacity: 1,
-                    x: 0,
-                    duration: 0.1,
-                    delay: 0.05 * staggerIndex,
-                    onComplete: done,
-                });
-            };
-
-            return {
-                isSectionOpen,
-                toggleSection,
-                beforeEnter,
-                enter,
-            };
+        subNav: {
+            type: Array,
+            required: true,
+        },
+        mode: {
+            type: String,
+            default: '',
         },
     });
+    const route = useRoute();
+    const isSectionOpen: Ref<boolean> = ref(false);
+    const toggleSection = useToggle(isSectionOpen);
+
+    onMounted(() => {
+        if (props.subNav.some((item) => item.to === route.path)) {
+            isSectionOpen.value = true;
+        }
+    });
+
+    const beforeEnter = (el) => {
+        el.style.opacity = 0;
+        el.style.transform = 'translateX(50%)';
+    };
+    const enter = (el, done) => {
+        const staggerIndex = el.dataset.staggerIndex;
+        gsap.to(el, {
+            opacity: 1,
+            x: 0,
+            duration: 0.1,
+            delay: 0.05 * staggerIndex,
+            onComplete: done,
+        });
+    };
 </script>
 
 <style lang="scss" scoped>
@@ -115,7 +107,7 @@
         @apply flex-shrink-0 h-8 lg:h-6 w-8 lg:w-6 transition transform duration-200 ease-in-out;
     }
     .sub-section {
-        @apply lg:ml-3 lg:pr-1 space-y-1;
+        @apply lg:ml-3 lg:pr-1 space-y-1 pb-2;
     }
     .sub-section:not(.small) {
         @apply ml-3;

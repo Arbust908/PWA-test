@@ -103,7 +103,7 @@ export default {
             Orden_de_Pedido,
             Ingreso_de_cajas,
             Operación_en_Cradle,
-            // Stage_Sheet
+            Stage_Sheet,
             LINE,
             {
                 name: 'Proveedores',

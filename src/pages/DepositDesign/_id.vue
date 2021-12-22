@@ -134,11 +134,8 @@
     import { useRouter, useRoute } from 'vue-router';
     import { useTitle } from '@vueuse/core';
 
-    import { TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Counter from '@/components/ui/Counter.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
@@ -151,14 +148,10 @@
 
     export default defineComponent({
         components: {
-            BellIcon,
-            CircularBtn,
             Counter,
             SecondaryBtn,
             Layout,
-            PlusIcon,
             PrimaryBtn,
-            TrashIcon,
             DepositGrid,
             BoxCard,
         },
@@ -171,7 +164,7 @@
             });
             const id = route.params.id;
             useTitle(`Depósito ${id} <> Sandflow`);
-            const Deposit = ref([]);
+            const warehouse = ref([]);
 
             const rows: Ref<number> = ref(0);
             watch(rows, (newV, oldV) => {
@@ -288,7 +281,7 @@
             const clientId = ref(-1);
             const clients = ref([] as Array<Company>);
             const { data: companiesData } = useAxios('/company', instance);
-            watch(companiesData, (companiesApi, prevCount) => {
+            watch(companiesData, (companiesApi) => {
                 if (companiesApi && companiesApi.data) {
                     clients.value = companiesApi.data;
                 }
@@ -303,7 +296,7 @@
             const pitId = ref(-1);
             const pits = ref([] as Array<Pit>);
             const { data: pitsData } = useAxios('/pit', instance);
-            watch(pitsData, (pitApi, prevCount) => {
+            watch(pitsData, (pitApi) => {
                 if (pitApi && pitApi.data) {
                     pits.value = pitApi.data;
                 }
@@ -338,13 +331,6 @@
                 selectedBox.value.category = cat;
                 const box = selectedBox.value;
                 deposit.value[`${box.floor}|${box.row}|${box.col}`].category = cat;
-                // deposit.value[`${box.floor}|${box.row}|${box.col}`] = {
-                //   category: box.category,
-                //   warehouseId: null,
-                //   floor: box.floor,
-                //   col: box.col,
-                //   row: box.row,
-                // };
             };
 
             // :: DEPOSIT
@@ -388,18 +374,18 @@
             );
 
             if (vuexData.value) {
-                Deposit.value = vuexData;
+                warehouse.value = vuexData;
                 updateData(vuexData.value);
             } else {
                 const { data: dData } = useAxios(`/warehouse/${id}`, instance);
                 watch(dData, (dData, prevCount) => {
                     if (dData && dData.data) {
-                        Deposit.value = dData.data;
+                        warehouse.value = dData.data;
                     }
                 });
             }
 
-            watch(Deposit, (newData, oldData) => {
+            watch(warehouse, (newData, oldData) => {
                 if (newData) {
                     updateData(newData);
                 }

@@ -169,7 +169,7 @@
             };
 
             const filteredItems = computed(() => {
-                let items = [...props.items];
+                let items = [...(props.items || [])];
 
                 if (items.length < 1) {
                     return [];

@@ -1,5 +1,5 @@
-<template class="gap-2">
-    <div class="col-span-full md:col-span-6">
+<template>
+    <div :class="sharedClasses">
         <FieldSelect
             v-if="clients.length > 0"
             field-name="client"
@@ -13,10 +13,10 @@
             @update:data="clientId = $event"
             @click="useFirstClient = true"
         />
-        <FieldLoading v-else class="col-span-6" />
+        <FieldLoading v-else />
         <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" :validation-type="validationType" />
     </div>
-    <div class="col-span-full md:col-span-6">
+    <div :class="sharedClasses">
         <FieldSelect
             v-if="pits.length > 0"
             field-name="pit"
@@ -29,16 +29,16 @@
             @update:data="pitId = $event"
             @click="useFirstPit = true"
         />
-        <FieldLoading v-else class="col-span-6" />
+        <FieldLoading v-else />
         <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" :validation-type="validationType" />
     </div>
 </template>
 
 <script lang="ts">
     import { defineComponent, ref, watch } from 'vue';
+    import { useVModels } from '@vueuse/core';
     import { Pit, Company } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
-    import { useVModels } from '@vueuse/core';
 
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLoading from '@/components/ui/form/FieldLoading.vue';
@@ -63,6 +63,10 @@
             isDisabled: {
                 type: Boolean,
                 default: false,
+            },
+            sharedClasses: {
+                type: String,
+                default: 'col-span-full md:col-span-6',
             },
             validationType: {
                 type: String,
