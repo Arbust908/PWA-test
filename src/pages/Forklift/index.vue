@@ -11,13 +11,10 @@
                 :data="forkliftId"
                 @update:data="forkliftId = $event"
             />
-            <div class="col-span-full sm:mt-7 sm:col-span-5">
-                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
-            </div>
         </div>
 
         <VTable
-            class="mt-5 lg:w-1/2"
+            class="mt-5 max-w-fit"
             :columns="columns"
             :pagination="pagination"
             :items="filteredForklifts"
