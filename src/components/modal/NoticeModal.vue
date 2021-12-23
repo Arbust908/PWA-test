@@ -85,7 +85,7 @@
 
 <style lang="scss" scoped>
     .icon {
-        @apply h-11 w-11;
+        @apply h-14 w-14;
         &--box {
             @apply flex flex-col justify-center items-center;
         }
@@ -94,7 +94,7 @@
         @apply text-lg font-medium mx-5 text-gray-900;
     }
     span {
-        @apply text-base text-sm;
+        @apply text-sm;
     }
     footer {
         @apply flex justify-center;

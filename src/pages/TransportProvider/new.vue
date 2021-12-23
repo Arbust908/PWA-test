@@ -148,7 +148,7 @@
         </section>
 
         <ErrorModal
-            :open="true /*showErrorCuitModal*/"
+            :open="showErrorCuitModal"
             title="Ya existe un proveedor con este CUIT"
             text="El proveedor que intentas guardar fue creado anteriormente"
             @close="showErrorCuitModal = false"
