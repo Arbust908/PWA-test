@@ -1,89 +1,21 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo cliente</h1>
-        </header>
+        <ABMFormTitle title="Nuevo cliente" />
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4 max-w-md">
-                <FieldGroup>
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="name"
-                        placeholder="Nombre y apellido / Razón social"
-                        title="Nombre y apellido / Razón social"
-                        :data="newClient.name"
-                        require-validation
-                        entity="client"
-                        @update:data="newClient.name = $event"
-                    />
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="legalId"
-                        placeholder="CUIL / CUIT"
-                        mask="#*"
-                        title="CUIL / CUIT"
-                        :data="newClient.legalId"
-                        require-validation
-                        entity="client"
-                        validation-type="extension"
-                        :char-amount="{ min: 11, max: 11 }"
-                        @update:data="newClient.legalId = $event"
-                    />
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="address"
-                        placeholder="Domicilio"
-                        title="Domicilio"
-                        :data="newClient.address"
-                        require-validation
-                        entity="client"
-                        @update:data="newClient.address = $event"
-                    />
-                    <toggle label="Es operadora" @handle-toggle-state="handleToggleState" />
-                    <textarea
-                        v-model="newClient.observations"
-                        class="col-span-full resize-none rounded-md input"
-                        fieldName="observations"
-                        rows="4"
-                        placeholder="Observaciones..."
-                        title="Observaciones"
-                    ></textarea>
-                </FieldGroup>
-                <FieldGroup>
-                    <FieldLegend>Contacto principal</FieldLegend>
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="nr-name"
-                        placeholder="Nombre de representante"
-                        title="Nombre"
-                        :data="newClient.companyRepresentative.name"
-                        require-validation
-                        entity="client"
-                        @update:data="newClient.companyRepresentative.name = $event"
-                    />
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="nr-phone"
-                        placeholder="+11 1111 1111"
-                        mask="#*"
-                        title="Teléfono"
-                        :data="newClient.companyRepresentative.phone"
-                        require-validation
-                        entity="client"
-                        @update:data="newClient.companyRepresentative.phone = $event"
-                    />
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="nr-email"
-                        placeholder="empresa@mail.com"
-                        title="Email"
-                        :data="newClient.companyRepresentative.email"
-                        require-validation
-                        entity="client"
-                        validation-type="email"
-                        @update:data="newClient.companyRepresentative.email = $event"
-                    />
-                </FieldGroup>
+                <CompanyForm
+                    v-model:name="newClient.name"
+                    v-model:legalId="newClient.legalId"
+                    v-model:address="newClient.address"
+                    v-model:isOperator="newClient.isOperator"
+                    v-model:observations="newClient.observations"
+                />
+                <RepFrom
+                    v-model:repName="newClient.companyRepresentative.name"
+                    v-model:repPhone="newClient.companyRepresentative.phone"
+                    v-model:repEmail="newClient.companyRepresentative.email"
+                    rep-entity="client"
+                />
             </form>
         </section>
         <!-- *** Cambiar todos por un componente de ABM Footer -->
@@ -133,6 +65,9 @@
 
     import ErrorModal from '@/components/modal/ErrorModal.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import RepFrom from '@/components/company/RepFrom.vue';
+    import CompanyForm from '../../components/company/CompanyForm.vue';
 
     export default {
         components: {
@@ -145,6 +80,9 @@
             Toggle,
             ErrorModal,
             SuccessModal,
+            ABMFormTitle,
+            RepFrom,
+            CompanyForm,
         },
         setup() {
             useTitle('Nuevo Cliente <> Sandflow');

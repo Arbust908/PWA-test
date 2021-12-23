@@ -1,91 +1,51 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo cliente</h1>
-        </header>
+        <ABMFormTitle title="Nuevo cliente" />
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4 max-w-md">
-                <FieldGroup>
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="name"
-                        placeholder="Nombre y apellido / Razón social"
-                        title="Nombre y apellido / Razón social"
-                        :data="editedCompany.name"
-                        require-validation
-                        entity="client"
-                        @update:data="editedCompany.name = $event"
-                    />
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="legalId"
-                        placeholder="CUIL / CUIT"
-                        mask="#*"
-                        title="CUIL / CUIT"
-                        :data="editedCompany.legalId"
-                        require-validation
-                        entity="client"
-                        validation-type="extension"
-                        :char-amount="{ min: 11, max: 11 }"
-                        @update:data="editedCompany.legalId = $event"
-                    />
-                    <FieldInput
-                        class="col-span-full"
-                        field-name="address"
-                        placeholder="Domicilio"
-                        title="Domicilio"
-                        :data="editedCompany.address"
-                        require-validation
-                        entity="client"
-                        @update:data="editedCompany.address = $event"
-                    />
-                    <toggle
-                        label="Es operadora"
-                        :initial-state="editedCompany.isOperator"
-                        @handle-toggle-state="handleToggleState"
-                    />
-                    <textarea
-                        v-model="editedCompany.observations"
-                        class="col-span-full resize-none rounded-md input"
-                        fieldName="observations"
-                        rows="4"
-                        placeholder="Observaciones..."
-                        title="Observaciones"
-                    ></textarea>
-                </FieldGroup>
+                <CompanyForm
+                    v-model:name="editedCompany.name"
+                    v-model:legalId="editedCompany.legalId"
+                    v-model:address="editedCompany.address"
+                    v-model:isOperator="editedCompany.isOperator"
+                    v-model:observations="editedCompany.observations"
+                />
+                <RepFrom
+                    v-model:repName="editedCompany.companyRepresentative.name"
+                    v-model:repPhone="editedCompany.companyRepresentative.phone"
+                    v-model:repEmail="editedCompany.companyRepresentative.email"
+                    rep-entity="client"
+                />
                 <FieldGroup>
                     <FieldLegend>Contacto principal</FieldLegend>
                     <FieldInput
+                        v-model:data="editedCompany.companyRepresentative.name"
                         class="col-span-full"
                         field-name="nr-name"
                         placeholder="Nombre de representante"
                         title="Nombre"
-                        :data="editedCompany.companyRepresentative.name"
                         require-validation
                         entity="client"
-                        @update:data="editedCompany.companyRepresentative.name = $event"
                     />
                     <FieldInput
+                        v-model:data="editedCompany.companyRepresentative.phone"
                         class="col-span-full"
                         field-name="nr-phone"
                         placeholder="+11 1111 1111"
                         mask="#*"
                         title="Teléfono"
-                        :data="editedCompany.companyRepresentative.phone"
                         require-validation
                         entity="client"
-                        @update:data="editedCompany.companyRepresentative.phone = $event"
                     />
                     <FieldInput
+                        v-model:data="editedCompany.companyRepresentative.email"
                         class="col-span-full"
                         field-name="nr-email"
                         placeholder="empresa@mail.com"
                         title="Email"
-                        :data="editedCompany.companyRepresentative.email"
                         require-validation
                         entity="client"
                         validation-type="email"
-                        @update:data="editedCompany.companyRepresentative.email = $event"
                     />
                 </FieldGroup>
             </form>
@@ -118,10 +78,6 @@
 </template>
 
 <script lang="ts">
-    import { useRouter, useRoute } from 'vue-router';
-    import { useStore } from 'vuex';
-    import { ref, watchEffect } from 'vue';
-    import { useTitle } from '@vueuse/core';
     import { Company } from '@/interfaces/sandflow';
     import Toggle from '@/components/ui/Toggle.vue';
     import { useValidator } from '@/helpers/useValidator';
@@ -131,23 +87,33 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+    import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     // AXIOS
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import FieldCheckbox from '@/components/ui/form/FieldCheckbox.vue';
+    import RepFrom from '@/components/company/RepFrom.vue';
+    import CompanyForm from '@/components/company/CompanyForm.vue';
 
     export default {
         components: {
-            Layout,
-            PrimaryBtn,
-            Toggle,
-            SecondaryBtn,
+            ABMFormTitle,
+            ErrorModal,
             FieldGroup,
             FieldInput,
             FieldLegend,
-            ErrorModal,
+            FieldTextArea,
+            Layout,
+            PrimaryBtn,
+            SecondaryBtn,
             SuccessModal,
+            Toggle,
+            FieldCheckbox,
+            RepFrom,
+            CompanyForm,
         },
         setup() {
             const route = useRoute();
@@ -167,10 +133,6 @@
 
             const goToIndex = () => {
                 router.push('/clientes');
-            };
-
-            const handleToggleState = () => {
-                editedCompany.value.isOperator = !editedCompany.value.isOperator;
             };
 
             const isValidated = ref(false);
@@ -254,7 +216,6 @@
                 update,
                 goToIndex,
                 editedCompany,
-                handleToggleState,
                 isValidated,
                 showErrorCuitModal,
                 showSuccessModal,
