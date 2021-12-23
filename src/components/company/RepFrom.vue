@@ -2,16 +2,16 @@
     <FieldGroup>
         <FieldLegend>Contacto principal</FieldLegend>
         <FieldInput
-            v-model:data="repName"
+            v-model:data="name"
             class="col-span-full"
             title="Nombre y apellido"
             field-name="sandRepName"
-            placeholder=""
+            placeholder="Nombre de representante"
             require-validation
-            entity="sandProvider"
+            :entity="repEntity"
         />
         <FieldInput
-            v-model:data="repPhone"
+            v-model:data="phone"
             class="col-span-full"
             title="Teléfono"
             field-name="sandRepPhone"
@@ -19,55 +19,46 @@
             mask="#*"
             require-validation
             validation-type="numeric"
-            entity="sandProvider"
+            :entity="repEntity"
         />
         <FieldInput
-            v-model:data="repEmail"
+            v-model:data="mail"
             class="col-span-full"
             title="Email"
             field-name="sandRepEmail"
             placeholder="empresa@mail.com"
             require-validation
             validation-type="email"
-            entity="sandProvider"
+            :entity="repEntity"
         />
     </FieldGroup>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     // *** SandProvider y TransportProvider tambien usan, deberiamos hacerlo genetico
-    import { defineComponent } from 'vue';
-    import { useVModels } from '@vueuse/core';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
 
-    export default defineComponent({
-        components: {
-            FieldLegend,
-            FieldInput,
-            FieldGroup,
+    const props = defineProps({
+        repName: {
+            type: String,
+            default: '',
         },
-        props: {
-            repName: {
-                type: String,
-                default: '',
-            },
-            repPhone: {
-                type: Number,
-                default: 0,
-            },
-            repEmail: {
-                type: String,
-                default: '',
-            },
+        repPhone: {
+            type: String,
+            default: '',
         },
-        setup(props, { emit }) {
-            const { repName, repPhone, repEmail } = useVModels(props, emit);
-
-            return { repName, repPhone, repEmail };
+        repEmail: {
+            type: String,
+            default: '',
+        },
+        repEntity: {
+            type: String,
+            default: '',
         },
     });
+
+    const emits = defineEmits(['update:repName', 'update:repPhone', 'update:repEmail']);
+    const { repName: name, repPhone: phone, repEmail: mail } = useVModels(props, emits);
 </script>

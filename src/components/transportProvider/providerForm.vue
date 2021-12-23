@@ -83,6 +83,7 @@
 </template>
 
 <script lang="ts">
+    // *** SandProvider y TransportProvider tambien usan, deberiamos hacerlo genetico
     import { defineComponent } from 'vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
