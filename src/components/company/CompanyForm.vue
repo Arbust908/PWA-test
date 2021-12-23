@@ -55,8 +55,8 @@
             default: '',
         },
         legalId: {
-            type: Number,
-            default: 0,
+            type: String,
+            default: '',
         },
         address: {
             type: String,
