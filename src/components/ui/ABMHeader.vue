@@ -4,7 +4,7 @@
         <router-link :to="link">
             <PrimaryBtn :btn="'pill'" size="sm">
                 <span> {{ btnText }} </span>
-                <Icon :icon="icon" class="size20" />
+                <Icon :icon="icon" class="h-5 w-5" />
             </PrimaryBtn>
         </router-link>
     </header>
@@ -40,8 +40,5 @@
     }
     h2 {
         @apply text-2xl font-semibold text-gray-900;
-    }
-    .size20 {
-        @apply w-[20px] h-[20px];
     }
 </style>
