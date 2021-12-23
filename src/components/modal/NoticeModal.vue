@@ -11,9 +11,9 @@
         <h2>{{ title }}</h2>
         <span> {{ text }} </span>
         <footer v-if="btnText">
-            <SecondaryBtn :btn="`wide`" @click="$emit('main')">
+            <PrimaryBtn :btn="`wide ${btnClass}`" @click="$emit('main')">
                 {{ btnText }}
-            </SecondaryBtn>
+            </PrimaryBtn>
         </footer>
     </Modal>
 </template>
@@ -21,13 +21,13 @@
 <script lang="ts">
     import Modal from '@/components/modal/General.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
 
     export default {
         components: {
             Modal,
             Icon,
-            SecondaryBtn,
+            PrimaryBtn,
         },
         inheritAttrs: false,
         props: {
@@ -85,7 +85,7 @@
 
 <style lang="scss" scoped>
     .icon {
-        @apply h-11 w-11 text-zinc-400;
+        @apply h-14 w-14;
         &--box {
             @apply flex flex-col justify-center items-center;
         }
@@ -94,7 +94,7 @@
         @apply text-lg font-medium mx-5 text-gray-900;
     }
     span {
-        @apply text-base text-sm;
+        @apply text-sm;
     }
     footer {
         @apply flex justify-center;
