@@ -183,6 +183,7 @@
 
                 if (workOrder.visible) {
                     showModal.value = true;
+
                     return;
                 }
                 await update(selectedWorkOrder.value);

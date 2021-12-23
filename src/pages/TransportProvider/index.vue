@@ -112,7 +112,7 @@
                 { title: 'Domicilio', key: 'legalId', sortable: true },
                 { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
                 { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
-                { title: '', key: 'name' },
+                { title: '', key: 'actions' },
             ];
 
             const actions = [

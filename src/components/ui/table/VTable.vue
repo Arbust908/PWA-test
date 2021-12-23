@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section class="max-w-fit">
         <!-- Desktop Table -->
         <div class="hidden sm:block">
             <div>

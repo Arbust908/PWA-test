@@ -1,8 +1,11 @@
 th {
-    @apply px-5 py-3 whitespace-nowrap text-center text-black text-sm font-medium uppercase tracking-wider max-w-[190px];
-  }
-  
-  .body-row {
+    @apply px-5 py-3 whitespace-nowrap text-center text-black text-sm font-medium uppercase tracking-wider w-[190px];
+    &.action-col {
+        @apply w-auto;
+    }
+}
+
+.body-row {
     @apply text-second-700;
     &:not(:disabled):not([disabled="true"]):hover {
         @apply bg-[#E5EEE5];
@@ -18,19 +21,19 @@ th {
         background: #F3F4F6;
         color: #7D7D7D !important;
     }
-  }
-  .disabled-mobile {
+}
+.disabled-mobile {
     background: #F3F4F6;
     color: #7D7D7D !important;
-  }
-  
-  td {
+}
+
+td {
     @apply px-6 py-4 text-sm font-medium text-center;
     color: inherit;
     &:not(.table--action) {
         @apply truncate max-w-[190px];
     }
-  
+
     &.empty {
         @apply text-second-400 italic;
     }
@@ -43,28 +46,13 @@ th {
     &.warn {
         @apply text-orange-500;
     }
-  }
-  
-  .btn-panel {
-    @apply flex justify-center space-x-4;
-  
-    .add {
-        @apply flex items-center text-emerald-600 hover:text-emerald-800;
-    }
-    .edit {
-        @apply flex items-center text-indigo-600 hover:text-indigo-800;
-    }
-  
-    .delete {
-        @apply flex items-center text-red-600 hover:text-red-800;
-    }
-  }
-  
-  td.emptyState {
+}
+
+td.emptyState {
     @apply text-center text-xs text-second-300 px-6 py-4;
-  }
-  
-  .centered {
+}
+
+.centered {
     :is(th, td) {
         @apply text-center;
         & > * {
@@ -74,5 +62,4 @@ th {
     .btn-panel {
         @apply justify-center;
     }
-  }
-  
+}
