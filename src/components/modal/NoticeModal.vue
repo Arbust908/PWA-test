@@ -9,7 +9,7 @@
             <Icon :icon="iconType" :class="iconClass" class="icon" />
         </div>
         <h2>{{ title }}</h2>
-        <span> {{ text }} </span>
+        <span :class="textClass"> {{ text }} </span>
         <footer v-if="btnText">
             <PrimaryBtn :btn="`wide ${btnClass}`" @click="$emit('main')">
                 {{ btnText }}
@@ -36,6 +36,10 @@
                 default: '',
             },
             text: {
+                type: String,
+                default: '',
+            },
+            textClass: {
                 type: String,
                 default: '',
             },
