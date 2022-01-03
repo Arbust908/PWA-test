@@ -44,6 +44,7 @@
         </footer>
         <ErrorModal
             :open="showErrorModal"
+            class="max-w-[480px]"
             title="Ya existe este cradle"
             text="El cradle que intentas guardar fue creado anteriormente."
             @close="toggleErrorModal()"
@@ -58,7 +59,8 @@
         />
         <SuccessModal
             :open="showModal"
-            text="¡El cradle fue guardado con éxito!"
+            class="max-w-[480px]"
+            title="¡El cradle fue guardado con éxito!"
             @close="$router.push('/cradle')"
             @main="$router.push('/cradle')"
         />

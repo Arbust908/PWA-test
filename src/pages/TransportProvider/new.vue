@@ -3,7 +3,7 @@
         <ABMFormTitle title="Nuevo proveedor de transporte" />
         <section class="flex flex-wrap md:flex-nowrap">
             <!-- main Section -->
-            <section class="w-full md:w-1/2">
+            <section class="w-full max-w-2xl">
                 <nav v-if="!isClicked" class="flex justify-between max-w-2xl bg-white">
                     <button
                         :class="['section-tab', activeSection === 'provider' ? 'active' : '']"
