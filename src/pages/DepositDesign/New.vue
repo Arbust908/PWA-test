@@ -30,6 +30,28 @@
                     <section class="w-full max-w-[220px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
                         <h2 class="col-span-full text-xl font-bold">Asignar categoría</h2>
                         <div class="flex flex-col gap-5 ml-4">
+                            <label v-for="(sand, i) in sandTypes" :key="i" class="type-select" :for="sand.type">
+                                <input
+                                    :id="sand.type"
+                                    :checked="selectedBox.category === sand.type"
+                                    type="radio"
+                                    name="boxCat"
+                                    :class="`form-checkbox mesh-type__${sand.id} radio`"
+                                    @click="setCat(sand.id.toString())"
+                                />
+                                <span>{{ sand.type }}</span>
+                            </label>
+                            <label class="type-select" for="empty">
+                                <input
+                                    id="empty"
+                                    :checked="selectedBox.category === 'empty'"
+                                    type="radio"
+                                    name="boxCat"
+                                    class="form-checkbox mesh-type__empty"
+                                    @click="setCat('empty')"
+                                />
+                                <span>Vacio</span>
+                            </label>
                             <label class="type-select" for="aisle">
                                 <input
                                     id="aisle"
@@ -41,52 +63,19 @@
                                 />
                                 <span>Pasillo</span>
                             </label>
-                            <label class="type-select" for="fina">
+                            <label class="type-select" for="cradle">
                                 <input
-                                    id="fina"
-                                    :checked="selectedBox.category === 'fina'"
+                                    id="cradle"
+                                    :checked="selectedBox.category === 'cradle'"
                                     type="radio"
                                     name="boxCat"
-                                    class="form-checkbox fina"
-                                    @click="setCat('fina')"
+                                    class="form-checkbox mesh-type__taken cradle-radio"
+                                    @click="setCat('cradle')"
                                 />
-                                <span>Arena fina</span>
-                            </label>
-                            <label class="type-select" for="gruesa">
-                                <input
-                                    id="gruesa"
-                                    :checked="selectedBox.category === 'gruesa'"
-                                    type="radio"
-                                    name="boxCat"
-                                    class="form-checkbox gruesa"
-                                    @click="setCat('gruesa')"
-                                />
-                                <span>Arena gruesa</span>
-                            </label>
-                            <label class="type-select" for="cortada">
-                                <input
-                                    id="cortada"
-                                    :checked="selectedBox.category === 'cortada'"
-                                    type="radio"
-                                    name="boxCat"
-                                    class="form-checkbox cortada"
-                                    @click="setCat('cortada')"
-                                />
-                                <span>Caja cortada</span>
-                            </label>
-                            <label class="type-select" for="empty">
-                                <input
-                                    id="empty"
-                                    :checked="selectedBox.category === 'empty'"
-                                    type="radio"
-                                    name="boxCat"
-                                    class="form-checkbox empty"
-                                    @click="setCat('empty')"
-                                />
-                                <span>Vacio</span>
+                                <span>Cradle</span>
                             </label>
                         </div>
-                        <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" />
+                        <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" :depositRender="true" />
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5 overflow-auto"
@@ -148,6 +137,14 @@
             const store = useStore();
             const instance = axios.create({
                 baseURL: apiUrl,
+            });
+
+            const sandTypes = ref([]);
+
+            onMounted(async () => {
+                const result = await axios.get(`${apiUrl}/sand`);
+                sandTypes.value = result.data.data;
+                console.log(sandTypes.value);
             });
 
             let deposit = ref({});
@@ -312,6 +309,7 @@
             };
 
             const setCat = (cat: string) => {
+                console.log(selectedBox.value.category);
                 selectedBox.value.category = cat;
 
                 const { floor, row, col } = selectedBox.value;
@@ -356,6 +354,7 @@
                 deposit,
                 isFull,
                 save,
+                sandTypes,
             };
         },
     });
@@ -368,28 +367,7 @@
     }
     input[type='radio'] {
         @apply w-5 h-5 border border-second-400 text-second-400;
-        // &.aisle {
-        //     @apply border-second-300 text-second-300;
-        // }
-        // &.fina {
-        //     @apply border-orange-600 text-orange-600;
-        // }
-        // &.gruesa {
-        //     @apply border-green-600 text-green-600;
-        // }
-        // &.cortada {
-        //     @apply border-blue-600 text-blue-600;
-        // }
-        // &.blocked {
-        //     @apply border-second-800 text-second-800;
-        // }
-        // &.empty {
-        //     @apply border-second-200 text-second-200;
-        // }
     }
-    // input:read-only {
-    //     @apply bg-second-200 border cursor-not-allowed;
-    // }
     fieldset:not(:last-of-type) {
         @apply border-b pb-6;
     }
