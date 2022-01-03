@@ -25,7 +25,6 @@
         @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
     }
 
-    
     &[size='xs'] {
         @apply text-xs rounded px-2.5 py-1.5;
     }
@@ -96,6 +95,9 @@
     }
     &.full {
         @apply w-full;
+    }
+    &.pill {
+        @apply h-8 rounded-xl;
     }
 
     // Estios de Color

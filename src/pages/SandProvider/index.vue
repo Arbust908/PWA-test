@@ -12,9 +12,6 @@
                 :data="sandProviderId"
                 @update:data="sandProviderId = $event"
             />
-            <div class="col-span-4 mt-7">
-                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
-            </div>
         </div>
 
         <VTable
@@ -26,7 +23,7 @@
         >
             <template #item="{ item: sandProvider }">
                 <!-- Desktop -->
-                <td :class="sandProvider.name ? null : 'empty'" class="text-center">
+                <td :class="sandProvider.name ? null : 'empty'">
                     {{ sandProvider?.name || '-' }}
                 </td>
                 <td :class="sandProvider.address ? null : 'empty'">
@@ -71,8 +68,7 @@
         <DisableModal
             :open="showModal"
             title="¿Desea inhabilitar este centro de carga de arena?"
-            text="Una vez inhabilitado, no podrá utilizar este centro de carga de arena en ninguna otra sección de la
-                    aplicación"
+            text="Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación."
             @close="showModal = false"
             @main="confirmModal"
         />
@@ -213,10 +209,6 @@
                 return sandProviders.value;
             });
 
-            const clearFilters = () => {
-                sandProviderId.value = -1;
-            };
-
             const openModalVisibility = async (sandProvider) => {
                 selectedsandProvider.value = sandProvider;
 
@@ -250,7 +242,6 @@
                 errorMessage,
                 filteredSandProviders,
                 sandProviderId,
-                clearFilters,
                 showModal,
                 openModalVisibility,
                 confirmModal,

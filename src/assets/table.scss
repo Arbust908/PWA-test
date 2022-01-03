@@ -7,7 +7,7 @@ th {
 
 .body-row {
     @apply text-second-700;
-    &:not(:disabled):not([disabled="true"]):hover {
+    &:not(:disabled):not([disabled='true']):hover {
         @apply bg-[#E5EEE5];
     }
     &.odd {
@@ -17,9 +17,9 @@ th {
         @apply bg-second-100;
     }
     &:disabled,
-    &[disabled="true"] {
-        background: #F3F4F6;
-        color: #7D7D7D !important;
+    &[disabled='true'] {
+        background: #f3f4f6;
+        color: #7d7d7d !important;
     }
 }
 .disabled-mobile {
