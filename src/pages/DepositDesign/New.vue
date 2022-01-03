@@ -37,7 +37,7 @@
                                     type="radio"
                                     name="boxCat"
                                     class="form-checkbox mesh-type__taken aisle-radio"
-                                    @click="setCat('mesh-type__taken aisle')"
+                                    @click="setCat('aisle')"
                                 />
                                 <span>Pasillo</span>
                             </label>

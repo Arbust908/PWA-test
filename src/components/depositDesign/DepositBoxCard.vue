@@ -58,8 +58,10 @@
         setup(props) {
             const { category } = toRefs(props);
             const makeValue = computed(() => {
+                console.log(BoxCategory[category.value]);
                 return BoxCategory[category.value];
             });
+            console.log(category.value);
 
             return {
                 makeValue,
