@@ -36,8 +36,8 @@
                                     :checked="selectedBox.category === 'aisle'"
                                     type="radio"
                                     name="boxCat"
-                                    class="form-checkbox mesh-type__taken cradle-radio"
-                                    @click="setCat('mesh-type__taken cradle')"
+                                    class="form-checkbox mesh-type__taken aisle-radio"
+                                    @click="setCat('mesh-type__taken aisle')"
                                 />
                                 <span>Pasillo</span>
                             </label>
@@ -387,9 +387,9 @@
         //     @apply border-second-200 text-second-200;
         // }
     }
-    input:read-only {
-        @apply bg-second-200 border cursor-not-allowed;
-    }
+    // input:read-only {
+    //     @apply bg-second-200 border cursor-not-allowed;
+    // }
     fieldset:not(:last-of-type) {
         @apply border-b pb-6;
     }

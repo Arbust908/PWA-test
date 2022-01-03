@@ -112,8 +112,11 @@
         color: #6160A3;
       };
     };
-    &-aisle {
+    &.aisle {
       @apply bg-zinc-600;
+      &-radio{
+        @apply border-zinc-600 text-zinc-600
+      }
       &.icon{
         @apply text-zinc-400;
       };
