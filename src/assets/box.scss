@@ -103,8 +103,11 @@
   };
   &__taken {
     @apply text-white;
-    &-cradle {
+    &.cradle {
       @apply bg-indigo-900;
+      &-radio{
+        @apply border-indigo-900 text-indigo-900
+      }
       &.icon{
         color: #6160A3;
       };

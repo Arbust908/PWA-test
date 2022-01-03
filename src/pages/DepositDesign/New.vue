@@ -36,8 +36,8 @@
                                     :checked="selectedBox.category === 'aisle'"
                                     type="radio"
                                     name="boxCat"
-                                    class="form-checkbox aisle"
-                                    @click="setCat('aisle')"
+                                    class="form-checkbox mesh-type__taken cradle-radio"
+                                    @click="setCat('mesh-type__taken cradle')"
                                 />
                                 <span>Pasillo</span>
                             </label>
@@ -362,33 +362,34 @@
 </script>
 
 <style lang="scss" scoped>
+    @import '@/assets/box.scss';
     .input {
         @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
     }
     input[type='radio'] {
         @apply w-5 h-5 border border-second-400 text-second-400;
-        &.aisle {
-            @apply border-second-300 text-second-300;
-        }
-        &.fina {
-            @apply border-orange-600 text-orange-600;
-        }
-        &.gruesa {
-            @apply border-green-600 text-green-600;
-        }
-        &.cortada {
-            @apply border-blue-600 text-blue-600;
-        }
-        &.blocked {
-            @apply border-second-800 text-second-800;
-        }
-        &.empty {
-            @apply border-second-200 text-second-200;
-        }
+        // &.aisle {
+        //     @apply border-second-300 text-second-300;
+        // }
+        // &.fina {
+        //     @apply border-orange-600 text-orange-600;
+        // }
+        // &.gruesa {
+        //     @apply border-green-600 text-green-600;
+        // }
+        // &.cortada {
+        //     @apply border-blue-600 text-blue-600;
+        // }
+        // &.blocked {
+        //     @apply border-second-800 text-second-800;
+        // }
+        // &.empty {
+        //     @apply border-second-200 text-second-200;
+        // }
     }
-    // input:read-only {
-    //   @apply bg-second-200 border cursor-not-allowed;
-    // }
+    input:read-only {
+        @apply bg-second-200 border cursor-not-allowed;
+    }
     fieldset:not(:last-of-type) {
         @apply border-b pb-6;
     }
