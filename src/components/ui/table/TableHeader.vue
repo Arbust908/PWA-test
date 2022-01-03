@@ -1,6 +1,6 @@
 <template>
     <tr>
-        <th v-for="column in columns" :key="column.key" scope="col">
+        <th v-for="column in columns" :key="column.key" scope="col" :class="{ 'action-col': column.key === 'actions' }">
             <div class="flex justify-center items-center gap-2">
                 {{ column.title }}
 

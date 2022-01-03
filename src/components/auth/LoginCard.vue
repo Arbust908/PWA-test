@@ -74,7 +74,7 @@
 <script lang="ts">
     import axios from 'axios';
     import { useActions } from 'vuex-composition-helpers';
-    import { Role } from '@/interfaces/sandflow';
+    import { Roles } from '@/interfaces/sandflow';
     import Logo from '@/components/Logo.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import PermissionsManager from '@/helpers/canI';
@@ -147,7 +147,7 @@
                     fullUser = {
                         id: 99,
                         username: username.value,
-                        role: Role.Logged,
+                        role: Roles.Logged,
                         permissions: fullUser.permissions,
                         token: fullUser.token,
                     };

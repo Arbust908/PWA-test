@@ -27,7 +27,7 @@
         <FieldSelect
             v-model:data="tpId"
             title="Proveedor"
-            class="col-span-full sm:col-span-5"
+            class="col-span-full sm:col-span-4"
             :field-name="`transportProvider`"
             placeholder="Seleccionar"
             endpoint="/transportProvider"
@@ -35,7 +35,7 @@
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldInput
                 v-model:data="amu"
-                class="col-span-full sm:col-span-3 bg-transparent"
+                class="col-span-full sm:col-span-2 bg-transparent"
                 :field-name="`transportAmount`"
                 title="Camiones"
                 placeholder="Camiones"
@@ -46,7 +46,7 @@
             />
             <FieldInput
                 v-model:data="obs"
-                class="col-span-full sm:col-span-5"
+                class="col-span-full sm:col-span-4"
                 :field-name="`transportObservations`"
                 placeholder="Observaciones"
                 title="Observaciones"

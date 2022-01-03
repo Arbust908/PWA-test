@@ -32,6 +32,12 @@ label {
     }
   }
 }
+input[type='checkbox'] {
+  @apply w-4 h-4 m-1 p-0 border-main-500 focus:ring-main-500;
+  &:checked {
+      @apply bg-main-500;
+  }
+}
 .pre,
 .post {
   @apply inline-flex items-center justify-center border border-second-300 bg-second-50 text-second-500 text-center;
@@ -49,7 +55,7 @@ label {
   @apply w-full;
 }
 
-input:read-only {
+input:read-only:is(:not([type="checkbox"])) {
   @apply bg-second-200 border cursor-not-allowed;
 }
 

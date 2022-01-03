@@ -1,5 +1,8 @@
 th {
-    @apply px-5 py-3 whitespace-nowrap text-center text-black text-sm font-medium uppercase tracking-wider max-w-[190px];
+    @apply px-5 py-3 whitespace-nowrap text-center text-black text-sm font-medium uppercase tracking-wider w-[190px];
+    &.action-col {
+        @apply w-auto;
+    }
 }
 
 .body-row {
@@ -20,8 +23,8 @@ th {
     }
 }
 .disabled-mobile {
-    background: #f3f4f6;
-    color: #7d7d7d !important;
+    background: #F3F4F6;
+    color: #7D7D7D !important;
 }
 
 td {
@@ -42,21 +45,6 @@ td {
     }
     &.warn {
         @apply text-orange-500;
-    }
-}
-
-.btn-panel {
-    @apply flex justify-center space-x-4;
-
-    .add {
-        @apply flex items-center text-emerald-600 hover:text-emerald-800;
-    }
-    .edit {
-        @apply flex items-center text-indigo-600 hover:text-indigo-800;
-    }
-
-    .delete {
-        @apply flex items-center text-red-600 hover:text-red-800;
     }
 }
 

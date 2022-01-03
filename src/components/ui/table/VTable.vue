@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section class="max-w-fit">
         <!-- Desktop Table -->
         <div class="hidden sm:block">
             <div>
@@ -169,7 +169,7 @@
             };
 
             const filteredItems = computed(() => {
-                let items = [...props.items];
+                let items = [...(props.items || [])];
 
                 if (items.length < 1) {
                     return [];

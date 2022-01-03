@@ -2,42 +2,40 @@
     <FieldGroup>
         <FieldLegend class="font-semibold">Contacto principal</FieldLegend>
         <FieldInput
+            v-model:data="repName"
             class="col-span-full"
             title="Nombre y apellido"
             field-name="sandRepName"
             placeholder=""
-            :data="repName"
             require-validation
             entity="sandProvider"
-            @update:data="repName = $event"
         />
         <FieldInput
+            v-model:data="repPhone"
             class="col-span-full"
             title="Teléfono"
             field-name="sandRepPhone"
             placeholder="Ingrese sólo números"
             mask="#*"
-            :data="repPhone"
             require-validation
             validation-type="numeric"
             entity="sandProvider"
-            @update:data="repPhone = $event"
         />
         <FieldInput
+            v-model:data="repEmail"
             class="col-span-full"
             title="Email"
             field-name="sandRepEmail"
             placeholder="empresa@mail.com"
-            :data="repEmail"
             require-validation
             validation-type="email"
             entity="sandProvider"
-            @update:data="repEmail = $event"
         />
     </FieldGroup>
 </template>
 
 <script lang="ts">
+    // *** SandProvider y TransportProvider tambien usan, deberiamos hacerlo genetico
     import { defineComponent } from 'vue';
     import { useVModels } from '@vueuse/core';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
@@ -48,11 +46,9 @@
 
     export default defineComponent({
         components: {
-            FieldGroup,
-            FieldInput,
-            FieldTextArea,
             FieldLegend,
-            Icon,
+            FieldInput,
+            FieldGroup,
         },
         props: {
             repName: {
@@ -60,7 +56,8 @@
                 default: '',
             },
             repPhone: {
-                type: String,
+                type: Number,
+                default: 0,
             },
             repEmail: {
                 type: String,

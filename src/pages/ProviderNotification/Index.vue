@@ -5,11 +5,10 @@
             <FieldSelect
                 title="Filtro"
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
-                field-name="name"
                 placeholder="Seleccionar cliente"
+                field-name="name"
                 endpoint="/sandProvider"
-                :data="sandProviderId"
-                @update:data="sandProviderId = $event"
+                v-model:data="sandProviderId"
             />
         </div>
         <VTable
@@ -18,6 +17,7 @@
             :pagination="pagination"
             :items="filteredNotifications"
             :actions="actions"
+            disable-key="id"
         >
             <template #item="{ item }">
                 <!-- Desktop -->
@@ -38,7 +38,7 @@
 
                 <td class="text-center" :class="item ? null : 'empty'">
                     <Badge v-if="item.isOperator" text="Completado" classes="bg-gray-500 text-white px-5" />
-                    <Badge v-else text="En proceso" classes="bg-gray-300 text-gray-600" />
+                    <Badge v-else text="En proceso" classes="badge text-white" />
                 </td>
             </template>
 
@@ -133,7 +133,7 @@
                 { title: 'Transporte', key: 'transportProvider.name', sortable: true },
                 { title: 'Camiones', key: 'data.cantidadCamiones', sortable: true },
                 { title: 'Estado', key: 'status' },
-                { title: '', key: '' },
+                { title: '', key: 'actions' },
             ];
 
             const actions = [
@@ -249,6 +249,7 @@
                 bdInfo,
                 showModal,
                 toggleModal,
+                sandProviderId,
             };
         },
     };
@@ -256,4 +257,7 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
+    .badge {
+        background-color: #616161;
+    }
 </style>
