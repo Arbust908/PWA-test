@@ -1,18 +1,7 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <SecondaryBtn @click="togglePDF()"> PDF </SecondaryBtn>
-        <PDF
-            v-if="showPDF"
-            :info="{
-                sandProvidersIds,
-                TransportOrders,
-                transportProviderId,
-                localDate,
-                localTime,
-                packageObservations,
-            }"
-        />
+        <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" />
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-3 sm:p-4 flex-col gap-4">
                 <FieldGroup class="max-w-2xl border-none">
@@ -257,7 +246,14 @@
             "
         />
 
-        <SuccessModal :open="openSuccess" :title="titleSuccess" @main="openSuccess = false" />
+        <SuccessModal
+            :open="openSuccess"
+            :title="titleSuccess"
+            @main="
+                togglePDF();
+                openSuccess = false;
+            "
+        />
         <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @main="openError = false" />
         <ErrorModal :open="openErrorGral" :title="titleError" :text="textError" @main="openErrorGral = false" />
     </Layout>
@@ -611,6 +607,21 @@
     };
 
     const purchaseId = ref(0);
+    const companies = ref([]);
+    const { data: companiesData } = useAxios('/company', instance);
+    watch(companiesData, (companiesIfno) => {
+        if (companiesIfno && companiesIfno.data) {
+            companies.value = companiesIfno.data;
+        }
+    });
+    const pits = ref([]);
+    const { data: pitsData } = useAxios('/pit', instance);
+    watch(pitsData, (pitsInfo) => {
+        if (pitsInfo && pitsInfo.data) {
+            pits.value = pitsInfo.data;
+        }
+    });
+
     onMounted(async () => {
         const result = await axios.get(`${api}/purchaseOrder`);
         purchaseId.value = result.data.data.at(-1).id + 1;
@@ -644,9 +655,9 @@
                     titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
                     _saveTO(poId);
                     _saveSO(poId);
-                    setTimeout(() => {
+                    /* setTimeout(() => {
                         router.push('/orden-de-pedido');
-                    }, 2000);
+                    }, 2000); */
                 }
             });
         }
@@ -664,6 +675,32 @@
 
     const showPDF = ref(false);
     const togglePDF = useToggle(showPDF);
+    const pdfInfo = computed(() => {
+        const emptyThing = {
+            name: 'none',
+        };
+        const client =
+            companies.value.find((c) => {
+                return c.id === companyClientId.value;
+            }) || emptyThing;
+        const pit =
+            pits.value.find((p) => {
+                return p.id === pitId.value;
+            }) || emptyThing;
+
+        return {
+            purchaseOrder: {
+                id: purchaseId.value,
+                ...po.value,
+                plates: filteredPlates.value,
+            },
+            client: client.name,
+            pit: pit.name,
+            localDate: localDate.value,
+            localTime: localTime.value,
+            observation: packageObservations.value,
+        };
+    });
 </script>
 
 <style lang="scss" scoped>

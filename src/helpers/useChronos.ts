@@ -22,6 +22,16 @@ export function createFromDate(datetime: number) {
     };
 }
 
+export const formatHour = ({ hour, minute, time }: { hour: Ref<number>; minute: Ref<number>; time: Ref<boolean> }) => {
+    const isAM = time.value;
+    hour.value = isAM ? hour.value : hour.value + 12;
+    const hourString = hour.value < 10 ? `0${hour.value}` : `${hour.value}`;
+    const minuteString = minute.value < 10 ? `0${minute.value}` : `${minute.value}`;
+    const formated = `${hourString}:${minuteString}hs`;
+
+    return formated;
+};
+
 export function createToDate(hour: number, minute: number, isAM: boolean) {
     const hours: Ref<number> = ref(hour);
 
