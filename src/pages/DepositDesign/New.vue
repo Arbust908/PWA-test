@@ -33,7 +33,7 @@
                             <label v-for="(sand, i) in sandTypes" :key="i" class="type-select" :for="sand.type">
                                 <input
                                     :id="sand.type"
-                                    :checked="selectedBox.category === sand.id"
+                                    :checked="selectedBox.category == sand.id"
                                     type="radio"
                                     name="boxCat"
                                     :class="`form-checkbox mesh-type__${sand.id} radio`"
@@ -318,6 +318,7 @@
                 id: '',
             });
             const selectBox = (box: Box) => {
+                console.log(box);
                 selectedBox.value = box;
             };
 
