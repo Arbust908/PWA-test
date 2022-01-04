@@ -53,7 +53,7 @@
                                     :checked="selectedBox.category == sand.id"
                                     type="radio"
                                     name="boxCat"
-                                    :class="`form-checkbox mesh-type__${sand.id} radio`"
+                                    :class="`form-checkbox mesh-type__${sand.id} radio clickable`"
                                     @click="setCat(sand.id.toString())"
                                 />
                                 <span>{{ sand.type }}</span>
@@ -64,7 +64,7 @@
                                     :checked="selectedBox.category === 'empty'"
                                     type="radio"
                                     name="boxCat"
-                                    class="form-checkbox mesh-type__empty"
+                                    class="form-checkbox mesh-type__empty mesh-type__empty"
                                     @click="setCat('empty')"
                                 />
                                 <span>Caja Vacía</span>
@@ -75,7 +75,7 @@
                                     :checked="selectedBox.category === 'cradle'"
                                     type="radio"
                                     name="boxCat"
-                                    class="form-checkbox mesh-type__taken cradle-radio"
+                                    class="form-checkbox mesh-type__taken cradle-clickable"
                                     @click="setCat('cradle')"
                                 />
                                 <span>Cradle</span>
@@ -86,7 +86,7 @@
                                     :checked="selectedBox.category === 'aisle'"
                                     type="radio"
                                     name="boxCat"
-                                    class="form-checkbox mesh-type__taken aisle-radio"
+                                    class="form-checkbox mesh-type__taken aisle-clickable"
                                     @click="setCat('aisle')"
                                 />
                                 <span>Pasillo</span>

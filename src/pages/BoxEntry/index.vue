@@ -54,20 +54,23 @@
                                 <div>
                                     <h2 class="col-span-full text-xl font-bold">Referencias</h2>
                                     <div class="flex flex-col gap-5 mt-4">
-                                        <span class="select-category fina" @click="setVisibleCategories('fina')">
-                                            <EyeIcon v-if="visibleCategories.includes('fina')" class="icon" />
-                                            <EyeIconOff v-else class="icon" />
-                                            Arena fina</span
+                                        <span
+                                            v-for="(sand, i) in sandTypes"
+                                            :key="i"
+                                            :class="`select-category mesh-type__${sand.id} radio clickable`"
+                                            @click="setVisibleCategories(sand.id)"
                                         >
-                                        <span class="select-category gruesa" @click="setVisibleCategories('gruesa')">
-                                            <EyeIcon v-if="visibleCategories.includes('gruesa')" class="icon" />
+                                            <EyeIcon v-if="visibleCategories.includes(sand.id)" class="icon" />
                                             <EyeIconOff v-else class="icon" />
-                                            Arena gruesa</span
+                                            {{ sand.type }}</span
                                         >
-                                        <span class="select-category cortada" @click="setVisibleCategories('cortada')">
-                                            <EyeIcon v-if="visibleCategories.includes('cortada')" class="icon" />
+                                        <span
+                                            class="select-category mesh-type__taken cradle-clickable"
+                                            @click="setVisibleCategories('cradle')"
+                                        >
+                                            <EyeIcon v-if="visibleCategories.includes('cradle')" class="icon" />
                                             <EyeIconOff v-else class="icon" />
-                                            Caja cortada</span
+                                            Cradle</span
                                         >
                                         <span class="select-category aisle">
                                             <div class="w-4 h-4 mr-3 rounded-full bg-gray-300" />
@@ -83,7 +86,7 @@
                                         :floor="choosedBox.floor"
                                         :row="choosedBox.row"
                                         :col="choosedBox.col"
-                                        :category="choosedBox.category"
+                                        :category="choosedBox.sandTypeId.toString()"
                                         :choosed-box="choosedBox"
                                     />
                                 </div>
@@ -98,6 +101,7 @@
                                 :deposit="warehouse.layout || {}"
                                 :visible-categories="visibleCategories"
                                 @select-box="selectBox"
+                                @click="conLog()"
                             />
                         </fieldset>
                         <fieldset v-if="activeSection == 'cradle'" class="py-2 flex flex-col gap-x-10 2xl:gap-x-40">
@@ -169,6 +173,10 @@
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
+    function conLog() {
+        console.log(choosedBox);
+    }
+
     useTitle('Ingreso de Cajas <> Sandflow');
     const router = useRouter();
     let activeSection = ref('deposit');
@@ -219,6 +227,12 @@
             })
             .catch((err) => console.error(err));
     };
+
+    const sandTypes = ref([]);
+    onMounted(async () => {
+        const result = await axios.get(`${apiUrl}/sand`);
+        sandTypes.value = result.data.data;
+    });
 
     const getFilteredCradles = async () => {
         const cradlesIds = [];
@@ -453,7 +467,7 @@
 
     const warehouse = ref({});
     const originalWarehouseLayout = ref({});
-    let visibleCategories = ref(['fina', 'gruesa', 'cortada']);
+    let visibleCategories = ref([1, 2, 3, 4, 5, 'cradle']);
 
     const setVisibleCategories = (category: string) => {
         if (visibleCategories.value.includes(category)) {
@@ -565,6 +579,7 @@
 </script>
 
 <style lang="scss" scoped>
+    @import '@/assets/box.scss';
     .section-tab {
         @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
     }
@@ -582,24 +597,8 @@
         &:not(.full):not(.aisle) {
             cursor: pointer;
         }
-
-        &.aisle {
-            @apply text-second-300 border-second-300;
-        }
-        &.fina {
-            @apply text-orange-600 border-orange-600;
-        }
-        &.gruesa {
-            @apply text-green-600 border-green-600;
-        }
-        &.cortada {
-            @apply text-blue-600 border-blue-600;
-        }
         &.blocked {
             @apply text-second-800 border-second-800;
-        }
-        &.empty {
-            @apply text-second-200 border-second-200;
         }
     }
 
