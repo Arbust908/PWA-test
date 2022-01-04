@@ -172,9 +172,12 @@ export interface SandStage {
     sandB?: Sand;
     sandId3: number;
     sandC?: Sand;
+    sandId4: number;
+    sandD?: Sand;
     quantity1: number;
     quantity2: number;
     quantity3: number;
+    quantity4: number;
     action?: 'create' | 'update' | 'delete';
     sandPlanId: number;
     sandPlan?: SandPlan;

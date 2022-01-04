@@ -39,12 +39,12 @@
                 <div class="flex flex-col">
                     <div class="overflow-x-auto">
                         <div class="align-middle inline-block min-w-full">
-                            <div class="overflow-hidden">
+                            <div class="h-full">
                                 <table class="min-w-full divide-y divide-gray-200">
                                     <thead>
                                         <StageHeader />
                                     </thead>
-                                    <tbody v-show="currentOpened" class="divide-y">
+                                    <tbody v-show="currentOpened" class="">
                                         <SandPlanStage
                                             v-for="(stage, Key) in inProgressStages"
                                             :key="Key"
@@ -52,7 +52,9 @@
                                             :stage="stage"
                                             :editing="editingStage"
                                             :sands="sands"
-                                            editing-key="innerId"
+                                            :stagesAmount="currentSandPlan.stages.length"
+                                            :actions="actions"
+                                            editing-key="id"
                                             @editStage="editStage"
                                             @saveStage="saveStage"
                                             @duplicateStage="duplicateStage"
@@ -103,7 +105,8 @@
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
-                        editing-key="innerId"
+                        :stagesAmount="currentSandPlan.stages.length"
+                        editing-key="id"
                         @editStage="editStage"
                         @saveStage="saveStage"
                         @duplicateStage="duplicateStage"
@@ -113,93 +116,6 @@
                 </div>
             </form>
         </section>
-        <section class="bg-white rounded-md shadow-sm hidden sm:block">
-            <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-                <header class="flex justify-between">
-                    <section class="flex space-x-4">
-                        <h2 class="text-2xl font-bold">
-                            <span>Etapas finalizadas</span>
-                        </h2>
-                    </section>
-                    <section class="flex space-x-4">
-                        <Icon
-                            icon="ChevronUp"
-                            outline
-                            :opened="finishedOpened"
-                            :class="finishedOpened ? 'rotate-180' : null"
-                            class="w-8 h-8 text-gray-600 transition transform duration-300 ease-out cursor-pointer"
-                            @click="toggleFinOp"
-                        />
-                    </section>
-                </header>
-                <div class="flex flex-col">
-                    <div class="overflow-x-auto">
-                        <div class="align-middle inline-block min-w-full">
-                            <div class="overflow-hidden">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead>
-                                        <StageHeader />
-                                    </thead>
-                                    <tbody v-show="finishedOpened" class="divide-y">
-                                        <SandPlanStage
-                                            v-for="(stage, Key) in finishedStages"
-                                            :key="Key"
-                                            :stage="stage"
-                                            :editing="editingStage"
-                                            :sands="sands"
-                                            @editStage="editStage"
-                                            @saveStage="saveStage"
-                                            @duplicateStage="duplicateStage"
-                                            @deleteStage="deleteStage"
-                                            @upgrade="upgrade"
-                                        />
-                                        <StageEmptyState v-if="finishedStages.length <= 0" />
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </section>
-        <section class="bg-white rounded-md shadow-sm mt-4 block sm:hidden">
-            <form method="POST" action="/" class="flex flex-col rounded border-solid border-black">
-                <header class="flex justify-between px-3 pb-3 pt-4 border-b-1 border-solid border-black">
-                    <section class="flex space-x-4">
-                        <h2 class="font-semibold">
-                            <span class="pl-6">Etapas Finalizadas</span>
-                        </h2>
-                    </section>
-                    <section class="flex space-x-4">
-                        <Icon
-                            icon="ChevronUp"
-                            outline
-                            :opened="finishedOpened"
-                            :class="finishedOpened ? 'rotate-180' : null"
-                            class="w-8 h-8 text-gray-600 transition transform duration-300 ease-out cursor-pointer"
-                            @click.prevent="toggleFinOp"
-                        />
-                    </section>
-                </header>
-                <div v-show="finishedOpened" class="flex flex-col p-4">
-                    <ResposiveTableSandPlan
-                        v-for="(stage, Key) in finishedStages"
-                        :key="Key"
-                        :pos="Key + 1"
-                        :stage="stage"
-                        :editing="editingStage"
-                        :sands="sands"
-                        @editStage="editStage"
-                        @saveStage="saveStage"
-                        @duplicateStage="duplicateStage"
-                        @deleteStage="deleteStage"
-                        @upgrade="upgrade"
-                    />
-                    <StageEmptyState v-if="finishedStages.length <= 0" />
-                </div>
-            </form>
-        </section>
-
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')">Cancelar</SecondaryBtn>
@@ -256,6 +172,8 @@
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
 
+    import DropdownBtn from '@/components/ui/buttons/DropdownBtn.vue';
+
     export default {
         components: {
             Layout,
@@ -273,6 +191,7 @@
             ABMFormTitle,
             SuccessModal,
             ErrorModal,
+            DropdownBtn,
         },
         setup() {
             // Init
@@ -285,6 +204,7 @@
                 baseURL: api,
             });
             const defaultStage = {
+                id: -1,
                 innerId: 0,
                 stage: null,
                 sandId1: -1,
@@ -293,6 +213,8 @@
                 quantity2: null,
                 sandId3: -1,
                 quantity3: null,
+                sandId4: -1,
+                quantity4: null,
                 sandPlanId: 0,
                 status: 0,
             };
@@ -305,14 +227,15 @@
             });
 
             const vuexSPs = JSON.parse(JSON.stringify(store.state.sandPlan.all));
+            const { data: spData } = useAxios('/sandPlan/' + id, instance);
             const vuexSP = vuexSPs.find((sp) => {
                 return sp.id == id;
             });
 
             const buckupStages = ref([]);
 
-            if (!vuexSP || true) {
-                const { data: spData } = useAxios('/sandPlan/' + id, instance);
+            if (!vuexSP || spData.value) {
+                // const { data: spData } = useAxios('/sandPlan/' + id, instance);
                 watch(spData, (sandplanApi, prevCount) => {
                     if (sandplanApi && sandplanApi.data) {
                         const sp = { ...currentSandPlan, ...sandplanApi.data };
@@ -351,13 +274,15 @@
             const finishedStages = computed(() => {
                 return currentSandPlan.stages.filter((stage) => stage.status >= 2) || [];
             });
+
             const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
             const lastStageId = lastStage ? Number(lastStage.innerId) : -1;
             const editingStage = ref(lastStageId);
 
             const editStage = (stage) => {
-                editingStage.value = Number(stage.innerId);
+                editingStage.value = Number(stage.id);
             };
+
             const saveStage = (stage) => {
                 // currentSandPlan.stages[stage.innerId] = stage;
                 editingStage.value = -1;
@@ -376,7 +301,6 @@
                     ...newStatus,
                     ...id,
                 };
-                console.log(newStage);
                 currentSandPlan.stages.push(newStage);
                 editStage(newStage);
             };
@@ -384,12 +308,16 @@
             const deleteStage = (stage) => {
                 const stageId = stage.innerId;
                 const isDB = stage.id ?? false;
-                currentSandPlan.stages = currentSandPlan.stages.filter((s) => s.innerId !== stageId);
 
-                if (isDB) {
+                if (stageId !== undefined) {
+                    currentSandPlan.stages = currentSandPlan.stages.filter((s) => s.innerId !== stageId);
                     stagesToDelete.value.push(stageId);
+                } else {
+                    currentSandPlan.stages = currentSandPlan.stages.filter((s) => s.id !== isDB);
+                    stagesToDelete.value.push(isDB);
                 }
             };
+
             const upgrade = (stage) => {
                 currentSandPlan.stages.map((s) => {
                     if (s.innerId === stage.innerId) {
@@ -466,13 +394,18 @@
                         stage.sandId3 = null;
                     }
 
+                    if (stage.sandId4 === -1) {
+                        stage.sandId4 = null;
+                    }
+
                     return stage;
                 });
                 currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
                     const noSandTypeNull =
                         (stage.sandId1 !== null && stage.quantity1 > 0) ||
                         (stage.sandId2 !== null && stage.quantity2 > 0) ||
-                        (stage.sandId3 !== null && stage.quantity3 > 0);
+                        (stage.sandId3 !== null && stage.quantity3 > 0) ||
+                        (stage.sandId4 !== null && stage.quantity4 > 0);
 
                     return noSandTypeNull;
                 });
@@ -488,9 +421,11 @@
                                     sandId1: stage.sandId1,
                                     sandId2: stage.sandId2,
                                     sandId3: stage.sandId3,
+                                    sandId4: stage.sandId4,
                                     quantity1: stage.quantity1,
                                     quantity2: stage.quantity2,
                                     quantity3: stage.quantity3,
+                                    quantity4: stage.quantity4,
                                 },
                             },
                             instance

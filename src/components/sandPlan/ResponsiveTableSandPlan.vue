@@ -3,7 +3,7 @@
         <tr>
             <th class="text-left px-6 py-4 w-3/6">
                 <span>Etapa </span>
-                <span>{{ pos }} - 40</span>
+                <span>{{ pos }} - {{ stagesAmount }}</span>
             </th>
             <td class="w-3/6">
                 <div class="flex justify-end w-28 ml-auto my-0">
@@ -211,6 +211,10 @@
             pos: {
                 type: Number,
                 required: true,
+            },
+            stagesAmount: {
+                type: Number,
+                default: 0,
             },
         },
         setup(props, { emit }) {
