@@ -33,7 +33,7 @@
                             <label v-for="(sand, i) in sandTypes" :key="i" class="type-select" :for="sand.type">
                                 <input
                                     :id="sand.type"
-                                    :checked="selectedBox.category === sand.type"
+                                    :checked="selectedBox.category === sand.id"
                                     type="radio"
                                     name="boxCat"
                                     :class="`form-checkbox mesh-type__${sand.id} radio`"
@@ -50,18 +50,7 @@
                                     class="form-checkbox mesh-type__empty"
                                     @click="setCat('empty')"
                                 />
-                                <span>Vacio</span>
-                            </label>
-                            <label class="type-select" for="aisle">
-                                <input
-                                    id="aisle"
-                                    :checked="selectedBox.category === 'aisle'"
-                                    type="radio"
-                                    name="boxCat"
-                                    class="form-checkbox mesh-type__taken aisle-radio"
-                                    @click="setCat('aisle')"
-                                />
-                                <span>Pasillo</span>
+                                <span>Caja Vacía</span>
                             </label>
                             <label class="type-select" for="cradle">
                                 <input
@@ -74,8 +63,24 @@
                                 />
                                 <span>Cradle</span>
                             </label>
+                            <label class="type-select" for="aisle">
+                                <input
+                                    id="aisle"
+                                    :checked="selectedBox.category === 'aisle'"
+                                    type="radio"
+                                    name="boxCat"
+                                    class="form-checkbox mesh-type__taken aisle-radio"
+                                    @click="setCat('aisle')"
+                                />
+                                <span>Pasillo</span>
+                            </label>
                         </div>
-                        <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" :depositRender="true" />
+                        <BoxCard
+                            v-if="selectedBox.category !== ''"
+                            v-bind="selectedBox"
+                            :deposit-render="true"
+                            :sand-name="sandName"
+                        />
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5 overflow-auto"
@@ -140,11 +145,19 @@
             });
 
             const sandTypes = ref([]);
+            const sandName = computed(() => {
+                if (
+                    selectedBox.value.category != 'empty' &&
+                    selectedBox.value.category != 'aisle' &&
+                    selectedBox.value.category != 'cradle'
+                ) {
+                    return sandTypes.value[parseInt(selectedBox.value.category) - 1].type;
+                }
+            });
 
             onMounted(async () => {
                 const result = await axios.get(`${apiUrl}/sand`);
                 sandTypes.value = result.data.data;
-                console.log(sandTypes.value);
             });
 
             let deposit = ref({});
@@ -309,7 +322,6 @@
             };
 
             const setCat = (cat: string) => {
-                console.log(selectedBox.value.category);
                 selectedBox.value.category = cat;
 
                 const { floor, row, col } = selectedBox.value;
@@ -355,6 +367,7 @@
                 isFull,
                 save,
                 sandTypes,
+                sandName,
             };
         },
     });

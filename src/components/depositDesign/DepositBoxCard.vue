@@ -10,9 +10,8 @@
                 <p class="text-sm font-bold leading-tight">Columna: {{ col }}</p>
                 <p class="text-sm font-bold leading-tight">Fila: {{ row }}</p>
             </div>
-            <p class="text-sm">{{ makeValue }}</p>
+            <p v-if="difRender" class="text-sm">{{ makeValue != null ? makeValue : 'Arena ' + sandName }}</p>
             <div v-if="choosedBox && !difRender" class="extra-data mt-4">
-                {{ category }}
                 <p class="text-sm">Arena {{ choosedBox.category }}</p>
                 <p class="text-sm">Cantidad {{ choosedBox.amount }}t</p>
             </div>
@@ -58,12 +57,19 @@
                 type: Boolean,
                 default: false,
             },
+            sandName: {
+                type: String,
+                default: '',
+            },
         },
 
         setup(props) {
             const { category } = toRefs(props);
             const difRender = computed(() => {
                 return props.depositRender;
+            });
+            const sandName = computed(() => {
+                return props.sandName;
             });
             const makeValue = computed(() => {
                 return BoxCategory[category.value];
@@ -93,6 +99,7 @@
                 makeValue,
                 cardClass,
                 difRender,
+                sandName,
             };
         },
     });
