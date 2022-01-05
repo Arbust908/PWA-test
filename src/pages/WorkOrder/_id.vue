@@ -26,7 +26,6 @@
                 v-model:service-company-id="serviceCompanyId"
                 v-model:pad="pad"
                 v-model:pits="pits"
-                v-model:isFull="isOrderFull"
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
@@ -41,9 +40,8 @@
                 v-model:generators="generators"
                 v-model:tower="tower"
                 v-model:cabin="cabin"
-                v-model:isFull="isEquipmentFull"
             />
-            <RRHHSection v-else-if="WO_section === 'rrhh'" v-model:crews="crews" v-model:isFull="isRRHHFull" />
+            <RRHHSection v-else-if="WO_section === 'rrhh'" v-model:crews="crews" />
             <section class="mt-8 p-4">
                 <GhostBtn
                     v-if="isLastSection()"
@@ -76,6 +74,7 @@
     import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/sandflow';
     import { compareCrews, compareResource } from '@/helpers/compareCrews';
     import { useAxios } from '@vueuse/integrations/useAxios';
+    import { validateOrder, validateEquipment } from '@/helpers/useWorkOrder';
 
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
@@ -226,7 +225,9 @@
                 WO_section.value = section_order[currentSectionIndex() + 1];
             };
             // Is the Order section is full
-            const isOrderFull = ref(false);
+            const isOrderFull = computed(() => {
+                return validateOrder(clientId.value, serviceCompanyId.value, pad.value, pits.value);
+            });
 
             // Is the Equipment section is full
             const isEquipmentFull = computed(() => {
@@ -235,10 +236,10 @@
                     backupCradleId.value > -1 &&
                     operativeForkliftId.value > -1 &&
                     backupForkliftId.value > -1 &&
-                    traktors.value[0].chassis !== '' &&
-                    traktors.value[0].supplier !== '' &&
-                    pickups.value[0].pickupId !== '' &&
-                    pickups.value[0].description !== ''
+                    traktors.value.length > 0 &&
+                    traktors.value.every((traktor) => traktor.chassis !== '' && traktor.supplier !== '') &&
+                    pickups.value.length > 0 &&
+                    pickups.value.every((pickup) => pickup.pickupId !== '')
                 );
             });
 
@@ -247,12 +248,15 @@
                 return !!(
                     crews.value &&
                     crews.value.length > 0 &&
-                    crews.value[0].timeStart &&
-                    crews.value[0].timeEnd &&
-                    crews.value[0].resources &&
-                    crews.value[0].resources.length > 0 &&
-                    crews.value[0].resources[0].role !== '' &&
-                    crews.value[0].resources[0].name !== ''
+                    crews.value.every((group: Crew) => {
+                        const resourcesFull =
+                            group.resources.value.length > 0 &&
+                            group.resources.value.every((resource: HumanResource) => {
+                                return resource.rol !== '' && resource.name !== '';
+                            });
+
+                        return group.timeStart && group.timeEnd && resourcesFull;
+                    })
                 );
             });
             // Is all sections full

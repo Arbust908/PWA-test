@@ -309,7 +309,18 @@
             // Is the Order section is full
             const isOrderFull = ref(false);
             // Is the Equipment section is full
-            const isEquipmentFull = ref(false);
+            const isEquipmentFull = computed(() => {
+                return !!(
+                    operativeCradleId.value > -1 &&
+                    backupCradleId.value > -1 &&
+                    operativeForkliftId.value > -1 &&
+                    backupForkliftId.value > -1 &&
+                    traktors.value.length > 0 &&
+                    traktors.value.every((traktor) => traktor.chassis !== '' && traktor.supplier !== '') &&
+                    pickups.value.length > 0 &&
+                    pickups.value.every((pickup) => pickup.pickupId !== '')
+                );
+            });
             // Is the RRHH section is full
             const isRRHHFull: ComputedRef<boolean> = computed(() => {
                 return !!(
