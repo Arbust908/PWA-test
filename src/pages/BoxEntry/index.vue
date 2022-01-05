@@ -64,20 +64,16 @@
                                             <EyeIconOff v-else class="icon" />
                                             {{ sand.type }}</span
                                         >
-                                        <span
-                                            class="select-category mesh-type__taken cradle-clickable"
-                                            @click="setVisibleCategories('cradle')"
-                                        >
-                                            <EyeIcon v-if="visibleCategories.includes('cradle')" class="icon" />
-                                            <EyeIconOff v-else class="icon" />
+                                        <span class="select-category full">
+                                            <div class="w-4 h-4 mr-3 rounded-full bg-indigo-900" />
                                             Cradle</span
                                         >
-                                        <span class="select-category aisle">
-                                            <div class="w-4 h-4 mr-3 rounded-full bg-gray-300" />
+                                        <span class="select-category full">
+                                            <div class="w-4 h-4 mr-3 rounded-full bg-zinc-600" />
                                             Pasillo
                                         </span>
                                         <span class="select-category full">
-                                            <div class="w-4 h-4 mr-3 rounded-full bg-gray-600" />
+                                            <div class="w-4 h-4 mr-3 rounded-full bg-red-700" />
                                             Ocupado
                                         </span>
                                     </div>
@@ -101,7 +97,6 @@
                                 :deposit="warehouse.layout || {}"
                                 :visible-categories="visibleCategories"
                                 @select-box="selectBox"
-                                @click="conLog()"
                             />
                         </fieldset>
                         <fieldset v-if="activeSection == 'cradle'" class="py-2 flex flex-col gap-x-10 2xl:gap-x-40">
@@ -172,10 +167,6 @@
 
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
-
-    function conLog() {
-        console.log(choosedBox);
-    }
 
     useTitle('Ingreso de Cajas <> Sandflow');
     const router = useRouter();
@@ -467,7 +458,7 @@
 
     const warehouse = ref({});
     const originalWarehouseLayout = ref({});
-    let visibleCategories = ref([1, 2, 3, 4, 5, 'cradle']);
+    let visibleCategories = ref([]);
 
     const setVisibleCategories = (category: string) => {
         if (visibleCategories.value.includes(category)) {
