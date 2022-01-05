@@ -6,36 +6,62 @@
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
         </section>
-        <footer class="mt-5 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
-            <section class="space-x-6 flex items-center justify-end">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
+            <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="goToIndex">Cancelar</SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
+                <PrimaryBtn
+                    btn="wide"
+                    :disabled="!isValidated"
+                    @click="isValidated && getForkliftsAndCheckIfNameExists()"
+                >
                     Finalizar
                 </PrimaryBtn>
             </section>
         </footer>
-        <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
-            <template #body>
-                <p>{{ errorMessage }}</p>
-                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
-            </template>
-        </Modal>
+
+        <SuccessModal
+            :open="showModal"
+            title="¡El forklift fue guardado con éxito!"
+            @close="$router.push('/forklift')"
+            @main="$router.push('/forklift')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="Ya existe este forklift"
+            text="El forklift que intentas guardar fue creado anteriormente."
+            @close="showErrorModal = false"
+            @main="showErrorModal = false"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar el forklift."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="showApiErrorModal = false"
+            @main="showApiErrorModal = false"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, reactive, onMounted, watchEffect } from 'vue';
+    import { ref, reactive, onMounted, defineAsyncComponent, watchEffect } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
+    import { useTitle, useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import ForkliftForm from '@/components/forklift/Form.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import Modal from '@/components/modal/General.vue';
+    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     import { Forklift } from '@/interfaces/sandflow';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     export default {
         components: {
@@ -44,6 +70,10 @@
             PrimaryBtn,
             ForkliftForm,
             Modal,
+            Icon,
+            WarningBtn,
+            ErrorModal,
+            SuccessModal,
         },
         setup() {
             const store = useStore();
@@ -52,9 +82,8 @@
             const id = route.params.id;
             useTitle(`Forklift ${id} <> Sandflow`);
             const forklifts: Array<Forklift> = JSON.parse(JSON.stringify(store.state.forklifts.all));
-            const notificationModalvisible = ref(false);
-            const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
-            const errorMessage = ref('');
+
+            const createdForklifts = ref([]);
 
             const currentForklift: Forklift = forklifts.find((forklift) => {
                 return forklift.id == route.params.id;
@@ -67,6 +96,8 @@
                 ownerContact: '',
                 observations: '',
             });
+
+            const currentForkliftName = currentForklift.name;
 
             onMounted(async () => {
                 forklift.id = currentForklift.id;
@@ -83,6 +114,16 @@
 
             const isValidated = ref(false);
 
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
+
             watchEffect(async () => {
                 isValidated.value = (await useValidator(store, 'forklift')) ? true : false;
             });
@@ -90,10 +131,31 @@
             const update = async () => {
                 await useStoreLogic(router, store, 'forklift', 'update', forklift).then((res) => {
                     if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
+                        toggleApiErrorModal();
+                    } else {
+                        toggleModal();
                     }
                 });
+            };
+
+            const getForkliftsAndCheckIfNameExists = async () => {
+                try {
+                    const forkliftsFromApi = await axios.get(`${api}/forklift`);
+
+                    createdForklifts.value = forkliftsFromApi.data.data;
+
+                    let types = createdForklifts.value.map((forklift) => forklift.name.toLowerCase());
+
+                    if (forklift.name.toLowerCase() == currentForkliftName.toLowerCase()) {
+                        update();
+                    } else if (types.includes(forklift.name.toLowerCase())) {
+                        toggleErrorModal();
+                    } else {
+                        update();
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
             };
 
             return {
@@ -102,9 +164,13 @@
                 isValidated,
                 goToIndex,
                 update,
-                notificationModalvisible,
-                toggleNotificationModal,
-                errorMessage,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
+                getForkliftsAndCheckIfNameExists,
             };
         },
     };

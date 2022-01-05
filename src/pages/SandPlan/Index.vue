@@ -1,114 +1,207 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 px-3">
-            <h2 class="text-2xl font-semibold text-gray-900">Planificación de arenas</h2>
-            <router-link to="/planificacion-de-arena/nueva">
-                <PrimaryBtn>Nuevo</PrimaryBtn>
-            </router-link>
-        </header>
-        <UiTable>
-            <template #header>
-                <tr>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Pozo</th>
-                    <th scope="col">Etapas</th>
-                    <th scope="col">Total</th>
-                    <th scope="col">
-                        <span class="sr-only">Acciones</span>
-                    </th>
-                </tr>
+        <ABMHeader title="Planificación de arena" link="/planificacion-de-arena/nueva" />
+        <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
+            <FieldSelect
+                title="Filtro"
+                class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
+                field-name="name"
+                placeholder="Seleccionar cliente"
+                endpoint="/company"
+                :data="clientId"
+                @update:data="clientId = $event"
+            />
+            <div class="col-span-full sm:mt-7 sm:col-span-5">
+                <GhostBtn size="sm" @click="clientId = -1"> Borrar filtros </GhostBtn>
+            </div>
+        </div>
+
+        <VTable
+            class="mt-5 lg:w-8/12 min-w-min"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredSandPlans"
+            :actions="actions"
+            empty-text="No hay proveedores de arena"
+        >
+            <template #item="{ item: sp }">
+                <!-- Desktop -->
+                <td>
+                    {{ sp?.company?.name || '-' }}
+                </td>
+                <td>
+                    {{ sp?.pit?.name || '-' }}
+                </td>
+                <td>
+                    {{ sp?.totalStages }}
+                </td>
+                <td>{{ sp?.totalSands }} toneladas</td>
             </template>
+
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }"> {{ item.company?.name }} </template>
+
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Pozo: {{ item.pit?.name }} </span>
+            </template>
+        </VTable>
+
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar esta planificación de arenas?"
+            text="Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
-                <tr v-for="(sp, Key) in sandPlans" :key="Key" :class="Key % 2 === 0 ? 'even' : 'odd'" class="body-row">
-                    <td>
-                        {{ sp?.company?.name || '-' }}
-                    </td>
-                    <td>
-                        {{ sp?.pit?.name || '-' }}
-                    </td>
-                    <td>
-                        {{ sp?.stages.length || '-' }}
-                    </td>
-                    <td>
-                        {{ sumQty(sp?.stages) || 0 }}
-                    </td>
-                    <td>
-                        <div class="btn-panel">
-                            <router-link :to="`/planificacion-de-arena/${sp.id}`" class="edit">
-                                <Icon icon="PencilAlt" class="w-5 h-5" />
-                                <span> Editar </span>
-                            </router-link>
-                            <button class="delete" @click="deleteSP(sp.id)">
-                                <Icon icon="Trash" class="w-5 h-5" />
-                                <span> Eliminar </span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                <tr v-if="sandPlans.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay Planificacion de Arena</p>
-                    </td>
-                </tr>
+                <p class="!text-lg !text-black">{{ selectedSandPlan.company?.name }}</p>
+                <p class="mt-2">
+                    <strong>Pozo: </strong>
+                    {{ selectedSandPlan.pit?.name }}
+                </p>
+                <p class="mt-2">
+                    <strong>Total Etapas: </strong>
+                    {{ selectedSandPlan.totalStages }}
+                </p>
+                <p class="mt-2">
+                    <strong>Total Arenas: </strong>
+                    {{ selectedSandPlan.totalSands }} toneladas
+                </p>
             </template>
-        </UiTable>
+        </Backdrop>
     </Layout>
 </template>
 
 <script>
-    import { onMounted, watch, ref } from 'vue';
-    import { useStore } from 'vuex';
+    import { useStoreLogic } from '@/helpers/useStoreLogic';
+
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
+    import Backdrop from '@/components/modal/Backdrop.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
-    import {
-        TrashIcon,
-        PencilAltIcon,
-        InformationCircleIcon,
-        ExclamationCircleIcon,
-        CheckCircleIcon,
-    } from '@heroicons/vue/solid';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
 
-    import { useApi } from '@/helpers/useApi';
-
-    import { useTitle } from '@vueuse/core';
-
-    import { useAxios } from '@vueuse/integrations/useAxios';
-    import axios from 'axios';
-    // import { Sand } from '@/interfaces/sandflow.Types.ts';
-
-    const api = import.meta.env.VITE_API_URL || '/api';
     export default {
         components: {
+            ABMHeader,
+            Backdrop,
+            DisableModal,
+            FieldSelect,
+            GhostBtn,
             Layout,
-            PrimaryBtn,
-            UiTable,
-            Icon,
+            VTable,
         },
         setup() {
             useTitle('Planificaciones de Arena <> Sandflow');
-            const instance = axios.create({
-                baseURL: api,
-            });
+
+            const clientId = ref(-1);
+            const selectedSandPlan = ref(null);
+            const showBackdrop = ref(false);
+            const showModal = ref(false);
 
             const store = useStore();
+            const router = useRouter();
 
             const sandPlans = ref([]);
-            const { data: sPData } = useAxios('/sandPlan', instance);
-            watch(sPData, (sPData, prevCount) => {
-                if (sPData && sPData.data) {
-                    sandPlans.value = sPData.data;
-                    console.log('mis sps', sandPlans.value);
-                    // sandPlans.value.map((sp) => {
-                    //     storeToVuex(sp);
-                    // });
-                }
+
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+                // currentPage: 1,
+                // perPage: 10,
             });
 
-            // const storeToVuex = (sandPlan) => {
-            //     store.dispatch('saveSandPlan', sandPlan);
-            // };
+            const columns = [
+                { title: 'Cliente', key: 'company.name', sortable: true },
+                { title: 'Pozo', key: 'pit.name', sortable: true },
+                { title: 'Total Etapas', key: 'totalStages', sortable: true },
+                { title: 'Total Arenas', key: 'totalSands', sortable: true },
+                { title: '', key: 'actions' },
+            ];
+
+            const actions = [
+                {
+                    label: 'Ver más',
+                    onlyMobile: true,
+                    callback: (item) => {
+                        selectedSandPlan.value = item;
+                        showBackdrop.value = true;
+                    },
+                },
+                {
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/planificacion-de-arena/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+            ];
+
+            const getSandPlans = async () => {
+                const result = await useStoreLogic(router, store, 'sandPlan', 'getAll');
+
+                if (result.type == 'success') {
+                    sandPlans.value = result.res.map((sp) => ({
+                        ...sp,
+                        totalStages: sp.stages.length,
+                        totalSands: sumQty(sp.stages),
+                    }));
+                }
+            };
+
+            const filteredSandPlans = computed(() => {
+                if (clientId.value > -1) {
+                    return sandPlans.value.filter((sandProvider) => sandProvider.companyId == clientId.value);
+                }
+
+                return sandPlans.value;
+            });
+
+            const openModalVisibility = async (sp) => {
+                selectedSandPlan.value = sp;
+
+                if (sp.visible) {
+                    showModal.value = true;
+
+                    return;
+                }
+                await update(selectedSandPlan.value);
+            };
+
+            const confirmModal = async () => {
+                await update(selectedSandPlan.value);
+                showModal.value = false;
+            };
+
+            const update = async (sandPlan) => {
+                const payload = {
+                    ...sandPlan,
+                    visible: !sandPlan.visible,
+                };
+                await store.dispatch('sandPlan_update', payload);
+                sandPlan.visible = payload.visible;
+            };
 
             const sumQty = (sandStages) => {
                 let total = 0;
@@ -122,20 +215,25 @@
 
                 return total;
             };
-            const deleteSP = (id) => {
-                const loading = ref(true);
-                const { data } = useAxios('/sandPlan/' + id, { method: 'DELETE' }, instance);
-                store.dispatch('updateSandPlan', id);
-                sandPlans.value = sandPlans.value.filter((sp) => {
-                    return sp.id !== id;
-                });
-                loading.value = false;
-            };
+
+            onMounted(() => {
+                getSandPlans();
+            });
 
             return {
                 sandPlans,
-                deleteSP,
                 sumQty,
+                clientId,
+                selectedSandPlan,
+                filteredSandPlans,
+                getSandPlans,
+                pagination,
+                columns,
+                actions,
+                showBackdrop,
+                showModal,
+                openModalVisibility,
+                confirmModal,
             };
         },
     };

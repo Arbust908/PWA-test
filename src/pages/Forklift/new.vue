@@ -1,41 +1,66 @@
 <template>
     <Layout>
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo Forklift</h1>
+            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo forklift</h1>
         </header>
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <ForkliftForm :forklift="forklift" @update:forklift="forklift = $event" />
-
-            <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
-                <template #body>
-                    <p>{{ errorMessage }}</p>
-                    <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
-                </template>
-            </Modal>
         </section>
-        <footer class="mt-5 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
-            <section class="space-x-6 flex items-center justify-end">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex md:flex-row-reverse justify-between max-w-2xl">
+            <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="goToIndex">Cancelar</SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
+                <PrimaryBtn
+                    btn="wide"
+                    :disabled="!isValidated"
+                    @click="isValidated && getForkliftsAndCheckIfNameExists()"
+                >
                     Finalizar
                 </PrimaryBtn>
             </section>
         </footer>
+
+        <SuccessModal
+            :open="showModal"
+            title="¡El forklift fue guardado con éxito!"
+            @close="$router.push('/forklift')"
+            @main="$router.push('/forklift')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="Ya existe este forklift"
+            text="El forklift que intentas guardar fue creado anteriormente."
+            @close="showErrorModal = false"
+            @main="showErrorModal = false"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar el forklift."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="showApiErrorModal = false"
+            @main="showApiErrorModal = false"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { watchEffect, reactive, ref } from 'vue';
+    import { watchEffect, reactive, defineAsyncComponent, ref } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
+    import { useTitle, useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import ForkliftForm from '@/components/forklift/Form.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import Modal from '@/components/modal/General.vue';
+    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
     export default {
         components: {
@@ -44,12 +69,17 @@
             PrimaryBtn,
             ForkliftForm,
             Modal,
+            Icon,
+            WarningBtn,
+            ErrorModal,
+            SuccessModal,
         },
         setup() {
             useTitle('Nuevo Forklift <> Sandflow');
             const store = useStore();
             const router = useRouter();
 
+            const createdForklifts = ref([]);
             const forklift = reactive({
                 name: '',
                 observations: '',
@@ -65,17 +95,42 @@
                 isValidated.value = (await useValidator(store, 'forklift')) ? true : false;
             });
 
-            const notificationModalvisible = ref(false);
-            const errorMessage = ref('');
-            const toggleNotificationModal = () => (notificationModalvisible.value = !notificationModalvisible.value);
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
 
             const save = async () => {
                 await useStoreLogic(router, store, 'forklift', 'create', forklift).then((res) => {
                     if (res.type == 'failed') {
-                        errorMessage.value = res.message;
-                        toggleNotificationModal();
+                        toggleApiErrorModal();
+                    } else {
+                        toggleModal();
                     }
                 });
+            };
+
+            const getForkliftsAndCheckIfNameExists = async () => {
+                try {
+                    const forkliftsFromApi = await axios.get(`${api}/forklift`);
+
+                    createdForklifts.value = forkliftsFromApi.data.data;
+
+                    let types = createdForklifts.value.map((forklift) => forklift.name.toLowerCase());
+
+                    if (types.includes(forklift.name.toLowerCase())) {
+                        toggleErrorModal();
+                    } else {
+                        save();
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
             };
 
             return {
@@ -83,9 +138,13 @@
                 goToIndex,
                 save,
                 isValidated,
-                notificationModalvisible,
-                toggleNotificationModal,
-                errorMessage,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
+                getForkliftsAndCheckIfNameExists,
             };
         },
     };

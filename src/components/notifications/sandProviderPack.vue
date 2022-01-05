@@ -3,13 +3,16 @@
         <FieldLegend>Arena</FieldLegend>
         <template v-for="(sPov, i) in sandProviders" :key="i">
             <FieldSelect
-                class="col-span-full sm:col-span-5"
+                class="col-span-full sm:col-span-4"
                 field-name="sandProvider"
                 placeholder="Seleccionar centro de carga"
-                title="Centro de Carga de Arena"
+                title="Centro de carga de arena"
                 endpoint="/sandProvider"
                 :data="sPov.id"
-                @update:data="(sPov.id = $event), cleanSandOrders()"
+                @update:data="
+                    sPov.id = $event;
+                    handleSandProviderUpdate($event);
+                "
             />
 
             <div
@@ -18,56 +21,48 @@
                 class="relative grid grid-cols-12 col-span-full gap-4 my-2"
             >
                 <FieldSelect
-                    class="col-span-5 sm:col-span-5"
-                    :title="Key === 0 ? 'Tipo' : ''"
+                    v-model:data="so.sandTypeId"
+                    class="col-span-5 sm:col-span-4"
+                    :title="Key === 0 ? 'Tipo' : null"
                     field-name="sandType"
                     placeholder="Arena"
-                    endpoint="/sand"
                     endpoint-key="type"
-                    :data="so.sandTypeId"
-                    :filtered-data="filteredSandTypes"
-                    @update:data="so.sandTypeId = $event"
+                    :endpoint-data="sandTypes"
                 />
                 <FieldWithSides
+                    v-model:data="so.amount"
                     class="col-span-5 sm:col-span-3"
-                    :title="Key === 0 ? 'Cantidad' : ''"
+                    :title="Key === 0 ? 'Cantidad' : null"
                     :field-name="`sandQuantity${Key}`"
-                    placeholder="0 t"
+                    placeholder="0"
                     type="number"
+                    mask="####"
+                    require-validation
+                    validation-type="extension"
+                    :char-amount="{ min: 1, max: 4 }"
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
-                    :data="so.amount"
-                    @update:data="so.amount = $event"
                 />
-                <!-- <AmountInput
-                    :class="sPov.SandOrders.length > 1 ? 'col-span-4 sm:col-span-3' : 'col-span-6 sm:col-span-3' "
-                    :title="Key === 0"
-                    :amount="so.amount"
-                    @update:amount="so.amount = $event"
-                /> -->
-                <div
-                    v-if="sPov.SandOrders.length > 0 && Key + 1 === sPov.SandOrders.length"
-                    class="col-span-1 my-auto mx-auto hidden sm:block"
-                >
-                    <Icon
-                        icon="PlusCircle"
-                        outline
-                        class="w-7 h-7 text-green-500 mr-1"
-                        :class="sPov.SandOrders.length == 1 ? 'mt-7' : 'mt-2'"
-                        @click.prevent="addSandOrder(sPov.innerId)"
-                    />
-                </div>
-                <div class="col-span-2 ml-2 my-auto">
-                    <Icon
+                <div class="flex flex-row content-evenly">
+                    <CircularBtn
                         v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length"
-                        icon="Trash"
-                        outline
-                        class="w-6 h-6"
-                        :class="Key + 1 === sPov.SandOrders.length ? 'mt-2' : 'mt-6'"
+                        class="flex self-end"
+                        size="sm"
                         @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
-                    />
+                    >
+                        <Icon icon="Trash" type="outline" class="w-7 h-7" />
+                    </CircularBtn>
+                    <CircularBtn
+                        v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4 && isLast(Key, sPov.SandOrders)"
+                        class="flex self-end"
+                        size="sm"
+                        btn="bg-green-500"
+                        @click.prevent="addSandOrder(sPov.innerId)"
+                    >
+                        <Icon icon="Plus" class="w-7 h-7 text-white" />
+                    </CircularBtn>
                 </div>
             </div>
-            <div class="col-span-full mt-2 sm:hidden">
+            <div v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4" class="col-span-full mt-2 sm:hidden">
                 <button class="flex items-center" @click.prevent="addSandOrder(sPov.innerId)">
                     <Icon icon="PlusCircle" outline class="w-6 h-6 text-green-500" />
                     <span class="font-semibold text pl-1">Agregar</span>
@@ -78,16 +73,15 @@
 </template>
 
 <script lang="ts">
-    import { computed, defineComponent, ref, watchEffect } from 'vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
-    import { useVModel } from '@vueuse/core';
     import { SandProvider, SandOrder } from '@/interfaces/sandflow';
+    import { isFirst, isLast } from '@/helpers/iteretionHelpers';
+    import CircularBtn from '../ui/buttons/CircularBtn.vue';
+
     const defaultSandOrder: SandOrder = {
         innerId: 0,
         sandTypeId: -1,
@@ -100,13 +94,12 @@
     };
     export default defineComponent({
         components: {
-            CircularBtn,
             FieldGroup,
-            FieldInput,
             FieldLegend,
             FieldSelect,
             FieldWithSides,
             Icon,
+            CircularBtn,
         },
         props: {
             sandProviders: {
@@ -118,17 +111,18 @@
                 required: true,
             },
         },
+        emits: ['update:sandProviders', 'update:sandOrders', 'sandProviderHandler'],
         setup(props, { emit }) {
             const sandProviders = useVModel(props, 'sandProviders', emit);
 
-            const filteredSandTypes = ref([]);
+            const sandTypes = ref([]);
 
             const getCurrentSandProvider = (Inid: number): SandProvider => {
                 return sandProviders.value.find((s) => s.innerId === Inid);
             };
 
             watchEffect(() => {
-                filteredSandTypes.value = props.filteredSandTypes;
+                sandTypes.value = props.filteredSandTypes;
             });
 
             const sandOrderInnerId = ref(0);
@@ -166,19 +160,26 @@
             });
 
             if (sandProviders && sandProviders.value && sandProviders.value.length <= 0) {
-                console.log('no sandProviders');
                 addSandProvider();
             }
 
+            const handleSandProviderUpdate = (id: number) => {
+                emit('sandProviderHandler', id);
+                cleanSandOrders();
+            };
+
             return {
-                sandProviders,
                 addSandOrder,
-                removeSandOrder,
                 addSandProvider,
-                removeSandProvider,
-                lastSandProviderInner,
-                filteredSandTypes,
                 cleanSandOrders,
+                sandTypes,
+                handleSandProviderUpdate,
+                isFirst,
+                isLast,
+                lastSandProviderInner,
+                removeSandOrder,
+                removeSandProvider,
+                sandProviders,
             };
         },
     });

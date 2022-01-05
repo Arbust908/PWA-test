@@ -11,14 +11,7 @@
             BaseBtn,
         },
         props: {
-            type: {
-                type: String,
-                default: 'button',
-            },
-            size: {
-                type: String,
-                default: 'md',
-            },
+            ...BaseBtn.props,
         },
     };
 </script>

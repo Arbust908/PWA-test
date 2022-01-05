@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Orden de trabajo - {{ woID }}</h1>
-        </header>
+        <ABMFormTitle :title="`Orden de trabajo - ${woID}`" />
         <section class="bg-second-0 rounded-md shadow-sm">
             <nav class="flex justify-between">
                 <button class="section-tab" :selected="WO_section === 'orden'" @click="changeSection('orden')">
@@ -69,59 +67,63 @@
                 @update:crews="crews = $event"
                 @update:isFull="isRRHHFull = $event"
             />
-            <footer class="p-4 gap-3 flex flex-col md:flex-row justify-between">
-                <section>
-                    <GhostBtn v-if="isLastSection()" @click.prevent="addCrew"> Agregar Crew </GhostBtn>
-                </section>
-                <section class="space-x-6 flex items-center justify-end">
-                    <NoneBtn @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </NoneBtn>
-                    <GhostBtn @click="save()">
-                        <BookmarkIcon class="w-4 h-4" />
-                        <span> Guardar Provisorio </span>
-                    </GhostBtn>
-                    <PrimaryBtn v-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
-                    <PrimaryBtn v-else :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
-            </footer>
+            <section class="mt-8 p-4">
+                <GhostBtn
+                    v-if="isLastSection()"
+                    btn="text-green-700 border !border-green-700 hover:bg-second-200"
+                    @click.prevent="addCrew"
+                >
+                    Agregar Crew
+                </GhostBtn>
+            </section>
         </section>
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
+            <section class="gap-6 flex flex-wrap items-center">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </SecondaryBtn>
+                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                    <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
+                    <span> Guardar Provisorio </span>
+                </GhostBtn>
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" @click="nextSection"> Siguiente </PrimaryBtn>
+                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, watch, computed, onMounted, reactive } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useToggle, useTitle } from '@vueuse/core';
-    import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+    import axios from 'axios';
+    import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/sandflow';
+    import { compareCrews, compareResource } from '@/helpers/compareCrews';
+    import { useAxios } from '@vueuse/integrations/useAxios';
+
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
     import OrderSection from '@/components/workOrder/Order.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
 
-    // AXIOS
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
     const api = import.meta.env.VITE_API_URL || '/api';
-    // TIPOS
-    import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/sandflow';
-    import { compareCrews, compareResource } from '@/helpers/compareCrews';
 
     export default {
         components: {
+            ABMFormTitle,
             BookmarkIcon,
             CheckCircleIcon,
             EquipmentSection,
             GhostBtn,
             Layout,
-            NoneBtn,
             OrderSection,
             PrimaryBtn,
             RRHHSection,
+            SecondaryBtn,
         },
         setup() {
             // Init
@@ -368,7 +370,7 @@
                     draft,
                 };
                 const { data: WODone } = useAxios(`/workOrder/${woID.value}`, { method: 'PUT', data: newWO }, instance);
-                watch(WODone, (newVal, _) => {
+                watch(WODone, async (newVal, _) => {
                     if (newVal && newVal.data && newVal.data.id) {
                         if (pits.value.length > 0) {
                             const isPitsFinished = ref([]);
@@ -463,88 +465,44 @@
                         }
 
                         if (crews.value.length > 0) {
-                            const isCrewsFinished = ref([]);
                             const comparedCrews = compareCrews(crews.value, backupCrew.value);
-                            console.log('edited', crews.value);
-                            console.log('backup', backupCrew.value);
-                            console.log('comparedCrews', comparedCrews);
-                            comparedCrews.changed.forEach((crewToUpdate) => {
+                            for (const crewToUpdate of comparedCrews.changed) {
                                 const { ...newCrew } = crewToUpdate;
-                                console.log('newValue', newVal.data.id);
                                 newCrew.workOrderId = newVal.data.id;
-                                const { data } = useAxios(
-                                    `/crew/${newCrew.id}`,
-                                    { method: 'PUT', data: newCrew },
-                                    instance
-                                );
-                                isCrewsFinished.value.push(data);
+                                const updatedCrew = await axios.put(api + `/crew/${newCrew.id}`, newCrew);
                                 const oldResources = backupCrew.value.find((crew) => crew.id === newCrew.id).resources;
                                 const comparedResources = compareResource(newCrew.resources, oldResources);
-                                console.log(comparedResources);
-                                comparedResources.new.forEach((resource) => {
-                                    const crewId = newCrew.id;
-                                    const { id: resourseId, ...newResource } = resource;
-                                    newResource.crewId = crewId;
-                                    useAxios('/humanResource', { method: 'POST', data: newResource }, instance);
-                                });
-                                comparedResources.changed.forEach((resource) => {
-                                    const crewId = newCrew.id;
-                                    const { ...newResource } = resource;
-                                    newResource.crewId = crewId;
-                                    useAxios(
-                                        `/humanResource/${newResource.id}`,
-                                        { method: 'PUT', data: newResource },
-                                        instance
-                                    );
-                                });
-                                comparedResources.deleted.forEach((resource) => {
-                                    useAxios(`/humanResource/${resource.id}`, { method: 'DELETE' }, instance);
-                                });
-                            });
-                            comparedCrews.deleted.forEach((crewToDelete) => {
-                                const { id: crewId } = crewToDelete;
-                                useAxios(`/crew/${crewId}`, { method: 'DELETE' }, instance);
-                            });
-                            comparedCrews.new.forEach((crewToCreate) => {
-                                const { id: innerCrewId, ...newCrew } = crewToCreate;
-                                newCrew.workOrderId = newVal.id;
-                                const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
-                                isCrewsFinished.value.push(data);
-                                watch(data, (newVal, _) => {
-                                    crew.value.resources.forEach((resource) => {
-                                        const crewId = newVal.data.id;
-                                        const { id, ...newResource } = resource;
-                                        newResource.crewId = crewId;
-                                        const { data: dataRH } = useAxios(
-                                            '/humanResource',
-                                            { method: 'POST', data: newResource },
-                                            instance
-                                        );
-                                    });
-                                });
-                            });
-                            // comparedCrews.unchanged Nothing to do
+                                const uCrewId = updatedCrew.data.data.id;
+                                for (const newRH of comparedResources.new) {
+                                    const { id, ...newResource } = newRH;
+                                    newResource.crewId = uCrewId;
+                                    await axios.post(api + '/humanResource', newResource);
+                                }
+                                for (const changedRH of comparedResources.changed) {
+                                    const { id, ...newResource } = changedRH;
+                                    newResource.crewId = uCrewId;
+                                    await axios.put(api + `/humanResource/${newResource.id}`, newResource);
+                                }
+                                for (const deleteRH of comparedResources.deleted) {
+                                    await axios.delete(api + `/humanResource/${deleteRH.id}`);
+                                }
+                            }
 
-                            crews.value.forEach((crew) => {
-                                const { id, ...newCrew } = crew;
-                                newCrew.workOrderId = newVal.id;
-                                console.log('crew', newCrew);
-                                const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
-                                isCrewsFinished.value.push(data);
-                                watch(data, (newVal, _) => {
-                                    crew.resources.forEach((resource) => {
-                                        const crewId = newVal.data.id;
-                                        const { id, ...newResource } = resource;
-                                        newResource.crewId = crewId;
-                                        const { data: dataRH } = useAxios(
-                                            '/humanResource',
-                                            { method: 'POST', data: newResource },
-                                            instance
-                                        );
-                                    });
-                                });
-                            });
-                            console.log(isCrewsFinished.value);
+                            for (const crewToDelete of comparedCrews.deleted) {
+                                await axios.post(api + `/humanResource/${crewToDelete.id}`);
+                            }
+
+                            for (const crewToCreate of comparedCrews.new) {
+                                const { id, ...newCrew } = crewToCreate;
+                                newCrew.workOrderId = newVal.data.id;
+                                const createdCrew = await axios.post(api + '/crew', newCrew);
+                                for (const rrhh of crewToCreate.resources) {
+                                    const crewId = createdCrew.data.data.id;
+                                    const { id, ...newResource } = rrhh;
+                                    newResource.crewId = crewId;
+                                    await axios.post(api + '/humanResource', newResource);
+                                }
+                            }
                         }
 
                         store.dispatch('updateWorkOrder', newVal.data);

@@ -1,42 +1,55 @@
-<template class="gap-2">
-    <FieldSelect
-        v-if="clients.length > 0"
-        class="col-span-full md:col-span-6"
-        field-name="client"
-        placeholder="Seleccionar cliente"
-        title="Cliente"
-        :endpoint-data="clients"
-        :data="clientId"
-        @update:data="clientId = $event"
-    />
-    <FieldLoading v-else class="col-span-6" />
-    <FieldSelect
-        v-if="pits.length > 0"
-        class="col-span-full md:col-span-6"
-        field-name="pit"
-        placeholder="Seleccionar pozo"
-        title="Pozo"
-        :endpoint-data="pits"
-        :data="pitId"
-        @update:data="pitId = $event"
-    />
-    <FieldLoading v-else class="col-span-6" />
+<template>
+    <div :class="sharedClasses">
+        <FieldSelect
+            v-if="clients.length > 0"
+            field-name="client"
+            placeholder="Seleccionar cliente"
+            title="Cliente"
+            require-validation
+            :endpoint-data="clients"
+            :data="clientId"
+            :is-disabled="isDisabled"
+            :select-class="useFirstClient"
+            @update:data="clientId = $event"
+            @click="useFirstClient = true"
+        />
+        <FieldLoading v-else />
+        <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" :validation-type="validationType" />
+    </div>
+    <div :class="sharedClasses">
+        <FieldSelect
+            v-if="pits.length > 0"
+            field-name="pit"
+            placeholder="Seleccionar pozo"
+            title="Pozo"
+            :endpoint-data="pits"
+            :data="pitId"
+            :is-disabled="isDisabled"
+            :select-class="useFirstPit"
+            @update:data="pitId = $event"
+            @click="useFirstPit = true"
+        />
+        <FieldLoading v-else />
+        <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" :validation-type="validationType" />
+    </div>
 </template>
 
 <script lang="ts">
     import { defineComponent, ref, watch } from 'vue';
+    import { useVModels } from '@vueuse/core';
     import { Pit, Company } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
-    import { useVModels } from '@vueuse/core';
 
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLoading from '@/components/ui/form/FieldLoading.vue';
+    import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
 
     export default defineComponent({
         name: 'ClientPitCombo',
         components: {
             FieldSelect,
             FieldLoading,
+            InvalidInputLabel,
         },
         props: {
             clientId: {
@@ -46,6 +59,18 @@
             pitId: {
                 type: Number,
                 required: true,
+            },
+            isDisabled: {
+                type: Boolean,
+                default: false,
+            },
+            sharedClasses: {
+                type: String,
+                default: 'col-span-full md:col-span-6',
+            },
+            validationType: {
+                type: String,
+                required: false,
             },
         },
         setup(props, { emit }) {
@@ -61,8 +86,6 @@
 
             const { read: getPits } = useApi('/pit');
             const backupPits = getPits();
-            console.log(getPits());
-            console.log(backupPits.value);
             const pits = ref([] as Array<Pit>);
             watch(backupPits, (newVal) => {
                 if (newVal) {
@@ -70,14 +93,14 @@
                 }
             });
 
-            const filterPitsByClient = (clientId: number) => {
+            const filterPitsByClient = (idOfClient: number) => {
                 pits.value = [];
                 setTimeout(() => {
                     const proxyPitId = pitId.value ? pitId.value : 0;
                     const waiter = setInterval(() => {
                         if (backupPits.value) {
                             pits.value = backupPits.value.filter((pit: Pit) => {
-                                return pit.companyId == clientId;
+                                return pit.companyId == idOfClient;
                             });
 
                             if (pits.value.length === 1) {
@@ -93,9 +116,9 @@
                     }, 1000);
                 }, 100);
             };
-            const selectClientByPit = (pitId: number) => {
+            const selectClientByPit = (idOfPit: number) => {
                 const curPit = backupPits.value.find((pit: Pit) => {
-                    return pit.id == pitId;
+                    return pit.id == idOfPit;
                 });
 
                 if (curPit) {
@@ -124,6 +147,13 @@
                 }
             });
 
+            const useFirstClient = ref(false);
+            watch(useFirstClient, (newVal) => {
+                useFirstClient.value = newVal;
+                console.log(useFirstClient.value);
+            });
+            const useFirstPit = ref(false);
+
             return {
                 clientId,
                 pitId,
@@ -131,7 +161,25 @@
                 backupClients,
                 pits,
                 backupPits,
+                InvalidInputLabel,
+                useFirstClient,
+                useFirstPit,
             };
         },
     });
 </script>
+
+<style lang="scss" scoped>
+    .unselected {
+        @apply border-red-500;
+    }
+    .unselected option {
+        @apply border-red-500;
+    }
+    .unselected option:first-child {
+        @apply border-red-500;
+    }
+    .client {
+        @apply border-red-500;
+    }
+</style>

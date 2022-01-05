@@ -1,14 +1,8 @@
 <template>
     <TransitionRoot as="template" :show="open">
-        <Dialog
-            as="div"
-            static
-            class="fixed z-10 top-10 inset-x-0 md:inset-0 overflow-y-auto"
-            :open="open"
-            @close="$emit('close')"
-        >
-            <div class="block min-h-screen pt-4 px-4 text-center">
-                <!-- <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0"> -->
+        <Dialog as="div" static class="fixed z-10 inset-0 overflow-y-auto" :open="open" @close="$emit('close')">
+            <!-- <div class="block min-h-screen pt-4 px-4 text-center"> -->
+            <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
                 <TransitionChild
                     as="template"
                     enter="ease-out duration-200"
@@ -18,9 +12,10 @@
                     leave-from="opacity-100"
                     leave-to="opacity-0"
                 >
-                    <DialogOverlay class="fixed inset-0 bg-gray-600 bg-opacity-50 transition-opacity" />
+                    <DialogOverlay
+                        class="fixed inset-0 bg-gray-600 bg-opacity-50 transition-opacity backdrop-filter backdrop-blur-sm"
+                    />
                 </TransitionChild>
-
                 <!-- This element is to trick the browser into centering the modal contents. -->
                 <span class="hidden sm:inline-block align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
                 <TransitionChild
@@ -32,85 +27,9 @@
                     leave-from="opacity-100 translate-y-0 sm:scale-100"
                     leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                 >
-                    <div
-                        class="
-                            inline-block
-                            bg-second-50
-                            rounded-lg
-                            text-left
-                            overflow-hidden
-                            shadow-xl
-                            transform
-                            transition-all
-                            w-full
-                            my-8
-                            align-middle
-                            max-w-sm
-                            p-6
-                        "
-                    >
-                        <div>
-                            <div
-                                v-if="type === 'error'"
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    h-12
-                                    w-12
-                                    rounded-full
-                                    bg-red-100
-                                    sm:h-10 sm:w-10
-                                "
-                            >
-                                <ExclamationIcon class="h-6 w-6 text-red-600" aria-hidden="true" />
-                            </div>
-                            <div
-                                v-else-if="type === 'success'"
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    h-12
-                                    w-12
-                                    rounded-full
-                                    sm:h-10 sm:w-10
-                                    bg-green-100
-                                "
-                            >
-                                <CheckIcon class="h-6 w-6 text-green-600" aria-hidden="true" />
-                            </div>
-                            <div v-else-if="type === 'off'"></div>
-                            <div
-                                v-else
-                                class="
-                                    mx-auto
-                                    flex-shrink-0 flex
-                                    items-center
-                                    justify-center
-                                    rounded-full
-                                    h-10
-                                    w-10
-                                    bg-second-200
-                                "
-                            >
-                                <QuestionMarkCircleIcon class="h-6 w-6 text-second-600" aria-hidden="true" />
-                            </div>
-                            <div class="mt-3 text-center sm:mt-5">
-                                <DialogTitle as="h3" class="text-lg leading-6 font-medium text-second-900">
-                                    {{ title }}
-                                </DialogTitle>
-                                <div class="mt-2 text-sm text-second-500">
-                                    <slot name="body"></slot>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-5 sm:mt-6">
-                            <slot name="btn"></slot>
-                        </div>
-                    </div>
+                    <section class="modal__card" :class="modalClasses" v-bind="$attrs">
+                        <slot></slot>
+                    </section>
                 </TransitionChild>
             </div>
         </Dialog>
@@ -118,34 +37,42 @@
 </template>
 
 <script lang="ts">
-    import { ref, toRefs } from 'vue';
-    import { Dialog, DialogOverlay, DialogTitle, TransitionChild, TransitionRoot } from '@headlessui/vue';
-    import { CheckIcon, QuestionMarkCircleIcon, ExclamationIcon } from '@heroicons/vue/outline';
+    import { Dialog, DialogOverlay, TransitionChild, TransitionRoot } from '@headlessui/vue';
 
     export default {
         components: {
             Dialog,
             DialogOverlay,
-            DialogTitle,
             TransitionChild,
             TransitionRoot,
-            CheckIcon,
-            QuestionMarkCircleIcon,
-            ExclamationIcon,
         },
+        inheritAttrs: false,
         props: {
-            title: String,
-            type: {
-                type: String,
-                default: 'info',
-                validate: (value) => ['error', 'success', 'info', 'off'].includes(value),
+            open: {
+                type: Boolean,
+                required: true,
             },
-            open: Boolean,
+            modalClasses: {
+                type: String,
+                default: 'max-w-xl',
+            },
         },
-        setup(props) {
+        emits: ['close'],
+        setup(props: any) {
             return {
                 ...toRefs(props),
             };
         },
     };
 </script>
+
+<style lang="scss">
+    .modal {
+        &__card {
+            @apply inline-flex flex-col bg-second-50 rounded-lg shadow-xl transform transition-all w-full mb-20 align-middle p-5 relative;
+        }
+        &__icon-circle {
+            @apply mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full sm:h-10 sm:w-10;
+        }
+    }
+</style>

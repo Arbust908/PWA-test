@@ -1,11 +1,10 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo proveedor de transporte</h1>
-        </header>
-        <section class="flex">
-            <section class="w-8/12">
-                <nav class="flex justify-between max-w-2xl bg-white">
+        <ABMFormTitle title="Nuevo proveedor de transporte" />
+        <section class="flex flex-wrap md:flex-nowrap">
+            <!-- main Section -->
+            <section class="w-full max-w-2xl">
+                <nav v-if="!isClicked" class="flex justify-between max-w-2xl bg-white">
                     <button
                         :class="['section-tab', activeSection === 'provider' ? 'active' : '']"
                         :selected="activeSection === 'provider'"
@@ -18,54 +17,108 @@
                         :selected="activeSection === 'driver'"
                         @click.prevent="changeSection('driver')"
                     >
-                        <span> Transportista </span>
+                        <span> Unidades </span>
                     </button>
                 </nav>
-                <section v-if="activeSection === 'provider'" class="bg-white rounded-md max-w-2xl shadow-sm">
+                <section
+                    v-if="activeSection === 'provider' && !isClicked"
+                    class="bg-white rounded-md max-w-2xl shadow-sm"
+                >
                     <TransportProviderFrom
-                        :tp-name="newTransportProvider.name"
-                        :tp-id="newTransportProvider.legalId"
-                        :tp-address="newTransportProvider.address"
-                        :tp-observations="newTransportProvider.observations"
-                        :cr-name="companyRepresentative.name"
-                        :cr-phone="companyRepresentative.phone"
-                        :cr-email="companyRepresentative.email"
-                        @update:tpName="newTransportProvider.name = $event"
-                        @update:tpId="newTransportProvider.legalId = $event"
-                        @update:tpAddress="newTransportProvider.address = $event"
-                        @update:tpObservations="newTransportProvider.observations = $event"
-                        @update:crName="companyRepresentative.name = $event"
-                        @update:crPhone="companyRepresentative.phone = $event"
-                        @update:crEmail="companyRepresentative.email = $event"
+                        v-model:tp-name="newTransportProvider.name"
+                        v-model:tp-id="newTransportProvider.legalId"
+                        v-model:tp-address="newTransportProvider.address"
+                        v-model:tp-observations="newTransportProvider.observations"
+                        v-model:cr-name="companyRepresentative.name"
+                        v-model:cr-phone="companyRepresentative.phone"
+                        v-model:cr-email="companyRepresentative.email"
                     />
                 </section>
-                <section v-if="activeSection === 'driver'" class="bg-white rounded-md max-w-2xl shadow-sm">
+                <section
+                    v-if="activeSection === 'driver' && !isClicked"
+                    class="bg-white rounded-md max-w-2xl shadow-sm"
+                >
                     <form method="POST" action="/" class="p-4 max-w-lg">
                         <TransportProviderDriverForm
-                            :driver-name="newDriver.name"
-                            :driver-phone="newDriver.phone"
-                            :driver-email="newDriver.email"
-                            :driver-t-type="newDriver.vehicleType"
-                            :driver-t-id="newDriver.transportId"
-                            :driver-obs="newDriver.observations"
-                            @update:driverName="newDriver.name = $event"
-                            @update:driverPhone="newDriver.phone = $event"
-                            @update:driverEmail="newDriver.email = $event"
-                            @update:driverTType="newDriver.vehicleType = $event"
-                            @update:driverTId="newDriver.transportId = $event"
-                            @update:driverObs="newDriver.observations = $event"
+                            v-model:driver-name="newDriver.name"
+                            v-model:driver-phone="newDriver.phone"
+                            v-model:driver-email="newDriver.email"
+                            v-model:driver-t-type="newDriver.vehicleType"
+                            v-model:driver-t-id="newDriver.transportId"
+                            v-model:driver-t-id2="newDriver.transportId2"
+                            v-model:driver-obs="newDriver.observations"
                             @add-driver="addDriver()"
                         />
                     </form>
                 </section>
-                <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
-                    <section class="w-full space-x-6 flex items-center justify-end">
+                <!-- mobile transportProviders Cards -->
+                <section v-if="showDrivers" class="w-full md:w-4/12 mt-12 flex flex-col gap-y-4 md:hidden">
+                    <button
+                        :class="'flex items-center w-[250px] gap-2'"
+                        @click="
+                            driversShown = !driversShown;
+                            isClicked = !isClicked;
+                        "
+                    >
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M12 0C5.37097 0 0 5.37097 0 12C0 18.629 5.37097 24 12 24C18.629 24 24 18.629 24 12C24 5.37097 18.629 0 12 0ZM18.9677 13.3548C18.9677 13.6742 18.7065 13.9355 18.3871 13.9355H13.9355V18.3871C13.9355 18.7065 13.6742 18.9677 13.3548 18.9677H10.6452C10.3258 18.9677 10.0645 18.7065 10.0645 18.3871V13.9355H5.6129C5.29355 13.9355 5.03226 13.6742 5.03226 13.3548V10.6452C5.03226 10.3258 5.29355 10.0645 5.6129 10.0645H10.0645V5.6129C10.0645 5.29355 10.3258 5.03226 10.6452 5.03226H13.3548C13.6742 5.03226 13.9355 5.29355 13.9355 5.6129V10.0645H18.3871C18.7065 10.0645 18.9677 10.3258 18.9677 10.6452V13.3548Z"
+                                fill="#8DC881"
+                            />
+                        </svg>
+
+                        <h2 class="font-semibold">Agregar Transportista</h2>
+                    </button>
+                    <DriverCard
+                        v-for="(driver, index) in drivers"
+                        :key="index"
+                        :name="driver.name"
+                        :phone="driver.phone"
+                        :email="driver.email"
+                        :vehicle-type="driver.vehicleType"
+                        :transport-id="driver.transportId"
+                        :transport-id2="driver.transportId2"
+                        :observations="driver.observations"
+                        @delete-driver="deleteDriver(index)"
+                        @edit-driver="
+                            editDriver(index);
+                            driversShown = !driversShown;
+                            isClicked = !isClicked;
+                        "
+                    />
+                </section>
+                <!-- *** -->
+                <footer class="mt-8 gap-3 flex flex-col justify-end max-w-2xl">
+                    <SideBtn
+                        v-if="drivers.length && !isClicked"
+                        class="md:hidden"
+                        btn="full"
+                        @click="
+                            driversShown = !driversShown;
+                            isClicked = !isClicked;
+                        "
+                    >
+                        {{ driverTabText }}
+                    </SideBtn>
+                    <SecondaryBtn
+                        v-if="isClicked"
+                        class="md:hidden"
+                        btn="wide"
+                        @click="
+                            driversShown = !driversShown;
+                            isClicked = !isClicked;
+                        "
+                    >
+                        Volver
+                    </SecondaryBtn>
+                    <!-- button Section -->
+                    <section v-if="!showDrivers" class="w-full space-x-3 flex items-center justify-end">
                         <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
                             Cancelar
                         </SecondaryBtn>
                         <PrimaryBtn
                             btn="wide"
-                            :disabled="!isValidated ? 'yes' : null"
+                            :disabled="!isValidated"
                             @click="
                                 hasFullNewDriver && addDriver();
                                 isValidated && save();
@@ -76,7 +129,8 @@
                     </section>
                 </footer>
             </section>
-            <section class="w-4/12 mt-12 ml-4 flex flex-col gap-y-4">
+            <!-- desktop transportProvider Card -->
+            <section class="hidden w-full md:w-4/12 mt-12 ml-9 md:flex flex-col gap-y-4">
                 <DriverCard
                     v-for="(driver, index) in drivers"
                     :key="index"
@@ -85,60 +139,83 @@
                     :email="driver.email"
                     :vehicle-type="driver.vehicleType"
                     :transport-id="driver.transportId"
+                    :transport-id2="driver.transportId2"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
                 />
             </section>
         </section>
+
+        <ErrorModal
+            :open="showErrorCuitModal"
+            title="Ya existe un proveedor con este CUIT"
+            text="El proveedor que intentas guardar fue creado anteriormente"
+            @close="showErrorCuitModal = false"
+            @main="showErrorCuitModal = false"
+        />
+        <SuccessModal
+            :open="showSuccessModal"
+            title="¡El proveedor fue guardado con éxito!"
+            @close="$router.push('/proveedores-de-transporte')"
+            @main="$router.push('/proveedores-de-transporte')"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { computed, reactive, watch, ref, watchEffect } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-    import { useValidator } from '@/helpers/useValidator';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
-    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
-    import DriverCard from '@/components/transportProvider/DriverCard.vue';
-    import Layout from '@/layouts/Main.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    // AXIOS
     import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
-    const api = import.meta.env.VITE_API_URL || '/api';
-    // TIPOS
     import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
+    import { useAxios } from '@vueuse/integrations/useAxios';
+    import { useValidator } from '@/helpers/useValidator';
+
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import DriverCard from '@/components/transportProvider/DriverCard.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
+    import Layout from '@/layouts/Main.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import SideBtn from '@/components/ui/buttons/SideBtn.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
+
+    const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
-            CircularBtn,
+            ABMFormTitle,
             DriverCard,
-            Icon,
+            ErrorModal,
             Layout,
-            SecondaryBtn,
             PrimaryBtn,
-            TransportProviderFrom,
+            SecondaryBtn,
+            SideBtn,
+            SuccessModal,
             TransportProviderDriverForm,
+            TransportProviderFrom,
         },
         setup() {
             const store = useStore();
-            const router = useRouter();
             useTitle(`Nuevo Proveedor de Transporte <> Sandflow`);
             const instance = axios.create({
                 baseURL: api,
             });
+            const showSuccessModal = ref(false);
+            const showErrorCuitModal = ref(false);
 
             let activeSection = ref('provider');
 
             const changeSection = (option: string) => {
                 return (activeSection.value = option);
             };
+            const driversShown = ref(false);
+            const showDrivers = computed(() => {
+                if (driversShown.value === true) {
+                    return driversShown.value;
+                }
+            });
 
             const drivers: Array<Driver> = reactive([]);
 
@@ -148,6 +225,7 @@
                 email: '',
                 vehicleType: '',
                 transportId: '',
+                transportId2: '',
                 observations: '',
             });
 
@@ -161,7 +239,7 @@
             };
 
             const deleteDriver = (index: number) => {
-                drivers.splice(index);
+                drivers.splice(index, 1);
             };
 
             const editDriver = (index: number) => {
@@ -172,6 +250,7 @@
                 newDriver.email = driver.email;
                 newDriver.vehicleType = driver.vehicleType;
                 newDriver.transportId = driver.transportId;
+                newDriver.transportId2 = driver.transportId2;
                 newDriver.observations = driver.observations;
             };
 
@@ -181,6 +260,7 @@
                 newDriver.email = '';
                 newDriver.vehicleType = '';
                 newDriver.transportId = '';
+                newDriver.transportId2 = '';
                 newDriver.observations = '';
             };
 
@@ -204,12 +284,20 @@
                     newDriver.phone !== '' &&
                     newDriver.email !== '' &&
                     newDriver.vehicleType !== '' &&
-                    newDriver.transportId !== ''
+                    newDriver.transportId !== '' &&
+                    newDriver.transportId2 !== ''
                 );
+            });
+            const isClicked = ref(false);
+            const driverTabText = computed(() => {
+                if (drivers.length > 1 && !isClicked.value) {
+                    return `Ver Transportistas (${drivers.length})`;
+                } else if (drivers.length == 1 && !isClicked.value) {
+                    return `Ver Transportista`;
+                }
             });
 
             const isValidated = ref(false);
-
             watchEffect(async () => {
                 isValidated.value = (await useValidator(store, 'transportProvider')) ? true : false;
             });
@@ -232,11 +320,17 @@
                         representanteDone.value = true;
                     }
                 });
-                watch(compRepData, (apiData) => {
-                    console.log(apiData);
-
+                watch(compRepData, async (apiData) => {
                     if (apiData && apiData.data) {
                         newTransportProvider.companyRepresentativeId = apiData.data.id;
+                        const legalIdExists = await checkIfExists('legalId', newTransportProvider.legalId);
+
+                        if (legalIdExists) {
+                            showErrorCuitModal.value = true;
+
+                            return;
+                        }
+
                         const { data, isFinished: transProvDone } = useAxios(
                             '/transportProvider',
                             { method: 'POST', data: newTransportProvider },
@@ -248,8 +342,6 @@
                             }
                         });
                         watch(data, (newData, _) => {
-                            console.log(newData);
-
                             if (newData && newData.data) {
                                 const tpId = newData.data.id;
                                 const tpSave = reactive({ ...newData.data });
@@ -257,8 +349,6 @@
                                 drivers.forEach((driver) => {
                                     const { id, ...newDriver } = driver;
                                     newDriver.transportProviderId = tpId;
-                                    console.log('newDriver.transportProviderId', newDriver.transportProviderId);
-                                    console.log('new Driver', newDriver);
                                     const { data } = useAxios(
                                         `/driver/`,
                                         { method: 'POST', data: newDriver },
@@ -275,16 +365,19 @@
                                     ...tpSave,
                                     companyRepresentative,
                                 });
-                                router.push('/proveedores-de-transporte');
+                                showSuccessModal.value = true;
                             }
                         });
                     }
                 });
-                watchEffect(() => {
-                    if (representanteDone.value && transportProviderDone.value) {
-                        console.log('All done');
-                    }
-                });
+            };
+
+            const checkIfExists = async (field: string, value: string) => {
+                const apiResponse = await axios.get(`${api}/transportProvider?${field}=${value}`);
+
+                const transportProviders = apiResponse.data.data;
+
+                return transportProviders.length > 0;
             };
 
             return {
@@ -300,33 +393,19 @@
                 newDriver,
                 deleteDriver,
                 editDriver,
+                driverTabText,
+                showDrivers,
+                driversShown,
+                showSuccessModal,
+                showErrorCuitModal,
+                hasFullNewDriver,
+                isClicked,
             };
         },
     };
 </script>
 
 <style lang="scss" scoped>
-    .btn {
-        &__draft {
-            @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-        }
-        &__delete {
-            @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-            /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-        }
-        &__add {
-            @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-        }
-        &__add--special {
-            @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-        }
-        &__mobile-only {
-            @apply lg:hidden;
-        }
-        &__desktop-only {
-            @apply hidden lg:inline-flex;
-        }
-    }
     .section-tab {
         @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
     }
@@ -353,7 +432,7 @@
         @apply bg-second-200 border cursor-not-allowed;
     }
     fieldset:not(:last-of-type) {
-        @apply border-b pb-6;
+        @apply border-b border-gray-200 pb-6;
     }
     label:not(.toggle) {
         @apply flex flex-col;

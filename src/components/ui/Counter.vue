@@ -1,10 +1,10 @@
 <template>
     <div>
-        <button :disabled="count <= 0" @click.prevent="dec()">
+        <button :disabled="count <= 1" @click.prevent="dec()">
             <MinusIcon class="icon" />
         </button>
         <input v-model.number="count" type="text" />
-        <button @click.prevent="inc()">
+        <button :disabled="count >= max" @click.prevent="inc()">
             <PlusIcon class="icon" />
         </button>
     </div>
@@ -25,12 +25,22 @@
                 type: Number,
                 required: true,
             },
+            max: {
+                type: Number,
+                default: Infinity,
+            },
         },
         setup(props, { emit }) {
             const amount = useVModel(props, 'amount', emit);
             const { count, inc, dec } = useCounter(amount);
             watch(count, (data, oldData) => {
-                amount.value = data;
+                if (data < 1) {
+                    amount.value = 1;
+                } else if (data > props.max) {
+                    amount.value = props.max;
+                } else {
+                    amount.value = data;
+                }
             });
 
             return {
@@ -47,6 +57,15 @@
         @apply flex;
     }
     button {
+        @apply bg-second-200 text-second-500 p-2 rounded-full w-8 h-8;
+        &:disabled {
+            @apply opacity-50 cursor-not-allowed;
+        }
+        &:not(:disabled):hover {
+            @apply shadow bg-second-300;
+        }
+    }
+    span {
         @apply bg-second-200 text-second-500 p-2 rounded-full w-8 h-8;
         &:disabled {
             @apply opacity-50 cursor-not-allowed;

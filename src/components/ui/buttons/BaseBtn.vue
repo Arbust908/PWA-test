@@ -1,6 +1,6 @@
 <template>
     <component :is="type">
-        <div :class="classes" class="btn" :type="type" :size="size" :disabled="disabled || isLoading">
+        <div class="btn" :class="classes" :type="type" :size="size" :disabled="disabled || isLoading">
             <slot>Boton</slot>
         </div>
     </component>
@@ -18,8 +18,8 @@
                 default: 'md',
             },
             disabled: {
-                type: String,
-                default: '',
+                type: [String, Boolean],
+                default: false,
             },
             btn: {
                 type: String,
@@ -46,7 +46,7 @@
 <style lang="scss" scoped>
     @import '@/assets/button.scss';
     button {
-        @apply p-1;
+        @apply py-1 pl-1;
     }
 
     @keyframes spinner {

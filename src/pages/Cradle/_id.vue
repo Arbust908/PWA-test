@@ -9,7 +9,7 @@
                     <FieldInput
                         class="col-span-full"
                         field-name="name"
-                        placeholder="Nombre del Cradle"
+                        placeholder=""
                         title="Nombre"
                         :data="name"
                         require-validation
@@ -19,7 +19,7 @@
                     <FieldTextArea
                         class="col-span-full"
                         field-name="observations"
-                        placeholder="Observaciones..."
+                        placeholder=""
                         title="Observaciones"
                         :rows="5"
                         is-optional
@@ -29,33 +29,66 @@
                 </FieldGroup>
             </form>
         </section>
-        <footer class="mt-5 gap-3 flex justify-end max-w-2xl">
-            <section class="space-x-6 flex items-center justify-end">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex justify-end max-w-2xl">
+            <section class="space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click="goToIndex">Cancelar</SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && update()">
+                <PrimaryBtn
+                    btn="wide"
+                    :disabled="!isValidated"
+                    @click="isValidated && getCradlesAndCheckIfNameExists()"
+                >
                     Finalizar
                 </PrimaryBtn>
             </section>
         </footer>
+
+        <ErrorModal
+            :open="showErrorModal"
+            class="max-w-[480px]"
+            title="Ya existe este cradle"
+            text="El cradle que intentas guardar fue creado anteriormente."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar el cradle."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
+        <SuccessModal
+            :open="showModal"
+            class="max-w-[480px]"
+            title="¡El cradle fue guardado con éxito!"
+            @close="$router.push('/cradle')"
+            @main="$router.push('/cradle')"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
     import Layout from '@/layouts/Main.vue';
-    import { reactive, ref, toRefs, computed, watchEffect } from 'vue';
+    import { reactive, ref, toRefs, computed, defineAsyncComponent, watchEffect } from 'vue';
     import { useRouter, useRoute } from 'vue-router';
     import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
-    import { Cradle } from '@/interfaces/SandProvider';
+    import { useTitle, useToggle } from '@vueuse/core';
+    import { Cradle } from '@/interfaces/sandflow';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import { useValidator } from '@/helpers/useValidator';
     import axios from 'axios';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
 
     export default {
         components: {
@@ -65,6 +98,11 @@
             Layout,
             PrimaryBtn,
             SecondaryBtn,
+            WarningBtn,
+            Icon,
+            Modal,
+            SuccessModal,
+            ErrorModal,
         },
         setup() {
             const route = useRoute();
@@ -83,11 +121,24 @@
                 observations: currentCradle.observations,
             });
 
+            const currentCradleName = cradleToUpdate.name;
+            const createdCradles = ref([]);
+
             const isValidated = ref(false);
 
             watchEffect(async () => {
                 isValidated.value = (await useValidator(store, 'cradle')) ? true : false;
             });
+
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
 
             const update = async () => {
                 const loading = ref(true);
@@ -95,10 +146,13 @@
                     .put(`${apiUrl}/cradle/${currentCradle.id}`, cradleToUpdate)
                     .catch((err) => {
                         console.log(err);
+                        toggleApiErrorModal();
                     })
                     .then((res) => {
                         if (res.status === 200) {
                             return res.data;
+                        } else {
+                            toggleApiErrorModal();
                         }
 
                         return {};
@@ -107,7 +161,27 @@
                         loading.value = false;
                     });
                 store.dispatch('updateCradle', cradleToUpdate);
-                router.push('/cradle');
+                toggleModal();
+            };
+
+            const getCradlesAndCheckIfNameExists = async () => {
+                try {
+                    const cradlesFromApi = await axios.get(`${apiUrl}/cradle`);
+
+                    createdCradles.value = cradlesFromApi.data.data;
+
+                    let names = createdCradles.value.map((cradle) => cradle.name.toLowerCase());
+
+                    if (currentCradleName == cradleToUpdate.name) {
+                        update();
+                    } else if (names.includes(cradleToUpdate.name.toLowerCase())) {
+                        toggleErrorModal();
+                    } else {
+                        update();
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
             };
 
             const goToIndex = () => {
@@ -119,6 +193,13 @@
                 goToIndex,
                 isValidated,
                 ...toRefs(cradleToUpdate),
+                getCradlesAndCheckIfNameExists,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
             };
         },
     };

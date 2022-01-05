@@ -41,7 +41,7 @@
                 default: ref({}),
             },
         },
-        emits: { 'select-box': null },
+        emits: ['select-box'],
         setup(props, { emit }) {
             let { floor, row, col, selectedBox, boxData } = toRefs(props);
 
@@ -108,16 +108,20 @@
             @apply bg-second-300 text-second-300;
         }
         &.fina {
-            @apply bg-orange-600 text-orange-800 font-medium;
+            @apply bg-[#FFD19B] text-[#974A08] font-medium;
         }
         &.gruesa {
-            @apply bg-green-600 text-green-800 font-medium;
+            @apply bg-[#AFDCC6] text-[#106843] font-medium;
         }
         &.cortada {
-            @apply bg-blue-600 text-blue-800 font-medium;
+            @apply bg-[#A6AFFE] text-[#2E36AF] font-medium;
         }
         &.blocked {
-            @apply bg-second-800 text-second-800;
+            @apply relative z-10;
+            &:after {
+                content: '';
+                @apply absolute z-40 inset-0 border-none opacity-75 border bg-slate-700 m-1 rounded;
+            }
         }
         &.empty {
             @apply bg-second-200 text-second-200;

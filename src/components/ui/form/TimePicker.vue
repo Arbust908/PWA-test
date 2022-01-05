@@ -16,7 +16,7 @@
             <button @click.prevent="toggleTime(true)">AM</button>
             <button @click.prevent="toggleTime(false)">PM</button>
             <div class="marker-wrapper">
-                <span :class="time ? 'am' : 'pm'" class="marker"></span>
+                <span :class="time ? 'translate-x-0' : 'translate-x-full'" class="marker"></span>
             </div>
         </div>
     </div>
@@ -65,6 +65,9 @@
             minutes = minutes.map((min: number) => {
                 return min * 5;
             });
+            const logger = () => {
+                console.log(`${hour.value} : ${minute.value} ${time.value}`);
+            };
 
             return {
                 hours,
@@ -73,6 +76,7 @@
                 minute,
                 time,
                 toggleTime,
+                logger,
             };
         },
     });

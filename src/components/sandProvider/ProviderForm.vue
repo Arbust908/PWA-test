@@ -2,9 +2,9 @@
     <FieldGroup>
         <FieldInput
             class="col-span-full"
-            title="Nombre / Razón Social"
+            title="Nombre / Razón social"
             field-name="sandProvName"
-            placeholder="Ingresar Nombre / Razón Social"
+            placeholder=""
             :data="sandProvider.name"
             require-validation
             entity="sandProvider"
@@ -15,8 +15,8 @@
             class="col-span-full"
             title="CUIT / CUIL"
             field-name="sandProvId"
-            placeholder="Ingresar CUIT / CUIL"
-            mask="#*"
+            placeholder="Ingrese sólo números"
+            mask="###########"
             :data="sandProvider.legalId"
             require-validation
             validation-type="extension"
@@ -29,7 +29,7 @@
             class="col-span-full"
             title="Domicilio"
             field-name="sandProvAddress"
-            placeholder="Ingresar domicilio"
+            placeholder="Ingrese domicilio"
             :data="sandProvider.address"
             require-validation
             entity="sandProvider"
@@ -41,7 +41,7 @@
             <div v-if="sandProvider.meshType?.length > 0" class="mb-4 col-span-12">
                 <div v-for="(mesh, i) in sandProvider.meshType" :key="i" class="flex items-center">
                     <FieldInput
-                        class="w-1/2"
+                        class="w-5/6"
                         field-name="mesh"
                         placeholder="Malla"
                         is-readonly
@@ -70,12 +70,12 @@
             </div>
             <div class="flex items-center">
                 <FieldSelect
-                    class="w-1/2"
+                    class="w-full"
                     field-name="sandType"
-                    placeholder="Seleccionar"
+                    placeholder="Ingrese tipo de malla"
                     endpoint-key="type"
                     :data="selectedMesh"
-                    :filtered-data="filteredMeshTypes"
+                    :endpoint-data="filteredMeshTypes"
                     require-validation
                     entity="sandProvider"
                     @is-blured="checkMeshValidation"
@@ -88,7 +88,7 @@
         <FieldTextArea
             class="col-span-full"
             field-name="observations"
-            placeholder="Observaciones..."
+            placeholder=""
             title="Observaciones"
             :rows="5"
             is-fixed
@@ -138,8 +138,10 @@
             const meshTypes = ref([]);
 
             const filteredMeshTypes = computed(() => {
+                console.log('Mesh Types', sandProvider.value.meshType);
                 const selectedMeshTypes = sandProvider.value.meshType?.map((mesh) => mesh.id);
 
+                // *** Problemas. Asyncronismo
                 return meshTypes.value.filter((m: any) => !selectedMeshTypes.includes(m.id));
             });
 

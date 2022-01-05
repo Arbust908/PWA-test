@@ -1,10 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">
-                Centro de carga de arena - {{ id }}
-            </h1>
-        </header>
+        <ABMFormTitle :title="`Centro de carga de arena - ${id}`" />
         <section class="bg-white rounded-md max-w-2xl shadow-sm">
             <form method="POST" action="/" class="p-4 max-w-lg">
                 <SandProviderForm v-if="currentSandProvider" v-model="currentSandProvider" />
@@ -20,53 +16,67 @@
             </form>
         </section>
 
-        <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
-            <section class="w-full space-x-6 flex items-center justify-end">
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
+            <section class="w-full space-x-3 flex items-center justify-end">
                 <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-arena')">
                     Cancelar
                 </SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isValidated && save()">
-                    Finalizar
-                </PrimaryBtn>
+                <PrimaryBtn btn="wide" :disabled="!isValidated" @click="isValidated && save()"> Finalizar </PrimaryBtn>
             </section>
         </footer>
 
-        <Modal type="off" :open="notificationModalvisible" @close="toggleNotificationModal">
-            <template #body>
-                <p>{{ errorMessage }}</p>
-                <button class="closeButton" @click.prevent="toggleNotificationModal">Cerrar</button>
-            </template>
-        </Modal>
+        <SuccessModal
+            :open="showModal"
+            title="¡El centro de carga fue guardado con éxito!"
+            @close="$router.push('/proveedores-de-arena')"
+            @main="$router.push('/proveedores-de-arena')"
+        />
+        <ErrorModal
+            :open="showNameErrorModal"
+            title="Ya existe un centro de carga con este nombre."
+            text="El forklift que intentas guardar fue creado anteriormente."
+            @close="showNameErrorModal = false"
+            @main="showNameErrorModal = false"
+        />
+        <ErrorModal
+            :open="showCuilErrorModal"
+            title="Ya existe un centro de carga con este CUIT."
+            text="El centro de carga que intenta registrar fue creado anteriormente."
+            @close="showCuilErrorModal = false"
+            @main="showCuilErrorModal = false"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, watchEffect, onMounted } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-    import Layout from '@/layouts/Main.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import { useToggle } from '@vueuse/core';
-    import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
-    import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
-    import Modal from '@/components/modal/General.vue';
+    import axios from 'axios';
+    import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
 
-    // TIPOS
-    import { SandProvider, CompanyRepresentative } from '@/interfaces/sandflow';
-    import axios from 'axios';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import Layout from '@/layouts/Main.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SandProviderForm from '@/components/sandProvider/ProviderForm.vue';
+    import SandProviderRep from '@/components/sandProvider/RepFrom.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+
+    const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
+            ABMFormTitle,
+            ErrorModal,
             Layout,
-            SecondaryBtn,
             PrimaryBtn,
             SandProviderForm,
             SandProviderRep,
-            Modal,
+            SecondaryBtn,
+            SuccessModal,
         },
         setup() {
             const store = useStore();
@@ -80,6 +90,15 @@
             const errorMessage = ref('');
             const meshTypes = ref([]);
             const apiUrl = import.meta.env.VITE_API_URL || '/api';
+
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showNameErrorModal = ref(false);
+            const toggleNameErrorModal = useToggle(showNameErrorModal);
+
+            const showCuilErrorModal = ref(false);
+            const toggleCuilErrorModal = useToggle(showCuilErrorModal);
 
             const currentSandProvider: SandProvider = ref({
                 meshType: [],
@@ -105,6 +124,22 @@
                     return;
                 }
 
+                const legalIdExists = await checkIfExists('legalId', currentSandProvider.value.legalId);
+
+                if (legalIdExists) {
+                    toggleCuilErrorModal();
+
+                    return;
+                }
+
+                const nameExists = await checkIfExists('name', currentSandProvider.value.name);
+
+                if (nameExists) {
+                    toggleNameErrorModal();
+
+                    return;
+                }
+
                 loading.value = true;
                 const res = await useStoreLogic(router, store, 'sandProvider', 'update', currentSandProvider.value);
 
@@ -114,7 +149,7 @@
                     errorMessage.value = res.message;
                     toggleNotificationModal();
                 } else if (res.type == 'success') {
-                    router.push('/proveedores-de-arena');
+                    toggleModal();
                 }
             };
 
@@ -139,6 +174,14 @@
                 loading.value = false;
             });
 
+            const checkIfExists = async (field: string, value: string) => {
+                //TODO: Refactor with useStoreLogic ? (useStoreLogic not accept filters)
+                const apiResponse = await axios.get(`${api}/sandProvider?${field}=${value}?id__`);
+                const sandProviders = apiResponse.data.data;
+
+                return sandProviders.filter((sp) => sp.id !== currentSandProvider.value.id).length > 0;
+            };
+
             return {
                 id,
                 isNewRep,
@@ -153,52 +196,13 @@
                 errorMessage,
                 meshTypes,
                 loading,
+                showModal,
+                showNameErrorModal,
+                showCuilErrorModal,
+                toggleModal,
+                toggleCuilErrorModal,
+                toggleNameErrorModal,
             };
         },
     };
 </script>
-
-<style lang="scss" scoped>
-    .btn {
-        &__draft {
-            @apply border-main-400 text-main-500 bg-transparent hover:bg-main-50 hover:shadow-lg;
-        }
-        &__delete {
-            @apply border-transparent text-gray-800 bg-transparent hover:bg-red-600 hover:text-white mx-2 p-2 transition duration-150 ease-out;
-            /* @apply border-transparent text-white bg-red-500 hover:bg-red-600 mx-2 p-2; */
-        }
-        &__add {
-            @apply border-transparent text-white bg-green-500 hover:bg-green-600 mr-2;
-        }
-        &__add--special {
-            @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
-        }
-        &__mobile-only {
-            @apply lg:hidden;
-        }
-        &__desktop-only {
-            @apply hidden lg:inline-flex;
-        }
-    }
-    .input {
-        @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
-    }
-    input:read-only {
-        @apply bg-second-200 border cursor-not-allowed;
-    }
-    fieldset:not(:last-of-type) {
-        @apply border-b pb-6;
-    }
-    label:not(.toggle) {
-        @apply flex flex-col;
-        span {
-            @apply text-sm;
-        }
-    }
-    .toggle {
-        @apply flex space-x-3 items-center;
-    }
-    .equip-grid {
-        @apply grid gap-4 grid-cols-2 md:grid-cols-3;
-    }
-</style>
