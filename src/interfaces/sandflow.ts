@@ -337,3 +337,18 @@ export interface Box {
     floor: number;
     row: number;
 }
+
+export interface QueueItem {
+    id?: number;
+    sandOrderId: number;
+    sandOrder?: SandOrder;
+    pitId: number;
+    pit?: Pit;
+    origin: string;
+    destination: string;
+    status: number;
+    order: number; // Cuanto mas alto, antes aparece en la cola
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
+}
