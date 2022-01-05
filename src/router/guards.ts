@@ -112,7 +112,6 @@ export const isMobileAndLogged = (to: any, from: any, next: any) => {
 
 export const checkPermission = (to: any, from: any, next: any) => {
     const { permissions: storePermissions, visible } = store.state.loggedUser;
-    console.log('Store User', store.state.loggedUser);
 
     if (!visible) {
         next({ name: 'Error-403' });

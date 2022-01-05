@@ -178,7 +178,6 @@
                     userToken = response.data.data.token;
                     fullUser = await getFullUser(email);
                 }
-                console.log('FullUser', fullUser);
 
                 if (fullUser) {
                     if (!fullUser.visible) {
@@ -196,7 +195,6 @@
                         token: userToken,
                         visible: fullUser.visible,
                     };
-                    console.log(fullUser);
 
                     if (shouldRemember.value) {
                         localStorage.setItem('user', JSON.stringify(fullUser));
