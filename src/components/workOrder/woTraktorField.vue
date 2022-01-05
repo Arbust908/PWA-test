@@ -31,15 +31,12 @@
                 :data="traktor.description"
                 @update:data="traktor.description = $event"
             />
-            <CircularBtn
+            <AddDeleteBtn
                 v-if="traktors.length > 1"
-                class="btn__delete"
-                :class="traktorI == 0 ? 'mt-6' : 'mt-2'"
+                :class="isFirst(traktor.innerId) ? 'mt-7' : 'mt-2'"
+                purpose="remove"
                 @click="remove(traktor.innerId)"
-                size="sm"
-            >
-                <Icon icon="Trash" class="w-6 h-6" />
-            </CircularBtn>
+            />
         </FieldGroup>
         <button class="mt-1 flex items-center col-span-full sm:col-span-6" @click.prevent="add">
             <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
@@ -49,12 +46,13 @@
 </template>
 
 <script lang="ts">
+    import { isFirst } from '@/helpers/iteretionHelpers';
     import { defineComponent, computed, ref } from 'vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import { useVModel } from '@vueuse/core';
 
     export default defineComponent({
@@ -64,7 +62,7 @@
             FieldGroup,
             FieldLegend,
             Icon,
-            CircularBtn,
+            AddDeleteBtn,
         },
         props: {
             traktors: {
@@ -122,6 +120,7 @@
                 traktors,
                 remove,
                 add,
+                isFirst,
             };
         },
     });

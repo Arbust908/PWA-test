@@ -18,15 +18,12 @@
                 :data="pickup.description"
                 @update:data="pickup.description = $event"
             />
-            <CircularBtn
+            <AddDeleteBtn
                 v-if="pickups.length > 1"
-                class="btn__delete"
-                :class="pickupI == 0 ? 'mt-7' : 'mt-4'"
+                :class="pickupI == 0 ? 'mt-7' : 'mt-2'"
+                purpose="remove"
                 @click="remove(pickup.id)"
-                size="sm"
-            >
-                <Icon icon="Trash" class="w-6 h-6" />
-            </CircularBtn>
+            />
         </FieldGroup>
         <button class="mt-1 flex items-center col-span-6" @click.prevent="add">
             <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
@@ -41,7 +38,7 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import { useVModel } from '@vueuse/core';
 
     export default defineComponent({
@@ -51,7 +48,7 @@
             FieldGroup,
             FieldLegend,
             Icon,
-            CircularBtn,
+            AddDeleteBtn,
         },
         props: {
             pickups: {
