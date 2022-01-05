@@ -47,6 +47,12 @@ const Stage_Sheet = {
     icon: 'DocumentReport',
     title: 'StageSheet',
 };
+const Deposito_de_cajas_vacias = {
+    name: 'Depósito de cajas vacias',
+    to: '/deposito-cajas-vacias',
+    icon: 'Archive',
+    title: 'EmptyBoxDeposit',
+};
 const LINE = {
     name: 'LINE',
 };
@@ -104,6 +110,7 @@ export default {
             Ingreso_de_cajas,
             Operación_en_Cradle,
             Stage_Sheet,
+            Deposito_de_cajas_vacias,
             LINE,
             {
                 name: 'Proveedores',

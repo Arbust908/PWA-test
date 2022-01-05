@@ -280,6 +280,12 @@ const routes: Array<RouteRecordRaw> = [
         beforeEnter: [isMobileAndLogged, checkPermission],
     },
     {
+        path: '/deposito-cajas-vacias',
+        name: 'EmptyBoxDeposit',
+        component: () => import('@/pages/EmptyBoxDeposit/Index.vue'),
+        beforeEnter: [isLogged],
+    },
+    {
         path: '/usuarios',
         name: 'User',
         component: () => import('@/pages/User/index.vue'),
