@@ -99,17 +99,18 @@
                     <ResposiveTableSandPlan
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
-                        class="mt-2"
                         :pos="Key + 1"
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
                         :stagesAmount="currentSandPlan.stages.length"
+                        :actions="actions"
                         editing-key="innerId"
                         @editStage="editStage"
                         @saveStage="saveStage"
                         @duplicateStage="duplicateStage"
                         @deleteStage="deleteStage"
+                        @upgrade="upgrade"
                     />
                 </div>
             </form>

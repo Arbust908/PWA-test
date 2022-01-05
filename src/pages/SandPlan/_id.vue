@@ -54,7 +54,7 @@
                                             :sands="sands"
                                             :stagesAmount="currentSandPlan.stages.length"
                                             :actions="actions"
-                                            editing-key="id"
+                                            editing-key="innerId"
                                             @editStage="editStage"
                                             @saveStage="saveStage"
                                             @duplicateStage="duplicateStage"
@@ -106,7 +106,8 @@
                         :editing="editingStage"
                         :sands="sands"
                         :stagesAmount="currentSandPlan.stages.length"
-                        editing-key="id"
+                        :actions="actions"
+                        editing-key="innerId"
                         @editStage="editStage"
                         @saveStage="saveStage"
                         @duplicateStage="duplicateStage"
@@ -264,6 +265,11 @@
                 currentSandPlan.id = sp.id;
             }
 
+            currentSandPlan.stages = currentSandPlan.stages.map((stage) => {
+                stage.innerId = stage.id;
+                return stage;
+            });
+
             const addStage = () => {
                 duplicateStage(defaultStage);
             };
@@ -280,7 +286,7 @@
             const editingStage = ref(lastStageId);
 
             const editStage = (stage) => {
-                editingStage.value = Number(stage.id);
+                editingStage.value = Number(stage.innerId);
             };
 
             const saveStage = (stage) => {
@@ -303,7 +309,9 @@
                 };
                 currentSandPlan.stages.push(newStage);
                 editStage(newStage);
+                console.log(inProgressStages.value);
             };
+
             const stagesToDelete = ref([]);
             const deleteStage = (stage) => {
                 const stageId = stage.innerId;

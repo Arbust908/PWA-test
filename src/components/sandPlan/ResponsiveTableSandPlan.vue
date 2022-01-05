@@ -7,43 +7,11 @@
             </th>
             <td class="w-3/6">
                 <div class="flex justify-end w-28 ml-auto my-0">
-                    <button
-                        class="action duplicate text-gray-600 hover:text-blue-800 p-2"
-                        title="Duplicar"
-                        @click.prevent="duplicateStage"
-                    >
-                        <Icon icon="DocumentDuplicate" class="w-6 h-6" />
-                        <span class="sr-only">Duplicar</span>
-                    </button>
-                    <button
-                        v-if="editing !== Number(stage.id)"
-                        :disabled="stage.status > 0"
-                        class="action edit text-gray-600 hover:text-blue-800 p-2"
-                        title="Editar"
-                        @click.prevent="editStage"
-                    >
-                        <Icon icon="PencilAlt" class="w-6 h-6" />
-                        <span class="sr-only">Editar</span>
-                    </button>
-                    <button
-                        v-else
-                        :disabled="stage.status > 0"
-                        class="action edit text-gray-600 hover:text-blue-800 p-2"
-                        title="Guardar"
-                        @click.prevent="saveStage"
-                    >
-                        <Icon icon="Save" class="w-6 h-6" />
-                        <span class="sr-only">Guardar</span>
-                    </button>
-                    <button
-                        :disabled="stage.status > 0 || stage.stage === 1"
-                        class="action delete text-gray-600 hover:text-blue-800 py-1 pl-1"
-                        title="Borrar"
-                        @click.prevent="deleteStage"
-                    >
-                        <Icon icon="Trash" class="w-6 h-6" />
-                        <span class="sr-only">Borrar</span>
-                    </button>
+                    <DropdownBtn :actions="actions" :item="stage">
+                        <CircularBtn size="sm" class="even">
+                            <Icon icon="DotsVertical" type="outlined" class="w-6 h-6 icon text-gray-800" />
+                        </CircularBtn>
+                    </DropdownBtn>
                 </div>
             </td>
         </tr>
@@ -156,6 +124,42 @@
 
         <div v-if="editing === Number(stage.id)" class="separador ml-6 mt-6 mb-6" />
 
+        <tr v-if="editing === Number(stage.id)">
+            <th class="head">Arena D</th>
+            <td>
+                <FieldSelect
+                    field-name="sandType3"
+                    placeholder="Seleccionar"
+                    endpoint="/sand"
+                    endpoint-key="type"
+                    :data="stage.sandId4"
+                    @update:data="stage.sandId4 = $event"
+                />
+            </td>
+        </tr>
+        <tr v-else>
+            <th class="head">Arena D</th>
+            <td v-if="(sands.length > 0 && stage.sandId4 >= 0) || stage.quantity4 > 0" class="td">
+                {{ getSand(Number(stage.sandId4))?.type }} / {{ stage.quantity4 }}t
+            </td>
+            <td v-else class="td">No hay arena</td>
+        </tr>
+        <tr v-if="editing === Number(stage.id)">
+            <th class="head">Cantidad</th>
+            <td>
+                <FieldWithSides
+                    field-name="sandQuantity3"
+                    placeholder="0 t"
+                    type="number"
+                    :post="{ title: '0', value: 't' }"
+                    :data="stage.quantity4"
+                    @update:data="stage.quantity4 = $event"
+                />
+            </td>
+        </tr>
+
+        <div v-if="editing === Number(stage.id)" class="separador ml-6 mt-6 mb-6" />
+
         <tr>
             <th
                 scope="col"
@@ -187,6 +191,8 @@
     import Pill from '@/components/ui/Pill.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import { Sand } from '@/interfaces/sandflow';
+    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import DropdownBtn from '@/components/ui/buttons/DropdownBtn.vue';
 
     export default defineComponent({
         components: {
@@ -194,6 +200,8 @@
             Pill,
             FieldSelect,
             FieldWithSides,
+            CircularBtn,
+            DropdownBtn,
         },
         props: {
             stage: {
@@ -212,13 +220,17 @@
                 type: Number,
                 required: true,
             },
+            editingKey: {
+                type: String,
+                default: 'id',
+            },
             stagesAmount: {
                 type: Number,
                 default: 0,
             },
         },
         setup(props, { emit }) {
-            const { stage, editing, sands, pos } = toRefs(props);
+            const { stage, editing, sands, pos, editingKey } = toRefs(props);
             stage.value.stage = pos.value;
 
             const totalWheight = computed(() => {
@@ -261,6 +273,39 @@
                 name: stage.value.status === 2 ? 'Finalizada' : stage.value.status === 1 ? 'En Progreso' : 'Creada',
             });
 
+            const actions = [
+                {
+                    label: 'Editar',
+                    hide: () => {
+                        return !(editing.value === Number(stage.value[editingKey.value]));
+                    },
+                    callback: () => {
+                        editStage();
+                    },
+                },
+                {
+                    label: 'Guardar',
+                    hide: () => {
+                        return editing.value === Number(stage.value[editingKey.value]);
+                    },
+                    callback: () => {
+                        saveStage();
+                    },
+                },
+                {
+                    label: 'Clonar',
+                    callback: () => {
+                        duplicateStage();
+                    },
+                },
+                {
+                    label: 'Eliminar',
+                    callback: () => {
+                        deleteStage();
+                    },
+                },
+            ];
+
             return {
                 stage,
                 editing,
@@ -273,6 +318,7 @@
                 saveStage,
                 upgrade,
                 pill,
+                actions,
             };
         },
     });

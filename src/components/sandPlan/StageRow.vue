@@ -145,48 +145,6 @@
                 </CircularBtn>
             </DropdownBtn>
         </td>
-
-        <!-- <div class="flex justify-center gap-x-2">
-                <Popper hover content="Duplicar etapa">
-                    <button class="action duplicate" title="Duplicar" @click.prevent="duplicateStage">
-                        <Icon icon="DocumentDuplicate" class="w-6 h-6" />
-                        <span class="sr-only">Duplicar</span>
-                    </button>
-                </Popper>
-                <Popper hover :content="editing !== Number(stage[editingKey]) ? 'Editar etapa' : 'dejar de editar'">
-                    <button
-                        v-if="editing !== Number(stage[editingKey])"
-                        :disabled="stage.status > 0"
-                        class="action edit text-gray-600 hover:text-blue-800 p-2"
-                        title="Editar"
-                        @click.prevent="editStage"
-                    >
-                        <Icon icon="PencilAlt" class="w-6 h-6" />
-                        <span class="sr-only">Editar</span>
-                    </button>
-                    <button
-                        v-else
-                        :disabled="stage.status > 0"
-                        class="action edit text-gray-600 hover:text-blue-800 p-2"
-                        title="Guardar"
-                        @click.prevent="saveStage"
-                    >
-                        <Icon icon="Save" class="w-6 h-6" />
-                        <span class="sr-only">Guardar</span>
-                    </button>
-                </Popper>
-                <Popper hover content="Borrar etapa">
-                    <button
-                        :disabled="stage.status > 0 || stage.stage === 1"
-                        class="action delete text-gray-600 hover:text-red-800 p-2"
-                        title="Borrar"
-                        @click.prevent="deleteStage"
-                    >
-                        <Icon icon="Trash" class="w-6 h-6" />
-                        <span class="sr-only">Borrar</span>
-                    </button>
-                </Popper> 
-            </div> -->
     </tr>
 </template>
 
@@ -244,7 +202,7 @@
             },
         },
         setup(props, { emit }) {
-            const { stage, editing, sands, pos } = toRefs(props);
+            const { stage, editing, sands, pos, editingKey } = toRefs(props);
             stage.value.stage = pos.value;
 
             const totalWheight = computed(() => {
@@ -263,14 +221,10 @@
                 );
             };
 
-            const editingValue = ref(true);
-
             const editStage = () => {
-                editingValue.value = false;
                 emit('editStage', stage.value);
             };
             const saveStage = () => {
-                editingValue.value = true;
                 emit('saveStage', stage.value);
             };
             const duplicateStage = () => {
@@ -298,7 +252,7 @@
                 {
                     label: 'Editar',
                     hide: () => {
-                        return editingValue.value;
+                        return !(editing.value === Number(stage.value[editingKey.value]));
                     },
                     callback: () => {
                         editStage();
@@ -307,7 +261,7 @@
                 {
                     label: 'Guardar',
                     hide: () => {
-                        return !editingValue.value;
+                        return editing.value === Number(stage.value[editingKey.value]);
                     },
                     callback: () => {
                         saveStage();
