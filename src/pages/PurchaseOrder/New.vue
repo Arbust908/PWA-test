@@ -324,6 +324,9 @@
             InvalidInputLabel,
         },
         setup() {
+            const drivers = ref([]);
+            const driverId = ref(-1);
+
             const filteredDrivers = computed(() => {
                 if (transportProviderId.value > -1) {
                     const driversFiltered = drivers.value.filter(
@@ -335,9 +338,6 @@
 
                 return [];
             });
-
-            const drivers = ref([]);
-            const driverId = ref(-1);
 
             const filteredPlates = computed(() => {
                 if (driverId.value > -1) {

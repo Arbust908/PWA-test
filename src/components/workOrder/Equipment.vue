@@ -22,7 +22,7 @@
                     @update:data="backupCradleId = $event"
                 />
             </FieldGroup>
-            <FieldGroup class="pb-6">
+            <FieldGroup>
                 <FieldLegend>Forklift</FieldLegend>
                 <FieldSelect
                     class="col-span-full"
@@ -44,10 +44,10 @@
                 />
             </FieldGroup>
         </div>
-        <TracktoField :traktors="traktors" @update:traktors="traktors = $event" />
+        <TracktorField v-model:traktors="traktors" />
         <PickupField :pickups="pickups" @update:pickups="pickups = $event" />
         <FieldGroup class="max-w-lg">
-            <FieldLegend>Equipamento</FieldLegend>
+            <FieldLegend>Equipamiento</FieldLegend>
             <FieldInput
                 class="col-span-6 sm:col-span-4"
                 title="Rigmats"
@@ -100,20 +100,16 @@
 <script lang="ts">
     import { ref, watchEffect, defineComponent, computed } from 'vue';
     import { useVModels } from '@vueuse/core';
-    import { useRoute } from 'vue-router';
 
     import Icon from '@/components/icon/TheAllIcon.vue';
-
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
-    import TracktoField from '@/components/workOrder/woTraktorField.vue';
+    import TracktorField from '@/components/workOrder/woTraktorField.vue';
     import PickupField from '@/components/workOrder/woPickupField.vue';
 
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import { Pit } from '@/interfaces/sandflow';
-    import { useApi } from '@/helpers/useApi';
 
     export default defineComponent({
         components: {
@@ -122,7 +118,7 @@
             FieldInput,
             FieldLegend,
             Icon,
-            TracktoField,
+            TracktorField,
             PickupField,
             CircularBtn,
         },
@@ -195,7 +191,7 @@
             const firstTracktorFull = computed(() => {
                 const trackto = traktors.value[0];
 
-                return trackto.chassis !== '' && trackto.supplier !== '';
+                return trackto.chassis !== -1 && trackto.supplier !== -1;
             });
             const firstPickupFull = computed(() => {
                 const pickup = pickups.value[0];

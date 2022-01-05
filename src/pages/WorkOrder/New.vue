@@ -11,10 +11,10 @@
                 </button>
                 <button
                     class="section-tab"
-                    :selected="WO_section === 'equipamento'"
-                    @click="changeSection('equipamento')"
+                    :selected="WO_section === 'equipamiento'"
+                    @click="changeSection('equipamiento')"
                 >
-                    <span> Equipamento </span>
+                    <span> Equipamiento </span>
                     <CheckCircleIcon v-if="isEquipmentFull" class="w-5 h-5" />
                 </button>
                 <button class="section-tab" :selected="WO_section === 'rrhh'" @click="changeSection('rrhh')">
@@ -31,39 +31,21 @@
                 v-model:is-full="isOrderFull"
             />
             <EquipmentSection
-                v-else-if="WO_section === 'equipamento'"
-                :operative-cradle-id="operativeCradleId"
-                :backup-cradle-id="backupCradleId"
-                :operative-forklift-id="operativeForkliftId"
-                :backup-forklift-id="backupForkliftId"
-                :traktors="traktors"
-                :pickups="pickups"
-                :rigmats="rigmats"
-                :conex="conex"
-                :generators="generators"
-                :tower="tower"
-                :cabin="cabin"
-                :is-full="isEquipmentFull"
-                @update:operativeCradleId="operativeCradleId = $event"
-                @update:backupCradleId="backupCradleId = $event"
-                @update:operativeForkliftId="operativeForkliftId = $event"
-                @update:backupForkliftId="backupForkliftId = $event"
-                @update:traktors="traktors = $event"
-                @update:pickups="pickups = $event"
-                @update:rigmats="rigmats = $event"
-                @update:conex="conex = $event"
-                @update:generators="generators = $event"
-                @update:tower="tower = $event"
-                @update:cabin="cabin = $event"
-                @update:isFull="isEquipmentFull = $event"
+                v-else-if="WO_section === 'equipamiento'"
+                v-model:operative-cradle-id="operativeCradleId"
+                v-model:backup-cradle-id="backupCradleId"
+                v-model:operative-forklift-id="operativeForkliftId"
+                v-model:backup-forklift-id="backupForkliftId"
+                v-model:traktors="traktors"
+                v-model:pickups="pickups"
+                v-model:rigmats="rigmats"
+                v-model:conex="conex"
+                v-model:generators="generators"
+                v-model:tower="tower"
+                v-model:cabin="cabin"
+                v-model:is-full="isEquipmentFull"
             />
-            <RRHHSection
-                v-else-if="WO_section === 'rrhh'"
-                :crews="crews"
-                :is-full="isRRHHFull"
-                @update:crews="crews = $event"
-                @update:isFull="isRRHHFull = $event"
-            />
+            <RRHHSection v-else-if="WO_section === 'rrhh'" v-model:crews="crews" v-model:is-full="isRRHHFull" />
             <footer
                 :class="isLastSection() ? 'justify-between' : 'justify-end'"
                 class="mt-8 p-4 gap-3 flex flex-col md:flex-row"
@@ -131,7 +113,6 @@
     // TIPOS
     import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/sandflow';
     // MODAL
-    // const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
     const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
 
@@ -186,17 +167,7 @@
             const operativeForkliftId: Ref<number> = ref(-1);
             const backupForkliftId: Ref<number> = ref(-1);
             const traktors: Ref<Array<Traktor>> = ref([]);
-            // watch(traktors, (newVal, oldVal) => {
-            //   if (newVal.length <= oldVal.length) {
-            //     traktors.value = oldVal;
-            //   }
-            // });
             const pickups: Ref<Array<Pickup>> = ref([]);
-            // watch(pickups, (newVal, oldVal) => {
-            //   if (newVal.length <= oldVal.length) {
-            //     pickups.value = oldVal;
-            //   }
-            // });
             const rigmats: Ref<number> = ref(0);
             const conex: Ref<number> = ref(0);
             const generators: Ref<number> = ref(0);
@@ -290,7 +261,7 @@
             };
             // :: >>> Sections
             const WO_section = ref('orden');
-            const section_order = ['orden', 'equipamento', 'rrhh'];
+            const section_order = ['orden', 'equipamiento', 'rrhh'];
             const changeSection = (new_section: string): void => {
                 WO_section.value = new_section;
             };
@@ -325,12 +296,6 @@
             const isAllFull = computed(() => {
                 return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
             });
-            const removeAllEmptys = (): void => {
-                removeEmptyPits();
-                removeEmptyTraktors();
-                removeEmptyPickups();
-                removeEmptyCrews();
-            };
 
             // MODAL
             const showModal = ref(false);
