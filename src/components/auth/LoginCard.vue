@@ -56,7 +56,9 @@
                 </div>
 
                 <div>
-                    <PrimaryBtn class="mx-auto" @click.prevent="formValidation"> Iniciar sesión </PrimaryBtn>
+                    <PrimaryBtn class="mx-auto" :loading="loading" @click.prevent="formValidation">
+                        Iniciar sesión
+                    </PrimaryBtn>
                 </div>
             </form>
         </article>
@@ -99,6 +101,8 @@
             const showModal: Ref<boolean> = ref(false);
             const toggleModal = useToggle(showModal);
 
+            const loading = ref(true);
+
             const validate = (event: any) => {
                 const name: string = event.target.name;
                 const isLong: boolean = event.target.value.length >= 3;
@@ -122,8 +126,35 @@
                     login();
                 }
             };
+            const getFullUser = async (userMail: string) => {
+                const response = await axios.get(`${api}/user?email=${userMail}`).catch((err) => {
+                    console.log(err);
+
+                    return false;
+                });
+                let userRes = response.data.data;
+
+                if (userRes.length <= 0) {
+                    const newResponse = await axios.get(`${api}/user`).catch((err) => {
+                        console.log(err);
+
+                        return false;
+                    });
+
+                    userRes = newResponse.data.data;
+
+                    if (userRes.length <= 0) {
+                        return false;
+                    }
+                }
+
+                return userRes.find((user) => user.email === userMail);
+            };
             const login = async () => {
-                const loading = ref(true);
+                if (localStorage.getItem('user')) {
+                    localStorage.removeItem('user');
+                }
+
                 const email = username.value;
                 const loggedUser = { email, password: password.value };
                 let response = await axios.post(`${api}/auth/login`, loggedUser).catch((err) => {
@@ -134,6 +165,8 @@
                 });
 
                 let fullUser;
+                let userPermisions;
+                let userToken;
 
                 if (response.status === 200) {
                     const permissions = response.data.data.permissions;
@@ -141,27 +174,42 @@
                     PermissionsManager.setPermissions([permissions]);
 
                     fullUser = response.data.data;
+                    userPermisions = fullUser.permissions;
+                    userToken = response.data.data.token;
+                    fullUser = await getFullUser(email);
                 }
+                console.log('FullUser', fullUser);
 
                 if (fullUser) {
+                    if (!fullUser.visible) {
+                        loading.value = false;
+                        toggleModal(true);
+
+                        return;
+                    }
+
                     fullUser = {
-                        id: 99,
+                        id: fullUser.id,
                         username: username.value,
-                        role: Roles.Logged,
-                        permissions: fullUser.permissions,
-                        token: fullUser.token,
+                        role: fullUser.roleId,
+                        permissions: userPermisions,
+                        token: userToken,
+                        visible: fullUser.visible,
                     };
+                    console.log(fullUser);
 
                     if (shouldRemember.value) {
                         localStorage.setItem('user', JSON.stringify(fullUser));
                     }
                     setUser(fullUser);
+                    loading.value = false;
                     router.push('/');
                 } else {
+                    loading.value = false;
                     toggleModal(true);
-                }
 
-                loading.value = false;
+                    return;
+                }
             };
 
             return {
@@ -175,6 +223,7 @@
                 passwordError,
                 showModal,
                 toggleModal,
+                loading,
             };
         },
     });

@@ -111,7 +111,14 @@ export const isMobileAndLogged = (to: any, from: any, next: any) => {
 };
 
 export const checkPermission = (to: any, from: any, next: any) => {
-    const storePermissions = store.state.loggedUser.permissions;
+    const { permissions: storePermissions, visible } = store.state.loggedUser;
+    console.log('Store User', store.state.loggedUser);
+
+    if (!visible) {
+        next({ name: 'Error-403' });
+
+        return;
+    }
 
     //TODO: usar el permissionManager
     const permissions = JSON.parse(JSON.stringify(storePermissions));
