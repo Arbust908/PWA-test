@@ -109,6 +109,7 @@
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+    import { getLast } from '@/helpers/iteretionHelpers';
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -190,33 +191,33 @@
             };
             const addResource = (crewId: number): void => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-                const lastId = selectedCrew.resources.length;
-                selectedCrew.resources.push({
-                    id: lastId,
-                    rol: '',
-                    name: '',
-                } as HumanResource);
+
+                if (!selectedCrew) {
+                    return new Error('No crew selected');
+                }
+
+                const lastResource = getLast(selectedCrew.resources);
+                const lastId = lastResource?.id + 1 || 0; // ***
+                const newResource: HumanResource = { id: lastId, role: -1, name: -1, crewId: selectedCrew.id };
+
+                selectedCrew.resources.push(newResource);
             };
             const addCrew = (): void => {
-                const lastCrew = crews.value[crews.value.length - 1];
-                const lastId = lastCrew.id + 1 || 1;
-                const makeNextCrewLetter = () => {
-                    const lastLetter = lastCrew.title ? lastCrew.title.split(' ')[1] : 'A';
-                    const letterNum = lastLetter.charCodeAt(0);
-
-                    return String.fromCharCode(letterNum + 1);
-                };
-                const crewLetter = makeNextCrewLetter();
-                const start_time = new Date().setHours(7);
-                const end_time = new Date().setHours(16);
-                crews.value.push({
+                const lastCrew = getLast(crews.value);
+                const lastId = lastCrew?.id + 1 || 2;
+                const numberForLetter = Math.max(Math.min(lastId + 64, 90), 65);
+                const crewLetter = String.fromCharCode(numberForLetter);
+                const timeStart = new Date().setHours(7);
+                const timeEnd = new Date().setHours(19);
+                const newCrew = {
                     id: lastId,
-                    start_time,
-                    end_time,
+                    timeStart,
+                    timeEnd,
                     title: `Crew ${crewLetter}`,
                     resources: [],
-                });
-                addResource(lastId);
+                };
+                crews.value.push(newCrew);
+                addResource(newCrew.id);
             };
             const removeCrew = (crewId: number): void => {
                 crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);

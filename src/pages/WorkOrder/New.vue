@@ -132,20 +132,6 @@
             SuccessModal,
         },
         setup() {
-            onMounted(async () => {
-                const result = await axios.get(`${api}/crew`);
-                console.log('crew', result.data.data);
-
-                const result2 = await axios.get(`${api}/humanResource`);
-                console.log('humanResource', result2.data.data);
-
-                const result3 = await axios.get(`${api}/user`);
-                console.log('usuarios', result3.data.data);
-
-                const result4 = await axios.get(`${api}/role`);
-                console.log('role', result4.data.data);
-            });
-
             // Init
             const router = useRouter();
             useTitle(`Nueva Orden de Trabajo <> Sandflow`);
@@ -210,13 +196,12 @@
                 if (!selectedCrew) {
                     return new Error('No crew selected');
                 }
-                const lastId = selectedCrew.resources.length; // ***
-                selectedCrew.resources.push({
-                    id: lastId,
-                    role: -1,
-                    name: -1,
-                    crewId: selectedCrew.id,
-                } as HumanResource);
+
+                const lastResource = getLast(selectedCrew.resources);
+                const lastId = lastResource?.id + 1 || 0; // ***
+                const newResource: HumanResource = { id: lastId, role: -1, name: -1, crewId: selectedCrew.id };
+
+                selectedCrew.resources.push(newResource);
             };
             const removeEmptyCrews = (): void => {
                 if (!isDraft.value) {

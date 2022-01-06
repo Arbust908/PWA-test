@@ -76,9 +76,6 @@
             const noAdminUsers = computed(() => {
                 if (props.roles && props.people.role > -1) {
                     return props.users.filter((user: any) => {
-                        console.log('USER', user);
-                        console.log('crews.value ROLE', props.people.role);
-
                         return user.roleId === props.people.role;
                     });
                 }

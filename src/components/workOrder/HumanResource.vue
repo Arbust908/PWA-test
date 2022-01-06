@@ -33,7 +33,7 @@
             <span class="col-span-12">
                 <button class="mt-1 flex items-center" @click.prevent="addResource(crew.id)">
                     <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
-                    <span class="font-bold text-lg"> Agregar otro </span>
+                    <span class="font-bold text-lg"> Agregar rol </span>
                 </button>
             </span>
         </FieldGroup>
@@ -52,7 +52,7 @@
     import { useVModels } from '@vueuse/core';
     import { HumanResource, Crew } from '@/interfaces/sandflow';
 
-    import { notLonly } from '@/helpers/iteretionHelpers';
+    import { notLonly, getLast } from '@/helpers/iteretionHelpers';
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
@@ -103,7 +103,8 @@
 
             const addResource = (crewId: number): void => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-                const lastId = selectedCrew.resources.length; // ***
+                const lastResource = getLast(selectedCrew.resources);
+                const lastId = lastResource.id + 1 || 1; // ***
                 selectedCrew.resources.push({
                     ...defaultResource,
                     id: lastId,
