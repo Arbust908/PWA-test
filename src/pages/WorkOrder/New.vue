@@ -203,17 +203,23 @@
                     (resource: HumanResource) => resource.id !== peopleId
                 );
             };
-            const addResource = (crewId: number): void => {
+            const addResource = (crewId: number) => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
 
                 if (!selectedCrew) {
                     return new Error('No crew selected');
+                    // QA(SB4(001))-----------------QA(SB4(003))
+                    // SB4(001) --------- SB4(002)--SB4(003)--(0031)
+                    // L> fix/233 ------ /          /
+                    // L>Fix/345-------------------/
+                    //                                     -SB5
                 }
                 const lastId = selectedCrew.resources.length;
                 selectedCrew.resources.push({
                     id: lastId,
-                    role: '',
-                    name: '',
+                    role: -1,
+                    name: -1,
+                    crewId: selectedCrew.id,
                 } as HumanResource);
             };
             const removeEmptyCrews = (): void => {
@@ -242,7 +248,7 @@
             ]);
             const addCrew = (): void => {
                 const lastId = crews.value.length + 1;
-                const crewLetter = String.fromCharCode(lastId + 64);
+                const crewLetter = String.fromCharCode(lastId + 64); // El error de la letra!
                 const timeStart = new Date().setHours(7);
                 const timeEnd = new Date().setHours(19);
                 crews.value.push({

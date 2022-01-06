@@ -1,6 +1,6 @@
 <template>
     <form method="POST" action="/" class="p-4 md:flex md:flex-wrap md:gap-20">
-        <FieldGroup v-for="(crew, key) in crews" :key="crew.id" class="max-w-sm w-full content-start">
+        <FieldGroup v-for="(crew, key) in crews" :key="crew.id + key" class="max-w-sm w-full content-start">
             <FieldLegend>
                 <span>{{ crew.title }}</span>
                 <CircularBtn v-if="crews.length > 1" class="btn__delete" size="sm" @click="removeCrew(crew.id)">
@@ -18,37 +18,17 @@
                 </label>
             </section>
             <section class="col-span-full">
-                <FieldGroup v-for="(people, peopleI) in crew.resources" :key="people.id" class="pt-2 pb-3 relative">
-                    <!-- TODO: Pasaria a FiledSelect si tuvieramos ABM de roles y Usuarios -->
-                    <FieldSelect
-                        v-model:data="people.role"
-                        class="col-span-full mr-5"
-                        title="Rol"
-                        :field-name="`crew-${crew.id}-${people.id}-role`"
-                        placeholder="Seleccione Rol"
-                        :endpoint-data="filterAdmin"
-                    />
-                    <span
-                        v-if="notOnly(crew.resources)"
-                        :class="peopleI === 0 ? 'md:top-10' : 'md:top-6'"
-                        class="md:absolute md:-right-12 ml-4"
-                    >
-                        <CircularBtn class="btn__delete" size="sm" @click="removeResource(crew.id, people.id)">
-                            <Icon icon="Trash" class="w-6 h-6" />
-                        </CircularBtn>
-                    </span>
-
-                    <FieldSelect
-                        v-model:data="people.name"
-                        class="col-span-full mr-5"
-                        title="Empleado"
-                        :field-name="`crew-${crew.id}-${people.id}-name`"
-                        placeholder="Empleado"
-                        :endpoint-data="noAdminUsers"
-                        endpoint-key="firstName"
-                    />
-                    <!-- ver peopleI y people.id -->
-                </FieldGroup>
+                <PeopleGroup
+                    v-for="(people, peopleI) in crew.resources"
+                    :key="people.id"
+                    :people="people"
+                    :people-index="peopleI"
+                    :crew-id="crew.id"
+                    :not-lonly-resource="notLonly(crew.resources)"
+                    :users="users"
+                    :roles="roles"
+                    @remove-resource="removeResource($event[0], $event[1])"
+                />
             </section>
             <span class="col-span-12">
                 <button class="mt-1 flex items-center" @click.prevent="addResource(crew.id)">
@@ -66,12 +46,13 @@
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import TimePicker from '@/components/ui/form/TimePicker.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+    import PeopleGroup from '@/components/workOrder/peopleGroup.vue';
 
     import { useVModels } from '@vueuse/core';
     import { HumanResource, Crew } from '@/interfaces/sandflow';
+
+    import { notLonly } from '@/helpers/iteretionHelpers';
 
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
@@ -79,12 +60,11 @@
     export default {
         components: {
             FieldGroup,
-            FieldInput,
             FieldLegend,
-            FieldSelect,
             CircularBtn,
             Icon,
             TimePicker,
+            PeopleGroup,
         },
         props: {
             crews: {
@@ -96,37 +76,16 @@
                 default: false,
             },
         },
-        setup(props, { emit }) {
+        setup(props: any, { emit }: any) {
             const { crews } = useVModels(props, emit);
             const roles = ref([]);
             const users = ref([]);
 
             onMounted(async () => {
                 const result = await axios.get(`${api}/role`);
-                roles.value = result.data.data;
+                roles.value = result.data.data.filter((role: any) => role.id !== 2);
                 const result2 = await axios.get(`${api}/user`);
                 users.value = result2.data.data;
-            });
-
-            const filterAdmin = computed(() => {
-                if (roles.value.length) {
-                    return roles.value.filter((role: any) => role.id !== 2);
-                }
-
-                return [];
-            });
-
-            const noAdminUsers = computed(() => {
-                if (filterAdmin.value && crews.value[0].resources[0].role > -1) {
-                    return users.value.filter((user: any) => {
-                        console.log('USER', user);
-                        console.log('crews.value ROLE', crews.value[0].resources[0].role);
-
-                        return user.roleId === crews.value[0].resources[0].role;
-                    });
-                }
-
-                return [];
             });
 
             const defaultResource = {
@@ -155,28 +114,14 @@
                 crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
             };
 
-            if (crews?.value?.some((crew: Crew) => crew.resources.length === 0)) {
+            if (crews?.value?.some((crew: Crew) => crew.resources?.length === 0)) {
                 crews.value.forEach((crew: Crew) => {
-                    if (crew.resources.length === 0) {
+                    if (crew.resources?.length === 0 && crew.id) {
                         addResource(crew.id);
                     }
                 });
             }
 
-            const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
-                if (crewList.length === 0) {
-                    return false;
-                }
-                const lastCrew = crewList[crewList.length - 1];
-
-                return crewInnerId !== lastCrew.id;
-            };
-
-            const notOnly = (crewList: Array<HumanResource>) => {
-                return crewList.length > 1;
-            };
-
-            // Is the RRHH section is full
             const isRRHHFull = computed(() => {
                 return !!(crews.value.length > 0 && crews.value[0].start_time && crews.value[0].end_time);
             });
@@ -184,13 +129,12 @@
             return {
                 addResource,
                 crews,
+                users,
+                roles,
                 isRRHHFull,
-                filterAdmin,
-                noAdminUsers,
-                notLast,
-                notOnly,
                 removeCrew,
                 removeResource,
+                notLonly,
             };
         },
     };
