@@ -20,13 +20,13 @@
             <section class="col-span-full">
                 <FieldGroup v-for="(people, peopleI) in crew.resources" :key="people.id" class="pt-2 pb-3 relative">
                     <!-- TODO: Pasaria a FiledSelect si tuvieramos ABM de roles y Usuarios -->
-                    <FieldInput
+                    <FieldSelect
+                        v-model:data="people.role"
                         class="col-span-full mr-5"
-                        :title="peopleI === 0 ? 'Rol' : null"
+                        title="Rol"
                         :field-name="`crew-${crew.id}-${people.id}-role`"
-                        placeholder="Rol"
-                        :data="people.role"
-                        @update:data="people.role = $event"
+                        placeholder="Seleccione Rol"
+                        :endpoint-data="filterAdmin"
                     />
                     <span
                         v-if="notOnly(crew.resources)"
@@ -37,13 +37,17 @@
                             <Icon icon="Trash" class="w-6 h-6" />
                         </CircularBtn>
                     </span>
-                    <FieldInput
+
+                    <FieldSelect
+                        v-model:data="people.name"
                         class="col-span-full mr-5"
+                        title="Empleado"
                         :field-name="`crew-${crew.id}-${people.id}-name`"
                         placeholder="Empleado"
-                        :data="people.name"
-                        @update:data="people.name = $event"
+                        :endpoint-data="noAdminUsers"
+                        endpoint-key="firstName"
                     />
+                    <!-- ver peopleI y people.id -->
                 </FieldGroup>
             </section>
             <span class="col-span-12">
@@ -63,16 +67,21 @@
     import TimePicker from '@/components/ui/form/TimePicker.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
 
     import { useVModels } from '@vueuse/core';
     import { HumanResource, Crew } from '@/interfaces/sandflow';
+
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
             FieldGroup,
             FieldInput,
             FieldLegend,
+            FieldSelect,
             CircularBtn,
             Icon,
             TimePicker,
@@ -89,17 +98,50 @@
         },
         setup(props, { emit }) {
             const { crews } = useVModels(props, emit);
+            const roles = ref([]);
+            const users = ref([]);
+
+            onMounted(async () => {
+                const result = await axios.get(`${api}/role`);
+                roles.value = result.data.data;
+                const result2 = await axios.get(`${api}/user`);
+                users.value = result2.data.data;
+            });
+
+            const filterAdmin = computed(() => {
+                if (roles.value.length) {
+                    return roles.value.filter((role: any) => role.id !== 2);
+                }
+
+                return [];
+            });
+
+            const noAdminUsers = computed(() => {
+                if (filterAdmin.value && crews.value[0].resources[0].role > -1) {
+                    return users.value.filter((user: any) => {
+                        console.log('USER', user);
+                        console.log('crews.value ROLE', crews.value[0].resources[0].role);
+
+                        return user.roleId === crews.value[0].resources[0].role;
+                    });
+                }
+
+                return [];
+            });
+
             const defaultResource = {
                 id: 0,
-                name: '',
-                role: '',
+                name: -1,
+                role: -1,
             };
+
             const removeResource = (crewId: number, peopleId: number) => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
                 selectedCrew.resources = selectedCrew.resources.filter(
                     (resource: HumanResource) => resource.id !== peopleId
                 );
             };
+
             const addResource = (crewId: number): void => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
                 const lastId = selectedCrew.resources.length;
@@ -108,6 +150,7 @@
                     id: lastId,
                 });
             };
+
             const removeCrew = (crewId: number): void => {
                 crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
             };
@@ -128,6 +171,7 @@
 
                 return crewInnerId !== lastCrew.id;
             };
+
             const notOnly = (crewList: Array<HumanResource>) => {
                 return crewList.length > 1;
             };
@@ -141,6 +185,8 @@
                 addResource,
                 crews,
                 isRRHHFull,
+                filterAdmin,
+                noAdminUsers,
                 notLast,
                 notOnly,
                 removeCrew,
