@@ -12,12 +12,6 @@
             <CircularBtn class="btn__delete" size="sm" @click="$emit('removeResource', [crewId, resource.id])">
                 <Icon icon="Trash" class="w-6 h-6" />
             </CircularBtn>
-            <!-- 
-                crews = [ crewA, crewB, crewC]
-                crewA = [ peopl1, people2]
-                crewB = [ peoplA, peopleB, peopleC]
-                crewC = [ lonlyPerson ]
-             -->
         </span>
 
         <FieldSelect

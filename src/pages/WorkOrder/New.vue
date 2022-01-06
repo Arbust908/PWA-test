@@ -106,6 +106,7 @@
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import { getLast } from '@/helpers/iteretionHelpers';
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -208,13 +209,8 @@
 
                 if (!selectedCrew) {
                     return new Error('No crew selected');
-                    // QA(SB4(001))-----------------QA(SB4(003))
-                    // SB4(001) --------- SB4(002)--SB4(003)--(0031)
-                    // L> fix/233 ------ /          /
-                    // L>Fix/345-------------------/
-                    //                                     -SB5
                 }
-                const lastId = selectedCrew.resources.length;
+                const lastId = selectedCrew.resources.length; // ***
                 selectedCrew.resources.push({
                     id: lastId,
                     role: -1,
@@ -247,18 +243,21 @@
                 },
             ]);
             const addCrew = (): void => {
-                const lastId = crews.value.length + 1;
-                const crewLetter = String.fromCharCode(lastId + 64); // El error de la letra!
+                const lastCrew = getLast(crews.value);
+                const lastId = lastCrew?.id + 1 || 2;
+                const numberForLetter = Math.max(Math.min(lastId + 64, 90), 65);
+                const crewLetter = String.fromCharCode(numberForLetter);
                 const timeStart = new Date().setHours(7);
                 const timeEnd = new Date().setHours(19);
-                crews.value.push({
+                const newCrew = {
                     id: lastId,
                     timeStart,
                     timeEnd,
                     title: `Crew ${crewLetter}`,
                     resources: [],
-                });
-                addResource(lastId);
+                };
+                crews.value.push(newCrew);
+                addResource(newCrew.id);
             };
             const removeCrew = (crewId: number) => {
                 crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);

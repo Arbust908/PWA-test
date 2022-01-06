@@ -103,7 +103,7 @@
 
             const addResource = (crewId: number): void => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-                const lastId = selectedCrew.resources.length;
+                const lastId = selectedCrew.resources.length; // ***
                 selectedCrew.resources.push({
                     ...defaultResource,
                     id: lastId,
