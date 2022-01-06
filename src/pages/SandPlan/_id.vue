@@ -204,6 +204,7 @@
             const instance = axios.create({
                 baseURL: api,
             });
+
             const defaultStage = {
                 id: -1,
                 innerId: 0,
@@ -219,6 +220,7 @@
                 sandPlanId: 0,
                 status: 0,
             };
+
             const currentSandPlan = reactive({
                 id: -1,
                 companyId: -1,
@@ -296,9 +298,9 @@
             const duplicateStage = (stage) => {
                 const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
                 // SOLUCION TEMPORAL PARA DUPLICADO DE INNER ID
-                const lastStageId = { innerId: Number(lastStage.innerId) + 100000 || 0 };
+                const lastStageId = { innerId: Number(lastStage?.innerId) + 100000 || 0 };
                 const id = { id: null };
-                const lastStageStage = { stage: lastStage.stage + 1 };
+                const lastStageStage = { stage: lastStage?.stage + 1 } || 0;
                 const newStatus = { status: 0 };
                 const newStage = {
                     ...stage,
@@ -373,8 +375,28 @@
             });
             // << SAND
 
+            const minSandsAmount = (stages) => {
+                let check = false;
+                stages.forEach((stage) => {
+                    if (
+                        stage.sandId1 !== null &&
+                        stage.sandId1 !== -1 &&
+                        stage.quantity1 > 0 &&
+                        stage.sandId2 !== null &&
+                        stage.sandId2 !== -1 &&
+                        stage.quantity2 > 0
+                    ) {
+                        check = true;
+                    } else {
+                        check = false;
+                    }
+                });
+                return check;
+            };
+
             const isFull = computed(() => {
-                return true;
+                const minSands = minSandsAmount(currentSandPlan.stages);
+                return !!minSands;
             });
 
             // MODALS

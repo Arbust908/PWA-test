@@ -103,7 +103,7 @@
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
-                        :stagesAmount="currentSandPlan.stages.length"
+                        :stagesAmount="currentSandPlan.stages.length - 1"
                         :actions="actions"
                         editing-key="innerId"
                         @editStage="editStage"
@@ -191,6 +191,7 @@
             const instance = axios.create({
                 baseURL: api,
             });
+
             const currentSandPlan: SandPlan = reactive({
                 companyId: -1,
                 pitId: -1,
@@ -317,8 +318,28 @@
                 }
             });
 
+            const minSandsAmount = (stages) => {
+                let check = false;
+                stages.forEach((stage) => {
+                    if (
+                        stage.sandId1 !== null &&
+                        stage.sandId1 !== -1 &&
+                        stage.quantity1 > 0 &&
+                        stage.sandId2 !== null &&
+                        stage.sandId2 !== -1 &&
+                        stage.quantity2 > 0
+                    ) {
+                        check = true;
+                    } else {
+                        check = false;
+                    }
+                });
+                return check;
+            };
+
             // << SAND
             const isFull = computed(() => {
+                const minSands = minSandsAmount(currentSandPlan.stages);
                 const noZeroSandTypeNull =
                     (currentSandPlan.stages[0].sandId1 !== null && currentSandPlan.stages[0].sandId1 !== -1) ||
                     (currentSandPlan.stages[0].sandId2 !== null && currentSandPlan.stages[0].sandId2 !== -1) ||
@@ -336,7 +357,8 @@
                     currentSandPlan.stages.length > 0 &&
                     currentSandPlan.stages.length <= 40 &&
                     noZeroSandTypeNull &&
-                    noZeroSandTypeZero
+                    noZeroSandTypeZero &&
+                    minSands
                 );
             });
 

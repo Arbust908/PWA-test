@@ -6,7 +6,7 @@
                 <FieldSelect
                     field-name="sandType1"
                     placeholder="Seleccionar"
-                    endpoint="/sand"
+                    :endpoint-data="sandTypes1"
                     endpoint-key="type"
                     :data="stage.sandId1"
                     @update:data="stage.sandId1 = $event"
@@ -16,6 +16,7 @@
                     field-name="sandQuantity1"
                     placeholder="0 t"
                     type="number"
+                    maxNumberAmount="9999"
                     :post="{ title: '0', value: 't' }"
                     :data="stage.quantity1"
                     @update:data="stage.quantity1 = $event"
@@ -25,7 +26,7 @@
                 <FieldSelect
                     field-name="sandType2"
                     placeholder="Seleccionar"
-                    endpoint="/sand"
+                    :endpoint-data="sandTypes2"
                     endpoint-key="type"
                     :data="stage.sandId2"
                     @update:data="stage.sandId2 = $event"
@@ -35,6 +36,7 @@
                     field-name="sandQuantity2"
                     placeholder="0 t"
                     type="number"
+                    maxNumberAmount="9999"
                     :post="{ title: '0', value: 't' }"
                     :data="stage.quantity2"
                     @update:data="stage.quantity2 = $event"
@@ -44,7 +46,7 @@
                 <FieldSelect
                     field-name="sandType3"
                     placeholder="Seleccionar"
-                    endpoint="/sand"
+                    :endpoint-data="sandTypes3"
                     endpoint-key="type"
                     :data="stage.sandId3"
                     @update:data="stage.sandId3 = $event"
@@ -54,6 +56,7 @@
                     field-name="sandQuantity3"
                     placeholder="0 t"
                     type="number"
+                    maxNumberAmount="9999"
                     :post="{ title: '0', value: 't' }"
                     :data="stage.quantity3"
                     @update:data="stage.quantity3 = $event"
@@ -63,7 +66,7 @@
                 <FieldSelect
                     field-name="sandType4"
                     placeholder="Seleccionar"
-                    endpoint="/sand"
+                    :endpoint-data="sandTypes4"
                     endpoint-key="type"
                     :data="stage.sandId4"
                     @update:data="stage.sandId4 = $event"
@@ -73,6 +76,7 @@
                     field-name="sandQuantity4"
                     placeholder="0 t"
                     type="number"
+                    maxNumberAmount="9999"
                     :post="{ title: '0', value: 't' }"
                     :data="stage.quantity4"
                     @update:data="stage.quantity4 = $event"
@@ -81,8 +85,8 @@
         </template>
         <template v-else>
             <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-center">
-                <template v-if="(sands.length > 0 && stage.sandId1 > 0) || stage.quantity1 > 0">
-                    <p v-if="sands.length > 0 && stage.sandId1 >= 0">
+                <template v-if="stage.sandId1 > 0 || stage.quantity1 > 0">
+                    <p v-if="stage.sandId1 > 0">
                         {{ getSand(Number(stage.sandId1))?.type }}
                     </p>
                     <p v-else>Tipo sin seleccionar</p>
@@ -94,8 +98,8 @@
                 </template>
             </td>
             <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-center">
-                <template v-if="(sands.length > 0 && stage.sandId2 >= 0) || stage.quantity2 > 0">
-                    <p v-if="sands.length > 0 && stage.sandId2 >= 0">
+                <template v-if="stage.sandId2 > 0 || stage.quantity2 > 0">
+                    <p v-if="stage.sandId2 > 0">
                         {{ getSand(Number(stage.sandId2))?.type }}
                     </p>
                     <p v-else>Tipo sin seleccionar</p>
@@ -107,8 +111,8 @@
                 </template>
             </td>
             <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-center">
-                <template v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0">
-                    <p v-if="sands.length > 0 && stage.sandId3 >= 0">
+                <template v-if="stage.sandId3 > 0 || stage.quantity3 > 0">
+                    <p v-if="stage.sandId3 > 0">
                         {{ getSand(Number(stage.sandId3))?.type }}
                     </p>
                     <p v-else>Tipo sin seleccionar</p>
@@ -120,8 +124,8 @@
                 </template>
             </td>
             <td class="text-gray-500 px-3 py-4 whitespace-nowrap text-sm text-center">
-                <template v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0">
-                    <p v-if="sands.length > 0 && stage.sandId4 >= 0">
+                <template v-if="stage.sandId4 > 0 || stage.quantity4 > 0">
+                    <p v-if="stage.sandId4 > 0">
                         {{ getSand(Number(stage.sandId4))?.type }}
                     </p>
                     <p v-else>Tipo sin seleccionar</p>
@@ -158,6 +162,7 @@
     import { Sand } from '@/interfaces/sandflow';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import DropdownBtn from '@/components/ui/buttons/DropdownBtn.vue';
+    import { useApi } from '@/helpers/useApi';
 
     export default defineComponent({
         components: {
@@ -202,8 +207,53 @@
             },
         },
         setup(props, { emit }) {
-            const { stage, editing, sands, pos, editingKey } = toRefs(props);
+            const { stage, editing, sands, pos, editingKey, stagesAmount } = toRefs(props);
             stage.value.stage = pos.value;
+
+            const { read: getSands } = useApi('/sand');
+
+            const backupSandTypes = getSands();
+            console.log(backupSandTypes.value);
+
+            const sandTypes1 = computed(() => {
+                return backupSandTypes?.value?.filter((sand) => {
+                    return (
+                        sand.id !== stage.value.sandId2 &&
+                        sand.id !== stage.value.sandId3 &&
+                        sand.id !== stage.value.sandId4
+                    );
+                });
+            });
+
+            const sandTypes2 = computed(() => {
+                return backupSandTypes?.value?.filter((sand) => {
+                    return (
+                        sand.id !== stage.value.sandId1 &&
+                        sand.id !== stage.value.sandId3 &&
+                        sand.id !== stage.value.sandId4
+                    );
+                });
+            });
+
+            const sandTypes3 = computed(() => {
+                return backupSandTypes?.value?.filter((sand) => {
+                    return (
+                        sand.id !== stage.value.sandId1 &&
+                        sand.id !== stage.value.sandId2 &&
+                        sand.id !== stage.value.sandId4
+                    );
+                });
+            });
+
+            const sandTypes4 = computed(() => {
+                return backupSandTypes?.value?.filter((sand) => {
+                    return (
+                        sand.id !== stage.value.sandId1 &&
+                        sand.id !== stage.value.sandId2 &&
+                        sand.id !== stage.value.sandId3
+                    );
+                });
+            });
 
             const totalWheight = computed(() => {
                 return (
@@ -228,7 +278,8 @@
                 emit('saveStage', stage.value);
             };
             const duplicateStage = () => {
-                emit('duplicateStage', stage.value);
+                console.log(stage.value.quantity1);
+                // emit('duplicateStage', stage.value);
             };
             const deleteStage = () => {
                 emit('deleteStage', stage.value);
@@ -275,6 +326,9 @@
                 },
                 {
                     label: 'Eliminar',
+                    hide: () => {
+                        return !(stagesAmount.value < 2);
+                    },
                     callback: () => {
                         deleteStage();
                     },
@@ -289,6 +343,11 @@
                 stage,
                 editing,
                 sands,
+                sandTypes1,
+                sandTypes2,
+                sandTypes3,
+                sandTypes4,
+                backupSandTypes,
                 totalWheight,
                 getSand,
                 duplicateStage,
