@@ -18,6 +18,22 @@ export const validateEquipment = (
     );
 };
 
-export const validateOrder = (clientId: number, companyId: number, pad: string, pits: Array<string>) => {
-    return !!(clientId > -1 && companyId > -1 && pad !== '' && pits.length > 0 && pits.every((pit) => pit !== ''));
+export const validateOrder = (clientId: number, pad: string, pits: Array<any>) => {
+    return !!(clientId > -1 && pad !== '' && pits.length > 0 && pits.every((pit) => pit.name !== ''));
+};
+
+export const validateHumanResourses = (crews: Array<any>) => {
+    return !!(
+        crews &&
+        crews.length > 0 &&
+        crews.every((group: Crew) => {
+            const resourcesFull =
+                group.resources.length > 0 &&
+                group.resources.every((resource: HumanResource) => {
+                    return resource.rol !== '' && resource.name !== '';
+                });
+
+            return group.timeStart && group.timeEnd && resourcesFull;
+        })
+    );
 };
