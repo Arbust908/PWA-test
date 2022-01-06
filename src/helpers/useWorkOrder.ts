@@ -8,9 +8,7 @@ export const validateEquipment = (
 ) => {
     return !!(
         cradleId > -1 &&
-        cradleIdBackup > -1 &&
         forkliftId > -1 &&
-        forkliftIdBackup > -1 &&
         traktors.length > 0 &&
         traktors.every((traktor) => traktor.chassis !== '' && traktor.supplier !== '') &&
         pickups.length > 0 &&
