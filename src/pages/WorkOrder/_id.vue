@@ -117,11 +117,9 @@
             const isDraft = ref(true);
             const toggleDraft = useToggle(isDraft);
             const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
-            /* let currentWorkOrder = workOrders.find((wo) => {
-                return wo.id == id;
-            }) */ const currentWorkOrder = ref(
+            const currentWorkOrder = ref(
                 workOrders.find((wo) => {
-                    return wo.id == id;
+                    return wo.id == Number(id);
                 })
             );
 
