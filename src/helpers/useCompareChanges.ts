@@ -1,6 +1,5 @@
-// WIP
 interface CompareActionables {
-    new: Array<any>;
+    create: Array<any>;
     changed: Array<any>;
     deleted: Array<any>;
     unchanged: Array<any>;
@@ -8,11 +7,16 @@ interface CompareActionables {
 
 export function useCompareChanges(original: Array<any>, backup: Array<any>): CompareActionables {
     const result: CompareActionables = {
-        new: [],
+        create: [],
         changed: [],
         deleted: [],
         unchanged: [],
     };
+
+    if (original.length === 0 && backup.length === 0) {
+        return result;
+    }
+
     const isGlobalSame = deepCompare(original, backup);
 
     if (isGlobalSame) {
@@ -21,14 +25,25 @@ export function useCompareChanges(original: Array<any>, backup: Array<any>): Com
         return result;
     }
 
-    if (original.length === 0 && backup.length === 0) {
-        return result;
-    }
-
     for (let i = 0; i < original.length; i++) {
         const originalEle = original[i];
-        for (let j = 0; j < backup.length; j++) {
-            const backupEle = backup[j];
+        const foundEle = backup.find((ele) => ele.id === originalEle.id);
+
+        if (foundEle && deepCompare(originalEle, foundEle)) {
+            result.unchanged.push(originalEle);
+        } else if (foundEle) {
+            result.changed.push(originalEle);
+        } else {
+            result.create.push(originalEle);
+        }
+    }
+
+    for (let i = 0; i < backup.length; i++) {
+        const backupEle = backup[i];
+        const foundEle = original.find((ele) => ele.id === backupEle.id);
+
+        if (!foundEle) {
+            result.deleted.push(backupEle);
         }
     }
 

@@ -93,7 +93,7 @@
                     <div v-else class="slot without-box">
                         <span class="station-title">Estación {{ index + 1 }} - Sin caja</span>
                     </div>
-                    <button class="calibrate">Calibrar E{{ index + 1 }}</button>
+                    <!-- <button class="calibrate">Calibrar E{{ index + 1 }}</button> -->
                 </div>
             </section>
         </section>
