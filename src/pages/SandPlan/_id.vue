@@ -20,7 +20,14 @@
                             <span>Pozo</span>
                             <span>{{ selectedPitName }}</span>
                         </h2>
-                        <button class="flex items-center" @click.prevent="addStage">
+                        <button
+                            :class="
+                                currentSandPlan.stages.length < 40
+                                    ? 'flex items-right'
+                                    : 'flex items-right cursor-not-allowed'
+                            "
+                            @click.prevent="addStage"
+                        >
                             <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
                             <span class="font-bold"> Agregar etapa </span>
                         </button>
@@ -273,6 +280,9 @@
             });
 
             const addStage = () => {
+                if (currentSandPlan.stages?.length >= 40) {
+                    return;
+                }
                 duplicateStage(defaultStage);
             };
 
