@@ -253,15 +253,19 @@
             const save = async () => {
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId < 0) {
                     pN.value = {
+                        textArena: 'Arena',
                         sandProviderId: Number(sandProviderIds.value[0].id),
                         data: {
                             sandOrders: sandProviderIds.value[0].SandOrders,
                         },
+                        sandId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandTypeId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
                     };
                 }
 
                 if (transportOrder.value[0].transportProviderId > 0 && sandProviderIds.value[0].id < 0) {
                     pN.value = {
+                        textTransporte: 'Transporte',
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
                         data: {
                             cantidadCamiones: Number(transportOrder.value[0].amount),
@@ -281,6 +285,8 @@
                             observations: transportOrder.value[0].observation,
                         },
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
+                        sandId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandTypeId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
                     };
                 }
 
