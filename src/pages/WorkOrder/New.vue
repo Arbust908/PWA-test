@@ -24,16 +24,11 @@
             </nav>
             <OrderSection
                 v-if="WO_section === 'orden'"
-                :client-id="clientId"
-                :service-company-id="serviceCompanyId"
-                :pad="pad"
-                :pits="pits"
-                :is-full="isOrderFull"
-                @update:clientId="clientId = $event"
-                @update:serviceCompanyId="serviceCompanyId = $event"
-                @update:pad="pad = $event"
-                @update:pits="pits = $event"
-                @update:isFull="isOrderFull = $event"
+                v-model:client-id="clientId"
+                v-model:service-company-id="serviceCompanyId"
+                v-model:pad="pad"
+                v-model:pits="pits"
+                v-model:is-full="isOrderFull"
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
@@ -71,74 +66,89 @@
             />
             <footer
                 :class="isLastSection() ? 'justify-between' : 'justify-end'"
-                class="p-4 gap-3 flex flex-col md:flex-row"
+                class="mt-8 p-4 gap-3 flex flex-col md:flex-row"
             >
                 <section v-if="isLastSection()" class="pb-4 mb-2 border-b md:pb-0 md:mb-0 md:border-none">
                     <GhostBtn
-                        class="
-                            w-full
-                            border-2
-                            rounded
-                            border-green-600 border-opacity-60
-                            md:w-auto
-                            justify-center
-                            sm:border-0
-                        "
+                        btn="text-green-700  border !border-green-700 hover:bg-second-100"
                         @click.prevent="addCrew"
                     >
                         Agregar Crew
                     </GhostBtn>
                 </section>
-                <section class="gap-6 flex flex-wrap items-center justify-center sm:justify-end">
-                    <NoneBtn class="order-last sm:order-none" @click.prevent="$router.push('/orden-de-trabajo')">
-                        Cancelar
-                    </NoneBtn>
-                    <GhostBtn class="w-1/2 md:w-max" @click="save()">
-                        <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
-                        <span> Guardar Provisorio </span>
-                    </GhostBtn>
-                    <PrimaryBtn v-if="isLoading" disabled> Guardando... </PrimaryBtn>
-                    <PrimaryBtn v-else-if="!isLastSection()" @click="nextSection"> Siguiente </PrimaryBtn>
-                    <PrimaryBtn v-else :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
-                        Finalizar
-                    </PrimaryBtn>
-                </section>
             </footer>
         </section>
+        <!-- *** -->
+        <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
+            <section class="gap-6 flex flex-wrap items-right">
+                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')">Cancelar</SecondaryBtn>
+                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                    <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
+                    <span> Guardar Provisorio </span>
+                </GhostBtn>
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection">
+                    Siguiente
+                </PrimaryBtn>
+                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                    Finalizar
+                </PrimaryBtn>
+            </section>
+        </footer>
+        <SuccessModal
+            :open="showModal"
+            text="¡La orden de trabajo fue guardada con éxito!"
+            @close="$router.push('/orden-de-trabajo')"
+            @main="$router.push('/orden-de-trabajo')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            text="Hubo un problema al intentar guardar."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            text="¡Ups! Hubo un problema y no pudimos guardar la orden de trabajo."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, ComputedRef, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useToggle, useTitle } from '@vueuse/core';
     import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
     import OrderSection from '@/components/workOrder/Order.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import { validateOrder, validateEquipment, validateHumanResourses } from '@/helpers/useWorkOrder';
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     const api = import.meta.env.VITE_API_URL || '/api';
     // TIPOS
     import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/sandflow';
+    // MODAL
+    // const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
+    const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
+    const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
 
     export default {
         components: {
             BookmarkIcon,
+            CheckCircleIcon,
+            EquipmentSection,
+            ErrorModal,
             GhostBtn,
             Layout,
-            CheckCircleIcon,
-            PrimaryBtn,
-            NoneBtn,
             OrderSection,
-            EquipmentSection,
+            PrimaryBtn,
             RRHHSection,
+            SecondaryBtn,
+            SuccessModal,
         },
         setup() {
             // Init
@@ -298,19 +308,24 @@
                 WO_section.value = section_order[currentSectionIndex() + 1];
             };
             // Is the Order section is full
-            const isOrderFull = ref(false);
+            const isOrderFull = computed(() => {
+                return validateOrder(clientId.value, pad.value, pits.value);
+            });
+
             // Is the Equipment section is full
-            const isEquipmentFull = ref(false);
-            // Is the RRHH section is full
-            const isRRHHFull: ComputedRef<boolean> = computed(() => {
-                return !!(
-                    crews.value.length > 0 &&
-                    crews.value[0].timeStart &&
-                    crews.value[0].timeEnd &&
-                    crews.value[0].resources.length > 0 &&
-                    crews.value[0].resources[0].role !== '' &&
-                    crews.value[0].resources[0].name !== ''
+            const isEquipmentFull = computed(() => {
+                return validateEquipment(
+                    operativeCradleId.value,
+                    backupCradleId.value,
+                    operativeForkliftId.value,
+                    backupForkliftId.value,
+                    traktors.value,
+                    pickups.value
                 );
+            });
+            // Is the RRHH section is full
+            const isRRHHFull = computed(() => {
+                return validateHumanResourses(crews.value);
             });
             // Is all sections full
             const isAllFull = computed(() => {
@@ -322,6 +337,17 @@
                 removeEmptyPickups();
                 removeEmptyCrews();
             };
+
+            // MODAL
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
+
             // :: SAVE
             const save = async (draft = true) => {
                 toggleLoading(true);
@@ -371,7 +397,7 @@
 
                 try {
                     const { data: WODone } = useAxios('/workOrder', { method: 'POST', data: newWO }, instance);
-                    watch(WODone, (newVal, _) => {
+                    watch(WODone, async (newVal, _) => {
                         console.log('nuevo', newVal);
 
                         if (newVal && newVal.data && newVal.data.id) {
@@ -385,7 +411,6 @@
                                     const { id, ...newPit } = pit;
                                     newPit.companyId = newWO.clientId;
                                     newPit.workOrderId = workOrderId;
-                                    console.log('NewPit', newPit);
                                     const { data } = useAxios('/pit', { method: 'POST', data: newPit }, instance);
                                     isPitsFinished.value.push(data);
                                 });
@@ -394,64 +419,40 @@
 
                             if (traktors.value.length > 0) {
                                 const isTraktorsFinished = ref([]);
-                                traktors.value.forEach((traktor) => {
-                                    console.log(traktor);
+                                for (const traktor of traktors.value) {
                                     const { id, ...newTraktor } = traktor;
                                     newTraktor.workOrderId = workOrderId;
-                                    const { data, isFinished } = useAxios(
-                                        '/traktor',
-                                        { method: 'POST', data: newTraktor },
-                                        instance
-                                    );
-                                    isTraktorsFinished.value.push(data);
-                                });
-                                console.log(isTraktorsFinished.value);
+                                    await axios.post(api + '/traktor', newTraktor);
+                                }
                             }
 
                             if (pickups.value.length > 0) {
                                 const isPickupFinished = ref([]);
-                                pickups.value.forEach((pickup) => {
+                                for (const pickup of pickups.value) {
                                     const { id, ...newPickup } = pickup;
                                     newPickup.workOrderId = workOrderId;
-                                    const { data } = useAxios('/pickup', { method: 'POST', data: newPickup }, instance);
-                                    isPickupFinished.value.push(data);
-                                });
+                                    await axios.post(api + '/pickup', newPickup);
+                                }
                             }
 
                             if (crews.value.length > 0) {
-                                const isCrewsFinished = ref([]);
-                                crews.value.forEach((crew) => {
+                                for (const crew of crews.value) {
                                     const { id, ...newCrew } = crew;
                                     newCrew.workOrderId = workOrderId;
-                                    console.log('crew', newCrew);
-                                    const { data } = useAxios('/crew', { method: 'POST', data: newCrew }, instance);
-                                    isCrewsFinished.value.push(data);
-                                    watch(data, (newVal, _) => {
-                                        crew.resources.forEach((resource) => {
-                                            const crewId = newVal.data.id;
-                                            const { id, ...newResource } = resource;
-                                            newResource.crewId = crewId;
-                                            const { data: dataRH } = useAxios(
-                                                '/humanResource',
-                                                { method: 'POST', data: newResource },
-                                                instance
-                                            );
-                                        });
-                                    });
-                                });
-                                console.log(isCrewsFinished.value);
+                                    const createdCrew = await axios.post(api + '/crew', newCrew);
+                                    for (const rrhh of crew.resources) {
+                                        const crewId = createdCrew.data.data.id;
+                                        const { id, ...newResource } = rrhh;
+                                        newResource.crewId = crewId;
+                                        await axios.post(api + '/humanResource', newResource);
+                                    }
+                                }
                             }
-                            // store.dispatch('saveWorkOrder', newVal.data);
-                            setTimeout(() => {
-                                toggleLoading(false);
-                                setTimeout(() => {
-                                    // Modal de procesasando?
-                                    router.push('/orden-de-trabajo');
-                                }, 100);
-                            }, 1000);
                         }
+                        toggleModal();
                     });
                 } catch (error) {
+                    toggleApiErrorModal();
                     console.log(error);
                 }
             };
@@ -487,6 +488,12 @@
                 save,
                 isAllFull,
                 isLoading,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
             };
         },
     };

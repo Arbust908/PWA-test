@@ -6,7 +6,7 @@
         </div>
         <div class="flex flex-col justify-between">
             <div>
-                <p class="text-sm font-bold leading-tight">Piso: {{ floor }}</p>
+                <p class="text-sm font-bold leading-tight">Nivel: {{ floor }}</p>
                 <p class="text-sm font-bold leading-tight">Columna: {{ col }}</p>
                 <p class="text-sm font-bold leading-tight">Fila: {{ row }}</p>
             </div>
@@ -44,7 +44,7 @@
             },
             category: {
                 type: String,
-                required: true,
+                default: '',
             },
             choosedBox: {
                 type: Object,

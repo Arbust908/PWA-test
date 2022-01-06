@@ -8,11 +8,12 @@
             :id="fieldName"
             v-model.number="value"
             class="input"
-            :class="noOptionSelected && 'unselected'"
+            :class="selectClasses"
             :name="fieldName"
+            :disabled="isDisabled"
             @blur="$emit('is-blured')"
         >
-            <option disabled value="-1">
+            <option selected value="-1">
                 {{ placeholder }}
             </option>
             <option v-for="(res, i) in resources" :key="res?.id + i" :value="res?.id">
@@ -26,9 +27,10 @@
 </template>
 
 <script>
-    import { defineComponent, computed, ref, toRefs, watchEffect } from 'vue';
+    import { defineComponent, computed, ref, toRefs, watch, watchEffect } from 'vue';
     import { useVModel } from '@vueuse/core';
     import { useApi } from '@/helpers/useApi';
+    import { addVisibleFilter } from '@/helpers/useUrlHelpers';
     import FieldTitle from '@/components/ui/form/FieldTitle.vue';
 
     export default defineComponent({
@@ -38,6 +40,7 @@
         },
         props: {
             data: {
+                type: [Array, Object, Boolean, String, Number],
                 default: '',
             },
             fieldName: {
@@ -68,10 +71,6 @@
                 type: Boolean,
                 default: false,
             },
-            filteredData: {
-                type: Array,
-                required: false,
-            },
             requireValidation: {
                 type: Boolean,
                 required: false,
@@ -79,18 +78,32 @@
             validationType: {
                 type: String,
                 required: false,
+                default: null,
             },
             entity: {
                 type: String,
                 required: false,
+                default: null,
+            },
+            isDisabled: {
+                type: Boolean,
+                default: false,
+            },
+            // ***
+            onlyVisible: {
+                type: Boolean,
+                default: true,
+            },
+            selectClass: {
+                type: Boolean,
             },
         },
         setup(props, { emit }) {
-            const { filteredData } = toRefs(props);
             const value = useVModel(props, 'data', emit);
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
-                const { read } = useApi(props.endpoint);
+                const endpoint = addVisibleFilter(props.endpoint);
+                const { read } = useApi(endpoint);
 
                 return read();
             };
@@ -100,25 +113,23 @@
                 return props.endpoint === '/' ? endpointData.value : null;
             });
 
-            if (props.endpoint !== '/' && props.endpoint !== null && !props.filteredData) {
+            if (props.endpoint !== '/' && props.endpoint !== null) {
                 resources = getApiVal();
             }
 
-            watchEffect(() => {
-                if (props.filteredData && props.filteredData.length > 0) {
-                    resources.value = filteredData.value;
-                }
-            });
-
             const noOptionSelected = computed(() => value.value === -1);
+
+            const selectClasses = computed(() => {
+                return props.selectClass && value.value === -1 ? 'error' : null;
+            });
 
             return {
                 value,
                 resources,
                 epData,
-                filteredData,
                 ...props,
                 noOptionSelected,
+                selectClasses,
             };
         },
     });
@@ -137,5 +148,8 @@
     }
     .unselected option:first-child {
         color: #a6a6a6;
+    }
+    .error {
+        @apply border-red-500;
     }
 </style>

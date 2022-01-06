@@ -1,15 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-start space-x-4 items-center mb-4">
-            <h2 class="text-2xl font-semibold text-gray-900">Clientes</h2>
-            <router-link to="/clientes/nuevo">
-                <PrimaryBtn size="sm"
-                    >Crear
-                    <Icon icon="PlusCircle" class="ml-1 w-4 h-4" />
-                </PrimaryBtn>
-            </router-link>
-        </header>
-        <hr />
+        <ABMHeader title="Clientes" link="/clientes/nuevo" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -20,133 +11,111 @@
                 :data="clientId"
                 @update:data="clientId = $event"
             />
-            <div class="col-span-4 mt-7">
+            <div class="col-span-full sm:mt-7 sm:col-span-5">
                 <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
             </div>
         </div>
-        <UiTable class="mt-5">
-            <template #header>
-                <tr>
-                    <th v-for="column in tableColumns" :key="column" scope="col">
-                        <div class="flex justify-center">
-                            {{ column }}
-                            <Icon icon="ArrowUp" class="w-4 h-4" />
-                            <Icon icon="ArrowDown" class="w-4 h-4" />
-                        </div>
-                    </th>
 
-                    <th scope="col">
-                        <span>Acciones</span>
-                    </th>
-                </tr>
+        <VTable
+            class="mt-5"
+            :columns="columns"
+            :items="filteredClients"
+            :actions="actions"
+            empty-text="No hay clientes cargados"
+        >
+            <template #item="{ item }">
+                <!-- Desktop -->
+                <td :class="item.name ? null : 'empty'">
+                    {{ item.name || 'Sin definir' }}
+                </td>
+
+                <td :class="item.legalId ? null : 'empty'">
+                    {{ item.legalId || 'Sin definir' }}
+                </td>
+
+                <td :class="item.companyRepresentative ? null : 'empty'">
+                    {{ item.companyRepresentative.name || 'Sin definir' }}
+                </td>
+
+                <td :class="item.companyRepresentative ? null : 'empty'">
+                    {{ item.companyRepresentative.phone || 'Sin definir' }}
+                </td>
+
+                <td class="text-center" :class="item ? null : 'empty'">
+                    <Badge v-if="item.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
+                    <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
+                </td>
             </template>
+
+            <!-- Mobile -->
+            <template #mobileTitle="{ item }">
+                {{ item.name }}
+            </template>
+
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Domicilio: </span>{{ item.address }}
+            </template>
+        </VTable>
+
+        <DisableModal
+            :open="showModal"
+            title="¿Desea inhabilitar este cliente?"
+            text="Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación"
+            @close="showModal = false"
+            @main="confirmModal"
+        />
+
+        <Backdrop :open="showBackdrop" title="Ver más" @close="showBackdrop = false">
             <template #body>
-                <tr
-                    v-for="(client, cKey) in filteredClients"
-                    :key="client.id"
-                    :class="cKey % 2 === 0 ? 'even' : 'odd'"
-                    class="body-row"
-                >
-                    <td :class="client.name ? null : 'empty'">
-                        {{ client.name || 'Sin definir' }}
-                    </td>
-                    <td :class="client.legalId ? null : 'empty'">
-                        {{ client.legalId || 'Sin definir' }}
-                    </td>
-                    <td :class="client.companyRepresentative ? null : 'empty'">
-                        {{ client.companyRepresentative.name || 'Sin definir' }}
-                    </td>
-                    <td :class="client.companyRepresentative ? null : 'empty'">
-                        {{ client.companyRepresentative.phone || 'Sin definir' }}
-                    </td>
-
-                    <td class="text-center" :class="client ? null : 'empty'">
-                        <Badge v-if="client.isOperator" text="SI" classes="bg-gray-500 text-white px-5" />
-                        <Badge v-else text="NO" classes="bg-gray-300 text-gray-600" />
-                    </td>
-
-                    <td>
-                        <div class="btn-panel">
-                            <router-link :to="`/clientes/${client.id}`">
-                                <Popper hover content="Editar">
-                                    <CircularBtn size="xs" class="btn__delete bg-blue-500">
-                                        <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                    </CircularBtn>
-                                </Popper>
-                            </router-link>
-
-                            <Popper hover :content="client.visible ? 'Inhabilitar' : 'Habilitar'">
-                                <CircularBtn
-                                    class="ml-4"
-                                    :class="client.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                    size="xs"
-                                    @click="openModalVisibility(client)"
-                                >
-                                    <Icon
-                                        v-if="client.visible"
-                                        icon="EyeOff"
-                                        type="outlined"
-                                        class="w-6 h-6 text-white"
-                                    />
-                                    <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                                </CircularBtn>
-                            </Popper>
-                        </div>
-                    </td>
-                </tr>
-                <tr v-if="clDB && clDB.length <= 0">
-                    <td colspan="5" class="emptyState">
-                        <p>No hay clientes cargados</p>
-                    </td>
-                </tr>
+                <p class="!text-lg !text-black">{{ selectedClient.name }}</p>
+                <p class="mt-2">
+                    <strong>CUIT: </strong>
+                    {{ selectedClient.legalId }}
+                </p>
+                <p class="mt-2">
+                    <strong>Representante: </strong>
+                    {{ selectedClient.companyRepresentative?.name }}
+                </p>
+                <p class="mt-2">
+                    <strong>Teléfono: </strong>
+                    {{ selectedClient.companyRepresentative?.phone }}
+                </p>
+                <p class="mt-2">
+                    <strong>Operadora: </strong>
+                    {{ selectedClient.isOperator ? 'SI' : 'NO' }}
+                </p>
             </template>
-        </UiTable>
-
-        <Modal title="¿Desea inhabilitar este cliente?" type="error" :open="showModal">
-            <template #body>
-                <div>Una vez inhabilitado, no podrá utilizar este cliente en ninguna otra sección de la aplicación</div>
-                <div></div>
-            </template>
-            <template #btn>
-                <div class="flex justify-center gap-5 btn">
-                    <GhostBtn class="outline-none" @click="showModal = false"> Volver </GhostBtn>
-                    <PrimaryBtn btn="btn__warning" @click="confirmModal">Inhabilitar cliente </PrimaryBtn>
-                </div>
-            </template>
-        </Modal>
+        </Backdrop>
     </Layout>
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
-    import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import UiTable from '@/components/ui/TableWrapper.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import Modal from '@/components/modal/General.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
-    import Popper from 'vue3-popper';
+    import Backdrop from '@/components/modal/Backdrop.vue';
+    import DisableModal from '@/components/modal/DisableModal.vue';
 
-    import { useStore } from 'vuex';
     import axios from 'axios';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default {
         components: {
+            Backdrop,
+            Badge,
+            DisableModal,
+            FieldSelect,
+            GhostBtn,
+            Icon,
             Layout,
             PrimaryBtn,
-            CircularBtn,
-            GhostBtn,
-            UiTable,
-            Icon,
-            FieldSelect,
-            Badge,
-            Modal,
-            Popper,
+            VTable,
+            ABMHeader,
         },
         setup() {
             useTitle('Clientes <> Sandflow');
@@ -156,7 +125,52 @@
             const clientId = ref(-1);
             const selectedClient = ref(null);
             const showModal = ref(false);
-            const tableColumns = ['Cliente', 'CUIT', 'Representante', 'Teléfono', 'Operadora'];
+            const router = useRouter();
+            const showBackdrop = ref(false);
+
+            const columns = [
+                { title: 'Cliente', key: 'name', sortable: true },
+                { title: 'CUIT', key: 'legalId', sortable: true },
+                { title: 'Representante', key: 'companyRepresentative.name', sortable: true },
+                { title: 'Teléfono', key: 'companyRepresentative.phone', sortable: true },
+                { title: 'Operadora', key: 'operadora' },
+                { title: '', key: 'actions' },
+            ];
+
+            const actions = [
+                {
+                    label: 'Ver más',
+                    onlyMobile: true,
+                    callback: (item) => {
+                        selectedClient.value = item;
+                        showBackdrop.value = true;
+                    },
+                },
+                {
+                    label: 'Editar',
+                    callback: (item) => {
+                        router.push(`/clientes/${item.id}`);
+                    },
+                },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+            ];
 
             const headers = {
                 'Content-Type': 'Application/JSON',
@@ -233,7 +247,10 @@
                 openModalVisibility,
                 confirmModal,
                 showModal,
-                tableColumns,
+                columns,
+                actions,
+                showBackdrop,
+                selectedClient,
             };
         },
     };

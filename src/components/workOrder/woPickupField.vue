@@ -21,7 +21,7 @@
             <CircularBtn
                 v-if="pickups.length > 1"
                 class="btn__delete"
-                :class="pickupI == 0 ? 'mt-6' : 'mt-2'"
+                :class="pickupI == 0 ? 'mt-7' : 'mt-4'"
                 @click="remove(pickup.id)"
                 size="sm"
             >

@@ -4,8 +4,8 @@
             <FieldInput
                 class="col-span-full"
                 field-name="transportName"
-                placeholder="Ingresar Nombre / Razón Social"
-                title="Nombre / Razón Social"
+                placeholder=""
+                title="Nombre / Razón social"
                 :data="tpName"
                 require-validation
                 entity="transportProvider"
@@ -14,7 +14,7 @@
             <FieldInput
                 class="col-span-full"
                 field-name="transportId"
-                placeholder="Ingresar CUIT / CUIL"
+                placeholder="Ingresar sólo números"
                 title="CUIT / CUIL"
                 mask="#*"
                 :data="tpId"
@@ -35,7 +35,7 @@
             <FieldTextArea
                 class="col-span-full"
                 field-name="observations"
-                placeholder="Observaciones..."
+                placeholder=""
                 title="Observaciones"
                 :rows="5"
                 is-fixed
@@ -48,9 +48,9 @@
             <FieldLegend>Contacto principal</FieldLegend>
             <FieldInput
                 class="col-span-full"
-                title="Nombre y Apellido"
+                title="Nombre y apellido"
                 field-name="repName"
-                placeholder="Ingresar Nombre y Apellido"
+                placeholder=""
                 :data="crName"
                 require-validation
                 entity="transportProvider"
@@ -60,7 +60,7 @@
                 class="col-span-full"
                 title="Teléfono"
                 field-name="repTel"
-                placeholder="+11 1234 5678"
+                placeholder="Ingresar sólo números"
                 mask="#*"
                 :data="crPhone"
                 require-validation
@@ -69,7 +69,7 @@
             />
             <FieldInput
                 class="col-span-full"
-                title="Email"
+                title="Mail"
                 field-name="repEmail"
                 placeholder="empresa@mail.com"
                 :data="crEmail"
@@ -83,6 +83,7 @@
 </template>
 
 <script lang="ts">
+    // *** SandProvider y TransportProvider tambien usan, deberiamos hacerlo genetico
     import { defineComponent } from 'vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
@@ -141,3 +142,12 @@
         },
     });
 </script>
+
+<style lang="scss" scoped>
+    fieldset:not(:last-of-type) {
+        @apply border-b border-transparent pb-6;
+    }
+    h2 {
+        @apply text-lg font-medium;
+    }
+</style>

@@ -3,35 +3,31 @@
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
             <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Diseño de depósito</h1>
         </header>
-        <section class="deposit bg-second-0 rounded-md shadow-sm">
-            <form method="POST" action="/" class="p-12 flex flex-col gap-4">
+        <section class="deposit bg-second-0 rounded-md shadow-sm overflow-hidden">
+            <form method="POST" action="/" class="p-8 md:p-12 flex flex-col gap-4">
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
-                    <h2 class="col-span-full text-3xl font-bold">Pozo {{ designName }}</h2>
+                    <h2 class="col-span-full text-[24px] font-bold">Pozo {{ designName }}</h2>
                     <ClientPitCombo
                         :client-id="clientId"
                         :pit-id="pitId"
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
                     />
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de filas</h3>
+                    <div class="col-span-4 flex flex-col items-center gap-4">
+                        <h3 class="text-sm">Cantidad de filas</h3>
                         <Counter :amount="rows" @update:amount="rows = $event" />
                     </div>
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de columnas</h3>
+                    <div class="col-span-4 flex flex-col items-center gap-4">
+                        <h3 class="text-sm">Cantidad de columnas</h3>
                         <Counter :amount="cols" @update:amount="cols = $event" />
                     </div>
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de pisos</h3>
-                        <Counter :amount="floors" @update:amount="floors = $event" />
+                    <div class="col-span-4 flex flex-col items-center gap-4">
+                        <h3 class="text-sm">Cantidad de niveles</h3>
+                        <Counter :amount="floors" :max="2" @update:amount="floors = $event" />
                     </div>
-                    <!-- <div class="col-span-3 flex flex-col items-center gap-4">
-            <h3 class="text-xs">Cantidad de ubicación</h3>
-            <Counter />
-          </div> -->
                 </FieldGroup>
                 <fieldset class="py-2 flex gap-x-10 2xl:gap-x-40">
-                    <section class="w-full max-w-[170px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
+                    <section class="w-full max-w-[220px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
                         <h2 class="col-span-full text-xl font-bold">Asignar categoría</h2>
                         <div class="flex flex-col gap-5 ml-4">
                             <label class="type-select" for="aisle">
@@ -90,31 +86,10 @@
                                 <span>Vacio</span>
                             </label>
                         </div>
-                        <!-- <h2 class="col-span-full text-xl font-bold">Asignar ubicación</h2>
-            <div class="flex flex-col gap-5 ml-4">
-              <label class="type-select" for="top">
-                <input
-                  id="aisle"
-                  type="radio"
-                  name="boxCat"
-                  class="form-checkbox"
-                />
-                <span>Pasillo</span>
-              </label>
-              <label class="type-select" for="bot">
-                <input
-                  id="fine"
-                  type="radio"
-                  name="boxCat"
-                  class="form-checkbox"
-                />
-                <span>Arena fina</span>
-              </label>
-            </div> -->
                         <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" />
                     </section>
                     <DepositGrid
-                        class="w-full flex flex-col gap-5"
+                        class="w-full flex flex-col gap-5 overflow-auto"
                         :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
@@ -126,13 +101,12 @@
             </form>
         </section>
 
-        <footer class="mt-5 gap-3 flex justify-end">
-            <section class="space-x-6 flex items-center justify-end">
-                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                    Guardar
-                </PrimaryBtn>
-            </section>
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end items-center">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                Guardar
+            </PrimaryBtn>
         </footer>
     </Layout>
 </template>
@@ -199,6 +173,24 @@
                 for (let c = cols.value; c > 1; c--) {
                     for (let f = floors.value; f > 1; f--) {
                         removeCell(f, row, c);
+                    }
+                }
+            };
+
+            const purgeOffCells = () => {
+                for (const key in deposit.value) {
+                    if (Object.prototype.hasOwnProperty.call(deposit.value, key)) {
+                        const cell = deposit.value[key];
+                        const proxy = key.split('|');
+                        const [Pfloor, Prow, Pcol] = proxy;
+
+                        if (cell === 'DELETED') {
+                            //BOrrar ?
+                        }
+
+                        if (Number(Pfloor) > floors.value || Number(Prow) > rows.value || Number(Pcol) > cols.value) {
+                            removeCell(Number(Pfloor), Number(Prow), Number(Pcol));
+                        }
                     }
                 }
             };
@@ -334,6 +326,7 @@
             });
 
             const save = () => {
+                purgeOffCells();
                 const wH: Warehouse = {
                     clientCompanyId: clientId.value,
                     pitId: pitId.value,

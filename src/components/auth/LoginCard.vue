@@ -56,63 +56,39 @@
                 </div>
 
                 <div>
-                    <PrimaryBtn class="mx-auto" @click.prevent="formValidation"> Iniciar sesión </PrimaryBtn>
+                    <PrimaryBtn class="mx-auto" :loading="loading" @click.prevent="formValidation">
+                        Iniciar sesión
+                    </PrimaryBtn>
                 </div>
             </form>
         </article>
-        <Modal title="Hubo un error" type="error" :open="showModal" @close="toggleModal(false)">
-            <template #body>
-                <div>
-                    Alguno de los datos no coinciden con los datos que tenemos registrados. Volve a ingresar los datos
-                    correctos.
-                </div>
-            </template>
-            <template #btn>
-                <button
-                    type="button"
-                    class="
-                        inline-flex
-                        justify-center
-                        w-full
-                        rounded-md
-                        border border-transparent
-                        shadow-sm
-                        px-4
-                        py-2
-                        bg-red-600
-                        text-base
-                        font-medium
-                        text-second-50
-                        hover:bg-red-700
-                        focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
-                        sm:text-sm
-                    "
-                    @click.prevent="toggleModal(false)"
-                >
-                    Ok
-                </button>
-            </template>
-        </Modal>
+        <ErrorModal
+            :open="showModal"
+            title="Hubo un error"
+            text="Alguno de los datos no coinciden con los datos que tenemos registrados. Volve a ingresar los datos
+                    correctos."
+            @close="toggleModal(false)"
+            @main="toggleModal(false)"
+        />
     </section>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, defineAsyncComponent, defineComponent } from 'vue';
-    import { useRouter } from 'vue-router';
+    import axios from 'axios';
     import { useActions } from 'vuex-composition-helpers';
-    import { Role } from '@/interfaces/sandflow';
+    import { Roles } from '@/interfaces/sandflow';
     import Logo from '@/components/Logo.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import PermissionsManager from '@/helpers/canI';
 
-    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
-    import { useToggle } from '@vueuse/core';
-    import axios from 'axios';
+    const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
     const api = import.meta.env.VITE_API_URL || '/api';
+
     export default defineComponent({
         components: {
             Logo,
             PrimaryBtn,
-            Modal,
+            ErrorModal,
         },
         setup() {
             const usernameError: Ref<boolean> = ref(false);
@@ -124,6 +100,8 @@
             const shouldRemember: Ref<boolean> = ref(true);
             const showModal: Ref<boolean> = ref(false);
             const toggleModal = useToggle(showModal);
+
+            const loading = ref(true);
 
             const validate = (event: any) => {
                 const name: string = event.target.name;
@@ -148,43 +126,87 @@
                     login();
                 }
             };
-            const login = async () => {
-                const loading = ref(true);
-                const email = username.value;
-                const loggedUser = { email, password: password.value };
-                let fullUser = await axios
-                    .post(`${api}/auth/login`, loggedUser)
-                    .catch((err) => {
+            const getFullUser = async (userMail: string) => {
+                const response = await axios.get(`${api}/user?email=${userMail}`).catch((err) => {
+                    console.log(err);
+
+                    return false;
+                });
+                let userRes = response.data.data;
+
+                if (userRes.length <= 0) {
+                    const newResponse = await axios.get(`${api}/user`).catch((err) => {
                         console.log(err);
 
                         return false;
-                    })
-                    .then((res) => {
-                        if (res.status === 200) {
-                            return res.data.data.token || res.data.token;
-                        }
-
-                        return false;
-                    })
-                    .finally(() => {
-                        loading.value = false;
                     });
 
+                    userRes = newResponse.data.data;
+
+                    if (userRes.length <= 0) {
+                        return false;
+                    }
+                }
+
+                return userRes.find((user) => user.email === userMail);
+            };
+            const login = async () => {
+                if (localStorage.getItem('user')) {
+                    localStorage.removeItem('user');
+                }
+
+                const email = username.value;
+                const loggedUser = { email, password: password.value };
+                let response = await axios.post(`${api}/auth/login`, loggedUser).catch((err) => {
+                    console.log(err);
+                    // alert(err);
+
+                    return false;
+                });
+
+                let fullUser;
+                let userPermisions;
+                let userToken;
+
+                if (response.status === 200) {
+                    const permissions = response.data.data.permissions;
+
+                    PermissionsManager.setPermissions([permissions]);
+
+                    fullUser = response.data.data;
+                    userPermisions = fullUser.permissions;
+                    userToken = response.data.data.token;
+                    fullUser = await getFullUser(email);
+                }
+
                 if (fullUser) {
+                    if (!fullUser.visible) {
+                        loading.value = false;
+                        toggleModal(true);
+
+                        return;
+                    }
+
                     fullUser = {
-                        id: 99,
+                        id: fullUser.id,
                         username: username.value,
-                        role: Role.Logged,
-                        token: fullUser,
+                        role: fullUser.roleId,
+                        permissions: userPermisions,
+                        token: userToken,
+                        visible: fullUser.visible,
                     };
 
                     if (shouldRemember.value) {
                         localStorage.setItem('user', JSON.stringify(fullUser));
                     }
                     setUser(fullUser);
+                    loading.value = false;
                     router.push('/');
                 } else {
+                    loading.value = false;
                     toggleModal(true);
+
+                    return;
                 }
             };
 
@@ -199,6 +221,7 @@
                 passwordError,
                 showModal,
                 toggleModal,
+                loading,
             };
         },
     });

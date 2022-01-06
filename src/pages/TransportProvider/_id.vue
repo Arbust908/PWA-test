@@ -1,10 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">
-                Proveedor de transporte - ID {{ id }}
-            </h1>
-        </header>
+        <ABMFormTitle :title="`Proveedor de transporte - ID ${id}`" />
         <section class="flex">
             <section class="w-8/12">
                 <nav class="flex justify-between max-w-2xl bg-white">
@@ -25,53 +21,71 @@
                 </nav>
                 <section v-if="activeSection === 'provider'" class="bg-white rounded-md max-w-2xl shadow-sm">
                     <TransportProviderFrom
-                        :tp-name="newTransportProvider.name"
-                        :tp-id="newTransportProvider.legalId"
-                        :tp-address="newTransportProvider.address"
-                        :tp-observations="newTransportProvider.observations"
-                        :cr-name="companyRepresentative.name"
-                        :cr-phone="companyRepresentative.phone"
-                        :cr-email="companyRepresentative.email"
-                        @update:tpName="newTransportProvider.name = $event"
-                        @update:tpId="newTransportProvider.legalId = $event"
-                        @update:tpAddress="newTransportProvider.address = $event"
-                        @update:tpObservations="newTransportProvider.observations = $event"
-                        @update:crName="companyRepresentative.name = $event"
-                        @update:crPhone="companyRepresentative.phone = $event"
-                        @update:crEmail="companyRepresentative.email = $event"
+                        v-model:tp-name="newTransportProvider.name"
+                        v-model:tp-id="newTransportProvider.legalId"
+                        v-model:tp-address="newTransportProvider.address"
+                        v-model:tp-observations="newTransportProvider.observations"
+                        v-model:cr-name="companyRepresentative.name"
+                        v-model:cr-phone="companyRepresentative.phone"
+                        v-model:cr-email="companyRepresentative.email"
                     />
                 </section>
                 <section v-if="activeSection === 'driver'" class="bg-white rounded-md max-w-2xl shadow-sm">
                     <form method="POST" action="/" class="p-4 max-w-lg">
                         <TransportProviderDriverForm
-                            :driver-name="newDriver.name"
-                            :driver-phone="newDriver.phone"
-                            :driver-email="newDriver.email"
-                            :driver-t-type="newDriver.vehicleType"
-                            :driver-t-id="newDriver.transportId"
-                            :driver-obs="newDriver.observations"
-                            @update:driverName="newDriver.name = $event"
-                            @update:driverPhone="newDriver.phone = $event"
-                            @update:driverEmail="newDriver.email = $event"
-                            @update:driverTType="newDriver.vehicleType = $event"
-                            @update:driverTId="newDriver.transportId = $event"
-                            @update:driverObs="newDriver.observations = $event"
+                            v-model:driver-name="newDriver.name"
+                            v-model:driver-phone="newDriver.phone"
+                            v-model:driver-email="newDriver.email"
+                            v-model:driver-t-type="newDriver.vehicleType"
+                            v-model:driver-t-id="newDriver.transportId"
+                            v-model:driver-t-id2="newDriver.transportId2"
+                            v-model:driver-obs="newDriver.observations"
                             @add-driver="addDriver()"
                         />
                     </form>
                 </section>
-                <footer class="mt-5 gap-3 flex flex-col md:flex-row justify-end max-w-2xl">
-                    <section class="w-full space-x-6 flex items-center justify-end">
-                        <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
+                <section v-if="showDrivers" class="w-full md:w-4/12 mt-12 flex flex-col gap-y-4 md:hidden">
+                    <DriverCard
+                        v-for="(driver, index) in drivers"
+                        :key="index"
+                        :name="driver.name"
+                        :phone="driver.phone"
+                        :email="driver.email"
+                        :vehicle-type="driver.vehicleType"
+                        :transport-id="driver.transportId"
+                        :transport-id2="driver.transportId2"
+                        :observations="driver.observations"
+                        @delete-driver="deleteDriver(index)"
+                        @edit-driver="editDriver(index)"
+                    />
+                </section>
+                <!-- *** -->
+                <footer class="mt-8 gap-3 flex flex-col justify-end max-w-2xl">
+                    <SideBtn v-if="drivers.length" class="md:hidden" btn="full" @click="driversShown = !driversShown">
+                        {{ showDrivers ? driverTabText : 'Volver' }}
+                    </SideBtn>
+                    <section v-if="!showDrivers" class="w-full space-x-3 flex items-center justify-end">
+                        <SecondaryBtn
+                            btn="wide"
+                            @click.prevent="driverRestore(), $router.push('/proveedores-de-transporte')"
+                        >
                             Cancelar
                         </SecondaryBtn>
-                        <PrimaryBtn btn="wide" :disabled="!isValidated ? 'yes' : null" @click="isFull && update()">
+                        <PrimaryBtn
+                            btn="wide"
+                            :disabled="!isFull ? 'yes' : null"
+                            :is-loading="isLoading"
+                            @click="
+                                hasFullNewDriver && addDriver();
+                                isFull && update();
+                            "
+                        >
                             Finalizar
                         </PrimaryBtn>
                     </section>
                 </footer>
             </section>
-            <section class="w-4/12 mt-12 ml-4 flex flex-col gap-y-4">
+            <section class="hidden w-full md:w-4/12 mt-12 ml-4 md:flex flex-col gap-y-4">
                 <DriverCard
                     v-for="(driver, index) in drivers"
                     :key="index"
@@ -80,6 +94,7 @@
                     :email="driver.email"
                     :vehicle-type="driver.vehicleType"
                     :transport-id="driver.transportId"
+                    :transport-id2="driver.transportId2"
                     :observations="driver.observations"
                     @delete-driver="deleteDriver(index)"
                     @edit-driver="editDriver(index)"
@@ -90,35 +105,29 @@
 </template>
 
 <script lang="ts">
-    import { computed, reactive, ref } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
-    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+    import axios from 'axios';
+    import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
+    import { useAxios } from '@vueuse/integrations/useAxios';
+
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import DriverCard from '@/components/transportProvider/DriverCard.vue';
     import Layout from '@/layouts/Main.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    // AXIOS
-    import axios from 'axios';
-    import { useAxios } from '@vueuse/integrations/useAxios';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import TransportProviderDriverForm from '@/components/transportProvider/driverForm.vue';
+    import TransportProviderFrom from '@/components/transportProvider/providerForm.vue';
+
     const api = import.meta.env.VITE_API_URL || '/api';
-    // TIPOS
-    import { TransportProvider, CompanyRepresentative, Driver } from '@/interfaces/sandflow';
 
     export default {
         components: {
-            CircularBtn,
+            ABMFormTitle,
             DriverCard,
-            Icon,
             Layout,
-            SecondaryBtn,
             PrimaryBtn,
-            TransportProviderFrom,
+            SecondaryBtn,
             TransportProviderDriverForm,
+            TransportProviderFrom,
         },
         setup() {
             const store = useStore();
@@ -130,23 +139,46 @@
                 baseURL: api,
             });
 
-            const transportProviders: Array<TransportProvider> = JSON.parse(
-                JSON.stringify(store.state.transportProviders.all)
-            );
-            const currentTransportProvider: TransportProvider = transportProviders.find((sp) => {
-                return sp.id == id;
+            const transportProviders = ref([]);
+            const currentTransportProvider = ref({});
+            const drivers = ref([]);
+            const newTransportProvider = ref({});
+            const companyRepresentative = ref({});
+
+            onMounted(async () => {
+                // TODO: StoreLogic
+                const result = await axios.get(`${api}/transportProvider`);
+                transportProviders.value = result.data.data;
+                currentTransportProvider.value = transportProviders.value.find((sp) => {
+                    return sp.id == id;
+                });
+                drivers.value = currentTransportProvider.value.drivers;
+                newTransportProvider.value = reactive({
+                    name: currentTransportProvider.value.name,
+                    legalId: currentTransportProvider.value.legalId,
+                    address: currentTransportProvider.value.address,
+                    observations: currentTransportProvider.value.observations,
+                    companyRepresentativeId: currentTransportProvider.value.companyRepresentativeId,
+                });
+                companyRepresentative.value = reactive({
+                    name: currentTransportProvider.value.companyRepresentative.name,
+                    phone: currentTransportProvider.value.companyRepresentative.phone,
+                    email: currentTransportProvider.value.companyRepresentative.email,
+                });
             });
-            console.log('ctp', currentTransportProvider);
 
             let activeSection = ref('provider');
 
             const changeSection = (option: string) => {
-                return (activeSection.value = option);
+                activeSection.value = option;
             };
 
-            console.log(currentTransportProvider.drivers);
-            const drivers: Array<Driver> = reactive(currentTransportProvider.drivers);
-            console.log(drivers);
+            const driversShown = ref(false);
+            const showDrivers = computed(() => {
+                const windowWidth = window.innerWidth;
+
+                return driversShown.value && windowWidth > 768;
+            });
 
             let newDriver = reactive({
                 name: '',
@@ -154,6 +186,7 @@
                 email: '',
                 vehicleType: '',
                 transportId: '',
+                transportId2: '',
                 observations: '',
             });
 
@@ -161,15 +194,15 @@
                 const driver = { ...newDriver };
 
                 if (hasFullNewDriver.value) {
-                    drivers.push(driver);
+                    drivers.value.push(driver);
                 }
                 cleanNewDriver();
             };
 
             const deleteDriver = async (index: number) => {
-                console.log(drivers[index].id);
+                console.log(drivers.value[index].id);
                 let response = await axios
-                    .delete(`${api}/driver/${drivers[index].id}`)
+                    .delete(`${api}/driver/${drivers.value[index].id}`)
                     .then((res) => {
                         if (res.status === 200) {
                             return res.data.data;
@@ -183,7 +216,7 @@
                         return;
                     })
                     .finally(() => {
-                        drivers.splice(index, 1);
+                        drivers.value.splice(index, 1);
                     });
 
                 return {
@@ -191,8 +224,11 @@
                 };
             };
 
+            const backUpDriver = ref(false);
+
             const editDriver = (index: number) => {
-                const driver = { ...drivers[index] };
+                const driver = { ...drivers.value[index] };
+                backUpDriver.value = true;
                 deleteDriver(index);
 
                 if (activeSection.value === 'provider') {
@@ -203,8 +239,20 @@
                 newDriver.email = driver.email;
                 newDriver.vehicleType = driver.vehicleType;
                 newDriver.transportId = driver.transportId;
+                newDriver.transportId2 = driver.transportId2;
                 newDriver.observations = driver.observations;
             };
+
+            const driverRestore = () => {
+                if (backUpDriver.value === true) {
+                    addDriver();
+                    update();
+                } else {
+                    console.log('Nothing to push');
+                }
+            };
+
+            console.log(axios.get(`${api}/transportProvider`));
 
             const cleanNewDriver = () => {
                 newDriver.name = '';
@@ -212,29 +260,19 @@
                 newDriver.email = '';
                 newDriver.vehicleType = '';
                 newDriver.transportId = '';
+                newDriver.transportId2 = '';
                 newDriver.observations = '';
             };
 
-            const newTransportProvider: TransportProvider = reactive({
-                name: currentTransportProvider.name,
-                legalId: currentTransportProvider.legalId,
-                address: currentTransportProvider.address,
-                observations: currentTransportProvider.observations,
-                companyRepresentativeId: currentTransportProvider.companyRepresentativeId,
-            });
-            console.log(newTransportProvider.legalId);
-
-            const companyRepresentative: CompanyRepresentative = reactive({
-                name: currentTransportProvider.companyRepresentative.name,
-                phone: currentTransportProvider.companyRepresentative.phone,
-                email: currentTransportProvider.companyRepresentative.email,
+            const driverTabText = computed(() => {
+                return `Transportista${drivers.value.length > 1 ? `s (${drivers.value.length})` : ''}`;
             });
 
             const transportProviderFull: ComputedRef<boolean> = computed(() => {
                 return !!(
-                    newTransportProvider.name !== '' &&
-                    newTransportProvider.address !== '0' &&
-                    newTransportProvider.legalId >= 0
+                    newTransportProvider.value.name !== '' &&
+                    newTransportProvider.value.address !== '0' &&
+                    newTransportProvider.value.legalId >= 0
                 );
             });
 
@@ -244,39 +282,43 @@
                     newDriver.phone !== '0' &&
                     newDriver.email !== '' &&
                     newDriver.vehicleType !== '' &&
-                    newDriver.transportId !== ''
+                    newDriver.transportId !== '' &&
+                    newDriver.transportId2 !== ''
                 );
             });
 
             const repFull: ComputedRef<boolean> = computed(() => {
                 return !!(
-                    companyRepresentative.name !== '' &&
-                    companyRepresentative.phone !== '' &&
-                    companyRepresentative.email !== ''
+                    companyRepresentative.value.name !== '' &&
+                    companyRepresentative.value.phone !== '' &&
+                    companyRepresentative.value.email !== ''
                 );
             });
 
             const isFull: ComputedRef<boolean> = computed(() => {
                 return transportProviderFull.value && repFull.value;
             });
-
+            const isLoading = ref(false);
             const update = async () => {
+                isLoading.value = true;
+                changeSection('provider');
+
                 if (hasFullNewDriver.value) {
                     addDriver();
                 }
-                const { drivers, ...newTProv } = currentTransportProvider;
+                const { drivers, ...newTProv } = currentTransportProvider.value;
 
-                console.log('newTraPro', newTransportProvider);
-                console.log('newComRep', companyRepresentative);
+                console.log('newTraPro', newTransportProvider.value);
+                console.log('newComRep', companyRepresentative.value);
 
                 const { data: tpData } = useAxios(
                     `/transportProvider/${id}`,
-                    { method: 'PUT', data: newTransportProvider },
+                    { method: 'PUT', data: newTransportProvider.value },
                     instance
                 );
                 const { data: rep } = useAxios(
-                    `/companyRepresentative/${currentTransportProvider.companyRepresentativeId}`,
-                    { method: 'PUT', data: companyRepresentative },
+                    `/companyRepresentative/${currentTransportProvider.value.companyRepresentativeId}`,
+                    { method: 'PUT', data: companyRepresentative.value },
                     instance
                 );
                 drivers.forEach((driver) => {
@@ -285,12 +327,13 @@
                         useAxios(`/driver/${driver.id}`, { method: 'PUT', data: driver }, instance);
                     } else {
                         const { id, ...newDriver } = driver;
-                        newDriver.transportProviderId = currentTransportProvider.id;
+                        newDriver.transportProviderId = currentTransportProvider.value.id;
                         console.log('newDriver', newDriver);
                         const { data } = useAxios(`/driver/`, { method: 'POST', data: newDriver }, instance);
                     }
                 });
                 setTimeout(() => {
+                    isLoading.value = false;
                     router.push('/proveedores-de-transporte');
                 }, 1000);
             };
@@ -302,15 +345,19 @@
                 activeSection,
                 changeSection,
                 drivers,
-                Icon,
                 addDriver,
                 newDriver,
                 hasFullNewDriver,
                 deleteDriver,
                 editDriver,
+                driverRestore,
                 id,
                 currentTransportProvider,
                 update,
+                driverTabText,
+                showDrivers,
+                driversShown,
+                isLoading,
             };
         },
     };

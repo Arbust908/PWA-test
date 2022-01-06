@@ -1,3 +1,7 @@
+<template>
+    <div></div>
+</template>
+
 <script lang="ts">
     import { ref, Ref, computed, ComputedRef, defineComponent } from 'vue';
     import { useStore } from 'vuex';
@@ -10,7 +14,7 @@
             const router = useRouter();
 
             const user = computed(() => {
-                return store.state.user;
+                return store.state.loggedUser;
             });
 
             if (user.value) {

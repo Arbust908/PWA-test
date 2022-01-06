@@ -1,13 +1,19 @@
 <template>
-    <template v-for="(pit, pitI) in pits" :key="pitI">
+    <template v-for="(pit, pitI) in pts" :key="pitI">
         <FieldInput
-            :class="pits.length > 1 ? 'col-span-10' : 'col-span-12'"
+            :class="pts.length > 1 ? 'col-span-10' : 'col-span-12'"
             field-name="name"
             placeholder="Nombre del pozo"
             :data="pit.name"
             @update:data="pit.name = $event"
         />
-        <CircularBtn v-if="pits.length > 1" class="btn__delete mt-2" @click="removePit(pit.id)">
+        <CircularBtn
+            v-if="pts.length > 1"
+            class="btn__delete"
+            :class="pitI == 0 ? 'mt-3' : 'mt-4'"
+            size="sm"
+            @click.prevent="removePit(pit.innerId)"
+        >
             <Icon icon="Trash" class="w-6 h-6" />
         </CircularBtn>
     </template>
@@ -35,17 +41,17 @@
         },
         emits: ['removePit'],
         setup(props, { emit }) {
-            const pits = useVModel(props, 'pits', emit);
+            const pts = useVModel(props, 'pits', emit);
             const lastPitIndex = computed(() => {
                 return props.pits.length - 1;
             });
             const firstPitIndex = 0;
-            const removePit = (pitId) => {
+            const removePit = (pitId: number) => {
                 emit('removePit', pitId);
             };
 
             return {
-                pits,
+                pts,
                 lastPitIndex,
                 firstPitIndex,
                 removePit,

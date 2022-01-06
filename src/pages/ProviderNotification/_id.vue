@@ -3,6 +3,7 @@
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
             <h1 class="font-bold text-second-900 text-xl self-start mb-3 md:mb-0">Notificación a proveedores</h1>
         </header>
+        <h1 class="text-4xl text-pink-400 p-8 bg-pink-100">DEPRECADO</h1>
         <section class="bg-second-50 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4">
                 <fieldset class="py-2 w-full max-w-md grid grid-cols-12 gap-3 md:gap-4">
@@ -155,28 +156,12 @@
             </template>
             <template #btn>
                 <div class="flex gap-4">
-                    <GhostBtn
-                        class="
-                            inline-flex
-                            justify-center
-                            w-full
-                            rounded-md
-                            border border-transparent
-                            shadow-sm
-                            px-4
-                            py-2
-                            bg-transparent
-                            text-base
-                            font-medium
-                            text-second-400
-                            hover:bg-gray-100
-                            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500
-                            sm:text-sm
-                        "
+                    <SecondaryBtn
+                        class="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-transparent text-base font-medium text-second-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm"
                         @click.prevent="toggleModal"
                     >
                         Volver
-                    </GhostBtn>
+                    </SecondaryBtn>
                     <PrimaryBtn btn="btn__warning" @click.prevent="confirm">Confirmar</PrimaryBtn>
                 </div>
             </template>
@@ -193,6 +178,7 @@
     import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
     import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';

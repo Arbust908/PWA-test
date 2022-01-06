@@ -1,16 +1,13 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Planificación de arenas</h1>
-        </header>
+        <ABMFormTitle title="Planificación de arenas" />
         <section>
             <form method="POST" action="/" class="py-4">
                 <FieldGroup class="grid-cols-6 md:grid-cols-12 max-w-2xl">
                     <ClientPitCombo
-                        :client-id="currentSandPlan.companyId"
-                        :pit-id="currentSandPlan.pitId"
-                        @update:clientId="currentSandPlan.companyId = $event"
-                        @update:pitId="currentSandPlan.pitId = $event"
+                        v-model:client-id="currentSandPlan.companyId"
+                        v-model:pit-id="currentSandPlan.pitId"
+                        :is-disabled="true"
                     />
                 </FieldGroup>
             </form>
@@ -203,23 +200,39 @@
             </form>
         </section>
 
-        <footer class="mt-5 space-x-8 flex justify-end">
-            <section class="w-full space-x-6 flex items-center justify-end">
-                <SecondaryBtn @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                    Guardar
-                </PrimaryBtn>
-            </section>
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')">Cancelar</SecondaryBtn>
+            <PrimaryBtn btn="wide" size="md" :disabled="!isFull" @click.prevent="isFull ? save() : toggleErrorModal()">
+                Guardar
+            </PrimaryBtn>
         </footer>
+
+        <SuccessModal
+            :open="showModal"
+            text="La planificación de arenas ha sido guardada con éxito"
+            @close="$router.push('/planificacion-de-arena')"
+            @main="$router.push('/planificacion-de-arena')"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="Hubo un problema al intentar guardar."
+            text="Por favor, verifica los datos ingresados e intenta nuevamente."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar la planificación."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, reactive, computed, ComputedRef, toRaw, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useState, useActions } from 'vuex-composition-helpers';
-    import { useTitle } from '@vueuse/core';
+    import { useActions } from 'vuex-composition-helpers';
 
     import Layout from '@/layouts/Main.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
@@ -228,14 +241,7 @@
     import SandPlanStage from '@/components/sandPlan/StageRow.vue';
     import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
     import StageHeader from '@/components/sandPlan/StageHeader.vue';
-    import {
-        PurchaseOrder,
-        SandProvider,
-        SandOrder,
-        TransportProvider,
-        Pit,
-        Company,
-    } from '@/interfaces/sandflow.Types.ts';
+    import { Pit, Company } from '@/interfaces/sandflow';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     import { useToggle } from '@vueuse/core';
@@ -245,6 +251,10 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
 
     export default {
         components: {
@@ -260,10 +270,12 @@
             Icon,
             SecondaryBtn,
             ResposiveTableSandPlan,
+            ABMFormTitle,
+            SuccessModal,
+            ErrorModal,
         },
         setup() {
             // Init
-            const windowWidth = window.innerWidth;
             const store = useStore();
             const router = useRouter();
             const route = useRoute();
@@ -316,26 +328,20 @@
                         formatedStages.sort((a, b) => {
                             return a.stage - b.stage;
                         });
-
-                        console.log('stages', sp.stages);
                         currentSandPlan.stages = formatedStages;
-                        console.log('formatedStages', formatedStages);
                         buckupStages.value = sp.stages;
                     }
                 });
             } else {
                 const sp = { ...currentSandPlan, ...vuexSP };
-                // console.log('VUEX', sp);
                 currentSandPlan.companyId = sp.companyId;
                 currentSandPlan.pitId = sp.pitId;
                 currentSandPlan.stagesAmount = sp.stagesAmount;
                 currentSandPlan.stages = sp.stages;
                 currentSandPlan.id = sp.id;
-                console.log('SP Vuex', currentSandPlan);
             }
 
             const addStage = () => {
-                console.log('DEFAULT', defaultStage);
                 duplicateStage(defaultStage);
             };
 
@@ -360,16 +366,17 @@
                 const lastStage = currentSandPlan.stages[currentSandPlan.stages.length - 1];
                 // SOLUCION TEMPORAL PARA DUPLICADO DE INNER ID
                 const lastStageId = { innerId: Number(lastStage.innerId) + 100000 || 0 };
+                const id = { id: null };
                 const lastStageStage = { stage: lastStage.stage + 1 };
                 const newStatus = { status: 0 };
-                console.log(lastStage, lastStageId, lastStageStage, newStatus);
                 const newStage = {
                     ...stage,
                     ...lastStageId,
                     ...lastStageStage,
                     ...newStatus,
+                    ...id,
                 };
-                console.log('NEWSTAGE', newStage);
+                console.log(newStage);
                 currentSandPlan.stages.push(newStage);
                 editStage(newStage);
             };
@@ -377,13 +384,10 @@
             const deleteStage = (stage) => {
                 const stageId = stage.innerId;
                 const isDB = stage.id ?? false;
-                console.log(isDB);
-                console.log(stageId, isDB);
                 currentSandPlan.stages = currentSandPlan.stages.filter((s) => s.innerId !== stageId);
 
                 if (isDB) {
                     stagesToDelete.value.push(stageId);
-                    console.log(stagesToDelete.value);
                 }
             };
             const upgrade = (stage) => {
@@ -418,8 +422,6 @@
                 }
             });
             const selectedPitName = computed(() => {
-                console.log('computed-pitId', currentSandPlan.pitId);
-
                 return Number(currentSandPlan.pitId) >= 0
                     ? pits.value.find((pit) => pit.id == currentSandPlan.pitId)?.name || 'Pit'
                     : '';
@@ -438,6 +440,17 @@
             const isFull = computed(() => {
                 return true;
             });
+
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
+
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
+
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
+
             const { updateSandPlan } = useActions(['updateSandPlan']);
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
@@ -465,22 +478,24 @@
                 });
 
                 currentSandPlan.stages.forEach((stage) => {
-                    const { data } = useAxios(
-                        '/sandStage/' + stage.id,
-                        {
-                            method: 'PUT',
-                            data: {
-                                stage: stage.stage,
-                                sandId1: stage.sandId1,
-                                sandId2: stage.sandId2,
-                                sandId3: stage.sandId3,
-                                quantity1: stage.quantity1,
-                                quantity2: stage.quantity2,
-                                quantity3: stage.quantity3,
+                    if (stage.id) {
+                        const { data } = useAxios(
+                            '/sandStage/' + stage.id,
+                            {
+                                method: 'PUT',
+                                data: {
+                                    stage: stage.stage,
+                                    sandId1: stage.sandId1,
+                                    sandId2: stage.sandId2,
+                                    sandId3: stage.sandId3,
+                                    quantity1: stage.quantity1,
+                                    quantity2: stage.quantity2,
+                                    quantity3: stage.quantity3,
+                                },
                             },
-                        },
-                        instance
-                    );
+                            instance
+                        );
+                    }
                 });
 
                 const { data } = useAxios(
@@ -501,7 +516,6 @@
                     if (apiData && apiData.data) {
                         const sandPlanId = apiData.data.id;
                         currentSandPlan.id = sandPlanId;
-                        console.log('toDeltete', stagesToDelete.value);
                         const deletingStages = stagesToDelete.value;
                         deletingStages.map((id) => {
                             const { data } = useAxios('/sandStage/' + id, { method: 'DELETE' }, instance);
@@ -511,7 +525,6 @@
                             const { ...sandStage } = stage;
                             sandStage.sandPlanId = sandPlanId;
 
-                            // console.log('Sand Stage', sandStage);
                             if (sandStage.action === 'create') {
                                 sandStage.action = 'update';
                                 const { data } = useAxios(
@@ -532,9 +545,8 @@
                                 }
                             }
                         });
-                        console.log(currentSandPlan);
                         updateSandPlan(currentSandPlan);
-                        router.push('/planificacion-de-arena');
+                        showModal.value = true;
                     }
                 });
             };
@@ -559,8 +571,13 @@
                 save,
                 isFull,
                 addStage,
-                // upgrade,
-                windowWidth,
+                upgrade,
+                showModal,
+                toggleModal,
+                showErrorModal,
+                toggleErrorModal,
+                showApiErrorModal,
+                toggleApiErrorModal,
             };
         },
     };

@@ -7,25 +7,35 @@
                 :id="fieldName"
                 v-model="value"
                 v-maska="mask"
-                :class="[pre ? null : 'n-pre', post ? null : 'n-post']"
+                :class="[numberValidation && used ? 'error' : null, pre ? null : 'n-pre', post ? null : 'n-post']"
                 :type="type"
                 :name="fieldName"
                 :placeholder="placeholder"
+                @blur="usedInput"
+                @click="print"
             />
             <span v-if="post" class="post text-center" :title="post.title">{{ post.value }}</span>
         </div>
+        <InvalidInputLabel v-if="numberValidation && used" class="text-xs" :validation-type="validationType" />
+        <!-- v-if con la validacion -->
+        <!-- Lo dejamos -->
     </label>
 </template>
 
 <script>
     import { defineComponent, watch } from 'vue';
+    import { useRoute } from 'vue-router';
     import { useVModel, useCssVar } from '@vueuse/core';
     import { maska } from 'maska';
     import FieldTitle from '@/components/ui/form/FieldTitle.vue';
+    import InvalidInputLabel from '../InvalidInputLabel.vue';
     export default defineComponent({
         name: 'FieldInput',
         directives: { maska },
-        components: { FieldTitle },
+        components: {
+            FieldTitle,
+            InvalidInputLabel,
+        },
         props: {
             data: {
                 default: '',
@@ -62,8 +72,16 @@
                 type: Object,
                 default: null,
             },
+            validationType: {
+                type: String,
+                required: true,
+            },
+            numberValidation: {
+                type: Boolean,
+            },
         },
         setup(props, { emit }) {
+            const route = useRoute();
             const value = useVModel(props, 'data', emit);
             const cssPre = useCssVar('--pre', 0);
             const cssPost = useCssVar('--post', 0);
@@ -76,9 +94,26 @@
                 cssPost.value = props.post.width ?? '20%';
             }
 
+            const used = ref(false);
+            const usedInput = () => {
+                used.value = true;
+            };
+
+            const numberValidation = computed(() => {
+                return props.numberValidation && value.value <= 0 ? true : null;
+            });
+
+            function print() {
+                console.log(props.numberValidation);
+            }
+
             return {
                 value,
                 ...props,
+                numberValidation,
+                usedInput,
+                used,
+                print,
             };
         },
     });
@@ -86,4 +121,8 @@
 
 <style lang="scss" scoped>
     @import '@/assets/inputs.scss';
+
+    .error {
+        @apply border-red-500;
+    }
 </style>

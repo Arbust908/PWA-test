@@ -27,6 +27,15 @@ label {
     &.n-post {
       @apply border-r rounded-r;
     }
+    &.error {
+      @apply border-red-500;
+    }
+  }
+}
+input[type='checkbox'] {
+  @apply w-4 h-4 m-1 p-0 border-main-500 focus:ring-main-500;
+  &:checked {
+      @apply bg-main-500;
   }
 }
 .pre,
@@ -46,7 +55,7 @@ label {
   @apply w-full;
 }
 
-input:read-only {
+input:read-only:is(:not([type="checkbox"])) {
   @apply bg-second-200 border cursor-not-allowed;
 }
 

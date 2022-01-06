@@ -109,3 +109,25 @@ export const isMobileAndLogged = (to: any, from: any, next: any) => {
         }
     }
 };
+
+export const checkPermission = (to: any, from: any, next: any) => {
+    const { permissions: storePermissions, visible } = store.state.loggedUser;
+
+    if (!visible) {
+        next({ name: 'Error-403' });
+
+        return;
+    }
+
+    //TODO: usar el permissionManager
+    const permissions = JSON.parse(JSON.stringify(storePermissions));
+
+    const actualRoute = to.name;
+
+    // check if has permissions
+    if (permissions.view.includes(actualRoute)) {
+        next();
+    } else {
+        next({ name: 'Error-403' });
+    }
+};

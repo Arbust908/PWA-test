@@ -6,7 +6,7 @@
         <section class="deposit bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
                 <fieldset class="py-2 w-full max-w-2xl grid grid-cols-12 gap-y-4 gap-x-14">
-                    <h2 class="col-span-full text-3xl font-bold">Pozo {{ designName }}</h2>
+                    <h2 class="col-span-full text-[24px] font-bold">Pozo {{ designName }}</h2>
                     <label class="col-span-5" for="depositClient">
                         <span>Cliente</span>
                         <select id="depositClient" v-model="clientId" class="input" name="depositClient">
@@ -26,17 +26,17 @@
                         </select>
                     </label>
                     <div class="col-span-2"></div>
-                    <div class="col-span-3 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de filas</h3>
+                    <div class="col-span-6 md:col-span-4 flex flex-col items-left gap-4">
+                        <h3 class="text-sm">Cantidad de filas</h3>
                         <Counter :amount="rows" @update:amount="rows = $event" />
                     </div>
-                    <div class="col-span-3 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de columnas</h3>
+                    <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
+                        <h3 class="text-sm">Cantidad de columnas</h3>
                         <Counter :amount="cols" @update:amount="cols = $event" />
                     </div>
-                    <div class="col-span-3 flex flex-col items-center gap-4">
-                        <h3 class="text-xs">Cantidad de pisos</h3>
-                        <Counter :amount="floors" @update:amount="floors = $event" />
+                    <div class="col-span-6 md:col-span-4 flex-col items-end gap-4">
+                        <h3 class="text-sm">Cantidad de pisos</h3>
+                        <Counter :amount="floors" :max="2" @update:amount="floors = $event" />
                     </div>
                     <!-- <div class="col-span-3 flex flex-col items-center gap-4">
             <h3 class="text-xs">Cantidad de ubicación</h3>
@@ -44,7 +44,7 @@
           </div> -->
                 </fieldset>
                 <fieldset class="py-2 flex gap-x-10 2xl:gap-x-40">
-                    <section class="w-full max-w-[170px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
+                    <section class="w-full max-w-[220px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
                         <h2 class="col-span-full text-xl font-bold">Asignar categoría</h2>
                         <div class="flex flex-col gap-5 ml-4">
                             <label class="type-select" for="aisle">
@@ -118,13 +118,12 @@
             </form>
         </section>
 
-        <footer class="mt-5 gap-3 flex justify-end">
-            <section class="space-x-6 flex items-center justify-end">
-                <SecondaryBtn @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
-                <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                    Guardar
-                </PrimaryBtn>
-            </section>
+        <!-- *** -->
+        <footer class="mt-8 space-x-3 flex justify-end items-center">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
+                Guardar
+            </PrimaryBtn>
         </footer>
     </Layout>
 </template>
@@ -135,11 +134,8 @@
     import { useRouter, useRoute } from 'vue-router';
     import { useTitle } from '@vueuse/core';
 
-    import { TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon, BellIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Counter from '@/components/ui/Counter.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
@@ -152,14 +148,10 @@
 
     export default defineComponent({
         components: {
-            BellIcon,
-            CircularBtn,
             Counter,
             SecondaryBtn,
             Layout,
-            PlusIcon,
             PrimaryBtn,
-            TrashIcon,
             DepositGrid,
             BoxCard,
         },
@@ -172,7 +164,7 @@
             });
             const id = route.params.id;
             useTitle(`Depósito ${id} <> Sandflow`);
-            const Deposit = ref([]);
+            const warehouse = ref([]);
 
             const rows: Ref<number> = ref(0);
             watch(rows, (newV, oldV) => {
@@ -289,7 +281,7 @@
             const clientId = ref(-1);
             const clients = ref([] as Array<Company>);
             const { data: companiesData } = useAxios('/company', instance);
-            watch(companiesData, (companiesApi, prevCount) => {
+            watch(companiesData, (companiesApi) => {
                 if (companiesApi && companiesApi.data) {
                     clients.value = companiesApi.data;
                 }
@@ -304,7 +296,7 @@
             const pitId = ref(-1);
             const pits = ref([] as Array<Pit>);
             const { data: pitsData } = useAxios('/pit', instance);
-            watch(pitsData, (pitApi, prevCount) => {
+            watch(pitsData, (pitApi) => {
                 if (pitApi && pitApi.data) {
                     pits.value = pitApi.data;
                 }
@@ -339,13 +331,6 @@
                 selectedBox.value.category = cat;
                 const box = selectedBox.value;
                 deposit.value[`${box.floor}|${box.row}|${box.col}`].category = cat;
-                // deposit.value[`${box.floor}|${box.row}|${box.col}`] = {
-                //   category: box.category,
-                //   warehouseId: null,
-                //   floor: box.floor,
-                //   col: box.col,
-                //   row: box.row,
-                // };
             };
 
             // :: DEPOSIT
@@ -389,18 +374,18 @@
             );
 
             if (vuexData.value) {
-                Deposit.value = vuexData;
+                warehouse.value = vuexData;
                 updateData(vuexData.value);
             } else {
                 const { data: dData } = useAxios(`/warehouse/${id}`, instance);
                 watch(dData, (dData, prevCount) => {
                     if (dData && dData.data) {
-                        Deposit.value = dData.data;
+                        warehouse.value = dData.data;
                     }
                 });
             }
 
-            watch(Deposit, (newData, oldData) => {
+            watch(warehouse, (newData, oldData) => {
                 if (newData) {
                     updateData(newData);
                 }

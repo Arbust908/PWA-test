@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de Pedido</h1>
+            <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de pedido</h1>
         </header>
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4">
@@ -36,7 +36,7 @@
                             :key="orderKey"
                             class="border-none"
                         >
-                            <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full" />
+                            <hr v-if="orderKey !== 0" class="mt-4 mb-2 col-span-full border-gray-300" />
                             <FieldSelect
                                 :title="orderKey === 0 ? 'Tipo' : ''"
                                 class="col-span-4"
@@ -116,7 +116,7 @@
                 </FieldGroup>
             </form>
             <footer class="p-4 space-x-8 flex justify-end">
-                <NoneBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </NoneBtn>
+                <SecondaryBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
                 <PrimaryBtn
                     type="submit"
                     size="sm"
@@ -132,17 +132,14 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, watchEffect, computed, ComputedRef, watch } from 'vue';
+    import { ref, Ref, computed, ComputedRef, watch } from 'vue';
     import { useStore } from 'vuex';
     import { useRouter, useRoute } from 'vue-router';
     import { useActions } from 'vuex-composition-helpers';
     import { useTitle } from '@vueuse/core';
 
-    import { BookmarkIcon, TrashIcon } from '@heroicons/vue/outline';
-    import { PlusIcon } from '@heroicons/vue/solid';
     import Layout from '@/layouts/Main.vue';
-    import NoneBtn from '@/components/ui/buttons/NoneBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -160,11 +157,6 @@
     export default {
         components: {
             Layout,
-            NoneBtn,
-            BookmarkIcon,
-            TrashIcon,
-            PlusIcon,
-            CircularBtn,
             PrimaryBtn,
             FieldGroup,
             FieldLegend,
@@ -173,6 +165,7 @@
             FieldSelect,
             ClientPitCombo,
             Icon,
+            SecondaryBtn,
         },
         setup() {
             // :: Init
