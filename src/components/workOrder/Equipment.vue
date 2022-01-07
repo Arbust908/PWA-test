@@ -4,43 +4,40 @@
             <FieldGroup>
                 <FieldLegend>Cradle</FieldLegend>
                 <FieldSelect
+                    v-model:data="operativeCradleId"
                     class="col-span-full"
                     field-name="operativeCradle"
                     placeholder="Selecciona un operativo"
                     title="Operativo"
                     endpoint="/cradle"
-                    :data="operativeCradleId"
-                    @update:data="operativeCradleId = $event"
                 />
+                <!-- agregar props con arrays ya filtrados de los que estan en uso -->
                 <FieldSelect
+                    v-model:data="backupCradleId"
                     class="col-span-full"
                     field-name="backupCradle"
                     placeholder="Selecciona un backup"
                     title="Backup"
                     endpoint="/cradle"
-                    :data="backupCradleId"
-                    @update:data="backupCradleId = $event"
                 />
             </FieldGroup>
             <FieldGroup>
                 <FieldLegend>Forklift</FieldLegend>
                 <FieldSelect
+                    v-model:data="operativeForkliftId"
                     class="col-span-full"
                     field-name="operativeForklift"
                     placeholder="Selecciona un operativo"
                     title="Operativo"
                     endpoint="/forklift"
-                    :data="operativeForkliftId"
-                    @update:data="operativeForkliftId = $event"
                 />
                 <FieldSelect
+                    v-model:data="backupForkliftId"
                     class="col-span-full"
                     field-name="backupForklift"
                     placeholder="Selecciona un backup"
                     title="Backup"
                     endpoint="/forklift"
-                    :data="backupForkliftId"
-                    @update:data="backupForkliftId = $event"
                 />
             </FieldGroup>
         </div>
@@ -108,8 +105,10 @@
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import TracktorField from '@/components/workOrder/woTraktorField.vue';
     import PickupField from '@/components/workOrder/woPickupField.vue';
-
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import axios from 'axios';
+
+    const api = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
         components: {
@@ -187,6 +186,24 @@
                 cabin,
                 isFull,
             } = useVModels(props, emit);
+
+            onMounted(async () => {
+                const WOsData = await axios.get(`${api}/workOrder`);
+                WOs.value = WOsData.data.data;
+                console.log(WOs.value);
+
+                const cradlesData = await axios.get(`${api}/workOrder`);
+                backupCradles.value = cradlesData.data.data;
+                console.log(backupCradles.value);
+
+                const forkliftData = await axios.get(`${api}/workOrder`);
+                backupForklifts.value = forkliftData.data.data;
+                console.log(backupForklifts.value);
+            });
+
+            const WOs = ref([]);
+            const backupCradles = ref([]);
+            const backupForklifts = ref([]);
 
             const firstTracktorFull = computed(() => {
                 const trackto = traktors.value[0];

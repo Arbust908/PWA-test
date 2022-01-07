@@ -254,7 +254,7 @@
                     const saveResourse = selectedCrew.resources[0];
                 }
                 selectedCrew.resources = selectedCrew.resources.filter(
-                    (resource: HumanResource) => resource.role !== '' && resource.name !== ''
+                    (resource: HumanResource) => resource.role !== -1 && resource.name !== -1
                 );
 
                 if (!isDraft.value && selectedCrew.resources.length === 0) {
@@ -292,12 +292,16 @@
                     crews.value[0].timeStart &&
                     crews.value[0].timeEnd &&
                     crews.value[0].resources.length > 0 &&
-                    crews.value[0].resources[0].role !== '' &&
-                    crews.value[0].resources[0].name !== ''
+                    crews.value[0].resources[0].role !== -1 &&
+                    crews.value[0].resources[0].name !== -1
                 );
             });
             // Is all sections full
             const isAllFull = computed(() => {
+                console.log('RRHHFULL', isRRHHFull.value);
+                console.log('isOrderFull', isOrderFull.value);
+                console.log('isEquipmentFull', isEquipmentFull.value);
+
                 return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
             });
 
@@ -311,13 +315,9 @@
             const showApiErrorModal = ref(false);
             const toggleApiErrorModal = useToggle(showApiErrorModal);
 
-            // :: SAVE
             const save = async (draft = true) => {
                 toggleLoading(true);
                 toggleDraft(draft);
-                console.log('isDraft', isDraft.value);
-                console.log('----------------------------------------');
-                console.groupCollapsed('RRHH');
                 crews.value.map((crew: Crew) => {
                     console.log(crew.title);
                     console.log(new Date(crew.timeEnd));
@@ -325,12 +325,7 @@
                     crew.resources.map((rrhh: HumanResource) => {
                         console.log('resource', rrhh);
                     });
-                    console.log(crew);
-                    console.log('<>--<>--<>--<>--<>--<>--<>--<>--<>--<>');
                 });
-                console.log(crews.value);
-                console.groupEnd();
-                console.log('----------------------------------------');
 
                 // removeAllEmptys();
                 const newWO = {
@@ -362,24 +357,19 @@
                 try {
                     const { data: WODone } = useAxios('/workOrder', { method: 'POST', data: newWO }, instance);
                     watch(WODone, async (newVal, _) => {
-                        console.log('nuevo', newVal);
-
                         if (newVal && newVal.data && newVal.data.id) {
                             const workOrderId = Number(newVal.data.id);
-                            console.log('nuevo id', newVal.data.id);
 
                             if (pits.value.length > 0) {
                                 const isPitsFinished = ref([]);
                                 pits.value.forEach((pit: Pit) => {
-                                    console.log(pit);
                                     const { id, ...newPit } = pit;
                                     newPit.companyId = newWO.clientId;
                                     newPit.workOrderId = workOrderId;
-                                    console.log('NewPit', newPit);
+
                                     const { data } = useAxios('/pit', { method: 'POST', data: newPit }, instance);
                                     isPitsFinished.value.push(data);
                                 });
-                                console.log(isPitsFinished.value);
                             }
 
                             if (traktors.value.length > 0) {
