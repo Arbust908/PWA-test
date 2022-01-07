@@ -94,14 +94,12 @@
 </template>
 
 <script setup lang="ts">
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import TracktorField from '@/components/workOrder/woTraktorField.vue';
     import PickupField from '@/components/workOrder/woPickupField.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import axios from 'axios';
 
     const api = import.meta.env.VITE_API_URL || '/api';
