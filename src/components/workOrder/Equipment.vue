@@ -223,44 +223,13 @@
         Fs.value = forkliftData.data.data;
     });
 
-    /* console.log('>------ Quick Mat');
-            const products = [
-                { name: 'a', price: 222, quantity: 2 },
-                { name: 's', price: 123, quantity: 1 },
-                { name: 'd', price: 90, quantity: 10 },
-                { name: 'v', price: 1000, quantity: 0 },
-            ];
-            let precio = products.reduce(
-                (acumulador, producto) => {
-                    // hago los caculos
-                    acumulador.list.push(producto.name);
-                    acumulador.total += producto.price * producto.quantity;
-                    acumulador.amount += producto.quantity;
-
-                    return acumulador;
-                },
-                { list: [], total: 0, amount: 0 }
-            );
-            /*             let total = products.map((product) => {
-                return product.price * product.quantity;
-            });
-            let precio = 0;
-            for (let i = 0; i < total.length; i++) {
-                const productPrice = total[i];
-                precio += productPrice;
-            }
-
-            console.log(total);
-            console.log(precio);
-            console.log('>------ Quick Mat'); */
-
     const WOs = ref([]);
     const Cs = ref([]);
     const Fs = ref([]);
-    // Sacar del WOs 2 Arrays de IDs de cradles y forklifts
+
     const inUseCradles = ref([]);
     const inUseForklifts = ref([]);
-    // una computed de cradle editando para marcar las En Uso
+
     const opCradle = computed(() => {
         return Cs.value.map((cradle) => {
             if (inUseCradles.value.includes(cradle.id)) {
@@ -270,7 +239,7 @@
             return cradle;
         });
     });
-    // una computed de forklift editando para marcar las En Uso
+
     const opForklift = computed(() => {
         return Fs.value.map((forklift) => {
             if (inUseForklifts.value.includes(forklift.id)) {
@@ -280,9 +249,7 @@
             return forklift;
         });
     });
-    // [ id: 1, id: 2, id: 3, id: 4 ] operativeCradleId = 3
-    // [ id: 1, id: 2, id: 4 ]
-    // Bouns: creamos 2 compued que aparte filtren el operativId
+
     const bpCradle = computed(() => {
         return Cs.value.filter((cradle) => {
             return cradle.id !== operativeCradleId.value;
