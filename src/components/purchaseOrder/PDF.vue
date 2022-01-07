@@ -149,10 +149,12 @@
     const trueOrientation = ([width, height]) => {
         return width > height ? 'l' : 'p';
     };
+    const router = useRouter();
     setTimeout(() => {
         download();
         setTimeout(() => {
             emit('close');
+            router.push('/orden-de-pedido');
         }, 1000);
     }, 500);
 </script>

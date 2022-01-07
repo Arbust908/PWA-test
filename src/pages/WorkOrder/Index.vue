@@ -99,6 +99,8 @@
     import Layout from '@/layouts/Main.vue';
     import VTable from '@/components/ui/table/VTable.vue';
 
+    import { validateOrder, validateEquipment, validateHumanResourses } from '@/helpers/useWorkOrder';
+
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
@@ -237,32 +239,18 @@
             });
 
             const isEquipmentFull = (order: WorkOrder) => {
-                return (
-                    parseInt(order.operativeCradle) >= 0 &&
-                    parseInt(order.operativeForklift) >= 0 &&
-                    order.traktors.length > 0 &&
-                    order.pickups.length > 0 &&
-                    order.conex >= 0 &&
-                    order.generators >= 0 &&
-                    order.rigmats >= 0 &&
-                    order.tower >= 0 &&
-                    order.cabin >= 0
+                return validateEquipment(
+                    parseInt(order.operativeCradle),
+                    0,
+                    parseInt(order.operativeForklift),
+                    0,
+                    order.traktors,
+                    order.pickups
                 );
             };
-            const isCrewFull = (order: WorkOrder) => {
-                return (
-                    order.crew.length > 0 &&
-                    order.crew.every((crew) => {
-                        return (
-                            crew.title &&
-                            crew.timeStart &&
-                            crew.timeEnd &&
-                            crew.resources?.every((resource) => {
-                                return resource.name && resource.role;
-                            })
-                        );
-                    })
-                );
+
+            const isCrewFull = ({ crew }: WorkOrder) => {
+                return validateHumanResourses(crew);
             };
 
             const isTotallyComplete = (item: WorkOrder) => {

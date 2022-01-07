@@ -19,6 +19,10 @@ export const useIfNotLonly = (array: any[]): boolean => {
     return notLonly(array);
 };
 
+export const getLast = (array: any[]): any => {
+    return array[array.length - 1];
+};
+
 export default {
     useOnFirst,
     useIfNotLonly,
@@ -26,4 +30,5 @@ export default {
     isFirst,
     isLast,
     isEven,
+    getLast,
 };
