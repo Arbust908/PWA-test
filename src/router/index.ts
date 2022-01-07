@@ -310,6 +310,12 @@ const routes: Array<RouteRecordRaw> = [
         beforeEnter: isAdmin,
     },
     {
+        path: '/cierre-de-operaciones',
+        name: 'CloseOfOperation',
+        component: () => import('@/pages/CloseOfOperations/index.vue'),
+        beforeEnter: isLogged,
+    },
+    {
         path: '/no-mobile',
         name: 'NoMobile',
         component: () => import('@/pages/Error/NoMobile.vue'),
