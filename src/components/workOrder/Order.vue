@@ -2,36 +2,33 @@
     <form method="POST" action="/" class="p-4 max-w-lg">
         <FieldGroup>
             <FieldSelect
+                v-model:data="cId"
                 class="col-span-full"
                 field-name="name"
                 placeholder="Seleccionar cliente"
                 title="Cliente"
                 endpoint="/company"
-                :data="clientId"
-                @update:data="clientId = $event"
             />
             <FieldSelect
+                v-model:data="scId"
                 class="col-span-full"
                 field-name="serviceCompany"
                 placeholder="Seleccionar operadora"
                 title="Operadora / Empresa de servicios"
                 endpoint="/company?isOperator=1"
                 is-optional
-                :data="serviceCompanyId"
-                @update:data="serviceCompanyId = $event"
             />
             <FieldInput
+                v-model:data="pd"
                 class="col-span-full mb-4"
                 field-name="observations"
                 placeholder="ej: 12313"
                 title="PAD"
-                :data="pad"
-                @update:data="pad = $event"
             />
         </FieldGroup>
         <FieldGroup class="max-w-lg">
             <FieldLegend>Pozos</FieldLegend>
-            <PitFields :pits="pits" @update:pits="pits = $event" @removePit="removePit" />
+            <PitFields v-model:pits="pt" @removePit="removePit" />
             <button class="mt-1 flex items-center col-span-6" @click.prevent="addPit">
                 <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
                 <span class="font-bold"> Agregar pozo </span>
@@ -40,10 +37,8 @@
     </form>
 </template>
 
-<script lang="ts">
-    import { watchEffect, defineComponent } from 'vue';
-    import { useVModels } from '@vueuse/core';
-
+<script setup lang="ts">
+    import { getLast } from '@/helpers/iteretionHelpers';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
@@ -55,72 +50,48 @@
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import { Pit } from '@/interfaces/sandflow';
 
-    export default defineComponent({
-        components: {
-            FieldGroup,
-            FieldSelect,
-            FieldInput,
-            FieldLegend,
-            PitFields,
-            Icon,
-            CircularBtn,
+    const props = defineProps({
+        clientId: {
+            type: Number,
+            required: true,
         },
-        props: {
-            clientId: {
-                type: Number,
-                required: true,
-            },
-            serviceCompanyId: {
-                type: Number,
-                required: true,
-            },
-            pad: {
-                type: String,
-                default: '',
-            },
-            pits: {
-                type: Array,
-                default: () => [],
-            },
-            isFull: {
-                type: Boolean,
-                default: false,
-            },
+        serviceCompanyId: {
+            type: Number,
+            required: true,
         },
-        setup(props, { emit }) {
-            const { clientId, serviceCompanyId, pad, pits, isFull } = useVModels(props, emit);
-            console.log(pits.value);
-            const removePit = (pitId: number) => {
-                pits.value = pits.value.filter((pit: Pit) => {
-                    return pit.id !== pitId;
-                });
-            };
-            const addPit = () => {
-                const lastPitId = pits.value.length;
-                pits.value.push({
-                    id: lastPitId,
-                    name: '',
-                });
-            };
-            watchEffect(() => {
-                isFull.value = !!(
-                    clientId.value >= 0 &&
-                    pad.value.length > 0 &&
-                    pits.value.length > 0 &&
-                    pits.value[0].name.length > 0
-                );
-            });
-
-            return {
-                clientId,
-                serviceCompanyId,
-                pad,
-                pits,
-                addPit,
-                removePit,
-            };
+        pad: {
+            type: String,
+            default: '',
+        },
+        pits: {
+            type: Array,
+            default: () => [],
         },
     });
+    const emits = defineEmits(['update:clientId', 'update:serviceCompanyId', 'update:pad', 'update:pits', 'removePit']);
+    const { clientId: cId, serviceCompanyId: scId, pad: pd, pits: pt } = useVModels(props, emits);
+    console.log(pt.value);
+    const removePit = (pitId: number) => {
+        pt.value = pt.value.filter((pit: Pit) => {
+            return pit.innerId !== pitId;
+        });
+    };
+    const addPit = () => {
+        const lastInnerId = getLast(pt.value)?.innerId || 0;
+        pt.value.push({
+            innerId: lastInnerId + 1,
+            name: '',
+        });
+    };
+
+    if (pt.value.length === 0) {
+        addPit();
+    } else {
+        const lastInnerId = getLast(pt.value)?.innerId || 0;
+        pt.value.forEach((pit: Pit) => {
+            pit.innerId = pit.id || lastInnerId + 1;
+        });
+    }
 </script>
 
 <style lang="scss" scoped>
