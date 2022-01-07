@@ -9,16 +9,15 @@
                     field-name="operativeCradle"
                     placeholder="Selecciona un operativo"
                     title="Operativo"
-                    endpoint="/cradle"
+                    :endpoint-data="opCradle"
                 />
-                <!-- agregar props con arrays ya filtrados de los que estan en uso -->
                 <FieldSelect
                     v-model:data="backupCradleId"
                     class="col-span-full"
                     field-name="backupCradle"
                     placeholder="Selecciona un backup"
                     title="Backup"
-                    endpoint="/cradle"
+                    :endpoint-data="bpCradle"
                 />
             </FieldGroup>
             <FieldGroup>
@@ -29,7 +28,7 @@
                     field-name="operativeForklift"
                     placeholder="Selecciona un operativo"
                     title="Operativo"
-                    endpoint="/forklift"
+                    :endpoint-data="opForklift"
                 />
                 <FieldSelect
                     v-model:data="backupForkliftId"
@@ -37,7 +36,7 @@
                     field-name="backupForklift"
                     placeholder="Selecciona un backup"
                     title="Backup"
-                    endpoint="/forklift"
+                    :endpoint-data="bpForklift"
                 />
             </FieldGroup>
         </div>
@@ -94,10 +93,7 @@
     </form>
 </template>
 
-<script lang="ts">
-    import { ref, watchEffect, defineComponent, computed } from 'vue';
-    import { useVModels } from '@vueuse/core';
-
+<script setup lang="ts">
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -110,142 +106,221 @@
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
-    export default defineComponent({
-        components: {
-            FieldGroup,
-            FieldSelect,
-            FieldInput,
-            FieldLegend,
-            Icon,
-            TracktorField,
-            PickupField,
-            CircularBtn,
+    const props = defineProps({
+        operativeCradleId: {
+            type: Number,
+            required: true,
         },
-        props: {
-            operativeCradleId: {
-                type: Number,
-                required: true,
-            },
-            backupCradleId: {
-                type: Number,
-                required: true,
-            },
-            operativeForkliftId: {
-                type: Number,
-                required: true,
-            },
-            backupForkliftId: {
-                type: Number,
-                required: true,
-            },
-            traktors: {
-                type: Array,
-                default: () => [],
-            },
-            pickups: {
-                type: Array,
-                default: () => [],
-            },
-            rigmats: {
-                type: Number,
-                required: true,
-            },
-            conex: {
-                type: Number,
-                required: true,
-            },
-            generators: {
-                type: Number,
-                required: true,
-            },
-            tower: {
-                type: Number,
-                required: true,
-            },
-            cabin: {
-                type: Number,
-                required: true,
-            },
-            isFull: {
-                type: Boolean,
-                default: false,
-            },
+        backupCradleId: {
+            type: Number,
+            required: true,
         },
-        setup(props, { emit }) {
-            const {
-                operativeCradleId,
-                backupCradleId,
-                operativeForkliftId,
-                backupForkliftId,
-                traktors,
-                pickups,
-                rigmats,
-                conex,
-                generators,
-                tower,
-                cabin,
-                isFull,
-            } = useVModels(props, emit);
-
-            onMounted(async () => {
-                const WOsData = await axios.get(`${api}/workOrder`);
-                WOs.value = WOsData.data.data;
-                console.log(WOs.value);
-
-                const cradlesData = await axios.get(`${api}/workOrder`);
-                backupCradles.value = cradlesData.data.data;
-                console.log(backupCradles.value);
-
-                const forkliftData = await axios.get(`${api}/workOrder`);
-                backupForklifts.value = forkliftData.data.data;
-                console.log(backupForklifts.value);
-            });
-
-            const WOs = ref([]);
-            const backupCradles = ref([]);
-            const backupForklifts = ref([]);
-
-            const firstTracktorFull = computed(() => {
-                const trackto = traktors.value[0];
-
-                return trackto.chassis !== -1 && trackto.supplier !== -1;
-            });
-            const firstPickupFull = computed(() => {
-                const pickup = pickups.value[0];
-
-                return pickup.pickup_id !== '';
-            });
-
-            watchEffect(() => {
-                isFull.value = !!(
-                    operativeCradleId.value >= 0 &&
-                    operativeForkliftId.value >= 0 &&
-                    traktors.value.length &&
-                    pickups.value.length &&
-                    firstTracktorFull.value &&
-                    firstPickupFull.value &&
-                    conex.value >= 0 &&
-                    generators.value >= 0 &&
-                    rigmats.value >= 0 &&
-                    tower.value >= 0 &&
-                    cabin.value >= 0
-                );
-            });
-
-            return {
-                operativeCradleId,
-                backupCradleId,
-                operativeForkliftId,
-                backupForkliftId,
-                traktors,
-                pickups,
-                rigmats,
-                conex,
-                generators,
-                tower,
-                cabin,
-            };
+        operativeForkliftId: {
+            type: Number,
+            required: true,
         },
+        backupForkliftId: {
+            type: Number,
+            required: true,
+        },
+        traktors: {
+            type: Array,
+            default: () => [],
+        },
+        pickups: {
+            type: Array,
+            default: () => [],
+        },
+        rigmats: {
+            type: Number,
+            required: true,
+        },
+        conex: {
+            type: Number,
+            required: true,
+        },
+        generators: {
+            type: Number,
+            required: true,
+        },
+        tower: {
+            type: Number,
+            required: true,
+        },
+        cabin: {
+            type: Number,
+            required: true,
+        },
+        isFull: {
+            type: Boolean,
+            default: false,
+        },
+    });
+    const emits = defineEmits([
+        'update:operativeCradleId',
+        'update:backupCradleId',
+        'update:operativeForkliftId',
+        'update:backupForkliftId',
+        'update:traktors',
+        'update:pickups',
+        'update:rigmats',
+        'update:conex',
+        'update:generators',
+        'update:tower',
+        'update:cabin',
+        'update:isFull',
+    ]);
+    const {
+        operativeCradleId,
+        backupCradleId,
+        operativeForkliftId,
+        backupForkliftId,
+        traktors,
+        pickups,
+        rigmats,
+        conex,
+        generators,
+        tower,
+        cabin,
+        isFull,
+    } = useVModels(props, emits);
+
+    onMounted(async () => {
+        const WOsData = await axios.get(`${api}/workOrder`);
+        WOs.value = WOsData.data.data;
+        console.log(WOs.value);
+
+        if (WOs.value.length > 0) {
+            const inUseArray = WOs.value.reduce(
+                (acumulador, wo) => {
+                    if (wo.operativeCradle) {
+                        acumulador.cradle.push(Number(wo.operativeCradle));
+                    }
+
+                    if (wo.backupCradle) {
+                        acumulador.cradle.push(Number(wo.backupCradle));
+                    }
+
+                    if (wo.operativeForklift) {
+                        acumulador.forklift.push(Number(wo.operativeForklift));
+                    }
+
+                    if (wo.backupForklift) {
+                        acumulador.forklift.push(Number(wo.operativeForklift));
+                    }
+
+                    return acumulador;
+                },
+                { cradle: [], forklift: [] }
+            );
+
+            inUseCradles.value = [...new Set(inUseArray.cradle)].filter((inUse) => inUse !== -1);
+            inUseForklifts.value = [...new Set(inUseArray.forklift)].filter((inUse) => inUse !== -1);
+        }
+
+        const cradlesData = await axios.get(`${api}/cradle`);
+        Cs.value = cradlesData.data.data;
+
+        const forkliftData = await axios.get(`${api}/forklift`);
+        Fs.value = forkliftData.data.data;
+    });
+
+    /* console.log('>------ Quick Mat');
+            const products = [
+                { name: 'a', price: 222, quantity: 2 },
+                { name: 's', price: 123, quantity: 1 },
+                { name: 'd', price: 90, quantity: 10 },
+                { name: 'v', price: 1000, quantity: 0 },
+            ];
+            let precio = products.reduce(
+                (acumulador, producto) => {
+                    // hago los caculos
+                    acumulador.list.push(producto.name);
+                    acumulador.total += producto.price * producto.quantity;
+                    acumulador.amount += producto.quantity;
+
+                    return acumulador;
+                },
+                { list: [], total: 0, amount: 0 }
+            );
+            /*             let total = products.map((product) => {
+                return product.price * product.quantity;
+            });
+            let precio = 0;
+            for (let i = 0; i < total.length; i++) {
+                const productPrice = total[i];
+                precio += productPrice;
+            }
+
+            console.log(total);
+            console.log(precio);
+            console.log('>------ Quick Mat'); */
+
+    const WOs = ref([]);
+    const Cs = ref([]);
+    const Fs = ref([]);
+    // Sacar del WOs 2 Arrays de IDs de cradles y forklifts
+    const inUseCradles = ref([]);
+    const inUseForklifts = ref([]);
+    // una computed de cradle editando para marcar las En Uso
+    const opCradle = computed(() => {
+        return Cs.value.map((cradle) => {
+            if (inUseCradles.value.includes(cradle.id)) {
+                cradle.name = cradle.name + ' (en uso)';
+            }
+
+            return cradle;
+        });
+    });
+    // una computed de forklift editando para marcar las En Uso
+    const opForklift = computed(() => {
+        return Fs.value.map((forklift) => {
+            if (inUseForklifts.value.includes(forklift.id)) {
+                forklift.name = forklift.name + ' (en uso)';
+            }
+
+            return forklift;
+        });
+    });
+    // [ id: 1, id: 2, id: 3, id: 4 ] operativeCradleId = 3
+    // [ id: 1, id: 2, id: 4 ]
+    // Bouns: creamos 2 compued que aparte filtren el operativId
+    const bpCradle = computed(() => {
+        return Cs.value.filter((cradle) => {
+            return cradle.id !== operativeCradleId.value;
+        });
+    });
+    const bpForklift = computed(() => {
+        return opForklift.value.filter((forklift) => {
+            return forklift.id !== operativeForkliftId.value;
+        });
+    });
+
+    const firstTracktorFull = computed(() => {
+        const trackto = traktors.value[0];
+
+        return trackto.chassis !== -1 && trackto.supplier !== -1;
+    });
+    const firstPickupFull = computed(() => {
+        const pickup = pickups.value[0];
+
+        return pickup.pickup_id !== '';
+    });
+
+    watchEffect(() => {
+        isFull.value = !!(
+            operativeCradleId.value >= 0 &&
+            operativeForkliftId.value >= 0 &&
+            traktors.value.length &&
+            pickups.value.length &&
+            firstTracktorFull.value &&
+            firstPickupFull.value &&
+            conex.value >= 0 &&
+            generators.value >= 0 &&
+            rigmats.value >= 0 &&
+            tower.value >= 0 &&
+            cabin.value >= 0
+        );
     });
 </script>
 
