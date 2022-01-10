@@ -1,6 +1,6 @@
 .mesh-type {
   &__1 {
-    &.radio {
+    &.clickable {
       @apply  border-orange-200 text-orange-200;
     };
     &.boxCard {
@@ -17,7 +17,7 @@
     };
   };
   &__2 {
-    &.radio {
+    &.clickable {
       @apply  border-emerald-200 text-emerald-200;
     };
     &.boxCard {
@@ -35,7 +35,7 @@
     };
   };
   &__3 {
-    &.radio {
+    &.clickable {
       @apply  border-sky-200 text-sky-200;
     };
     &.boxCard {
@@ -52,7 +52,7 @@
     };
   };
   &__4 {
-    &.radio {
+    &.clickable {
       @apply  border-purple-200 text-purple-200;
     };
     &.boxCard {
@@ -70,7 +70,7 @@
     };
   };
   &__5 {
-    &.radio {
+    &.clickable {
       @apply  border-red-100 text-red-100;
     };
     &.boxCard {
@@ -88,7 +88,7 @@
     };
   };
   &__empty {
-    &.radio {
+    &.clickable {
       @apply  border-stone-300 text-stone-300;
     };
     &.boxCard {
@@ -105,7 +105,7 @@
     @apply text-white;
     &.cradle {
       @apply bg-indigo-900;
-      &-radio{
+      &-clickable{
         @apply border-indigo-900 text-indigo-900
       }
       &.icon{
@@ -114,7 +114,7 @@
     };
     &.aisle {
       @apply bg-zinc-600;
-      &-radio{
+      &-clickable{
         @apply border-zinc-600 text-zinc-600
       }
       &.icon{

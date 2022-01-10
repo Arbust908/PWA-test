@@ -132,7 +132,14 @@
             @apply relative z-10;
             &:after {
                 content: '';
-                @apply absolute z-40 inset-0 border-none opacity-75 border bg-slate-700 m-1 rounded;
+                @apply absolute z-40 inset-0 border-none opacity-75 border bg-red-700 m-1 rounded;
+                background: repeating-linear-gradient(
+                    135deg,
+                    rgba(0, 0, 0, 0),
+                    rgba(0, 0, 0, 0) 5px,
+                    rgba(185, 28, 28, 1) 5px,
+                    rgba(185, 28, 28, 1) 10px
+                );
             }
         }
         &.selected {
