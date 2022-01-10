@@ -367,18 +367,15 @@
                             const workOrderId = Number(newVal.data.id);
 
                             if (pits.value.length > 0) {
-                                const isPitsFinished = ref([]);
                                 pits.value.forEach((pit: Pit) => {
                                     const { id, ...newPit } = pit;
                                     newPit.companyId = newWO.clientId;
                                     newPit.workOrderId = workOrderId;
                                     const { data } = useAxios('/pit', { method: 'POST', data: newPit }, instance);
-                                    isPitsFinished.value.push(data);
                                 });
                             }
 
                             if (traktors.value.length > 0) {
-                                const isTraktorsFinished = ref([]);
                                 for (const traktor of traktors.value) {
                                     const { id, ...newTraktor } = traktor;
                                     newTraktor.workOrderId = workOrderId;
@@ -387,7 +384,6 @@
                             }
 
                             if (pickups.value.length > 0) {
-                                const isPickupFinished = ref([]);
                                 for (const pickup of pickups.value) {
                                     const { id, ...newPickup } = pickup;
                                     newPickup.workOrderId = workOrderId;
