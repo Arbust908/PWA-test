@@ -1,43 +1,14 @@
 <template>
-    <FieldGroup class="max-w-2xl">
+    <FieldGroup>
         <FieldLegend>Tractor / Chasis</FieldLegend>
-        <FieldGroup
+        <TraktorGroup
             v-for="(traktor, traktorI) in traktors"
             :key="traktorI"
-            class="relative col-span-full max-w-2xl items-center flex"
-        >
-            <FieldInput
-                class="col-span-full sm:col-span-6 lg:col-span-3"
-                field-name="chassis"
-                placeholder="Id de tractor"
-                :title="traktorI === firstTraktorIndex ? 'ID Tractor/Chasis' : null"
-                :data="traktor.chassis"
-                @update:data="traktor.chassis = $event"
-            />
-            <FieldInput
-                class="col-span-full sm:col-span-6 lg:col-span-4"
-                field-name="supplier"
-                placeholder="Proveedor de tractor"
-                :title="traktorI === firstTraktorIndex ? 'Proveedor' : null"
-                :data="traktor.supplier"
-                @update:data="traktor.supplier = $event"
-            />
-            <FieldInput
-                class="col-span-9 sm:col-span-6 lg:col-span-4"
-                :title="traktorI === firstTraktorIndex ? 'Descripción' : null"
-                field-name="description"
-                placeholder="Descripción de tractor"
-                is-optional
-                :data="traktor.description"
-                @update:data="traktor.description = $event"
-            />
-            <AddDeleteBtn
-                v-if="traktors.length > 1"
-                :class="isFirst(traktor.innerId) ? 'mt-7' : 'mt-2'"
-                purpose="remove"
-                @click="remove(traktor.innerId)"
-            />
-        </FieldGroup>
+            :traktor-length="traktors.length"
+            :traktor="traktor"
+            @remove-traktor="removeTraktor"
+        />
+
         <button class="mt-1 flex items-center col-span-full sm:col-span-6" @click.prevent="add">
             <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
             <span class="font-bold"> Agregar tractor/chasis </span>
@@ -45,85 +16,57 @@
     </FieldGroup>
 </template>
 
-<script lang="ts">
-    import { isFirst } from '@/helpers/iteretionHelpers';
-    import { defineComponent, computed, ref } from 'vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
+<script setup lang="ts">
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+    import TraktorGroup from '@/components/workOrder/traktorGroup.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
-    import { useVModel } from '@vueuse/core';
 
-    export default defineComponent({
-        name: 'WoTraktorField',
-        components: {
-            FieldInput,
-            FieldGroup,
-            FieldLegend,
-            Icon,
-            AddDeleteBtn,
-        },
-        props: {
-            traktors: {
-                type: Array,
-                required: true,
-            },
-        },
-        emits: ['update:traktors'],
-        setup(props, { emit }) {
-            const traktors = useVModel(props, 'traktors', emit);
-            const lastTraktorIndex = computed(() => {
-                return props.traktors.length - 1;
-            });
-
-            const defaultTraktor = {
-                innerId: 0,
-                chassis: '',
-                supplier: '',
-                description: '',
-            };
-
-            if (traktors.value.length === 0) {
-                traktors.value.push(defaultTraktor);
-            }
-
-            const firstTraktorIndex = 0;
-            const tracktorInnerId = ref(0);
-            traktors.value = traktors.value.map((traktor) => {
-                tracktorInnerId.value++;
-                traktor.innerId = traktor.innerId ?? tracktorInnerId.value;
-
-                return traktor;
-            });
-            const remove = (traktorId: number) => {
-                traktors.value = traktors.value.filter((traktor: Traktor) => traktor.innerId !== traktorId);
-            };
-            const add = (): void => {
-                tracktorInnerId.value++;
-                const newTraktorId = tracktorInnerId.value;
-                traktors.value.push({
-                    innerId: newTraktorId,
-                    chassis: '',
-                    supplier: '',
-                    description: '',
-                });
-            };
-
-            if (traktors?.value?.length === 0) {
-                add();
-            }
-
-            return {
-                lastTraktorIndex,
-                firstTraktorIndex,
-                traktors,
-                remove,
-                add,
-                isFirst,
-            };
+    const props = defineProps({
+        traktors: {
+            type: Array,
+            required: true,
         },
     });
+    const emits = defineEmits(['update:traktors']);
+    const traktors = useVModel(props, 'traktors', emits);
+    const tracktorInnerId = ref(0);
+
+    const defaultTraktor = {
+        innerId: 0,
+        chassis: -1,
+        supplier: -1,
+        description: '',
+    };
+
+    if (traktors.value.length === 0) {
+        traktors.value.push({ ...defaultTraktor });
+    }
+
+    traktors.value = traktors.value.map((traktor) => {
+        traktor.innerId = traktor.innerId ?? tracktorInnerId.value;
+        tracktorInnerId.value++;
+
+        return traktor;
+    });
+
+    const add = (): void => {
+        tracktorInnerId.value++;
+        const newTraktorId = tracktorInnerId.value;
+        traktors.value.push({
+            innerId: newTraktorId,
+            chassis: -1,
+            supplier: -1,
+            description: '',
+        });
+    };
+
+    const removeTraktor = (innerId: number) => {
+        const newTraktorsArray = ref([]);
+
+        newTraktorsArray.value = traktors.value.filter((Traktor) => Traktor.innerId !== innerId);
+        traktors.value = newTraktorsArray.value;
+    };
 </script>
 
 <style lang="scss" scoped>

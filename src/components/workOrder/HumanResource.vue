@@ -1,6 +1,6 @@
 <template>
     <form method="POST" action="/" class="p-4 md:flex md:flex-wrap md:gap-20">
-        <FieldGroup v-for="(crew, key) in crews" :key="crew.id" class="max-w-sm w-full content-start">
+        <FieldGroup v-for="(crew, key) in crews" :key="crew.id + key" class="max-w-sm w-full content-start">
             <FieldLegend>
                 <span>{{ crew.title }}</span>
                 <AddDeleteBtn v-if="crews.length > 1" purpose="remove" @click="removeCrew(crew.id)" />
@@ -16,130 +16,96 @@
                 </label>
             </section>
             <section class="col-span-full">
-                <FieldGroup v-for="(people, peopleI) in crew.resources" :key="people.id" class="pt-2 pb-3 relative">
-                    <!-- TODO: Pasaria a FiledSelect si tuvieramos ABM de roles y Usuarios -->
-                    <FieldInput
-                        class="col-span-full mr-5"
-                        :title="peopleI === 0 ? 'Rol' : null"
-                        :field-name="`crew-${crew.id}-${people.id}-role`"
-                        placeholder="Rol"
-                        :data="people.role"
-                        @update:data="people.role = $event"
-                    />
-                    <span v-if="notOnly(crew.resources)" class="md:absolute md:-right-12 ml-4 md:top-4">
-                        <AddDeleteBtn purpose="remove" @click="removeResource(crew.id, people.id)" />
-                    </span>
-                    <FieldInput
-                        class="col-span-full mr-5"
-                        :field-name="`crew-${crew.id}-${people.id}-name`"
-                        placeholder="Empleado"
-                        :data="people.name"
-                        @update:data="people.name = $event"
-                    />
-                </FieldGroup>
+                <PeopleGroup
+                    v-for="(people, peopleI) in crew.resources"
+                    :key="people.id"
+                    :people="people"
+                    :people-index="peopleI"
+                    :crew-id="crew.id"
+                    :not-lonly-resource="notLonly(crew.resources)"
+                    :users="users"
+                    :roles="roles"
+                    @remove-resource="removeResource($event[0], $event[1])"
+                />
             </section>
             <span class="col-span-12">
                 <button class="mt-1 flex items-center" @click.prevent="addResource(crew.id)">
                     <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
-                    <span class="font-bold text-lg"> Agregar otro </span>
+                    <span class="font-bold text-lg"> Agregar rol </span>
                 </button>
             </span>
         </FieldGroup>
     </form>
 </template>
 
-<script lang="ts">
-    import { computed } from 'vue';
+<script setup lang="ts">
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import TimePicker from '@/components/ui/form/TimePicker.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
+    import PeopleGroup from '@/components/workOrder/peopleGroup.vue';
 
-    import { useVModels } from '@vueuse/core';
     import { HumanResource, Crew } from '@/interfaces/sandflow';
 
-    export default {
-        components: {
-            FieldGroup,
-            FieldInput,
-            FieldLegend,
-            AddDeleteBtn,
-            Icon,
-            TimePicker,
+    import { notLonly, getLast } from '@/helpers/iteretionHelpers';
+
+    import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+
+    const props = defineProps({
+        crews: {
+            type: Array,
+            default: () => [],
         },
-        props: {
-            crews: {
-                type: Array,
-                default: () => [],
-            },
-            isFull: {
-                type: Boolean,
-                default: false,
-            },
+        isFull: {
+            type: Boolean,
+            default: false,
         },
-        setup(props, { emit }) {
-            const { crews } = useVModels(props, emit);
-            const defaultResource = {
-                id: 0,
-                name: '',
-                role: '',
-            };
-            const removeResource = (crewId: number, peopleId: number) => {
-                const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-                selectedCrew.resources = selectedCrew.resources.filter(
-                    (resource: HumanResource) => resource.id !== peopleId
-                );
-            };
-            const addResource = (crewId: number): void => {
-                const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-                const lastId = selectedCrew.resources.length;
-                selectedCrew.resources.push({
-                    ...defaultResource,
-                    id: lastId,
-                });
-            };
-            const removeCrew = (crewId: number): void => {
-                crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
-            };
+    });
+    const emits = defineEmits(['update:crews']);
+    const { crews } = useVModels(props, emits);
+    const roles = ref([]);
+    const users = ref([]);
 
-            if (crews?.value?.some((crew: Crew) => crew.resources.length === 0)) {
-                crews.value.forEach((crew: Crew) => {
-                    if (crew.resources.length === 0) {
-                        addResource(crew.id);
-                    }
-                });
-            }
+    onMounted(async () => {
+        const result = await axios.get(`${api}/role`);
+        roles.value = result.data.data.filter((role: any) => role.id !== 2);
+        const result2 = await axios.get(`${api}/user`);
+        users.value = result2.data.data;
+    });
 
-            const notLast = (crewInnerId: number, crewList: Array<HumanResource>) => {
-                if (crewList.length === 0) {
-                    return false;
-                }
-                const lastCrew = crewList[crewList.length - 1];
-
-                return crewInnerId !== lastCrew.id;
-            };
-            const notOnly = (crewList: Array<HumanResource>) => {
-                return crewList.length > 1;
-            };
-
-            // Is the RRHH section is full
-            const isRRHHFull = computed(() => {
-                return !!(crews.value.length > 0 && crews.value[0].start_time && crews.value[0].end_time);
-            });
-
-            return {
-                addResource,
-                crews,
-                isRRHHFull,
-                notLast,
-                notOnly,
-                removeCrew,
-                removeResource,
-            };
-        },
+    const defaultResource = {
+        id: 0,
+        name: -1,
+        role: -1,
     };
+
+    const removeResource = (crewId: number, peopleId: number) => {
+        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        selectedCrew.resources = selectedCrew.resources.filter((resource: HumanResource) => resource.id !== peopleId);
+    };
+
+    const addResource = (crewId: number): void => {
+        const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
+        const lastResource = getLast(selectedCrew.resources);
+        const lastId = lastResource.id + 1 || 1; // ***
+        selectedCrew.resources.push({
+            ...defaultResource,
+            id: lastId,
+        });
+    };
+
+    const removeCrew = (crewId: number): void => {
+        crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
+    };
+
+    if (crews?.value?.some((crew: Crew) => crew.resources?.length === 0)) {
+        crews.value.forEach((crew: Crew) => {
+            if (crew.resources?.length === 0 && crew.id) {
+                addResource(crew.id);
+            }
+        });
+    }
 </script>
 
 <style lang="scss" scoped>

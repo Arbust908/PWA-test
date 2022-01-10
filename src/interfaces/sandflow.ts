@@ -29,8 +29,8 @@ export interface Pickup {
 }
 export interface HumanResource {
     id?: number;
-    role: string;
-    name: string;
+    role: string | number;
+    name: string | number;
     crewId: number;
     crew?: Crew;
 }
