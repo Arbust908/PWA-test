@@ -1,5 +1,5 @@
 .mesh-type {
-  &__a {
+  &__1 {
     &.radio {
       @apply  border-orange-200 text-orange-200;
     };
@@ -16,7 +16,7 @@
       @apply border border-amber-800;
     };
   };
-  &__b {
+  &__2 {
     &.radio {
       @apply  border-emerald-200 text-emerald-200;
     };
@@ -34,7 +34,7 @@
       @apply border border-emerald-800;
     };
   };
-  &__c {
+  &__3 {
     &.radio {
       @apply  border-sky-200 text-sky-200;
     };
@@ -51,7 +51,7 @@
       @apply border border-sky-900;
     };
   };
-  &__d {
+  &__4 {
     &.radio {
       @apply  border-purple-200 text-purple-200;
     };
@@ -69,7 +69,7 @@
       @apply border border-violet-900;
     };
   };
-  &__e {
+  &__5 {
     &.radio {
       @apply  border-red-100 text-red-100;
     };
@@ -103,14 +103,20 @@
   };
   &__taken {
     @apply text-white;
-    &-cradle {
+    &.cradle {
       @apply bg-indigo-900;
+      &-radio{
+        @apply border-indigo-900 text-indigo-900
+      }
       &.icon{
         color: #6160A3;
       };
     };
-    &-aisle {
+    &.aisle {
       @apply bg-zinc-600;
+      &-radio{
+        @apply border-zinc-600 text-zinc-600
+      }
       &.icon{
         @apply text-zinc-400;
       };

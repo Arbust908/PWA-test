@@ -1,6 +1,6 @@
 <template>
     <button
-        :class="['box', category, isTheSelected ? 'selected' : null, isBlocked() ? 'blocked' : null]"
+        :class="['box', cardClass, isTheSelected ? 'selected' : null, isBlocked() ? 'blocked' : null]"
         @click.prevent="selectBox"
     >
         <span class="text-sm">{{ id }}</span>
@@ -49,6 +49,27 @@
                 return boxData && boxData.value ? boxData.value.category : 'empty';
             });
 
+            const cardClass = computed(() => {
+                switch (category.value) {
+                    case '1':
+                        return 'mesh-type__1 boxCard';
+                    case '2':
+                        return 'mesh-type__2 boxCard';
+                    case '3':
+                        return 'mesh-type__3 boxCard';
+                    case '4':
+                        return 'mesh-type__4 boxCard';
+                    case '5':
+                        return 'mesh-type__5 boxCard';
+                    case 'empty':
+                        return 'mesh-type__empty boxCard';
+                    case 'aisle':
+                        return 'mesh-type__taken aisle';
+                    case 'cradle':
+                        return 'mesh-type__taken cradle';
+                }
+            });
+
             const id = computed(() => {
                 return boxData && boxData.value ? boxData.value.id : '';
             });
@@ -92,6 +113,7 @@
 
             return {
                 category,
+                cardClass,
                 selectBox,
                 isTheSelected,
                 isBlocked,
@@ -102,29 +124,16 @@
 </script>
 
 <style lang="scss" scoped>
+    @import '@/assets/box.scss';
     .box {
         @apply h-[58px] w-[58px] rounded bg-second-300;
-        &.aisle {
-            @apply bg-second-300 text-second-300;
-        }
-        &.fina {
-            @apply bg-[#FFD19B] text-[#974A08] font-medium;
-        }
-        &.gruesa {
-            @apply bg-[#AFDCC6] text-[#106843] font-medium;
-        }
-        &.cortada {
-            @apply bg-[#A6AFFE] text-[#2E36AF] font-medium;
-        }
+
         &.blocked {
             @apply relative z-10;
             &:after {
                 content: '';
                 @apply absolute z-40 inset-0 border-none opacity-75 border bg-slate-700 m-1 rounded;
             }
-        }
-        &.empty {
-            @apply bg-second-200 text-second-200;
         }
         &.selected {
             @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
