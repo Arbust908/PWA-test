@@ -169,194 +169,139 @@
     </table>
 </template>
 
-<script lang="ts">
-    import { defineComponent, toRefs, reactive, computed } from 'vue';
+<script setup lang="ts">
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
-    import Pill from '@/components/ui/Pill.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import { Sand } from '@/interfaces/sandflow';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import DropdownBtn from '@/components/ui/buttons/DropdownBtn.vue';
     import { useApi } from '@/helpers/useApi';
 
-    export default defineComponent({
-        components: {
-            Icon,
-            Pill,
-            FieldSelect,
-            FieldWithSides,
-            CircularBtn,
-            DropdownBtn,
+    const props = defineProps({
+        stage: {
+            type: Object,
+            required: true,
         },
-        props: {
-            stage: {
-                type: Object,
-                required: true,
-            },
-            editing: {
-                type: Number,
-                required: true,
-            },
-            sands: {
-                type: Array,
-                required: true,
-            },
-            pos: {
-                type: Number,
-                required: true,
-            },
-            editingKey: {
-                type: String,
-                default: 'id',
-            },
-            stagesAmount: {
-                type: Number,
-                default: 0,
-            },
+        editing: {
+            type: Number,
+            required: true,
         },
-        setup(props, { emit }) {
-            const { stage, editing, sands, pos, editingKey } = toRefs(props);
-            stage.value.stage = pos.value;
-
-            const { read: getSands } = useApi('/sand');
-
-            const backupSandTypes = getSands();
-            console.log(backupSandTypes.value);
-
-            const sandTypes1 = computed(() => {
-                return backupSandTypes?.value?.filter((sand) => {
-                    return (
-                        sand.id !== stage.value.sandId2 &&
-                        sand.id !== stage.value.sandId3 &&
-                        sand.id !== stage.value.sandId4
-                    );
-                });
-            });
-
-            const sandTypes2 = computed(() => {
-                return backupSandTypes?.value?.filter((sand) => {
-                    return (
-                        sand.id !== stage.value.sandId1 &&
-                        sand.id !== stage.value.sandId3 &&
-                        sand.id !== stage.value.sandId4
-                    );
-                });
-            });
-
-            const sandTypes3 = computed(() => {
-                return backupSandTypes?.value?.filter((sand) => {
-                    return (
-                        sand.id !== stage.value.sandId1 &&
-                        sand.id !== stage.value.sandId2 &&
-                        sand.id !== stage.value.sandId4
-                    );
-                });
-            });
-
-            const sandTypes4 = computed(() => {
-                return backupSandTypes?.value?.filter((sand) => {
-                    return (
-                        sand.id !== stage.value.sandId1 &&
-                        sand.id !== stage.value.sandId2 &&
-                        sand.id !== stage.value.sandId3
-                    );
-                });
-            });
-
-            const totalWheight = computed(() => {
-                return (
-                    Number(stage.value.quantity1) + Number(stage.value.quantity2) + Number(stage.value.quantity3) || 0
-                );
-            });
-            const getSand = (sandId: number) => {
-                return (
-                    sands.value.find((sand: Sand) => {
-                        return Number(sand.id) === sandId;
-                    }) || { tpye: '' }
-                );
-            };
-
-            const editStage = () => {
-                emit('editStage', stage.value);
-            };
-            const saveStage = () => {
-                emit('saveStage', stage.value);
-            };
-            const duplicateStage = () => {
-                emit('duplicateStage', stage.value);
-            };
-            const deleteStage = () => {
-                emit('deleteStage', stage.value);
-            };
-            const upgrade = () => {
-                if (stage.value.status >= 2) {
-                    console.error('Reset status');
-                    stage.value.status = 0;
-
-                    return;
-                }
-                stage.value.status++;
-            };
-
-            const pill = reactive({
-                status: stage.value.status === 2 ? 'finished' : stage.value.status === 1 ? 'idle' : 'empty',
-                name: stage.value.status === 2 ? 'Finalizada' : stage.value.status === 1 ? 'En Progreso' : 'Creada',
-            });
-
-            const actions = [
-                {
-                    label: 'Editar',
-                    hide: () => {
-                        return !(editing.value === Number(stage.value[editingKey.value]));
-                    },
-                    callback: () => {
-                        editStage();
-                    },
-                },
-                {
-                    label: 'Guardar',
-                    hide: () => {
-                        return editing.value === Number(stage.value[editingKey.value]);
-                    },
-                    callback: () => {
-                        saveStage();
-                    },
-                },
-                {
-                    label: 'Clonar',
-                    callback: () => {
-                        duplicateStage();
-                    },
-                },
-                {
-                    label: 'Eliminar',
-                    callback: () => {
-                        deleteStage();
-                    },
-                },
-            ];
-
-            return {
-                stage,
-                editing,
-                sands,
-                sandTypes1,
-                sandTypes2,
-                sandTypes3,
-                sandTypes4,
-                totalWheight,
-                getSand,
-                duplicateStage,
-                deleteStage,
-                editStage,
-                saveStage,
-                upgrade,
-                pill,
-                actions,
-            };
+        sands: {
+            type: Array,
+            required: true,
+        },
+        pos: {
+            type: Number,
+            required: true,
+        },
+        editingKey: {
+            type: String,
+            default: 'id',
+        },
+        stagesAmount: {
+            type: Number,
+            default: 0,
         },
     });
+
+    const emits = defineEmits(['editStage', 'saveStage', 'duplicateStage', 'deleteStage']);
+
+    const { stage, editing, sands, pos, editingKey } = toRefs(props);
+    stage.value.stage = pos.value;
+
+    const { read: getSands } = useApi('/sand');
+
+    const backupSandTypes = getSands();
+
+    const sandTypes1 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId3 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes2 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId3 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes3 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes4 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId3
+            );
+        });
+    });
+
+    const totalWheight = computed(() => {
+        return Number(stage.value.quantity1) + Number(stage.value.quantity2) + Number(stage.value.quantity3) || 0;
+    });
+    const getSand = (sandId: number) => {
+        return (
+            sands.value.find((sand: Sand) => {
+                return Number(sand.id) === sandId;
+            }) || { tpye: '' }
+        );
+    };
+
+    const editStage = () => {
+        emits('editStage', stage.value);
+    };
+    const saveStage = () => {
+        emits('saveStage', stage.value);
+    };
+    const duplicateStage = () => {
+        emits('duplicateStage', stage.value);
+    };
+    const deleteStage = () => {
+        emits('deleteStage', stage.value);
+    };
+
+    const actions = [
+        {
+            label: 'Editar',
+            hide: () => {
+                return !(editing.value === Number(stage.value[editingKey.value]));
+            },
+            callback: () => {
+                editStage();
+            },
+        },
+        {
+            label: 'Guardar',
+            hide: () => {
+                return editing.value === Number(stage.value[editingKey.value]);
+            },
+            callback: () => {
+                saveStage();
+            },
+        },
+        {
+            label: 'Clonar',
+            callback: () => {
+                duplicateStage();
+            },
+        },
+        {
+            label: 'Eliminar',
+            callback: () => {
+                deleteStage();
+            },
+        },
+    ];
 </script>
 
 <style lang="scss" scoped>

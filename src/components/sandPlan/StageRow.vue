@@ -1,85 +1,77 @@
 <template>
     <tr>
-        <td class="text-gray-500 px-3 text-center py-4 whitespace-nowrap text-lg">{{ pos }} - {{ stagesAmount }}</td>
+        <td class="text-gray-500 px-3 text-center py-4 text-lg">{{ pos }} - {{ stagesAmount }}</td>
         <template v-if="editing === Number(stage[editingKey])">
             <td :id="`sandType${stage.id}`" class="typeWrap">
                 <FieldSelect
+                    v-model:data="stage.sandId1"
                     field-name="sandType1"
                     placeholder="Seleccionar"
                     :endpoint-data="sandTypes1"
                     endpoint-key="type"
-                    :data="stage.sandId1"
-                    @update:data="stage.sandId1 = $event"
                 />
                 <FieldWithSides
+                    v-model:data="stage.quantity1"
                     class="mt-2"
                     field-name="sandQuantity1"
                     placeholder="0 t"
                     type="number"
-                    maxNumberAmount="9999"
+                    :max-number-amount="9999"
                     :post="{ title: '0', value: 't' }"
-                    :data="stage.quantity1"
-                    @update:data="stage.quantity1 = $event"
                 />
             </td>
             <td class="typeWrap">
                 <FieldSelect
+                    v-model:data="stage.sandId2"
                     field-name="sandType2"
                     placeholder="Seleccionar"
                     :endpoint-data="sandTypes2"
                     endpoint-key="type"
-                    :data="stage.sandId2"
-                    @update:data="stage.sandId2 = $event"
                 />
                 <FieldWithSides
+                    v-model:data="stage.quantity2"
                     class="mt-2"
                     field-name="sandQuantity2"
                     placeholder="0 t"
                     type="number"
-                    maxNumberAmount="9999"
+                    :max-number-amount="9999"
                     :post="{ title: '0', value: 't' }"
-                    :data="stage.quantity2"
-                    @update:data="stage.quantity2 = $event"
                 />
             </td>
             <td class="typeWrap">
                 <FieldSelect
+                    v-model:data="stage.sandId3"
                     field-name="sandType3"
                     placeholder="Seleccionar"
                     :endpoint-data="sandTypes3"
                     endpoint-key="type"
-                    :data="stage.sandId3"
-                    @update:data="stage.sandId3 = $event"
                 />
                 <FieldWithSides
+                    v-model:data="stage.quantity3"
                     class="mt-2"
                     field-name="sandQuantity3"
                     placeholder="0 t"
                     type="number"
-                    maxNumberAmount="9999"
+                    :max-number-amount="9999"
                     :post="{ title: '0', value: 't' }"
-                    :data="stage.quantity3"
-                    @update:data="stage.quantity3 = $event"
                 />
             </td>
             <td class="typeWrap">
                 <FieldSelect
+                    v-model:data="stage.sandId4"
                     field-name="sandType4"
                     placeholder="Seleccionar"
                     :endpoint-data="sandTypes4"
                     endpoint-key="type"
-                    :data="stage.sandId4"
-                    @update:data="stage.sandId4 = $event"
                 />
                 <FieldWithSides
+                    v-model:data="stage.quantity4"
                     class="mt-2"
                     field-name="sandQuantity4"
                     placeholder="0 t"
                     type="number"
-                    maxNumberAmount="9999"
+                    :max-number-amount="9999"
                     :post="{ title: '0', value: 't' }"
-                    :data="stage.quantity4"
-                    @update:data="stage.quantity4 = $event"
                 />
             </td>
         </template>
@@ -152,10 +144,7 @@
     </tr>
 </template>
 
-<script lang="ts">
-    import { defineComponent, toRefs, reactive, computed } from 'vue';
-    import Popper from 'vue3-popper';
-    import Pill from '@/components/ui/Pill.vue';
+<script setup lang="ts">
     import Icon from '@/components/icon/TheAllIcon.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
@@ -164,202 +153,142 @@
     import DropdownBtn from '@/components/ui/buttons/DropdownBtn.vue';
     import { useApi } from '@/helpers/useApi';
 
-    export default defineComponent({
-        components: {
-            Icon,
-            Pill,
-            FieldSelect,
-            FieldWithSides,
-            CircularBtn,
-            DropdownBtn,
-            Popper,
+    const props = defineProps({
+        actions: {
+            type: Array,
+            default: () => [],
         },
-        props: {
-            actions: {
-                type: Array,
-                default: () => [],
-            },
-            stage: {
-                type: Object,
-                required: true,
-            },
-            editing: {
-                type: Number,
-                required: true,
-            },
-            sands: {
-                type: Array,
-                required: true,
-            },
-            pos: {
-                type: Number,
-                required: true,
-            },
-            // ESTO ES TEMPÖRAL
-            // ESTO PASARIA A SER InnerID
-            editingKey: {
-                type: String,
-                default: 'id',
-            },
-            stagesAmount: {
-                type: Number,
-                default: 0,
-            },
+        stage: {
+            type: Object,
+            required: true,
         },
-        setup(props, { emit }) {
-            const { stage, editing, sands, pos, editingKey, stagesAmount } = toRefs(props);
-            stage.value.stage = pos.value;
-
-            const { read: getSands } = useApi('/sand');
-
-            const backupSandTypes = getSands();
-            console.log(backupSandTypes.value);
-
-            const sandTypes1 = computed(() => {
-                return backupSandTypes?.value?.filter((sand) => {
-                    return (
-                        sand.id !== stage.value.sandId2 &&
-                        sand.id !== stage.value.sandId3 &&
-                        sand.id !== stage.value.sandId4
-                    );
-                });
-            });
-
-            const sandTypes2 = computed(() => {
-                return backupSandTypes?.value?.filter((sand) => {
-                    return (
-                        sand.id !== stage.value.sandId1 &&
-                        sand.id !== stage.value.sandId3 &&
-                        sand.id !== stage.value.sandId4
-                    );
-                });
-            });
-
-            const sandTypes3 = computed(() => {
-                return backupSandTypes?.value?.filter((sand) => {
-                    return (
-                        sand.id !== stage.value.sandId1 &&
-                        sand.id !== stage.value.sandId2 &&
-                        sand.id !== stage.value.sandId4
-                    );
-                });
-            });
-
-            const sandTypes4 = computed(() => {
-                return backupSandTypes?.value?.filter((sand) => {
-                    return (
-                        sand.id !== stage.value.sandId1 &&
-                        sand.id !== stage.value.sandId2 &&
-                        sand.id !== stage.value.sandId3
-                    );
-                });
-            });
-
-            const totalWheight = computed(() => {
-                return (
-                    Number(stage.value.quantity1) +
-                        Number(stage.value.quantity2) +
-                        Number(stage.value.quantity3) +
-                        Number(stage.value.quantity4) || 0
-                );
-            });
-            const getSand = (sandId: number) => {
-                return (
-                    sands.value.find((sand: Sand) => {
-                        return Number(sand.id) === sandId;
-                    }) || { type: '' }
-                );
-            };
-
-            const editStage = () => {
-                emit('editStage', stage.value);
-            };
-            const saveStage = () => {
-                emit('saveStage', stage.value);
-            };
-            const duplicateStage = () => {
-                console.log(stage.value.quantity1);
-                // emit('duplicateStage', stage.value);
-            };
-            const deleteStage = () => {
-                emit('deleteStage', stage.value);
-            };
-            const upgrade = () => {
-                if (stage.value.status >= 2) {
-                    console.error('Reset status');
-                    stage.value.status = 0;
-
-                    return;
-                }
-                stage.value.status++;
-            };
-
-            const pill = reactive({
-                status: stage.value.status === 2 ? 'finished' : stage.value.status === 1 ? 'idle' : 'empty',
-                name: stage.value.status === 2 ? 'Finalizada' : stage.value.status === 1 ? 'En Progreso' : 'Creada',
-            });
-
-            const actions = [
-                {
-                    label: 'Editar',
-                    hide: () => {
-                        return !(editing.value === Number(stage.value[editingKey.value]));
-                    },
-                    callback: () => {
-                        editStage();
-                    },
-                },
-                {
-                    label: 'Guardar',
-                    hide: () => {
-                        return editing.value === Number(stage.value[editingKey.value]);
-                    },
-                    callback: () => {
-                        saveStage();
-                    },
-                },
-                {
-                    label: 'Clonar',
-                    callback: () => {
-                        duplicateStage();
-                    },
-                },
-                {
-                    label: 'Eliminar',
-                    hide: () => {
-                        return !(stagesAmount.value < 2);
-                    },
-                    callback: () => {
-                        deleteStage();
-                    },
-                },
-            ];
-
-            const headers = {
-                'Content-Type': 'Application/JSON',
-            };
-
-            return {
-                stage,
-                editing,
-                sands,
-                sandTypes1,
-                sandTypes2,
-                sandTypes3,
-                sandTypes4,
-                backupSandTypes,
-                totalWheight,
-                getSand,
-                duplicateStage,
-                deleteStage,
-                editStage,
-                saveStage,
-                upgrade,
-                pill,
-                actions,
-            };
+        editing: {
+            type: Number,
+            required: true,
+        },
+        sands: {
+            type: Array,
+            required: true,
+        },
+        pos: {
+            type: Number,
+            required: true,
+        },
+        // ESTO ES TEMPÖRAL
+        // ESTO PASARIA A SER InnerID
+        editingKey: {
+            type: String,
+            default: 'id',
+        },
+        stagesAmount: {
+            type: Number,
+            default: 0,
         },
     });
+    const emit = defineEmits(['editStage', 'saveStage', 'duplicateStage', 'deleteStage']);
+    const { stage, editing, sands, pos, editingKey, stagesAmount } = toRefs(props);
+    stage.value.stage = pos.value;
+
+    const { read: getSands } = useApi('/sand');
+
+    const backupSandTypes = getSands();
+
+    const sandTypes1 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId3 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes2 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId3 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes3 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes4 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId3
+            );
+        });
+    });
+
+    const totalWheight = computed(() => {
+        return (
+            Number(stage.value.quantity1) +
+                Number(stage.value.quantity2) +
+                Number(stage.value.quantity3) +
+                Number(stage.value.quantity4) || 0
+        );
+    });
+    const getSand = (sandId: number) => {
+        return (
+            sands.value.find((sand: Sand) => {
+                return Number(sand.id) === sandId;
+            }) || { type: '' }
+        );
+    };
+
+    const editStage = () => {
+        emit('editStage', stage.value);
+    };
+    const saveStage = () => {
+        emit('saveStage', stage.value);
+    };
+    const duplicateStage = () => {
+        emit('duplicateStage', stage.value);
+    };
+    const deleteStage = () => {
+        emit('deleteStage', stage.value);
+    };
+
+    const actions = [
+        {
+            label: 'Editar',
+            hide: () => {
+                return !(editing.value === Number(stage.value[editingKey.value]));
+            },
+            callback: () => {
+                editStage();
+            },
+        },
+        {
+            label: 'Guardar',
+            hide: () => {
+                return editing.value === Number(stage.value[editingKey.value]);
+            },
+            callback: () => {
+                saveStage();
+            },
+        },
+        {
+            label: 'Clonar',
+            callback: () => {
+                duplicateStage();
+            },
+        },
+        {
+            label: 'Eliminar',
+            hide: () => {
+                return !(stagesAmount.value < 2);
+            },
+            callback: () => {
+                deleteStage();
+            },
+        },
+    ];
 </script>
 
 <style lang="scss" scoped>

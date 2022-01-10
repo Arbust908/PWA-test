@@ -43,32 +43,28 @@
                     </section>
                 </header>
                 <div class="flex flex-col">
-                    <div class="overflow-x-auto">
-                        <div class="align-middle inline-block min-w-full">
-                            <div class="overflow-x-hidden">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead>
-                                        <StageHeader />
-                                    </thead>
-                                    <tbody v-show="currentOpened" class="divide-y">
-                                        <SandPlanStage
-                                            v-for="(stage, Key) in inProgressStages"
-                                            :key="Key"
-                                            :pos="Key + 1"
-                                            :stage="stage"
-                                            :editing="editingStage"
-                                            :sands="sands"
-                                            :stagesAmount="currentSandPlan.stages.length"
-                                            @editStage="editStage"
-                                            @saveStage="saveStage"
-                                            @duplicateStage="duplicateStage"
-                                            @deleteStage="deleteStage"
-                                        />
-                                        <StageEmptyState v-if="inProgressStages.length <= 0" />
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="align-middle inline-block min-w-full">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <StageHeader />
+                            </thead>
+                            <tbody v-show="currentOpened" class="divide-y">
+                                <SandPlanStage
+                                    v-for="(stage, Key) in inProgressStages"
+                                    :key="Key"
+                                    :pos="Key + 1"
+                                    :stage="stage"
+                                    :editing="editingStage"
+                                    :sands="sands"
+                                    :stages-amount="currentSandPlan.stages.length"
+                                    @editStage="editStage"
+                                    @saveStage="saveStage"
+                                    @duplicateStage="duplicateStage"
+                                    @deleteStage="deleteStage"
+                                />
+                                <StageEmptyState v-if="inProgressStages.length <= 0" />
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </form>
@@ -110,14 +106,12 @@
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
-                        :stagesAmount="currentSandPlan.stages.length - 1"
-                        :actions="actions"
+                        :stages-amount="currentSandPlan.stages.length - 1"
                         editing-key="innerId"
                         @editStage="editStage"
                         @saveStage="saveStage"
                         @duplicateStage="duplicateStage"
                         @deleteStage="deleteStage"
-                        @upgrade="upgrade"
                     />
                 </div>
             </form>
@@ -340,6 +334,7 @@
                         check = false;
                     }
                 });
+
                 return check;
             };
 
@@ -393,6 +388,7 @@
                     if (stage.sandId3 === -1) {
                         stage.sandId3 = null;
                     }
+
                     if (stage.sandId4 === -1) {
                         stage.sandId4 = null;
                     }
