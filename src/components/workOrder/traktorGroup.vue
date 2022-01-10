@@ -41,7 +41,11 @@
             placeholder="Descripción de tractor"
             is-optional
         />
-        <AddDeleteBtn purpose="remove" @click.prevent="$emit('removeTraktor', traktor.innerId)" />
+        <AddDeleteBtn
+            v-if="traktorLength > 1"
+            purpose="remove"
+            @click.prevent="$emit('removeTraktor', traktor.innerId)"
+        />
     </FieldGroup>
 </template>
 

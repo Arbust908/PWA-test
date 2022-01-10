@@ -44,6 +44,7 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import PeopleGroup from '@/components/workOrder/peopleGroup.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
 
     import { HumanResource, Crew } from '@/interfaces/sandflow';
 

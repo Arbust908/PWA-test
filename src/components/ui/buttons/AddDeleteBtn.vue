@@ -1,5 +1,5 @@
 <template>
-    <CircularBtn size="sm" :btn="purposeRender ? 'bg-green-500 !px-0' : '!px-0'">
+    <CircularBtn size="sm" :btn="purposeRender ? 'bg-green-500 !px-0' : '!px-0 hover:!bg-red-500 hover:!text-white'">
         <Icon v-if="purposeRender" icon="Plus" class="w-5 h-5 text-white" />
         <TrashIcon v-else />
     </CircularBtn>

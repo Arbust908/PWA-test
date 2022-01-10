@@ -9,9 +9,7 @@
             :endpoint-data="roles"
         />
         <span v-if="notLonlyResource" :class="lonlyClasses" class="md:absolute md:-right-12 ml-4">
-            <CircularBtn class="btn__delete" size="sm" @click="$emit('removeResource', [crewId, resource.id])">
-                <Icon icon="Trash" class="w-6 h-6" />
-            </CircularBtn>
+            <AddDeleteBtn class="mt-8" purpose="remove" @click="$emit('removeResource', [crewId, resource.id])" />
         </span>
 
         <FieldSelect
@@ -26,70 +24,51 @@
     </FieldGroup>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
 
-    export default defineComponent({
-        components: {
-            FieldGroup,
-            FieldSelect,
-            CircularBtn,
-            Icon,
+    const props = defineProps({
+        people: {
+            type: Object,
+            required: true,
         },
-        props: {
-            people: {
-                type: Object,
-                required: true,
-            },
-            roles: {
-                type: Array,
-                required: true,
-            },
-            users: {
-                type: Array,
-                required: true,
-            },
-            crewId: {
-                type: Number,
-                required: true,
-            },
-            peopleIndex: {
-                type: Number,
-                default: 0,
-            },
-            notLonlyResource: {
-                type: Boolean,
-                default: false,
-            },
+        roles: {
+            type: Array,
+            required: true,
         },
-        emits: ['removeResource', 'update:people'],
-        setup(props) {
-            const resource = useVModel(props, 'people');
-
-            const lonlyClasses = () => {
-                return props.peopleIndex === 0 ? 'md:top-10' : 'md:top-6';
-            };
-
-            const noAdminUsers = computed(() => {
-                if (props.roles && props.people.role > -1) {
-                    return props.users.filter((user: any) => {
-                        return user.roleId === props.people.role;
-                    });
-                }
-
-                return [];
-            });
-
-            return {
-                lonlyClasses,
-                noAdminUsers,
-                resource,
-            };
+        users: {
+            type: Array,
+            required: true,
+        },
+        crewId: {
+            type: Number,
+            required: true,
+        },
+        peopleIndex: {
+            type: Number,
+            default: 0,
+        },
+        notLonlyResource: {
+            type: Boolean,
+            default: false,
         },
     });
-</script>
+    const emits = defineEmits(['removeResource', 'update:people']);
+    const resource = useVModel(props, 'people', emits);
 
-<style scoped></style>
+    const lonlyClasses = () => {
+        return props.peopleIndex === 0 ? 'md:top-10' : 'md:top-6';
+    };
+
+    const noAdminUsers = computed(() => {
+        if (props.roles && props.people.role > -1) {
+            return props.users.filter((user: any) => {
+                return user.roleId === props.people.role;
+            });
+        }
+
+        return [];
+    });
+</script>
