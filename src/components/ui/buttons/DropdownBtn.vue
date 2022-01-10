@@ -1,7 +1,7 @@
 <template>
     <div class="group relative">
         <!-- btn slot -->
-        <button @click="toggleShow">
+        <button @click.prevent="toggleShow">
             <slot></slot>
         </button>
         <OnClickOutside @trigger="closeIfOpen">
