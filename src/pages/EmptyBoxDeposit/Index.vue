@@ -19,6 +19,10 @@
                 <h1 class="text-center mt-4">Cajas Seleccionadas</h1>
             </section>
         </div>
+        <footer class="mt-8 space-x-3 flex justify-end">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/')">Cancelar</SecondaryBtn>
+            <PrimaryBtn btn="wide" size="md"> Guardar </PrimaryBtn>
+        </footer>
     </Layout>
 </template>
 
@@ -27,6 +31,8 @@
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -38,6 +44,8 @@
             ABMFormTitle,
             ClientPitCombo,
             FieldGroup,
+            PrimaryBtn,
+            SecondaryBtn,
         },
 
         setup() {
