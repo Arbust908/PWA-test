@@ -111,7 +111,6 @@
     import TracktoField from '@/components/workOrder/woTraktorField.vue';
     import PickupField from '@/components/workOrder/woPickupField.vue';
 
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import { Pit } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
 
@@ -124,7 +123,6 @@
             Icon,
             TracktoField,
             PickupField,
-            CircularBtn,
         },
         props: {
             operativeCradleId: {

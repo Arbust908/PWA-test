@@ -87,24 +87,17 @@
                             :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'"
                             class="col-span-1 md:col-span-2 flex flex-row"
                         >
-                            <CircularBtn
+                            <AddDeleteBtn
                                 v-if="useIfNotLonly(providerId.sandOrders)"
-                                class="flex self-start"
-                                size="sm"
-                                @click="removeOrder(order.id, providerId.innerId)"
-                            >
-                                <Icon icon="Trash" type="outline" class="w-7 h-7" />
-                            </CircularBtn>
+                                purpose="remove"
+                                @click.prevent="removeOrder(order.id, providerId.innerId)"
+                            />
                             <!-- Arena Section -->
-                            <CircularBtn
+                            <AddDeleteBtn
                                 v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
-                                class="flex self-start"
-                                size="sm"
-                                btn="bg-green-500"
+                                purpose="add"
                                 @click.prevent="addOrder(providerId.innerId)"
-                            >
-                                <Icon icon="Plus" class="w-7 h-7 text-white" />
-                            </CircularBtn>
+                            />
                         </div>
                     </FieldGroup>
                 </template>
@@ -264,6 +257,7 @@
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';

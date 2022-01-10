@@ -3,9 +3,7 @@
         <FieldGroup v-for="(crew, key) in crews" :key="crew.id" class="max-w-sm w-full content-start">
             <FieldLegend>
                 <span>{{ crew.title }}</span>
-                <CircularBtn v-if="crews.length > 1" class="btn__delete" size="sm" @click="removeCrew(crew.id)">
-                    <Icon icon="Trash" class="icon" />
-                </CircularBtn>
+                <AddDeleteBtn v-if="crews.length > 1" purpose="remove" @click="removeCrew(crew.id)" />
             </FieldLegend>
             <section class="flex gap-2 flex-col sm:flex-row items-start mb-4 col-span-full">
                 <label class="flex flex-col" :for="`crew-${crew.id}-start-time`">
@@ -28,14 +26,8 @@
                         :data="people.role"
                         @update:data="people.role = $event"
                     />
-                    <span
-                        v-if="notOnly(crew.resources)"
-                        :class="peopleI === 0 ? 'md:top-10' : 'md:top-6'"
-                        class="md:absolute md:-right-12 ml-4"
-                    >
-                        <CircularBtn class="btn__delete" size="sm" @click="removeResource(crew.id, people.id)">
-                            <Icon icon="Trash" class="w-6 h-6" />
-                        </CircularBtn>
+                    <span v-if="notOnly(crew.resources)" class="md:absolute md:-right-12 ml-4 md:top-4">
+                        <AddDeleteBtn purpose="remove" @click="removeResource(crew.id, people.id)" />
                     </span>
                     <FieldInput
                         class="col-span-full mr-5"
@@ -59,7 +51,7 @@
 <script lang="ts">
     import { computed } from 'vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import TimePicker from '@/components/ui/form/TimePicker.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
@@ -73,7 +65,7 @@
             FieldGroup,
             FieldInput,
             FieldLegend,
-            CircularBtn,
+            AddDeleteBtn,
             Icon,
             TimePicker,
         },
