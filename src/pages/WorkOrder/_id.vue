@@ -22,18 +22,17 @@
             </nav>
             <OrderSection
                 v-if="WO_section === 'orden'"
-                v-model:client-id="clientId"
+                v-model:clientId="clientId"
                 v-model:service-company-id="serviceCompanyId"
                 v-model:pad="pad"
                 v-model:pits="pits"
-                v-model:is-full="isOrderFull"
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
-                v-model:operative-cradle-id="operativeCradleId"
-                v-model:backup-cradle-id="backupCradleId"
-                v-model:operative-forklift-id="operativeForkliftId"
-                v-model:backup-forklift-id="backupForkliftId"
+                v-model:operativeCradleId="operativeCradleId"
+                v-model:backupCradleId="backupCradleId"
+                v-model:operativeForkliftId="operativeForkliftId"
+                v-model:backupForkliftId="backupForkliftId"
                 v-model:traktors="traktors"
                 v-model:pickups="pickups"
                 v-model:rigmats="rigmats"
@@ -41,9 +40,8 @@
                 v-model:generators="generators"
                 v-model:tower="tower"
                 v-model:cabin="cabin"
-                v-model:is-full="isEquipmentFull"
             />
-            <RRHHSection v-else-if="WO_section === 'rrhh'" v-model:crews="crews" v-model:is-full="isRRHHFull" />
+            <RRHHSection v-else-if="WO_section === 'rrhh'" v-model:crews="crews" />
             <section class="mt-8 p-4">
                 <GhostBtn
                     v-if="isLastSection()"
@@ -76,6 +74,8 @@
     import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/sandflow';
     import { compareCrews, compareResource } from '@/helpers/compareCrews';
     import { useAxios } from '@vueuse/integrations/useAxios';
+    import { validateOrder, validateEquipment, validateHumanResourses } from '@/helpers/useWorkOrder';
+    import { useCompareChanges } from '@/helpers/useCompareChanges';
 
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
@@ -118,21 +118,24 @@
             const isDraft = ref(true);
             const toggleDraft = useToggle(isDraft);
             const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
-            let currentWorkOrder = workOrders.find((wo) => {
-                return wo.id == id;
-            });
+            const currentWorkOrder = ref(
+                workOrders.find((wo) => {
+                    return wo.id == Number(id);
+                })
+            );
+
             onMounted(async () => {
                 const { data } = await useAxios(`/workOrder/${id}`, instance);
-                console.log(data);
-                currentWorkOrder = data;
+                currentWorkOrder.value = data;
             });
-            let newCWO = ref(currentWorkOrder);
+            let newCWO = ref(currentWorkOrder.value);
 
             const woID = ref(newCWO.value.id);
             const client = ref(newCWO.value.client);
             const serviceCompany = ref(newCWO.value.serviceCompany);
             const pad = ref(newCWO.value.pad);
             const pits = ref(newCWO.value.pits);
+            const backupPits = ref(JSON.parse(JSON.stringify(newCWO.value.pits)));
             const operativeCradle = ref(newCWO.value.operativeCradle);
             const backupCradle = ref(newCWO.value.backupCradle);
             const operativeForklift = ref(newCWO.value.operativeForklift);
@@ -179,6 +182,7 @@
 
                 selectedCrew.resources.push(newResource);
             };
+
             const addCrew = (): void => {
                 const lastCrew = getLast(crews.value);
                 const lastId = lastCrew?.id + 1 || 2;
@@ -226,21 +230,25 @@
                 WO_section.value = section_order[currentSectionIndex() + 1];
             };
             // Is the Order section is full
-            const isOrderFull = ref(false);
+            const isOrderFull = computed(() => {
+                return validateOrder(clientId.value, pad.value, pits.value);
+            });
+
             // Is the Equipment section is full
-            const isEquipmentFull = ref(false);
+            const isEquipmentFull = computed(() => {
+                return validateEquipment(
+                    operativeCradleId.value,
+                    backupCradleId.value,
+                    operativeForkliftId.value,
+                    backupForkliftId.value,
+                    traktors.value,
+                    pickups.value
+                );
+            });
+
             // Is the RRHH section is full
             const isRRHHFull = computed(() => {
-                return !!(
-                    crews.value &&
-                    crews.value.length > 0 &&
-                    crews.value[0].timeStart &&
-                    crews.value[0].timeEnd &&
-                    crews.value[0].resources &&
-                    crews.value[0].resources.length > 0 &&
-                    crews.value[0].resources[0].role !== '' &&
-                    crews.value[0].resources[0].name !== ''
-                );
+                return validateHumanResourses(crews.value);
             });
             // Is all sections full
             const isAllFull = computed(() => {
@@ -330,15 +338,15 @@
                 // removeAllEmptys();
                 const newWO = {
                     id: woID.value,
-                    client: client.value,
+                    client: clientId.value,
                     serviceCompany: serviceCompany.value,
-                    clientId: clientId.value,
+                    // clientId: clientId.value,
                     serviceCompanyId: serviceCompanyId.value,
                     pad: pad.value,
-                    operativeCradleId: operativeCradleId.value,
-                    backupCradleId: backupCradleId.value,
-                    operativeForkliftId: operativeForkliftId.value,
-                    backupForkliftId: backupForkliftId.value,
+                    operativeCradle: operativeCradleId.value,
+                    backupCradle: backupCradleId.value,
+                    operativeForklift: operativeForkliftId.value,
+                    backupForklift: backupForkliftId.value,
                     crews: crews.value,
                     rigmats: rigmats.value,
                     conex: conex.value,
@@ -350,31 +358,23 @@
                 const { data: WODone } = useAxios(`/workOrder/${woID.value}`, { method: 'PUT', data: newWO }, instance);
                 watch(WODone, async (newVal, _) => {
                     if (newVal && newVal.data && newVal.data.id) {
-                        if (pits.value.length > 0) {
-                            const isPitsFinished = ref([]);
-                            pits.value.forEach((pit: Pit) => {
-                                if (!pit.id) {
-                                    const { data } = useAxios(
-                                        `/pit/${pit.id}`,
-                                        {
-                                            method: 'POST',
-                                            data: { ...pit, workOrderId: newVal.data.id },
-                                        },
-                                        instance
-                                    );
-                                    isPitsFinished.value.push(data);
-                                    newVal.data.pits.push(pit);
-                                } else {
-                                    const { data } = useAxios(`/pit/${pit.id}`, { method: 'PUT', data: pit }, instance);
-                                    isPitsFinished.value.push(data);
-                                    newVal.data.pits = newVal.data.pits.map((p) => {
-                                        if (p.id === pit.id) {
-                                            return pit;
-                                        }
+                        const workOrderId = newVal.data.id;
 
-                                        return p;
-                                    });
-                                }
+                        if (pits.value.length > 0) {
+                            const actionablePits = useCompareChanges(pits.value, backupPits.value);
+                            console.log('actionablePits', actionablePits);
+                            const { changed, deleted, create } = actionablePits;
+                            changed.forEach(async (pit: Pit) => {
+                                await useAxios(`/pit/${pit.id}`, { method: 'PUT', data: pit }, instance);
+                            });
+                            deleted.forEach(async (pit: Pit) => {
+                                await useAxios(`/pit/${pit.id}`, { method: 'DELETE' }, instance);
+                            });
+                            create.forEach(async (pit: Pit) => {
+                                const { id: noUseId, ...newPit } = pit;
+                                newPit.companyId = Number(newVal.data.client);
+                                newPit.workOrderId = workOrderId;
+                                await useAxios(`/pit`, { method: 'POST', data: newPit }, instance);
                             });
                         }
 
@@ -459,7 +459,8 @@
                                 for (const changedRH of comparedResources.changed) {
                                     const { id, ...newResource } = changedRH;
                                     newResource.crewId = uCrewId;
-                                    await axios.put(api + `/humanResource/${newResource.id}`, newResource);
+                                    console.log('aaa', id);
+                                    await axios.put(api + `/humanResource/${id}`, newResource);
                                 }
                                 for (const deleteRH of comparedResources.deleted) {
                                     await axios.delete(api + `/humanResource/${deleteRH.id}`);
@@ -510,6 +511,7 @@
                 serviceCompanyId,
                 pad,
                 pits,
+                backupPits,
                 operativeCradleId,
                 backupCradleId,
                 operativeForkliftId,

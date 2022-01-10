@@ -107,6 +107,7 @@
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import { getLast } from '@/helpers/iteretionHelpers';
+    import { validateOrder, validateEquipment, validateHumanResourses } from '@/helpers/useWorkOrder';
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -282,19 +283,24 @@
                 WO_section.value = section_order[currentSectionIndex() + 1];
             };
             // Is the Order section is full
-            const isOrderFull = ref(false);
+            const isOrderFull = computed(() => {
+                return validateOrder(clientId.value, pad.value, pits.value);
+            });
+
             // Is the Equipment section is full
-            const isEquipmentFull = ref(false);
-            // Is the RRHH section is full
-            const isRRHHFull: ComputedRef<boolean> = computed(() => {
-                return !!(
-                    crews.value.length > 0 &&
-                    crews.value[0].timeStart &&
-                    crews.value[0].timeEnd &&
-                    crews.value[0].resources.length > 0 &&
-                    crews.value[0].resources[0].role !== -1 &&
-                    crews.value[0].resources[0].name !== -1
+            const isEquipmentFull = computed(() => {
+                return validateEquipment(
+                    operativeCradleId.value,
+                    backupCradleId.value,
+                    operativeForkliftId.value,
+                    backupForkliftId.value,
+                    traktors.value,
+                    pickups.value
                 );
+            });
+            // Is the RRHH section is full
+            const isRRHHFull = computed(() => {
+                return validateHumanResourses(crews.value);
             });
             // Is all sections full
             const isAllFull = computed(() => {
@@ -366,7 +372,6 @@
                                     const { id, ...newPit } = pit;
                                     newPit.companyId = newWO.clientId;
                                     newPit.workOrderId = workOrderId;
-
                                     const { data } = useAxios('/pit', { method: 'POST', data: newPit }, instance);
                                     isPitsFinished.value.push(data);
                                 });

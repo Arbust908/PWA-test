@@ -251,17 +251,32 @@
             const modalData = ref({});
 
             const save = async () => {
+                const sandOrderId = ref(0);
+
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId < 0) {
+                    const { data: sandOrder } = await useAxios(
+                        `/sandOrder`,
+                        { method: 'POST', data: sandProviderIds.value[0].SandOrders[0] },
+                        instance
+                    );
+                    console.log(sandOrder);
+                    console.log(sandOrder.id);
+                    sandOrderId.value = sandOrder.id;
                     pN.value = {
+                        textArena: 'Arena',
                         sandProviderId: Number(sandProviderIds.value[0].id),
                         data: {
                             sandOrders: sandProviderIds.value[0].SandOrders,
                         },
+                        sandId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandTypeId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandOrderId: sandOrderId.value,
                     };
                 }
 
                 if (transportOrder.value[0].transportProviderId > 0 && sandProviderIds.value[0].id < 0) {
                     pN.value = {
+                        textTransporte: 'Transporte',
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
                         data: {
                             cantidadCamiones: Number(transportOrder.value[0].amount),
@@ -271,6 +286,17 @@
                 }
 
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId > 0) {
+                    let response = await axios
+                        .post(`${apiUrl}/sandOrder`, sandProviderIds.value[0].SandOrders[0])
+                        .catch((err) => {
+                            console.log(err);
+
+                            return false;
+                        });
+
+                    let order = response.data.data;
+                    console.log(order.id);
+                    sandOrderId.value = order.id;
                     pN.value = {
                         textArena: 'Arena',
                         sandProviderId: Number(sandProviderIds.value[0].id),
@@ -281,6 +307,9 @@
                             observations: transportOrder.value[0].observation,
                         },
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
+                        sandId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandTypeId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandOrderId: sandOrderId.value,
                     };
                 }
 
