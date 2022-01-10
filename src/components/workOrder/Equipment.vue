@@ -44,8 +44,8 @@
                 />
             </FieldGroup>
         </div>
-        <TracktoField :traktors="traktors" @update:traktors="traktors = $event" />
-        <PickupField :pickups="pickups" @update:pickups="pickups = $event" />
+        <TracktoField v-model:traktors="traktors" />
+        <PickupField v-model:pickups="pickups" />
         <FieldGroup class="max-w-lg">
             <FieldLegend>Equipamento</FieldLegend>
             <FieldInput
