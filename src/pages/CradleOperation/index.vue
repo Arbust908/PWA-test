@@ -73,10 +73,10 @@
                                 <Icon icon="InformationCircle" class="icon" />
                                 {{ slot.amount }}T peso remito
                             </span>
-                            <!-- <span class="cradle-data">
-                <Icon icon="InformationCircle" class="icon"/>
-                15T peso actual
-              </span> -->
+                            <span class="cradle-data">
+                                <Icon icon="InformationCircle" class="icon" />
+                                10T peso actual (No reactivo)
+                            </span>
                             <span class="cradle-data">
                                 <Icon icon="InformationCircle" class="icon" />
                                 Arena: {{ slot.sandType }}
@@ -424,6 +424,9 @@
                 .station-title {
                     @apply pb-0 pt-0;
                 }
+            }
+            &.test {
+                @apply border-8 border-green-600;
             }
 
             .station-title {
