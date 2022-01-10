@@ -98,7 +98,7 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
-    import TracktorField from '@/components/workOrder/woTraktorField.vue';
+    import TracktoField from '@/components/workOrder/woTraktorField.vue';
     import PickupField from '@/components/workOrder/woPickupField.vue';
     import axios from 'axios';
 

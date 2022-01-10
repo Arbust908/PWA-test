@@ -316,10 +316,8 @@ export enum Roles {
 }
 
 export enum BoxCategory {
-    empty = 'Vacio',
-    cut = 'Cortada',
-    thick = 'Gruesa',
-    fine = 'Fina',
+    empty = 'Caja Vacía',
+    cradle = 'Cradle',
     aisle = 'Pasillo',
 }
 export enum SandStageStatus {

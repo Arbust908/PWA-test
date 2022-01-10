@@ -16,86 +16,57 @@
     </FieldGroup>
 </template>
 
-<script lang="ts">
-    import { defineComponent, computed, ref, Ref } from 'vue';
-    import FieldInput from '@/components/ui/form/FieldInput.vue';
+<script setup lang="ts">
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
-    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import TraktorGroup from '@/components/workOrder/traktorGroup.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import { useVModel } from '@vueuse/core';
-    import axios from 'axios';
 
-    const api = import.meta.env.VITE_API_URL || '/api';
-
-    export default defineComponent({
-        name: 'WoTraktorField',
-        components: {
-            FieldInput,
-            FieldGroup,
-            FieldLegend,
-            FieldSelect,
-            TraktorGroup,
-            Icon,
-            CircularBtn,
-        },
-        props: {
-            traktors: {
-                type: Array,
-                required: true,
-            },
-        },
-        emits: ['update:traktors'],
-        setup(props, { emit }) {
-            const traktors = useVModel(props, 'traktors', emit);
-            const tracktorInnerId = ref(0);
-
-            const defaultTraktor = {
-                innerId: 0,
-                chassis: -1,
-                supplier: -1,
-                description: '',
-            };
-
-            if (traktors.value.length === 0) {
-                traktors.value.push({ ...defaultTraktor });
-            }
-
-            traktors.value = traktors.value.map((traktor) => {
-                traktor.innerId = traktor.innerId ?? tracktorInnerId.value;
-                tracktorInnerId.value++;
-
-                return traktor;
-            });
-
-            const add = (): void => {
-                tracktorInnerId.value++;
-                const newTraktorId = tracktorInnerId.value;
-                traktors.value.push({
-                    innerId: newTraktorId,
-                    chassis: -1,
-                    supplier: -1,
-                    description: '',
-                });
-            };
-
-            const removeTraktor = (innerId: number) => {
-                const newTraktorsArray = ref([]);
-
-                newTraktorsArray.value = traktors.value.filter((Traktor) => Traktor.innerId !== innerId);
-                traktors.value = newTraktorsArray.value;
-            };
-
-            return {
-                traktors,
-                tracktorInnerId,
-                add,
-                removeTraktor,
-            };
+    const props = defineProps({
+        traktors: {
+            type: Array,
+            required: true,
         },
     });
+    const emits = defineEmits(['update:traktors']);
+    const traktors = useVModel(props, 'traktors', emits);
+    const tracktorInnerId = ref(0);
+
+    const defaultTraktor = {
+        innerId: 0,
+        chassis: -1,
+        supplier: -1,
+        description: '',
+    };
+
+    if (traktors.value.length === 0) {
+        traktors.value.push({ ...defaultTraktor });
+    }
+
+    traktors.value = traktors.value.map((traktor) => {
+        traktor.innerId = traktor.innerId ?? tracktorInnerId.value;
+        tracktorInnerId.value++;
+
+        return traktor;
+    });
+
+    const add = (): void => {
+        tracktorInnerId.value++;
+        const newTraktorId = tracktorInnerId.value;
+        traktors.value.push({
+            innerId: newTraktorId,
+            chassis: -1,
+            supplier: -1,
+            description: '',
+        });
+    };
+
+    const removeTraktor = (innerId: number) => {
+        const newTraktorsArray = ref([]);
+
+        newTraktorsArray.value = traktors.value.filter((Traktor) => Traktor.innerId !== innerId);
+        traktors.value = newTraktorsArray.value;
+    };
 </script>
 
 <style lang="scss" scoped>
