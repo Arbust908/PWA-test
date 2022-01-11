@@ -1,5 +1,4 @@
 <template>
-    <!--class="order"-->
     <section
         id="toPds"
         style="
@@ -19,7 +18,7 @@
         <header>
             <h2 style="font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; margin-bottom: 1.5rem">
                 Orden de pedido -
-                <span style="color: hsl(215, 14%, 34%)">{{ '#' + info.purchaseOrder.id }}</span>
+                <span style="color: hsl(151, 65%, 30%)">{{ '#' + info.purchaseOrder.id }}</span>
             </h2>
             <dl style="display: flex; margin-bottom: 2rem">
                 <dt style="font-weight: 500; margin-right: 0.25rem">Cliente</dt>
@@ -30,7 +29,7 @@
         </header>
         <main>
             <section style="margin-bottom: 1.25rem">
-                <!-- class="detalle"-->
+                ="detalle"-->
                 <h3
                     style="
                         font-weight: 700;
@@ -59,7 +58,7 @@
                         :key="arena?.id"
                         style="margin-bottom: 0.5rem; display: flex; flex-direction: column"
                     >
-                        <dt style="display: flex; align-items: center; gap: 0.25rem">
+                        <dt style="display: flex; align-items: center; gap: 0.25rem; font-weight: 500">
                             <span
                                 style="
                                     width: 0.5rem;
@@ -71,15 +70,24 @@
                             />
                             Pedido:
                         </dt>
-                        <!-- class="dot"-->
-                        <dd style="display: flex; align-items: center; gap: 0.25rem; margin-left: 0.75rem">
+                        <dd
+                            style="
+                                display: flex;
+                                align-items: center;
+                                gap: 0.25rem;
+                                margin-left: 0.75rem;
+                                font-weight: 400;
+                                color: rgb(107 114 128);
+                                margin-right: 2rem;
+                            "
+                        >
                             {{ arena?.amount }}t - {{ arena?.sandType }} - {{ arena?.boxId }}
                         </dd>
                     </dl>
                 </article>
             </section>
             <section style="margin-bottom: 1.25rem">
-                <!-- class="detalle"-->
+                ="detalle"-->
                 <h3
                     style="
                         font-weight: 700;
@@ -103,30 +111,34 @@
                     "
                 >
                     <h4 style="font-weight: 700">{{ transportProviderName }}</h4>
-                    <p v-for="line in formatTransportOrder" :key="line">{{ line }}</p>
+                    <p v-for="line in formatTransportOrder" :key="line" style="margin-top: 0.25rem">{{ line }}</p>
                 </article>
             </section>
             <hr style="border-color: rgb(209 213 219); margin-top: 2.5rem; margin-bottom: 2.5rem" />
             <section style="font-size: 0.875rem; line-height: 1.25rem">
-                <!-- class="observaciones"-->
+                ="observaciones"-->
                 <h3
                     style="
                         font-size: 0.875rem;
                         line-height: 1.25rem;
                         font-weight: 700;
                         margin-bottom: 1.25rem;
-                        text-transform: capitalize;
+                        text-transform: uppercase;
                     "
                 >
                     Observaciones
                 </h3>
                 <dl style="font-size: 0.875rem; line-height: 1.25rem; margin-bottom: 0.75rem">
-                    <dt>Fecha de entrega:</dt>
-                    <dd>{{ localDate }}</dd>
-                    <dt>Hora de entrega:</dt>
-                    <dd>{{ formatedTime }}</dd>
+                    <dt style="font-weight: 500; margin-right: 0.25rem; display: inline">Fecha de entrega:</dt>
+                    <dd style="font-weight: 400; color: rgb(107 114 128); margin-right: 2rem; display: inline">
+                        {{ localDate }}
+                    </dd>
+                    <dt style="font-weight: 500; margin-right: 0.25rem; display: inline">Hora de entrega:</dt>
+                    <dd style="font-weight: 400; color: rgb(107 114 128); margin-right: 2rem; display: inline">
+                        {{ formatedTime }}
+                    </dd>
                 </dl>
-                <p style="font-size: 0.875rem; line-height: 1.25rem">Observaciones:{{ info.observation }}</p>
+                <p style="font-size: 0.875rem; line-height: 1.25rem">Observaciones: {{ info.observation }}</p>
             </section>
         </main>
         <footer
@@ -256,74 +268,3 @@
         }, 1000);
     }, 500);
 </script>
-
-<!-- <style scoped lang="scss">
-    // .order {
-        // @apply rounded-lg px-6 pt-7 w-[595px] h-[838px] mx-auto bg-white shadow relative;
-        // h2 {
-        //     @apply text-xl font-bold mb-6;
-        //     span {
-        //         @apply text-main-600;
-        //     }
-        // }
-
-        // dl {
-        //     @apply flex mb-8;
-        //     dt {
-        //         @apply font-medium mr-1;
-        //     }
-        //     dd {
-        //         @apply font-normal text-gray-500 mr-8;
-        //     }
-        // }
-
-        // .detalle {
-        //     @apply mb-5;
-        //     dl {
-        //         @apply mb-2 flex flex-col;
-        //         & :is(dt, dd) {
-        //             @apply flex items-center gap-1;
-        //         }
-        //         dd {
-        //             @apply ml-3;
-        //         }
-        //         .dot {
-        //             @apply w-2 h-2 bg-main-400 rounded-full inline-block;
-        //         }
-        //     }
-        //     h3 {
-        //         @apply font-bold text-[#117E49] mb-5 uppercase text-lg;
-        //     }
-        //     article {
-        //         @apply py-3 pl-5 bg-[#f9f9f9] border-l-2 border-main-600;
-        //         h4 {
-        //             @apply font-bold;
-        //         }
-        //     }
-        // }
-
-        // hr {
-        //     @apply border-gray-300;
-        // }
-
-        // .observaciones {
-        //     @apply text-sm;
-        //     h3 {
-        //         @apply text-sm font-bold mb-5 uppercase;
-        //     }
-        //     dl {
-        //         @apply text-sm mb-3;
-        //     }
-        //     p {
-        //         @apply text-sm;
-        //     }
-        // }
-
-    //     footer {
-    //         @apply flex w-full justify-center gap-x-[75px] absolute bottom-10 inset-x-0;
-    //         p {
-    //             @apply text-center pt-3 border-t;
-    //         }
-    //     }
-    // }
-</style> -->

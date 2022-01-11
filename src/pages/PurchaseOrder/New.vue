@@ -96,7 +96,10 @@
                             <AddDeleteBtn
                                 v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
                                 purpose="add"
-                                @click.prevent="addOrder(providerId.innerId)"
+                                @click.prevent="
+                                    addOrder(providerId.innerId);
+                                    useFirstST = false;
+                                "
                             />
                         </div>
                     </FieldGroup>
