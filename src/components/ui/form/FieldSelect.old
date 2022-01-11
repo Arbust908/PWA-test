@@ -3,26 +3,25 @@
         <FieldTitle v-if="title" :title="title" :is-optional="isOptional" />
         <!-- TODO: Options con entrada cheta -->
         <!-- TODO: StoreLogic -->
-
-        <el-select
+        <select
             :id="fieldName"
-            class="searchSelect mt-2"
-            :popper-class="'font-title text-base border-0'"
-            :fit-input-width="false"
             v-model.number="value"
+            class="input"
             :class="selectClasses"
             :name="fieldName"
             :disabled="isDisabled"
             @blur="$emit('is-blured')"
-            @change="$emit('change', value)"
-            @visible-change="$emit('click')"
-            filterable
-            placeholder="placeholder"
         >
-            <el-option selected :key="-1" :label="placeholder" :value="-1"> </el-option>
-            <el-option v-for="(res, i) in resources" :key="res?.id" :label="res[endpointKey]" :value="res?.id" />
-            <el-option v-for="(res, i) in epData" :key="res?.id" :label="res[endpointKey]" :value="res?.id" />
-        </el-select>
+            <option selected value="-1">
+                {{ placeholder }}
+            </option>
+            <option v-for="(res, i) in resources" :key="res?.id + i" :value="res?.id">
+                {{ res[endpointKey] }}
+            </option>
+            <option v-for="(res, i) in epData" :key="res?.id + i" :value="res?.id">
+                {{ res[endpointKey] }}
+            </option>
+        </select>
     </label>
 </template>
 
@@ -115,12 +114,12 @@
 
             if (props.endpoint !== '/' && props.endpoint !== null) {
                 resources = getApiVal();
+                console.log(resources.value)
             }
 
             const noOptionSelected = computed(() => value.value === -1);
 
             const selectClasses = computed(() => {
-                console.log(value.value);
                 return props.selectClass && value.value === -1 ? 'error' : null;
             });
 
@@ -138,6 +137,9 @@
 
 <style lang="scss" scoped>
     @import '@/assets/inputs.scss';
+</style>
+
+<style scoped>
     .unselected {
         color: #a6a6a6;
     }
@@ -149,23 +151,5 @@
     }
     .error {
         @apply border-red-500;
-    }
-</style>
-
-<style>
-    .error.el-select .el-input__inner {
-        @apply border border-red-500;
-    }
-    .searchSelect .el-input .el-input__inner {
-        @apply h-12 text-base text-black focus:border-indigo-500 ease-out duration-75;
-    }
-    .searchSelect .icon {
-        @apply text-black font-black;
-    }
-    -el-popper {
-        @apply mt-0;
-    }
-    .el-select-dropdown__item.selected {
-        @apply text-white bg-blue-500 font-normal;
     }
 </style>

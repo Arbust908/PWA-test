@@ -296,7 +296,11 @@
     const GhostBtn = defineAsyncComponent(() => import('@/components/ui/buttons/GhostBtn.vue'));
     const api = import.meta.env.VITE_API_URL || '/api';
 
+    const drivers = ref([]);
+    const driverId = ref(-1);
+
     const filteredDrivers = computed(() => {
+        driverId.value = -1;
         if (transportProviderId.value > -1) {
             const driversFiltered = drivers.value.filter(
                 (driver) => driver.transportProviderId === transportProviderId.value
@@ -307,9 +311,6 @@
 
         return [];
     });
-
-    const drivers = ref([]);
-    const driverId = ref(-1);
 
     const filteredPlates = computed(() => {
         if (driverId.value > -1) {
@@ -336,6 +337,8 @@
         // TODO: StoreLogic
         const result = await axios.get(`${api}/driver`);
         drivers.value = result.data.data;
+        const result2 = await axios.get(`${api}/sandProvider`);
+        console.log(result2.data.data);
     });
 
     useTitle('Nueva orden de pedido <> Sandflow');
@@ -381,7 +384,7 @@
                 return sandProvider;
             }
         });
-
+        console.log('holi');
         filteredSandTypes.value = provider.meshType;
     };
 

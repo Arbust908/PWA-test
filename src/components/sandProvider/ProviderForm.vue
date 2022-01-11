@@ -79,7 +79,7 @@
                     require-validation
                     entity="sandProvider"
                     @is-blured="checkMeshValidation"
-                    @change="addMeshType($event.target.value)"
+                    @update:data="addMeshType(String($event))"
                 />
             </div>
             <InvalidInputLabel v-if="!isMeshValid && wasMeshSelectBlured" validation-type="empty" />
@@ -148,7 +148,7 @@
             const addMeshType = (newMeshType: string) => {
                 // check duplicates
                 const exists = sandProvider.value.meshType.map((mesh) => mesh.id).includes(newMeshType);
-
+                console.log('NMT', newMeshType);
                 if (exists) {
                     return;
                 }
