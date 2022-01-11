@@ -4,8 +4,8 @@
         <th scope="col">Tipo de arena A</th>
         <th scope="col">Tipo de arena B</th>
         <th scope="col">Tipo de arena C</th>
+        <th scope="col">Tipo de arena D</th>
         <th scope="col">Total</th>
-        <th scope="col">Estado</th>
         <th scope="col">Acciones</th>
     </tr>
 </template>

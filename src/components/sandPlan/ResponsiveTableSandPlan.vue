@@ -3,47 +3,15 @@
         <tr>
             <th class="text-left px-6 py-4 w-3/6">
                 <span>Etapa </span>
-                <span>{{ pos }} - 40</span>
+                <span>{{ pos }} - {{ stagesAmount }}</span>
             </th>
             <td class="w-3/6">
                 <div class="flex justify-end w-28 ml-auto my-0">
-                    <button
-                        class="action duplicate text-gray-600 hover:text-blue-800 p-2"
-                        title="Duplicar"
-                        @click.prevent="duplicateStage"
-                    >
-                        <Icon icon="DocumentDuplicate" class="w-6 h-6" />
-                        <span class="sr-only">Duplicar</span>
-                    </button>
-                    <button
-                        v-if="editing !== Number(stage.id)"
-                        :disabled="stage.status > 0"
-                        class="action edit text-gray-600 hover:text-blue-800 p-2"
-                        title="Editar"
-                        @click.prevent="editStage"
-                    >
-                        <Icon icon="PencilAlt" class="w-6 h-6" />
-                        <span class="sr-only">Editar</span>
-                    </button>
-                    <button
-                        v-else
-                        :disabled="stage.status > 0"
-                        class="action edit text-gray-600 hover:text-blue-800 p-2"
-                        title="Guardar"
-                        @click.prevent="saveStage"
-                    >
-                        <Icon icon="Save" class="w-6 h-6" />
-                        <span class="sr-only">Guardar</span>
-                    </button>
-                    <button
-                        :disabled="stage.status > 0 || stage.stage === 1"
-                        class="action delete text-gray-600 hover:text-blue-800 py-1 pl-1"
-                        title="Borrar"
-                        @click.prevent="deleteStage"
-                    >
-                        <Icon icon="Trash" class="w-6 h-6" />
-                        <span class="sr-only">Borrar</span>
-                    </button>
+                    <DropdownBtn :actions="actions" :item="stage">
+                        <CircularBtn size="sm" class="even">
+                            <Icon icon="DotsVertical" type="outlined" class="w-6 h-6 icon text-gray-800" />
+                        </CircularBtn>
+                    </DropdownBtn>
                 </div>
             </td>
         </tr>
@@ -54,7 +22,7 @@
                 <FieldSelect
                     field-name="sandType1"
                     placeholder="Seleccionar"
-                    endpoint="/sand"
+                    :endpoint-data="sandTypes1"
                     endpoint-key="type"
                     :data="stage.sandId1"
                     @update:data="stage.sandId1 = $event"
@@ -63,7 +31,7 @@
         </tr>
         <tr v-else>
             <th class="head">Arena A</th>
-            <td v-if="(sands.length > 0 && stage.sandId1 >= 0) || stage.quantity1 > 0" class="td">
+            <td v-if="stage.sandId1 > 0 || stage.quantity1 > 0" class="td">
                 {{ getSand(Number(stage.sandId1))?.type }} / {{ stage.quantity1 }}t
             </td>
             <td v-else class="td">No hay arena</td>
@@ -83,14 +51,13 @@
         </tr>
 
         <div v-if="editing === Number(stage.id)" class="separador ml-6 mt-6 mb-6" />
-
         <tr v-if="editing === Number(stage.id)">
             <th class="head">Arena B</th>
             <td>
                 <FieldSelect
                     field-name="sandType2"
                     placeholder="Seleccionar"
-                    endpoint="/sand"
+                    :endpoint-data="sandTypes2"
                     endpoint-key="type"
                     :data="stage.sandId2"
                     @update:data="stage.sandId2 = $event"
@@ -99,7 +66,7 @@
         </tr>
         <tr v-else>
             <th class="head">Arena B</th>
-            <td v-if="(sands.length > 0 && stage.sandId2 >= 0) || stage.quantity2 > 0" class="td">
+            <td v-if="stage.sandId2 > 0 || stage.quantity2 > 0" class="td">
                 {{ getSand(Number(stage.sandId2))?.type }} / {{ stage.quantity2 }}t
             </td>
             <td v-else class="td">No hay arena</td>
@@ -119,14 +86,13 @@
         </tr>
 
         <div v-if="editing === Number(stage.id)" class="separador ml-6 mt-6 mb-6" />
-
         <tr v-if="editing === Number(stage.id)">
             <th class="head">Arena C</th>
             <td>
                 <FieldSelect
                     field-name="sandType3"
                     placeholder="Seleccionar"
-                    endpoint="/sand"
+                    :endpoint-data="sandTypes3"
                     endpoint-key="type"
                     :data="stage.sandId3"
                     @update:data="stage.sandId3 = $event"
@@ -135,7 +101,7 @@
         </tr>
         <tr v-else>
             <th class="head">Arena C</th>
-            <td v-if="(sands.length > 0 && stage.sandId3 >= 0) || stage.quantity3 > 0" class="td">
+            <td v-if="stage.sandId3 > 0 || stage.quantity3 > 0" class="td">
                 {{ getSand(Number(stage.sandId3))?.type }} / {{ stage.quantity3 }}t
             </td>
             <td v-else class="td">No hay arena</td>
@@ -155,7 +121,41 @@
         </tr>
 
         <div v-if="editing === Number(stage.id)" class="separador ml-6 mt-6 mb-6" />
+        <tr v-if="editing === Number(stage.id)">
+            <th class="head">Arena D</th>
+            <td>
+                <FieldSelect
+                    field-name="sandType4"
+                    placeholder="Seleccionar"
+                    :endpoint-data="sandTypes4"
+                    endpoint-key="type"
+                    :data="stage.sandId4"
+                    @update:data="stage.sandId4 = $event"
+                />
+            </td>
+        </tr>
+        <tr v-else>
+            <th class="head">Arena D</th>
+            <td v-if="stage.sandId4 > 0 || stage.quantity4 > 0" class="td">
+                {{ getSand(Number(stage.sandId4))?.type }} / {{ stage.quantity4 }}t
+            </td>
+            <td v-else class="td">No hay arena</td>
+        </tr>
+        <tr v-if="editing === Number(stage.id)">
+            <th class="head">Cantidad</th>
+            <td>
+                <FieldWithSides
+                    field-name="sandQuantity4"
+                    placeholder="0 t"
+                    type="number"
+                    :post="{ title: '0', value: 't' }"
+                    :data="stage.quantity4"
+                    @update:data="stage.quantity4 = $event"
+                />
+            </td>
+        </tr>
 
+        <div v-if="editing === Number(stage.id)" class="separador ml-6 mt-6 mb-6" />
         <tr>
             <th
                 scope="col"
@@ -165,113 +165,143 @@
             </th>
             <td class="text-gray-500 pl-3 py-4 whitespace-nowrap font-bold text-right">{{ totalWheight }}t</td>
         </tr>
-        <tr>
-            <th
-                scope="col"
-                class="px-6 py-3 text-sm font-medium text-gray-500 uppercase tracking-wider flex-1 text-left"
-            >
-                Estado
-            </th>
-            <td>
-                <Pill :type="pill.status" class="uppercase p-1 float-right"> {{ pill.name }} </Pill>
-            </td>
-        </tr>
         <div class="separador-final ml-6 mt-6 mb-6" />
     </table>
 </template>
 
-<script lang="ts">
-    import { defineComponent, toRefs, reactive, computed } from 'vue';
+<script setup lang="ts">
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
-    import Pill from '@/components/ui/Pill.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import { Sand } from '@/interfaces/sandflow';
+    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import DropdownBtn from '@/components/ui/buttons/DropdownBtn.vue';
+    import { useApi } from '@/helpers/useApi';
 
-    export default defineComponent({
-        components: {
-            Icon,
-            Pill,
-            FieldSelect,
-            FieldWithSides,
+    const props = defineProps({
+        stage: {
+            type: Object,
+            required: true,
         },
-        props: {
-            stage: {
-                type: Object,
-                required: true,
-            },
-            editing: {
-                type: Number,
-                required: true,
-            },
-            sands: {
-                type: Array,
-                required: true,
-            },
-            pos: {
-                type: Number,
-                required: true,
-            },
+        editing: {
+            type: Number,
+            required: true,
         },
-        setup(props, { emit }) {
-            const { stage, editing, sands, pos } = toRefs(props);
-            stage.value.stage = pos.value;
-
-            const totalWheight = computed(() => {
-                return (
-                    Number(stage.value.quantity1) + Number(stage.value.quantity2) + Number(stage.value.quantity3) || 0
-                );
-            });
-            const getSand = (sandId: number) => {
-                return (
-                    sands.value.find((sand: Sand) => {
-                        return Number(sand.id) === sandId;
-                    }) || { tpye: '' }
-                );
-            };
-
-            const editStage = () => {
-                emit('editStage', stage.value);
-            };
-            const saveStage = () => {
-                emit('saveStage', stage.value);
-            };
-            const duplicateStage = () => {
-                emit('duplicateStage', stage.value);
-            };
-            const deleteStage = () => {
-                emit('deleteStage', stage.value);
-            };
-            const upgrade = () => {
-                if (stage.value.status >= 2) {
-                    console.error('Reset status');
-                    stage.value.status = 0;
-
-                    return;
-                }
-                stage.value.status++;
-            };
-
-            const pill = reactive({
-                status: stage.value.status === 2 ? 'finished' : stage.value.status === 1 ? 'idle' : 'empty',
-                name: stage.value.status === 2 ? 'Finalizada' : stage.value.status === 1 ? 'En Progreso' : 'Creada',
-            });
-
-            return {
-                stage,
-                editing,
-                sands,
-                totalWheight,
-                getSand,
-                duplicateStage,
-                deleteStage,
-                editStage,
-                saveStage,
-                upgrade,
-                pill,
-            };
+        sands: {
+            type: Array,
+            required: true,
+        },
+        pos: {
+            type: Number,
+            required: true,
+        },
+        editingKey: {
+            type: String,
+            default: 'id',
+        },
+        stagesAmount: {
+            type: Number,
+            default: 0,
         },
     });
+
+    const emits = defineEmits(['editStage', 'saveStage', 'duplicateStage', 'deleteStage']);
+
+    const { stage, editing, sands, pos, editingKey } = toRefs(props);
+    stage.value.stage = pos.value;
+
+    const { read: getSands } = useApi('/sand');
+
+    const backupSandTypes = getSands();
+
+    const sandTypes1 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId3 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes2 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId3 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes3 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId4
+            );
+        });
+    });
+
+    const sandTypes4 = computed(() => {
+        return backupSandTypes?.value?.filter((sand) => {
+            return (
+                sand.id !== stage.value.sandId1 && sand.id !== stage.value.sandId2 && sand.id !== stage.value.sandId3
+            );
+        });
+    });
+
+    const totalWheight = computed(() => {
+        return Number(stage.value.quantity1) + Number(stage.value.quantity2) + Number(stage.value.quantity3) || 0;
+    });
+    const getSand = (sandId: number) => {
+        return (
+            sands.value.find((sand: Sand) => {
+                return Number(sand.id) === sandId;
+            }) || { tpye: '' }
+        );
+    };
+
+    const editStage = () => {
+        emits('editStage', stage.value);
+    };
+    const saveStage = () => {
+        emits('saveStage', stage.value);
+    };
+    const duplicateStage = () => {
+        emits('duplicateStage', stage.value);
+    };
+    const deleteStage = () => {
+        emits('deleteStage', stage.value);
+    };
+
+    const actions = [
+        {
+            label: 'Editar',
+            hide: () => {
+                return !(editing.value === Number(stage.value[editingKey.value]));
+            },
+            callback: () => {
+                editStage();
+            },
+        },
+        {
+            label: 'Guardar',
+            hide: () => {
+                return editing.value === Number(stage.value[editingKey.value]);
+            },
+            callback: () => {
+                saveStage();
+            },
+        },
+        {
+            label: 'Clonar',
+            callback: () => {
+                duplicateStage();
+            },
+        },
+        {
+            label: 'Eliminar',
+            callback: () => {
+                deleteStage();
+            },
+        },
+    ];
 </script>
 
 <style lang="scss" scoped>

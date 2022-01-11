@@ -29,8 +29,8 @@ export interface Pickup {
 }
 export interface HumanResource {
     id?: number;
-    role: string;
-    name: string;
+    role: string | number;
+    name: string | number;
     crewId: number;
     crew?: Crew;
 }
@@ -172,9 +172,12 @@ export interface SandStage {
     sandB?: Sand;
     sandId3: number;
     sandC?: Sand;
+    sandId4: number;
+    sandD?: Sand;
     quantity1: number;
     quantity2: number;
     quantity3: number;
+    quantity4: number;
     action?: 'create' | 'update' | 'delete';
     sandPlanId: number;
     sandPlan?: SandPlan;
@@ -316,10 +319,8 @@ export enum Roles {
 }
 
 export enum BoxCategory {
-    empty = 'Vacio',
-    cut = 'Cortada',
-    thick = 'Gruesa',
-    fine = 'Fina',
+    empty = 'Caja Vacía',
+    cradle = 'Cradle',
     aisle = 'Pasillo',
 }
 export enum SandStageStatus {

@@ -1,3 +1,63 @@
+<template>
+    <fieldset class="w-full pt-1 pb-5 px-2">
+        <section v-if="boxes.length > 0" class="space-y-4">
+            <transition-group
+                v-if="boxes.length > 0"
+                tag="section"
+                class="space-y-4"
+                @before-enter="beforeEnter"
+                @enter="enter"
+                @leave="leave"
+            >
+                <BoxIdCard
+                    v-for="(box, index) in definedBoxes"
+                    :key="box.id"
+                    :box="box"
+                    :data-stagger-index="index"
+                    :is-active-box="isActiveBox(box?.boxId || null)"
+                    @select-box="$emit('select-box', $event)"
+                />
+            </transition-group>
+            <transition
+                v-if="undefinedBoxes.length > 0"
+                tag="div"
+                @before-enter="beforeEnter"
+                @enter="enter"
+                @before-leave="beforeLeave"
+                @leave="leave"
+            >
+                <span class="text-xs text-green-600"> *Complete los ids de caja faltantes </span>
+            </transition>
+            <transition-group
+                v-if="boxes.length > 0"
+                tag="section"
+                class="space-y-4"
+                @before-enter="beforeEnter"
+                @enter="enter"
+                @before-leave="beforeLeave"
+                @leave="leave"
+            >
+                <BoxIdCard
+                    v-for="(box, index) in undefinedBoxes"
+                    :key="box.id"
+                    :box="box"
+                    :data-stagger-index="index"
+                    @update:box="box = $event"
+                    @select-box="$emit('select-box', $event)"
+                />
+            </transition-group>
+        </section>
+        <section v-else class="px-2 py-6">No hay cajas asociadas.</section>
+    </fieldset>
+    <ErrorModal
+        :open="noIdModal"
+        title="La caja no tiene ID"
+        text="Para poder ingresar la caja necesitas completar el ID de la misma."
+        @close="toggleNIM"
+        @main="toggleNIM"
+    />
+</template>
+
 <script setup lang="ts">
     import BoxIdCard from './BoxIdCard.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
@@ -66,63 +126,3 @@
         });
     };
 </script>
-
-<template>
-    <fieldset class="w-full pt-1 pb-5 px-2">
-        <section v-if="boxes.length > 0" class="space-y-4">
-            <transition-group
-                v-if="boxes.length > 0"
-                tag="section"
-                class="space-y-4"
-                @before-enter="beforeEnter"
-                @enter="enter"
-                @leave="leave"
-            >
-                <BoxIdCard
-                    v-for="(box, index) in definedBoxes"
-                    :key="box.id"
-                    :box="box"
-                    :data-stagger-index="index"
-                    :is-active-box="isActiveBox(box?.boxId || null)"
-                    @select-box="$emit('select-box', $event)"
-                />
-            </transition-group>
-            <transition
-                v-if="undefinedBoxes.length > 0"
-                tag="div"
-                @before-enter="beforeEnter"
-                @enter="enter"
-                @before-leave="beforeLeave"
-                @leave="leave"
-            >
-                <span class="text-xs text-green-600"> *Complete los ids de caja faltantes </span>
-            </transition>
-            <transition-group
-                v-if="boxes.length > 0"
-                tag="section"
-                class="space-y-4"
-                @before-enter="beforeEnter"
-                @enter="enter"
-                @before-leave="beforeLeave"
-                @leave="leave"
-            >
-                <BoxIdCard
-                    v-for="(box, index) in undefinedBoxes"
-                    :key="box.id"
-                    :box="box"
-                    :data-stagger-index="index"
-                    @update:box="box = $event"
-                    @select-box="$emit('select-box', $event)"
-                />
-            </transition-group>
-        </section>
-        <section v-else class="px-2 py-6">No hay cajas asociadas.</section>
-    </fieldset>
-    <ErrorModal
-        :open="noIdModal"
-        title="La caja no tiene ID"
-        text="Para poder ingresar la caja necesitas completar el ID de la misma."
-        @close="toggleNIM"
-        @main="toggleNIM"
-    />
-</template>

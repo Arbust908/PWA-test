@@ -7,31 +7,19 @@
             :data="pit.name"
             @update:data="pit.name = $event"
         />
-        <CircularBtn
-            v-if="pts.length > 1"
-            class="btn__delete"
-            :class="pitI == 0 ? 'mt-3' : 'mt-4'"
-            size="sm"
-            @click.prevent="removePit(pit.innerId)"
-        >
-            <Icon icon="Trash" class="w-6 h-6" />
-        </CircularBtn>
+        <AddDeleteBtn v-if="pits.length > 1" class="mt-2" purpose="remove" @click="removePit(pit.innerId)" />
     </template>
 </template>
 
 <script lang="ts">
-    import { defineComponent, computed } from 'vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
-    import { useVModel } from '@vueuse/core';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
 
     export default defineComponent({
         name: 'WoPitField',
         components: {
             FieldInput,
-            Icon,
-            CircularBtn,
+            AddDeleteBtn,
         },
         props: {
             pits: {
