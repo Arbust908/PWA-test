@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <PDF v-if="/*showPDF*/ true" :info="pdfInfo" @close="togglePDF()" />
+        <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" />
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-3 sm:p-4 flex-col gap-4">
                 <FieldGroup class="max-w-2xl border-none">

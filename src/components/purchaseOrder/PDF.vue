@@ -53,7 +53,7 @@
                         border-color: hsl(151, 65%, 30%);
                     "
                 >
-                    <h4>{{ sandProviderName }}</h4>
+                    <h4 style="font-weight: 700">{{ sandProviderName }}</h4>
                     <dl
                         v-for="arena in sandOrders"
                         :key="arena?.id"
@@ -93,7 +93,6 @@
                     Transporte
                 </h3>
                 <article
-                    class="space-y-1"
                     style="
                         padding-top: 0.75rem;
                         padding-bottom: 0.75rem;
@@ -103,25 +102,47 @@
                         border-color: hsl(151, 65%, 30%);
                     "
                 >
-                    <h4>{{ transportProviderName }}</h4>
+                    <h4 style="font-weight: 700">{{ transportProviderName }}</h4>
                     <p v-for="line in formatTransportOrder" :key="line">{{ line }}</p>
                 </article>
             </section>
-            <hr class="my-10" />
-            <section class="observaciones">
-                <h3>Observaciones</h3>
-                <dl>
+            <hr style="border-color: rgb(209 213 219); margin-top: 2.5rem; margin-bottom: 2.5rem" />
+            <section style="font-size: 0.875rem; line-height: 1.25rem">
+                <!-- class="observaciones"-->
+                <h3
+                    style="
+                        font-size: 0.875rem;
+                        line-height: 1.25rem;
+                        font-weight: 700;
+                        margin-bottom: 1.25rem;
+                        text-transform: capitalize;
+                    "
+                >
+                    Observaciones
+                </h3>
+                <dl style="font-size: 0.875rem; line-height: 1.25rem; margin-bottom: 0.75rem">
                     <dt>Fecha de entrega:</dt>
                     <dd>{{ localDate }}</dd>
                     <dt>Hora de entrega:</dt>
                     <dd>{{ formatedTime }}</dd>
                 </dl>
-                <p>Observaciones:{{ info.observation }}</p>
+                <p style="font-size: 0.875rem; line-height: 1.25rem">Observaciones:{{ info.observation }}</p>
             </section>
         </main>
-        <footer>
-            <p>Responsable de carga</p>
-            <p>Confirma recepción</p>
+        <footer
+            style="
+                display: flex;
+                width: 100%;
+                justify-content: center;
+                column-gap: 75px;
+                position: absolute;
+                bottom: 2.5rem;
+                left: 0px;
+                right: 0px;
+            "
+        >
+            <p style="text-align: center; padding-top: 0.75rem; border-top-width: 1px">Responsable de carga</p>
+            <p style="text-align: center; padding-top: 0.75rem; border-top-width: 1px">Confirma recepción</p>
         </footer>
     </section>
 </template>
@@ -227,17 +248,17 @@
         return width > height ? 'l' : 'p';
     };
     const router = useRouter();
-    // setTimeout(() => {
-    //     download();
-    //     setTimeout(() => {
-    //         emit('close');
-    //         router.push('/orden-de-pedido');
-    //     }, 1000);
-    // }, 500);
+    setTimeout(() => {
+        download();
+        setTimeout(() => {
+            emit('close');
+            router.push('/orden-de-pedido');
+        }, 1000);
+    }, 500);
 </script>
 
-<style scoped lang="scss">
-    .order {
+<!-- <style scoped lang="scss">
+    // .order {
         // @apply rounded-lg px-6 pt-7 w-[595px] h-[838px] mx-auto bg-white shadow relative;
         // h2 {
         //     @apply text-xl font-bold mb-6;
@@ -256,53 +277,53 @@
         //     }
         // }
 
-        .detalle {
-            @apply mb-5;
-            dl {
-                @apply mb-2 flex flex-col;
-                & :is(dt, dd) {
-                    @apply flex items-center gap-1;
-                }
-                dd {
-                    @apply ml-3;
-                }
-                .dot {
-                    @apply w-2 h-2 bg-main-400 rounded-full inline-block;
-                }
-            }
-            h3 {
-                @apply font-bold text-[#117E49] mb-5 uppercase text-lg;
-            }
-            article {
-                @apply py-3 pl-5 bg-[#f9f9f9] border-l-2 border-main-600;
-                h4 {
-                    @apply font-bold;
-                }
-            }
-        }
+        // .detalle {
+        //     @apply mb-5;
+        //     dl {
+        //         @apply mb-2 flex flex-col;
+        //         & :is(dt, dd) {
+        //             @apply flex items-center gap-1;
+        //         }
+        //         dd {
+        //             @apply ml-3;
+        //         }
+        //         .dot {
+        //             @apply w-2 h-2 bg-main-400 rounded-full inline-block;
+        //         }
+        //     }
+        //     h3 {
+        //         @apply font-bold text-[#117E49] mb-5 uppercase text-lg;
+        //     }
+        //     article {
+        //         @apply py-3 pl-5 bg-[#f9f9f9] border-l-2 border-main-600;
+        //         h4 {
+        //             @apply font-bold;
+        //         }
+        //     }
+        // }
 
-        hr {
-            @apply border-gray-300;
-        }
+        // hr {
+        //     @apply border-gray-300;
+        // }
 
-        .observaciones {
-            @apply text-sm;
-            h3 {
-                @apply text-sm font-bold mb-5 uppercase;
-            }
-            dl {
-                @apply text-sm mb-3;
-            }
-            p {
-                @apply text-sm;
-            }
-        }
+        // .observaciones {
+        //     @apply text-sm;
+        //     h3 {
+        //         @apply text-sm font-bold mb-5 uppercase;
+        //     }
+        //     dl {
+        //         @apply text-sm mb-3;
+        //     }
+        //     p {
+        //         @apply text-sm;
+        //     }
+        // }
 
-        footer {
-            @apply flex w-full justify-center gap-x-[75px] absolute bottom-10 inset-x-0;
-            p {
-                @apply text-center pt-3 border-t;
-            }
-        }
-    }
-</style>
+    //     footer {
+    //         @apply flex w-full justify-center gap-x-[75px] absolute bottom-10 inset-x-0;
+    //         p {
+    //             @apply text-center pt-3 border-t;
+    //         }
+    //     }
+    // }
+</style> -->
