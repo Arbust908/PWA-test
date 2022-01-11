@@ -1,31 +1,108 @@
 <template>
-    <section id="toPds" class="order">
+    <!--class="order"-->
+    <section
+        id="toPds"
+        style="
+            border-radius: 0.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-top: 1.75rem;
+            width: 595px;
+            height: 838px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: rgb(255, 255, 255);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            position: relative;
+        "
+    >
         <header>
-            <h2>
+            <h2 style="font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; margin-bottom: 1.5rem">
                 Orden de pedido -
-                <span>{{ '#' + info.purchaseOrder.id }}</span>
+                <span style="color: hsl(215, 14%, 34%)">{{ '#' + info.purchaseOrder.id }}</span>
             </h2>
-            <dl>
-                <dt>Cliente</dt>
-                <dd>{{ info.client }}</dd>
-                <dt>Pozo</dt>
-                <dd>{{ info.pit }}</dd>
+            <dl style="display: flex; margin-bottom: 2rem">
+                <dt style="font-weight: 500; margin-right: 0.25rem">Cliente</dt>
+                <dd style="font-weight: 400; color: rgb(107 114 128); margin-right: 2rem">{{ info.client }}</dd>
+                <dt style="font-weight: 500; margin-right: 0.25rem">Pozo</dt>
+                <dd style="font-weight: 400; color: rgb(107 114 128); margin-right: 2rem">{{ info.pit }}</dd>
             </dl>
         </header>
         <main>
-            <section class="detalle">
-                <h3>Arena</h3>
-                <article>
+            <section style="margin-bottom: 1.25rem">
+                <!-- class="detalle"-->
+                <h3
+                    style="
+                        font-weight: 700;
+                        color: #117e49;
+                        margin-bottom: 1.25rem;
+                        text-transform: uppercase;
+                        font-size: 1.125rem;
+                        line-height: 1.75rem;
+                    "
+                >
+                    Arena
+                </h3>
+                <article
+                    style="
+                        padding-top: 0.75rem;
+                        padding-bottom: 0.75rem;
+                        padding-left: 1.25rem;
+                        background-color: #f9f9f9;
+                        border-left-width: 2px;
+                        border-color: hsl(151, 65%, 30%);
+                    "
+                >
                     <h4>{{ sandProviderName }}</h4>
-                    <dl v-for="arena in sandOrders" :key="arena?.id">
-                        <dt><span class="dot" /> Pedido:</dt>
-                        <dd>{{ arena?.amount }}t - {{ arena?.sandType }} - {{ arena?.boxId }}</dd>
+                    <dl
+                        v-for="arena in sandOrders"
+                        :key="arena?.id"
+                        style="margin-bottom: 0.5rem; display: flex; flex-direction: column"
+                    >
+                        <dt style="display: flex; align-items: center; gap: 0.25rem">
+                            <span
+                                style="
+                                    width: 0.5rem;
+                                    height: 0.5rem;
+                                    background-color: hsl(151, 65%, 50%);
+                                    border-radius: 9999px;
+                                    display: inline-block;
+                                "
+                            />
+                            Pedido:
+                        </dt>
+                        <!-- class="dot"-->
+                        <dd style="display: flex; align-items: center; gap: 0.25rem; margin-left: 0.75rem">
+                            {{ arena?.amount }}t - {{ arena?.sandType }} - {{ arena?.boxId }}
+                        </dd>
                     </dl>
                 </article>
             </section>
-            <section class="detalle">
-                <h3>Transporte</h3>
-                <article class="space-y-1">
+            <section style="margin-bottom: 1.25rem">
+                <!-- class="detalle"-->
+                <h3
+                    style="
+                        font-weight: 700;
+                        color: #117e49;
+                        margin-bottom: 1.25rem;
+                        text-transform: uppercase;
+                        font-size: 1.125rem;
+                        line-height: 1.75rem;
+                    "
+                >
+                    Transporte
+                </h3>
+                <article
+                    class="space-y-1"
+                    style="
+                        padding-top: 0.75rem;
+                        padding-bottom: 0.75rem;
+                        padding-left: 1.25rem;
+                        background-color: #f9f9f9;
+                        border-left-width: 2px;
+                        border-color: hsl(151, 65%, 30%);
+                    "
+                >
                     <h4>{{ transportProviderName }}</h4>
                     <p v-for="line in formatTransportOrder" :key="line">{{ line }}</p>
                 </article>
@@ -150,34 +227,34 @@
         return width > height ? 'l' : 'p';
     };
     const router = useRouter();
-    setTimeout(() => {
-        download();
-        setTimeout(() => {
-            emit('close');
-            router.push('/orden-de-pedido');
-        }, 1000);
-    }, 500);
+    // setTimeout(() => {
+    //     download();
+    //     setTimeout(() => {
+    //         emit('close');
+    //         router.push('/orden-de-pedido');
+    //     }, 1000);
+    // }, 500);
 </script>
 
 <style scoped lang="scss">
     .order {
-        @apply rounded-lg px-6 pt-7 w-[595px] h-[838px] mx-auto bg-white shadow relative;
-        h2 {
-            @apply text-xl font-bold mb-6;
-            span {
-                @apply text-main-600;
-            }
-        }
+        // @apply rounded-lg px-6 pt-7 w-[595px] h-[838px] mx-auto bg-white shadow relative;
+        // h2 {
+        //     @apply text-xl font-bold mb-6;
+        //     span {
+        //         @apply text-main-600;
+        //     }
+        // }
 
-        dl {
-            @apply flex mb-8;
-            dt {
-                @apply font-medium mr-1;
-            }
-            dd {
-                @apply font-normal text-gray-500 mr-8;
-            }
-        }
+        // dl {
+        //     @apply flex mb-8;
+        //     dt {
+        //         @apply font-medium mr-1;
+        //     }
+        //     dd {
+        //         @apply font-normal text-gray-500 mr-8;
+        //     }
+        // }
 
         .detalle {
             @apply mb-5;
