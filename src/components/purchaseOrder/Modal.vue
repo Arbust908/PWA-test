@@ -7,8 +7,8 @@
                 <ul>
                     Pedido:
                     <li v-for="(so, index) in po.sandOrders" :key="index" class="ml-0 text-black text-sm list-none">
-                        {{ so.amount }}t - arena #{{ getSandType(so?.sandTypeId) }} - ID
-                        {{ so.boxId !== '' ? so.boxId : 'Sin ID de caja' }}
+                        {{ so.amount }}t - arena #{{ getSandType(so?.sandTypeId) }} -
+                        {{ so.boxId !== '' ? `ID ${so.boxId}` : 'Sin ID de caja' }}
                     </li>
                 </ul>
             </div>

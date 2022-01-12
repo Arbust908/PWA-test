@@ -1,3 +1,16 @@
+<template>
+    <header>
+        <h2>{{ title }}</h2>
+        <router-link :to="link">
+            <PrimaryBtn :btn="'pill'" size="sm">
+                <span> {{ btnText }} </span>
+                <Icon :icon="icon" class="h-5 w-5" />
+            </PrimaryBtn>
+        </router-link>
+    </header>
+    <hr class="mb-4 border-gray-300" />
+</template>
+
 <script setup lang="ts">
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
@@ -20,19 +33,6 @@
         },
     });
 </script>
-
-<template>
-    <header>
-        <h2>{{ title }}</h2>
-        <router-link :to="link">
-            <PrimaryBtn size="sm">
-                <span> {{ btnText }} </span>
-                <Icon :icon="icon" class="ml-1 w-4 h-4" />
-            </PrimaryBtn>
-        </router-link>
-    </header>
-    <hr class="mb-4 border-gray-300" />
-</template>
 
 <style scoped>
     header {

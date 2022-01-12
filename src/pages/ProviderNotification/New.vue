@@ -13,52 +13,14 @@
                     v-model:amount="transportOrder[0].amount"
                     v-model:observation="transportOrder[0].observation"
                 />
-                <!-- <fieldset class="py-2 w-full grid grid-cols-12 gap-3 md:gap-4">
-                    <h2 class="col-span-full text-xl mt-4">Transporte</h2>
-                    <template v-for="(tO, tOKey) in transportOrder" :key="tOKey">
-                        <hr v-if="tOKey !== 0" class="mt-4 mb-2 col-span-full" />
-                        <FieldSelect
-                            :class="tOKey !== 0 ? 'col-span-10' : 'col-span-full sm:col-span-5'"
-                            title="Proveedor"
-                            :field-name="`transportProvider${tO.id}`"
-                            placeholder="Seleccionar"
-                            endpoint="/transportProvider"
-                            :data="tO.transportProviderId"
-                            @update:data="tO.transportProviderId = $event"
-                        />
-                        <div v-if="transportOrder.length > 1" class="col-span-2 flex mx-auto items-end pb-2">
-                            <Icon icon="Trash" outline class="w-5 h-5" @click="removeTransportProvider(tO.id)" />
-                        </div>
-                        <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
-                            <FieldInput
-                                class="col-span-full sm:col-span-3 bg-transparent"
-                                :field-name="`transportAmount${tO.id}`"
-                                title="Camiones"
-                                placeholder="Camiones"
-                                mask="####"
-                                required-validation
-                                validation-type="extension"
-                                :char-amount="{ min: 1, max: 4 }"
-                                :data="tO.amount"
-                                @update:data="tO.amount = $event"
-                            />
-                            <FieldInput
-                                v-model:data="tO.observation"
-                                class="col-span-full sm:col-span-5"
-                                :field-name="`transportObservations${tO.id}`"
-                                placeholder="Observaciones"
-                                title="Observaciones"
-                                is-optional
-                            />
-                        </div>
-                    </template>
-                </fieldset> -->
             </form>
         </section>
 
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
-            <SecondaryBtn btn="wide" @click.prevent="$router.push('/')"> Cancelar </SecondaryBtn>
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/notificaciones-a-proveedores')">
+                Cancelar
+            </SecondaryBtn>
             <PrimaryBtn
                 btn="wide"
                 :class="!someFull && 'opacity-50 cursor-not-allowed'"
@@ -73,18 +35,24 @@
             :open="isNotificationConfirmed && apiRequest && hasSaveSuccess"
             title="¡La notificación está en proceso de envío!"
             text="En breve lo verás reflejado en la columna “Estado”"
-            :icon="{ type: 'ArrowCircleUp', classes: 'rotate-45 text-gray-700' }"
-            :btn="{ text: 'Continuar', classes: 'indefinite' }"
+            :icon="{ type: 'ArrowCircleUp', classes: 'text-gray-400 rotate-45' }"
+            :btn="{ text: 'Volver', classes: 'indefinite' }"
             @close="$router.push('/notificaciones-a-proveedores')"
             @main="$router.push('/notificaciones-a-proveedores')"
         />
         <ErrorModal
             :open="isNotificationConfirmed && apiRequest && !hasSaveSuccess"
-            :text="`Hubo un problema con el envío de la notificación. <br />Por favor, intenta nuevamente`"
-            @close="showModal = false"
-            @main="showModal = false"
+            text="Hubo un problema con el envío de la notificación. Por favor, intenta nuevamente."
+            @close="
+                showModal = false;
+                isNotificationConfirmed = false;
+            "
+            @main="
+                showModal = false;
+                isNotificationConfirmed = false;
+            "
         />
-        <Modal :open="showModal" modal-classes="max-w-md" @close="showModal = false">
+        <Modal :open="showModal" modal-classes="max-w-[440px] font-body" @close="showModal = false">
             <div v-if="!isNotificationConfirmed" class="text-left">
                 <p class="text-lg text-black font-bold">Notificación a proveedores</p>
                 <!-- <p class="mt-3">Se está por enviar una notificación a los siguientes proveedores:</p> -->
@@ -97,7 +65,7 @@
                         <li
                             v-for="(order, index) in modalData.sandOrders"
                             :key="index"
-                            class="text-black text-base list-none mt-1"
+                            class="text-black text-base font-light list-none mt-1"
                         >
                             {{ order.amount }}t - {{ order.sandType }}
                         </li>
@@ -109,7 +77,7 @@
                 >
                     <p class="font-bold text-black text-base">Transporte {{ modalData.transportProvider }}</p>
                     <ul>
-                        <li class="text-black text-base list-none mt-2">
+                        <li class="text-black text-base font-light list-none mt-2">
                             {{ modalData.transportQuantity }} camion{{
                                 modalData.transportQuantity > 1 ? '(es)' : null
                             }}
@@ -119,33 +87,9 @@
                 </div>
             </div>
             <div v-if="!isNotificationConfirmed" class="flex gap-4 justify-end mt-6">
-                <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
-                <PrimaryBtn btn="btn__warning" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
+                <SecondaryBtn :btn="'wide'" class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
+                <PrimaryBtn :btn="'wide'" @click.prevent="confirmNotification">Confirmar</PrimaryBtn>
             </div>
-            <!-- <div
-                v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess"
-                class="divide-y text-center flex flex-col justify-center text-xl items-center"
-            >
-                <Icon icon="ArrowCircleUp" class="h-[60px] w-[60px] rotate-45 mb-5 text-gray-400" />
-                <span class="text-center text-base border-none text-gray-900">
-                    ¡La notificación está en proceso de envío!
-                </span>
-                <span class="text-center text-sm border-none m-2">
-                    En breve lo verás reflejado en la columna “Estado”
-                </span>
-            </div> -->
-            <!-- 
-            <div v-if="isNotificationConfirmed && apiRequest && hasSaveSuccess" class="flex justify-center gap-4">
-                <BaseBtn
-                    class="border-2 text-gray-500 rounded"
-                    @click.prevent="$router.push('/notificaciones-a-proveedores')"
-                >
-                    Continuar
-                </BaseBtn>
-            </div>
-            <div v-if="isNotificationConfirmed && apiRequest && !hasSaveSuccess" class="flex gap-4">
-                <SecondaryBtn class="outline-none" @click.prevent="toggleModal"> Volver </SecondaryBtn>
-            </div> -->
         </Modal>
     </Layout>
 </template>
@@ -307,17 +251,32 @@
             const modalData = ref({});
 
             const save = async () => {
+                const sandOrderId = ref(0);
+
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId < 0) {
+                    const { data: sandOrder } = await useAxios(
+                        `/sandOrder`,
+                        { method: 'POST', data: sandProviderIds.value[0].SandOrders[0] },
+                        instance
+                    );
+                    console.log(sandOrder);
+                    console.log(sandOrder.id);
+                    sandOrderId.value = sandOrder.id;
                     pN.value = {
+                        textArena: 'Arena',
                         sandProviderId: Number(sandProviderIds.value[0].id),
                         data: {
                             sandOrders: sandProviderIds.value[0].SandOrders,
                         },
+                        sandId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandTypeId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandOrderId: sandOrderId.value,
                     };
                 }
 
                 if (transportOrder.value[0].transportProviderId > 0 && sandProviderIds.value[0].id < 0) {
                     pN.value = {
+                        textTransporte: 'Transporte',
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
                         data: {
                             cantidadCamiones: Number(transportOrder.value[0].amount),
@@ -327,6 +286,17 @@
                 }
 
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId > 0) {
+                    let response = await axios
+                        .post(`${apiUrl}/sandOrder`, sandProviderIds.value[0].SandOrders[0])
+                        .catch((err) => {
+                            console.log(err);
+
+                            return false;
+                        });
+
+                    let order = response.data.data;
+                    console.log(order.id);
+                    sandOrderId.value = order.id;
                     pN.value = {
                         textArena: 'Arena',
                         sandProviderId: Number(sandProviderIds.value[0].id),
@@ -337,6 +307,9 @@
                             observations: transportOrder.value[0].observation,
                         },
                         transportProviderId: Number(transportOrder.value[0].transportProviderId),
+                        sandId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandTypeId: sandProviderIds.value[0].SandOrders[0].sandTypeId,
+                        sandOrderId: sandOrderId.value,
                     };
                 }
 

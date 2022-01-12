@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section class="max-w-fit">
         <!-- Desktop Table -->
         <div class="hidden sm:block">
             <div>
@@ -18,7 +18,7 @@
                                 </td>
                             </tr>
                         </tbody>
-                        <tbody v-else>
+                        <tbody v-else class="divide-y divide-gray-200">
                             <template v-for="(item, index) in paginatedItems" :key="item.id">
                                 <tr
                                     class="body-row"
@@ -169,7 +169,7 @@
             };
 
             const filteredItems = computed(() => {
-                let items = [...props.items];
+                let items = [...(props.items || [])];
 
                 if (items.length < 1) {
                     return [];

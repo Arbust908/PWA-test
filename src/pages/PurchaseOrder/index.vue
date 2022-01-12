@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <ABMHeader title="Ordenes de Pedido" link="/orden-de-pedido/nueva" />
+        <ABMHeader title="Ordenes de pedido" link="/orden-de-pedido/nueva" />
         <!-- <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -101,7 +101,7 @@
                 { title: 'N°', key: 'id', sortable: true },
                 { title: 'Centro de carga de arena', key: 'sandProvider.name', sortable: true },
                 { title: 'Proveedor de transporte', key: 'transportProvider.name', sortable: true },
-                { title: '', key: '' },
+                { title: '', key: 'actions' },
             ];
 
             const actions = [

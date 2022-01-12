@@ -1,57 +1,125 @@
-&.aisle {
-  @apply bg-second-300 text-second-300;
-}
-&.fina {
-  @apply bg-orange-600 text-orange-800 font-medium;
-}
-&.gruesa {
-  @apply bg-green-600 text-green-800 font-medium;
-}
-&.cortada {
-  @apply bg-blue-600 text-blue-800 font-medium;
-}
-&.blocked {
-  @apply bg-second-800 text-second-800;
-}
-&.empty {
-  @apply bg-second-200 text-second-200;
-}
-&.selected {
-  @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
-}
-
-&.mesh-box {
+.mesh-type {
   &__1 {
-    background-color: #FFD19B;
-    color: #974A08;
-  }
+    &.clickable {
+      @apply  border-orange-200 text-orange-200;
+    };
+    &.boxCard {
+      @apply bg-orange-200 text-amber-800;
+    };
+    &.arrow {
+      @apply text-amber-800 bg-orange-300;
+    };
+    &.iconBg {
+      @apply text-orange-300;
+    };
+    &.meshBorder {
+      @apply border border-amber-800;
+    };
+  };
   &__2 {
-    background-color: #AFDCC6;
-    color: #106843;
-  }
+    &.clickable {
+      @apply  border-emerald-200 text-emerald-200;
+    };
+    &.boxCard {
+      @apply bg-emerald-200 text-emerald-800;
+    };
+    &.arrow {
+      @apply text-emerald-800;
+      background-color: #81C2A3;
+    };
+    &.iconBg {
+      color: #81C2A3;
+    };
+    &.meshBorder {
+      @apply border border-emerald-800;
+    };
+  };
   &__3 {
-    background-color: #C3EDFF;
-    color: #015072;
-  }
+    &.clickable {
+      @apply  border-sky-200 text-sky-200;
+    };
+    &.boxCard {
+      @apply bg-sky-200 text-sky-900;
+    };
+    &.arrow {
+      @apply text-sky-900 bg-sky-300;
+    };
+    &.iconBg {
+      @apply text-sky-300;
+    };
+    &.meshBorder {
+      @apply border border-sky-900;
+    };
+  };
   &__4 {
-    background-color: #E8D7F5;
-    color: #510092;
-  }
+    &.clickable {
+      @apply  border-purple-200 text-purple-200;
+    };
+    &.boxCard {
+      @apply bg-purple-200 text-violet-900;
+    };
+    &.arrow {
+      @apply text-violet-900;
+      background-color: #AB78D2;
+    };
+    &.iconBg {
+      color: #AB78D2;
+    };
+    &.meshBorder {
+      @apply border border-violet-900;
+    };
+  };
   &__5 {
-    background-color: #FBE1D9;
-    color: #AB2A03;
-  }
+    &.clickable {
+      @apply  border-red-100 text-red-100;
+    };
+    &.boxCard {
+      @apply bg-red-100 text-orange-800;
+    };
+    &.arrow {
+      @apply text-orange-800;
+      background-color: #F98764;
+    };
+    &.iconBg {
+      color: #F98764;
+    };
+    &.meshBorder {
+      @apply border border-orange-800;
+    };
+  };
   &__empty {
-    background-color: #C0BFBF;
-    color: #FFFFFF;
-  }
+    &.clickable {
+      @apply  border-stone-300 text-stone-300;
+    };
+    &.boxCard {
+      @apply bg-stone-300 text-white;
+    };
+    &.arrow {
+      @apply text-white bg-neutral-400;
+    };
+    &.iconBg {
+      @apply text-neutral-400;
+    };
+  };
   &__taken {
-    color: #FFFFFF;
+    @apply text-white;
     &.cradle {
-      background-color: #25238F;
-    }
+      @apply bg-indigo-900;
+      &-clickable{
+        @apply border-indigo-900 text-indigo-900
+      }
+      &.icon{
+        color: #6160A3;
+      };
+    };
     &.aisle {
-      background-color: #616161;
-    }
-  }
-}
+      @apply bg-zinc-600;
+      &-clickable{
+        @apply border-zinc-600 text-zinc-600
+      }
+      &.icon{
+        @apply text-zinc-400;
+      };
+    };
+  };
+};

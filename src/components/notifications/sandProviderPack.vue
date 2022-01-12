@@ -3,10 +3,10 @@
         <FieldLegend>Arena</FieldLegend>
         <template v-for="(sPov, i) in sandProviders" :key="i">
             <FieldSelect
-                class="col-span-full sm:col-span-5"
+                class="col-span-full sm:col-span-4"
                 field-name="sandProvider"
                 placeholder="Seleccionar centro de carga"
-                title="Centro de Carga de Arena"
+                title="Centro de carga de arena"
                 endpoint="/sandProvider"
                 :data="sPov.id"
                 @update:data="
@@ -22,7 +22,7 @@
             >
                 <FieldSelect
                     v-model:data="so.sandTypeId"
-                    class="col-span-5 sm:col-span-5"
+                    class="col-span-5 sm:col-span-4"
                     :title="Key === 0 ? 'Tipo' : null"
                     field-name="sandType"
                     placeholder="Arena"
@@ -43,30 +43,18 @@
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
                 />
                 <div class="flex flex-row content-evenly">
-                    <div
+                    <AddDeleteBtn
                         v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length"
-                        class="ml-2 mr-6 my-auto mx-auto"
-                    >
-                        <Icon
-                            icon="Trash"
-                            outline
-                            class="w-6 h-6 align-middle"
-                            :class="isFirst(Key, sPov.SandOrders) ? 'mt-6' : 'mt-2'"
-                            @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
-                        />
-                    </div>
-                    <div
+                        class="flex self-end"
+                        purpose="remove"
+                        @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
+                    />
+                    <AddDeleteBtn
                         v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4 && isLast(Key, sPov.SandOrders)"
-                        class="ml-4 my-auto hidden sm:block"
-                    >
-                        <Icon
-                            icon="PlusCircle"
-                            outline
-                            class="w-7 h-7 text-green-500"
-                            :class="sPov.SandOrders.length == 1 ? 'mt-7' : 'mt-2'"
-                            @click.prevent="addSandOrder(sPov.innerId)"
-                        />
-                    </div>
+                        class="flex self-end"
+                        purpose="add"
+                        @click.prevent="addSandOrder(sPov.innerId)"
+                    />
                 </div>
             </div>
             <div v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4" class="col-span-full mt-2 sm:hidden">
@@ -87,6 +75,7 @@
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
     import { SandProvider, SandOrder } from '@/interfaces/sandflow';
     import { isFirst, isLast } from '@/helpers/iteretionHelpers';
+    import AddDeleteBtn from '../ui/buttons/AddDeleteBtn.vue';
 
     const defaultSandOrder: SandOrder = {
         innerId: 0,
@@ -105,6 +94,7 @@
             FieldSelect,
             FieldWithSides,
             Icon,
+            AddDeleteBtn,
         },
         props: {
             sandProviders: {

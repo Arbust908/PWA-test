@@ -65,7 +65,10 @@
                         {{ showDrivers ? driverTabText : 'Volver' }}
                     </SideBtn>
                     <section v-if="!showDrivers" class="w-full space-x-3 flex items-center justify-end">
-                        <SecondaryBtn btn="wide" @click.prevent="$router.push('/proveedores-de-transporte')">
+                        <SecondaryBtn
+                            btn="wide"
+                            @click.prevent="driverRestore(), $router.push('/proveedores-de-transporte')"
+                        >
                             Cancelar
                         </SecondaryBtn>
                         <PrimaryBtn
@@ -136,11 +139,32 @@
                 baseURL: api,
             });
 
-            const transportProviders: Array<TransportProvider> = JSON.parse(
-                JSON.stringify(store.state.transportProviders.all)
-            );
-            const currentTransportProvider: TransportProvider = transportProviders.find((sp) => {
-                return sp.id == id;
+            const transportProviders = ref([]);
+            const currentTransportProvider = ref({});
+            const drivers = ref([]);
+            const newTransportProvider = ref({});
+            const companyRepresentative = ref({});
+
+            onMounted(async () => {
+                // TODO: StoreLogic
+                const result = await axios.get(`${api}/transportProvider`);
+                transportProviders.value = result.data.data;
+                currentTransportProvider.value = transportProviders.value.find((sp) => {
+                    return sp.id == id;
+                });
+                drivers.value = currentTransportProvider.value.drivers;
+                newTransportProvider.value = reactive({
+                    name: currentTransportProvider.value.name,
+                    legalId: currentTransportProvider.value.legalId,
+                    address: currentTransportProvider.value.address,
+                    observations: currentTransportProvider.value.observations,
+                    companyRepresentativeId: currentTransportProvider.value.companyRepresentativeId,
+                });
+                companyRepresentative.value = reactive({
+                    name: currentTransportProvider.value.companyRepresentative.name,
+                    phone: currentTransportProvider.value.companyRepresentative.phone,
+                    email: currentTransportProvider.value.companyRepresentative.email,
+                });
             });
 
             let activeSection = ref('provider');
@@ -156,8 +180,6 @@
                 return driversShown.value && windowWidth > 768;
             });
 
-            const drivers: Array<Driver> = reactive(currentTransportProvider.drivers);
-
             let newDriver = reactive({
                 name: '',
                 phone: '',
@@ -172,15 +194,15 @@
                 const driver = { ...newDriver };
 
                 if (hasFullNewDriver.value) {
-                    drivers.push(driver);
+                    drivers.value.push(driver);
                 }
                 cleanNewDriver();
             };
 
             const deleteDriver = async (index: number) => {
-                console.log(drivers[index].id);
+                console.log(drivers.value[index].id);
                 let response = await axios
-                    .delete(`${api}/driver/${drivers[index].id}`)
+                    .delete(`${api}/driver/${drivers.value[index].id}`)
                     .then((res) => {
                         if (res.status === 200) {
                             return res.data.data;
@@ -194,7 +216,7 @@
                         return;
                     })
                     .finally(() => {
-                        drivers.splice(index, 1);
+                        drivers.value.splice(index, 1);
                     });
 
                 return {
@@ -202,8 +224,11 @@
                 };
             };
 
+            const backUpDriver = ref(false);
+
             const editDriver = (index: number) => {
-                const driver = { ...drivers[index] };
+                const driver = { ...drivers.value[index] };
+                backUpDriver.value = true;
                 deleteDriver(index);
 
                 if (activeSection.value === 'provider') {
@@ -218,6 +243,17 @@
                 newDriver.observations = driver.observations;
             };
 
+            const driverRestore = () => {
+                if (backUpDriver.value === true) {
+                    addDriver();
+                    update();
+                } else {
+                    console.log('Nothing to push');
+                }
+            };
+
+            console.log(axios.get(`${api}/transportProvider`));
+
             const cleanNewDriver = () => {
                 newDriver.name = '';
                 newDriver.phone = '';
@@ -228,28 +264,15 @@
                 newDriver.observations = '';
             };
 
-            const newTransportProvider: TransportProvider = reactive({
-                name: currentTransportProvider.name,
-                legalId: currentTransportProvider.legalId,
-                address: currentTransportProvider.address,
-                observations: currentTransportProvider.observations,
-                companyRepresentativeId: currentTransportProvider.companyRepresentativeId,
-            });
             const driverTabText = computed(() => {
-                return `Transportista${drivers.length > 1 ? `s (${drivers.length})` : ''}`;
-            });
-
-            const companyRepresentative: CompanyRepresentative = reactive({
-                name: currentTransportProvider.companyRepresentative.name,
-                phone: currentTransportProvider.companyRepresentative.phone,
-                email: currentTransportProvider.companyRepresentative.email,
+                return `Transportista${drivers.value.length > 1 ? `s (${drivers.value.length})` : ''}`;
             });
 
             const transportProviderFull: ComputedRef<boolean> = computed(() => {
                 return !!(
-                    newTransportProvider.name !== '' &&
-                    newTransportProvider.address !== '0' &&
-                    newTransportProvider.legalId >= 0
+                    newTransportProvider.value.name !== '' &&
+                    newTransportProvider.value.address !== '0' &&
+                    newTransportProvider.value.legalId >= 0
                 );
             });
 
@@ -266,9 +289,9 @@
 
             const repFull: ComputedRef<boolean> = computed(() => {
                 return !!(
-                    companyRepresentative.name !== '' &&
-                    companyRepresentative.phone !== '' &&
-                    companyRepresentative.email !== ''
+                    companyRepresentative.value.name !== '' &&
+                    companyRepresentative.value.phone !== '' &&
+                    companyRepresentative.value.email !== ''
                 );
             });
 
@@ -283,19 +306,19 @@
                 if (hasFullNewDriver.value) {
                     addDriver();
                 }
-                const { drivers, ...newTProv } = currentTransportProvider;
+                const { drivers, ...newTProv } = currentTransportProvider.value;
 
-                console.log('newTraPro', newTransportProvider);
-                console.log('newComRep', companyRepresentative);
+                console.log('newTraPro', newTransportProvider.value);
+                console.log('newComRep', companyRepresentative.value);
 
                 const { data: tpData } = useAxios(
                     `/transportProvider/${id}`,
-                    { method: 'PUT', data: newTransportProvider },
+                    { method: 'PUT', data: newTransportProvider.value },
                     instance
                 );
                 const { data: rep } = useAxios(
-                    `/companyRepresentative/${currentTransportProvider.companyRepresentativeId}`,
-                    { method: 'PUT', data: companyRepresentative },
+                    `/companyRepresentative/${currentTransportProvider.value.companyRepresentativeId}`,
+                    { method: 'PUT', data: companyRepresentative.value },
                     instance
                 );
                 drivers.forEach((driver) => {
@@ -304,7 +327,7 @@
                         useAxios(`/driver/${driver.id}`, { method: 'PUT', data: driver }, instance);
                     } else {
                         const { id, ...newDriver } = driver;
-                        newDriver.transportProviderId = currentTransportProvider.id;
+                        newDriver.transportProviderId = currentTransportProvider.value.id;
                         console.log('newDriver', newDriver);
                         const { data } = useAxios(`/driver/`, { method: 'POST', data: newDriver }, instance);
                     }
@@ -327,6 +350,7 @@
                 hasFullNewDriver,
                 deleteDriver,
                 editDriver,
+                driverRestore,
                 id,
                 currentTransportProvider,
                 update,

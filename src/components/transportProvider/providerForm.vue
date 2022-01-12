@@ -5,7 +5,7 @@
                 class="col-span-full"
                 field-name="transportName"
                 placeholder=""
-                title="Nombre / Razón Social"
+                title="Nombre / Razón social"
                 :data="tpName"
                 require-validation
                 entity="transportProvider"
@@ -48,7 +48,7 @@
             <FieldLegend>Contacto principal</FieldLegend>
             <FieldInput
                 class="col-span-full"
-                title="Nombre y Apellido"
+                title="Nombre y apellido"
                 field-name="repName"
                 placeholder=""
                 :data="crName"
@@ -83,6 +83,7 @@
 </template>
 
 <script lang="ts">
+    // *** SandProvider y TransportProvider tambien usan, deberiamos hacerlo genetico
     import { defineComponent } from 'vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
@@ -144,6 +145,9 @@
 
 <style lang="scss" scoped>
     fieldset:not(:last-of-type) {
-        @apply border-b border-gray-200 pb-6;
+        @apply border-b border-transparent pb-6;
+    }
+    h2 {
+        @apply text-lg font-medium;
     }
 </style>

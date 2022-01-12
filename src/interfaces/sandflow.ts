@@ -1,42 +1,4 @@
-export enum Role {
-    SuperAdmin = 99,
-    Admin = 10,
-    Logged = 1,
-    Guest = 0,
-}
-export interface User {
-    id: number;
-    username: string;
-    role: Role;
-}
-
-export enum BoxCategory {
-    empty = 'Vacio',
-    cut = 'Cortada',
-    thick = 'Gruesa',
-    fine = 'Fina',
-    aisle = 'Pasillo',
-}
-export enum SandStageStatus {
-    started = 0,
-    in_progress = 1,
-    finished = 2,
-}
-// TODO
-export interface StageSheet {
-    id?: number;
-    companyId: number;
-    compnay?: Company;
-    pitId: number;
-    pit?: Pit;
-    warehouseId: number;
-    warehouse?: Warehouse;
-    stages?: SandStage[];
-    operativeCradleId: number;
-    backupCradleId: number;
-    operativeCradle?: Cradle;
-    backupCradle?: Cradle;
-}
+/* eslint no-use-before-define: 0 */
 
 export interface Pit {
     id?: number;
@@ -44,6 +6,11 @@ export interface Pit {
     workOrderId?: number;
     companyId?: number;
     company?: Company;
+    workOrder?: WorkOrder;
+    purchaseOrders?: PurchaseOrder[];
+    stageSheets?: StageSheet[];
+    sandPlans?: SandPlan[];
+    warehouses?: Warehouse[];
 }
 export interface Traktor {
     id?: number;
@@ -51,49 +18,52 @@ export interface Traktor {
     supplier: string;
     description: string;
     workOrderId: number;
+    workOrder?: WorkOrder[];
 }
 export interface Pickup {
     id?: number;
-    pickupId: number; // Esto va como string
+    pickupId: string;
     description: string;
     workOrderId: number;
+    workOrder?: WorkOrder[];
 }
 export interface HumanResource {
     id?: number;
-    role: string;
-    name: string;
+    role: string | number;
+    name: string | number;
     crewId: number;
+    crew?: Crew;
 }
 export interface Crew {
     id?: number;
     timeStart: number;
     timeEnd: number;
     title: string;
-    resources?: HumanResource[];
     workOrderId: number;
+    resources?: HumanResource[];
+    workOrder?: WorkOrder[];
 }
 
 export interface WorkOrder {
     id?: number;
-    client: string; // Id
-    serviceCompany: string; // Id
+    client: string;
+    serviceCompany: string;
     pad: string;
     pits: Pit[] | number[]; // Nope
-    operativeCradle: string; // Id
-    backupCradle: string; // Id
-    operativeForklift: string; // Id
-    backupForklift: string; // Id
+    operativeCradle: string;
+    backupCradle: string;
+    operativeForklift: string;
+    backupForklift: string;
     traktors: Traktor[];
     pickups: Pickup[];
-    crews?: Crew[];
-    crew?: Crew[];
+    crews: Crew[];
     rigmats: number;
     conex: number;
     generators: number;
     tower: number;
     cabin: number;
     draft?: boolean;
-    visible?: boolean;
+    visible: boolean;
 }
 
 export interface CompanyRepresentative {
@@ -101,6 +71,9 @@ export interface CompanyRepresentative {
     name: string;
     email: string;
     phone: string;
+    sandProviders?: SandProvider[];
+    company?: Company[];
+    transportProviders?: TransportProvider[];
 }
 
 export interface SandProvider {
@@ -111,10 +84,12 @@ export interface SandProvider {
     meshType: any;
     observations?: string;
     companyRepresentativeId: number;
+    visible: boolean;
     CompanyRepresentative?: CompanyRepresentative;
     ProviderNotifications?: ProviderNotification[];
     PurhcaseOrders?: PurchaseOrder[];
     SandOrders?: SandOrder[];
+    Sands?: Sand[];
 }
 
 export interface Driver {
@@ -123,10 +98,12 @@ export interface Driver {
     phone: string;
     email: string;
     vehicleType: string;
-    vehicleId: string;
     transportId: string;
-    transportId2?: string;
+    transportProviderId?: number;
     observations?: string;
+    visible: boolean;
+    transportProvider?: TransportProvider;
+    vehicles?: Vehicle[];
 }
 
 export interface Vehicle {
@@ -139,20 +116,21 @@ export interface Vehicle {
 export interface Sand {
     id?: number;
     type: string;
-    // description?: string;
-    // meshType: string;
-    // grainType: string;
-    observations?: string;
-    sandOrders?: SandOrder[];
     categoryId?: number;
+    observations?: string;
+    visible: boolean;
+    sandOrders?: SandOrder[];
     category?: sandCategory;
 }
 
 export interface Cradle {
     id?: number;
     name: string;
-    slots: string[]; // json
     observations?: string;
+    slots?: string;
+    visible: boolean;
+    stageSheets?: StageSheet[];
+    backupStageSheets?: StageSheet[];
 }
 
 export interface Forklift {
@@ -162,6 +140,7 @@ export interface Forklift {
     ownerName?: string;
     ownerContact?: string;
     observations?: string;
+    visible: boolean;
 }
 
 export interface Company {
@@ -173,10 +152,15 @@ export interface Company {
     childId?: number;
     observations?: string;
     companyRepresentativeId: number;
+    visible: boolean;
     company?: Company;
     companyRepresentative?: CompanyRepresentative;
     sandPlans?: SandPlan[];
     pits?: Pit[];
+    purchaseOrders?: PurchaseOrder[];
+    stageSheets?: StageSheet[];
+    warehouses?: Warehouse[];
+    child?: Company[];
 }
 
 export interface SandStage {
@@ -184,39 +168,45 @@ export interface SandStage {
     stage: number;
     sandId1: number;
     sandA?: Sand;
-    quantity1: number;
     sandId2: number;
     sandB?: Sand;
-    quantity2: number;
     sandId3: number;
     sandC?: Sand;
+    sandId4: number;
+    sandD?: Sand;
+    quantity1: number;
+    quantity2: number;
     quantity3: number;
+    quantity4: number;
     action?: 'create' | 'update' | 'delete';
     sandPlanId: number;
     sandPlan?: SandPlan;
-    status: null | 'started' | 'in_progress' | 'finished';
+    status: null | 0 | 1 | 2;
 }
 
 export interface SandPlan {
     id?: number;
     pitId: number;
-    pit?: Pit;
     companyId: number;
-    company?: Company;
     stagesAmount?: number;
+    visible: boolean;
+    pit?: Pit;
+    company?: Company;
     stages?: SandStage[];
 }
 
 export interface SandOrder {
     id?: number;
     sandTypeId: number;
-    sandType?: Sand;
     amount: number;
     purchaseOrderId: number;
-    purchaseOrder?: PurchaseOrder;
     sandProviderId: number;
-    sandProvider?: SandProvider;
     boxId?: string;
+    status: number;
+    location: string;
+    sandType?: Sand;
+    purchaseOrder?: PurchaseOrder;
+    sandProvider?: SandProvider;
 }
 
 export interface TransportProvider {
@@ -225,58 +215,61 @@ export interface TransportProvider {
     legalId: number;
     address: string;
     observations?: string;
+    providerNotificationId?: number;
     companyRepresentativeId: number;
+    visible: boolean;
+    providerNotification?: ProviderNotification;
+    purchaseOrders?: PurchaseOrder[];
     CompanyRepresentative?: CompanyRepresentative;
-    // amount: number; // no va
-    providerNotificationId: number; // no se si va aca
-    providerNotification?: ProviderNotification; // no se si va aca
-    purchaseOrders?: PurchaseOrder[]; // no se si va aca
     drivers?: Driver[];
 }
 
 export interface ProviderNotification {
-    // ??? Dudas
     id?: number;
     sandProviderId: number;
-    sandProvider?: SandProvider;
     sandOrderId: number;
-    sandOrder?: SandOrder;
     transportProviderId: number;
-    transportProviders?: TransportProvider;
+    data: any;
+    sandProvider?: SandProvider;
+    sandOrder?: SandOrder;
+    transportProvider?: TransportProvider;
 }
 
 export interface PurchaseOrder {
     id?: number;
-    transportProviderId: number;
-    deliveryTime: any;
-    packageObservations: string;
-    driverId: number;
-    driver?: Driver;
-    sandProviderId: number;
-    sandProvider?: SandProvider;
-    pitId: number;
-    pit?: Pit;
     companyId: number;
+    pitId: number;
+    sandProviderId: number;
+    transportProviderId: number;
+    isFullyAllocated: number;
+    deliveryTime: Date;
+    packageObservations: string;
     company?: Company;
-    transportProvider?: TransportProvider;
     sandOrders?: SandOrder[];
     transportOrders?: TransportOrder[];
+    transportProvider?: TransportProvider;
+    sandProvider?: SandProvider;
+    pit?: Pit;
 }
+
 export interface TransportOrder {
     id?: number;
-    boxAmount: number;
+    boxAmount: string;
     licensePlate: string;
     observations: string;
     purchaseOrderId: number;
+    purchaseOrder?: PurchaseOrder;
 }
 
 export interface Warehouse {
     id?: number;
     clientCompanyId: number;
-    clientCompany?: Company;
     pitId: number;
-    pit?: Pit;
     layout: any;
+    visible: boolean;
+    pit?: Pit;
+    stageSheets?: StageSheet[];
+    clientCompany?: Company;
 }
 
 export interface sandCategory {
@@ -284,6 +277,58 @@ export interface sandCategory {
     name: string;
     sands?: Sand[];
 }
+
+export interface StageSheet {
+    id?: number;
+    companyId: number;
+    pitId: number;
+    warehouseId: number;
+    operativeCradleId: number;
+    backupCradleId: number;
+    company?: Company;
+    pit?: Pit;
+    warehouse?: Warehouse;
+    stages?: SandStage[];
+    operativeCradle?: Cradle;
+    backupCradle?: Cradle;
+}
+
+export interface User {
+    id?: number;
+    firstName: string;
+    midName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    roleId: number;
+    active: boolean;
+    Role?: Role;
+}
+
+export interface Role {
+    id?: number;
+    name: string;
+    permissions: any;
+}
+
+export enum Roles {
+    SuperAdmin = 99,
+    Admin = 10,
+    Logged = 1,
+    Guest = 0,
+}
+
+export enum BoxCategory {
+    empty = 'Caja Vacía',
+    cradle = 'Cradle',
+    aisle = 'Pasillo',
+}
+export enum SandStageStatus {
+    started = 0,
+    in_progress = 1,
+    finished = 2,
+}
+// TODO
 export interface Box {
     id?: number;
     warehouseId: number | null;
@@ -293,18 +338,33 @@ export interface Box {
     floor: number;
     row: number;
 }
-
-export interface StageSheet {
+export interface QueueItem {
     id?: number;
-    companyId: number;
-    company?: Company;
+    sandOrderId: number;
+    sandOrder?: SandOrder;
     pitId: number;
     pit?: Pit;
-    warehouseId: number;
-    warehouse?: Warehouse;
-    stages?: SandStage[];
-    operativeCradleId: number;
-    backupCradleId: number;
-    operativeCradle?: Cradle;
-    backupCradle?: Cradle;
+    origin: string;
+    destination: string;
+    status: number;
+    order: number;
+    // 999999 - 900000 aTRansporte
+    // 99999 - 90000 Retiro ( cradleAOtro )
+    // 9999 - 9000 TRansporte a Otro
+    // 999 - 500 Deposito a Cradle
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
 }
+
+/* 
+C - T 
+D - T
+
+C - D
+
+T - C
+T - D
+
+D - C
+*/

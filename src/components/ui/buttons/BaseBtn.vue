@@ -1,6 +1,6 @@
 <template>
     <component :is="type">
-        <div :class="classes" class="btn" :type="type" :size="size" :disabled="disabled || isLoading">
+        <div class="btn" :class="classes" :type="type" :size="size" :disabled="disabled || isLoading">
             <slot>Boton</slot>
         </div>
     </component>

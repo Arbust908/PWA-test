@@ -49,7 +49,7 @@
         <DisableModal
             :open="showModal"
             title="¿Desea inhabilitar este cradle?"
-            text="Una vez inhabilitado, no podrá utilizar este cradle en ninguna otra sección de la aplicación"
+            text="Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación."
             @close="showModal = false"
             @main="confirmModal"
         />

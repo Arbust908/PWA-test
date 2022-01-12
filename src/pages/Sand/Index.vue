@@ -24,30 +24,6 @@
                 <td :class="item.observations ? null : 'empty'">
                     {{ item.observations || 'Sin observaciones' }}
                 </td>
-
-                <td v-if="false">
-                    <div class="btn-panel">
-                        <router-link :to="`/clientes/${item.id}`">
-                            <Popper hover content="Editar">
-                                <CircularBtn size="xs" class="btn__delete bg-blue-500">
-                                    <Icon icon="PencilAlt" type="outlined" class="w-6 h-6 icon text-white" />
-                                </CircularBtn>
-                            </Popper>
-                        </router-link>
-
-                        <Popper hover :content="item.visible ? 'Inhabilitar' : 'Habilitar'">
-                            <CircularBtn
-                                class="ml-4"
-                                :class="item.visible ? 'bg-red-500' : 'bg-blue-500'"
-                                size="xs"
-                                @click="openModalVisibility(item)"
-                            >
-                                <Icon v-if="item.visible" icon="EyeOff" type="outlined" class="w-6 h-6 text-white" />
-                                <Icon v-else icon="Eye" type="outlined" class="w-6 h-6 text-white" />
-                            </CircularBtn>
-                        </Popper>
-                    </div>
-                </td>
             </template>
 
             <!-- Mobile -->
@@ -134,7 +110,7 @@
             const columns = [
                 { title: 'Tipo de Malla', key: 'name', sortable: true },
                 { title: 'Observaciones', key: 'observations', sortable: true },
-                { title: '', key: 'name' },
+                { title: '', key: 'actions' },
             ];
 
             const actions = [

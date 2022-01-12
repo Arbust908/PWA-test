@@ -4,6 +4,7 @@
         :open="open"
         :title="title"
         :text="text"
+        :text-class="'text-gray-900'"
         :icon="{ type: 'ExclamationCircle', classes: 'text-red-700' }"
         :btn="{ text: 'Volver', classes: 'warning' }"
         @close="$emit('close')"

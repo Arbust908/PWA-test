@@ -3,6 +3,7 @@
         <ABMHeader title="Usuarios" link="/usuarios/nuevo" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
+                v-model:data="userId"
                 title="Filtro"
                 placeholder="Seleccionar usuario"
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
@@ -10,12 +11,7 @@
                 endpoint="/user"
                 endpoint-key="firstName"
                 :only-visible="false"
-                :data="cradleId"
-                @update:data="cradleId = $event"
             />
-            <div class="col-span-4 mt-7">
-                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
-            </div>
         </div>
 
         <VTable
@@ -24,7 +20,6 @@
             :pagination="pagination"
             :items="filteredUsers"
             :actions="actions"
-            disable-key="active"
             empty-text="No hay users cargados"
         >
             <template #item="{ item: user }">
@@ -43,7 +38,12 @@
                 {{ item.fullName || 'Sin nombre' }}
             </template>
 
-            <template #mobileSubtitle="{ item }"> <span class="font-bold">Rol: </span> {{ item.Role?.name }} </template>
+            <template #mobileSubtitle="{ item }">
+                <p><span class="font-bold">Rol: </span> {{ item.Role?.name }}</p>
+                <p>
+                    <span class="font-bold">Usuario {{ item.active ? 'Activo' : 'Inactivo' }}</span>
+                </p>
+            </template>
         </VTable>
 
         <DisableModal
@@ -71,16 +71,11 @@
 </template>
 
 <script>
-    import { onMounted, ref, computed } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
 
     import Layout from '@/layouts/Main.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
-    import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
-    import { useRouter } from 'vue-router';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import DisableModal from '@/components/modal/DisableModal.vue';
     import ABMHeader from '@/components/ui/ABMHeader.vue';
@@ -90,7 +85,6 @@
             Layout,
             VTable,
             FieldSelect,
-            GhostBtn,
             Backdrop,
             DisableModal,
             ABMHeader,
@@ -100,7 +94,7 @@
             const store = useStore();
             const router = useRouter();
             const loading = ref(false);
-            let cradleId = ref(-1);
+            const userId = ref(-1);
             const selectedUser = ref(null);
             const showModal = ref(false);
             const showBackdrop = ref(false);
@@ -110,8 +104,6 @@
             const pagination = ref({
                 sortKey: 'id',
                 sortDir: 'asc',
-                // currentPage: 1,
-                // perPage: 10,
             });
 
             const columns = [
@@ -136,29 +128,29 @@
                         router.push(`/usuarios/${item.id}`);
                     },
                 },
-                // {
-                //     label: 'Inhabilitar',
-                //     hide: (item) => {
-                //         return item.visible;
-                //     },
-                //     callback: (item) => {
-                //         openModalVisibility(item);
-                //     },
-                // },
-                // {
-                //     label: 'Habilitar',
-                //     hide: (item) => {
-                //         return !item.visible;
-                //     },
-                //     callback: (item) => {
-                //         openModalVisibility(item);
-                //     },
-                // },
+                {
+                    label: 'Inhabilitar',
+                    hide: (item) => {
+                        return item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
+                {
+                    label: 'Habilitar',
+                    hide: (item) => {
+                        return !item.visible;
+                    },
+                    callback: (item) => {
+                        openModalVisibility(item);
+                    },
+                },
             ];
 
             const filteredUsers = computed(() => {
-                if (cradleId.value > -1) {
-                    return users.value.filter((cradle) => cradle.id == cradleId.value);
+                if (userId.value > -1) {
+                    return users.value.filter((user) => user.id == userId.value);
                 }
 
                 return users.value;
@@ -182,14 +174,16 @@
                 loading.value = false;
             };
 
-            const openModalVisibility = async (cradle) => {
-                selectedUser.value = cradle;
+            const openModalVisibility = async (user) => {
+                selectedUser.value = user;
 
-                if (cradle.visible) {
+                if (user.visible) {
+                    // Si es visible le disparamos el modal
                     showModal.value = true;
 
                     return;
                 }
+                // Si no es visible actualizamos la visibilidad
                 await updateVisibility(selectedUser.value);
             };
 
@@ -210,18 +204,13 @@
                 await getUsers();
             };
 
-            const clearFilters = () => {
-                cradleId.value = -1;
-            };
-
             onMounted(async () => {
                 await getUsers();
             });
 
             return {
                 users,
-                cradleId,
-                clearFilters,
+                userId,
                 filteredUsers,
                 showModal,
                 openModalVisibility,

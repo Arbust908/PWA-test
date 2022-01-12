@@ -79,9 +79,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/PurchaseOrder/New.vue'),
         beforeEnter: [isLogged, checkPermission],
     },
-    // > ::
-    // DepositDesign
-    // > ::
     {
         path: '/diseno-de-deposito',
         name: 'DepositDesigns',
@@ -260,21 +257,22 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/stage-sheet',
         name: 'StageSheet',
-        component: () => import('@/pages/StageSheet/index.vue'),
+        component: () => import('@/pages/StageSheet/new.vue'),
+        // component: () => import('@/pages/StageSheet/index.vue'),
         beforeEnter: [isMobileAndLogged, checkPermission],
     },
-    {
-        path: '/stage-sheet/:id',
-        name: 'StageSheetById',
-        component: () => import('@/pages/StageSheet/_id/index.vue'),
-        beforeEnter: [isMobileAndLogged, checkPermission],
-    },
-    {
-        path: '/stage-sheet/:id/nueva',
-        name: 'StageSheetNewStage',
-        component: () => import('@/pages/StageSheet/_id/new.vue'),
-        beforeEnter: [isMobileAndLogged, checkPermission],
-    },
+    // {
+    //     path: '/stage-sheet/:id',
+    //     name: 'StageSheetById',
+    //     component: () => import('@/pages/StageSheet/_id/index.vue'),
+    //     beforeEnter: [isMobileAndLogged, checkPermission],
+    // },
+    // {
+    //     path: '/stage-sheet/:id/nueva',
+    //     name: 'StageSheetNewStage',
+    //     component: () => import('@/pages/StageSheet/_id/new.vue'),
+    //     beforeEnter: [isMobileAndLogged, checkPermission],
+    // },
     {
         path: '/stage-sheet/nuevo',
         name: 'NewStageSheet',
@@ -330,6 +328,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/error403',
         name: 'Error-403',
         component: () => import('@/pages/Error/403.vue'),
+        beforeEnter: [isLogged],
     },
     {
         path: '/error404',
@@ -365,6 +364,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/tests/pdf',
         name: 'TestPDF',
         component: () => import('@/pages/Tests/PDF.vue'),
+    },
+    {
+        path: '/tests/queue',
+        name: 'TestQueue',
+        component: () => import('@/pages/Tests/QueueItems.vue'),
     },
     {
         path: '/:catchAll(.*)',

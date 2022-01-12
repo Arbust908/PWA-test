@@ -1,10 +1,15 @@
 <template>
-    <Modal v-bind="$attrs" :open="open" modal-classes="gap-4 text-center max-w-md" @close="$emit('close')">
+    <Modal
+        v-bind="$attrs"
+        :open="open"
+        modal-classes="gap-4 text-center max-w-[444px] font-body"
+        @close="$emit('close')"
+    >
         <div class="icon--box">
             <Icon :icon="iconType" :class="iconClass" class="icon" />
         </div>
         <h2>{{ title }}</h2>
-        <span> {{ text }} </span>
+        <span :class="textClass"> {{ text }} </span>
         <footer v-if="btnText">
             <PrimaryBtn :btn="`wide ${btnClass}`" @click="$emit('main')">
                 {{ btnText }}
@@ -31,6 +36,10 @@
                 default: '',
             },
             text: {
+                type: String,
+                default: '',
+            },
+            textClass: {
                 type: String,
                 default: '',
             },
@@ -86,10 +95,10 @@
         }
     }
     h2 {
-        @apply text-xl font-semibold mx-5 text-gray-900;
+        @apply text-lg font-medium mx-5 text-gray-900;
     }
     span {
-        @apply text-base;
+        @apply text-sm;
     }
     footer {
         @apply flex justify-center;

@@ -17,7 +17,7 @@ import user from '@/store/user';
 
 const store = createStore({
     state: {
-        loggedUser: { username: '', role: 0 },
+        loggedUser: { id: -1, username: '', role: 0, permissions: null, token: '', visible: false },
     },
     getters: {
         isAdmin(state) {

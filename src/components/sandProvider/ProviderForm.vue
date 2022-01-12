@@ -2,7 +2,7 @@
     <FieldGroup>
         <FieldInput
             class="col-span-full"
-            title="Nombre / Razón Social"
+            title="Nombre / Razón social"
             field-name="sandProvName"
             placeholder=""
             :data="sandProvider.name"
@@ -49,13 +49,7 @@
                         require-validation
                         entity="sandProvider"
                     />
-                    <Icon
-                        icon="Trash"
-                        type="outline"
-                        size="lg"
-                        class="ml-3 w-5 h-5 cursor-pointer"
-                        @click="deleteMeshType(i)"
-                    />
+                    <AddDeleteBtn class="mt-2" purpose="remove" @click.prevent="deleteMeshType(i)" />
                 </div>
             </div>
             <div v-else class="mb-6 hidden">
@@ -106,6 +100,7 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useStore } from 'vuex';
@@ -119,6 +114,7 @@
             FieldTextArea,
             Icon,
             InvalidInputLabel,
+            AddDeleteBtn,
         },
         props: {
             modelValue: {

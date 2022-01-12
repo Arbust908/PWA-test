@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de Pedido</h1>
+            <h1 class="font-bold text-gray-900 text-xl self-start mb-3 md:mb-0">Orden de pedido</h1>
         </header>
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4">
@@ -83,22 +83,17 @@
                             />
                         </template>
                         <div class="flex items-center col-span-12">
-                            <div
+                            <AddDeleteBtn
                                 v-if="sandProvidersIds.length > 1"
-                                class="icon-button"
+                                purpose="remove"
                                 @click.prevent="removeSandProvider(providerId.innerId)"
-                            >
-                                <Icon icon="Trash" type="outline" class="w-5 h-5 items-center" />
-                                Borrar proveedor
-                            </div>
-                            <div
+                            />
+                            <!-- Arena Section -->
+                            <AddDeleteBtn
                                 v-if="sandProvidersIds.length - 1 == sandProvidersKey"
-                                :class="['icon-button', sandProvidersIds.length - 1 !== sandProvidersKey ? '' : 'ml-3']"
+                                purpose="add"
                                 @click.prevent="addSandProvider"
-                            >
-                                <Icon icon="Plus" type="outline" class="icon w-5 h-5 items-center" />
-                                Agregar proveedor
-                            </div>
+                            />
                         </div>
                     </FieldGroup>
                 </div>

@@ -25,7 +25,7 @@ export function useApi(endpoint: string) {
      * @returns objeto con la entidad
      */
     const read = () => {
-        const entity = ref([]);
+        const entity = ref(null);
         const { data } = useAxios(endpoint, instance);
         watch(data, (newValue) => {
             if (newValue && newValue.data) {

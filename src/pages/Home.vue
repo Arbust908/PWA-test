@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Panel de Control</h2>
+        <h2 class="text-2xl font-semibold text-gray-900 mb-4">Panel de control</h2>
         <section class="grid grid-cols-2 md:grid-cols-4 gap-4">
             <PanelControlCard v-for="link in navigation" :key="link.to" v-bind="link" />
         </section>

@@ -3,50 +3,34 @@
     <NavLink v-else-if="isNotSection" v-bind="item" :mode="mode" />
     <NavSection v-else v-bind="item" :mode="mode" />
 </template>
-<script lang="ts">
-    import { defineComponent } from 'vue';
+<script setup lang="ts">
     import NavLine from '@/components/navigation/NavLine.vue';
     import NavLink from '@/components/navigation/NavLink.vue';
     import NavSection from '@/components/navigation/NavSection.vue';
 
-    export default defineComponent({
-        components: {
-            NavLine,
-            NavLink,
-            NavSection,
+    const props = defineProps({
+        to: {
+            type: String,
+            default: null,
         },
-        props: {
-            to: {
-                type: String,
-                default: null,
-            },
-            icon: {
-                type: String,
-                default: null,
-            },
-            name: {
-                type: String,
-                required: true,
-            },
-            subNav: {
-                type: Array,
-                default: null,
-            },
-            mode: {
-                type: String,
-                default: '',
-            },
+        icon: {
+            type: String,
+            default: null,
         },
-        setup(props) {
-            const { subNav, name } = props;
-            const isNotSection = subNav === null;
-            const isLine = name === 'LINE';
-
-            return {
-                item: props,
-                isNotSection,
-                isLine,
-            };
+        name: {
+            type: String,
+            required: true,
+        },
+        subNav: {
+            type: Array,
+            default: null,
+        },
+        mode: {
+            type: String,
+            default: '',
         },
     });
+    const isNotSection = props.subNav === null;
+    const isLine = props.name === 'LINE';
+    const item = props;
 </script>

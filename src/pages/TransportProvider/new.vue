@@ -3,7 +3,7 @@
         <ABMFormTitle title="Nuevo proveedor de transporte" />
         <section class="flex flex-wrap md:flex-nowrap">
             <!-- main Section -->
-            <section class="w-full md:w-8/12">
+            <section class="w-full max-w-2xl">
                 <nav v-if="!isClicked" class="flex justify-between max-w-2xl bg-white">
                     <button
                         :class="['section-tab', activeSection === 'provider' ? 'active' : '']"
@@ -130,7 +130,7 @@
                 </footer>
             </section>
             <!-- desktop transportProvider Card -->
-            <section class="hidden w-full md:w-4/12 mt-12 ml-4 md:flex flex-col gap-y-4">
+            <section class="hidden w-full md:w-4/12 mt-12 ml-9 md:flex flex-col gap-y-4">
                 <DriverCard
                     v-for="(driver, index) in drivers"
                     :key="index"
@@ -149,8 +149,8 @@
 
         <ErrorModal
             :open="showErrorCuitModal"
-            title="Ya existe un cliente con este CUIT"
-            text="El cliente que intentas guardar fue creado anteriormente"
+            title="Ya existe un proveedor con este CUIT"
+            text="El proveedor que intentas guardar fue creado anteriormente"
             @close="showErrorCuitModal = false"
             @main="showErrorCuitModal = false"
         />
@@ -398,6 +398,7 @@
                 driversShown,
                 showSuccessModal,
                 showErrorCuitModal,
+                hasFullNewDriver,
                 isClicked,
             };
         },

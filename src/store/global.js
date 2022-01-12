@@ -1,6 +1,6 @@
 import { useRouter } from 'vue-router';
 const OrdenDeTrabajo = {
-    name: 'Orden de Trabajo',
+    name: 'Orden de trabajo',
     to: '/orden-de-trabajo',
     icon: 'Briefcase',
     title: 'WorkOrders',
@@ -18,13 +18,13 @@ const Notificaciones = {
     title: 'ProviderNotifications',
 };
 const Diseño_de_Depósito = {
-    name: 'Diseño de Depósito',
+    name: 'Diseño de depósito',
     to: '/diseno-de-deposito',
     icon: 'ViewGridAdd',
     title: 'DepositDesigns',
 };
 const Orden_de_Pedido = {
-    name: 'Orden de Pedido',
+    name: 'Orden de pedido',
     to: '/orden-de-pedido',
     icon: 'Tag',
     title: 'PurchaseOrders',
@@ -36,13 +36,13 @@ const Ingreso_de_cajas = {
     title: 'BoxEntry',
 };
 const Operación_en_Cradle = {
-    name: 'Operación en Cradle',
+    name: 'Operación en cradle',
     to: '/operacion-en-cradle',
     icon: 'Tag',
     title: 'CradleOperation',
 };
 const Stage_Sheet = {
-    name: 'Stage Sheet',
+    name: 'Stage sheet',
     to: '/stage-sheet',
     icon: 'DocumentReport',
     title: 'StageSheet',
@@ -103,7 +103,7 @@ export default {
             Orden_de_Pedido,
             Ingreso_de_cajas,
             Operación_en_Cradle,
-            // Stage_Sheet
+            Stage_Sheet,
             LINE,
             {
                 name: 'Proveedores',

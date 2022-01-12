@@ -1,7 +1,7 @@
 // [#117E49]
 .btn {
     // Puntos base de BTNs
-    @apply border-transparent inline-flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500 space-x-2 transition duration-150 ease-out cursor-pointer;
+    @apply border border-transparent inline-flex items-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-main-500 space-x-2 transition duration-150 ease-out cursor-pointer shadow-sm hover:shadow-lg;
     // Esto es para que en Safari no aparezca un degrade
     -webkit-appearance: none;
 
@@ -25,7 +25,6 @@
         @apply border-2 border-gray-400 text-gray-400 bg-transparent group-hover:bg-gray-200 group-hover:text-gray-600 group-hover:border-gray-600;
     }
 
-    
     &[size='xs'] {
         @apply text-xs rounded px-2.5 py-1.5;
     }
@@ -63,19 +62,22 @@
         @apply w-16 h-16;
     }
     &.main {
-        @apply text-white bg-main-600 hover:bg-main-700 border shadow-sm hover:shadow-lg;
+        @apply text-white bg-main-600 hover:bg-main-700;
+    }
+    &.inverse {
+        @apply text-main-600 bg-transparent border-main-600 hover:bg-main-600 hover:text-white;
     }
     &.secondary {
-        @apply text-second-700 bg-second-100 hover:bg-second-200 border border-second-400 hover:shadow-lg;
+        @apply text-second-700 bg-second-100 hover:bg-second-200 border-second-400 ;
     }
     &.ghost {
-        @apply text-main-600 border shadow-sm hover:text-main-400 hover:shadow-lg;
+        @apply text-main-600 hover:text-main-400;
     }
     &.side {
-        @apply text-main-500 bg-white hover:bg-second-200 text-center font-semibold border border-transparent shadow-lg hover:shadow justify-center;
+        @apply text-main-500 bg-white hover:bg-second-200 text-center font-semibold border-transparent shadow-lg hover:shadow justify-center;
     }
     &.none {
-        @apply border-transparent border hover:opacity-75 hover:border-gray-200;
+        @apply hover:opacity-75 hover:border-gray-200;
     }
 
     // Estilos de Ancho
@@ -94,6 +96,9 @@
     &.full {
         @apply w-full;
     }
+    &.pill {
+        @apply h-8 rounded-xl;
+    }
 
     // Estios de Color
     &.warning {
@@ -103,7 +108,7 @@
         @apply border-transparent text-white bg-green-700 hover:bg-green-800 hover:text-white transition duration-150 ease-out;
     }
     &.indefinite {
-        @apply border-transparent text-white bg-gray-700 hover:bg-gray-800 hover:text-white transition duration-150 ease-out;
+        @apply text-black bg-transparent hover:bg-gray-100 border border-second-400 transition duration-150 ease-out;
     }
     &:disabled {
         @apply opacity-50 cursor-not-allowed bg-yellow-400;

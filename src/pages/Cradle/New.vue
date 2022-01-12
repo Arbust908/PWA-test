@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo Cradle</h1>
+            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo cradle</h1>
         </header>
         <section class="bg-white rounded-md shadow-sm max-w-2xl">
             <form method="POST" action="/" class="p-4 flex flex-col gap-4" @submit.prevent>
@@ -44,6 +44,7 @@
         </footer>
         <ErrorModal
             :open="showErrorModal"
+            class="max-w-[480px]"
             title="Ya existe este cradle"
             text="El cradle que intentas guardar fue creado anteriormente."
             @close="toggleErrorModal()"
@@ -58,7 +59,8 @@
         />
         <SuccessModal
             :open="showModal"
-            text="¡El cradle fue guardado con éxito!"
+            class="max-w-[480px]"
+            title="¡El cradle fue guardado con éxito!"
             @close="$router.push('/cradle')"
             @main="$router.push('/cradle')"
         />
