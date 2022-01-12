@@ -338,3 +338,33 @@ export interface Box {
     floor: number;
     row: number;
 }
+export interface QueueItem {
+    id?: number;
+    sandOrderId: number;
+    sandOrder?: SandOrder;
+    pitId: number;
+    pit?: Pit;
+    origin: string;
+    destination: string;
+    status: number;
+    order: number;
+    // 999999 - 900000 aTRansporte
+    // 99999 - 90000 Retiro ( cradleAOtro )
+    // 9999 - 9000 TRansporte a Otro
+    // 999 - 500 Deposito a Cradle
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
+}
+
+/* 
+C - T 
+D - T
+
+C - D
+
+T - C
+T - D
+
+D - C
+*/

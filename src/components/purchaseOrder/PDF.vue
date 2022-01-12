@@ -58,6 +58,8 @@
         },
     });
     const emit = defineEmits(['close']);
+
+    const toPDF = ref(null);
     const sandProviderName = computed(() => {
         return props.info.purchaseOrder?.sandProvider?.name;
     });
@@ -144,6 +146,7 @@
     const download = () => {
         const doc = document.querySelector('#toPds');
         pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
+        console.log(toPDF.value);
         worker.set(pdfOptions).from(doc).save(exportFilename);
     };
     const trueOrientation = ([width, height]) => {
@@ -153,8 +156,8 @@
     setTimeout(() => {
         download();
         setTimeout(() => {
-            emit('close');
-            router.push('/orden-de-pedido');
+            // emit('close');
+            // router.push('/orden-de-pedido');
         }, 1000);
     }, 500);
 </script>
