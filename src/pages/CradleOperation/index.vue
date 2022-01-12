@@ -68,11 +68,12 @@
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
-    import { Company, Pit } from '@/interfaces/sandflow';
+    import { Company, Pit, QueueItem } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import CradleSlot from '@/components/Cradle/cradleSlot.vue';
+    import { getOrder, QueueTransactions } from '@/helpers/useQueueItem';
 
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -247,12 +248,37 @@
                     : '';
             });
 
+            const defaultQueueItem: QueueItem = {
+                sandOrderId: -1,
+                pitId: -1,
+                origin: '',
+                destination: '',
+                status: 0,
+                order: -1,
+            };
+
             const requestEmptyBoxHandle = () => {
                 //toggleModal();
                 selectedSlots.value.forEach((selectedSlot) => {
-                    selectedSlot;
+                    const newQI = { ...defaultQueueItem };
+                    newQI.status = 10;
+                    newQI.origin = 'Estación ' + selectedSlot?.location?.where_id;
+                    newQI.pitId = pitId.value;
+                    //newQI.sandOrderId = Panchos duty;
                     console.log('selectedSlot', selectedSlot);
+                    createQueueItem(newQI);
                 });
+            };
+
+            const createQueueItem = async (queueItem: QueueItem) => {
+                await axios
+                    .post(`${apiUrl}/queueItem/`, queueItem)
+                    .then((response) => {
+                        if (response.request.status == 200) {
+                            console.log(queueItem, 'se guardo bien');
+                        }
+                    })
+                    .catch((err) => console.error(err));
             };
 
             const completeStageHandle = async () => {
