@@ -20,82 +20,34 @@
                             "
                         />
                     </span>
+                    {{ cradleId }}
                 </FieldGroup>
+
                 <fieldset class="py-2 col-span-6 flex flex-col gap-x-10 2xl:gap-x-40">
                     <h2 class="text-xl font-bold mb-4">Estaciones</h2>
                     <FieldSelect
+                        v-model:data="cradleId"
                         class="cradle-col"
                         title="Cradle"
                         field-name="cradle"
                         placeholder="Seleccionar cradle"
                         endpoint-key="name"
                         :endpoint-data="filteredCradles"
-                        :data="cradleId"
-                        @update:data="cradleId = $event"
                     />
                 </fieldset>
             </form>
-
-            <!-- selected cradles -->
-            <section v-if="cradleId > 0" class="cradle-slots">
-                <div v-for="(slot, index) in cradleSlots" :key="index">
-                    <div v-if="slot.boxId" class="slot">
-                        <span class="station-title">Estación {{ index + 1 }} - {{ slot.boxId }}</span>
-                        <div class="cradle-status-wrapper">
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '1')">
-                                <div class="icon-wrapper check" :class="[slot.status == '1' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '1'" icon="Check" class="icon" />
-                                </div>
-                                En ejecución
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '2')">
-                                <div class="icon-wrapper pause" :class="[slot.status == '2' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '2'" icon="Pause" type="outline" class="icon" />
-                                </div>
-                                Pausa
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '3')">
-                                <div class="icon-wrapper empty" :class="[slot.status == '3' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '3'" icon="Minus" class="icon" />
-                                </div>
-                                Vacía
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '0')">
-                                <div class="icon-wrapper unavailable" :class="[slot.status == '0' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '0'" icon="X" class="icon" />
-                                </div>
-                                No disponible
-                            </span>
-                        </div>
-                        <hr class="border-gray-300" />
-                        <div class="cradle-data-wrapper">
-                            <span class="cradle-data">
-                                <Icon icon="InformationCircle" class="icon" />
-                                {{ slot.amount }}T peso remito
-                            </span>
-                            <span class="cradle-data">
-                                <Icon icon="InformationCircle" class="icon" />
-                                10T peso actual (No reactivo)
-                            </span>
-                            <span class="cradle-data">
-                                <Icon icon="InformationCircle" class="icon" />
-                                Arena: {{ slot.sandType }}
-                            </span>
-                        </div>
-                    </div>
-                    <div v-else class="slot without-box">
-                        <span class="station-title">Estación {{ index + 1 }} - Sin caja</span>
-                    </div>
-                </div>
-            </section>
-            <!-- empty cradles -->
-            <section v-else class="cradle-slots">
-                <div v-for="(slot, index) in cradleSlots" :key="index">
-                    <div class="slot empty">
-                        <span class="station-title">Estación {{ index + 1 }}</span>
-                        <span class="copy">Seleccione cliente, etapa y cradle.</span>
-                    </div>
-                </div>
+            <section class="cradle-slots">
+                <CradleSlot
+                    v-for="(slot, index) in cradleSlots"
+                    :key="index"
+                    class="slot"
+                    :cradles="cradles"
+                    :index="index"
+                    :cradle-slots="cradleSlots"
+                    :box="slot"
+                    @selected-slots="SelectSlot(slot)"
+                    @change-cradle-slot-status="changeCradleSlotStatus($event[0], $event[1])"
+                />
             </section>
         </section>
         <!-- *** -->
@@ -108,8 +60,6 @@
 
 <script lang="ts">
     import { ref, computed, defineComponent, onMounted, watchEffect } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -122,6 +72,7 @@
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import CradleSlot from '@/components/Cradle/cradleSlot.vue';
 
     import axios from 'axios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -137,6 +88,7 @@
             Modal,
             SuccessModal,
             Icon,
+            CradleSlot,
         },
         setup() {
             useTitle('Operación en cradle <> Sandflow');
@@ -157,14 +109,33 @@
             const sandTypes = ref([]);
             const openSuccess = ref(false);
             const ModalText = 'La solicitud de retiro de cajas fue enviada con éxito';
+            const selectedSlots = ref([]);
 
             const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
                 await axios
                     .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
                     .catch((err) => console.error(err));
-                console.log(selectedCradle.value);
+                console.log('selectedCradleCheckbox', selectedCradle.value);
 
                 return (cradleSlots.value[slotIndex].status = newStatus);
+            };
+
+            const SelectSlot = (slot: any) => {
+                let hasSlots = selectedSlots.value.find((insideSlot) => {
+                    console.log('insideSlot.id', insideSlot.id);
+
+                    return insideSlot.id === slot.id;
+                });
+
+                if (hasSlots) {
+                    selectedSlots.value = selectedSlots.value.filter((insideSlot) => {
+                        return insideSlot.id !== slot.id;
+                    });
+                    console.log('selectedSlotsIF', selectedSlots.value);
+                } else {
+                    selectedSlots.value.push(slot);
+                    console.log('selectedSlotsELSE', selectedSlots.value);
+                }
             };
 
             const toggleModal = () => {
@@ -210,6 +181,8 @@
                 if (clientId.value >= 0 && pitId.value >= 0) {
                     return true;
                 }
+
+                return false;
             });
 
             const getFilteredCradles = () => {
@@ -318,6 +291,7 @@
                 openSuccess,
                 ModalText,
                 selectedCradle,
+                SelectSlot,
             };
         },
     });
@@ -329,6 +303,9 @@
             width: 32%;
             max-width: 18rem;
         }
+    }
+    .ring {
+        @apply ring-inset ring-green-600;
     }
     .cradle-data-wrapper,
     .cradle-status-wrapper {
