@@ -52,7 +52,7 @@
         </section>
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
-            <PrimaryBtn btn="wide" type="submit" @click.prevent="completeStageHandle"> Solicitar retiro </PrimaryBtn>
+            <PrimaryBtn btn="wide" type="submit" @click.prevent="requestEmptyBoxHandle"> Solicitar retiro </PrimaryBtn>
         </footer>
         <SuccessModal :open="isModalVisible" :title="ModalText" @main="toggleModal" @close="toggleModal" />
     </Layout>
@@ -122,8 +122,6 @@
 
             const SelectSlot = (slot: any) => {
                 let hasSlots = selectedSlots.value.find((insideSlot) => {
-                    console.log('insideSlot.id', insideSlot.id);
-
                     return insideSlot.id === slot.id;
                 });
 
@@ -131,10 +129,8 @@
                     selectedSlots.value = selectedSlots.value.filter((insideSlot) => {
                         return insideSlot.id !== slot.id;
                     });
-                    console.log('selectedSlotsIF', selectedSlots.value);
                 } else {
                     selectedSlots.value.push(slot);
-                    console.log('selectedSlotsELSE', selectedSlots.value);
                 }
             };
 
@@ -252,7 +248,11 @@
             });
 
             const requestEmptyBoxHandle = () => {
-                toggleModal();
+                //toggleModal();
+                selectedSlots.value.forEach((selectedSlot) => {
+                    selectedSlot;
+                    console.log('selectedSlot', selectedSlot);
+                });
             };
 
             const completeStageHandle = async () => {
