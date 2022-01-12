@@ -14,7 +14,9 @@
                     <p>Hora de fin</p>
                     <TimePicker :timetrack="Number(crew.timeEnd)" @update:timetrack="crew.timeEnd = $event" />
                 </label>
+                <div class="grid col-span-12"></div>
             </section>
+
             <section class="col-span-full">
                 <PeopleGroup
                     v-for="(people, peopleI) in crew.resources"

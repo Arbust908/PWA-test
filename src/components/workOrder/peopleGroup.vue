@@ -7,6 +7,7 @@
             :field-name="`crew-${crewId}-${resource.id}-role`"
             placeholder="Seleccione Rol"
             :endpoint-data="roles"
+            @change="resource.name = -1"
         />
         <span v-if="notLonlyResource" :class="lonlyClasses" class="md:absolute md:-right-12 ml-4">
             <AddDeleteBtn class="mt-8" purpose="remove" @click="$emit('removeResource', [crewId, resource.id])" />
@@ -57,6 +58,9 @@
     });
     const emits = defineEmits(['removeResource', 'update:people']);
     const resource = useVModel(props, 'people', emits);
+
+    resource.value.role = Number(resource.value.role);
+    resource.value.name = Number(resource.value.name);
 
     const lonlyClasses = () => {
         return props.peopleIndex === 0 ? 'md:top-10' : 'md:top-6';

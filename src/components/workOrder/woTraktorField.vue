@@ -46,7 +46,6 @@
     traktors.value = traktors.value.map((traktor) => {
         traktor.innerId = traktor.innerId ?? tracktorInnerId.value;
         tracktorInnerId.value++;
-
         return traktor;
     });
 
