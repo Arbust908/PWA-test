@@ -38,7 +38,7 @@
 
     setInterval(() => {
         // Shift title string
-        title.value = title.value.substr(1) + title.value.substr(0, 1);
+        title.value = title.value.substring(1) + title.value.substring(0, 1);
     }, 300);
     onMounted(async () => {
         const response = await axios.get(`${api}/queueItem`).catch((err) => {
