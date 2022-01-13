@@ -19,7 +19,14 @@
                             <span>Pozo</span>
                             <span>{{ selectedPitName }}</span>
                         </h2>
-                        <button class="flex items-center" @click.prevent="addStage">
+                        <button
+                            :class="
+                                currentSandPlan.stages.length < 40
+                                    ? 'flex items-right'
+                                    : 'flex items-right cursor-not-allowed'
+                            "
+                            @click.prevent="addStage"
+                        >
                             <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
                             <span class="font-bold"> Agregar etapa </span>
                         </button>
@@ -36,31 +43,28 @@
                     </section>
                 </header>
                 <div class="flex flex-col">
-                    <div class="overflow-x-auto">
-                        <div class="align-middle inline-block min-w-full">
-                            <div class="overflow-hidden">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead>
-                                        <StageHeader />
-                                    </thead>
-                                    <tbody v-show="currentOpened" class="divide-y">
-                                        <SandPlanStage
-                                            v-for="(stage, Key) in inProgressStages"
-                                            :key="Key"
-                                            :pos="Key + 1"
-                                            :stage="stage"
-                                            :editing="editingStage"
-                                            :sands="sands"
-                                            @editStage="editStage"
-                                            @saveStage="saveStage"
-                                            @duplicateStage="duplicateStage"
-                                            @deleteStage="deleteStage"
-                                        />
-                                        <StageEmptyState v-if="inProgressStages.length <= 0" />
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                    <div class="align-middle inline-block min-w-full">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <StageHeader />
+                            </thead>
+                            <tbody v-show="currentOpened" class="divide-y">
+                                <SandPlanStage
+                                    v-for="(stage, Key) in inProgressStages"
+                                    :key="Key"
+                                    :pos="Key + 1"
+                                    :stage="stage"
+                                    :editing="editingStage"
+                                    :sands="sands"
+                                    :stages-amount="currentSandPlan.stages.length"
+                                    @editStage="editStage"
+                                    @saveStage="saveStage"
+                                    @duplicateStage="duplicateStage"
+                                    @deleteStage="deleteStage"
+                                />
+                                <StageEmptyState v-if="inProgressStages.length <= 0" />
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </form>
@@ -98,102 +102,17 @@
                     <ResposiveTableSandPlan
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
-                        class="mt-2"
                         :pos="Key + 1"
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
+                        :stages-amount="currentSandPlan.stages.length - 1"
                         editing-key="innerId"
                         @editStage="editStage"
                         @saveStage="saveStage"
                         @duplicateStage="duplicateStage"
                         @deleteStage="deleteStage"
                     />
-                </div>
-            </form>
-        </section>
-        <section class="bg-white rounded-md shadow-sm mt-4 hidden sm:block">
-            <form method="POST" action="/" class="p-4 flex flex-col gap-4">
-                <header class="flex justify-between">
-                    <section class="flex space-x-4">
-                        <h2 class="text-2xl font-bold">
-                            <span>Etapas finalizadas</span>
-                        </h2>
-                    </section>
-                    <section class="flex space-x-4">
-                        <Icon
-                            icon="ChevronUp"
-                            outline
-                            :opened="finishedOpened"
-                            :class="finishedOpened ? 'rotate-180' : null"
-                            class="w-8 h-8 text-gray-600 transition transform duration-300 ease-out cursor-pointer"
-                            @click.prevent="toggleFinOp"
-                        />
-                    </section>
-                </header>
-                <div class="flex flex-col">
-                    <div class="overflow-x-auto">
-                        <div class="align-middle inline-block min-w-full">
-                            <div class="overflow-hidden">
-                                <table class="min-w-full divide-y divide-gray-200">
-                                    <thead>
-                                        <StageHeader />
-                                    </thead>
-                                    <tbody v-show="finishedOpened" class="divide-y">
-                                        <SandPlanStage
-                                            v-for="(stage, Key) in finishedStages"
-                                            :key="Key"
-                                            :stage="stage"
-                                            :editing="editingStage"
-                                            :sands="sands"
-                                            @editStage="editStage"
-                                            @saveStage="saveStage"
-                                            @duplicateStage="duplicateStage"
-                                            @deleteStage="deleteStage"
-                                        />
-                                        <StageEmptyState v-if="finishedStages.length <= 0" />
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </form>
-        </section>
-        <section class="bg-white rounded-md shadow-sm mt-4 block sm:hidden">
-            <form method="POST" action="/" class="flex flex-col rounded border-solid border-black">
-                <header
-                    class="flex justify-between px-3 pb-3 pt-4 pr-4 rounded-t-lg border-b-1 border-solid border-black bg-gray-100"
-                >
-                    <section class="flex space-x-4 pr-3 mt-2">
-                        <h2 class="font-semibold">
-                            <span class="pl-6">Etapas Finalizadas</span>
-                        </h2>
-                    </section>
-                    <section class="flex space-x-4 pr-3">
-                        <Icon
-                            icon="ChevronUp"
-                            outline
-                            :opened="finishedOpened"
-                            :class="finishedOpened ? 'rotate-180' : null"
-                            class="w-8 h-8 text-gray-600 transition transform duration-300 ease-out cursor-pointer"
-                            @click.prevent="toggleFinOp"
-                        />
-                    </section>
-                </header>
-                <div v-show="finishedOpened" class="flex flex-col p-4 border-2 border-solid">
-                    <ResposiveTableSandPlan
-                        v-for="(stage, Key) in finishedStages"
-                        :key="Key"
-                        :pos="Key + 1"
-                        :stage="stage"
-                        :sands="sands"
-                        @editStage="editStage"
-                        @saveStage="saveStage"
-                        @duplicateStage="duplicateStage"
-                        @deleteStage="deleteStage"
-                    />
-                    <StageEmptyState v-if="finishedStages.length <= 0" />
                 </div>
             </form>
         </section>
@@ -273,6 +192,7 @@
             const instance = axios.create({
                 baseURL: api,
             });
+
             const currentSandPlan: SandPlan = reactive({
                 companyId: -1,
                 pitId: -1,
@@ -288,6 +208,8 @@
                         quantity2: 0,
                         sandId3: -1,
                         quantity3: 0,
+                        sandId4: -1,
+                        quantity4: 0,
                         sandPlanId: 0,
                         status: 0,
                     },
@@ -295,8 +217,7 @@
             });
 
             const addStage = () => {
-                if (currentSandPlan.stages?.length >= 39) {
-                    // Disparar modal. No se puede mas de 40 etapas
+                if (currentSandPlan.stages?.length >= 40) {
                     return;
                 }
                 const defaultStage = {
@@ -308,6 +229,8 @@
                     quantity2: null,
                     sandId3: -1,
                     quantity3: null,
+                    sandId4: -1,
+                    quantity4: null,
                     sandPlanId: 0,
                     status: 0,
                 };
@@ -324,7 +247,9 @@
 
             const editStage = (stage) => {
                 editingStage.value = stage.id;
+                console.log(editingStage.value);
             };
+
             const saveStage = (stage) => {
                 currentSandPlan.stages[stage.id] = stage;
                 editingStage.value = -1;
@@ -393,16 +318,39 @@
                 }
             });
 
+            const minSandsAmount = (stages) => {
+                let check = false;
+                stages.forEach((stage) => {
+                    if (
+                        stage.sandId1 !== null &&
+                        stage.sandId1 !== -1 &&
+                        stage.quantity1 > 0 &&
+                        stage.sandId2 !== null &&
+                        stage.sandId2 !== -1 &&
+                        stage.quantity2 > 0
+                    ) {
+                        check = true;
+                    } else {
+                        check = false;
+                    }
+                });
+
+                return check;
+            };
+
             // << SAND
             const isFull = computed(() => {
+                const minSands = minSandsAmount(currentSandPlan.stages);
                 const noZeroSandTypeNull =
                     (currentSandPlan.stages[0].sandId1 !== null && currentSandPlan.stages[0].sandId1 !== -1) ||
                     (currentSandPlan.stages[0].sandId2 !== null && currentSandPlan.stages[0].sandId2 !== -1) ||
-                    (currentSandPlan.stages[0].sandId3 !== null && currentSandPlan.stages[0].sandId3 !== -1);
+                    (currentSandPlan.stages[0].sandId3 !== null && currentSandPlan.stages[0].sandId3 !== -1) ||
+                    (currentSandPlan.stages[0].sandId4 !== null && currentSandPlan.stages[0].sandId4 !== -1);
                 const noZeroSandTypeZero =
                     currentSandPlan.stages[0].quantity1 !== 0 ||
                     currentSandPlan.stages[0].quantity2 !== 0 ||
-                    currentSandPlan.stages[0].quantity3 !== 0;
+                    currentSandPlan.stages[0].quantity3 !== 0 ||
+                    currentSandPlan.stages[0].quantity4 !== 0;
 
                 return !!(
                     currentSandPlan.companyId >= 0 &&
@@ -410,7 +358,8 @@
                     currentSandPlan.stages.length > 0 &&
                     currentSandPlan.stages.length <= 40 &&
                     noZeroSandTypeNull &&
-                    noZeroSandTypeZero
+                    noZeroSandTypeZero &&
+                    minSands
                 );
             });
 
@@ -440,6 +389,10 @@
                         stage.sandId3 = null;
                     }
 
+                    if (stage.sandId4 === -1) {
+                        stage.sandId4 = null;
+                    }
+
                     return stage;
                 });
 
@@ -447,7 +400,8 @@
                     const noSandTypeNull =
                         (stage.sandId1 !== null && stage.quantity1 > 0) ||
                         (stage.sandId2 !== null && stage.quantity2 > 0) ||
-                        (stage.sandId3 !== null && stage.quantity3 > 0);
+                        (stage.sandId3 !== null && stage.quantity3 > 0) ||
+                        (stage.sandId4 !== null && stage.quantity4 > 0);
 
                     return noSandTypeNull;
                 });
@@ -469,9 +423,11 @@
                                         sandId1: stage.sandId1,
                                         sandId2: stage.sandId2,
                                         sandId3: stage.sandId3,
+                                        sandId4: stage.sandId4,
                                         quantity1: stage.quantity1,
                                         quantity2: stage.quantity2,
                                         quantity3: stage.quantity3,
+                                        quantity4: stage.quantity4,
                                     },
                                 },
                                 instance

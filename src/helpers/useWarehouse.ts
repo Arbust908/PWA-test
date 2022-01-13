@@ -1,11 +1,23 @@
 import { useClone } from '@/helpers/useClone';
 
+export const defaultBox = {
+    floor: 1,
+    col: 0,
+    row: 0,
+    category: '',
+    id: '',
+    boxId: '',
+    location: '',
+    wasOriginallyOnDeposit: false,
+    wasOriginallyOnCradle: false,
+};
+
 export const formatDeposit = (deposit: any) => {
-    const deposito = useClone(deposit);
+    const { clone: deposito } = useClone(deposit);
     const dimensions = Object.keys(deposito).reduce(
         (dims, currentCell) => {
-            const proxy = currentCell.split('|');
-            const [floor, row, col] = proxy;
+            const cellNameArray = currentCell.split('|');
+            const [floor, row, col] = cellNameArray;
             dims.floor = Math.max(dims.floor, Number(floor));
             dims.row = Math.max(dims.row, Number(row));
             dims.col = Math.max(dims.col, Number(col));
@@ -46,54 +58,6 @@ export const formatLocation = (location: any) => {
     return dimensions;
 };
 
-// {
-//     "1|1|1": {
-//         "id": "SDG85",
-//         "category": "fina"
-//     },
-//     "1|1|2": {
-//         "category": "empty"
-//     },
-//     "1|1|3": {
-//         "category": "gruesa"
-//     },
-//     "1|1|4": {
-//         "category": "empty"
-//     },
-//     "1|1|5": {
-//         "category": "cortada"
-//     },
-//     "1|2|1": {
-//         "category": "fina"
-//     },
-//     "1|2|2": {
-//         "category": "empty"
-//     },
-//     "1|2|3": {
-//         "category": "gruesa"
-//     },
-//     "1|2|4": {
-//         "category": "empty"
-//     },
-//     "1|2|5": {
-//         "category": "cortada"
-//     },
-//     "1|3|1": {
-//         "category": "fina"
-//     },
-//     "1|3|2": {
-//         "category": "empty"
-//     },
-//     "1|3|3": {
-//         "category": "gruesa"
-//     },
-//     "1|3|4": {
-//         "category": "empty"
-//     },
-//     "1|3|5": {
-//         "category": "cortada"
-//     }
-// }
 export const boxesByFloor = (location: any) => {
     console.log('boxesByFloor', location);
     const boxes = Object.keys(location).reduce((bxs: any, currentCell) => {
@@ -118,4 +82,39 @@ export const boxesByFloor = (location: any) => {
     console.log(boxes);
 
     return boxes;
+};
+
+export const getBoxClasses = (category: string) => {
+    switch (category) {
+        case '1':
+            return 'mesh-type__1 boxCard';
+        case '2':
+            return 'mesh-type__2 boxCard';
+        case '3':
+            return 'mesh-type__3 boxCard';
+        case '4':
+            return 'mesh-type__4 boxCard';
+        case '5':
+            return 'mesh-type__5 boxCard';
+        case 'empty':
+            return 'mesh-type__empty boxCard';
+        case 'aisle':
+            return 'mesh-type__taken aisle';
+        case 'cradle':
+            return 'mesh-type__taken cradle';
+    }
+
+    return 'mesh-type__empty boxCard';
+};
+
+export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
+    const boxy = boxes.filter((box) => {
+        const { location } = box;
+
+        return location && location.where_id === depoId;
+    });
+
+    console.log('boxy', boxy);
+
+    return [...new Set(boxy)];
 };

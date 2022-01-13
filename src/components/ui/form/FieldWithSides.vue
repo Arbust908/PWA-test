@@ -11,6 +11,7 @@
                 :type="type"
                 :name="fieldName"
                 :placeholder="placeholder"
+                :max="maxNumberAmount"
                 @blur="usedInput"
                 @click="print"
             />
@@ -79,12 +80,26 @@
             numberValidation: {
                 type: Boolean,
             },
+            maxNumberAmount: {
+                type: Number,
+            },
         },
+
         setup(props, { emit }) {
             const route = useRoute();
             const value = useVModel(props, 'data', emit);
             const cssPre = useCssVar('--pre', 0);
             const cssPost = useCssVar('--post', 0);
+
+            watch(value, (data, oldData) => {
+                if (data < 1 && props.maxNumberAmount) {
+                    props.data = 1;
+                } else if (data > props.maxNumberAmount) {
+                    value.value = props.maxNumberAmount;
+                } else {
+                    value.value = data;
+                }
+            });
 
             if (props.pre) {
                 cssPre.value = props.pre.width ?? '20%';

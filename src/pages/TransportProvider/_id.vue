@@ -73,7 +73,7 @@
                         </SecondaryBtn>
                         <PrimaryBtn
                             btn="wide"
-                            :disabled="!isFull ? 'yes' : null"
+                            :disabled="!isFull"
                             :is-loading="isLoading"
                             @click="
                                 hasFullNewDriver && addDriver();

@@ -59,7 +59,7 @@
     }
 
     .box-id {
-        @apply mx-2 w-48 flex justify-between text-center border rounded-md overflow-hidden border-gray-300;
+        @apply mx-2 w-[148px] flex justify-between text-center border rounded-md overflow-hidden border-gray-300;
         span {
             @apply p-2 w-1/2 bg-gray-100 border-r border-gray-300;
         }

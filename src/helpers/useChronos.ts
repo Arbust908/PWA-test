@@ -6,7 +6,14 @@ export function createFromDate(datetime: number) {
     const hour: Ref<number> = ref(dateFormat.getHours());
     const time: Ref<boolean> = ref(true); //isAm
 
-    if (hour.value > 12) {
+    if (hour.value === 0) {
+        time.value = true;
+        hour.value = 12;
+    } else if (hour.value < 12) {
+        time.value = true;
+    } else if (hour.value === 12) {
+        time.value = false;
+    } else {
         time.value = false;
         hour.value = hour.value - 12;
     }

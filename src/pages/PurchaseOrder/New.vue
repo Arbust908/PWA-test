@@ -87,24 +87,20 @@
                             :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'"
                             class="col-span-1 md:col-span-2 flex flex-row"
                         >
-                            <CircularBtn
+                            <AddDeleteBtn
                                 v-if="useIfNotLonly(providerId.sandOrders)"
-                                class="flex self-start"
-                                size="sm"
-                                @click="removeOrder(order.id, providerId.innerId)"
-                            >
-                                <Icon icon="Trash" type="outline" class="w-7 h-7" />
-                            </CircularBtn>
+                                purpose="remove"
+                                @click.prevent="removeOrder(order.id, providerId.innerId)"
+                            />
                             <!-- Arena Section -->
-                            <CircularBtn
+                            <AddDeleteBtn
                                 v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
-                                class="flex self-start"
-                                size="sm"
-                                btn="bg-green-500"
-                                @click.prevent="addOrder(providerId.innerId)"
-                            >
-                                <Icon icon="Plus" class="w-7 h-7 text-white" />
-                            </CircularBtn>
+                                purpose="add"
+                                @click.prevent="
+                                    addOrder(providerId.innerId);
+                                    useFirstST = false;
+                                "
+                            />
                         </div>
                     </FieldGroup>
                 </template>
@@ -264,6 +260,7 @@
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -296,7 +293,11 @@
     const GhostBtn = defineAsyncComponent(() => import('@/components/ui/buttons/GhostBtn.vue'));
     const api = import.meta.env.VITE_API_URL || '/api';
 
+    const drivers = ref([]);
+    const driverId = ref(-1);
+
     const filteredDrivers = computed(() => {
+        driverId.value = -1;
         if (transportProviderId.value > -1) {
             const driversFiltered = drivers.value.filter(
                 (driver) => driver.transportProviderId === transportProviderId.value
@@ -307,9 +308,6 @@
 
         return [];
     });
-
-    const drivers = ref([]);
-    const driverId = ref(-1);
 
     const filteredPlates = computed(() => {
         if (driverId.value > -1) {
@@ -336,6 +334,8 @@
         // TODO: StoreLogic
         const result = await axios.get(`${api}/driver`);
         drivers.value = result.data.data;
+        const result2 = await axios.get(`${api}/sandProvider`);
+        console.log(result2.data.data);
     });
 
     useTitle('Nueva orden de pedido <> Sandflow');
@@ -381,7 +381,7 @@
                 return sandProvider;
             }
         });
-
+        console.log('holi');
         filteredSandTypes.value = provider.meshType;
     };
 

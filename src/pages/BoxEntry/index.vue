@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-gray-900 text-2xl self-start mb-3 md:mb-0">Nuevo ingreso de caja</h1>
-        </header>
+        <ABMFormTitle title="Nuevo ingreso de caja" />
         <section class="deposit bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
                 <FieldGroup class="border-hidden grid grid-cols-12 gap-4 max-w-4xl">
@@ -33,7 +31,7 @@
                 />
                 <nav class="flex justify-between">
                     <button
-                        :class="['section-tab', activeSection == 'deposit' ? 'active' : '']"
+                        :class="['section-tab', activeSection == 'deposit' ? 'active' : null]"
                         :selected="activeSection == 'deposit'"
                         @click.prevent="changeSection('deposit')"
                     >
@@ -51,47 +49,45 @@
                     <div v-if="warehouse">
                         <fieldset v-if="activeSection === 'deposit'" class="py-2 flex gap-x-10 2xl:gap-x-40">
                             <section class="w-full max-w-[170px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
-                                <div>
-                                    <h2 class="col-span-full text-xl font-bold">Referencias</h2>
-                                    <div class="flex flex-col gap-5 mt-4">
-                                        <span class="select-category fina" @click="setVisibleCategories('fina')">
-                                            <EyeIcon v-if="visibleCategories.includes('fina')" class="icon" />
-                                            <EyeIconOff v-else class="icon" />
-                                            Arena fina</span
-                                        >
-                                        <span class="select-category gruesa" @click="setVisibleCategories('gruesa')">
-                                            <EyeIcon v-if="visibleCategories.includes('gruesa')" class="icon" />
-                                            <EyeIconOff v-else class="icon" />
-                                            Arena gruesa</span
-                                        >
-                                        <span class="select-category cortada" @click="setVisibleCategories('cortada')">
-                                            <EyeIcon v-if="visibleCategories.includes('cortada')" class="icon" />
-                                            <EyeIconOff v-else class="icon" />
-                                            Caja cortada</span
-                                        >
-                                        <span class="select-category aisle">
-                                            <div class="w-4 h-4 mr-3 rounded-full bg-gray-300" />
-                                            Pasillo
-                                        </span>
-                                        <span class="select-category full">
-                                            <div class="w-4 h-4 mr-3 rounded-full bg-gray-600" />
-                                            Ocupado
-                                        </span>
-                                    </div>
-                                    <BoxCard
-                                        v-if="choosedBox.category !== ''"
-                                        :floor="choosedBox.floor"
-                                        :row="choosedBox.row"
-                                        :col="choosedBox.col"
-                                        :category="choosedBox.category"
-                                        :choosed-box="choosedBox"
-                                    />
+                                <h2 class="col-span-full text-xl font-bold">Referencias</h2>
+                                <div class="flex flex-col gap-5">
+                                    <span
+                                        v-for="(sand, i) in sandTypes"
+                                        :key="i"
+                                        :class="`select-category mesh-type__${sand.id} radio clickable`"
+                                        @click="setVisibleCategories(sand.id)"
+                                    >
+                                        <EyeIcon v-if="visibleCategories.includes(sand.id)" class="icon" />
+                                        <EyeIconOff v-else class="icon" />
+                                        {{ sand.type }}</span
+                                    >
+                                    <!-- <span class="select-category full">
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-indigo-900" />
+                                        Cradle</span
+                                    > -->
+                                    <span class="select-category full">
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-[#878787]" />
+                                        Ocupado ocupado
+                                    </span>
+                                    <span class="select-category full">
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-[#CECCCC]" />
+                                        Pasillo
+                                    </span>
                                 </div>
+                                <BoxCard
+                                    v-if="choosedBox.category !== ''"
+                                    :floor="choosedBox.floor"
+                                    :row="choosedBox.row"
+                                    :col="choosedBox.col"
+                                    :category="choosedBox.sandTypeId.toString()"
+                                    :choosed-box="choosedBox"
+                                />
                             </section>
                             <DepositGrid
                                 v-if="warehouse"
                                 class="w-full flex flex-col gap-5"
                                 :selected-box="choosedBox"
+                                :boxes="inDepoBoxes"
                                 :rows="row"
                                 :cols="col"
                                 :floor="floor"
@@ -153,11 +149,19 @@
     import { EyeIcon } from '@heroicons/vue/solid';
     import EyeIconOff from './EyeIconOff.vue';
     import Layout from '@/layouts/Main.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
     import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
     import CradleRow from './CradleRow.vue';
+    import { formatDeposit, defaultBox, getInDepoBoxes } from '@/helpers/useWarehouse';
+    import {
+        getPurchaseOrders,
+        getSandOrders,
+        getWarehouses,
+        getCradles,
+        getWorkOrders,
+        getSand,
+    } from '@/helpers/useGetEntities';
 
     import { Company, Pit, Box } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -167,6 +171,7 @@
     import EntryBoxesList from '@/components/BoxEntry/EntryBoxesList.vue';
 
     import axios from 'axios';
+    import ABMFormTitle from '../../components/ui/ABMFormTitle.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     useTitle('Ingreso de Cajas <> Sandflow');
@@ -175,59 +180,27 @@
     let boxes = ref([]);
 
     const purchaseOrders = ref([]);
+    const sandOrders = ref([]);
+    const inDepoBoxes = ref([]);
     const filteredPurchaseOrders = ref([]);
-    const clients = ref([] as Array<Company>);
-    const pits = ref([] as Array<Pit>);
+
     const clientId = ref(-1);
     const purchaseOrderId = ref(-1);
     const pitId = ref(-1);
     const warehouses = ref([]);
-    let floor = ref(0);
-    let row = ref(0);
-    let col = ref(0);
-    let dimensions = ref('');
-    let cradles = ref([]);
-    let cleanCradles = ref([]);
+
+    const floor = ref(0);
+    const row = ref(0);
+    const col = ref(0);
+    const cradles = ref([]);
+    const cleanCradles = ref([]);
     const selectedPurchaseOrder = ref({});
 
-    const getPurchaseOrders = async () => {
-        await axios
-            .get(`${apiUrl}/purchaseOrder`)
-            .then((res) => {
-                purchaseOrders.value = res.data.data;
-            })
-            .catch((err) => console.error(err));
-    };
-
-    const getWarehouses = async () => {
-        await axios
-            .get(`${apiUrl}/warehouse`)
-            .then((res) => {
-                warehouses.value = res.data.data;
-            })
-            .catch((err) => console.error(err));
-    };
-
-    // Los Cradles deberian venir de la Orden de Trabajo
-    // Ver con @Back tema api
-    const getCradles = async () => {
-        await axios
-            .get(`${apiUrl}/cradle`)
-            .then((res) => {
-                cradles.value = res.data.data;
-                cleanCradles.value = res.data.data;
-            })
-            .catch((err) => console.error(err));
-    };
+    const sandTypes = ref([]);
 
     const getFilteredCradles = async () => {
         const cradlesIds = [];
-        const workOrders = await axios
-            .get(`${apiUrl}/workOrder`)
-            .then((res) => {
-                return res.data.data;
-            })
-            .catch((err) => console.error(err));
+        const workOrders = await getWorkOrders();
 
         workOrders.forEach((workOrder) => {
             workOrder.pits.forEach((pit) => {
@@ -250,24 +223,6 @@
         });
 
         cradles.value = newCradles;
-    };
-
-    const formatDeposit = (deposit) => {
-        const dimensions = Object.keys(deposit).reduce(
-            (dims, currentCell) => {
-                const proxy = currentCell.split('|');
-                const [floor, row, col] = proxy;
-                dims.floor = Math.max(dims.floor, floor);
-                dims.row = Math.max(dims.row, row);
-                dims.col = Math.max(dims.col, col);
-
-                return dims;
-            },
-            { floor: 0, row: 0, col: 0 }
-        );
-        dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
-
-        return dimensions;
     };
 
     const clearBoxInDeposit = (id) => {
@@ -293,7 +248,8 @@
     };
 
     watchEffect(async () => {
-        // console.log('filteredPurchaseOrders', filteredPurchaseOrders.value);
+        console.log('Watchpokalips');
+
         if (purchaseOrders.value.length > 0) {
             if (clientId.value !== -1 && pitId.value !== -1) {
                 filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
@@ -341,24 +297,17 @@
                 await getFilteredCradles();
 
                 if (warehouse.value) {
-                    floor.value = formatDeposit(warehouse.value.layout).floor;
-                    col.value = formatDeposit(warehouse.value.layout).col;
-                    dimensions.value = formatDeposit(warehouse.value.layout).dimensions;
-                    row.value = formatDeposit(warehouse.value.layout).row;
+                    const { col: fCol, floor: fFloor, row: fRow } = formatDeposit(warehouse.value.layout);
+                    col.value = fCol;
+                    floor.value = fFloor;
+                    row.value = fRow;
                 }
             }
         }
     });
 
     const choosedBox = ref({
-        floor: 1,
-        col: 0,
-        row: 0,
-        category: '',
-        id: '',
-        boxId: '',
-        wasOriginallyOnDeposit: false,
-        wasOriginallyOnCradle: false,
+        ...defaultBox,
     });
 
     const checkIfWasBoxInOriginalDeposit = (boxId) => {
@@ -390,6 +339,8 @@
             return box.boxId === id;
         });
 
+        setVisibleCategories(choosedBox.value.sandTypeId);
+
         if (checkIfWasBoxInOriginalDeposit(id)) {
             Object.entries(warehouse.value.layout).forEach((cell) => {
                 if (cell[1].id == id) {
@@ -405,42 +356,52 @@
     };
 
     const selectBox = (box: Box) => {
-        if (choosedBox.value.wasOriginallyOnDeposit) {
+        // Si ya estaba en el deposito o en el cradle no se pisa
+        // Igual no se deberia poder clickear ;D
+        if (choosedBox.value.wasOriginallyOnDeposit || choosedBox.value.wasOriginallyOnCradle) {
             return;
         }
 
-        if (choosedBox.value.wasOriginallyOnCradle) {
+        // Si clickea en un pasillo no hace nada. Sumo Cradle
+        // Tampoco deberia poder clickear en un pasillo
+        if (box.category == 'aisle' || box.category == 'cradle') {
             return;
         }
 
+        // Sacamos la caja de cradle si estaba ahi
         clearBoxInCradleSlots(choosedBox.value.boxId);
-
-        if (box.category == 'aisle') {
-            return;
-        }
 
         choosedBox.value.location = {
             where: 'warehouse',
             where_id: warehouse.value.id,
+            floor: box.floor,
+            row: box.row,
+            col: box.col,
         };
+        choosedBox.value.floor = box.floor;
+        choosedBox.value.row = box.row;
+        choosedBox.value.col = box.col;
+        console.log(choosedBox.value);
+        sandOrders.value.push(choosedBox.value);
+        inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
 
-        if (box.category == 'empty' || box.category !== 'aisle') {
-            // if (visibleCategories.value.includes(box.category)) {
-            wasWarehouseModificated.value = true;
-            const hasPos = [choosedBox.value.floor, choosedBox.value.row, choosedBox.value.col].some(Boolean);
+        // if (box.category == 'empty' || box.category !== 'aisle') {
+        //     // if (visibleCategories.value.includes(box.category)) {
+        //     wasWarehouseModificated.value = true;
+        //     const hasPos = [choosedBox.value.floor, choosedBox.value.row, choosedBox.value.col].some(Boolean);
 
-            if (hasPos) {
-                let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
-                warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
-                warehouse.value.layout[`${prevBoxPosition}`].id = '';
-            }
-            const newBPos = `${box.floor}|${box.row}|${box.col}`;
-            choosedBox.value.floor = box.floor;
-            choosedBox.value.col = box.col;
-            choosedBox.value.row = box.row;
-            warehouse.value.layout[`${newBPos}`].category = choosedBox.value.category;
-            warehouse.value.layout[`${newBPos}`].id = choosedBox.value.boxId;
-        }
+        //     if (hasPos) {
+        //         let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
+        //         warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
+        //         warehouse.value.layout[`${prevBoxPosition}`].id = '';
+        //     }
+        //     const newBPos = `${box.floor}|${box.row}|${box.col}`;
+        //     choosedBox.value.floor = box.floor;
+        //     choosedBox.value.col = box.col;
+        //     choosedBox.value.row = box.row;
+        //     warehouse.value.layout[`${newBPos}`].category = choosedBox.value.category;
+        //     warehouse.value.layout[`${newBPos}`].id = choosedBox.value.boxId;
+        // }
     };
 
     const changeSection = (option: string) => {
@@ -451,9 +412,29 @@
         return clientId.value !== -1 && pitId.value !== -1 && purchaseOrderId.value !== -1;
     });
 
+    watch(selectionsAreDone, async (newVal) => {
+        console.log(newVal ? 'selectionsAreDone' : 'not done');
+
+        if (newVal) {
+            sandOrders.value = await getSandOrders();
+            console.groupCollapsed('Boxes :D');
+            const boxes = sandOrders.value.map((box) => {
+                if (box.location && JSON.parse(box.location)) {
+                    box.location = JSON.parse(box.location);
+                    box.location.been_set = true;
+                }
+
+                return box;
+            });
+            inDepoBoxes.value = getInDepoBoxes(boxes, warehouse.value.id);
+            console.log(inDepoBoxes.value);
+            console.groupEnd();
+        }
+    });
+
     const warehouse = ref({});
     const originalWarehouseLayout = ref({});
-    let visibleCategories = ref(['fina', 'gruesa', 'cortada']);
+    const visibleCategories = ref([]);
 
     const setVisibleCategories = (category: string) => {
         if (visibleCategories.value.includes(category)) {
@@ -467,16 +448,9 @@
     let wasCradleModificated = ref(false);
     let wasWarehouseModificated = ref(false);
 
-    const handleSelectedCradle = (id) => {
+    const handleSelectedCradle = (id: any) => {
         selectedCradle.value = id;
     };
-    const setCat = (cat: string) => {
-        choosedBox.value.category = cat;
-        const box = choosedBox.value;
-        deposit.value[`${box.floor}|${box.row}|${box.col}`].category = box.category;
-    };
-
-    const deposit = ref({});
 
     const confirmModal = ref(false);
     const resetBoxIn = () => {
@@ -551,6 +525,7 @@
                 isFullyAllocated: 1,
             });
         }
+        resetBoxIn();
     };
 
     const canSave = computed(() => {
@@ -558,13 +533,16 @@
     });
 
     onMounted(async () => {
-        await getPurchaseOrders();
-        await getWarehouses();
-        await getCradles();
+        sandTypes.value = await getSand();
+        purchaseOrders.value = await getPurchaseOrders();
+        warehouses.value = await getWarehouses();
+        cradles.value = await getCradles();
+        cleanCradles.value = [...cradles.value];
     });
 </script>
 
 <style lang="scss" scoped>
+    @import '@/assets/box.scss';
     .section-tab {
         @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;
     }
@@ -573,33 +551,17 @@
     }
 
     span.select-category {
-        @apply flex items-center;
+        @apply flex items-center gap-x-3;
 
         & .icon {
-            @apply w-5 h-5 mr-2;
+            @apply w-5 h-5;
         }
 
         &:not(.full):not(.aisle) {
             cursor: pointer;
         }
-
-        &.aisle {
-            @apply text-second-300 border-second-300;
-        }
-        &.fina {
-            @apply text-orange-600 border-orange-600;
-        }
-        &.gruesa {
-            @apply text-green-600 border-green-600;
-        }
-        &.cortada {
-            @apply text-blue-600 border-blue-600;
-        }
         &.blocked {
             @apply text-second-800 border-second-800;
-        }
-        &.empty {
-            @apply text-second-200 border-second-200;
         }
     }
 
