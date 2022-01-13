@@ -43,23 +43,18 @@
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
                 />
                 <div class="flex flex-row content-evenly">
-                    <CircularBtn
+                    <AddDeleteBtn
                         v-if="sPov.SandOrders.length > 1 && Key !== sPov.SandOrders.length"
                         class="flex self-end"
-                        size="sm"
+                        purpose="remove"
                         @click.prevent="removeSandOrder(sPov.innerId, so.innerId)"
-                    >
-                        <Icon icon="Trash" type="outline" class="w-7 h-7" />
-                    </CircularBtn>
-                    <CircularBtn
+                    />
+                    <AddDeleteBtn
                         v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4 && isLast(Key, sPov.SandOrders)"
                         class="flex self-end"
-                        size="sm"
-                        btn="bg-green-500"
+                        purpose="add"
                         @click.prevent="addSandOrder(sPov.innerId)"
-                    >
-                        <Icon icon="Plus" class="w-7 h-7 text-white" />
-                    </CircularBtn>
+                    />
                 </div>
             </div>
             <div v-if="sPov.SandOrders.length > 0 && sPov.SandOrders.length < 4" class="col-span-full mt-2 sm:hidden">
@@ -80,7 +75,7 @@
     import FieldWithSides from '@/components/ui/form/FieldWithSides.vue';
     import { SandProvider, SandOrder } from '@/interfaces/sandflow';
     import { isFirst, isLast } from '@/helpers/iteretionHelpers';
-    import CircularBtn from '../ui/buttons/CircularBtn.vue';
+    import AddDeleteBtn from '../ui/buttons/AddDeleteBtn.vue';
 
     const defaultSandOrder: SandOrder = {
         innerId: 0,
@@ -99,7 +94,7 @@
             FieldSelect,
             FieldWithSides,
             Icon,
-            CircularBtn,
+            AddDeleteBtn,
         },
         props: {
             sandProviders: {

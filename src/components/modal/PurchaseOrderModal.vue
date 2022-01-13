@@ -78,15 +78,11 @@
                 return sandType ? sandType.type : 'Sin tipo de arena';
             };
             const content = ref(null);
-            watchEffect(() => {
-                console.log(content.value);
-            });
 
             const checked = ref(false);
 
             const downloadPDF = (po) => {
                 const doc = new jsPDF();
-                console.log('po', po);
 
                 const id = 'ID-123';
                 const spName = po.sandProvider.name;

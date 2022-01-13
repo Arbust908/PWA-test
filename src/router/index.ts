@@ -372,6 +372,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/Tests/PDF.vue'),
     },
     {
+        path: '/tests/queue',
+        name: 'TestQueue',
+        component: () => import('@/pages/Tests/QueueItems.vue'),
+    },
+    {
         path: '/:catchAll(.*)',
         name: 'PageNotFound',
         component: () => import('@/pages/Error/404.vue'),

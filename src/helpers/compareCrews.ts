@@ -4,6 +4,9 @@ interface CompareActionables {
     deleted: Array<any>;
     unchanged: Array<any>;
 }
+
+// Deberia ser el mismo compareThings o el generico :D
+
 import { HumanResource, Crew } from '@/interfaces/sandflow';
 
 export function compareCrews(original: Array<Crew>, backup: Array<Crew>): CompareActionables {
@@ -22,8 +25,6 @@ export function compareCrews(original: Array<Crew>, backup: Array<Crew>): Compar
     }
 
     if (original.length === 0 && backup.length === 0) {
-        console.log('both empty');
-
         return result;
     }
 
@@ -68,8 +69,6 @@ export function compareResource(original: Array<HumanResource>, backup: Array<Hu
     }
 
     if (original.length === 0 && backup.length === 0) {
-        console.log('both empty');
-
         return result;
     }
 
