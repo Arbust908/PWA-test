@@ -10,6 +10,7 @@
                         <ClientPitCombo
                             :client-id="Number(clientId)"
                             :pit-id="Number(pitId)"
+                            validation-type="empty"
                             @update:clientId="
                                 clientId = Number($event);
                                 cradleId = -1;
@@ -52,7 +53,7 @@
         <footer class="mt-8 space-x-3 flex justify-end items-center">
             <PrimaryBtn btn="wide" type="submit" @click.prevent="requestEmptyBoxHandle"> Solicitar retiro </PrimaryBtn>
         </footer>
-        <SuccessModal :open="isModalVisible" :title="ModalText" @main="toggleModal" @close="toggleModal" />
+        <SuccessModal :open="isModalVisible" :title="ModalText" @main="confirmModal" @close="confirmModal" />
     </Layout>
 </template>
 
@@ -74,6 +75,8 @@
     import { getOrder, QueueTransactions } from '@/helpers/useQueueItem';
 
     import axios from 'axios';
+    import router from '@/router';
+
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
@@ -131,6 +134,13 @@
                 } else {
                     selectedSlots.value.push(slot);
                 }
+            };
+            const routerGo = () => {
+                router.go(0);
+            };
+
+            const confirmModal = () => {
+                return toggleModal() && setTimeout(routerGo, 2000);
             };
 
             const toggleModal = () => {
@@ -269,13 +279,12 @@
             };
 
             const requestEmptyBoxHandle = () => {
-                //toggleModal();
                 selectedSlots.value.forEach((selectedSlot) => {
                     const newQI = { ...defaultQueueItem };
                     newQI.status = 10;
-                    newQI.origin = 'Estación ' + selectedSlot?.location?.where_id;
+                    newQI.origin = selectedSlot?.location?.where_origin;
                     newQI.pitId = pitId.value;
-                    //newQI.sandOrderId = Panchos duty;
+                    newQI.sandOrderId = selectedSlot.id;
                     console.log('selectedSlot', selectedSlot);
                     createQueueItem(newQI);
                 });
@@ -287,6 +296,7 @@
                     .then((response) => {
                         if (response.request.status == 200) {
                             console.log(queueItem, 'se guardo bien');
+                            confirmModal();
                         }
                     })
                     .catch((err) => console.error(err));
@@ -329,6 +339,7 @@
                 ModalText,
                 selectedCradle,
                 SelectSlot,
+                confirmModal,
             };
         },
     });

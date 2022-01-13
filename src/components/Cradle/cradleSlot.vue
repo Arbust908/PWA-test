@@ -1,5 +1,5 @@
 <template>
-    <article v-if="box.boxId > 0" class="slot" :class="isClicked ? 'ring' : null" @click.self="isClickedAndSelected">
+    <article v-if="box.boxId" class="slot" :class="isClicked ? 'ring' : null" @click.self="isClickedAndSelected">
         <span class="station-title" @click.self="isClickedAndSelected">
             Estación {{ index + 1 }} - {{ box.boxId }}</span
         >
@@ -85,7 +85,7 @@
             type: Number,
             required: true,
         },
-    }); //props.cradle/index/box, etc
+    });
     const emits = defineEmits(['changeCradleSlotStatus', 'selectedSlots']);
 
     const isClicked = ref(false);
