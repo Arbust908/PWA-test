@@ -88,7 +88,6 @@
                 </article>
             </section>
             <section style="margin-bottom: 1.25rem">
-                ="detalle"-->
                 <h3
                     style="
                         font-weight: 700;
@@ -117,7 +116,6 @@
             </section>
             <hr style="border-color: rgb(209 213 219); margin-top: 2.5rem; margin-bottom: 2.5rem" />
             <section style="font-size: 0.875rem; line-height: 1.25rem">
-                ="observaciones"-->
                 <h3
                     style="
                         font-size: 0.875rem;
