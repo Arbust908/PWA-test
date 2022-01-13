@@ -30,7 +30,6 @@
         </header>
         <main>
             <section style="margin-bottom: 1.25rem">
-                ="detalle"-->
                 <h3
                     style="
                         font-weight: 700;
@@ -157,7 +156,6 @@
         </footer>
     </section>
 </template>
-
 <script setup lang="ts">
     import { formatHour, createFromDate } from '@/helpers/useChronos';
     const props = defineProps({
