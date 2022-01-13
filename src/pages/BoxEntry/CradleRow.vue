@@ -7,7 +7,13 @@
             :selected="selected"
             @click="handleSelectedCradle"
         />
-        <CradleSlots v-if="selected" :cradle="cradle" :box="choosedBox" @clear-box-in-deposit="clearBoxInDeposit" />
+        <CradleSlots
+            v-if="selected"
+            :cradle="cradle"
+            :box="choosedBox"
+            @clear-box-in-deposit="clearBoxInDeposit"
+            @handle-slot-click="handleSlotClick($event)"
+        />
     </div>
 </template>
 
@@ -38,7 +44,8 @@
                 required: true,
             },
         },
-        setup(props, { emit }) {
+        emits: ['clear-box-in-deposit', 'handle-selected-cradle', 'handle-slot-click'],
+        setup(props: any, { emit }: any) {
             const cradle = ref(props.cradle);
             const choosedBox = ref(props.choosedBox);
             const selected = ref(props.selected);
@@ -46,6 +53,9 @@
 
             const handleSelectedCradle = () => {
                 emit('handle-selected-cradle');
+            };
+            const handleSlotClick = (e) => {
+                emit('handle-slot-click', e);
             };
 
             const clearBoxInDeposit = (id) => {
@@ -64,6 +74,7 @@
                 id,
                 handleSelectedCradle,
                 clearBoxInDeposit,
+                handleSlotClick,
             };
         },
     };

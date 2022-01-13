@@ -100,9 +100,11 @@ export const getBoxClasses = (category: string) => {
             return 'mesh-type__taken aisle';
         case 'cradle':
             return 'mesh-type__taken cradle';
+        case null:
+            return '';
     }
 
-    return 'mesh-type__empty boxCard';
+    return '';
 };
 
 export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {

@@ -3,8 +3,13 @@
         <div
             v-for="(slot, index) in cradle.slots"
             :key="index"
-            :class="['single-slot', slot.category, !slot.category ? 'border-dashed border-2 border-second-500' : '']"
-            @click="handleSlotClick(index)"
+            :class="[
+                'single-slot',
+                slot.sandTypeId,
+                slotClasses(slot.sandTypeId),
+                !slot.category ? 'border-dashed border-2 border-second-500' : '',
+            ]"
+            @click="handleSlotClick(slot, index)"
         >
             <div v-if="slot.boxId == null" class="index-wrapper">
                 <span class="index">{{ index + 1 }}</span>
@@ -17,6 +22,7 @@
 </template>
 
 <script setup lang="ts">
+    import { getBoxClasses } from '@/helpers/useWarehouse';
     const props = defineProps({
         cradle: {
             type: Object,
@@ -27,12 +33,25 @@
             required: true,
         },
     });
-    const emits = defineEmits(['clear-box-in-deposit']);
+    const emits = defineEmits(['clear-box-in-deposit', 'handle-slot-click']);
     const cradle = ref(props.cradle);
     const box = ref(props.box);
     const wasBoxInCradle = ref(false);
 
-    const handleSlotClick = (index) => {
+    const slotClasses = (sandId: number) => {
+        console.log(sandId);
+
+        if (typeof sandId === 'number') {
+            return getBoxClasses(String(sandId));
+        }
+
+        return getBoxClasses(sandId);
+    };
+
+    const handleSlotClick = (slot, index: number) => {
+        console.log('Slot', slot);
+        console.log('Box', box.value);
+
         if (box.value.wasOriginallyOnDeposit) {
             return;
         }
@@ -43,6 +62,10 @@
 
         if (wasBoxInCradle.value) {
             // toast.error("La caja ya est� ingresada")
+            return;
+        }
+
+        if (box.value.id === '') {
             return;
         }
 
@@ -65,6 +88,7 @@
         });
         cradle.value.slots[index] = box.value;
         emits('clear-box-in-deposit', id);
+        emits('handle-slot-click', slot);
     };
 
     watchEffect(() => {
@@ -74,6 +98,7 @@
 </script>
 
 <style lang="scss" scoped>
+    @import '@/assets/box.scss';
     .slots-wrapper {
         @apply ml-4 flex flex-row justify-between items-center;
     }

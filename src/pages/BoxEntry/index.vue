@@ -107,6 +107,7 @@
                                     :cradle="cradle"
                                     :selected="selectedCradle == cradle.id"
                                     :choosed-box="choosedBox"
+                                    @handle-slot-click="handleSlotClick($event)"
                                     @handle-selected-cradle="handleSelectedCradle(cradle.id)"
                                     @clear-box-in-deposit="clearBoxInDeposit"
                                 />
@@ -231,26 +232,28 @@
         cradles.value = newCradles;
     };
 
-    const clearBoxInDeposit = (id) => {
-        Object.entries(warehouse.value.layout).forEach((cell) => {
-            if (cell[1].id == id) {
-                (cell[1].category = 'empty'), delete cell[1][id];
-            }
-        });
+    const clearBoxInDeposit = (boxId: number) => {
+        // Look for box AKA sandOrder and emtpy location
+        // Object.entries(warehouse.value.layout).forEach((cell) => {
+        //     if (cell[1].id == id) {
+        //         (cell[1].category = 'empty'), delete cell[1][id];
+        //     }
+        // });
     };
 
-    const clearBoxInCradleSlots = (id) => {
-        cradles.value.forEach((cradle) => {
-            cradle.slots = cradle.slots.map((slot) => {
-                if (slot.boxId == id) {
-                    slot = {
-                        boxId: null,
-                    };
-                }
-
-                return slot;
-            });
-        });
+    const clearBoxInCradleSlots = (boxId: number) => {
+        // Look for box AKA sandOrder and emtpy location
+        // let id = 0;
+        // cradles.value.forEach((cradle) => {
+        //     cradle.slots = cradle.slots.map((slot) => {
+        //         if (slot.boxId == id) {
+        //             slot = {
+        //                 boxId: null,
+        //             };
+        //         }
+        //         return slot;
+        //     });
+        // });
     };
 
     watchEffect(async () => {
@@ -315,6 +318,7 @@
     const choosedBox = ref({
         ...defaultBox,
     });
+    console.log('Primer caja', choosedBox.value);
 
     const checkIfWasBoxInOriginalDeposit = (boxId) => {
         let response = false;
@@ -383,6 +387,7 @@
             floor: box.floor,
             row: box.row,
             col: box.col,
+            where_orogon: `F${box.row} C${box.col} N${box.floor}`,
         };
         choosedBox.value.floor = box.floor;
         choosedBox.value.row = box.row;
@@ -454,6 +459,10 @@
 
     const handleSelectedCradle = (id: any) => {
         selectedCradle.value = id;
+    };
+
+    const handleSlotClick = (slot: Slot) => {
+        console.log(slot);
     };
 
     const confirmModal = ref(false);

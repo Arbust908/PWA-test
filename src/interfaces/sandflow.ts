@@ -352,9 +352,9 @@ export interface QueueItem {
     // 99999 - 90000 Retiro ( cradleAOtro )
     // 9999 - 9000 TRansporte a Otro
     // 999 - 500 Deposito a Cradle
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
 }
 
 /* 
