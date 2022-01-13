@@ -91,7 +91,6 @@
     });
     const transportOrder = computed(() => {
         const to = props.info.purchaseOrder?.transportOrders && props.info.purchaseOrder?.transportOrders[0];
-        console.log(to);
 
         if (!to) {
             return null;
