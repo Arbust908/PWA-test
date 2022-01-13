@@ -1,12 +1,9 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Diseño de depósito</h1>
-        </header>
+        <ABMFormTitle title="Diseño de depósito" />
         <section class="deposit bg-second-0 rounded-md shadow-sm overflow-hidden">
             <form method="POST" action="/" class="p-8 md:p-12 flex flex-col gap-4">
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
-                    <h2 class="col-span-full text-[24px] font-bold">Pozo {{ designName }}</h2>
                     <ClientPitCombo
                         :client-id="clientId"
                         :pit-id="pitId"
@@ -98,19 +95,12 @@
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
-            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                Guardar
-            </PrimaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull" @click.prevent="isFull && save()"> Guardar </PrimaryBtn>
         </footer>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -123,6 +113,7 @@
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
@@ -135,6 +126,7 @@
             BoxCard,
             FieldGroup,
             ClientPitCombo,
+            ABMFormTitle,
         },
         setup() {
             useTitle('Nuevo Depósito <> Sandflow');
@@ -326,7 +318,9 @@
                 selectedBox.value.category = cat;
 
                 const { floor, row, col } = selectedBox.value;
-                deposit.value[`${floor}|${row}|${col}`].category = cat;
+                const key = `${floor}|${row}|${col}`;
+
+                deposit.value[key].category = cat;
             };
 
             const isFull = computed(() => {

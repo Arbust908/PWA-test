@@ -55,13 +55,13 @@
         <!-- *** -->
         <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
             <section class="gap-6 flex flex-wrap items-center">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')" :is-loading="isLoading">
+                <SecondaryBtn btn="wide" :is-loading="isLoading" @click.prevent="$router.push('/orden-de-trabajo')">
                     Cancelar
                 </SecondaryBtn>
                 <GhostBtn
                     btn="text-green-700 border !border-green-700 hover:bg-second-200"
-                    @click="save()"
                     :is-loading="isLoading"
+                    @click="save()"
                 >
                     <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
@@ -70,9 +70,9 @@
                 <PrimaryBtn
                     v-else
                     btn="wide"
-                    :disabled="!isAllFull ? 'yes' : null"
-                    @click="isAllFull && save(false)"
+                    :disabled="!isAllFull"
                     :is-loading="isLoading"
+                    @click="isAllFull && save(false)"
                 >
                     Finalizar
                 </PrimaryBtn>

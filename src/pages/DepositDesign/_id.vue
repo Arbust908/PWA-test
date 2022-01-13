@@ -6,7 +6,6 @@
         <section class="deposit bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
                 <fieldset class="py-2 w-full max-w-2xl grid grid-cols-12 gap-y-4 gap-x-14">
-                    <h2 class="col-span-full text-[24px] font-bold">Pozo {{ designName }}</h2>
                     <label class="col-span-5" for="depositClient">
                         <span>Cliente</span>
                         <select id="depositClient" v-model="clientId" class="input" name="depositClient">
@@ -115,19 +114,12 @@
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
-            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                Guardar
-            </PrimaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull" @click.prevent="isFull && save()"> Guardar </PrimaryBtn>
         </footer>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter, useRoute } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';

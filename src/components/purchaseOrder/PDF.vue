@@ -1,50 +1,161 @@
 <template>
-    <section id="toPds" class="order">
+    <section
+        id="toPDF"
+        ref="toPDF"
+        style="
+            border-radius: 0.5rem;
+            padding-left: 1.5rem;
+            padding-right: 1.5rem;
+            padding-top: 1.75rem;
+            width: 595px;
+            height: 838px;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: rgb(255, 255, 255);
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+            position: relative;
+        "
+    >
         <header>
-            <h2>
+            <h2 style="font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; margin-bottom: 1.5rem">
                 Orden de pedido -
-                <span>{{ '#' + info.purchaseOrder.id }}</span>
+                <span style="color: hsl(151, 65%, 30%)">{{ '#' + info.purchaseOrder.id }}</span>
             </h2>
-            <dl>
-                <dt>Cliente</dt>
-                <dd>{{ info.client }}</dd>
-                <dt>Pozo</dt>
-                <dd>{{ info.pit }}</dd>
+            <dl style="display: flex; margin-bottom: 2rem">
+                <dt style="font-weight: 500; margin-right: 0.25rem">Cliente</dt>
+                <dd style="font-weight: 400; color: rgb(107 114 128); margin-right: 2rem">{{ info.client }}</dd>
+                <dt style="font-weight: 500; margin-right: 0.25rem">Pozo</dt>
+                <dd style="font-weight: 400; color: rgb(107 114 128); margin-right: 2rem">{{ info.pit }}</dd>
             </dl>
         </header>
         <main>
-            <section class="detalle">
-                <h3>Arena</h3>
-                <article>
-                    <h4>{{ sandProviderName }}</h4>
-                    <dl v-for="arena in sandOrders" :key="arena?.id">
-                        <dt><span class="dot" /> Pedido:</dt>
-                        <dd>{{ arena?.amount }}t - {{ arena?.sandType }} - {{ arena?.boxId }}</dd>
+            <section style="margin-bottom: 1.25rem">
+                ="detalle"-->
+                <h3
+                    style="
+                        font-weight: 700;
+                        color: #117e49;
+                        margin-bottom: 1.25rem;
+                        text-transform: uppercase;
+                        font-size: 1.125rem;
+                        line-height: 1.75rem;
+                    "
+                >
+                    Arena
+                </h3>
+                <article
+                    style="
+                        padding-top: 0.75rem;
+                        padding-bottom: 0.75rem;
+                        padding-left: 1.25rem;
+                        background-color: #f9f9f9;
+                        border-left-width: 2px;
+                        border-color: hsl(151, 65%, 30%);
+                    "
+                >
+                    <h4 style="font-weight: 700">{{ sandProviderName }}</h4>
+                    <dl
+                        v-for="arena in sandOrders"
+                        :key="arena?.id"
+                        style="margin-bottom: 0.5rem; display: flex; flex-direction: column"
+                    >
+                        <dt style="display: flex; align-items: center; gap: 0.25rem; font-weight: 500">
+                            <span
+                                style="
+                                    width: 0.5rem;
+                                    height: 0.5rem;
+                                    background-color: hsl(151, 65%, 50%);
+                                    border-radius: 9999px;
+                                    display: inline-block;
+                                "
+                            />
+                            Pedido:
+                        </dt>
+                        <dd
+                            style="
+                                display: flex;
+                                align-items: center;
+                                gap: 0.25rem;
+                                margin-left: 0.75rem;
+                                font-weight: 400;
+                                color: rgb(107 114 128);
+                                margin-right: 2rem;
+                            "
+                        >
+                            {{ arena?.amount }}t - {{ arena?.sandType }} - {{ arena?.boxId }}
+                        </dd>
                     </dl>
                 </article>
             </section>
-            <section class="detalle">
-                <h3>Transporte</h3>
-                <article class="space-y-1">
-                    <h4>{{ transportProviderName }}</h4>
-                    <p v-for="line in formatTransportOrder" :key="line">{{ line }}</p>
+            <section style="margin-bottom: 1.25rem">
+                ="detalle"-->
+                <h3
+                    style="
+                        font-weight: 700;
+                        color: #117e49;
+                        margin-bottom: 1.25rem;
+                        text-transform: uppercase;
+                        font-size: 1.125rem;
+                        line-height: 1.75rem;
+                    "
+                >
+                    Transporte
+                </h3>
+                <article
+                    style="
+                        padding-top: 0.75rem;
+                        padding-bottom: 0.75rem;
+                        padding-left: 1.25rem;
+                        background-color: #f9f9f9;
+                        border-left-width: 2px;
+                        border-color: hsl(151, 65%, 30%);
+                    "
+                >
+                    <h4 style="font-weight: 700">{{ transportProviderName }}</h4>
+                    <p v-for="line in formatTransportOrder" :key="line" style="margin-top: 0.25rem">{{ line }}</p>
                 </article>
             </section>
-            <hr class="my-10" />
-            <section class="observaciones">
-                <h3>Observaciones</h3>
-                <dl>
-                    <dt>Fecha de entrega:</dt>
-                    <dd>{{ localDate }}</dd>
-                    <dt>Hora de entrega:</dt>
-                    <dd>{{ formatedTime }}</dd>
+            <hr style="border-color: rgb(209 213 219); margin-top: 2.5rem; margin-bottom: 2.5rem" />
+            <section style="font-size: 0.875rem; line-height: 1.25rem">
+                ="observaciones"-->
+                <h3
+                    style="
+                        font-size: 0.875rem;
+                        line-height: 1.25rem;
+                        font-weight: 700;
+                        margin-bottom: 1.25rem;
+                        text-transform: uppercase;
+                    "
+                >
+                    Observaciones
+                </h3>
+                <dl style="font-size: 0.875rem; line-height: 1.25rem; margin-bottom: 0.75rem">
+                    <dt style="font-weight: 500; margin-right: 0.25rem; display: inline">Fecha de entrega:</dt>
+                    <dd style="font-weight: 400; color: rgb(107 114 128); margin-right: 2rem; display: inline">
+                        {{ localDate }}
+                    </dd>
+                    <dt style="font-weight: 500; margin-right: 0.25rem; display: inline">Hora de entrega:</dt>
+                    <dd style="font-weight: 400; color: rgb(107 114 128); margin-right: 2rem; display: inline">
+                        {{ formatedTime }}
+                    </dd>
                 </dl>
-                <p>Observaciones:{{ info.observation }}</p>
+                <p style="font-size: 0.875rem; line-height: 1.25rem">Observaciones: {{ info.observation }}</p>
             </section>
         </main>
-        <footer>
-            <p>Responsable de carga</p>
-            <p>Confirma recepción</p>
+        <footer
+            style="
+                display: flex;
+                width: 100%;
+                justify-content: center;
+                column-gap: 75px;
+                position: absolute;
+                bottom: 2.5rem;
+                left: 0px;
+                right: 0px;
+            "
+        >
+            <p style="text-align: center; padding-top: 0.75rem; border-top-width: 1px">Responsable de carga</p>
+            <p style="text-align: center; padding-top: 0.75rem; border-top-width: 1px">Confirma recepción</p>
         </footer>
     </section>
 </template>
@@ -91,7 +202,6 @@
     });
     const transportOrder = computed(() => {
         const to = props.info.purchaseOrder?.transportOrders && props.info.purchaseOrder?.transportOrders[0];
-        console.log(to);
 
         if (!to) {
             return null;
@@ -144,9 +254,9 @@
     };
     const exportFilename = `orden_de_pedido_${props.info.purchaseOrder.id}.pdf`;
     const download = () => {
-        const doc = document.querySelector('#toPds');
+        const doc = document.querySelector('#toPDF');
         pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
-        console.log(toPDF.value);
+        console.log('PDF en HTMl', toPDF.value);
         worker.set(pdfOptions).from(doc).save(exportFilename);
     };
     const trueOrientation = ([width, height]) => {
@@ -156,79 +266,8 @@
     setTimeout(() => {
         download();
         setTimeout(() => {
-            // emit('close');
-            // router.push('/orden-de-pedido');
+            emit('close');
+            router.push('/orden-de-pedido');
         }, 1000);
     }, 500);
 </script>
-
-<style scoped lang="scss">
-    .order {
-        @apply rounded-lg px-6 pt-7 w-[595px] h-[838px] mx-auto bg-white shadow relative;
-        h2 {
-            @apply text-xl font-bold mb-6;
-            span {
-                @apply text-main-600;
-            }
-        }
-
-        dl {
-            @apply flex mb-8;
-            dt {
-                @apply font-medium mr-1;
-            }
-            dd {
-                @apply font-normal text-gray-500 mr-8;
-            }
-        }
-
-        .detalle {
-            @apply mb-5;
-            dl {
-                @apply mb-2 flex flex-col;
-                & :is(dt, dd) {
-                    @apply flex items-center gap-1;
-                }
-                dd {
-                    @apply ml-3;
-                }
-                .dot {
-                    @apply w-2 h-2 bg-main-400 rounded-full inline-block;
-                }
-            }
-            h3 {
-                @apply font-bold text-[#117E49] mb-5 uppercase text-lg;
-            }
-            article {
-                @apply py-3 pl-5 bg-[#f9f9f9] border-l-2 border-main-600;
-                h4 {
-                    @apply font-bold;
-                }
-            }
-        }
-
-        hr {
-            @apply border-gray-300;
-        }
-
-        .observaciones {
-            @apply text-sm;
-            h3 {
-                @apply text-sm font-bold mb-5 uppercase;
-            }
-            dl {
-                @apply text-sm mb-3;
-            }
-            p {
-                @apply text-sm;
-            }
-        }
-
-        footer {
-            @apply flex w-full justify-center gap-x-[75px] absolute bottom-10 inset-x-0;
-            p {
-                @apply text-center pt-3 border-t;
-            }
-        }
-    }
-</style>

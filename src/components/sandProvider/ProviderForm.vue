@@ -73,7 +73,7 @@
                     require-validation
                     entity="sandProvider"
                     @is-blured="checkMeshValidation"
-                    @change="addMeshType($event.target.value)"
+                    @update:data="addMeshType(String($event))"
                 />
             </div>
             <InvalidInputLabel v-if="!isMeshValid && wasMeshSelectBlured" validation-type="empty" />
@@ -134,7 +134,6 @@
             const meshTypes = ref([]);
 
             const filteredMeshTypes = computed(() => {
-                console.log('Mesh Types', sandProvider.value.meshType);
                 const selectedMeshTypes = sandProvider.value.meshType?.map((mesh) => mesh.id);
 
                 // *** Problemas. Asyncronismo

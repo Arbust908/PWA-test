@@ -1,7 +1,7 @@
 import { QueueItem } from '@/interfaces/sandflow';
 import { getLast } from './iteretionHelpers';
 
-enum QueueTransactions {
+export enum QueueTransactions {
     CradleATransporte = 'aTransporte',
     DepositoATransporte = 'aTranporte',
     CradleADeposito = 'Retiro',
@@ -10,7 +10,7 @@ enum QueueTransactions {
     DepositoACradle = 'aCradle',
 }
 
-interface SteppedQueue {
+export interface SteppedQueue {
     aTransporte: Array<QueueItem>;
     Retiro: Array<QueueItem>;
     deTransporte: Array<QueueItem>;
@@ -45,8 +45,7 @@ export const getOrder = (
 };
 
 const getOrderNumber = (queueNumbers: Array<number>, { min, max }: any) => {
-    console.log(queueNumbers);
-    let number = getLast(queueNumbers);
+    let number = getLast(queueNumbers) || max;
     number = number - 1;
     number = number < min ? max : number;
 
@@ -63,12 +62,16 @@ export const separateQueues = (queue: Array<QueueItem>): SteppedQueue => {
 
                 if (order <= 999999 && order >= 900000) {
                     acc.aTransporte.push(queueItem);
+                    acc.aTransporte = [...new Set(acc.aTransporte)];
                 } else if (order <= 99999 && order >= 90000) {
                     acc.Retiro.push(queueItem);
+                    acc.Retiro = [...new Set(acc.Retiro)];
                 } else if (order <= 9999 && order >= 9000) {
                     acc.deTransporte.push(queueItem);
+                    acc.deTransporte = [...new Set(acc.deTransporte)];
                 } else if (order <= 999 && order >= 500) {
                     acc.aCradle.push(queueItem);
+                    acc.aCradle = [...new Set(acc.aCradle)];
                 }
 
                 return acc;
@@ -76,5 +79,5 @@ export const separateQueues = (queue: Array<QueueItem>): SteppedQueue => {
             { ...defaultSteppedQueue } as SteppedQueue
         );
 
-    return steppedQueue;
+    return { ...steppedQueue };
 };

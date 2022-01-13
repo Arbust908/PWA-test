@@ -150,7 +150,6 @@
             const useFirstClient = ref(false);
             watch(useFirstClient, (newVal) => {
                 useFirstClient.value = newVal;
-                console.log(useFirstClient.value);
             });
             const useFirstPit = ref(false);
 
