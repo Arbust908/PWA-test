@@ -7,7 +7,7 @@
             :data="pit.name"
             @update:data="pit.name = $event"
         />
-        <AddDeleteBtn v-if="pits.length > 1" class="mt-2" purpose="remove" @click="removePit(pit.innerId)" />
+        <AddDeleteBtn v-if="pits.length > 1" class="mt-2" purpose="remove" @click.prevent="removePit(pit.innerId)" />
     </template>
 </template>
 

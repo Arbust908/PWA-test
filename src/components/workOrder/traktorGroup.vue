@@ -7,7 +7,10 @@
             title="Proveedor"
             placeholder="Selecciona Proveedor"
             endpoint="/transportProvider"
-            @change="sendDrivers"
+            @change="
+                sendDrivers();
+                traktor.chassis = -1;
+            "
         />
         <FieldSelect
             v-model:data="traktor.chassis"
@@ -81,11 +84,13 @@
     onMounted(async () => {
         const result = await axios.get(`${api}/driver`);
         drivers.value = result.data.data;
+        sendDrivers();
     });
 
-    const sendDrivers = () => {
-        traktor.value.chassis = -1;
+    traktor.value.supplier = Number(traktor.value.supplier);
+    traktor.value.chassis = Number(traktor.value.chassis);
 
+    const sendDrivers = () => {
         if (traktor.value.supplier > -1) {
             driversFiltered.value = drivers.value.filter(
                 (driver) => driver.transportProviderId === traktor.value.supplier

@@ -55,13 +55,25 @@
         <!-- *** -->
         <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
             <section class="gap-6 flex flex-wrap items-center">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </SecondaryBtn>
-                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                <SecondaryBtn btn="wide" :is-loading="isLoading" @click.prevent="$router.push('/orden-de-trabajo')">
+                    Cancelar
+                </SecondaryBtn>
+                <GhostBtn
+                    btn="text-green-700 border !border-green-700 hover:bg-second-200"
+                    :is-loading="isLoading"
+                    @click="save()"
+                >
                     <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
                 <PrimaryBtn v-if="!isLastSection()" btn="wide" @click="nextSection"> Siguiente </PrimaryBtn>
-                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                <PrimaryBtn
+                    v-else
+                    btn="wide"
+                    :disabled="!isAllFull"
+                    :is-loading="isLoading"
+                    @click="isAllFull && save(false)"
+                >
                     Finalizar
                 </PrimaryBtn>
             </section>
@@ -141,8 +153,10 @@
             const operativeForklift = ref(newCWO.value.operativeForklift);
             const backupForklift = ref(newCWO.value.backupForklift);
             const traktors = ref(newCWO.value.traktors);
+            const backupTraktors = ref(JSON.parse(JSON.stringify(newCWO.value.traktors)));
 
             const pickups = ref(newCWO.value.pickups);
+            const backupPickups = ref(JSON.parse(JSON.stringify(newCWO.value.pickups)));
 
             const crew = ref(newCWO.value.crew);
             const backupCrew = ref(JSON.parse(JSON.stringify(newCWO.value.crew)));
@@ -186,7 +200,9 @@
             const addCrew = (): void => {
                 const lastCrew = getLast(crews.value);
                 const lastId = lastCrew?.id + 1 || 2;
-                const numberForLetter = Math.max(Math.min(lastId + 64, 90), 65);
+                const lastLetter = lastCrew?.title?.split(' ')[1] || 'A';
+                const lastLetterCode = lastLetter.charCodeAt(0);
+                const numberForLetter = Math.max(Math.min(lastLetterCode + 1, 90), 65);
                 const crewLetter = String.fromCharCode(numberForLetter);
                 const timeStart = new Date().setHours(7);
                 const timeEnd = new Date().setHours(19);
@@ -362,7 +378,6 @@
 
                         if (pits.value.length > 0) {
                             const actionablePits = useCompareChanges(pits.value, backupPits.value);
-                            console.log('actionablePits', actionablePits);
                             const { changed, deleted, create } = actionablePits;
                             changed.forEach(async (pit: Pit) => {
                                 await useAxios(`/pit/${pit.id}`, { method: 'PUT', data: pit }, instance);
@@ -379,66 +394,36 @@
                         }
 
                         if (traktors.value.length > 0) {
-                            const isTraktorsFinished = ref([]);
-                            traktors.value.forEach((traktor) => {
-                                if (!traktor.id) {
-                                    const { data } = useAxios(
-                                        `/traktor/`,
-                                        {
-                                            method: 'POST',
-                                            data: { ...traktor, workOrderId: newVal.data.id },
-                                        },
-                                        instance
-                                    );
-                                    isTraktorsFinished.value.push(data);
-                                    newVal.data.traktors.push(traktor);
-                                } else {
-                                    const { data } = useAxios(
-                                        `/traktor/${traktor.id}`,
-                                        { method: 'PUT', data: traktor },
-                                        instance
-                                    );
-                                    isTraktorsFinished.value.push(data);
-                                    newVal.data.traktors = newVal.data.traktors.map((trak) => {
-                                        if (trak.id === traktor.id) {
-                                            return traktor;
-                                        }
-
-                                        return trak;
-                                    });
-                                }
+                            const actionableTraktors = useCompareChanges(traktors.value, backupTraktors.value);
+                            const { changed, deleted, create } = actionableTraktors;
+                            changed.forEach(async (traktor: Traktor) => {
+                                await useAxios(`/traktor/${traktor.id}`, { method: 'PUT', data: traktor }, instance);
+                            });
+                            deleted.forEach(async (traktor: Traktor) => {
+                                await useAxios(`/traktor/${traktor.id}`, { method: 'DELETE' }, instance);
+                            });
+                            create.forEach(async (traktor: Traktor) => {
+                                const { id: noUseId, ...newTraktor } = traktor;
+                                newTraktor.workOrderId = workOrderId;
+                                newTraktor.supplier = String(newTraktor.supplier);
+                                newTraktor.chassis = String(newTraktor.chassis);
+                                await useAxios(`/traktor`, { method: 'POST', data: newTraktor }, instance);
                             });
                         }
 
                         if (pickups.value.length > 0) {
-                            const isPickupFinished = ref([]);
-                            pickups.value.forEach((pickup) => {
-                                if (!pickup.id) {
-                                    const { data } = useAxios(
-                                        `/pickup/`,
-                                        {
-                                            method: 'POST',
-                                            data: { ...pickup, workOrderId: newVal.data.id },
-                                        },
-                                        instance
-                                    );
-                                    isPickupFinished.value.push(data.value);
-                                    newVal.data.pickups.push(pickup);
-                                } else {
-                                    const { data } = useAxios(
-                                        `/pickup/${pickup.id}`,
-                                        { method: 'PUT', data: pickup },
-                                        instance
-                                    );
-                                    isPickupFinished.value.push(data);
-                                    newVal.data.pickups = newVal.data.pickups.map((pick) => {
-                                        if (pick.id === pickup.id) {
-                                            return pickup;
-                                        }
-
-                                        return pick;
-                                    });
-                                }
+                            const actionablePickups = useCompareChanges(pickups.value, backupPickups.value);
+                            const { changed, deleted, create } = actionablePickups;
+                            changed.forEach(async (pickup: Pickup) => {
+                                await useAxios(`/pickup/${pickup.id}`, { method: 'PUT', data: pickup }, instance);
+                            });
+                            deleted.forEach(async (pickup: Pickup) => {
+                                await useAxios(`/pickup/${pickup.id}`, { method: 'DELETE' }, instance);
+                            });
+                            create.forEach(async (pickup: Pickup) => {
+                                const { id: noUseId, ...newPickup } = pickup;
+                                newPickup.workOrderId = workOrderId;
+                                await useAxios(`/pickup`, { method: 'POST', data: newPickup }, instance);
                             });
                         }
 
@@ -454,11 +439,16 @@
                                 for (const newRH of comparedResources.new) {
                                     const { id, ...newResource } = newRH;
                                     newResource.crewId = uCrewId;
+                                    newResource.role = String(newResource.role);
+                                    newResource.name = String(newResource.name);
                                     await axios.post(api + '/humanResource', newResource);
                                 }
                                 for (const changedRH of comparedResources.changed) {
+                                    console.log(comparedResources.changed);
                                     const { id, ...newResource } = changedRH;
                                     newResource.crewId = uCrewId;
+                                    newResource.role = String(newResource.role);
+                                    newResource.name = String(newResource.name);
                                     console.log('aaa', id);
                                     await axios.put(api + `/humanResource/${id}`, newResource);
                                 }
@@ -468,7 +458,7 @@
                             }
 
                             for (const crewToDelete of comparedCrews.deleted) {
-                                await axios.post(api + `/humanResource/${crewToDelete.id}`);
+                                await axios.delete(api + `/crew/${crewToDelete.id}`);
                             }
 
                             for (const crewToCreate of comparedCrews.new) {
@@ -479,6 +469,8 @@
                                     const crewId = createdCrew.data.data.id;
                                     const { id, ...newResource } = rrhh;
                                     newResource.crewId = crewId;
+                                    newResource.role = String(newResource.role);
+                                    newResource.name = String(newResource.name);
                                     await axios.post(api + '/humanResource', newResource);
                                 }
                             }
@@ -530,6 +522,7 @@
                 addCrew,
                 save,
                 isAllFull,
+                isLoading,
             };
         },
     };

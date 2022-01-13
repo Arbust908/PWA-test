@@ -22,7 +22,7 @@
                 v-if="pickups.length > 1"
                 :class="pickupI == 0 ? 'mt-7' : 'mt-2'"
                 purpose="remove"
-                @click="remove(pickup.id)"
+                @click.prevent="remove(pickup.innerId)"
             />
         </FieldGroup>
         <button class="mt-1 flex items-center col-span-6" @click.prevent="add">
@@ -64,7 +64,6 @@
             });
 
             const defaultPickup = {
-                id: 0,
                 pickupId: '',
                 description: '',
             };
@@ -75,15 +74,15 @@
 
             const firstIndex = 0;
             const pickupInnerId = ref(0);
-            pickups.value = pickups.value.map((pickup) => {
+            pickups.value = pickups.value.map((pickup: any) => {
                 pickupInnerId.value++;
-                pickup.innerId = pickup.innerId ?? pickupInnerId.value;
+                pickup.innerId = pickup?.innerId ?? pickupInnerId.value;
 
                 return pickup;
             });
             const remove = (id: number) => {
-                pickups.value = pickups.value.filter((pickup) => {
-                    if (pickup.id !== id) {
+                pickups.value = pickups.value.filter((pickup: any) => {
+                    if (pickup.innerId !== id) {
                         return pickup;
                     }
                 });
@@ -92,7 +91,7 @@
                 pickupInnerId.value++;
                 const newPickupId = pickupInnerId.value;
                 pickups.value.push({
-                    id: newPickupId,
+                    innerId: newPickupId,
                     pickupId: '',
                     description: '',
                 });

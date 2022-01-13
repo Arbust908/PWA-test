@@ -63,15 +63,33 @@
         <!-- *** -->
         <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
             <section class="gap-6 flex flex-wrap items-right">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')">Cancelar</SecondaryBtn>
-                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                <SecondaryBtn btn="wide" :is-loading="isLoading" @click.prevent="$router.push('/orden-de-trabajo')"
+                    >Cancelar</SecondaryBtn
+                >
+                <GhostBtn
+                    btn="text-green-700 border !border-green-700 hover:bg-second-200"
+                    :is-loading="isLoading"
+                    @click="save()"
+                >
                     <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
-                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection">
+                <PrimaryBtn
+                    v-if="!isLastSection()"
+                    btn="wide"
+                    :loading="isLoading"
+                    :is-loading="isLoading"
+                    @click="nextSection"
+                >
                     Siguiente
                 </PrimaryBtn>
-                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                <PrimaryBtn
+                    v-else
+                    btn="wide"
+                    :disabled="!isAllFull"
+                    :is-loading="isLoading"
+                    @click="isAllFull && save(false)"
+                >
                     Finalizar
                 </PrimaryBtn>
             </section>
@@ -379,6 +397,8 @@
                                 for (const traktor of traktors.value) {
                                     const { id, ...newTraktor } = traktor;
                                     newTraktor.workOrderId = workOrderId;
+                                    newTraktor.supplier = String(newTraktor.supplier);
+                                    newTraktor.chassis = String(newTraktor.chassis);
                                     await axios.post(api + '/traktor', newTraktor);
                                 }
                             }
@@ -400,6 +420,8 @@
                                         const crewId = createdCrew.data.data.id;
                                         const { id, ...newResource } = rrhh;
                                         newResource.crewId = crewId;
+                                        newResource.name = String(newResource.name);
+                                        newResource.role = String(newResource.role);
                                         await axios.post(api + '/humanResource', newResource);
                                     }
                                 }
