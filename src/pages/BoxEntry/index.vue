@@ -556,6 +556,10 @@
 
     onMounted(async () => {
         sandTypes.value = await getSand();
+        sandTypes.value = sandTypes.value.filter((type) => {
+            return type.visible;
+        });
+
         purchaseOrders.value = await getPurchaseOrders();
         warehouses.value = await getWarehouses();
         cradles.value = await getCradles();
