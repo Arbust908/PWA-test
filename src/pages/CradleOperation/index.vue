@@ -39,7 +39,6 @@
                 <CradleSlot
                     v-for="(slot, index) in cradleSlots"
                     :key="index"
-                    class="slot"
                     :cradles="cradles"
                     :index="index"
                     :cradle-slots="cradleSlots"
@@ -207,17 +206,31 @@
 
             watchEffect(async () => {
                 if (cradleId.value !== -1) {
+                    console.log('cradleId', cradleId.value);
+
                     selectedCradle.value = cradles.value.filter((cradle) => {
+                        console.log('cradle', cradle);
+
                         return cradle.id == cradleId.value;
                     })[0];
+
                     cradleSlots.value = selectedCradle.value.slots;
+
                     cradleSlots.value.forEach((slot) => {
                         const { sandTypeId } = slot;
-                        let sandType = sandTypes.value.filter((sandType) => {
-                            if (sandType.id == sandTypeId) {
-                                return sandType;
-                            }
-                        })[0].type;
+                        console.log('sandTypeId', { sandTypeId });
+                        console.log('slot', slot);
+                        let sandType = sandTypes.value.find((sandType) => {
+                            console.log('sandType', sandType);
+
+                            return sandType.id == sandTypeId;
+                        });
+
+                        if (sandType) {
+                            sandType = sandType.type;
+                        }
+                        console.log('sandType', sandType);
+
                         slot.sandType = sandType;
                     });
                 }
@@ -226,7 +239,6 @@
                     await getFilteredCradles();
                 }
             });
-
             // :: CLIENT
             const selectedClientName = computed(() => {
                 return clientId.value >= 0 ? clients.value.find((pit) => pit.id === clientId.value).name : '';

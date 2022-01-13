@@ -1,5 +1,5 @@
 <template>
-    <article v-if="box.boxId > 0" :class="isClicked ? 'ring' : null" @click.self="isClickedAndSelected">
+    <article v-if="box.boxId > 0" class="slot" :class="isClicked ? 'ring' : null" @click.self="isClickedAndSelected">
         <span class="station-title" @click.self="isClickedAndSelected">
             Estación {{ index + 1 }} - {{ box.boxId }}</span
         >
@@ -47,10 +47,16 @@
             </div>
         </div>
     </article>
+    <article v-else-if="box && box.boxId === null">
+        <div class="slot empty">
+            <span class="station-title">Estación {{ index + 1 }}</span>
+            <span class="copy">Sin Caja</span>
+        </div>
+    </article>
     <article v-else>
         <div class="slot empty">
             <span class="station-title">Estación {{ index + 1 }}</span>
-            <span class="copy">Seleccione cliente, etapa y cradle.</span>
+            <span class="copy">Seleccione cliente, pozo y cradle.</span>
         </div>
     </article>
 </template>
@@ -156,7 +162,7 @@
         }
     }
     .cradle-slots {
-        @apply pl-12 pr-12 pb-12 grid grid-cols-1 gap-4 justify-between items-center;
+        @apply pl-12 pr-12 pb-12 grid grid-cols-1 gap-4  items-center;
 
         @screen lg {
             @apply grid-cols-4;
@@ -167,7 +173,7 @@
             @apply border-dashed border-2 border-second-300 rounded-lg p-4 cursor-pointer flex flex-col text-center;
 
             &:not(.empty) {
-                @apply justify-between bg-gray-100 border-none;
+                @apply bg-gray-100 border-none;
             }
 
             &.without-box {
