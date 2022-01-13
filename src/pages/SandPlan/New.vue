@@ -52,7 +52,7 @@
                                 <SandPlanStage
                                     v-for="(stage, Key) in inProgressStages"
                                     :key="Key"
-                                    :pos="Key + 1"
+                                    :pos="Key"
                                     :stage="stage"
                                     :editing="editingStage"
                                     :sands="sands"
@@ -102,7 +102,7 @@
                     <ResposiveTableSandPlan
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
-                        :pos="Key + 1"
+                        :pos="Key"
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
