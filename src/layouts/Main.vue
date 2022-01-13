@@ -216,6 +216,10 @@
                         return true;
                     }
 
+                    if (nav.keep) {
+                        return nav.keep;
+                    }
+
                     if (nav.subNav) {
                         nav.subNav = nav.subNav.filter((subNav) => {
                             return permissions.view.includes(subNav.title);
