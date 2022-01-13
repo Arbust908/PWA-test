@@ -47,6 +47,13 @@ const Stage_Sheet = {
     icon: 'DocumentReport',
     title: 'StageSheet',
 };
+const Forklift_Operation = {
+    name: 'Operacion en forklift',
+    to: '/operacion-en-forklift',
+    icon: 'SwitchHorizontal',
+    title: 'ForkliftOperation',
+    keep: true,
+};
 const LINE = {
     name: 'LINE',
 };
@@ -104,6 +111,7 @@ export default {
             Ingreso_de_cajas,
             Operación_en_Cradle,
             Stage_Sheet,
+            Forklift_Operation,
             LINE,
             {
                 name: 'Proveedores',
