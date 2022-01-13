@@ -20,7 +20,6 @@
                             "
                         />
                     </span>
-                    {{ cradleId }}
                 </FieldGroup>
 
                 <fieldset class="py-2 col-span-6 flex flex-col gap-x-10 2xl:gap-x-40">
