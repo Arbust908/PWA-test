@@ -1,5 +1,5 @@
 <template>
-    <Layout>
+    <Layout class="bg-white sm:bg-gray-100">
         <ABMFormTitle title="Planificación de arenas" />
         <section>
             <form method="POST" action="/" class="py-4">
@@ -29,12 +29,12 @@
                             @click.prevent="addStage"
                         >
                             <Icon icon="PlusCircle" class="w-7 h-7 text-green-500 mr-1" />
-                            <span class="font-bold"> Agregar etapa </span>
+                            <span class="flex self-center font-bold mb-1"> Agregar etapa </span>
                         </button>
                     </section>
                     <section class="flex space-x-4">
                         <Icon
-                            icon="ChevronUp"
+                            icon="ChevronDown"
                             outline
                             :opened="currentOpened"
                             :class="currentOpened ? 'rotate-180' : null"
@@ -54,8 +54,9 @@
                                     <tbody v-show="currentOpened" class="">
                                         <SandPlanStage
                                             v-for="(stage, Key) in inProgressStages"
+                                            :class="isNotLast(Key, inProgressStages) && 'border-b border-gray-200'"
                                             :key="Key"
-                                            :pos="Key + 1"
+                                            :pos="Key"
                                             :stage="stage"
                                             :editing="editingStage"
                                             :sands="sands"
@@ -79,10 +80,12 @@
         </section>
         <section class="bg-white rounded-md shadow-sm block sm:hidden">
             <form method="POST" action="/" class="flex flex-col rounded border-solid border-black">
-                <header class="flex justify-between px-3 pb-3 pt-4 border-b-1 border-solid border-black">
-                    <section class="flex space-x-4">
-                        <h2 class="font-semibold">
-                            <span class="pl-6">Pozo</span>
+                <header
+                    class="flex justify-between px-3 pb-3 pt-4 border-2 border-b-0 border-solid bg-gray-100 rounded-t-lg"
+                >
+                    <section class="flex space-x-4 self-center">
+                        <h2 class="font-bold">
+                            <span class="pl-6">Pozo </span>
                             <span>{{ selectedPitName }}</span>
                         </h2>
                     </section>
@@ -95,7 +98,7 @@
                             @click.prevent="toggleCurOp"
                         >
                             <Icon
-                                icon="ChevronUp"
+                                icon="ChevronDown"
                                 outline
                                 :opened="currentOpened"
                                 :class="currentOpened ? 'rotate-180' : null"
@@ -104,11 +107,11 @@
                         </button>
                     </section>
                 </header>
-                <div v-show="currentOpened" class="flex flex-col p-4">
+                <div v-show="currentOpened" class="pr-8 pl-2 border-2 border-solid rounded-b-lg">
                     <ResposiveTableSandPlan
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
-                        :pos="Key + 1"
+                        :pos="Key"
                         :stage="stage"
                         :editing="editingStage"
                         :sands="sands"
@@ -176,6 +179,7 @@
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import { isNotLast } from '@/helpers/iteretionHelpers';
 
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
@@ -553,6 +557,7 @@
                 toggleErrorModal,
                 showApiErrorModal,
                 toggleApiErrorModal,
+                isNotLast,
             };
         },
     };

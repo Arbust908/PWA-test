@@ -82,15 +82,6 @@
             PrimaryBtn,
             ErrorModal,
         },
-        data() {
-            return {
-                error: {
-                    username: false,
-                    password: false,
-                    new_password: false,
-                },
-            };
-        },
         setup() {
             const apiUrl = import.meta.env.VITE_API_URL || '/api';
             const router = useRouter();
@@ -148,6 +139,7 @@
                 const response = await axios.post(`${apiUrl}/auth/login`, user).catch((err) => {
                     console.log(err);
                     toggleModal(true);
+
                     return false;
                 });
                 console.log(response);
@@ -166,6 +158,15 @@
                 toggleModal,
                 email,
                 password,
+            };
+        },
+        data() {
+            return {
+                error: {
+                    username: false,
+                    password: false,
+                    new_password: false,
+                },
             };
         },
     });
