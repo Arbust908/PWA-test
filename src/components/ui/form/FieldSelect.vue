@@ -120,7 +120,6 @@
             const noOptionSelected = computed(() => value.value === -1);
 
             const selectClasses = computed(() => {
-                console.log(value.value);
                 return props.selectClass && value.value === -1 ? 'error' : null;
             });
 

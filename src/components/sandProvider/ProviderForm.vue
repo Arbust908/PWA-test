@@ -134,7 +134,6 @@
             const meshTypes = ref([]);
 
             const filteredMeshTypes = computed(() => {
-                console.log('Mesh Types', sandProvider.value.meshType);
                 const selectedMeshTypes = sandProvider.value.meshType?.map((mesh) => mesh.id);
 
                 // *** Problemas. Asyncronismo
@@ -144,7 +143,7 @@
             const addMeshType = (newMeshType: string) => {
                 // check duplicates
                 const exists = sandProvider.value.meshType.map((mesh) => mesh.id).includes(newMeshType);
-                console.log('NMT', newMeshType);
+
                 if (exists) {
                     return;
                 }
