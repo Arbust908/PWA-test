@@ -298,6 +298,12 @@ const routes: Array<RouteRecordRaw> = [
         beforeEnter: isAdmin,
     },
     {
+        path: '/cierre-de-operaciones',
+        name: 'CloseOfOperation',
+        component: () => import('@/pages/CloseOfOperations/index.vue'),
+        beforeEnter: isLogged,
+    },
+    {
         path: '/operacion-en-forklift',
         name: 'ForkliftOperation',
         component: () => import('@/pages/ForkliftOperation/index.vue'),

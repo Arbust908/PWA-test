@@ -162,7 +162,7 @@
                 </div>
             </div>
 
-            <main class="flex-1 relative overflow-y-auto focus:outline-none p-4 md:p-6 lg:p-8 gutter-stable-both">
+            <main class="flex-1 relative overflow-y-auto focus:outline-none p-2 md:p-4 gutter-stable-both">
                 <div class="max-w-7xl">
                     <slot></slot>
                 </div>
