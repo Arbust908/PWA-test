@@ -327,7 +327,6 @@
                 category: '',
             });
             const selectBox = (box: Box) => {
-                console.log(box);
                 selectedBox.value = box;
             };
             const setCat = (cat: string) => {

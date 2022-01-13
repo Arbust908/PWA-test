@@ -205,18 +205,11 @@
             const sidebarOpen = ref(false);
             const navigation = computed(() => {
                 const hasCustom = store.state.global.isCustom;
-
-                // if (hasCustom) {
-                //     console.log('has custom');
-
-                //     return store.state.global.navigation;
-                // }
                 //Filtramos los items por permiso
                 const navigationItems = JSON.parse(JSON.stringify(store.state.global.navigation));
                 //TODO: usar el permissionManager
                 const storePermissions = store.state.loggedUser.permissions || [];
                 const permissions = JSON.parse(JSON.stringify(storePermissions));
-                // console.log('permissions', permissions);
 
                 const fN = navigationItems.filter((nav) => {
                     if (nav.name === 'LINE') {
@@ -233,10 +226,6 @@
 
                     return permissions.view.includes(nav.title);
                 });
-                // store.commit('SET_NEW_NAVIGATION', fN);
-                // store.commit('SET_CUSTOM');
-
-                // console.log('Custome', fN);
 
                 return fN;
             });

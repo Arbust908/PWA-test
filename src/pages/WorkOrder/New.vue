@@ -322,10 +322,6 @@
             });
             // Is all sections full
             const isAllFull = computed(() => {
-                console.log('RRHHFULL', isRRHHFull.value);
-                console.log('isOrderFull', isOrderFull.value);
-                console.log('isEquipmentFull', isEquipmentFull.value);
-
                 return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
             });
 
@@ -342,14 +338,11 @@
             const save = async (draft = true) => {
                 toggleLoading(true);
                 toggleDraft(draft);
-                crews.value.map((crew: Crew) => {
-                    console.log(crew.title);
-                    console.log(new Date(crew.timeEnd));
-                    console.log(new Date(crew.timeStart));
-                    crew.resources.map((rrhh: HumanResource) => {
-                        console.log('resource', rrhh);
-                    });
-                });
+                // crews.value.map((crew: Crew) => {
+                //     crew.resources.map((rrhh: HumanResource) => {
+                //         console.log('resource', rrhh);
+                //     });
+                // });
 
                 // removeAllEmptys();
                 const newWO = {

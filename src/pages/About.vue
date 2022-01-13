@@ -31,9 +31,7 @@
     const title = useTitle(`  About <> Sandflow  `);
     const showBD = ref(false);
     const toggleBD = () => {
-        console.log('show BD', showBD.value);
         showBD.value = !showBD.value;
-        console.log('show BD', showBD.value);
     };
 
     setInterval(() => {
@@ -47,7 +45,6 @@
             return false;
         });
         queue.value = response.data.data;
-        console.log(getOrder(queue.value));
     });
 </script>
 

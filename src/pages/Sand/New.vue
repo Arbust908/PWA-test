@@ -107,7 +107,6 @@
 
             const save = async () => {
                 isLoading.value = true;
-                console.log(newSand);
                 const response = await axios.post(`${api}/sand`, newSand).catch((err) => {
                     console.log(err);
                     toggleApiErrorModal;

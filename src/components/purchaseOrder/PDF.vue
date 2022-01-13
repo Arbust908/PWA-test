@@ -181,7 +181,6 @@
 
     const sandOrders = computed(() => {
         const so = props.info.purchaseOrder?.sandOrders;
-        console.log('Sand order', so);
         const sand = props.info.purchaseOrder?.sands;
 
         if (!so) {

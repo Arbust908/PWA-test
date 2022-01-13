@@ -315,8 +315,6 @@
                 crews.value = crews.value
                     .map((crew: Crew) => removeEmptyResource(crew.id))
                     .filter((crew: Crew) => {
-                        console.log(crew);
-
                         return !(crew.resources.length <= 0 && crew.timeStart === '' && crew.timeEnd === '');
                     });
 
@@ -444,12 +442,10 @@
                                     await axios.post(api + '/humanResource', newResource);
                                 }
                                 for (const changedRH of comparedResources.changed) {
-                                    console.log(comparedResources.changed);
                                     const { id, ...newResource } = changedRH;
                                     newResource.crewId = uCrewId;
                                     newResource.role = String(newResource.role);
                                     newResource.name = String(newResource.name);
-                                    console.log('aaa', id);
                                     await axios.put(api + `/humanResource/${id}`, newResource);
                                 }
                                 for (const deleteRH of comparedResources.deleted) {

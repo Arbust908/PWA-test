@@ -335,7 +335,6 @@
         const result = await axios.get(`${api}/driver`);
         drivers.value = result.data.data;
         const result2 = await axios.get(`${api}/sandProvider`);
-        console.log(result2.data.data);
     });
 
     useTitle('Nueva orden de pedido <> Sandflow');
@@ -381,7 +380,6 @@
                 return sandProvider;
             }
         });
-        console.log('holi');
         filteredSandTypes.value = provider.meshType;
     };
 
