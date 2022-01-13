@@ -53,6 +53,12 @@ const Deposito_de_cajas_vacias = {
     icon: 'Archive',
     title: 'EmptyBoxDeposit',
 };
+const Destino_de_cajas_vacias = {
+    name: 'Destino de cajas vacias',
+    to: '/Destino-cajas-vacias',
+    icon: 'Archive',
+    title: 'EmptyBox',
+};
 const LINE = {
     name: 'LINE',
 };
@@ -111,6 +117,7 @@ export default {
             Operación_en_Cradle,
             Stage_Sheet,
             Deposito_de_cajas_vacias,
+            Destino_de_cajas_vacias,
             LINE,
             {
                 name: 'Proveedores',
