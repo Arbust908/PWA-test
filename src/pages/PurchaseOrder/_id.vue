@@ -112,13 +112,7 @@
             </form>
             <footer class="p-4 space-x-8 flex justify-end">
                 <SecondaryBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
-                <PrimaryBtn
-                    type="submit"
-                    size="sm"
-                    class="p-4"
-                    :disabled="!isFull ? 'yes' : null"
-                    @click.prevent="isFull && save()"
-                >
+                <PrimaryBtn type="submit" size="sm" class="p-4" :disabled="!isFull" @click.prevent="isFull && save()">
                     Guardar Orden
                 </PrimaryBtn>
             </footer>

@@ -6,9 +6,9 @@
         </div>
         <div class="flex flex-col justify-between">
             <div>
-                <p class="text-sm font-bold leading-tight">Nivel: {{ floor }}</p>
-                <p class="text-sm font-bold leading-tight">Columna: {{ col }}</p>
-                <p class="text-sm font-bold leading-tight">Fila: {{ row }}</p>
+                <p class="text-sm font-bold leading-tight">Nivel: {{ floor ? floor : '-' }}</p>
+                <p class="text-sm font-bold leading-tight">Columna: {{ col ? col : '-' }}</p>
+                <p class="text-sm font-bold leading-tight">Fila: {{ row ? row : '-' }}</p>
             </div>
             <p v-if="difRender" class="text-sm">{{ makeValue != null ? makeValue : 'Arena ' + sandName }}</p>
             <div v-if="choosedBox && !difRender" class="extra-data mt-4">
@@ -32,15 +32,15 @@
         props: {
             floor: {
                 type: Number,
-                required: true,
+                default: 0,
             },
             row: {
                 type: Number,
-                required: true,
+                default: 0,
             },
             col: {
                 type: Number,
-                required: true,
+                default: 0,
             },
             category: {
                 type: String,

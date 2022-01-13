@@ -27,8 +27,6 @@
 </template>
 
 <script>
-    import { defineComponent, computed, ref, toRefs, watch, watchEffect } from 'vue';
-    import { useVModel } from '@vueuse/core';
     import { useApi } from '@/helpers/useApi';
     import { addVisibleFilter } from '@/helpers/useUrlHelpers';
     import FieldTitle from '@/components/ui/form/FieldTitle.vue';

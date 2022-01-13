@@ -61,7 +61,7 @@
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
                 <PrimaryBtn v-if="!isLastSection()" btn="wide" @click="nextSection"> Siguiente </PrimaryBtn>
-                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull" @click="isAllFull && save(false)">
                     Finalizar
                 </PrimaryBtn>
             </section>
@@ -186,7 +186,9 @@
             const addCrew = (): void => {
                 const lastCrew = getLast(crews.value);
                 const lastId = lastCrew?.id + 1 || 2;
-                const numberForLetter = Math.max(Math.min(lastId + 64, 90), 65);
+                const lastLetter = lastCrew?.title?.split(' ')[1] || 'A';
+                const lastLetterCode = lastLetter.charCodeAt(0);
+                const numberForLetter = Math.max(Math.min(lastLetterCode + 1, 90), 65);
                 const crewLetter = String.fromCharCode(numberForLetter);
                 const timeStart = new Date().setHours(7);
                 const timeEnd = new Date().setHours(19);
@@ -468,7 +470,7 @@
                             }
 
                             for (const crewToDelete of comparedCrews.deleted) {
-                                await axios.post(api + `/humanResource/${crewToDelete.id}`);
+                                await axios.delete(api + `/crew/${crewToDelete.id}`);
                             }
 
                             for (const crewToCreate of comparedCrews.new) {

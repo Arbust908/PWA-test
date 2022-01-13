@@ -90,10 +90,6 @@
     const toggleNIM = useToggle(noIdModal);
 
     const isActiveBox = (boxId: string) => {
-        console.log(props.selectedBox.boxId);
-        console.log(boxId);
-        console.log(props.selectedBox.boxId === boxId);
-
         return props.selectedBox.boxId === boxId;
     };
 

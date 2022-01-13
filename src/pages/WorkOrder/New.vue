@@ -71,7 +71,7 @@
                 <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection">
                     Siguiente
                 </PrimaryBtn>
-                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull" @click="isAllFull && save(false)">
                     Finalizar
                 </PrimaryBtn>
             </section>

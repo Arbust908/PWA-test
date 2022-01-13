@@ -1,6 +1,7 @@
 <template>
     <section
-        id="toPds"
+        id="toPDF"
+        ref="toPDF"
         style="
             border-radius: 0.5rem;
             padding-left: 1.5rem;
@@ -168,6 +169,8 @@
         },
     });
     const emit = defineEmits(['close']);
+
+    const toPDF = ref(null);
     const sandProviderName = computed(() => {
         return props.info.purchaseOrder?.sandProvider?.name;
     });
@@ -252,8 +255,9 @@
     };
     const exportFilename = `orden_de_dedido_${props.info.purchaseOrder.id}.pdf`;
     const download = () => {
-        const doc = document.querySelector('#toPds');
+        const doc = document.querySelector('#toPDF');
         pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
+        console.log('PDF en HTMl', toPDF.value);
         worker.set(pdfOptions).from(doc).save(exportFilename);
     };
     const trueOrientation = ([width, height]) => {
