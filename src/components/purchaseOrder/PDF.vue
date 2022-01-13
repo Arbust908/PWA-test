@@ -252,7 +252,7 @@
             orientation: 'p',
         },
     };
-    const exportFilename = `orden_de_dedido_${props.info.purchaseOrder.id}.pdf`;
+    const exportFilename = `orden_de_pedido_${props.info.purchaseOrder.id}.pdf`;
     const download = () => {
         const doc = document.querySelector('#toPDF');
         pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
