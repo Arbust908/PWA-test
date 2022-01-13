@@ -180,8 +180,8 @@
 
     useTitle('Ingreso de Cajas <> Sandflow');
     const router = useRouter();
-    let activeSection = ref('deposit');
-    let boxes = ref([]);
+    const activeSection = ref('deposit');
+    const boxes = ref([]);
 
     const purchaseOrders = ref([]);
     const sandOrders = ref([]);
@@ -488,6 +488,23 @@
         const cradleData = cradles.value.find((c) => {
             return c.id === cradleId;
         });
+
+        console.log('inDepo', inDepoBoxes.value);
+        console.log('CurrPO', selectedPurchaseOrder.value);
+        const toFilterBoxes = selectedPurchaseOrder.value.sandOrders;
+
+        // const boxesToQueue =
+
+        toFilterBoxes.map((box) => {
+            console.log('box', box);
+
+            if (box.location) {
+                const { floor, row, col, ...location } = box.location;
+                console.log('location', box.location);
+            }
+        });
+
+        return;
 
         if (cradleId !== 0) {
             wasCradleModificated.value = true;
