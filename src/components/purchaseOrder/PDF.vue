@@ -1,5 +1,5 @@
 <template>
-    <section id="toPds" class="order">
+    <section id="toPDF" ref="toPDF" class="order">
         <header>
             <h2>
                 Orden de pedido -
@@ -144,9 +144,9 @@
     };
     const exportFilename = `orden_de_dedido_${props.info.purchaseOrder.id}.pdf`;
     const download = () => {
-        const doc = document.querySelector('#toPds');
+        const doc = document.querySelector('#toPDF');
         pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
-        console.log(toPDF.value);
+        console.log('PDF en HTMl', toPDF.value);
         worker.set(pdfOptions).from(doc).save(exportFilename);
     };
     const trueOrientation = ([width, height]) => {
@@ -156,8 +156,8 @@
     setTimeout(() => {
         download();
         setTimeout(() => {
-            // emit('close');
-            // router.push('/orden-de-pedido');
+            emit('close');
+            router.push('/orden-de-pedido');
         }, 1000);
     }, 500);
 </script>

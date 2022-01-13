@@ -1,149 +1,135 @@
 <template>
-    <button
-        :class="['box', cardClass, isTheSelected ? 'selected' : null, isBlocked() ? 'blocked' : null]"
-        @click.prevent="selectBox"
-    >
-        <span class="text-sm">{{ id }}</span>
+    <button :class="[boxClassess]" class="box" @click.prevent="selectBox">
+        <span class="text-sm">{{ sandInfo?.id }}</span>
+        <!-- {{ sandInfo }} -->
     </button>
 </template>
 
-<script lang="ts">
-    import { defineComponent, ref, toRefs, computed } from 'vue';
+<script setup lang="ts">
     import { Box } from '@/interfaces/sandflow';
+    import { getBoxClasses } from '@/helpers/useWarehouse';
 
-    export default defineComponent({
-        name: 'DepositBox',
-        props: {
-            selectedBox: {
-                type: Object,
-                required: true,
-            },
-            floor: {
-                type: Number,
-                required: true,
-            },
-            row: {
-                type: Number,
-                required: true,
-            },
-            col: {
-                type: Number,
-                required: true,
-            },
-            visibleCategories: {
-                type: Array,
-                required: false,
-                default: () => undefined,
-            },
-            boxData: {
-                type: Object,
-                required: false,
-                default: ref({}),
-            },
+    const props = defineProps({
+        selectedBox: {
+            type: Object,
+            required: true,
         },
-        emits: ['select-box'],
-        setup(props, { emit }) {
-            let { floor, row, col, selectedBox, boxData } = toRefs(props);
-
-            const category = computed(() => {
-                return boxData && boxData.value ? boxData.value.category : 'empty';
-            });
-
-            const cardClass = computed(() => {
-                switch (category.value) {
-                    case '1':
-                        return 'mesh-type__1 boxCard';
-                    case '2':
-                        return 'mesh-type__2 boxCard';
-                    case '3':
-                        return 'mesh-type__3 boxCard';
-                    case '4':
-                        return 'mesh-type__4 boxCard';
-                    case '5':
-                        return 'mesh-type__5 boxCard';
-                    case 'empty':
-                        return 'mesh-type__empty boxCard';
-                    case 'aisle':
-                        return 'mesh-type__taken aisle';
-                    case 'cradle':
-                        return 'mesh-type__taken cradle';
-                }
-            });
-
-            const id = computed(() => {
-                return boxData && boxData.value ? boxData.value.id : '';
-            });
-
-            const selectBox = () => {
-                const box: Box = {
-                    floor: floor.value,
-                    row: row.value,
-                    col: col.value,
-                    category: category.value || '',
-                    id: id.value || '',
-                };
-                emit('select-box', box);
-            };
-
-            const isTheSelected = computed(() => {
-                return (
-                    selectedBox.value.row === row.value &&
-                    selectedBox.value.col === col.value &&
-                    selectedBox.value.floor === floor.value
-                );
-            });
-
-            let visibleCategories = ref(props.visibleCategories);
-
-            const isBlocked = () => {
-                if (!visibleCategories.value) {
-                    return false;
-                }
-
-                if (!visibleCategories.value.includes(category.value)) {
-                    return true;
-                }
-
-                if (category.value == 'aisle') {
-                    return true;
-                } else {
-                    return false;
-                }
-            };
-
-            return {
-                category,
-                cardClass,
-                selectBox,
-                isTheSelected,
-                isBlocked,
-                id,
-            };
+        floor: {
+            type: Number,
+            required: true,
         },
+        row: {
+            type: Number,
+            required: true,
+        },
+        col: {
+            type: Number,
+            required: true,
+        },
+        visibleCategories: {
+            type: Array,
+            required: false,
+            default: () => undefined,
+        },
+        boxData: {
+            type: Object,
+            required: false,
+            default: ref({}),
+        },
+        sandInfo: {
+            type: Object,
+            required: false,
+            default: ref({}),
+        },
+    });
+    const emits = defineEmits(['select-box']);
+    let { floor, row, col, selectedBox, boxData } = toRefs(props);
+
+    const category = computed(() => {
+        return boxData && boxData.value ? boxData.value.category : 'empty';
+    });
+
+    const boxClassess = computed(() => {
+        let bC = '';
+
+        if (props.sandInfo?.sandTypeId) {
+            bC += getBoxClasses(String(props.sandInfo?.sandTypeId));
+        } else {
+            bC += getBoxClasses(category.value);
+        }
+
+        if (isBlocked()) {
+            bC += ' not-shown';
+        }
+
+        if (isTheSelected.value) {
+            bC += ' selected';
+        }
+
+        if (beenSet.value) {
+            bC += ' been-set';
+        }
+
+        return bC;
+    });
+
+    const id = computed(() => {
+        return boxData?.value?.id || '';
+    });
+
+    const selectBox = () => {
+        if (category.value == 'aisle' || category.value == 'cradle' || isBlocked()) {
+            console.log('Bloqueo');
+
+            return;
+        }
+        console.log('selectBox', selectedBox.value);
+        const box: Box = {
+            floor: floor.value,
+            row: row.value,
+            col: col.value,
+            category: category.value || '',
+            id: id.value || '',
+        };
+        console.log('selectBox', box);
+        emits('select-box', box);
+    };
+
+    const isTheSelected = computed(() => {
+        return (
+            selectedBox.value.row === row.value &&
+            selectedBox.value.col === col.value &&
+            selectedBox.value.floor === floor.value
+        );
+    });
+
+    let visibleCategories = ref(props.visibleCategories);
+
+    const isBlocked = () => {
+        if (!visibleCategories.value) {
+            return false;
+        }
+
+        if (category.value == 'aisle' || category.value == 'cradle') {
+            return false;
+        }
+
+        if (!visibleCategories.value.includes(Number(category.value))) {
+            return true;
+        }
+
+        return false;
+    };
+    const beenSet = computed(() => {
+        return props.sandInfo?.location?.been_set || false;
     });
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
     @import '@/assets/box.scss';
-    .box {
-        @apply h-[58px] w-[58px] rounded bg-second-300;
-
-        &.blocked {
-            @apply relative z-10;
-            &:after {
-                content: '';
-                @apply absolute z-40 inset-0 border-none opacity-75 border bg-red-700 m-1 rounded;
-                background: repeating-linear-gradient(
-                    135deg,
-                    rgba(0, 0, 0, 0),
-                    rgba(0, 0, 0, 0) 5px,
-                    rgba(185, 28, 28, 1) 5px,
-                    rgba(185, 28, 28, 1) 10px
-                );
-            }
-        }
-        &.selected {
-            @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
-        }
+</style>
+<style lang="scss" scoped>
+    .been-set {
+        @apply cursor-not-allowed border;
     }
 </style>

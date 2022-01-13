@@ -102,24 +102,40 @@
     };
   };
   &__taken {
-    @apply text-white;
+    @apply text-white cursor-not-allowed;
     &.cradle {
       @apply bg-indigo-900;
       &-clickable{
-        @apply border-indigo-900 text-indigo-900
+        @apply border-indigo-900 text-indigo-900;
       }
       &.icon{
         color: #6160A3;
       };
     };
     &.aisle {
-      @apply bg-zinc-600;
+      @apply bg-stone-300;
       &-clickable{
-        @apply border-zinc-600 text-zinc-600
+        @apply border-stone-300 text-stone-600;
       }
       &.icon{
-        @apply text-zinc-400;
+        @apply text-stone-200;
       };
     };
   };
 };
+.box {
+  @apply h-[58px] w-[58px] rounded;
+  &.selected {
+    @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
+  }
+  &.not-shown {
+    @apply bg-zinc-600 cursor-not-allowed;
+    
+    &-clickable{
+      @apply border-zinc-600 text-zinc-600;
+    }
+    &.icon{
+      @apply text-zinc-400;
+    };
+  };
+}
