@@ -66,7 +66,9 @@
                     <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
-                <PrimaryBtn v-if="!isLastSection()" btn="wide" @click="nextSection"> Siguiente </PrimaryBtn>
+                <PrimaryBtn v-if="!isLastSection()" btn="wide" @click="nextSection" :is-loading="isLoading">
+                    Siguiente
+                </PrimaryBtn>
                 <PrimaryBtn
                     v-else
                     btn="wide"
@@ -138,7 +140,18 @@
 
             onMounted(async () => {
                 const { data } = await useAxios(`/workOrder/${id}`, instance);
-                currentWorkOrder.value = data;
+                watch(data, (newValue) => {
+                    if (newValue) {
+                        console.log(newValue.data);
+                        currentWorkOrder.value = newValue.data;
+                        console.log(currentWorkOrder.value?.traktors);
+                        const { traktors, serviceCompany }: any = currentWorkOrder.value;
+                        const servCompany = serviceCompany;
+                        serviceCompany.value = servCompany;
+                        serviceCompanyId.value = Number(serviceCompany.value);
+                        traktors.value = traktors;
+                    }
+                });
             });
             let newCWO = ref(currentWorkOrder.value);
 
