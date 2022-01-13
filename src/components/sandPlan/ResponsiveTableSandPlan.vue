@@ -157,13 +157,10 @@
 
         <div v-if="editing === Number(stage.id)" class="separador ml-6 mt-6 mb-6" />
         <tr>
-            <th
-                scope="col"
-                class="px-6 py-3 text-left text-sm font-medium text-gray-500 uppercase tracking-wider flex-1"
-            >
+            <th scope="col" class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider flex-1">
                 Cantidad Total
             </th>
-            <td class="text-gray-500 pl-3 py-4 whitespace-nowrap font-bold text-right">{{ totalWheight }}t</td>
+            <td class="text-gray-500 pl-3 py-4 whitespace-nowrap text-right text-sm">{{ totalWheight }}t</td>
         </tr>
         <div class="separador-final ml-6 mt-6 mb-6" />
     </table>
@@ -316,12 +313,12 @@
     .separador {
         width: 80%;
         height: 1px;
-        background-color: gray;
+        @apply bg-gray-200;
     }
 
     .separador-final {
-        width: 160%;
+        width: 180%;
         height: 1px;
-        background-color: gray;
+        @apply bg-gray-200;
     }
 </style>

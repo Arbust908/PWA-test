@@ -1,6 +1,6 @@
 <template>
     <tr>
-        <td class="text-gray-500 px-3 text-center py-4 text-lg">{{ pos }} - {{ stagesAmount }}</td>
+        <td class="text-gray-500 px-3 text-center py-4 text-lg enbolden">{{ pos }} - {{ stagesAmount }}</td>
         <template v-if="editing === Number(stage[editingKey])">
             <td :id="`sandType${stage.id}`" class="typeWrap">
                 <FieldSelect
@@ -129,7 +129,7 @@
                 </template>
             </td>
         </template>
-        <td class="text-gray-500 px-3 py-4 whitespace-nowrap font-bold text-center">
+        <td class="text-gray-500 px-3 py-4 whitespace-nowrap enbolden text-center">
             {{ totalWheight }}t
             <!-- Mecanica de x/total para ir agregando / descontando -->
         </td>
@@ -292,6 +292,9 @@
 </script>
 
 <style lang="scss" scoped>
+    .enbolden {
+        @apply font-bold;
+    }
     .typeWrap {
         @apply text-gray-500 px-3 py-4 whitespace-nowrap text-sm max-w-[10rem];
     }
