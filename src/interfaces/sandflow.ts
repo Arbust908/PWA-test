@@ -29,8 +29,8 @@ export interface Pickup {
 }
 export interface HumanResource {
     id?: number;
-    role: string;
-    name: string;
+    role: string | number;
+    name: string | number;
     crewId: number;
     crew?: Crew;
 }
@@ -172,9 +172,12 @@ export interface SandStage {
     sandB?: Sand;
     sandId3: number;
     sandC?: Sand;
+    sandId4: number;
+    sandD?: Sand;
     quantity1: number;
     quantity2: number;
     quantity3: number;
+    quantity4: number;
     action?: 'create' | 'update' | 'delete';
     sandPlanId: number;
     sandPlan?: SandPlan;
@@ -316,10 +319,8 @@ export enum Roles {
 }
 
 export enum BoxCategory {
-    empty = 'Vacio',
-    cut = 'Cortada',
-    thick = 'Gruesa',
-    fine = 'Fina',
+    empty = 'Caja Vacía',
+    cradle = 'Cradle',
     aisle = 'Pasillo',
 }
 export enum SandStageStatus {
@@ -337,7 +338,6 @@ export interface Box {
     floor: number;
     row: number;
 }
-
 export interface QueueItem {
     id?: number;
     sandOrderId: number;
@@ -347,8 +347,24 @@ export interface QueueItem {
     origin: string;
     destination: string;
     status: number;
-    order: number; // Cuanto mas alto, antes aparece en la cola
-    createdAt?: Date;
-    updatedAt?: Date;
-    deletedAt?: Date;
+    order: number;
+    // 999999 - 900000 aTRansporte
+    // 99999 - 90000 Retiro ( cradleAOtro )
+    // 9999 - 9000 TRansporte a Otro
+    // 999 - 500 Deposito a Cradle
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date;
 }
+
+/* 
+C - T 
+D - T
+
+C - D
+
+T - C
+T - D
+
+D - C
+*/

@@ -1,133 +1,133 @@
 <template>
-    <button
-        :class="['box', category, isTheSelected ? 'selected' : null, isBlocked() ? 'blocked' : null]"
-        @click.prevent="selectBox"
-    >
-        <span class="text-sm">{{ id }}</span>
+    <button :class="[boxClassess]" class="box" @click.prevent="selectBox">
+        <span class="text-sm">{{ sandInfo?.boxId }}</span>
+        <!-- {{ sandInfo }} -->
     </button>
 </template>
 
-<script lang="ts">
-    import { defineComponent, ref, toRefs, computed } from 'vue';
+<script setup lang="ts">
     import { Box } from '@/interfaces/sandflow';
+    import { getBoxClasses } from '@/helpers/useWarehouse';
 
-    export default defineComponent({
-        name: 'DepositBox',
-        props: {
-            selectedBox: {
-                type: Object,
-                required: true,
-            },
-            floor: {
-                type: Number,
-                required: true,
-            },
-            row: {
-                type: Number,
-                required: true,
-            },
-            col: {
-                type: Number,
-                required: true,
-            },
-            visibleCategories: {
-                type: Array,
-                required: false,
-                default: () => undefined,
-            },
-            boxData: {
-                type: Object,
-                required: false,
-                default: ref({}),
-            },
+    const props = defineProps({
+        selectedBox: {
+            type: Object,
+            required: true,
         },
-        emits: ['select-box'],
-        setup(props, { emit }) {
-            let { floor, row, col, selectedBox, boxData } = toRefs(props);
-
-            const category = computed(() => {
-                return boxData && boxData.value ? boxData.value.category : 'empty';
-            });
-
-            const id = computed(() => {
-                return boxData && boxData.value ? boxData.value.id : '';
-            });
-
-            const selectBox = () => {
-                const box: Box = {
-                    floor: floor.value,
-                    row: row.value,
-                    col: col.value,
-                    category: category.value || '',
-                    id: id.value || '',
-                };
-                emit('select-box', box);
-            };
-
-            const isTheSelected = computed(() => {
-                return (
-                    selectedBox.value.row === row.value &&
-                    selectedBox.value.col === col.value &&
-                    selectedBox.value.floor === floor.value
-                );
-            });
-
-            let visibleCategories = ref(props.visibleCategories);
-
-            const isBlocked = () => {
-                if (!visibleCategories.value) {
-                    return false;
-                }
-
-                if (!visibleCategories.value.includes(category.value)) {
-                    return true;
-                }
-
-                if (category.value == 'aisle') {
-                    return true;
-                } else {
-                    return false;
-                }
-            };
-
-            return {
-                category,
-                selectBox,
-                isTheSelected,
-                isBlocked,
-                id,
-            };
+        floor: {
+            type: Number,
+            required: true,
         },
+        row: {
+            type: Number,
+            required: true,
+        },
+        col: {
+            type: Number,
+            required: true,
+        },
+        visibleCategories: {
+            type: Array,
+            required: false,
+            default: () => undefined,
+        },
+        boxData: {
+            type: Object,
+            required: false,
+            default: ref({}),
+        },
+        sandInfo: {
+            type: Object,
+            required: false,
+            default: ref({}),
+        },
+    });
+    const emits = defineEmits(['select-box']);
+    let { floor, row, col, selectedBox, boxData } = toRefs(props);
+
+    const category = computed(() => {
+        return boxData && boxData.value ? boxData.value.category : 'empty';
+    });
+
+    const boxClassess = computed(() => {
+        let bC = '';
+
+        if (props.sandInfo?.sandTypeId) {
+            bC += getBoxClasses(String(props.sandInfo?.sandTypeId));
+        } else {
+            bC += getBoxClasses(category.value);
+        }
+
+        if (isBlocked()) {
+            bC += ' not-shown';
+        }
+
+        if (isTheSelected.value) {
+            bC += ' selected';
+        }
+
+        if (beenSet.value) {
+            bC += ' been-set';
+        }
+
+        return bC;
+    });
+
+    const id = computed(() => {
+        return boxData?.value?.id || '';
+    });
+
+    const selectBox = () => {
+        if (category.value == 'aisle' || category.value == 'cradle' || isBlocked()) {
+            console.log('Bloqueo');
+
+            return;
+        }
+        const box: Box = {
+            floor: floor.value,
+            row: row.value,
+            col: col.value,
+            category: category.value || '',
+            id: id.value || '',
+        };
+        emits('select-box', box);
+    };
+
+    const isTheSelected = computed(() => {
+        return (
+            selectedBox.value.row === row.value &&
+            selectedBox.value.col === col.value &&
+            selectedBox.value.floor === floor.value
+        );
+    });
+
+    let visibleCategories = ref(props.visibleCategories);
+
+    const isBlocked = () => {
+        if (!visibleCategories.value) {
+            return false;
+        }
+
+        if (category.value == 'aisle' || category.value == 'cradle') {
+            return false;
+        }
+
+        if (!visibleCategories.value.includes(Number(category.value))) {
+            return true;
+        }
+
+        return false;
+    };
+    const beenSet = computed(() => {
+        return props.sandInfo?.location?.been_set || false;
     });
 </script>
 
+<style lang="scss">
+    @import '@/assets/box.scss';
+</style>
 <style lang="scss" scoped>
-    .box {
-        @apply h-[58px] w-[58px] rounded bg-second-300;
-        &.aisle {
-            @apply bg-second-300 text-second-300;
-        }
-        &.fina {
-            @apply bg-[#FFD19B] text-[#974A08] font-medium;
-        }
-        &.gruesa {
-            @apply bg-[#AFDCC6] text-[#106843] font-medium;
-        }
-        &.cortada {
-            @apply bg-[#A6AFFE] text-[#2E36AF] font-medium;
-        }
-        &.blocked {
-            @apply relative z-10;
-            &:after {
-                content: '';
-                @apply absolute z-40 inset-0 border-none opacity-75 border bg-slate-700 m-1 rounded;
-            }
-        }
-        &.empty {
-            @apply bg-second-200 text-second-200;
-        }
-        &.selected {
-            @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
-        }
+    .been-set {
+        @apply cursor-not-allowed border;
     }
 </style>

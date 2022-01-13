@@ -1,48 +1,36 @@
 <template>
     <article :class="['card', 'items-center', category, !selected ? 'w-100 bg-gray-800' : 'w-80 bg-green-800']">
-        <div v-if="!selected" :class="['check-radio-button', !selected ? '' : 'w-80 border-green-800']"></div>
+        <div v-if="!selected" :class="['check-radio-button', !selected ? '' : 'w-80 h-80 border-green-800']"></div>
         <CheckCircleIcon v-else class="w-5 h-5" />
         <ExcavatorIcon :class="['icon', 'p-2 rounded-md', !selected ? 'bg-gray-700' : 'bg-green-700']" />
         <div class="flex flex-col justify-between">
             <div>
-                Cradle<br />
+                {{ cradle.name }}<br />
                 ID {{ id }}
             </div>
         </div>
     </article>
 </template>
 
-<script lang="ts">
-    import { defineComponent, toRefs } from 'vue';
-    import BoxCardIcon from '@/components/depositDesign/BoxCardIcon.vue';
+<script setup lang="ts">
     import { CheckCircleIcon } from '@heroicons/vue/solid';
     import ExcavatorIcon from './ExcavatorIcon.vue';
 
-    export default defineComponent({
-        name: 'BoxCard',
-        components: {
-            CheckCircleIcon,
-            ExcavatorIcon,
+    const props = defineProps({
+        id: {
+            type: Number,
+            required: true,
         },
-        props: {
-            id: {
-                type: Number,
-                required: true,
-            },
-            selected: {
-                type: Boolean,
-                required: true,
-            },
+        selected: {
+            type: Boolean,
+            required: true,
         },
-        setup(props) {
-            const { id, selected } = toRefs(props);
-
-            return {
-                id,
-                selected,
-            };
+        cradle: {
+            type: Object,
+            required: true,
         },
     });
+    const { id, selected, cradle } = toRefs(props);
 </script>
 
 <style lang="scss" scoped>

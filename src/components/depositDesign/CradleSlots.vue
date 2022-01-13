@@ -16,70 +16,61 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { onMounted, ref, watchEffect } from 'vue';
-
-    export default {
-        props: {
-            cradle: {
-                type: Object,
-                required: true,
-            },
-            box: {
-                type: Object,
-                required: true,
-            },
+<script setup lang="ts">
+    const props = defineProps({
+        cradle: {
+            type: Object,
+            required: true,
         },
-        setup(props, { emit }) {
-            const cradle = ref(props.cradle);
-            const box = ref(props.box);
-            const wasBoxInCradle = ref(false);
+        box: {
+            type: Object,
+            required: true,
+        },
+    });
+    const emits = defineEmits(['clear-box-in-deposit']);
+    const cradle = ref(props.cradle);
+    const box = ref(props.box);
+    const wasBoxInCradle = ref(false);
 
-            const handleSlotClick = (index) => {
-                if (box.value.wasOriginallyOnDeposit) {
-                    return;
-                }
+    const handleSlotClick = (index) => {
+        if (box.value.wasOriginallyOnDeposit) {
+            return;
+        }
 
-                if (box.value.wasOriginallyOnCradle) {
-                    return;
-                }
+        if (box.value.wasOriginallyOnCradle) {
+            return;
+        }
 
-                if (wasBoxInCradle.value) {
-                    // toast.error("La caja ya est� ingresada")
-                    return;
-                }
+        if (wasBoxInCradle.value) {
+            // toast.error("La caja ya est� ingresada")
+            return;
+        }
 
-                box.value.location = {
-                    where: 'cradle',
-                    where_id: cradle.value.id,
+        box.value.location = {
+            where: 'cradle',
+            where_id: cradle.value.id,
+            where_slot: index,
+            where_origin: 'Estación ' + (index + 1),
+        };
+
+        const id = box.value.boxId;
+        cradle.value.slots = cradle.value.slots.map((slot) => {
+            if (slot.boxId == id) {
+                slot = {
+                    boxId: null,
                 };
+            }
 
-                const id = box.value.boxId;
-                cradle.value.slots = cradle.value.slots.map((slot) => {
-                    if (slot.boxId == id) {
-                        slot = {
-                            boxId: null,
-                        };
-                    }
-
-                    return slot;
-                });
-                emit('clear-box-in-deposit', id);
-                cradle.value.slots[index] = box.value;
-            };
-
-            watchEffect(() => {
-                box.value = props.box;
-                cradle.value = props.cradle;
-            });
-
-            return {
-                cradle,
-                box,
-                handleSlotClick,
-            };
-        },
+            return slot;
+        });
+        cradle.value.slots[index] = box.value;
+        emits('clear-box-in-deposit', id);
     };
+
+    watchEffect(() => {
+        box.value = props.box;
+        cradle.value = props.cradle;
+    });
 </script>
 
 <style lang="scss" scoped>

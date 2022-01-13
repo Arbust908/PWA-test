@@ -8,6 +8,8 @@ import VueAxios from 'vue-axios';
 import './index.css';
 import { abilitiesPlugin } from '@casl/vue';
 import ability from './helpers/canI';
+import ElementPlus from 'element-plus';
+import 'element-plus/dist/index.css';
 
 import { registerSW } from 'virtual:pwa-register';
 
@@ -26,5 +28,6 @@ createApp(App)
     .use(router)
     .use(store)
     .use(VueAxios, axios)
+    .use(ElementPlus)
     .use(abilitiesPlugin, ability.getInstance(), { useGlobalProperties: true })
     .mount('#app');

@@ -1,6 +1,6 @@
 .mesh-type {
-  &__a {
-    &.radio {
+  &__1 {
+    &.clickable {
       @apply  border-orange-200 text-orange-200;
     };
     &.boxCard {
@@ -16,8 +16,8 @@
       @apply border border-amber-800;
     };
   };
-  &__b {
-    &.radio {
+  &__2 {
+    &.clickable {
       @apply  border-emerald-200 text-emerald-200;
     };
     &.boxCard {
@@ -34,8 +34,8 @@
       @apply border border-emerald-800;
     };
   };
-  &__c {
-    &.radio {
+  &__3 {
+    &.clickable {
       @apply  border-sky-200 text-sky-200;
     };
     &.boxCard {
@@ -51,8 +51,8 @@
       @apply border border-sky-900;
     };
   };
-  &__d {
-    &.radio {
+  &__4 {
+    &.clickable {
       @apply  border-purple-200 text-purple-200;
     };
     &.boxCard {
@@ -69,8 +69,8 @@
       @apply border border-violet-900;
     };
   };
-  &__e {
-    &.radio {
+  &__5 {
+    &.clickable {
       @apply  border-red-100 text-red-100;
     };
     &.boxCard {
@@ -88,7 +88,7 @@
     };
   };
   &__empty {
-    &.radio {
+    &.clickable {
       @apply  border-stone-300 text-stone-300;
     };
     &.boxCard {
@@ -102,18 +102,40 @@
     };
   };
   &__taken {
-    @apply text-white;
-    &-cradle {
+    @apply text-white cursor-not-allowed;
+    &.cradle {
       @apply bg-indigo-900;
+      &-clickable{
+        @apply border-indigo-900 text-indigo-900;
+      }
       &.icon{
         color: #6160A3;
       };
     };
-    &-aisle {
-      @apply bg-zinc-600;
+    &.aisle {
+      @apply bg-stone-300;
+      &-clickable{
+        @apply border-stone-300 text-stone-600;
+      }
       &.icon{
-        @apply text-zinc-400;
+        @apply text-stone-200;
       };
     };
   };
 };
+.box {
+  @apply h-[58px] w-[58px] rounded;
+  &.selected {
+    @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
+  }
+  &.not-shown {
+    @apply bg-zinc-600 cursor-not-allowed;
+    
+    &-clickable{
+      @apply border-zinc-600 text-zinc-600;
+    }
+    &.icon{
+      @apply text-zinc-400;
+    };
+  };
+}

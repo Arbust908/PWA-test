@@ -22,51 +22,26 @@
             </nav>
             <OrderSection
                 v-if="WO_section === 'orden'"
-                :client-id="clientId"
-                :service-company-id="serviceCompanyId"
-                :pad="pad"
-                :pits="pits"
-                :is-full="isOrderFull"
-                @update:clientId="clientId = $event"
-                @update:serviceCompanyId="serviceCompanyId = $event"
-                @update:pad="pad = $event"
-                @update:pits="pits = $event"
-                @update:isFull="isOrderFull = $event"
+                v-model:clientId="clientId"
+                v-model:service-company-id="serviceCompanyId"
+                v-model:pad="pad"
+                v-model:pits="pits"
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
-                :operative-cradle-id="operativeCradleId"
-                :backup-cradle-id="backupCradleId"
-                :operative-forklift-id="operativeForkliftId"
-                :backup-forklift-id="backupForkliftId"
-                :traktors="traktors"
-                :pickups="pickups"
-                :rigmats="rigmats"
-                :conex="conex"
-                :generators="generators"
-                :tower="tower"
-                :cabin="cabin"
-                :is-full="isEquipmentFull"
-                @update:operativeCradleId="operativeCradleId = $event"
-                @update:backupCradleId="backupCradleId = $event"
-                @update:operativeForkliftId="operativeForkliftId = $event"
-                @update:backupForkliftId="backupForkliftId = $event"
-                @update:traktors="traktors = $event"
-                @update:pickups="pickups = $event"
-                @update:rigmats="rigmats = $event"
-                @update:conex="conex = $event"
-                @update:generators="generators = $event"
-                @update:tower="tower = $event"
-                @update:cabin="cabin = $event"
-                @update:isFull="isEquipmentFull = $event"
+                v-model:operativeCradleId="operativeCradleId"
+                v-model:backupCradleId="backupCradleId"
+                v-model:operativeForkliftId="operativeForkliftId"
+                v-model:backupForkliftId="backupForkliftId"
+                v-model:traktors="traktors"
+                v-model:pickups="pickups"
+                v-model:rigmats="rigmats"
+                v-model:conex="conex"
+                v-model:generators="generators"
+                v-model:tower="tower"
+                v-model:cabin="cabin"
             />
-            <RRHHSection
-                v-else-if="WO_section === 'rrhh'"
-                :crews="crews"
-                :is-full="isRRHHFull"
-                @update:crews="crews = $event"
-                @update:isFull="isRRHHFull = $event"
-            />
+            <RRHHSection v-else-if="WO_section === 'rrhh'" v-model:crews="crews" />
             <section class="mt-8 p-4">
                 <GhostBtn
                     v-if="isLastSection()"
@@ -80,13 +55,25 @@
         <!-- *** -->
         <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
             <section class="gap-6 flex flex-wrap items-center">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')"> Cancelar </SecondaryBtn>
-                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                <SecondaryBtn btn="wide" :is-loading="isLoading" @click.prevent="$router.push('/orden-de-trabajo')">
+                    Cancelar
+                </SecondaryBtn>
+                <GhostBtn
+                    btn="text-green-700 border !border-green-700 hover:bg-second-200"
+                    :is-loading="isLoading"
+                    @click="save()"
+                >
                     <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
                 <PrimaryBtn v-if="!isLastSection()" btn="wide" @click="nextSection"> Siguiente </PrimaryBtn>
-                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                <PrimaryBtn
+                    v-else
+                    btn="wide"
+                    :disabled="!isAllFull"
+                    :is-loading="isLoading"
+                    @click="isAllFull && save(false)"
+                >
                     Finalizar
                 </PrimaryBtn>
             </section>
@@ -99,6 +86,8 @@
     import { Pit, Traktor, Pickup, HumanResource, Crew, WorkOrder } from '@/interfaces/sandflow';
     import { compareCrews, compareResource } from '@/helpers/compareCrews';
     import { useAxios } from '@vueuse/integrations/useAxios';
+    import { validateOrder, validateEquipment, validateHumanResourses } from '@/helpers/useWorkOrder';
+    import { useCompareChanges } from '@/helpers/useCompareChanges';
 
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import EquipmentSection from '@/components/workOrder/Equipment.vue';
@@ -109,6 +98,7 @@
     import RRHHSection from '@/components/workOrder/HumanResource.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import { BookmarkIcon, CheckCircleIcon } from '@heroicons/vue/outline';
+    import { getLast } from '@/helpers/iteretionHelpers';
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -140,28 +130,33 @@
             const isDraft = ref(true);
             const toggleDraft = useToggle(isDraft);
             const workOrders: Array<WorkOrder> = JSON.parse(JSON.stringify(store.state.workOrders.all));
-            let currentWorkOrder = workOrders.find((wo) => {
-                return wo.id == id;
-            });
+            const currentWorkOrder = ref(
+                workOrders.find((wo) => {
+                    return wo.id == Number(id);
+                })
+            );
+
             onMounted(async () => {
                 const { data } = await useAxios(`/workOrder/${id}`, instance);
-                console.log(data);
-                currentWorkOrder = data;
+                currentWorkOrder.value = data;
             });
-            let newCWO = ref(currentWorkOrder);
+            let newCWO = ref(currentWorkOrder.value);
 
             const woID = ref(newCWO.value.id);
             const client = ref(newCWO.value.client);
             const serviceCompany = ref(newCWO.value.serviceCompany);
             const pad = ref(newCWO.value.pad);
             const pits = ref(newCWO.value.pits);
+            const backupPits = ref(JSON.parse(JSON.stringify(newCWO.value.pits)));
             const operativeCradle = ref(newCWO.value.operativeCradle);
             const backupCradle = ref(newCWO.value.backupCradle);
             const operativeForklift = ref(newCWO.value.operativeForklift);
             const backupForklift = ref(newCWO.value.backupForklift);
             const traktors = ref(newCWO.value.traktors);
+            const backupTraktors = ref(JSON.parse(JSON.stringify(newCWO.value.traktors)));
 
             const pickups = ref(newCWO.value.pickups);
+            const backupPickups = ref(JSON.parse(JSON.stringify(newCWO.value.pickups)));
 
             const crew = ref(newCWO.value.crew);
             const backupCrew = ref(JSON.parse(JSON.stringify(newCWO.value.crew)));
@@ -190,33 +185,36 @@
             };
             const addResource = (crewId: number): void => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
-                const lastId = selectedCrew.resources.length;
-                selectedCrew.resources.push({
-                    id: lastId,
-                    rol: '',
-                    name: '',
-                } as HumanResource);
-            };
-            const addCrew = (): void => {
-                const lastCrew = crews.value[crews.value.length - 1];
-                const lastId = lastCrew.id + 1 || 1;
-                const makeNextCrewLetter = () => {
-                    const lastLetter = lastCrew.title ? lastCrew.title.split(' ')[1] : 'A';
-                    const letterNum = lastLetter.charCodeAt(0);
 
-                    return String.fromCharCode(letterNum + 1);
-                };
-                const crewLetter = makeNextCrewLetter();
-                const start_time = new Date().setHours(7);
-                const end_time = new Date().setHours(16);
-                crews.value.push({
+                if (!selectedCrew) {
+                    return new Error('No crew selected');
+                }
+
+                const lastResource = getLast(selectedCrew.resources);
+                const lastId = lastResource?.id + 1 || 0; // ***
+                const newResource: HumanResource = { id: lastId, role: -1, name: -1, crewId: selectedCrew.id };
+
+                selectedCrew.resources.push(newResource);
+            };
+
+            const addCrew = (): void => {
+                const lastCrew = getLast(crews.value);
+                const lastId = lastCrew?.id + 1 || 2;
+                const lastLetter = lastCrew?.title?.split(' ')[1] || 'A';
+                const lastLetterCode = lastLetter.charCodeAt(0);
+                const numberForLetter = Math.max(Math.min(lastLetterCode + 1, 90), 65);
+                const crewLetter = String.fromCharCode(numberForLetter);
+                const timeStart = new Date().setHours(7);
+                const timeEnd = new Date().setHours(19);
+                const newCrew = {
                     id: lastId,
-                    start_time,
-                    end_time,
+                    timeStart,
+                    timeEnd,
                     title: `Crew ${crewLetter}`,
                     resources: [],
-                });
-                addResource(lastId);
+                };
+                crews.value.push(newCrew);
+                addResource(newCrew.id);
             };
             const removeCrew = (crewId: number): void => {
                 crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
@@ -248,21 +246,25 @@
                 WO_section.value = section_order[currentSectionIndex() + 1];
             };
             // Is the Order section is full
-            const isOrderFull = ref(false);
+            const isOrderFull = computed(() => {
+                return validateOrder(clientId.value, pad.value, pits.value);
+            });
+
             // Is the Equipment section is full
-            const isEquipmentFull = ref(false);
+            const isEquipmentFull = computed(() => {
+                return validateEquipment(
+                    operativeCradleId.value,
+                    backupCradleId.value,
+                    operativeForkliftId.value,
+                    backupForkliftId.value,
+                    traktors.value,
+                    pickups.value
+                );
+            });
+
             // Is the RRHH section is full
             const isRRHHFull = computed(() => {
-                return !!(
-                    crews.value &&
-                    crews.value.length > 0 &&
-                    crews.value[0].timeStart &&
-                    crews.value[0].timeEnd &&
-                    crews.value[0].resources &&
-                    crews.value[0].resources.length > 0 &&
-                    crews.value[0].resources[0].role !== '' &&
-                    crews.value[0].resources[0].name !== ''
-                );
+                return validateHumanResourses(crews.value);
             });
             // Is all sections full
             const isAllFull = computed(() => {
@@ -313,8 +315,6 @@
                 crews.value = crews.value
                     .map((crew: Crew) => removeEmptyResource(crew.id))
                     .filter((crew: Crew) => {
-                        console.log(crew);
-
                         return !(crew.resources.length <= 0 && crew.timeStart === '' && crew.timeEnd === '');
                     });
 
@@ -352,15 +352,15 @@
                 // removeAllEmptys();
                 const newWO = {
                     id: woID.value,
-                    client: client.value,
+                    client: clientId.value,
                     serviceCompany: serviceCompany.value,
-                    clientId: clientId.value,
+                    // clientId: clientId.value,
                     serviceCompanyId: serviceCompanyId.value,
                     pad: pad.value,
-                    operativeCradleId: operativeCradleId.value,
-                    backupCradleId: backupCradleId.value,
-                    operativeForkliftId: operativeForkliftId.value,
-                    backupForkliftId: backupForkliftId.value,
+                    operativeCradle: operativeCradleId.value,
+                    backupCradle: backupCradleId.value,
+                    operativeForklift: operativeForkliftId.value,
+                    backupForklift: backupForkliftId.value,
                     crews: crews.value,
                     rigmats: rigmats.value,
                     conex: conex.value,
@@ -372,95 +372,56 @@
                 const { data: WODone } = useAxios(`/workOrder/${woID.value}`, { method: 'PUT', data: newWO }, instance);
                 watch(WODone, async (newVal, _) => {
                     if (newVal && newVal.data && newVal.data.id) {
-                        if (pits.value.length > 0) {
-                            const isPitsFinished = ref([]);
-                            pits.value.forEach((pit: Pit) => {
-                                if (!pit.id) {
-                                    const { data } = useAxios(
-                                        `/pit/${pit.id}`,
-                                        {
-                                            method: 'POST',
-                                            data: { ...pit, workOrderId: newVal.data.id },
-                                        },
-                                        instance
-                                    );
-                                    isPitsFinished.value.push(data);
-                                    newVal.data.pits.push(pit);
-                                } else {
-                                    const { data } = useAxios(`/pit/${pit.id}`, { method: 'PUT', data: pit }, instance);
-                                    isPitsFinished.value.push(data);
-                                    newVal.data.pits = newVal.data.pits.map((p) => {
-                                        if (p.id === pit.id) {
-                                            return pit;
-                                        }
+                        const workOrderId = newVal.data.id;
 
-                                        return p;
-                                    });
-                                }
+                        if (pits.value.length > 0) {
+                            const actionablePits = useCompareChanges(pits.value, backupPits.value);
+                            const { changed, deleted, create } = actionablePits;
+                            changed.forEach(async (pit: Pit) => {
+                                await useAxios(`/pit/${pit.id}`, { method: 'PUT', data: pit }, instance);
+                            });
+                            deleted.forEach(async (pit: Pit) => {
+                                await useAxios(`/pit/${pit.id}`, { method: 'DELETE' }, instance);
+                            });
+                            create.forEach(async (pit: Pit) => {
+                                const { id: noUseId, ...newPit } = pit;
+                                newPit.companyId = Number(newVal.data.client);
+                                newPit.workOrderId = workOrderId;
+                                await useAxios(`/pit`, { method: 'POST', data: newPit }, instance);
                             });
                         }
 
                         if (traktors.value.length > 0) {
-                            const isTraktorsFinished = ref([]);
-                            traktors.value.forEach((traktor) => {
-                                if (!traktor.id) {
-                                    const { data } = useAxios(
-                                        `/traktor/`,
-                                        {
-                                            method: 'POST',
-                                            data: { ...traktor, workOrderId: newVal.data.id },
-                                        },
-                                        instance
-                                    );
-                                    isTraktorsFinished.value.push(data);
-                                    newVal.data.traktors.push(traktor);
-                                } else {
-                                    const { data } = useAxios(
-                                        `/traktor/${traktor.id}`,
-                                        { method: 'PUT', data: traktor },
-                                        instance
-                                    );
-                                    isTraktorsFinished.value.push(data);
-                                    newVal.data.traktors = newVal.data.traktors.map((trak) => {
-                                        if (trak.id === traktor.id) {
-                                            return traktor;
-                                        }
-
-                                        return trak;
-                                    });
-                                }
+                            const actionableTraktors = useCompareChanges(traktors.value, backupTraktors.value);
+                            const { changed, deleted, create } = actionableTraktors;
+                            changed.forEach(async (traktor: Traktor) => {
+                                await useAxios(`/traktor/${traktor.id}`, { method: 'PUT', data: traktor }, instance);
+                            });
+                            deleted.forEach(async (traktor: Traktor) => {
+                                await useAxios(`/traktor/${traktor.id}`, { method: 'DELETE' }, instance);
+                            });
+                            create.forEach(async (traktor: Traktor) => {
+                                const { id: noUseId, ...newTraktor } = traktor;
+                                newTraktor.workOrderId = workOrderId;
+                                newTraktor.supplier = String(newTraktor.supplier);
+                                newTraktor.chassis = String(newTraktor.chassis);
+                                await useAxios(`/traktor`, { method: 'POST', data: newTraktor }, instance);
                             });
                         }
 
                         if (pickups.value.length > 0) {
-                            const isPickupFinished = ref([]);
-                            pickups.value.forEach((pickup) => {
-                                if (!pickup.id) {
-                                    const { data } = useAxios(
-                                        `/pickup/`,
-                                        {
-                                            method: 'POST',
-                                            data: { ...pickup, workOrderId: newVal.data.id },
-                                        },
-                                        instance
-                                    );
-                                    isPickupFinished.value.push(data.value);
-                                    newVal.data.pickups.push(pickup);
-                                } else {
-                                    const { data } = useAxios(
-                                        `/pickup/${pickup.id}`,
-                                        { method: 'PUT', data: pickup },
-                                        instance
-                                    );
-                                    isPickupFinished.value.push(data);
-                                    newVal.data.pickups = newVal.data.pickups.map((pick) => {
-                                        if (pick.id === pickup.id) {
-                                            return pickup;
-                                        }
-
-                                        return pick;
-                                    });
-                                }
+                            const actionablePickups = useCompareChanges(pickups.value, backupPickups.value);
+                            const { changed, deleted, create } = actionablePickups;
+                            changed.forEach(async (pickup: Pickup) => {
+                                await useAxios(`/pickup/${pickup.id}`, { method: 'PUT', data: pickup }, instance);
+                            });
+                            deleted.forEach(async (pickup: Pickup) => {
+                                await useAxios(`/pickup/${pickup.id}`, { method: 'DELETE' }, instance);
+                            });
+                            create.forEach(async (pickup: Pickup) => {
+                                const { id: noUseId, ...newPickup } = pickup;
+                                newPickup.workOrderId = workOrderId;
+                                await useAxios(`/pickup`, { method: 'POST', data: newPickup }, instance);
                             });
                         }
 
@@ -476,12 +437,16 @@
                                 for (const newRH of comparedResources.new) {
                                     const { id, ...newResource } = newRH;
                                     newResource.crewId = uCrewId;
+                                    newResource.role = String(newResource.role);
+                                    newResource.name = String(newResource.name);
                                     await axios.post(api + '/humanResource', newResource);
                                 }
                                 for (const changedRH of comparedResources.changed) {
                                     const { id, ...newResource } = changedRH;
                                     newResource.crewId = uCrewId;
-                                    await axios.put(api + `/humanResource/${newResource.id}`, newResource);
+                                    newResource.role = String(newResource.role);
+                                    newResource.name = String(newResource.name);
+                                    await axios.put(api + `/humanResource/${id}`, newResource);
                                 }
                                 for (const deleteRH of comparedResources.deleted) {
                                     await axios.delete(api + `/humanResource/${deleteRH.id}`);
@@ -489,7 +454,7 @@
                             }
 
                             for (const crewToDelete of comparedCrews.deleted) {
-                                await axios.post(api + `/humanResource/${crewToDelete.id}`);
+                                await axios.delete(api + `/crew/${crewToDelete.id}`);
                             }
 
                             for (const crewToCreate of comparedCrews.new) {
@@ -500,6 +465,8 @@
                                     const crewId = createdCrew.data.data.id;
                                     const { id, ...newResource } = rrhh;
                                     newResource.crewId = crewId;
+                                    newResource.role = String(newResource.role);
+                                    newResource.name = String(newResource.name);
                                     await axios.post(api + '/humanResource', newResource);
                                 }
                             }
@@ -532,6 +499,7 @@
                 serviceCompanyId,
                 pad,
                 pits,
+                backupPits,
                 operativeCradleId,
                 backupCradleId,
                 operativeForkliftId,
@@ -550,6 +518,7 @@
                 addCrew,
                 save,
                 isAllFull,
+                isLoading,
             };
         },
     };

@@ -1,3 +1,7 @@
+<template>
+    <div></div>
+</template>
+
 <script lang="ts">
     import { ref, Ref, computed, ComputedRef, defineComponent } from 'vue';
     import { useStore } from 'vuex';

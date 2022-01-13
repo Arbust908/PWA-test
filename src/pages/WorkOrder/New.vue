@@ -11,10 +11,10 @@
                 </button>
                 <button
                     class="section-tab"
-                    :selected="WO_section === 'equipamento'"
-                    @click="changeSection('equipamento')"
+                    :selected="WO_section === 'equipamiento'"
+                    @click="changeSection('equipamiento')"
                 >
-                    <span> Equipamento </span>
+                    <span> Equipamiento </span>
                     <CheckCircleIcon v-if="isEquipmentFull" class="w-5 h-5" />
                 </button>
                 <button class="section-tab" :selected="WO_section === 'rrhh'" @click="changeSection('rrhh')">
@@ -31,39 +31,21 @@
                 v-model:is-full="isOrderFull"
             />
             <EquipmentSection
-                v-else-if="WO_section === 'equipamento'"
-                :operative-cradle-id="operativeCradleId"
-                :backup-cradle-id="backupCradleId"
-                :operative-forklift-id="operativeForkliftId"
-                :backup-forklift-id="backupForkliftId"
-                :traktors="traktors"
-                :pickups="pickups"
-                :rigmats="rigmats"
-                :conex="conex"
-                :generators="generators"
-                :tower="tower"
-                :cabin="cabin"
-                :is-full="isEquipmentFull"
-                @update:operativeCradleId="operativeCradleId = $event"
-                @update:backupCradleId="backupCradleId = $event"
-                @update:operativeForkliftId="operativeForkliftId = $event"
-                @update:backupForkliftId="backupForkliftId = $event"
-                @update:traktors="traktors = $event"
-                @update:pickups="pickups = $event"
-                @update:rigmats="rigmats = $event"
-                @update:conex="conex = $event"
-                @update:generators="generators = $event"
-                @update:tower="tower = $event"
-                @update:cabin="cabin = $event"
-                @update:isFull="isEquipmentFull = $event"
+                v-else-if="WO_section === 'equipamiento'"
+                v-model:operative-cradle-id="operativeCradleId"
+                v-model:backup-cradle-id="backupCradleId"
+                v-model:operative-forklift-id="operativeForkliftId"
+                v-model:backup-forklift-id="backupForkliftId"
+                v-model:traktors="traktors"
+                v-model:pickups="pickups"
+                v-model:rigmats="rigmats"
+                v-model:conex="conex"
+                v-model:generators="generators"
+                v-model:tower="tower"
+                v-model:cabin="cabin"
+                v-model:is-full="isEquipmentFull"
             />
-            <RRHHSection
-                v-else-if="WO_section === 'rrhh'"
-                :crews="crews"
-                :is-full="isRRHHFull"
-                @update:crews="crews = $event"
-                @update:isFull="isRRHHFull = $event"
-            />
+            <RRHHSection v-else-if="WO_section === 'rrhh'" v-model:crews="crews" v-model:is-full="isRRHHFull" />
             <footer
                 :class="isLastSection() ? 'justify-between' : 'justify-end'"
                 class="mt-8 p-4 gap-3 flex flex-col md:flex-row"
@@ -81,15 +63,33 @@
         <!-- *** -->
         <footer class="mt-8 gap-3 flex flex-col md:flex-row justify-end">
             <section class="gap-6 flex flex-wrap items-right">
-                <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-trabajo')">Cancelar</SecondaryBtn>
-                <GhostBtn btn="text-green-700 border !border-green-700 hover:bg-second-200" @click="save()">
+                <SecondaryBtn btn="wide" :is-loading="isLoading" @click.prevent="$router.push('/orden-de-trabajo')"
+                    >Cancelar</SecondaryBtn
+                >
+                <GhostBtn
+                    btn="text-green-700 border !border-green-700 hover:bg-second-200"
+                    :is-loading="isLoading"
+                    @click="save()"
+                >
                     <BookmarkIcon class="w-6 h-6 md:w-4 md:h-4" />
                     <span> Guardar Provisorio </span>
                 </GhostBtn>
-                <PrimaryBtn v-if="!isLastSection()" btn="wide" :loading="isLoading" @click="nextSection">
+                <PrimaryBtn
+                    v-if="!isLastSection()"
+                    btn="wide"
+                    :loading="isLoading"
+                    :is-loading="isLoading"
+                    @click="nextSection"
+                >
                     Siguiente
                 </PrimaryBtn>
-                <PrimaryBtn v-else btn="wide" :disabled="!isAllFull ? 'yes' : null" @click="isAllFull && save(false)">
+                <PrimaryBtn
+                    v-else
+                    btn="wide"
+                    :disabled="!isAllFull"
+                    :is-loading="isLoading"
+                    @click="isAllFull && save(false)"
+                >
                     Finalizar
                 </PrimaryBtn>
             </section>
@@ -124,6 +124,8 @@
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import { getLast } from '@/helpers/iteretionHelpers';
+    import { validateOrder, validateEquipment, validateHumanResourses } from '@/helpers/useWorkOrder';
     // AXIOS
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -131,7 +133,6 @@
     // TIPOS
     import { Pit, Traktor, Pickup, HumanResource, Crew } from '@/interfaces/sandflow';
     // MODAL
-    // const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
     const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
 
@@ -186,17 +187,7 @@
             const operativeForkliftId: Ref<number> = ref(-1);
             const backupForkliftId: Ref<number> = ref(-1);
             const traktors: Ref<Array<Traktor>> = ref([]);
-            // watch(traktors, (newVal, oldVal) => {
-            //   if (newVal.length <= oldVal.length) {
-            //     traktors.value = oldVal;
-            //   }
-            // });
             const pickups: Ref<Array<Pickup>> = ref([]);
-            // watch(pickups, (newVal, oldVal) => {
-            //   if (newVal.length <= oldVal.length) {
-            //     pickups.value = oldVal;
-            //   }
-            // });
             const rigmats: Ref<number> = ref(0);
             const conex: Ref<number> = ref(0);
             const generators: Ref<number> = ref(0);
@@ -208,8 +199,8 @@
             const resource: Ref<Array<HumanResource>> = ref([
                 {
                     id: 0,
-                    role: '',
-                    name: '',
+                    role: -1,
+                    name: -1,
                 },
             ]);
             const removeResource = (crewId: number, peopleId: number) => {
@@ -218,18 +209,18 @@
                     (resource: HumanResource) => resource.id !== peopleId
                 );
             };
-            const addResource = (crewId: number): void => {
+            const addResource = (crewId: number) => {
                 const selectedCrew = crews.value.find((crew: Crew) => crew.id === crewId);
 
                 if (!selectedCrew) {
                     return new Error('No crew selected');
                 }
-                const lastId = selectedCrew.resources.length;
-                selectedCrew.resources.push({
-                    id: lastId,
-                    role: '',
-                    name: '',
-                } as HumanResource);
+
+                const lastResource = getLast(selectedCrew.resources);
+                const lastId = lastResource?.id + 1 || 0; // ***
+                const newResource: HumanResource = { id: lastId, role: -1, name: -1, crewId: selectedCrew.id };
+
+                selectedCrew.resources.push(newResource);
             };
             const removeEmptyCrews = (): void => {
                 if (!isDraft.value) {
@@ -256,18 +247,21 @@
                 },
             ]);
             const addCrew = (): void => {
-                const lastId = crews.value.length + 1;
-                const crewLetter = String.fromCharCode(lastId + 64);
+                const lastCrew = getLast(crews.value);
+                const lastId = lastCrew?.id + 1 || 2;
+                const numberForLetter = Math.max(Math.min(lastId + 64, 90), 65);
+                const crewLetter = String.fromCharCode(numberForLetter);
                 const timeStart = new Date().setHours(7);
                 const timeEnd = new Date().setHours(19);
-                crews.value.push({
+                const newCrew = {
                     id: lastId,
                     timeStart,
                     timeEnd,
                     title: `Crew ${crewLetter}`,
                     resources: [],
-                });
-                addResource(lastId);
+                };
+                crews.value.push(newCrew);
+                addResource(newCrew.id);
             };
             const removeCrew = (crewId: number) => {
                 crews.value = crews.value.filter((crew: Crew) => crew.id !== crewId);
@@ -279,7 +273,7 @@
                     const saveResourse = selectedCrew.resources[0];
                 }
                 selectedCrew.resources = selectedCrew.resources.filter(
-                    (resource: HumanResource) => resource.role !== '' && resource.name !== ''
+                    (resource: HumanResource) => resource.role !== -1 && resource.name !== -1
                 );
 
                 if (!isDraft.value && selectedCrew.resources.length === 0) {
@@ -290,7 +284,7 @@
             };
             // :: >>> Sections
             const WO_section = ref('orden');
-            const section_order = ['orden', 'equipamento', 'rrhh'];
+            const section_order = ['orden', 'equipamiento', 'rrhh'];
             const changeSection = (new_section: string): void => {
                 WO_section.value = new_section;
             };
@@ -307,30 +301,29 @@
                 WO_section.value = section_order[currentSectionIndex() + 1];
             };
             // Is the Order section is full
-            const isOrderFull = ref(false);
+            const isOrderFull = computed(() => {
+                return validateOrder(clientId.value, pad.value, pits.value);
+            });
+
             // Is the Equipment section is full
-            const isEquipmentFull = ref(false);
-            // Is the RRHH section is full
-            const isRRHHFull: ComputedRef<boolean> = computed(() => {
-                return !!(
-                    crews.value.length > 0 &&
-                    crews.value[0].timeStart &&
-                    crews.value[0].timeEnd &&
-                    crews.value[0].resources.length > 0 &&
-                    crews.value[0].resources[0].role !== '' &&
-                    crews.value[0].resources[0].name !== ''
+            const isEquipmentFull = computed(() => {
+                return validateEquipment(
+                    operativeCradleId.value,
+                    backupCradleId.value,
+                    operativeForkliftId.value,
+                    backupForkliftId.value,
+                    traktors.value,
+                    pickups.value
                 );
+            });
+            // Is the RRHH section is full
+            const isRRHHFull = computed(() => {
+                return validateHumanResourses(crews.value);
             });
             // Is all sections full
             const isAllFull = computed(() => {
                 return isOrderFull.value && isEquipmentFull.value && isRRHHFull.value;
             });
-            const removeAllEmptys = (): void => {
-                removeEmptyPits();
-                removeEmptyTraktors();
-                removeEmptyPickups();
-                removeEmptyCrews();
-            };
 
             // MODAL
             const showModal = ref(false);
@@ -342,26 +335,15 @@
             const showApiErrorModal = ref(false);
             const toggleApiErrorModal = useToggle(showApiErrorModal);
 
-            // :: SAVE
             const save = async (draft = true) => {
                 toggleLoading(true);
                 toggleDraft(draft);
-                console.log('isDraft', isDraft.value);
-                console.log('----------------------------------------');
-                console.groupCollapsed('RRHH');
-                crews.value.map((crew: Crew) => {
-                    console.log(crew.title);
-                    console.log(new Date(crew.timeEnd));
-                    console.log(new Date(crew.timeStart));
-                    crew.resources.map((rrhh: HumanResource) => {
-                        console.log('resource', rrhh);
-                    });
-                    console.log(crew);
-                    console.log('<>--<>--<>--<>--<>--<>--<>--<>--<>--<>');
-                });
-                console.log(crews.value);
-                console.groupEnd();
-                console.log('----------------------------------------');
+                // crews.value.map((crew: Crew) => {
+                //     crew.resources.map((rrhh: HumanResource) => {
+                //         console.log('resource', rrhh);
+                //     });
+                // });
+
                 // removeAllEmptys();
                 const newWO = {
                     client: clientId.value,
@@ -392,37 +374,29 @@
                 try {
                     const { data: WODone } = useAxios('/workOrder', { method: 'POST', data: newWO }, instance);
                     watch(WODone, async (newVal, _) => {
-                        console.log('nuevo', newVal);
-
                         if (newVal && newVal.data && newVal.data.id) {
                             const workOrderId = Number(newVal.data.id);
-                            console.log('nuevo id', newVal.data.id);
 
                             if (pits.value.length > 0) {
-                                const isPitsFinished = ref([]);
                                 pits.value.forEach((pit: Pit) => {
-                                    console.log(pit);
                                     const { id, ...newPit } = pit;
                                     newPit.companyId = newWO.clientId;
                                     newPit.workOrderId = workOrderId;
-                                    console.log('NewPit', newPit);
                                     const { data } = useAxios('/pit', { method: 'POST', data: newPit }, instance);
-                                    isPitsFinished.value.push(data);
                                 });
-                                console.log(isPitsFinished.value);
                             }
 
                             if (traktors.value.length > 0) {
-                                const isTraktorsFinished = ref([]);
                                 for (const traktor of traktors.value) {
                                     const { id, ...newTraktor } = traktor;
                                     newTraktor.workOrderId = workOrderId;
+                                    newTraktor.supplier = String(newTraktor.supplier);
+                                    newTraktor.chassis = String(newTraktor.chassis);
                                     await axios.post(api + '/traktor', newTraktor);
                                 }
                             }
 
                             if (pickups.value.length > 0) {
-                                const isPickupFinished = ref([]);
                                 for (const pickup of pickups.value) {
                                     const { id, ...newPickup } = pickup;
                                     newPickup.workOrderId = workOrderId;
@@ -439,6 +413,8 @@
                                         const crewId = createdCrew.data.data.id;
                                         const { id, ...newResource } = rrhh;
                                         newResource.crewId = crewId;
+                                        newResource.name = String(newResource.name);
+                                        newResource.role = String(newResource.role);
                                         await axios.post(api + '/humanResource', newResource);
                                     }
                                 }
