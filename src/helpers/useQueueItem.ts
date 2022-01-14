@@ -116,3 +116,21 @@ export const getQueueItems = async () => {
         })
         .catch((err) => console.error(err));
 };
+export const updateQueueItems = async (queueData) => {
+    const { id } = queueData;
+
+    return await axios
+        .put(`${apiUrl}/queueItem/${id}`, queueData)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const deleteQueueItems = async (queueItemId: number) => {
+    return await axios
+        .delete(`${apiUrl}/queueItem/${queueItemId}`)
+        .then((response) => {
+            return response;
+        })
+        .catch((err) => console.error(err));
+};
