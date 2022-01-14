@@ -1,5 +1,8 @@
 import { QueueItem } from '@/interfaces/sandflow';
 import { getLast } from './iteretionHelpers';
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
 export enum QueueTransactions {
     CradleATransporte = 'aTransporte',
@@ -80,4 +83,36 @@ export const separateQueues = (queue: Array<QueueItem>): SteppedQueue => {
         );
 
     return { ...steppedQueue };
+};
+
+export const defaultQueueItem: QueueItem = {
+    sandOrderId: -1,
+    pitId: -1,
+    origin: '',
+    destination: '',
+    status: 0,
+    order: -1,
+};
+
+export const getOrderPro = async (transition: QueueTransactions = QueueTransactions.DepositoACradle) => {
+    const queue = await getQueueItems();
+
+    return getOrder(queue, transition);
+};
+
+export const createQueueItem = async (queueItem: QueueItem) => {
+    return await axios
+        .post(`${apiUrl}/queueItem/`, queueItem)
+        .then((response) => {
+            return response;
+        })
+        .catch((err) => console.error(err));
+};
+export const getQueueItems = async () => {
+    return await axios
+        .get(`${apiUrl}/queueItem/`)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
 };

@@ -166,6 +166,7 @@
         getSand,
     } from '@/helpers/useGetEntities';
     import { asyncForEach } from '@/helpers/useAsyncFor';
+    import { defaultQueueItem, createQueueItem, QueueTransactions, getOrderPro } from '@/helpers/useQueueItem';
 
     import { Box } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -310,6 +311,7 @@
                     col.value = fCol;
                     floor.value = fFloor;
                     row.value = fRow;
+                    inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
                 }
             }
         }
@@ -387,7 +389,7 @@
             floor: box.floor,
             row: box.row,
             col: box.col,
-            where_orogon: `F${box.row} C${box.col} N${box.floor}`,
+            where_origin: `F${box.row} C${box.col} N${box.floor}`,
         };
         choosedBox.value.floor = box.floor;
         choosedBox.value.row = box.row;
@@ -489,22 +491,31 @@
             return c.id === cradleId;
         });
 
-        console.log('inDepo', inDepoBoxes.value);
-        console.log('CurrPO', selectedPurchaseOrder.value);
-        const toFilterBoxes = selectedPurchaseOrder.value.sandOrders;
+        const toFilterBoxes = selectedPurchaseOrder?.value?.sandOrders;
+        const transportDriverId = selectedPurchaseOrder?.value?.transportOrders[0]?.driverId;
+        const driver = await (await axios.get(`${apiUrl}/driver/${transportDriverId}`))?.data?.data;
+        const transportId = driver?.transportId;
 
-        // const boxesToQueue =
+        toFilterBoxes.map(async (box) => {
+            const { TransporteACradle, TransporteADeposito } = QueueTransactions;
+            const {
+                location: { where },
+            } = box;
+            let orderQI = 0;
 
-        toFilterBoxes.map((box) => {
-            console.log('box', box);
-
-            if (box.location) {
-                const { floor, row, col, ...location } = box.location;
-                console.log('location', box.location);
+            if (where === 'warehouse') {
+                orderQI = await getOrderPro(TransporteADeposito);
+            } else if (where === 'cradle') {
+                orderQI = await getOrderPro(TransporteACradle);
             }
+            const newQI = { ...defaultQueueItem };
+            newQI.origin = `Camion ${transportId}`;
+            newQI.destination = box?.location?.where_origin;
+            newQI.pitId = pitId.value;
+            newQI.sandOrderId = box?.id;
+            newQI.order = orderQI;
+            const res = await createQueueItem(newQI);
         });
-
-        return;
 
         if (cradleId !== 0) {
             wasCradleModificated.value = true;
