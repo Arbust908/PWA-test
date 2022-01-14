@@ -134,7 +134,6 @@
 
                 if (currSP) {
                     currSP.SandOrders = currSP.SandOrders.filter((so) => so.innerId !== soInid);
-                    console.log('jaja me borre2');
                 }
             };
 
