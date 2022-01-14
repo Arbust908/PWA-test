@@ -169,14 +169,15 @@
 
             const deposit = (box) => {
                 choosedBox.value = box;
-                if (selectedBoxesForDeposit.value.filter((check) => check.boxId === box.boxId).length > 0) {
+                let checkFilter =
+                    selectedBoxesForDeposit.value.filter((check) => check.boxId === box.sandOrder.boxId).length > 0;
+                if (checkFilter) {
                     selectedBoxesForDeposit.value = selectedBoxesForDeposit.value.filter(
-                        (check) => check.boxId !== box.boxId
+                        (check) => check.boxId !== box.sandOrder.boxId
                     );
                 } else {
-                    selectedBoxesForDeposit.value.push(box);
+                    selectedBoxesForDeposit.value.push(box.sandOrder);
                 }
-
                 if (selectedBoxesForDeposit.value.length > 0) {
                     activeSection.value = 'Deposit';
                 } else {
@@ -185,14 +186,13 @@
             };
 
             const truck = (box) => {
-                console.log('AA', box.sandOrder);
-                console.log(selectedBoxesForTrucks.value);
-                if (selectedBoxesForTrucks.value.filter((check) => check.boxId === box.sandOrder.boxId).length > 0) {
+                let checkFilter =
+                    selectedBoxesForTrucks.value.filter((check) => check.boxId === box.sandOrder.boxId).length > 0;
+                if (checkFilter) {
                     selectedBoxesForTrucks.value = selectedBoxesForTrucks.value.filter(
                         (check) => check.boxId !== box.sandOrder.boxId
                     );
                 } else {
-                    console.log('llega');
                     selectedBoxesForTrucks.value.push(box.sandOrder);
                 }
 
@@ -201,8 +201,6 @@
                 } else {
                     activeSection.value = null;
                 }
-                console.log('selected', selectedBoxesForTrucks.value);
-                console.log('length', selectedBoxesForTrucks.value.length);
             };
 
             // :: DEPOSIT

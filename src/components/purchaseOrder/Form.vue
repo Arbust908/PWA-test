@@ -33,14 +33,22 @@
                     </div>
                 </div>
                 <FieldGroup v-for="box in selectedBoxes" :key="box.boxId" class="max-w-3xl relative">
-                    <FieldInput
-                        class="col-span-12 sm:col-span-4"
+                    <FieldSelect
+                        class="col-span-7 sm:col-span-4"
+                        :title="orderKey === 0 ? 'Tipo' : ''"
                         field-name="sandType"
-                        placeholder="Seleccionar"
+                        placeholder="Tipo de Arena"
                         endpoint-key="type"
                         :data="box.sandTypeId"
+                        :endpoint-data="filteredSandTypes"
+                        :select-class="useFirstST"
                         @update:data="box.sandTypeId = $event"
-                        is-readonly
+                        @click="useFirstST = true"
+                    />
+                    <InvalidInputLabel
+                        v-if="box.sandTypeId === -1 && useFirstST === true"
+                        validation-type="empty"
+                        class="text-xs"
                     />
                     <FieldInput
                         class="col-span-7 sm:col-span-4"
@@ -48,7 +56,6 @@
                         placeholder="ID"
                         :data="box.amount"
                         @update:data="box.amount = $event"
-                        is-readonly
                     />
                     <FieldInput
                         :title="box.index === 0 ? 'ID de caja' : ''"
@@ -60,28 +67,6 @@
                         @update:data="box.boxId = $event"
                         is-readonly
                     />
-                    <!-- <div
-                        :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'"
-                        class="col-span-1 md:col-span-2 flex flex-row"
-                    >
-                        <CircularBtn
-                            v-if="useIfNotLonly(providerId.sandOrders)"
-                            class="flex self-start"
-                            size="sm"
-                            @click="removeOrder(order.id, providerId.innerId)"
-                        >
-                            <Icon icon="Trash" type="outline" class="w-7 h-7" />
-                        </CircularBtn>
-                        <CircularBtn
-                            v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
-                            class="flex self-start"
-                            size="sm"
-                            btn="bg-green-500"
-                            @click.prevent="addOrder(providerId.innerId)"
-                        >
-                            <Icon icon="Plus" class="w-7 h-7 text-white" />
-                        </CircularBtn>
-                    </div> -->
                 </FieldGroup>
             </template>
             <FieldGroup class="max-w-3xl relative">
@@ -280,6 +265,7 @@
         },
     });
 
+    // console.log(props.selectedBoxes);
     console.log(props.companyClientId);
 
     const filteredDrivers = computed(() => {
@@ -538,7 +524,7 @@
         po.value = {
             sandProvider: { ...sp },
             sandOrders: [...props.selectedBoxes],
-            sands: [...props.selectedBoxes],
+            sands: [...sandTypes.value],
             transportProvider: { ...tp },
             transportOrders: TransportOrders.value,
         };

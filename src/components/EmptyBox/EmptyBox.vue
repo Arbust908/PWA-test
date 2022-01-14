@@ -23,9 +23,9 @@
                     :class="clickedTruck ? 'clicked' : 'button'"
                     @click="truck"
                 >
-                    Camion
+                    Camión
                 </button>
-                <button v-else class="button cursor-not-allowed">Camion</button>
+                <button v-else class="button cursor-not-allowed">Camión</button>
                 <!-- <button :class="clickedTruck ? 'clicked' : 'button'" @click="truck">Camion</button> -->
             </div>
         </div>

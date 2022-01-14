@@ -53,11 +53,6 @@
                                 @update:data="order.sandTypeId = $event"
                                 @click="useFirstST = true"
                             />
-                            <InvalidInputLabel
-                                v-if="order.sandTypeId === -1 && useFirstST === true"
-                                validation-type="empty"
-                                class="text-xs"
-                            />
                         </div>
                         <FieldWithSides
                             :title="orderKey === 0 ? 'Cantidad' : ''"
