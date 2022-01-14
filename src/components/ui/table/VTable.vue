@@ -245,25 +245,29 @@
 
             const desktopActions = computed(() => props.actions.filter((action: any) => !action.onlyMobile));
 
-            const beforeEnter = (el) => {
+            const beforeEnter = (el: any) => {
                 el.style.opacity = 0;
                 el.style.transform = 'translateY(50%)';
             };
-            const enter = (el, done) => {
+            const enter = (el: any, done: any) => {
                 const staggerIndex = el.dataset.staggerIndex;
                 gsap.to(el, {
                     opacity: 1,
                     y: 0,
                     duration: 0.5,
                     delay: 0.15 * staggerIndex,
-                    onComplete: done,
+                    onComplete: () => {
+                        el.style.transform = '';
+                        el.style.opacity = '';
+                        done();
+                    },
                 });
             };
-            const beforeLeave = (el) => {
+            const beforeLeave = (el: any) => {
                 el.style.opacity = 1;
                 el.style.transform = 'translateY(0)';
             };
-            const leave = (el, done) => {
+            const leave = (el: any, done: any) => {
                 const staggerIndex = el.dataset.staggerIndex;
                 gsap.to(el, {
                     opacity: 0,
