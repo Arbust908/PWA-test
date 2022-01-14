@@ -166,6 +166,7 @@
         getSand,
     } from '@/helpers/useGetEntities';
     import { asyncForEach } from '@/helpers/useAsyncFor';
+    import { defaultQueueItem, createQueueItem, QueueTransactions, getOrderPro } from '@/helpers/useQueueItem';
 
     import { Box } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -180,8 +181,8 @@
 
     useTitle('Ingreso de Cajas <> Sandflow');
     const router = useRouter();
-    let activeSection = ref('deposit');
-    let boxes = ref([]);
+    const activeSection = ref('deposit');
+    const boxes = ref([]);
 
     const purchaseOrders = ref([]);
     const sandOrders = ref([]);
@@ -310,6 +311,7 @@
                     col.value = fCol;
                     floor.value = fFloor;
                     row.value = fRow;
+                    inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
                 }
             }
         }
@@ -387,7 +389,7 @@
             floor: box.floor,
             row: box.row,
             col: box.col,
-            where_orogon: `F${box.row} C${box.col} N${box.floor}`,
+            where_origin: `F${box.row} C${box.col} N${box.floor}`,
         };
         choosedBox.value.floor = box.floor;
         choosedBox.value.row = box.row;
@@ -487,6 +489,32 @@
         const cradleId = selectedCradle.value;
         const cradleData = cradles.value.find((c) => {
             return c.id === cradleId;
+        });
+
+        const toFilterBoxes = selectedPurchaseOrder?.value?.sandOrders;
+        const transportDriverId = selectedPurchaseOrder?.value?.transportOrders[0]?.driverId;
+        const driver = await (await axios.get(`${apiUrl}/driver/${transportDriverId}`))?.data?.data;
+        const transportId = driver?.transportId;
+
+        toFilterBoxes.map(async (box) => {
+            const { TransporteACradle, TransporteADeposito } = QueueTransactions;
+            const {
+                location: { where },
+            } = box;
+            let orderQI = 0;
+
+            if (where === 'warehouse') {
+                orderQI = await getOrderPro(TransporteADeposito);
+            } else if (where === 'cradle') {
+                orderQI = await getOrderPro(TransporteACradle);
+            }
+            const newQI = { ...defaultQueueItem };
+            newQI.origin = `Camion ${transportId}`;
+            newQI.destination = box?.location?.where_origin;
+            newQI.pitId = pitId.value;
+            newQI.sandOrderId = box?.id;
+            newQI.order = orderQI;
+            const res = await createQueueItem(newQI);
         });
 
         if (cradleId !== 0) {

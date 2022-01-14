@@ -246,12 +246,10 @@
             const desktopActions = computed(() => props.actions.filter((action: any) => !action.onlyMobile));
 
             const beforeEnter = (el) => {
-                console.log(el);
                 el.style.opacity = 0;
                 el.style.transform = 'translateY(50%)';
             };
             const enter = (el, done) => {
-                console.log(el);
                 const staggerIndex = el.dataset.staggerIndex;
                 gsap.to(el, {
                     opacity: 1,
@@ -262,12 +260,10 @@
                 });
             };
             const beforeLeave = (el) => {
-                console.log(el);
                 el.style.opacity = 1;
                 el.style.transform = 'translateY(0)';
             };
             const leave = (el, done) => {
-                console.log(el);
                 const staggerIndex = el.dataset.staggerIndex;
                 gsap.to(el, {
                     opacity: 0,
