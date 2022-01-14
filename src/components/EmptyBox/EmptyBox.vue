@@ -17,7 +17,16 @@
                     Depósito
                 </button>
                 <button v-else class="button cursor-not-allowed">Depósito</button>
-                <button :class="clickedTruck ? 'clicked' : 'button'" @click="truck">Camion</button>
+
+                <button
+                    v-if="selectedBoxesForDeposit.length < 1"
+                    :class="clickedTruck ? 'clicked' : 'button'"
+                    @click="truck"
+                >
+                    Camion
+                </button>
+                <button v-else class="button cursor-not-allowed">Camion</button>
+                <!-- <button :class="clickedTruck ? 'clicked' : 'button'" @click="truck">Camion</button> -->
             </div>
         </div>
     </article>
@@ -45,6 +54,10 @@
                 type: Array,
                 default: () => [],
             },
+            selectedBoxesForDeposit: {
+                type: Array,
+                default: () => [],
+            },
             // choosedBox: {
             //     type: Object,
             //     required: false,
@@ -58,8 +71,6 @@
 
             const clickedDeposit = ref(false);
             const clickedTruck = ref(false);
-
-            const selectedBoxesForTrucks = ref(props.selectedBoxesForTrucks);
 
             const choosedBox = ref({
                 id: boxId.value,

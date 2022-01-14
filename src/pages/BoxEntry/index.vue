@@ -338,6 +338,7 @@
         choosedBox.value = boxes.value.find((box) => {
             return box.boxId === id;
         });
+        console.log('CHOOSEDBOX', choosedBox.value);
 
         setVisibleCategories(choosedBox.value.sandTypeId);
 

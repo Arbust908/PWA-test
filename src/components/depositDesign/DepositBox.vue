@@ -83,7 +83,6 @@
 
             return;
         }
-        console.log('selectBox', selectedBox.value);
         const box: Box = {
             floor: floor.value,
             row: row.value,
@@ -91,7 +90,6 @@
             category: category.value || '',
             id: id.value || '',
         };
-        console.log('selectBox', box);
         emits('select-box', box);
     };
 

@@ -11,13 +11,14 @@
         <div class="flex flex-row justify-between">
             <section class="bg-white rounded-md shadow-sm w-2/5 mr-10">
                 <ABMFormTitle title="Cajas vacias" class="p-4" />
-                <div v-if="clientId > -1 && pitId > -1" class="px-10 py-6">
+                <div class="px-10 py-6" v-if="clientId > 0 && pitId > 0">
                     <BoxCard
                         v-for="box in boxes"
-                        :key="box.boxId"
-                        :boxId="box.boxId"
-                        :estacion="box.estacion"
+                        :key="box.sandOrder.boxId"
+                        :boxId="box.sandOrder.boxId"
+                        :estacion="box.origin"
                         :selectedBoxesForTrucks="selectedBoxesForTrucks"
+                        :selectedBoxesForDeposit="selectedBoxesForDeposit"
                         @deposit="deposit(box)"
                         @truck="truck(box)"
                     />
@@ -31,30 +32,25 @@
             <section class="bg-white rounded-md shadow-sm max-w-4xl w-3/5 p-4">
                 <ABMFormTitle title="Detalle" />
                 <img v-if="clientId < 0 || pitId < 0" src="@/assets/imgs/cajasvacias.png" alt="" />
-                <div
-                    v-else
-                    v-show="selectedBoxesForTrucks.length < 1 && selectedBoxesForDeposit < 1"
-                    class="p-6 m-6 rounded-lg border-2 text-center"
-                >
+                <div v-show="activeSection === null" class="p-6 m-6 rounded-lg border-2 text-center">
                     <p>Seleccione depósito ó camión para comenzar</p>
                 </div>
                 <PurchaseOrderForm
-                    v-if="selectedBoxesForTrucks.length > 0 && selectedBoxesForDeposit.length < 1"
+                    v-if="activeSection === 'PurchaseOrder'"
                     :company-client-id="clientId"
                     :pit-id="pitId"
                     :selectedBoxes="selectedBoxesForTrucks"
                 />
-                <span v-if="selectedBoxesForDeposit.length > 0 && selectedBoxesForTrucks.length < 1">deposito</span>
-                <!-- <DepositGrid
-                    v-if="warehouse"
+                <DepositGrid
+                    v-if="activeSection === 'Deposit'"
                     class="w-full flex flex-col gap-5"
                     :selected-box="choosedBox"
+                    :boxes="selectedBoxesForDeposit"
                     :rows="row"
                     :cols="col"
                     :floor="floor"
                     :deposit="warehouse.layout || {}"
-                    @select-box="selectBox"
-                /> -->
+                />
             </section>
         </div>
         <footer class="mt-8 space-x-3 flex justify-end">
@@ -79,6 +75,16 @@
     import BoxCard from '@/components/EmptyBox/EmptyBox.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import PurchaseOrderForm from '@/components/purchaseOrder/Form.vue';
+    import { formatDeposit, defaultBox, getInDepoBoxes } from '@/helpers/useWarehouse';
+    import {
+        getPurchaseOrders,
+        getSandOrders,
+        getWarehouses,
+        getCradles,
+        getWorkOrders,
+        getSand,
+    } from '@/helpers/useGetEntities';
+    import { Warehouse } from '@/interfaces/sandflow';
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -100,6 +106,8 @@
 
         setup() {
             useTitle('Destino de cajas vacias');
+
+            let activeSection = ref(null);
 
             const router = useRouter();
             const route = useRoute();
@@ -143,37 +151,24 @@
             const showDepositGrid = ref(false);
             // :: BOXES
             // let boxes = ref([]);
-            const boxes = ref([
-                {
-                    boxId: 'AA1',
-                    estacion: 'Estacion 1',
-                    amount: 0,
-                    type: 'Fina',
-                    sandTypeId: 1,
-                },
-                {
-                    boxId: 'AB2',
-                    estacion: 'Estacion 2',
-                    amount: 10,
-                    type: 'Gruesa',
-                    sandTypeId: 2,
-                },
-                {
-                    boxId: 'AC3',
-                    estacion: 'Estacion 3',
-                    amount: 0,
-                    type: 'Media',
-                    sandTypeId: 3,
-                },
-            ]);
+
+            const getQueueItem = async () => {
+                boxes.value = [];
+                boxes.value = await axios
+                    .get(`${apiUrl}/queueitem?=status10&pitId=${pitId.value}`)
+                    .then((res) => {
+                        return res.data.data;
+                    })
+                    .catch((err) => console.error(err));
+            };
+
+            const boxes = ref([]);
 
             const selectedBoxesForTrucks = ref([]);
             const selectedBoxesForDeposit = ref([]);
 
             const deposit = (box) => {
-                showPurchaseOrder.value = false;
-                showDepositGrid.value = !showDepositGrid.value;
-
+                choosedBox.value = box;
                 if (selectedBoxesForDeposit.value.filter((check) => check.boxId === box.boxId).length > 0) {
                     selectedBoxesForDeposit.value = selectedBoxesForDeposit.value.filter(
                         (check) => check.boxId !== box.boxId
@@ -181,49 +176,85 @@
                 } else {
                     selectedBoxesForDeposit.value.push(box);
                 }
-            };
 
-            const truck = (box) => {
-                showDepositGrid.value = false;
-                showPurchaseOrder.value = !showPurchaseOrder.value;
-
-                if (selectedBoxesForTrucks.value.filter((check) => check.boxId === box.boxId).length > 0) {
-                    selectedBoxesForTrucks.value = selectedBoxesForTrucks.value.filter(
-                        (check) => check.boxId !== box.boxId
-                    );
+                if (selectedBoxesForDeposit.value.length > 0) {
+                    activeSection.value = 'Deposit';
                 } else {
-                    selectedBoxesForTrucks.value.push(box);
+                    activeSection.value = null;
                 }
             };
 
-            // :: DEPOSIT
-            const rows: Ref<number> = ref(0);
-            const cols: Ref<number> = ref(0);
-            const floors: Ref<number> = ref(1);
+            const truck = (box) => {
+                console.log('AA', box.sandOrder);
+                console.log(selectedBoxesForTrucks.value);
+                if (selectedBoxesForTrucks.value.filter((check) => check.boxId === box.sandOrder.boxId).length > 0) {
+                    selectedBoxesForTrucks.value = selectedBoxesForTrucks.value.filter(
+                        (check) => check.boxId !== box.sandOrder.boxId
+                    );
+                } else {
+                    console.log('llega');
+                    selectedBoxesForTrucks.value.push(box.sandOrder);
+                }
 
-            const warehouses = ref([]);
-            // const dimensions = ref('');
-
-            const getWarehouses = async () => {
-                await axios
-                    .get(`${apiUrl}/warehouse`)
-                    .then((res) => {
-                        warehouses.value = res.data.data;
-                        console.log(warehouses.value);
-                    })
-                    .catch((err) => console.error(err));
+                if (selectedBoxesForTrucks.value.length > 0) {
+                    activeSection.value = 'PurchaseOrder';
+                } else {
+                    activeSection.value = null;
+                }
+                console.log('selected', selectedBoxesForTrucks.value);
+                console.log('length', selectedBoxesForTrucks.value.length);
             };
 
+            // :: DEPOSIT
+            const warehouses = ref([]);
+            const warehouse = ref({});
+
+            const floor = ref(0);
+            const row = ref(0);
+            const col = ref(0);
+
+            const choosedBox = ref({
+                ...defaultBox,
+            });
+
+            const assingWareHouseValue = async () => {
+                warehouse.value = await warehouses.value.find((singleWarehouse) => {
+                    return (
+                        parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
+                        parseInt(singleWarehouse.pitId) == pitId.value
+                    );
+                });
+            };
+
+            const assignDepositLayout = async () => {
+                const { col: fCol, floor: fFloor, row: fRow } = await formatDeposit(warehouse.value?.layout);
+                col.value = fCol;
+                floor.value = fFloor;
+                row.value = fRow;
+            };
+
+            watchEffect(async () => {
+                if (clientId.value >= 0 && pitId.value >= 0) {
+                    await assingWareHouseValue();
+                    await assignDepositLayout();
+                    await getQueueItem();
+                }
+
+                boxes.value = boxes.value.map((box) => {
+                    if (box.location && JSON.parse(box.location)) {
+                        box.location = JSON.parse(box.location);
+                        box.location.been_set = true;
+                    }
+                    return box;
+                });
+            });
+
             onMounted(async () => {
-                await getWarehouses();
+                warehouses.value = await getWarehouses();
             });
 
             return {
                 clients,
-                pits,
-                rows,
-                cols,
-                floors,
                 clientId,
                 pitId,
                 print,
@@ -234,6 +265,12 @@
                 showDepositGrid,
                 selectedBoxesForTrucks,
                 selectedBoxesForDeposit,
+                floor,
+                col,
+                row,
+                warehouse,
+                choosedBox,
+                activeSection,
             };
         },
     };

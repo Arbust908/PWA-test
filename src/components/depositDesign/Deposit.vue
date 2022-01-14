@@ -113,8 +113,6 @@
             return location.floor === floorNum && location.row === row && location.col === col;
         });
 
-        console.log(cellBox);
-
         return cellBox || null;
     };
 </script>
