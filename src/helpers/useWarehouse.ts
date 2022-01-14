@@ -59,7 +59,6 @@ export const formatLocation = (location: any) => {
 };
 
 export const boxesByFloor = (location: any) => {
-    console.log('boxesByFloor', location);
     const boxes = Object.keys(location).reduce((bxs: any, currentCell) => {
         const box = location[currentCell];
 
@@ -79,7 +78,6 @@ export const boxesByFloor = (location: any) => {
 
         return bxs;
     }, []);
-    console.log(boxes);
 
     return boxes;
 };
@@ -102,9 +100,11 @@ export const getBoxClasses = (category: string) => {
             return 'mesh-type__taken aisle';
         case 'cradle':
             return 'mesh-type__taken cradle';
+        case null:
+            return '';
     }
 
-    return 'mesh-type__empty boxCard';
+    return '';
 };
 
 export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
@@ -113,8 +113,6 @@ export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
 
         return location && location.where_id === depoId;
     });
-
-    console.log('boxy', boxy);
 
     return [...new Set(boxy)];
 };

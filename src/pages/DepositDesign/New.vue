@@ -81,6 +81,7 @@
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5 overflow-auto"
+                        is-design
                         :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
@@ -150,6 +151,9 @@
             onMounted(async () => {
                 const result = await axios.get(`${apiUrl}/sand`);
                 sandTypes.value = result.data.data;
+                sandTypes.value = sandTypes.value.filter((type) => {
+                    return type.visible;
+                });
             });
 
             let deposit = ref({});

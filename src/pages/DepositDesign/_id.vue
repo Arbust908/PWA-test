@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Diseño de depósito</h1>
-        </header>
+        <ABMHeader title="Diseño de depósito" />
         <section class="deposit bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
                 <fieldset class="py-2 w-full max-w-2xl grid grid-cols-12 gap-y-4 gap-x-14">
@@ -130,6 +128,7 @@
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
@@ -140,6 +139,7 @@
             PrimaryBtn,
             DepositGrid,
             BoxCard,
+            ABMHeader,
         },
         setup() {
             const router = useRouter();
@@ -166,6 +166,9 @@
             onMounted(async () => {
                 const result = await axios.get(`${apiUrl}/sand`);
                 sandTypes.value = result.data.data;
+                sandTypes.value = sandTypes.value.filter((type) => {
+                    return type.visible;
+                });
             });
 
             const rows: Ref<number> = ref(0);
@@ -327,7 +330,6 @@
                 category: '',
             });
             const selectBox = (box: Box) => {
-                console.log(box);
                 selectedBox.value = box;
             };
             const setCat = (cat: string) => {

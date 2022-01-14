@@ -18,28 +18,38 @@
                                 </td>
                             </tr>
                         </tbody>
-                        <tbody v-else class="divide-y divide-gray-200">
-                            <template v-for="(item, index) in paginatedItems" :key="item.id">
-                                <tr
-                                    class="body-row"
-                                    :class="index % 2 === 0 ? 'odd' : 'odd'"
-                                    :disabled="!item[disableKey]"
-                                >
-                                    <slot name="item" :item="item" />
-                                    <td v-if="desktopActions" class="p-0 table--action">
-                                        <DropdownBtn :actions="desktopActions" :item="item">
-                                            <CircularBtn size="xs" class="even">
-                                                <Icon
-                                                    icon="DotsVertical"
-                                                    type="outlined"
-                                                    class="w-6 h-6 icon text-gray-800"
-                                                />
-                                            </CircularBtn>
-                                        </DropdownBtn>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
+                        <transition-group
+                            v-else
+                            appear
+                            tag="tbody"
+                            class="divide-y divide-gray-200"
+                            @before-enter="beforeEnter"
+                            @enter="enter"
+                            @leave="leave"
+                            @before-leave="beforeLeave"
+                        >
+                            <tr
+                                v-for="(item, index) in paginatedItems"
+                                :key="item.id"
+                                :data-stagger-index="index"
+                                class="body-row"
+                                :class="index % 2 === 0 ? 'odd' : 'odd'"
+                                :disabled="!item[disableKey]"
+                            >
+                                <slot name="item" :item="item" />
+                                <td v-if="desktopActions && desktopActions.length" class="p-0 table--action">
+                                    <DropdownBtn :actions="desktopActions" :item="item">
+                                        <CircularBtn size="xs" class="even">
+                                            <Icon
+                                                icon="DotsVertical"
+                                                type="outlined"
+                                                class="w-6 h-6 icon text-gray-800"
+                                            />
+                                        </CircularBtn>
+                                    </DropdownBtn>
+                                </td>
+                            </tr>
+                        </transition-group>
                     </table>
                 </article>
             </div>
@@ -94,6 +104,7 @@
 </template>
 
 <script lang="ts">
+    import gsap from 'gsap';
     import { defineComponent, computed, ref } from 'vue';
     import TableHeader from '@/components/ui/table/TableHeader.vue';
     import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
@@ -223,7 +234,7 @@
                 return [];
             });
 
-            const paginate = (array, length, pageNumber) => {
+            const paginate = (array: Array<any>, length: number, pageNumber: number) => {
                 localPagination.value.from = array.length ? (pageNumber - 1) * length + 1 : ' ';
                 localPagination.value.to = pageNumber * length > array.length ? array.length : pageNumber * length;
                 localPagination.value.prevPage = pageNumber > 1 ? pageNumber : '';
@@ -234,6 +245,39 @@
 
             const desktopActions = computed(() => props.actions.filter((action: any) => !action.onlyMobile));
 
+            const beforeEnter = (el: any) => {
+                el.style.opacity = 0;
+                el.style.transform = 'translateY(50%)';
+            };
+            const enter = (el: any, done: any) => {
+                const staggerIndex = el.dataset.staggerIndex;
+                gsap.to(el, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.5,
+                    delay: 0.15 * staggerIndex,
+                    onComplete: () => {
+                        el.style.transform = '';
+                        el.style.opacity = '';
+                        done();
+                    },
+                });
+            };
+            const beforeLeave = (el: any) => {
+                el.style.opacity = 1;
+                el.style.transform = 'translateY(0)';
+            };
+            const leave = (el: any, done: any) => {
+                const staggerIndex = el.dataset.staggerIndex;
+                gsap.to(el, {
+                    opacity: 0,
+                    y: '-50%',
+                    duration: 0.5,
+                    delay: 0.15 * staggerIndex,
+                    onComplete: done,
+                });
+            };
+
             return {
                 localPagination,
                 filteredItems,
@@ -241,6 +285,10 @@
                 show,
                 paginatedItems,
                 desktopActions,
+                beforeEnter,
+                enter,
+                leave,
+                beforeLeave,
             };
         },
     });

@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" />
+        <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" @pdf-html="sendPdf" />
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-3 sm:p-4 flex-col gap-4">
                 <FieldGroup class="max-w-2xl border-none">
@@ -293,6 +293,7 @@
 
     const filteredDrivers = computed(() => {
         driverId.value = -1;
+
         if (transportProviderId.value > -1) {
             const driversFiltered = drivers.value.filter(
                 (driver) => driver.transportProviderId === transportProviderId.value
@@ -330,7 +331,6 @@
         const result = await axios.get(`${api}/driver`);
         drivers.value = result.data.data;
         const result2 = await axios.get(`${api}/sandProvider`);
-        console.log(result2.data.data);
     });
 
     useTitle('Nueva orden de pedido <> Sandflow');
@@ -376,7 +376,6 @@
                 return sandProvider;
             }
         });
-        console.log('holi');
         filteredSandTypes.value = provider.meshType;
     };
 
@@ -696,6 +695,10 @@
             observation: packageObservations.value,
         };
     });
+    const sendPdf = (pdfHtml: string) => {
+        // Enviar el PDF al Back
+        console.log(pdfHtml);
+    };
 </script>
 
 <style lang="scss" scoped>

@@ -107,6 +107,7 @@
                                     :cradle="cradle"
                                     :selected="selectedCradle == cradle.id"
                                     :choosed-box="choosedBox"
+                                    @handle-slot-click="handleSlotClick($event)"
                                     @handle-selected-cradle="handleSelectedCradle(cradle.id)"
                                     @clear-box-in-deposit="clearBoxInDeposit"
                                 />
@@ -134,7 +135,9 @@
         </section>
         <footer class="space-x-3 flex justify-end items-center mt-8">
             <!-- <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')"> Cancelar </SecondaryBtn> -->
-            <PrimaryBtn btn="wide" :disabled="!canSave" @click.prevent="save()"> Guardar </PrimaryBtn>
+            <PrimaryBtn btn="wide" :is-loading="isLoading" :disabled="!canSave" @click.prevent="save()">
+                Guardar
+            </PrimaryBtn>
         </footer>
         <SuccessModal
             :open="confirmModal"
@@ -162,22 +165,24 @@
         getWorkOrders,
         getSand,
     } from '@/helpers/useGetEntities';
+    import { asyncForEach } from '@/helpers/useAsyncFor';
+    import { defaultQueueItem, createQueueItem, QueueTransactions, getOrderPro } from '@/helpers/useQueueItem';
 
-    import { Company, Pit, Box } from '@/interfaces/sandflow';
+    import { Box } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import EntryBoxesList from '@/components/BoxEntry/EntryBoxesList.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
 
     import axios from 'axios';
-    import ABMFormTitle from '../../components/ui/ABMFormTitle.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     useTitle('Ingreso de Cajas <> Sandflow');
     const router = useRouter();
-    let activeSection = ref('deposit');
-    let boxes = ref([]);
+    const activeSection = ref('deposit');
+    const boxes = ref([]);
 
     const purchaseOrders = ref([]);
     const sandOrders = ref([]);
@@ -197,6 +202,9 @@
     const selectedPurchaseOrder = ref({});
 
     const sandTypes = ref([]);
+
+    const isLoading = ref(false);
+    const toggleLoading = useToggle(isLoading);
 
     const getFilteredCradles = async () => {
         const cradlesIds = [];
@@ -225,26 +233,28 @@
         cradles.value = newCradles;
     };
 
-    const clearBoxInDeposit = (id) => {
-        Object.entries(warehouse.value.layout).forEach((cell) => {
-            if (cell[1].id == id) {
-                (cell[1].category = 'empty'), delete cell[1][id];
-            }
-        });
+    const clearBoxInDeposit = (boxId: number) => {
+        // Look for box AKA sandOrder and emtpy location
+        // Object.entries(warehouse.value.layout).forEach((cell) => {
+        //     if (cell[1].id == id) {
+        //         (cell[1].category = 'empty'), delete cell[1][id];
+        //     }
+        // });
     };
 
-    const clearBoxInCradleSlots = (id) => {
-        cradles.value.forEach((cradle) => {
-            cradle.slots = cradle.slots.map((slot) => {
-                if (slot.boxId == id) {
-                    slot = {
-                        boxId: null,
-                    };
-                }
-
-                return slot;
-            });
-        });
+    const clearBoxInCradleSlots = (boxId: number) => {
+        // Look for box AKA sandOrder and emtpy location
+        // let id = 0;
+        // cradles.value.forEach((cradle) => {
+        //     cradle.slots = cradle.slots.map((slot) => {
+        //         if (slot.boxId == id) {
+        //             slot = {
+        //                 boxId: null,
+        //             };
+        //         }
+        //         return slot;
+        //     });
+        // });
     };
 
     watchEffect(async () => {
@@ -301,6 +311,7 @@
                     col.value = fCol;
                     floor.value = fFloor;
                     row.value = fRow;
+                    inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
                 }
             }
         }
@@ -309,6 +320,7 @@
     const choosedBox = ref({
         ...defaultBox,
     });
+    console.log('Primer caja', choosedBox.value);
 
     const checkIfWasBoxInOriginalDeposit = (boxId) => {
         let response = false;
@@ -378,17 +390,17 @@
             floor: box.floor,
             row: box.row,
             col: box.col,
+            where_origin: `F${box.row} C${box.col} N${box.floor}`,
         };
         choosedBox.value.floor = box.floor;
         choosedBox.value.row = box.row;
         choosedBox.value.col = box.col;
-        console.log(choosedBox.value);
         sandOrders.value.push(choosedBox.value);
+        wasWarehouseModificated.value = true;
         inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
 
         // if (box.category == 'empty' || box.category !== 'aisle') {
         //     // if (visibleCategories.value.includes(box.category)) {
-        //     wasWarehouseModificated.value = true;
         //     const hasPos = [choosedBox.value.floor, choosedBox.value.row, choosedBox.value.col].some(Boolean);
 
         //     if (hasPos) {
@@ -414,22 +426,21 @@
     });
 
     watch(selectionsAreDone, async (newVal) => {
-        console.log(newVal ? 'selectionsAreDone' : 'not done');
-
         if (newVal) {
             sandOrders.value = await getSandOrders();
-            console.groupCollapsed('Boxes :D');
-            const boxes = sandOrders.value.map((box) => {
-                if (box.location && JSON.parse(box.location)) {
-                    box.location = JSON.parse(box.location);
-                    box.location.been_set = true;
-                }
+            const boxes = sandOrders.value
+                .map((box) => {
+                    if (box.location && JSON.parse(box.location)) {
+                        box.location = JSON.parse(box.location);
+                        box.location.been_set = true;
+                    }
 
-                return box;
-            });
+                    return box;
+                })
+                .filter((box) => {
+                    return box.location;
+                });
             inDepoBoxes.value = getInDepoBoxes(boxes, warehouse.value.id);
-            console.log(inDepoBoxes.value);
-            console.groupEnd();
         }
     });
 
@@ -453,6 +464,10 @@
         selectedCradle.value = id;
     };
 
+    const handleSlotClick = (slot: Slot) => {
+        console.log(slot);
+    };
+
     const confirmModal = ref(false);
     const resetBoxIn = () => {
         router.go(0);
@@ -465,14 +480,42 @@
     };
 
     const save = async () => {
+        toggleLoading(true);
         const isFullyAllocated = checkIfIsFullyAllocated(selectedPurchaseOrder.value);
         const warehouseDone = ref(false);
         const warehouseId = warehouse.value.id;
         const { createdAt, deletedAt, updatedAt, pit, clientCompany, ...wareData } = warehouse.value;
+        // Conseguir el Cradle para guardar la data
         const cradleDone = ref(false);
         const cradleId = selectedCradle.value;
         const cradleData = cradles.value.find((c) => {
             return c.id === cradleId;
+        });
+
+        const toFilterBoxes = selectedPurchaseOrder?.value?.sandOrders;
+        const transportDriverId = selectedPurchaseOrder?.value?.transportOrders[0]?.driverId;
+        const driver = await (await axios.get(`${apiUrl}/driver/${transportDriverId}`))?.data?.data;
+        const transportId = driver?.transportId;
+
+        toFilterBoxes.map(async (box) => {
+            const { TransporteACradle, TransporteADeposito } = QueueTransactions;
+            const {
+                location: { where },
+            } = box;
+            let orderQI = 0;
+
+            if (where === 'warehouse') {
+                orderQI = await getOrderPro(TransporteADeposito);
+            } else if (where === 'cradle') {
+                orderQI = await getOrderPro(TransporteACradle);
+            }
+            const newQI = { ...defaultQueueItem };
+            newQI.origin = `Camion ${transportId}`;
+            newQI.destination = box?.location?.where_origin;
+            newQI.pitId = pitId.value;
+            newQI.sandOrderId = box?.id;
+            newQI.order = orderQI;
+            const res = await createQueueItem(newQI);
         });
 
         if (cradleId !== 0) {
@@ -483,6 +526,7 @@
             await axios
                 .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
                 .then((res) => {
+                    console.log('SH axios', res.data.data);
                     warehouseDone.value = !!res.data.data;
                 })
                 .catch((err) => console.error(err));
@@ -492,21 +536,42 @@
             await axios
                 .put(`${apiUrl}/cradle/${cradleId}`, cradleData)
                 .then((res) => {
+                    console.log('Cd axios', res.data.data);
                     cradleDone.value = !!res.data.data;
                 })
                 .catch((err) => console.error(err));
         }
 
-        boxes.value.forEach(async (box) => {
-            const data = {
-                id: box.id,
-                boxId: box.boxId,
-                sandTypeId: box.sandTypeId,
-                amount: box.amount,
-                location: JSON.stringify(box.location),
-            };
-            await axios.put(`${apiUrl}/sandOrder/${data.id}`, data);
-        });
+        const saveBoxes = async () => {
+            await asyncForEach(boxes.value, async (box) => {
+                const data = {
+                    id: box.id,
+                    boxId: box.boxId,
+                    sandTypeId: box.sandTypeId,
+                    amount: box.amount,
+                    location: JSON.stringify(box.location),
+                };
+                await axios.put(`${apiUrl}/sandOrder/${data.id}`, data);
+            });
+        };
+
+        await saveBoxes();
+
+        if (isFullyAllocated) {
+            const selectedPurchaseOrderID = selectedPurchaseOrder.value.id;
+            axios.put(`${apiUrl}/purchaseOrder/${selectedPurchaseOrderID}`, {
+                isFullyAllocated: 1,
+            });
+        }
+
+        toggleLoading(false);
+
+        console.info('Depo Guardado', warehouseDone.value);
+        console.info('Crdl Guardado', cradleDone.value);
+        console.warn('Se modifico Cradle?', wasCradleModificated.value);
+        console.warn('Se modifico Depo?', wasWarehouseModificated.value);
+        console.error(wasCradleModificated.value == false);
+        console.error(wasWarehouseModificated.value == false);
 
         if (warehouseDone.value && cradleDone.value) {
             confirmModal.value = true;
@@ -520,13 +585,7 @@
             confirmModal.value = true;
         }
 
-        if (isFullyAllocated) {
-            const selectedPurchaseOrderID = selectedPurchaseOrder.value.id;
-            axios.put(`${apiUrl}/purchaseOrder/${selectedPurchaseOrderID}`, {
-                isFullyAllocated: 1,
-            });
-        }
-        resetBoxIn();
+        toggleLoading(false);
     };
 
     const canSave = computed(() => {
@@ -535,6 +594,10 @@
 
     onMounted(async () => {
         sandTypes.value = await getSand();
+        sandTypes.value = sandTypes.value.filter((type) => {
+            return type.visible;
+        });
+
         purchaseOrders.value = await getPurchaseOrders();
         warehouses.value = await getWarehouses();
         cradles.value = await getCradles();

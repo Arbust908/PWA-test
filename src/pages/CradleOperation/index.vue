@@ -10,6 +10,7 @@
                         <ClientPitCombo
                             :client-id="Number(clientId)"
                             :pit-id="Number(pitId)"
+                            validation-type="empty"
                             @update:clientId="
                                 clientId = Number($event);
                                 cradleId = -1;
@@ -21,114 +22,61 @@
                         />
                     </span>
                 </FieldGroup>
+
                 <fieldset class="py-2 col-span-6 flex flex-col gap-x-10 2xl:gap-x-40">
                     <h2 class="text-xl font-bold mb-4">Estaciones</h2>
                     <FieldSelect
+                        v-model:data="cradleId"
                         class="cradle-col"
                         title="Cradle"
                         field-name="cradle"
                         placeholder="Seleccionar cradle"
                         endpoint-key="name"
                         :endpoint-data="filteredCradles"
-                        :data="cradleId"
-                        @update:data="cradleId = $event"
                     />
                 </fieldset>
             </form>
-            <section v-if="cradleId < 0" class="cradle-slots">
-                <div v-for="(slot, index) in cradleSlots" :key="index">
-                    <div class="slot empty">
-                        <span class="station-title">Estación {{ index + 1 }}</span>
-                        <span class="copy">Seleccione cliente, etapa y cradle.</span>
-                    </div>
-                    <!-- <button class="calibrate">Calibrar E{{ index + 1 }}</button> -->
-                </div>
-            </section>
-            <section v-else class="cradle-slots">
-                <div v-for="(slot, index) in cradleSlots" :key="index">
-                    <div v-if="slot.boxId" class="slot">
-                        <span class="station-title">Estación {{ index + 1 }} - {{ slot.boxId }}</span>
-                        <div class="cradle-status-wrapper">
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '1')">
-                                <div class="icon-wrapper check" :class="[slot.status == '1' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '1'" icon="Check" class="icon" />
-                                </div>
-                                En ejecución
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '2')">
-                                <div class="icon-wrapper pause" :class="[slot.status == '2' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '2'" icon="Pause" type="outline" class="icon" />
-                                </div>
-                                Pausa
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '3')">
-                                <div class="icon-wrapper empty" :class="[slot.status == '3' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '3'" icon="Minus" class="icon" />
-                                </div>
-                                Vacía
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '0')">
-                                <div class="icon-wrapper unavailable" :class="[slot.status == '0' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '0'" icon="X" class="icon" />
-                                </div>
-                                No disponible
-                            </span>
-                        </div>
-                        <hr class="border-gray-300" />
-                        <div class="cradle-data-wrapper">
-                            <span class="cradle-data">
-                                <Icon icon="InformationCircle" class="icon" />
-                                {{ slot.amount }}T peso remito
-                            </span>
-                            <!-- <span class="cradle-data">
-                <Icon icon="InformationCircle" class="icon"/>
-                15T peso actual
-              </span> -->
-                            <span class="cradle-data">
-                                <Icon icon="InformationCircle" class="icon" />
-                                Arena: {{ slot.sandType }}
-                            </span>
-                        </div>
-                    </div>
-                    <div v-else class="slot without-box">
-                        <span class="station-title">Estación {{ index + 1 }} - Sin caja</span>
-                    </div>
-                    <!-- <button class="calibrate">Calibrar E{{ index + 1 }}</button> -->
-                </div>
+            <section class="cradle-slots">
+                <CradleSlot
+                    v-for="(slot, index) in cradleSlots"
+                    :key="index"
+                    :cradles="cradles"
+                    :index="index"
+                    :cradle-slots="cradleSlots"
+                    :box="slot"
+                    @selected-slots="SelectSlot(slot)"
+                    @change-cradle-slot-status="changeCradleSlotStatus($event[0], $event[1])"
+                />
             </section>
         </section>
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
-            <SecondaryBtn btn="wide" @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</SecondaryBtn>
-            <PrimaryBtn btn="wide" type="submit" @click.prevent="completeStageHandle"> Finalizar </PrimaryBtn>
+            <PrimaryBtn btn="wide" type="submit" @click.prevent="requestEmptyBoxHandle"> Solicitar retiro </PrimaryBtn>
         </footer>
-        <Modal type="off" :open="isModalVisible" class="modal" @close="toggleModal">
-            <template #body>
-                <Icon icon="check" class="mx-auto mb-4 w-16 h-16 text-green-400" />
-                <p class="mb-4 text-lg text-gray-600">{{ modalMessage }}</p>
-                <PrimaryBtn btn="confirm-button" @click.prevent="toggleModal">{{ modalButtonText }}</PrimaryBtn>
-            </template>
-        </Modal>
+        <SuccessModal :open="isModalVisible" :title="ModalText" @main="confirmModal" @close="confirmModal" />
     </Layout>
 </template>
 
 <script lang="ts">
     import { ref, computed, defineComponent, onMounted, watchEffect } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
     import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import Modal from '@/components/modal/General.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
 
-    import { Company, Pit } from '@/interfaces/sandflow';
+    import { Company, Pit, QueueItem } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import CradleSlot from '@/components/Cradle/cradleSlot.vue';
+    import { getOrder, QueueTransactions } from '@/helpers/useQueueItem';
 
     import axios from 'axios';
+    import router from '@/router';
+
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
@@ -140,7 +88,9 @@
             FieldGroup,
             FieldSelect,
             Modal,
+            SuccessModal,
             Icon,
+            CradleSlot,
         },
         setup() {
             useTitle('Operación en cradle <> Sandflow');
@@ -159,13 +109,38 @@
             const isModalVisible = ref(false);
             const selectedCradle = ref({});
             const sandTypes = ref([]);
+            const openSuccess = ref(false);
+            const ModalText = 'La solicitud de retiro de cajas fue enviada con éxito';
+            const selectedSlots = ref([]);
 
             const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
                 await axios
                     .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
                     .catch((err) => console.error(err));
+                console.log('selectedCradleCheckbox', selectedCradle.value);
 
                 return (cradleSlots.value[slotIndex].status = newStatus);
+            };
+
+            const SelectSlot = (slot: any) => {
+                let hasSlots = selectedSlots.value.find((insideSlot) => {
+                    return insideSlot.id === slot.id;
+                });
+
+                if (hasSlots) {
+                    selectedSlots.value = selectedSlots.value.filter((insideSlot) => {
+                        return insideSlot.id !== slot.id;
+                    });
+                } else {
+                    selectedSlots.value.push(slot);
+                }
+            };
+            const routerGo = () => {
+                router.go(0);
+            };
+
+            const confirmModal = () => {
+                return toggleModal() && setTimeout(routerGo, 2000);
             };
 
             const toggleModal = () => {
@@ -211,6 +186,8 @@
                 if (clientId.value >= 0 && pitId.value >= 0) {
                     return true;
                 }
+
+                return false;
             });
 
             const getFilteredCradles = () => {
@@ -239,17 +216,31 @@
 
             watchEffect(async () => {
                 if (cradleId.value !== -1) {
+                    console.log('cradleId', cradleId.value);
+
                     selectedCradle.value = cradles.value.filter((cradle) => {
+                        console.log('cradle', cradle);
+
                         return cradle.id == cradleId.value;
                     })[0];
+
                     cradleSlots.value = selectedCradle.value.slots;
+
                     cradleSlots.value.forEach((slot) => {
                         const { sandTypeId } = slot;
-                        let sandType = sandTypes.value.filter((sandType) => {
-                            if (sandType.id == sandTypeId) {
-                                return sandType;
-                            }
-                        })[0].type;
+                        console.log('sandTypeId', { sandTypeId });
+                        console.log('slot', slot);
+                        let sandType = sandTypes.value.find((sandType) => {
+                            console.log('sandType', sandType);
+
+                            return sandType.id == sandTypeId;
+                        });
+
+                        if (sandType) {
+                            sandType = sandType.type;
+                        }
+                        console.log('sandType', sandType);
+
                         slot.sandType = sandType;
                     });
                 }
@@ -258,7 +249,6 @@
                     await getFilteredCradles();
                 }
             });
-
             // :: CLIENT
             const selectedClientName = computed(() => {
                 return clientId.value >= 0 ? clients.value.find((pit) => pit.id === clientId.value).name : '';
@@ -279,10 +269,37 @@
                     : '';
             });
 
+            const defaultQueueItem: QueueItem = {
+                sandOrderId: -1,
+                pitId: -1,
+                origin: '',
+                destination: '',
+                status: 0,
+                order: -1,
+            };
+
             const requestEmptyBoxHandle = () => {
-                modalMessage.value = 'La solicitud de retiro de caja vacía fue enviada con éxito.';
-                modalButtonText.value = 'Continuar';
-                toggleModal();
+                selectedSlots.value.forEach((selectedSlot) => {
+                    const newQI = { ...defaultQueueItem };
+                    newQI.status = 10;
+                    newQI.origin = selectedSlot?.location?.where_origin;
+                    newQI.pitId = pitId.value;
+                    newQI.sandOrderId = selectedSlot.id;
+                    console.log('selectedSlot', selectedSlot);
+                    createQueueItem(newQI);
+                });
+            };
+
+            const createQueueItem = async (queueItem: QueueItem) => {
+                await axios
+                    .post(`${apiUrl}/queueItem/`, queueItem)
+                    .then((response) => {
+                        if (response.request.status == 200) {
+                            console.log(queueItem, 'se guardo bien');
+                            confirmModal();
+                        }
+                    })
+                    .catch((err) => console.error(err));
             };
 
             const completeStageHandle = async () => {
@@ -317,6 +334,12 @@
                 toggleModal,
                 isModalVisible,
                 changeCradleSlotStatus,
+                SuccessModal,
+                openSuccess,
+                ModalText,
+                selectedCradle,
+                SelectSlot,
+                confirmModal,
             };
         },
     });
@@ -328,6 +351,9 @@
             width: 32%;
             max-width: 18rem;
         }
+    }
+    .ring {
+        @apply ring-inset ring-green-600;
     }
     .cradle-data-wrapper,
     .cradle-status-wrapper {
@@ -423,6 +449,9 @@
                 .station-title {
                     @apply pb-0 pt-0;
                 }
+            }
+            &.test {
+                @apply border-8 border-green-600;
             }
 
             .station-title {

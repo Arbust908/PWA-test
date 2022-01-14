@@ -200,7 +200,6 @@
             };
 
             const deleteDriver = async (index: number) => {
-                console.log(drivers.value[index].id);
                 let response = await axios
                     .delete(`${api}/driver/${drivers.value[index].id}`)
                     .then((res) => {
@@ -251,8 +250,6 @@
                     console.log('Nothing to push');
                 }
             };
-
-            console.log(axios.get(`${api}/transportProvider`));
 
             const cleanNewDriver = () => {
                 newDriver.name = '';
@@ -308,9 +305,6 @@
                 }
                 const { drivers, ...newTProv } = currentTransportProvider.value;
 
-                console.log('newTraPro', newTransportProvider.value);
-                console.log('newComRep', companyRepresentative.value);
-
                 const { data: tpData } = useAxios(
                     `/transportProvider/${id}`,
                     { method: 'PUT', data: newTransportProvider.value },
@@ -323,12 +317,10 @@
                 );
                 drivers.forEach((driver) => {
                     if (driver.id) {
-                        console.log('driver tiene ID, y aexiste');
                         useAxios(`/driver/${driver.id}`, { method: 'PUT', data: driver }, instance);
                     } else {
                         const { id, ...newDriver } = driver;
                         newDriver.transportProviderId = currentTransportProvider.value.id;
-                        console.log('newDriver', newDriver);
                         const { data } = useAxios(`/driver/`, { method: 'POST', data: newDriver }, instance);
                     }
                 });

@@ -102,7 +102,7 @@
     };
   };
   &__taken {
-    @apply text-white cursor-not-allowed;
+    @apply text-white;
     &.cradle {
       @apply bg-indigo-900;
       &-clickable{
@@ -138,4 +138,7 @@
       @apply text-zinc-400;
     };
   };
+  &.design {
+    background: #CECCCC;
+  }
 }
