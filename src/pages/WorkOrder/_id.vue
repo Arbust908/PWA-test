@@ -25,7 +25,7 @@
                 v-model:clientId="clientId"
                 v-model:service-company-id="serviceCompanyId"
                 v-model:pad="pad"
-                v-model:pits="pits"
+                v-model:pits="pit"
             />
             <EquipmentSection
                 v-else-if="WO_section === 'equipamento'"
@@ -33,8 +33,8 @@
                 v-model:backupCradleId="backupCradleId"
                 v-model:operativeForkliftId="operativeForkliftId"
                 v-model:backupForkliftId="backupForkliftId"
-                v-model:traktors="traktors"
-                v-model:pickups="pickups"
+                v-model:traktors="traktorsObj"
+                v-model:pickups="pickupsObj"
                 v-model:rigmats="rigmats"
                 v-model:conex="conex"
                 v-model:generators="generators"
@@ -142,14 +142,13 @@
                 const { data } = await useAxios(`/workOrder/${id}`, instance);
                 watch(data, (newValue) => {
                     if (newValue) {
-                        console.log(newValue.data);
                         currentWorkOrder.value = newValue.data;
-                        console.log(currentWorkOrder.value?.traktors);
-                        const { traktors, serviceCompany }: any = currentWorkOrder.value;
-                        const servCompany = serviceCompany;
-                        serviceCompany.value = servCompany;
-                        serviceCompanyId.value = Number(serviceCompany.value);
-                        traktors.value = traktors;
+                        const { serviceCompany, pits, traktors, pickups, crew }: any = currentWorkOrder.value;
+                        servCompany.value = serviceCompany;
+                        pit.value = pits;
+                        traktorsObj.value = traktors;
+                        pickupsObj.value = pickups;
+                        crewObj.value = crew;
                     }
                 });
             });
@@ -157,21 +156,21 @@
 
             const woID = ref(newCWO.value.id);
             const client = ref(newCWO.value.client);
-            const serviceCompany = ref(newCWO.value.serviceCompany);
+            const servCompany = ref(newCWO.value.serviceCompany);
             const pad = ref(newCWO.value.pad);
-            const pits = ref(newCWO.value.pits);
+            const pit = ref(newCWO.value.pits);
             const backupPits = ref(JSON.parse(JSON.stringify(newCWO.value.pits)));
             const operativeCradle = ref(newCWO.value.operativeCradle);
             const backupCradle = ref(newCWO.value.backupCradle);
             const operativeForklift = ref(newCWO.value.operativeForklift);
             const backupForklift = ref(newCWO.value.backupForklift);
-            const traktors = ref(newCWO.value.traktors);
+            const traktorsObj = ref(newCWO.value.traktors);
             const backupTraktors = ref(JSON.parse(JSON.stringify(newCWO.value.traktors)));
 
-            const pickups = ref(newCWO.value.pickups);
+            const pickupsObj = ref(newCWO.value.pickups);
             const backupPickups = ref(JSON.parse(JSON.stringify(newCWO.value.pickups)));
 
-            const crew = ref(newCWO.value.crew);
+            const crewObj = ref(newCWO.value.crew);
             const backupCrew = ref(JSON.parse(JSON.stringify(newCWO.value.crew)));
 
             const rigmats = ref(newCWO.value.rigmats);
@@ -181,13 +180,13 @@
             const cabin = ref(newCWO.value.cabin);
 
             const clientId = ref(Number(client.value));
-            const serviceCompanyId = ref(Number(serviceCompany.value));
+            const serviceCompanyId = ref(Number(servCompany.value));
             const operativeCradleId = ref(Number(operativeCradle.value));
             const backupCradleId = ref(Number(backupCradle.value));
             const operativeForkliftId = ref(Number(operativeForklift.value));
             const backupForkliftId = ref(Number(backupForklift.value));
 
-            const crews = crew;
+            const crews = crewObj;
 
             // Crew
             const removeResource = (crewId: number, peopleId: number) => {
@@ -260,7 +259,7 @@
             };
             // Is the Order section is full
             const isOrderFull = computed(() => {
-                return validateOrder(clientId.value, pad.value, pits.value);
+                return validateOrder(clientId.value, pad.value, pit.value);
             });
 
             // Is the Equipment section is full
@@ -270,8 +269,8 @@
                     backupCradleId.value,
                     operativeForkliftId.value,
                     backupForkliftId.value,
-                    traktors.value,
-                    pickups.value
+                    traktorsObj.value,
+                    pickupsObj.value
                 );
             });
 
@@ -286,38 +285,38 @@
             // Remove Empty pits
             const removeEmptyPits = () => {
                 if (!isDraft.value) {
-                    const savedPit = pits.value[0];
+                    const savedPit = pit.value[0];
                 }
-                pits.value = pits.value.filter((pit: Pit) => pit.name !== '');
+                pit.value = pit.value.filter((pit: Pit) => pit.name !== '');
 
-                if (!isDraft.value && pits.value.length === 0) {
-                    pits.value.push(savedPit);
+                if (!isDraft.value && pit.value.length === 0) {
+                    pit.value.push(savedPit);
                 }
             };
             // Remove empty traktors
             const removeEmptyTraktors = (): void => {
                 if (!isDraft.value) {
-                    const savedTraktor = traktors.value[0];
+                    const savedTraktor = traktorsObj.value[0];
                 }
-                traktors.value = traktors.value.filter(
+                traktorsObj.value = traktorsObj.value.filter(
                     (traktor: Traktor) =>
                         !(traktor.chassis === '' && traktor.supplier === '' && traktor.description === '')
                 );
 
-                if (!isDraft.value && traktors.value.length === 0) {
-                    traktors.value.push(savedTraktor);
+                if (!isDraft.value && traktorsObj.value.length === 0) {
+                    traktorsObj.value.push(savedTraktor);
                 }
             };
             const removeEmptyPickups = (): void => {
                 if (!isDraft.value) {
-                    const savedPickup = pickups.value[0];
+                    const savedPickup = pickupsObj.value[0];
                 }
-                pickups.value = pickups.value.filter(
+                pickupsObj.value = pickupsObj.value.filter(
                     (pickup: Pickup) => pickup.pickup_id !== '' && pickup.description !== ''
                 );
 
-                if (!isDraft.value && pickups.value.length === 0) {
-                    pickups.value.push(savedPickup);
+                if (!isDraft.value && pickupsObj.value.length === 0) {
+                    pickupsObj.value.push(savedPickup);
                 }
             };
             // Remove empty Crews
@@ -366,7 +365,7 @@
                 const newWO = {
                     id: woID.value,
                     client: clientId.value,
-                    serviceCompany: serviceCompany.value,
+                    serviceCompany: String(serviceCompanyId.value),
                     // clientId: clientId.value,
                     serviceCompanyId: serviceCompanyId.value,
                     pad: pad.value,
@@ -382,13 +381,14 @@
                     cabin: cabin.value,
                     draft,
                 };
+                console.log(newWO);
                 const { data: WODone } = useAxios(`/workOrder/${woID.value}`, { method: 'PUT', data: newWO }, instance);
                 watch(WODone, async (newVal, _) => {
                     if (newVal && newVal.data && newVal.data.id) {
                         const workOrderId = newVal.data.id;
 
-                        if (pits.value.length > 0) {
-                            const actionablePits = useCompareChanges(pits.value, backupPits.value);
+                        if (pit.value.length > 0) {
+                            const actionablePits = useCompareChanges(pit.value, backupPits.value);
                             const { changed, deleted, create } = actionablePits;
                             changed.forEach(async (pit: Pit) => {
                                 await useAxios(`/pit/${pit.id}`, { method: 'PUT', data: pit }, instance);
@@ -404,8 +404,8 @@
                             });
                         }
 
-                        if (traktors.value.length > 0) {
-                            const actionableTraktors = useCompareChanges(traktors.value, backupTraktors.value);
+                        if (traktorsObj.value.length > 0) {
+                            const actionableTraktors = useCompareChanges(traktorsObj.value, backupTraktors.value);
                             const { changed, deleted, create } = actionableTraktors;
                             changed.forEach(async (traktor: Traktor) => {
                                 await useAxios(`/traktor/${traktor.id}`, { method: 'PUT', data: traktor }, instance);
@@ -422,8 +422,8 @@
                             });
                         }
 
-                        if (pickups.value.length > 0) {
-                            const actionablePickups = useCompareChanges(pickups.value, backupPickups.value);
+                        if (pickupsObj.value.length > 0) {
+                            const actionablePickups = useCompareChanges(pickupsObj.value, backupPickups.value);
                             const { changed, deleted, create } = actionablePickups;
                             changed.forEach(async (pickup: Pickup) => {
                                 await useAxios(`/pickup/${pickup.id}`, { method: 'PUT', data: pickup }, instance);
@@ -507,18 +507,18 @@
                 isEquipmentFull,
                 isRRHHFull,
                 client,
-                serviceCompany,
+                servCompany,
                 clientId,
                 serviceCompanyId,
                 pad,
-                pits,
+                pit,
                 backupPits,
                 operativeCradleId,
                 backupCradleId,
                 operativeForkliftId,
                 backupForkliftId,
-                traktors,
-                pickups,
+                traktorsObj,
+                pickupsObj,
                 rigmats,
                 conex,
                 generators,
