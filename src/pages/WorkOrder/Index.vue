@@ -12,7 +12,13 @@
                 @update:data="clientId = $event"
             />
         </div>
-        <VTable class="mt-5" :columns="columns" :pagination="pagination" :items="filteredWorkOrders" :actions="actions">
+        <VTable
+            class="mt-5 min-w-full lg:min-w-min"
+            :columns="columns"
+            :pagination="pagination"
+            :items="filteredWorkOrders"
+            :actions="actions"
+        >
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item.id ? null : 'empty'">

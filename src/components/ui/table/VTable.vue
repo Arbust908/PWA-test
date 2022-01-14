@@ -201,11 +201,23 @@
                         modifier = -1;
                     }
 
-                    const propA = getDescendantProp(a, sortKey).toString().toLowerCase();
-                    const propB = getDescendantProp(b, sortKey).toString().toLowerCase();
+                    let propA = getDescendantProp(a, sortKey);
+                    let propB = getDescendantProp(b, sortKey);
 
-                    if (!isNaN(Number(propA)) && !isNaN(Number(propA))) {
-                        return Number(propA) - Number(propB);
+                    if (propA === null) {
+                        propA = 'zzzzz';
+                    }
+
+                    if (propB === null) {
+                        propB = 'zzzzz';
+                    }
+
+                    if (!isNaN(Number(propA))) {
+                        propA = Number(propA);
+                    }
+
+                    if (!isNaN(Number(propB))) {
+                        propB = Number(propB);
                     }
 
                     if (propA < propB) {

@@ -14,9 +14,18 @@
             />
         </div>
 
-        <VTable class="mt-5" :columns="columns" :items="filteredSands" :actions="actions">
+        <VTable
+            class="mt-5 min-w-full sm:min-w-min"
+            :columns="columns"
+            :items="filteredSands"
+            :actions="actions"
+            :pagination="pagination"
+        >
             <template #item="{ item }">
                 <!-- Desktop -->
+                <td :class="item.type ? null : 'empty'">
+                    <div :class="`m-auto w-5 h-5 rounded-full mesh-type__${item.id} boxCard`"></div>
+                </td>
                 <td :class="item.type ? null : 'empty'">
                     {{ item.type || 'Sin definir' }}
                 </td>
@@ -28,11 +37,16 @@
 
             <!-- Mobile -->
             <template #mobileTitle="{ item }">
-                {{ item.type }}
+                <div class="flex items-center">
+                    <div
+                        :class="`mr-2 w-5 h-5 rounded-full mesh-type__${item.id} boxCard inline-block relative top-2`"
+                    />
+                    {{ item.type }}
+                </div>
             </template>
 
             <template #mobileSubtitle="{ item }">
-                <span class="font-bold">Observaciones: </span> {{ item.observations }}
+                <span class="font-bold ml-7">Observaciones: </span> {{ item.observations }}
             </template>
         </VTable>
 
@@ -107,8 +121,14 @@
             const bdInfo = ref(null);
             const toggleBD = () => (showBD.value = !showBD.value);
 
+            const pagination = ref({
+                sortKey: 'id',
+                sortDir: 'asc',
+            });
+
             const columns = [
-                { title: 'Tipo de Malla', key: 'name', sortable: true },
+                { title: 'Color', key: 'id', sortable: true },
+                { title: 'Tipo de Malla', key: 'type', sortable: true },
                 { title: 'Observaciones', key: 'observations', sortable: true },
                 { title: '', key: 'actions' },
             ];
@@ -237,6 +257,7 @@
                 toggleBD,
                 showBD,
                 bdInfo,
+                pagination,
             };
         },
     };
@@ -244,4 +265,5 @@
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
+    @import '@/assets/box.scss';
 </style>
