@@ -41,6 +41,7 @@
                     validation-type="extension"
                     :char-amount="{ min: 1, max: 4 }"
                     :post="{ title: 'Peso en Toneladas', value: 't' }"
+                    @keydown.enter.prevent
                 />
                 <div class="flex flex-row content-evenly">
                     <AddDeleteBtn
@@ -127,11 +128,13 @@
                 const currSP = getCurrentSandProvider(spId);
                 currSP?.SandOrders?.push(newSandOrder);
             };
+
             const removeSandOrder = (spId: number, soInid: number) => {
                 const currSP = getCurrentSandProvider(spId);
 
                 if (currSP) {
                     currSP.SandOrders = currSP.SandOrders.filter((so) => so.innerId !== soInid);
+                    console.log('jaja me borre2');
                 }
             };
 
