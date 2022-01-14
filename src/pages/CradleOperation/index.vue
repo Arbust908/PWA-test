@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
+        <header class="flex flex-col md:flex-row items-center md:mb-4">
             <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Operación en cradle</h1>
         </header>
         <section class="bg-second-0 rounded-md shadow-sm">
@@ -357,7 +357,7 @@
     }
     .cradle-data-wrapper,
     .cradle-status-wrapper {
-        @apply flex flex-col text-left justify-between;
+        @apply flex flex-col text-left;
     }
     .cradle-status-wrapper {
         @apply mb-4;
@@ -429,7 +429,7 @@
         }
     }
     .cradle-slots {
-        @apply pl-12 pr-12 pb-12 grid grid-cols-1 gap-4 justify-between items-center;
+        @apply pl-12 pr-12 pb-12 grid grid-cols-1 gap-4  items-center;
 
         @screen lg {
             @apply grid-cols-4;
@@ -440,7 +440,7 @@
             @apply border-dashed border-2 border-second-300 rounded-lg p-4 cursor-pointer flex flex-col text-center;
 
             &:not(.empty) {
-                @apply justify-between bg-gray-100 border-none;
+                @apply bg-gray-100 border-none;
             }
 
             &.without-box {

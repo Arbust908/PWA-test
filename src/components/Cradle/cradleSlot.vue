@@ -1,34 +1,36 @@
 <template>
     <article v-if="box.boxId" class="slot" :class="isClicked ? 'ring' : null" @click.self="isClickedAndSelected">
-        <span class="station-title" @click.self="isClickedAndSelected">
+        <span class="station-title-full" @click.self="isClickedAndSelected">
             Estación {{ index + 1 }} - {{ box.boxId }}</span
         >
         <div class="cradle-status-wrapper">
             <!-- checkbox section  -->
-            <span class="cradle-status" @click.prevent="$emit('changeCradleSlotStatus', [index, '1'])">
-                <div class="icon-wrapper check" :class="[box.status == '1' ? 'active' : '']">
-                    <Icon v-if="box.status == '1'" icon="Check" class="icon" />
-                </div>
-                En ejecución
-            </span>
-            <span class="cradle-status" @click.prevent="$emit('changeCradleSlotStatus', [index, '2'])">
-                <div class="icon-wrapper pause" :class="[box.status == '2' ? 'active' : '']">
-                    <Icon v-if="box.status == '2'" icon="Pause" type="outline" class="icon" />
-                </div>
-                Pausa
-            </span>
-            <span class="cradle-status" @click.prevent="$emit('changeCradleSlotStatus', [index, '3'])">
-                <div class="icon-wrapper empty" :class="[box.status == '3' ? 'active' : '']">
-                    <Icon v-if="box.status == '3'" icon="Minus" class="icon" />
-                </div>
-                Vacía
-            </span>
-            <span class="cradle-status" @click.prevent="$emit('changeCradleSlotStatus', [index, '0'])">
-                <div class="icon-wrapper unavailable" :class="[box.status == '0' ? 'active' : '']">
-                    <Icon v-if="box.status == '0'" icon="X" class="icon" />
-                </div>
-                No disponible
-            </span>
+            <div class="cradle-status-wrapper">
+                <span class="cradle-status" @click.prevent="$emit('changeCradleSlotStatus', [index, '1'])">
+                    <div class="icon-wrapper check" :class="[box.status == '1' ? 'active' : '']">
+                        <Icon v-if="box.status == '1'" icon="Check" class="icon" />
+                    </div>
+                    En ejecución
+                </span>
+                <span class="cradle-status" @click.prevent="$emit('changeCradleSlotStatus', [index, '2'])">
+                    <div class="icon-wrapper pause" :class="[box.status == '2' ? 'active' : '']">
+                        <Icon v-if="box.status == '2'" icon="Pause" type="outline" class="icon" />
+                    </div>
+                    Pausa
+                </span>
+                <span class="cradle-status" @click.prevent="$emit('changeCradleSlotStatus', [index, '3'])">
+                    <div class="icon-wrapper empty" :class="[box.status == '3' ? 'active' : '']">
+                        <Icon v-if="box.status == '3'" icon="Minus" class="icon" />
+                    </div>
+                    Vacía
+                </span>
+                <span class="cradle-status" @click.prevent="$emit('changeCradleSlotStatus', [index, '0'])">
+                    <div class="icon-wrapper unavailable" :class="[box.status == '0' ? 'active' : '']">
+                        <Icon v-if="box.status == '0'" icon="X" class="icon" />
+                    </div>
+                    No disponible
+                </span>
+            </div>
 
             <hr class="border-gray-300" />
             <div class="cradle-data-wrapper" @click.self="isClickedAndSelected">
@@ -98,19 +100,16 @@
 <style lang="scss" scoped>
     .cradle-data-wrapper,
     .cradle-status-wrapper {
-        @apply flex flex-col text-left justify-between;
-    }
-    .cradle-status-wrapper {
-        @apply mb-4;
+        @apply flex flex-col text-left justify-between mb-4 px-3;
     }
     .cradle-data-wrapper {
         @apply mt-4;
     }
     .cradle-status {
-        @apply flex;
+        @apply flex mb-2;
         & .icon-wrapper {
             border-radius: 100%;
-            @apply mr-1 w-5 h-5 flex items-center justify-center;
+            @apply mr-4 w-5 h-5 flex items-center justify-center;
 
             & .icon {
                 @apply w-5 h-5;
@@ -121,18 +120,16 @@
             }
 
             &.pause {
-                @apply mr-1;
-
+                @apply text-yellow-600 border-yellow-600;
                 &.active {
                     transform: translate(-2px, -2px);
-                    @apply text-yellow-600 w-6 h-6 mr-0;
+                    @apply w-6 h-6 mr-3;
 
                     & .icon {
                         @apply w-6 h-6;
                     }
                 }
             }
-
             &.empty {
                 @apply text-gray-600 border-gray-600 border-2;
             }
@@ -151,7 +148,7 @@
         }
     }
     .cradle-data {
-        @apply text-purple-600 flex items-center;
+        @apply text-purple-600 flex items-center py-2;
 
         & .icon {
             @apply mr-1 w-6 h-6 text-purple-600;
@@ -183,12 +180,12 @@
                     @apply pb-0 pt-0;
                 }
             }
-            &.test {
-                @apply border-8 border-green-600;
-            }
 
             .station-title {
-                @apply text-lg font-bold text-gray-400 pb-16 pt-4;
+                @apply text-lg font-bold text-gray-400 pb-8 pt-4;
+            }
+            .station-title-full {
+                @apply text-lg font-bold text-gray-700 pb-8 pt-4;
             }
 
             .copy {
