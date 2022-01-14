@@ -81,6 +81,7 @@
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5 overflow-auto"
+                        is-design
                         :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
