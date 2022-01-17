@@ -14,6 +14,7 @@
 <script setup lang="ts">
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
+
     defineProps({
         title: {
             type: String,
