@@ -5,7 +5,7 @@
             <p>Total: {{ weigth }} Toneladas</p>
             <div class="flex gap-x-1 items-center">
                 <progress v-if="showProgress" max="100" :value="stagePorcentage">{{ stagePorcentage }}%</progress>
-                <span v-if="showProgress">{{ stagePorcentage + '%' }}</span>
+                <span v-if="showProgress">{{ stagePorcentage.toFixed(2) + '%' }}</span>
                 <span v-else class="italic text-center w-full">{{
                     stagePorcentage === 0 ? 'Pendiente' : 'Finalizada '
                 }}</span>
@@ -25,25 +25,13 @@
             <section
                 class="max-w-[16rem] w-full rounded border border-gray-200 shadow-sm px-5 py-7 self-start space-y-6"
             >
-                <div v-for="(sand, index) in sands" :key="sand.id + sand.type" class="flex items-start">
-                    <i class="w-3 h-3 inline-block rounded-full mesh-box__1 m-2 bubble"></i>
-                    <article>
-                        <h4>Arena {{ sand.type }}</h4>
-                        <p class="text-gray-400">{{ sand.quantity }} toneladas</p>
-                    </article>
-                    <article
-                        :ref="`progress${index >= 1 ? index + 1 : null}`"
-                        class="w-[70px] rounded flex justify-center items-center ml-auto"
-                    >
-                        <div
-                            class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center circle-progress"
-                        >
-                            <p class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]">
-                                {{ getPorcentage(sand.quantity, queueDetail[sand.type], index) }}%
-                            </p>
-                        </div>
-                    </article>
-                </div>
+                <StageSheetSandDetail
+                    v-for="sand in sands"
+                    :key="sand.id + sand.type"
+                    :type="sand.type"
+                    :amount="sand.quantity"
+                    :porcentage="getPorcentage(sand.quantity, queueDetail[sand.type])"
+                />
             </section>
             <section v-if="!isActiveStage" class="flex justify-center items-center max-w-md">
                 <p class="leading-wider leading-loose text-center max-w-sm mx-auto">
@@ -56,7 +44,7 @@
                     :key="place + 'place'"
                     :class="[
                         isSelectedBox(place) ? 'selected' : null,
-                        box.boxId ? `mesh-box__1 mesh-box__${box.category} filled` : 'not-filled',
+                        box.boxId ? `mesh-type__${box?.sandType?.id} filled boxCard` : 'not-filled',
                     ]"
                     class="stage--box"
                     @click="fillBox(place, $event)"
@@ -93,6 +81,7 @@
                                             :box="box"
                                             @set-box="addBoxToQueue(place, $event)"
                                         />
+                                        <p v-if="boxesByFloorAndFiltered.length <= 0">Sin Cajas</p>
                                     </section>
                                 </div>
                             </div>
@@ -104,17 +93,18 @@
                 </article>
             </section>
             <footer class="w-full flex justify-end gap-3">
-                <NoneBtn btn="wide"> Cancelar </NoneBtn>
-                <InverseBtn btn="wide"> Guardar </InverseBtn>
+                <NoneBtn btn="wide" :is-loading="isLoading"> Cancelar </NoneBtn>
+                <InverseBtn btn="wide" :is-loading="isLoading" @click="generateQueue()"> Guardar </InverseBtn>
             </footer>
         </div>
     </article>
 </template>
 
 <script setup lang="ts">
-    import { SandStage, Sand } from '@/interfaces/sandflow';
+    import { SandStage, Sand, QueueItem, SandOrder } from '@/interfaces/sandflow';
     import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
     import { useClone } from '@/helpers/useClone';
+    import { Ref } from 'vue';
 
     import { OnClickOutside } from '@vueuse/components';
     import ChevronIcon from '@/components/stageSheet/ChevronIcon.vue';
@@ -122,6 +112,7 @@
     import InverseBtn from '@/components/ui/buttons/InverseBtn.vue';
     import PlusIcon from './PlusIcon.vue';
     import SheetDepoBox from './sheetDepoBox.vue';
+    import StageSheetSandDetail from './stageSheetSandDetail.vue';
     const props = defineProps({
         sandStage: {
             type: Object,
@@ -150,27 +141,22 @@
         }, 0);
     });
 
-    const progress = ref(null);
-    const progress2 = ref(null);
-    const progress3 = ref(null);
-    const stagePorcentageVariable = useCssVar('--progress', progress);
-    const stagePorcentageVariable2 = useCssVar('--progress', progress2);
-    const stagePorcentageVariable3 = useCssVar('--progress', progress3);
-    stagePorcentageVariable.value = '0%';
-    const progression = setInterval(() => {
-        if (parseInt(stagePorcentageVariable.value) < stagePorcentage.value) {
-            stagePorcentageVariable.value = parseInt(stagePorcentageVariable.value) + '%';
-        } else {
-            clearInterval(progression);
-        }
-    }, 100);
+    const isLoading = ref(false);
+    const toggleLoading = useToggle(isLoading);
 
     const showProgress = computed(() => {
         return stagePorcentage.value > 0 && stagePorcentage.value < 100;
     });
-    const boxQueue = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    const boxQueue: Ref<Array<number | SandOrder>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
     const addBoxToQueue = (place: null | number = null, box: any = null) => {
         if (place !== null && box !== null) {
+            console.log(place, box);
+            console.log(typeof box.location === 'string');
+
+            if (typeof box.location === 'string') {
+                box.location = JSON.parse(box.location);
+            }
+            box.location.where = 'sheet';
             boxQueue.value[place] = box;
             selectedBox.value = null;
             emits('update-queue', boxQueue.value);
@@ -210,9 +196,18 @@
     const boxesByFloorAndFiltered = computed(() => {
         const filteredBoxes = [];
         props.boxes[selectedFloor.value - 1].map((box) => {
-            const compareQueue = boxQueue.value.filter((box) => {
-                return box.id;
+            console.groupCollapsed(`${box.id}`);
+            console.log('Box Id: ', box.id);
+            console.log('Box where: ', box?.location?.where);
+            console.log('Box BoxId: ', box?.sandOrder?.boxId);
+            console.log('Box: ', box);
+            console.groupEnd();
+
+            const compareQueue = boxQueue.value.filter((queuedBox) => {
+                return queuedBox.id;
             });
+
+            console.log('Compare Queue: ', compareQueue);
 
             if (compareQueue.length <= 0) {
                 filteredBoxes.push(box);
@@ -220,9 +215,16 @@
                 return true;
             }
 
-            if (box && box.id) {
+            if (box?.id) {
                 const isOnQueue = compareQueue.some((queuedBox) => {
-                    return queuedBox.boxId === box.id;
+                    console.groupCollapsed(`isOnQueue ${queuedBox.id}`);
+                    console.log('Box: ', queuedBox);
+                    console.log('Box Id: ', queuedBox.id);
+                    console.log('Box where: ', queuedBox?.location?.where);
+                    console.log('Box BoxId: ', queuedBox?.boxId);
+                    console.groupEnd();
+
+                    return queuedBox.boxId === box?.sandOrder?.boxId;
                 });
 
                 if (!isOnQueue) {
@@ -261,26 +263,12 @@
 
         return total;
     });
-    const getPorcentage = (total: number, value = 0, index = 0) => {
-        if (index !== null) {
-            switch (index) {
-                case 0:
-                    stagePorcentageVariable.value = (value * 100) / total + '%';
-                    break;
-                case 1:
-                    stagePorcentageVariable2.value = (value * 100) / total + '%';
-                    break;
-                case 2:
-                    stagePorcentageVariable3.value = (value * 100) / total + '%';
-                    break;
-            }
-        }
-
+    const getPorcentage = (total: number, value = 0) => {
         return (value * 100) / total;
     };
 
     const stagePorcentage = computed(() => {
-        return getPorcentage(weigth.value, queueDetailTotal.value, null);
+        return getPorcentage(weigth.value, queueDetailTotal.value);
     });
     watch(stagePorcentage, () => {
         if (stagePorcentage.value >= 100) {
@@ -307,7 +295,7 @@
 
     onMounted(async () => {
         emits('update-queue', boxQueue.value);
-        const { sandId1, sandId2, sandId3, quantity1, quantity2, quantity3 } = props.sandStage;
+        const { sandId1, sandId2, sandId3, sandId4, quantity1, quantity2, quantity3, quantity4 } = props.sandStage;
 
         if (sandId1) {
             updateSand(await getSandLogic(sandId1), quantity1);
@@ -320,7 +308,24 @@
         if (sandId3) {
             updateSand(await getSandLogic(sandId3), quantity3);
         }
+
+        if (sandId4) {
+            updateSand(await getSandLogic(sandId4), quantity4);
+        }
     });
+
+    const generateQueue = () => {
+        isLoading.value = true;
+        console.log(boxQueue.value);
+        const toAddQueue = boxQueue.value.filter((box) => {
+            return typeof box !== 'number';
+        });
+        console.log(toAddQueue);
+        setTimeout(() => {
+            console.log('Espero');
+            isLoading.value = false;
+        }, 1500);
+    };
 </script>
 
 <style scoped lang="scss">
@@ -344,7 +349,6 @@
             }
         }
     }
-
     progress {
         @apply rounded-full h-2.5;
     }
@@ -371,7 +375,7 @@
             @apply text-blue-600 bg-blue-100 border-blue-600 border-solid;
         }
         &.filled {
-            @apply border-solid border-2 text-sm;
+            @apply border-solid border  text-sm;
         }
     }
     .circle-progress {

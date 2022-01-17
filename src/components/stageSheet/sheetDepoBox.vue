@@ -23,14 +23,17 @@
 
     const myBox = ref(props.box);
 
-    const boxId = computed(() => {
+    const sOId = computed(() => {
         return myBox.value?.sandOrder?.id;
+    });
+    const boxId = computed(() => {
+        return myBox.value?.sandOrder?.boxId;
     });
     const amountInT = computed(() => {
         return myBox.value?.sandOrder?.amount + ' toneladas';
     });
 
-    const { read } = useApi(`/sandOrder/${boxId.value}`);
+    const { read } = useApi(`/sandOrder/${sOId.value}`);
     const boxInfo = read();
     watch(boxInfo, () => {
         if (boxInfo.value) {
