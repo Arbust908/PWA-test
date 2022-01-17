@@ -95,7 +95,6 @@
                     pickupId: '',
                     description: '',
                 });
-                console.log(pickups.value);
             };
 
             if (pickups?.value?.length === 0) {

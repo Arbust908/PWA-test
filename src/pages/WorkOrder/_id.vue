@@ -146,8 +146,14 @@
                         const { serviceCompany, pits, traktors, pickups, crew }: any = currentWorkOrder.value;
                         servCompany.value = serviceCompany;
                         pit.value = pits;
+                        pit.value.forEach((pitInId) => {
+                            pitInId.innerId = pitInId.id;
+                        });
+                        backupPits.value = JSON.parse(JSON.stringify(pit.value));
                         traktorsObj.value = traktors;
+                        backupTraktors.value = JSON.parse(JSON.stringify(traktorsObj.value));
                         pickupsObj.value = pickups;
+                        backupPickups.value = JSON.parse(JSON.stringify(pickupsObj.value));
                         crewObj.value = crew;
                     }
                 });
@@ -381,7 +387,6 @@
                     cabin: cabin.value,
                     draft,
                 };
-                console.log(newWO);
                 const { data: WODone } = useAxios(`/workOrder/${woID.value}`, { method: 'PUT', data: newWO }, instance);
                 watch(WODone, async (newVal, _) => {
                     if (newVal && newVal.data && newVal.data.id) {
@@ -397,7 +402,7 @@
                                 await useAxios(`/pit/${pit.id}`, { method: 'DELETE' }, instance);
                             });
                             create.forEach(async (pit: Pit) => {
-                                const { id: noUseId, ...newPit } = pit;
+                                const { id: noUseId, innerId: noUseinnerId, ...newPit } = pit;
                                 newPit.companyId = Number(newVal.data.client);
                                 newPit.workOrderId = workOrderId;
                                 await useAxios(`/pit`, { method: 'POST', data: newPit }, instance);
