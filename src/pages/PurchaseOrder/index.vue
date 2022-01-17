@@ -54,13 +54,6 @@
     useTitle('Ordenes de Pedido <> Sandflow');
 
     const sandProviderId = ref(-1);
-    const router = useRouter();
-
-    const { Ctrl_C } = useMagicKeys();
-    whenever(Ctrl_C, () => {
-        console.log('Crear Nuevo!');
-        router.push('/orden-de-pedido/nueva');
-    });
 
     const { deletePurchaseOrder, savePurchaseOrder } = useActions(['deletePurchaseOrder', 'savePurchaseOrder']);
     const { read, destroy } = useApi('/purchaseOrder');
