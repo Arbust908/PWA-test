@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <ABMFormTitle title="Operacíon en forklift" />
+        <ABMFormTitle title="Operación en forklift" />
         <FieldGroup class="max-w-2xl">
             <ClientPitCombo v-model:client-id="clientId" v-model:pit-id="pitId" validation-type="empty" />
         </FieldGroup>

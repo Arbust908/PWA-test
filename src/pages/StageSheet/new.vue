@@ -1,155 +1,3 @@
-<script setup lang="ts">
-    import axios from 'axios';
-    import { StageSheet, SandStage, Warehouse } from '@/interfaces/sandflow';
-    import { boxesByFloor, formatLocation } from '@/helpers/useWarehouse';
-    import { useAxios } from '@vueuse/integrations/useAxios';
-
-    import Layout from '@/layouts/Main.vue';
-    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
-    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
-    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import StageSheetStage from '@/components/stageSheet/stageSheetStage.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import StageSheetStageBox from '@/components/stageSheet/stageSheetStageBox.vue';
-
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
-    const instance = axios.create({
-        baseURL: apiUrl,
-    });
-
-    const clientId = ref(-1);
-    const pitId = ref(-1);
-
-    const _TABS = { PENDING: 0, COMPLETED: 1 };
-    const selectedTab = ref(0);
-    const setTab = (tab: number) => {
-        selectedTab.value = tab;
-    };
-    const isTabSelected = (tab: number) => {
-        return selectedTab.value === tab;
-    };
-
-    const actualSheet: StageSheet = reactive({
-        companyId: -1,
-        pitId: -1,
-        warehouseId: -1,
-        operativeCradleId: -1,
-        backupCradleId: -1,
-        stages: [],
-    });
-
-    let warehouse: Ref<Warehouse> = ref({});
-
-    const fillSheet = async (currentSheet: any) => {
-        if (currentSheet.companyId !== -1 && currentSheet.pitId !== -1) {
-            getSandPlan(currentSheet);
-            getDeposit(currentSheet);
-        }
-    };
-
-    watch(clientId, (newVal) => {
-        actualSheet.companyId = newVal;
-        fillSheet(actualSheet);
-    });
-    watch(pitId, (newVal) => {
-        actualSheet.pitId = newVal;
-        fillSheet(actualSheet);
-    });
-
-    const getSandPlan = async ({ pitId: pozoId, companyId }: StageSheet) => {
-        const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
-        watch(data, (newVal) => {
-            stages.value = newVal.data[0].stages;
-        });
-    };
-
-    const getDeposit = async ({ pitId: pozoId, companyId }: StageSheet) => {
-        const { data } = useAxios(`/warehouse?pitId=${pozoId}`, instance);
-        watch(data, (newVal) => {
-            warehouse.value = newVal.data[0];
-        });
-    };
-
-    const selectedStage = ref(-1);
-    let stages: Ref<Array<SandStage>> = ref([]);
-
-    const setWareHouseBoxes = ({ layout }: Warehouse) => {
-        const whBoxes = [];
-        for (const key in layout) {
-            if (Object.prototype.hasOwnProperty.call(layout, key)) {
-                const element = layout[key];
-                const location = formatLocation(key);
-                whBoxes.push({
-                    ...element,
-                    ...location,
-                });
-            }
-        }
-
-        return whBoxes.filter((box) => box.id);
-    };
-
-    const setStage = (stage: number) => {
-        if (selectedStage.value.id === stage) {
-            selectedStage.value = -1;
-        } else {
-            selectedStage.value = stages.value.find((s) => s.id === stage);
-        }
-    };
-    const finalizedStages = computed(() => {
-        return stages.value?.filter((s) => s.status === 'finalized');
-    });
-    const pendingStages = computed(() => {
-        return stages.value?.sort((a, b) => a.stage - b.stage);
-    });
-    const isSageSelected = (stage: number, selected: number): boolean => {
-        return selected === stage;
-    };
-    const boxes = computed(() => {
-        return boxesByFloor(warehouse.value.layout || {});
-    });
-
-    const selectedQueue = ref([]);
-    const updateQueue = (queue: Array<any>) => {
-        selectedQueue.value = queue;
-    };
-    const queueDetail = computed(() => {
-        return selectedQueue.value.reduce((acc, item) => {
-            if (item?.sandType?.id) {
-                const sandId = item?.sandType?.id;
-                const sandIndex = acc.indexOf(sandId);
-
-                if (sandIndex === -1) {
-                    acc.push(item?.amount);
-                } else {
-                    acc[sandIndex] = acc[sandIndex] + item?.amount;
-                }
-            }
-
-            return acc;
-        }, []);
-    });
-    const sumQueueDetail = computed(() => {
-        return queueDetail.value.reduce((acc, item) => {
-            return acc + item;
-        }, 0);
-    });
-    const queueDetailFormated = (info: any) => {
-        if (info) {
-            return info + ' toneladas';
-        }
-
-        return '-';
-    };
-    const setStageFull = (sheetId: number) => {
-        const stage = stages.value.find((stage) => stage.stageSheetId === sheetId);
-
-        if (stage) {
-            stage.done = stage.weight;
-        }
-    };
-</script>
-
 <template>
     <Layout>
         <ABMFormTitle title="Stage sheet" />
@@ -162,7 +10,6 @@
             />
             <PrimaryBtn class="col-span-6 md:col-span-3 max-h-12 mt-7">Finalizar Stage</PrimaryBtn>
         </FieldGroup>
-        {{}}
         <nav class="flex gap-8 mt-10">
             <button
                 :class="isTabSelected(_TABS.PENDING) ? 'selected' : null"
@@ -212,6 +59,11 @@
                     <p class="text-center p-6">No hay etapas finalizadas</p>
                 </StageSheetStageBox>
             </div>
+            <div v-else>
+                <StageSheetStageBox v-if="finalizedStages.length <= 0">
+                    <p class="text-center p-6">No hay etapas</p>
+                </StageSheetStageBox>
+            </div>
             <aside>
                 <h3 class="text-3xl font-bold">Detalle</h3>
                 <article v-if="selectedStage?.id === -1" class="px-4 py-6 border rounded-[10px]">
@@ -257,6 +109,182 @@
         </section>
     </Layout>
 </template>
+
+<script setup lang="ts">
+    import axios from 'axios';
+    import { StageSheet, SandStage, Warehouse, QueueItem } from '@/interfaces/sandflow';
+    import { boxesByFloor, formatLocation } from '@/helpers/useWarehouse';
+    import { useAxios } from '@vueuse/integrations/useAxios';
+
+    import Layout from '@/layouts/Main.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+    import StageSheetStage from '@/components/stageSheet/stageSheetStage.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import StageSheetStageBox from '@/components/stageSheet/stageSheetStageBox.vue';
+    import { getQueueItems } from '@/helpers/useQueueItem';
+
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    const instance = axios.create({
+        baseURL: apiUrl,
+    });
+
+    const clientId = ref(-1);
+    const pitId = ref(-1);
+
+    const _TABS = { PENDING: 0, COMPLETED: 1 };
+    const selectedTab = ref(0);
+    const setTab = (tab: number) => {
+        selectedTab.value = tab;
+    };
+    const isTabSelected = (tab: number) => {
+        return selectedTab.value === tab;
+    };
+
+    const actualSheet: StageSheet = reactive({
+        companyId: -1,
+        pitId: -1,
+        warehouseId: -1,
+        operativeCradleId: -1,
+        backupCradleId: -1,
+        stages: [],
+    });
+
+    let warehouse: Ref<Warehouse> = ref({});
+    const queueBoxes = ref([]);
+
+    const fillSheet = async (currentSheet: any) => {
+        if (currentSheet.companyId !== -1 && currentSheet.pitId !== -1) {
+            getSandPlan(currentSheet);
+            getDeposit(currentSheet);
+        }
+    };
+
+    watch(clientId, (newVal) => {
+        actualSheet.companyId = newVal;
+        fillSheet(actualSheet);
+    });
+    watch(pitId, (newVal) => {
+        actualSheet.pitId = newVal;
+        fillSheet(actualSheet);
+    });
+
+    const getSandPlan = async ({ pitId: pozoId, companyId }: StageSheet) => {
+        const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
+        watch(data, (newVal) => {
+            console.log(newVal);
+            stages.value = newVal.data[0]?.stages;
+        });
+    };
+
+    const getDeposit = async ({ pitId: pozoId, companyId }: StageSheet) => {
+        const { data } = useAxios(`/warehouse?pitId=${pozoId}`, instance);
+        watch(data, (newVal) => {
+            warehouse.value = newVal?.data[0];
+        });
+    };
+
+    const selectedStage = ref(-1);
+    let stages: Ref<Array<SandStage>> = ref([]);
+
+    const setWareHouseBoxes = ({ layout }: Warehouse) => {
+        const whBoxes = [];
+        for (const key in layout) {
+            if (Object.prototype.hasOwnProperty.call(layout, key)) {
+                const element = layout[key];
+                const location = formatLocation(key);
+                whBoxes.push({
+                    ...element,
+                    ...location,
+                });
+            }
+        }
+
+        return whBoxes.filter((box) => box.id);
+    };
+
+    const setStage = (stage: number) => {
+        if (selectedStage.value.id === stage) {
+            selectedStage.value = -1;
+        } else {
+            selectedStage.value = stages.value.find((s) => s.id === stage);
+        }
+    };
+    const finalizedStages = computed(() => {
+        return stages.value?.filter((s) => s.status === 'finalized') || [];
+    });
+    const pendingStages = computed(() => {
+        return stages.value?.sort((a, b) => a.stage - b.stage) || [];
+    });
+    const isSageSelected = (stage: number, selected: number): boolean => {
+        return selected === stage;
+    };
+    const boxes = computed(() => {
+        if (pitId.value !== -1 && clientId.value !== -1) {
+            return boxesByFloor(
+                queueBoxes.value.filter((box) => box.pitId === pitId.value),
+                true
+            );
+        }
+
+        return boxesByFloor(warehouse.value.layout || {});
+    });
+
+    const selectedQueue = ref([]);
+    const updateQueue = (queue: Array<any>) => {
+        selectedQueue.value = queue;
+    };
+    const queueDetail = computed(() => {
+        return selectedQueue.value.reduce((acc, item) => {
+            if (item?.sandType?.id) {
+                const sandId = item?.sandType?.id;
+                const sandIndex = acc.indexOf(sandId);
+
+                if (sandIndex === -1) {
+                    acc.push(item?.amount);
+                } else {
+                    acc[sandIndex] = acc[sandIndex] + item?.amount;
+                }
+            }
+
+            return acc;
+        }, []);
+    });
+    const sumQueueDetail = computed(() => {
+        return queueDetail.value.reduce((acc, item) => {
+            return acc + item;
+        }, 0);
+    });
+    const queueDetailFormated = (info: any) => {
+        if (info) {
+            return info + ' toneladas';
+        }
+
+        return '-';
+    };
+    const setStageFull = (sheetId: number) => {
+        const stage = stages.value.find((stage) => stage.stageSheetId === sheetId);
+
+        if (stage) {
+            stage.done = stage.weight;
+        }
+    };
+
+    onMounted(async () => {
+        queueBoxes.value = await getQueueItems();
+        queueBoxes.value = queueBoxes.value
+            ?.map((item) => {
+                const {
+                    sandOrder: { location },
+                } = item;
+                item.location = JSON.parse(location);
+
+                return item;
+            })
+            .filter((item) => item.location?.where === 'warehouse');
+    });
+</script>
 
 <style scoped lang="scss">
     @import '@/assets/box.scss';

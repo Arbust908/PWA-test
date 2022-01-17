@@ -1,3 +1,116 @@
+<template>
+    <article class="stage--row">
+        <header class="flex justify-between">
+            <h2>Etapa {{ sandStage.stage }}/20</h2>
+            <p>Total: {{ weigth }} Toneladas</p>
+            <div class="flex gap-x-1 items-center">
+                <progress v-if="showProgress" max="100" :value="stagePorcentage">{{ stagePorcentage }}%</progress>
+                <span v-if="showProgress">{{ stagePorcentage + '%' }}</span>
+                <span v-else class="italic text-center w-full">{{
+                    stagePorcentage === 0 ? 'Pendiente' : 'Finalizada '
+                }}</span>
+            </div>
+            <i
+                :class="isSelectedStage ? 'rotate-180' : 'rotate-0'"
+                class="expand-btn"
+                @click="$emit('set-stage', sandStage.id)"
+            >
+                <ChevronIcon />
+            </i>
+        </header>
+        <div
+            :class="isSelectedStage ? 'opened' : 'scale-y-0 h-0'"
+            class="flex gap-5 border-t border-gray-200 transform transition ease-in-out duration-300 overflow-hidden origin-top flex-wrap"
+        >
+            <section
+                class="max-w-[16rem] w-full rounded border border-gray-200 shadow-sm px-5 py-7 self-start space-y-6"
+            >
+                <div v-for="(sand, index) in sands" :key="sand.id + sand.type" class="flex items-start">
+                    <i class="w-3 h-3 inline-block rounded-full mesh-box__1 m-2 bubble"></i>
+                    <article>
+                        <h4>Arena {{ sand.type }}</h4>
+                        <p class="text-gray-400">{{ sand.quantity }} toneladas</p>
+                    </article>
+                    <article
+                        :ref="`progress${index >= 1 ? index + 1 : null}`"
+                        class="w-[70px] rounded flex justify-center items-center ml-auto"
+                    >
+                        <div
+                            class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center circle-progress"
+                        >
+                            <p class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]">
+                                {{ getPorcentage(sand.quantity, queueDetail[sand.type], index) }}%
+                            </p>
+                        </div>
+                    </article>
+                </div>
+            </section>
+            <section v-if="!isActiveStage" class="flex justify-center items-center max-w-md">
+                <p class="leading-wider leading-loose text-center max-w-sm mx-auto">
+                    Debés completar al menos un 70% de la etapa anterior para continuar con la siguiente
+                </p>
+            </section>
+            <section v-else class="grid grid-cols-5 gap-4 max-w-md mx-auto">
+                <article
+                    v-for="(box, place) in boxQueue"
+                    :key="place + 'place'"
+                    :class="[
+                        isSelectedBox(place) ? 'selected' : null,
+                        box.boxId ? `mesh-box__1 mesh-box__${box.category} filled` : 'not-filled',
+                    ]"
+                    class="stage--box"
+                    @click="fillBox(place, $event)"
+                >
+                    <p>{{ box.boxId ? box.boxId : box }}</p>
+                    <p v-if="box.amount" class="text-black">{{ box.amount }} ton</p>
+                    <teleport to="#modal">
+                        <OnClickOutside v-if="isSelectedBox(place)" @trigger="selectedBox = null">
+                            <div
+                                :style="`top: ${popUpCords.y}px; left: ${popUpCords.x}px`"
+                                class="top-0 left-0 absolute rounded bg-gray-50 z-40 w-[309px] max-h-[390px] pt-6 shadow-md"
+                            >
+                                <div>
+                                    <h2 class="text-xl font-bold px-6">Depósito</h2>
+                                    <nav class="mt-5 mb-4 space-x-6 px-6">
+                                        <button
+                                            v-for="flor in floors"
+                                            :key="`Floor${flor}`"
+                                            :class="`${
+                                                flor === selectedFloor
+                                                    ? 'border-main-500 font-medium'
+                                                    : 'border-transparent font-normal'
+                                            }`"
+                                            class="text-sm text-main-500 pb-3 border-b-2"
+                                            @click="selectFloor(flor)"
+                                        >
+                                            Nivel {{ flor }}
+                                        </button>
+                                    </nav>
+                                    <section class="overflow-y-auto gutter-stable-both max-h-[220px] pb-6 space-y-2">
+                                        <SheetDepoBox
+                                            v-for="(box, index) in boxesByFloorAndFiltered"
+                                            :key="index"
+                                            :box="box"
+                                            @set-box="addBoxToQueue(place, $event)"
+                                        />
+                                    </section>
+                                </div>
+                            </div>
+                        </OnClickOutside>
+                    </teleport>
+                </article>
+                <article class="stage--box" @click="addBoxToQueue()">
+                    <PlusIcon />
+                </article>
+            </section>
+            <footer class="w-full flex justify-end gap-3">
+                <NoneBtn btn="wide"> Cancelar </NoneBtn>
+                <InverseBtn btn="wide"> Guardar </InverseBtn>
+            </footer>
+        </div>
+    </article>
+</template>
+
 <script setup lang="ts">
     import { SandStage, Sand } from '@/interfaces/sandflow';
     import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
@@ -209,120 +322,6 @@
         }
     });
 </script>
-
-<template>
-    <article class="stage--row">
-        <header class="flex justify-between">
-            <h2>Etapa {{ sandStage.stage }}/20</h2>
-            <p>Total: {{ weigth }} Toneladas</p>
-            <div class="flex gap-x-1 items-center">
-                <progress v-if="showProgress" max="100" :value="stagePorcentage">{{ stagePorcentage }}%</progress>
-                <span v-if="showProgress">{{ stagePorcentage + '%' }}</span>
-                <span v-else class="italic text-center w-full">{{
-                    stagePorcentage === 0 ? 'Pendiente' : 'Finalizada '
-                }}</span>
-            </div>
-            <i
-                :class="isSelectedStage ? 'rotate-180' : 'rotate-0'"
-                class="expand-btn"
-                @click="$emit('set-stage', sandStage.id)"
-            >
-                <ChevronIcon />
-            </i>
-        </header>
-        <div
-            :class="isSelectedStage ? 'opened' : 'scale-y-0 h-0'"
-            class="flex gap-5 border-t border-gray-200 transform transition ease-in-out duration-300 overflow-hidden origin-top flex-wrap"
-        >
-            <section
-                class="max-w-[16rem] w-full rounded border border-gray-200 shadow-sm px-5 py-7 self-start space-y-6"
-            >
-                <div v-for="(sand, index) in sands" :key="sand.id + sand.type" class="flex items-start">
-                    <i class="w-3 h-3 inline-block rounded-full mesh-box__1 m-2 bubble"></i>
-                    <article>
-                        <h4>Arena {{ sand.type }}</h4>
-                        <p class="text-gray-400">{{ sand.quantity }} toneladas</p>
-                    </article>
-                    <article
-                        :ref="`progress${index >= 1 ? index + 1 : null}`"
-                        class="w-[70px] rounded flex justify-center items-center ml-auto"
-                    >
-                        <div
-                            class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center circle-progress"
-                        >
-                            <p class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]">
-                                {{ getPorcentage(sand.quantity, queueDetail[sand.type], index) }}%
-                            </p>
-                        </div>
-                    </article>
-                </div>
-            </section>
-            <section v-if="!isActiveStage" class="flex justify-center items-center max-w-md">
-                <p class="leading-wider leading-loose text-center max-w-sm mx-auto">
-                    Debés completar al menos un 70% de la etapa anterior para continuar con la siguiente
-                </p>
-            </section>
-            <section v-else class="grid grid-cols-5 gap-4 max-w-md mx-auto">
-                <article
-                    v-for="(box, place) in boxQueue"
-                    :key="place + 'place'"
-                    :class="[
-                        isSelectedBox(place) ? 'selected' : null,
-                        box.boxId ? `mesh-box__1 mesh-box__${box.category} filled` : 'not-filled',
-                    ]"
-                    class="stage--box"
-                    @click="fillBox(place, $event)"
-                >
-                    <p>{{ box.boxId ? box.boxId : box }}</p>
-                    <p v-if="box.amount" class="text-black">{{ box.amount }} ton</p>
-                    <teleport to="#modal">
-                        <OnClickOutside v-if="isSelectedBox(place)" @trigger="selectedBox = null">
-                            <div
-                                :style="`top: ${popUpCords.y}px; left: ${popUpCords.x}px`"
-                                class="top-0 left-0 absolute rounded bg-gray-50 z-40 w-[309px] max-h-[390px] pt-6 shadow-md"
-                            >
-                                <div>
-                                    <h2 class="text-xl font-bold px-6">Depósito</h2>
-                                    <nav class="mt-5 mb-4 space-x-6 px-6">
-                                        <button
-                                            v-for="flor in floors"
-                                            :key="`Floor${flor}`"
-                                            :class="`${
-                                                flor === selectedFloor
-                                                    ? 'border-main-500 font-medium'
-                                                    : 'border-transparent font-normal'
-                                            }`"
-                                            class="text-sm text-main-500 pb-3 border-b-2"
-                                            @click="selectFloor(flor)"
-                                        >
-                                            Nivel {{ flor }}
-                                        </button>
-                                    </nav>
-                                    <section class="overflow-y-auto gutter-stable-both max-h-[220px] pb-6 space-y-2">
-                                        <SheetDepoBox
-                                            v-for="(box, index) in boxesByFloorAndFiltered"
-                                            :key="index"
-                                            :box-id="box.id"
-                                            :category="box.category"
-                                            @set-box="addBoxToQueue(place, $event)"
-                                        />
-                                    </section>
-                                </div>
-                            </div>
-                        </OnClickOutside>
-                    </teleport>
-                </article>
-                <article class="stage--box" @click="addBoxToQueue()">
-                    <PlusIcon />
-                </article>
-            </section>
-            <footer class="w-full flex justify-end gap-3">
-                <NoneBtn btn="wide"> Cancelar </NoneBtn>
-                <InverseBtn btn="wide"> Guardar </InverseBtn>
-            </footer>
-        </div>
-    </article>
-</template>
 
 <style scoped lang="scss">
     @import '@/assets/box.scss';

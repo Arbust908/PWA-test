@@ -14,7 +14,7 @@
         </div>
 
         <VTable
-            class="mt-5 max-w-fit"
+            class="mt-5 min-w-full lg:min-w-min"
             :columns="columns"
             :pagination="pagination"
             :items="filteredForklifts"

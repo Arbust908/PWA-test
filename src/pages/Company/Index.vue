@@ -11,13 +11,10 @@
                 :data="clientId"
                 @update:data="clientId = $event"
             />
-            <div class="col-span-full sm:mt-7 sm:col-span-5">
-                <GhostBtn size="sm" @click="clearFilters()"> Borrar filtros </GhostBtn>
-            </div>
         </div>
 
         <VTable
-            class="mt-5"
+            class="mt-5 min-w-full lg:min-w-min"
             :columns="columns"
             :items="filteredClients"
             :actions="actions"
