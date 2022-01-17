@@ -20,11 +20,10 @@
             disable-key="id"
         >
             <template #item="{ item }">
-                <!-- Desktop -->
                 <td :class="item?.sandProvider?.name ? null : 'empty'">
                     {{ item?.sandProvider?.name || 'Sin definir' }}
                 </td>
-                <td :class="item?.data ? null : 'empty'">
+                <td :class="item?.data?.sandOrders ? null : 'empty'">
                     {{ listSandTypes(item.data?.sandOrders) || 'Sin definir' }}
                 </td>
 
@@ -32,7 +31,7 @@
                     {{ item?.transportProvider?.name || 'Sin definir' }}
                 </td>
 
-                <td :class="item.data ? null : 'empty'">
+                <td :class="item?.data?.cantidadCamiones ? null : 'empty'">
                     {{ item?.data?.cantidadCamiones || 'Sin definir' }}
                 </td>
 
@@ -42,7 +41,6 @@
                 </td>
             </template>
 
-            <!-- Mobile -->
             <template #mobileTitle="{ item }">
                 <span class="font-bold">Carga: </span> {{ item?.sandProvider?.name }}
             </template>
