@@ -158,6 +158,7 @@
                 v-model:client-id="clientId"
                 v-model:pit-id="pitId"
                 shared-classes="col-span-full md:col-span-4"
+                validation-type="empty"
             />
             <PrimaryBtn class="col-span-6 md:col-span-3 max-h-12 mt-7">Finalizar Stage</PrimaryBtn>
         </FieldGroup>
