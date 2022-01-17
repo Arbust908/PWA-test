@@ -184,10 +184,10 @@
             </FieldGroup>
         </form>
     </section>
-    <footer class="mt-8 space-x-3 flex justify-end">
+    <!-- <footer class="mt-8 space-x-3 flex justify-end">
         <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
         <PrimaryBtn btn="wide" @click.prevent="confirm()"> Crear Orden </PrimaryBtn>
-    </footer>
+    </footer> -->
 
     <OrderModal
         v-if="showModal"
@@ -263,10 +263,19 @@
             type: Array,
             default: () => [],
         },
+        confirmPurchaseOrder: {
+            type: Boolean,
+            default: false,
+        },
     });
-
-    // console.log(props.selectedBoxes);
-    console.log(props.companyClientId);
+    const emit = defineEmits(['updateQueueItem']);
+    const { confirmPurchaseOrder } = toRefs(props);
+    watch(confirmPurchaseOrder, (newVal) => {
+        if (newVal) {
+            console.log(props.confirmPurchaseOrder);
+            confirm();
+        }
+    });
 
     const filteredDrivers = computed(() => {
         if (transportProviderId.value > -1) {
@@ -330,6 +339,7 @@
         baseURL: api,
     });
     const showModal = ref(false);
+    // console.log(boxes.value)
     const sandProvidersIds = ref([
         {
             innerId: 0,
@@ -538,15 +548,12 @@
         });
     };
     const _saveSO = (poId: number) => {
-        // sandProvidersIds.value.map((spI) => {
-        // Guradamos via api las ordenes de sand
-        props.selectedBoxes.map((sO: SandOrder) => {
-            const { id, ...newSO } = sO;
-            newSO.purchaseOrderId = poId;
-            newSO.sandProviderId = sO.boxId;
+        props.selectedBoxes.map((box) => {
+            const { id, ...newSO } = box;
+            newSO.purchaseOrderId = box.purcharseOrderId;
+            newSO.sandProviderId = box.sandProviderId;
             useAxios('/sandOrder', { method: 'POST', data: newSO }, instance);
         });
-        // });
     };
 
     let pObs = '';
@@ -601,10 +608,10 @@
 
     const save = (): void => {
         if (true) {
+            // _updateQueueItem();
             // Formateamos la orden de pedido
             const purchaseOrder = _formatPO();
             // Creamos via API la orden de pedido
-            console.log(purchaseOrder);
             const { data: pODone, error } = useAxios(
                 '/purchaseOrder',
                 { method: 'POST', data: purchaseOrder },
@@ -634,6 +641,7 @@
                 }
             });
         }
+        emit('updateQueueItem');
     };
     // >> Success y Error Modal
     const openSuccess = ref(false);

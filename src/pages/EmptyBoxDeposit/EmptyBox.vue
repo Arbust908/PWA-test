@@ -40,6 +40,8 @@
                     :company-client-id="clientId"
                     :pit-id="pitId"
                     :selectedBoxes="selectedBoxesForTrucks"
+                    :confirm-purchase-order="confirmPurchaseOrder"
+                    @updateQueueItem="updateQueueItem()"
                 />
                 <DepositGrid
                     v-if="activeSection === 'Deposit'"
@@ -55,7 +57,7 @@
         </div>
         <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/')">Cancelar</SecondaryBtn>
-            <PrimaryBtn btn="wide" size="md"> Confirmar </PrimaryBtn>
+            <PrimaryBtn btn="wide" size="md" @click.prevent="confirm()"> Confirmar </PrimaryBtn>
         </footer>
     </Layout>
 </template>
@@ -123,6 +125,7 @@
             watch(companiesData, (companiesApi) => {
                 if (companiesApi && companiesApi.data) {
                     clients.value = companiesApi.data;
+                    boxes.value = [];
                 }
             });
 
@@ -149,23 +152,40 @@
 
             const showPurchaseOrder = ref(false);
             const showDepositGrid = ref(false);
+
             // :: BOXES
             // let boxes = ref([]);
-
             const getQueueItem = async () => {
                 boxes.value = [];
                 boxes.value = await axios
-                    .get(`${apiUrl}/queueitem?=status10&pitId=${pitId.value}`)
+                    .get(`${apiUrl}/queueitem?status=10&pitId=${pitId.value}`)
                     .then((res) => {
                         return res.data.data;
                     })
                     .catch((err) => console.error(err));
+                console.log(boxes.value);
+            };
+
+            const updateQueueItem = () => {
+                selectedQueueForTrucks.value.forEach((queueItem) => {
+                    queueItem.status = 0;
+                    console.log(queueItem);
+                    useAxios('/queueItem/' + queueItem.id, { method: 'PUT', data: queueItem }, instance);
+                });
             };
 
             const boxes = ref([]);
+            const confirmPurchaseOrder = ref(false);
+
+            const confirm = () => {
+                confirmPurchaseOrder.value = true;
+            };
 
             const selectedBoxesForTrucks = ref([]);
             const selectedBoxesForDeposit = ref([]);
+
+            const selectedQueueForTrucks = ref([]);
+            const selectedQueueForDeposit = ref([]);
 
             const deposit = (box) => {
                 choosedBox.value = box;
@@ -175,8 +195,12 @@
                     selectedBoxesForDeposit.value = selectedBoxesForDeposit.value.filter(
                         (check) => check.boxId !== box.sandOrder.boxId
                     );
+                    selectedQueueForDeposit.value = selectedQueueForDeposit.value.filter(
+                        (check) => check.boxId !== box.boxId
+                    );
                 } else {
                     selectedBoxesForDeposit.value.push(box.sandOrder);
+                    selectedQueueForDeposit.value.push(box);
                 }
                 if (selectedBoxesForDeposit.value.length > 0) {
                     activeSection.value = 'Deposit';
@@ -192,8 +216,12 @@
                     selectedBoxesForTrucks.value = selectedBoxesForTrucks.value.filter(
                         (check) => check.boxId !== box.sandOrder.boxId
                     );
+                    selectedBoxesForTrucks.value = selectedBoxesForTrucks.value.filter(
+                        (check) => check.boxId !== box.boxId
+                    );
                 } else {
                     selectedBoxesForTrucks.value.push(box.sandOrder);
+                    selectedQueueForTrucks.value.push(box);
                 }
 
                 if (selectedBoxesForTrucks.value.length > 0) {
@@ -201,6 +229,8 @@
                 } else {
                     activeSection.value = null;
                 }
+                console.log(box);
+                console.log(selectedBoxesForTrucks.value);
             };
 
             // :: DEPOSIT
@@ -233,9 +263,9 @@
 
             watchEffect(async () => {
                 if (clientId.value >= 0 && pitId.value >= 0) {
+                    await getQueueItem();
                     await assingWareHouseValue();
                     await assignDepositLayout();
-                    await getQueueItem();
                 }
 
                 boxes.value = boxes.value.map((box) => {
@@ -269,6 +299,9 @@
                 warehouse,
                 choosedBox,
                 activeSection,
+                confirmPurchaseOrder,
+                confirm,
+                updateQueueItem,
             };
         },
     };
