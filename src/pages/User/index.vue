@@ -15,7 +15,7 @@
         </div>
 
         <VTable
-            class="mt-5 lg:w-7/12 min-w-min"
+            class="mt-5 min-w-full lg:min-w-min"
             :columns="columns"
             :pagination="pagination"
             :items="filteredUsers"

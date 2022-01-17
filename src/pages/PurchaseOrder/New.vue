@@ -78,10 +78,7 @@
                             :data="order.boxId"
                             @update:data="order.boxId = $event"
                         />
-                        <div
-                            :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'"
-                            class="col-span-1 md:col-span-2 flex flex-row"
-                        >
+                        <div :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'" class="col-span-1 md:col-span-2">
                             <AddDeleteBtn
                                 v-if="useIfNotLonly(providerId.sandOrders)"
                                 purpose="remove"

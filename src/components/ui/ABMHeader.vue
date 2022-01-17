@@ -2,10 +2,12 @@
     <header>
         <h2>{{ title }}</h2>
         <router-link :to="link">
-            <PrimaryBtn :btn="'pill'" size="sm">
-                <span> {{ btnText }} </span>
-                <Icon :icon="icon" class="h-5 w-5" />
-            </PrimaryBtn>
+            <el-tooltip effect="dark" content="Ctrl + C">
+                <PrimaryBtn :btn="'pill'" size="sm">
+                    <span> {{ btnText }} </span>
+                    <Icon :icon="icon" class="h-5 w-5" />
+                </PrimaryBtn>
+            </el-tooltip>
         </router-link>
     </header>
     <hr class="mb-4 border-gray-300" />
@@ -14,7 +16,8 @@
 <script setup lang="ts">
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
-    defineProps({
+
+    const props = defineProps({
         title: {
             type: String,
             default: 'ABM',
@@ -31,6 +34,15 @@
             type: String,
             default: 'Crear',
         },
+    });
+
+    const { btnText, link, title } = toRefs(props);
+    const router = useRouter();
+
+    const { Ctrl_C } = useMagicKeys();
+    whenever(Ctrl_C, () => {
+        console.log(`${btnText.value} ${title.value}`);
+        router.push(link.value);
     });
 </script>
 
