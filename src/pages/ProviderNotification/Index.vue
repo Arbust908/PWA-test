@@ -168,7 +168,7 @@
 
                 return provNotifDB.value;
             });
-
+            console.log(filteredNotifications.value);
             const getProviderNotifications = async () => {
                 loading.value = true;
 
