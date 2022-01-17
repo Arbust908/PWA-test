@@ -13,7 +13,7 @@
       @apply text-orange-300;
     };
     &.meshBorder {
-      @apply border border-amber-800;
+      @apply border border-amber-700;
     };
   };
   &__2 {
@@ -31,7 +31,7 @@
       color: #81C2A3;
     };
     &.meshBorder {
-      @apply border border-emerald-800;
+      @apply border border-emerald-700;
     };
   };
   &__3 {
@@ -48,7 +48,7 @@
       @apply text-sky-300;
     };
     &.meshBorder {
-      @apply border border-sky-900;
+      @apply border border-sky-700;
     };
   };
   &__4 {
@@ -66,7 +66,7 @@
       color: #AB78D2;
     };
     &.meshBorder {
-      @apply border border-violet-900;
+      @apply border border-violet-700;
     };
   };
   &__5 {
@@ -84,7 +84,7 @@
       color: #F98764;
     };
     &.meshBorder {
-      @apply border border-orange-800;
+      @apply border border-orange-700;
     };
   };
   &__empty {
@@ -102,7 +102,7 @@
     };
   };
   &__taken {
-    @apply text-white cursor-not-allowed;
+    @apply text-white;
     &.cradle {
       @apply bg-indigo-900;
       &-clickable{
@@ -138,4 +138,7 @@
       @apply text-zinc-400;
     };
   };
+  &.design {
+    background: #CECCCC;
+  }
 }

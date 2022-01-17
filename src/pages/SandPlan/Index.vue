@@ -14,7 +14,7 @@
         </div>
 
         <VTable
-            class="mt-5 lg:w-8/12 min-w-full"
+            class="mt-5 min-w-full lg:min-w-min"
             :columns="columns"
             :pagination="pagination"
             :items="filteredSandPlans"
