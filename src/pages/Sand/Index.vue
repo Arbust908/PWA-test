@@ -28,6 +28,7 @@
 
             <!-- Mobile -->
             <template #mobileTitle="{ item }">
+                <span class="inline-block bg-pink-500 w-3 h-3 rounded-full" />
                 {{ item.type }}
             </template>
 

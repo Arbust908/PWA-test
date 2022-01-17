@@ -58,7 +58,29 @@ export const formatLocation = (location: any) => {
     return dimensions;
 };
 
-export const boxesByFloor = (location: any) => {
+export const boxesByFloor = (location: any, queueItemSort = false) => {
+    if (queueItemSort) {
+        const boxes = location.reduce((allFloors: Array<any>, box: any) => {
+            const { location: wheres } = box;
+            const { floor, col, row } = wheres;
+
+            box.floor = floor;
+            box.col = col;
+            box.row = row;
+
+            const floorIndex = Number(box.floor) - 1;
+
+            if (!allFloors[floorIndex]) {
+                allFloors[floorIndex] = [];
+            }
+            allFloors[floorIndex].push(box);
+
+            return allFloors;
+        }, []);
+
+        return boxes;
+    }
+
     const boxes = Object.keys(location).reduce((bxs: any, currentCell) => {
         const box = location[currentCell];
 
