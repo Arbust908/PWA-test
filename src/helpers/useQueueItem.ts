@@ -116,7 +116,7 @@ export const getQueueItems = async () => {
         })
         .catch((err) => console.error(err));
 };
-export const updateQueueItems = async (queueData) => {
+export const updateQueueItems = async (queueData: QueueItem) => {
     const { id } = queueData;
 
     return await axios
@@ -133,4 +133,14 @@ export const deleteQueueItems = async (queueItemId: number) => {
             return response;
         })
         .catch((err) => console.error(err));
+};
+
+export const createAllQueueItems = async (queue: Array<QueueItem>) => {
+    const queueItems = queue.map((queueItem) => {
+        queueItem.status = 0;
+
+        return updateQueueItems(queueItem);
+    });
+
+    return Promise.all(queueItems);
 };

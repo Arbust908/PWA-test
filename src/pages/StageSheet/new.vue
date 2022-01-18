@@ -34,6 +34,7 @@
                     :boxes="boxes"
                     :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
                     :is-active="pendingStages[0].id === sheet.id"
+                    :pit-id="pitId"
                     @set-stage="setStage($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
@@ -50,6 +51,7 @@
                     :boxes="boxes"
                     :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
                     :is-active="pendingStages[0].id === sheet.id"
+                    :pit-id="pitId"
                     @set-stage="setStage($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
@@ -82,11 +84,15 @@
                             <span class="mr-2">Total Arena C:</span>
                             <span>{{ queueDetailFormated(queueDetail && queueDetail[2]) }}</span>
                         </p>
+                        <p>
+                            <span class="mr-2">Total Arena D:</span>
+                            <span>{{ queueDetailFormated(queueDetail && queueDetail[3]) }}</span>
+                        </p>
                     </div>
                     <hr class="border-white border mt-1" />
-                    <p class="text-bold text-lg mt-4">
+                    <p class="font-bold text-lg mt-4">
                         <span class="mr-2">Total General:</span>
-                        <span>{{ sumQueueDetail || '-' }}</span>
+                        <span>{{ queueDetailFormated(sumQueueDetail) }}</span>
                     </p>
                 </article>
                 <article v-if="false" class="px-3 py-4 rounded-[10px] bg-gray-100 border border-gray-400 shadow">
@@ -112,7 +118,7 @@
 <script setup lang="ts">
     import axios from 'axios';
     import { StageSheet, SandStage, Warehouse, QueueItem } from '@/interfaces/sandflow';
-    import { boxesByFloor, formatLocation } from '@/helpers/useWarehouse';
+    import { boxesByFloor, formatLocation, searchInDepoBoxes } from '@/helpers/useWarehouse';
     import { useAxios } from '@vueuse/integrations/useAxios';
 
     import Layout from '@/layouts/Main.vue';
@@ -282,6 +288,9 @@
                 return item;
             })
             .filter((item) => item.location?.where === 'warehouse');
+
+        // const AllTheBoxes = await searchInDepoBoxes(1);
+        // console.log(AllTheBoxes);
     });
 </script>
 
