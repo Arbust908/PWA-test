@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-    import { QueueItem } from '@/interfaces/sandflow';
+    import { QueueItem, SandOrder } from '@/interfaces/sandflow';
     import Layout from '@/layouts/Main.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -102,10 +102,11 @@
         itemIsNotToEmpty,
     } from '@/helpers/useQueueItem';
     import { getCradle, getWorkOrders } from '@/helpers/useGetEntities';
+    import { Cradle } from '@/interfaces/sandflow';
 
     const clientId = ref(-1);
     const pitId = ref(-1);
-    const currentCradle = ref({});
+    const currentCradle = ref({} as Cradle);
     const columns = [
         { title: 'Caja Id', key: 'sandOrder.boxId' },
         { title: 'Origen', key: 'origin' },
@@ -124,13 +125,10 @@
         }
 
         queue.value = queueBackup.value.filter((item: QueueItem) => item.pitId === pitId.value);
-        updateLists();
         const workOrders = await getWorkOrders(`?client=${clientId.value}`);
-        console.log(workOrders);
         const cradleId = workOrders[0]?.operativeCradle;
-        console.log(cradleId);
         currentCradle.value = await getCradle(Number(cradleId));
-        console.log(currentCradle.value);
+        updateLists();
     };
 
     watch(clientId, await onPitUpdate);
@@ -148,6 +146,7 @@
         item.status = item.status === 0 ? 99 : 0;
         setTimeout(() => {
             updateLists();
+            commitTransition(item);
             updateQueueItems(item);
         }, 1000);
     };
@@ -157,6 +156,13 @@
 
     const filterNotDone = () => {
         toDoQueue.value = queue.value.filter((item: QueueItem) => itemIsNotDone(item));
+        const hasNoDestinations = toDoQueue.value.filter(({ destination }: QueueItem) => !destination);
+
+        if (hasNoDestinations) {
+            console.log('Hay Lugar en Cradle?');
+            const availables = checkCradleSlots();
+            availables && fillItemDestination(hasNoDestinations, availables);
+        }
     };
     const filterFinished = () => {
         finishedQueue.value = queue.value.filter((item: QueueItem) => itemIsFinished(item));
@@ -164,6 +170,47 @@
     const updateLists = () => {
         filterNotDone();
         filterFinished();
+    };
+
+    const checkCradleSlots = () => {
+        const { slots } = currentCradle.value;
+
+        return slots
+            ?.map((slot: SandOrder, index: number) => {
+                slot.station = index;
+
+                return slot;
+            })
+            .filter(({ boxId }: SandOrder) => boxId === null);
+    };
+
+    const fillItemDestination = (items: QueueItem[], availableSlots: any[]) => {
+        console.log(items);
+        console.log(availableSlots);
+        const amountOfSlots = availableSlots.length;
+
+        for (let i = 0; i < amountOfSlots; i++) {
+            const item = items[i];
+            const slot = availableSlots[i];
+            const station = `Estacion ${slot.station + 1}`;
+
+            if (slot) {
+                item.destination = station;
+            }
+        }
+        // Cambiar el destino al Slot libre
+    };
+
+    // Cuando se completa la tarea deberia impactar en el where del SandOrder
+    const commitTransition = async (item: QueueItem) => {
+        const { sandOrder, origin, destination } = item;
+        const { location } = sandOrder;
+
+        console.log(JSON.parse(location));
+
+        if (JSON.parse(location)) {
+            sandOrder.location = JSON.parse(location);
+        }
     };
 
     updateLists();
