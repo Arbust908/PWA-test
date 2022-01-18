@@ -87,6 +87,23 @@
       @apply border border-orange-700;
     };
   };
+  &__extra {
+    &.clickable {
+      @apply  border-pink-200 text-pink-200;
+    };
+    &.boxCard {
+      @apply bg-pink-200 text-pink-800;
+    };
+    &.arrow {
+      @apply text-pink-800 bg-pink-300;
+    };
+    &.iconBg {
+      @apply text-pink-300;
+    };
+    &.meshBorder {
+      @apply border border-amber-700;
+    };
+  };
   &__empty {
     &.clickable {
       @apply  border-stone-300 text-stone-300;
@@ -129,7 +146,7 @@
     @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
   }
   &.not-shown {
-    @apply bg-zinc-600 cursor-not-allowed;
+    @apply bg-zinc-600 cursor-not-allowed text-zinc-600;
     
     &-clickable{
       @apply border-zinc-600 text-zinc-600;
