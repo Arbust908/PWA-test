@@ -34,7 +34,9 @@
         </div>
         <div class="w-full flex gap-x-6 justify-end mt-3">
             <SecondaryBtn @click.prevent="$emit('close')"> Volver </SecondaryBtn>
-            <PrimaryBtn @click.prevent="$emit('confirm')" @click="checked && downloadPDF(po)"> Confirmar </PrimaryBtn>
+            <PrimaryBtn @click.prevent="$emit('confirm')" :is-loading="loading" @click="checked && downloadPDF(po)">
+                Confirmar
+            </PrimaryBtn>
         </div>
     </Modal>
 </template>
@@ -72,6 +74,11 @@
             plates: {
                 type: Array,
                 required: true,
+            },
+            loading: {
+                type: Boolean,
+                required: false,
+                default: false,
             },
         },
         setup(props) {
