@@ -161,6 +161,7 @@ export const searchInDepoBoxes = async (depoId: number) => {
 
     return getInDepoBoxes(allBoxes, depoId);
 };
+
 export const getSandOrders = async () => {
     return await axios
         .get(`${apiUrl}/sandOrder`)

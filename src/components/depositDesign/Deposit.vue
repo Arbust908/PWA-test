@@ -75,11 +75,12 @@
             default: false,
         },
     });
+
+    console.log(props);
+
     const emits = defineEmits(['select-box']);
     const { floor, rows, cols, deposit } = toRefs(props);
     const depo = ref(null);
-
-    console.log(props);
 
     const cssRows = useCssVar('--rows', depo);
     cssRows.value = String(rows.value);
@@ -113,6 +114,8 @@
     const getBoxData = (row: number, col: number, floorNum: number) => {
         return deposit.value[`${floorNum}|${row}|${col}`];
     };
+
+    console.log(props.boxes);
 
     const getCellBox = (row: number, col: number, floorNum: number) => {
         const cellBox = props.boxes.find((box) => {

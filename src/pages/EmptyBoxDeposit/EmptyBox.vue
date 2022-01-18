@@ -79,7 +79,7 @@
     import BoxCard from '@/components/EmptyBox/EmptyBox.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import PurchaseOrderForm from '@/components/purchaseOrder/Form.vue';
-    import { formatDeposit, defaultBox, getInDepoBoxes } from '@/helpers/useWarehouse';
+    import { formatDeposit, defaultBox, getInDepoBoxes, searchInDepoBoxes } from '@/helpers/useWarehouse';
     import {
         getPurchaseOrders,
         getSandOrders,
@@ -237,9 +237,68 @@
                 console.log(selectedBoxesForTrucks.value);
             };
 
+            const checkIfWasBoxInOriginalDeposit = (boxId) => {
+                let response = false;
+                Object.entries(originalWarehouseLayout.value.layout).forEach((cell) => {
+                    if (cell[1].id == boxId) {
+                        return (response = true);
+                    }
+                });
+
+                return response;
+            };
+
+            const checkIfWasBoxInOriginalCradle = (boxId) => {
+                let response = false;
+                cradles.value.forEach((cradle) => {
+                    cradle.slots.forEach((slot) => {
+                        if (slot.boxId == boxId) {
+                            response = true;
+                        }
+                    });
+                });
+
+                return response;
+            };
+
+            const selectBox = (box: Box) => {
+                // Si ya estaba en el deposito o en el cradle no se pisa
+                // Igual no se deberia poder clickear ;D
+                if (choosedBox.value.wasOriginallyOnDeposit || choosedBox.value.wasOriginallyOnCradle) {
+                    return;
+                }
+
+                // Si clickea en un pasillo no hace nada. Sumo Cradle
+                // Tampoco deberia poder clickear en un pasillo
+                if (box.category == 'aisle' || box.category == 'cradle') {
+                    return;
+                }
+
+                // Sacamos la caja de cradle si estaba ahi
+                // clearBoxInCradleSlots(choosedBox.value.boxId);
+
+                choosedBox.value.location = {
+                    where: 'warehouse',
+                    where_id: warehouse.value.id,
+                    floor: box.floor,
+                    row: box.row,
+                    col: box.col,
+                    where_origin: `F${box.row} C${box.col} N${box.floor}`,
+                };
+
+                choosedBox.value.floor = box.floor;
+                choosedBox.value.row = box.row;
+                choosedBox.value.col = box.col;
+                sandOrders.value.push(choosedBox.value);
+                wasWarehouseModificated.value = true;
+                inDepoBoxes.value = searchInDepoBoxes(warehouse.value.id);
+            };
+
             // :: DEPOSIT
             const warehouses = ref([]);
             const warehouse = ref({});
+
+            let wasWarehouseModificated = ref(false);
 
             const inDepoBoxes = ref([]);
 
@@ -249,14 +308,13 @@
 
             const sandOrders = ref([]);
 
+            const getSandOrders = async () => {
+                sandOrders.value = await axios.get(`${apiUrl}/sandOrder`);
+            };
+
             const choosedBox = ref({
                 ...defaultBox,
             });
-
-            const getSandOrders = async () => {
-                // sandOrders.value = axios.get(`${api}/sandOrders?pitId=${pitId.value}`);
-                sandOrders.value = await (await axios.get(`${apiUrl}/sandOrder?pitId=${pitId.value}`))?.data?.data;
-            };
 
             const assingWareHouseValue = async () => {
                 warehouse.value = await warehouses.value.find((singleWarehouse) => {
@@ -276,7 +334,7 @@
 
             watchEffect(async () => {
                 if (clientId.value >= 0 && pitId.value >= 0) {
-                    await getSandOrders();
+                    // await getSandOrders();
                     await getQueueItem();
                     await assingWareHouseValue();
                     await assignDepositLayout();
@@ -291,15 +349,9 @@
                 });
 
                 if (warehouse.value) {
-                    inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
+                    inDepoBoxes.value = await searchInDepoBoxes(warehouse.value.id);
                 }
             });
-
-            // TRAER TODAS LAS SAND ORDERS.map(order)
-            // hacer MAP para convertir location order.location = Json.parse(order.location)
-            // Filter de eso location.where = 'warehouse' && location.whereId = warehouse.value.id
-
-            // esto me da todas las cajas que estan adentro del deposito para completar inDepoBoxes.
 
             onMounted(async () => {
                 warehouses.value = await getWarehouses();
@@ -327,6 +379,7 @@
                 confirm,
                 updateQueueItem,
                 inDepoBoxes,
+                selectBox,
             };
         },
     };
