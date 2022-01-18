@@ -8,12 +8,10 @@
                 shared-classes="col-span-full md:col-span-4"
             />
         </FieldGroup>
-        <div class="flex flex-row justify-between">
-            <section class="bg-white rounded-md shadow-sm w-2/5 mr-10">
-                <ABMFormTitle title="Cajas vacias" class="p-4" />
-                <div v-if="clientId > 0 && pitId > 0" class="px-10 py-6">
-                    {{ selectedBoxesForTrucks }}
-                    {{ selectedBoxesForDeposit }}
+        <div class="flex gap-x-6">
+            <section class="bg-white rounded-md shadow-sm min-w-[308px]">
+                <h2 class="p-6 pb-0 font-bold text-2xl">Cajas Vacias</h2>
+                <div v-if="clientId > 0 && pitId > 0" class="px-6 py-5 space-y-5">
                     <BoxCard
                         v-for="box in boxes"
                         :key="box.sandOrder.boxId"
@@ -31,7 +29,7 @@
                 </div>
             </section>
 
-            <section class="bg-white rounded-md shadow-sm max-w-4xl w-3/5 p-4">
+            <section class="bg-white rounded-md shadow-sm max-w-4xl p-4">
                 <ABMFormTitle title="Detalle" />
                 <img v-if="clientId < 0 || pitId < 0" src="@/assets/imgs/cajasvacias.png" alt="" />
                 <div v-show="activeSection === null" class="p-6 m-6 rounded-lg border-2 text-center">
