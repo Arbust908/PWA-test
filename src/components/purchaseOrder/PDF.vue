@@ -20,7 +20,6 @@
             <header>
                 <h2 style="font-size: 1.25rem; line-height: 1.75rem; font-weight: 700; margin-bottom: 1.5rem">
                     Orden de pedido -
-                    {{ info }}
                     <span style="color: hsl(151, 65%, 30%)">{{ '#' + info.purchaseOrder.id }}</span>
                 </h2>
                 <dl style="display: flex; margin-bottom: 2rem">
