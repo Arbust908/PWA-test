@@ -100,7 +100,7 @@
 <style lang="scss" scoped>
     .cradle-data-wrapper,
     .cradle-status-wrapper {
-        @apply flex flex-col text-left justify-between mb-4 px-3;
+        @apply flex flex-col text-left justify-between mb-4 pl-3;
     }
     .cradle-data-wrapper {
         @apply mt-4;
@@ -167,6 +167,7 @@
 
         .slot {
             height: 25rem;
+            max-width: 220px;
             @apply border-dashed border-2 border-second-300 rounded-lg p-4 cursor-pointer flex flex-col text-center;
 
             &:not(.empty) {
