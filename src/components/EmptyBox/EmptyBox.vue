@@ -26,7 +26,6 @@
                     Camión
                 </button>
                 <button v-else class="button cursor-not-allowed">Camión</button>
-                <!-- <button :class="clickedTruck ? 'clicked' : 'button'" @click="truck">Camion</button> -->
             </div>
         </div>
     </article>
@@ -43,7 +42,7 @@
         },
         props: {
             boxId: {
-                type: Number,
+                type: [Number, String],
                 required: true,
             },
             estacion: {
@@ -58,14 +57,8 @@
                 type: Array,
                 default: () => [],
             },
-            // choosedBox: {
-            //     type: Object,
-            //     required: false,
-            //     default: () => {
-            //         return {};
-            //     },
-            // },
         },
+        emits: ['deposit', 'truck'],
         setup(props, { emit }) {
             const { boxId, estacion } = useVModels(props, emit);
 

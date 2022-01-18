@@ -11,14 +11,16 @@
         <div class="flex flex-row justify-between">
             <section class="bg-white rounded-md shadow-sm w-2/5 mr-10">
                 <ABMFormTitle title="Cajas vacias" class="p-4" />
-                <div class="px-10 py-6" v-if="clientId > 0 && pitId > 0">
+                <div v-if="clientId > 0 && pitId > 0" class="px-10 py-6">
+                    {{ selectedBoxesForTrucks }}
+                    {{ selectedBoxesForDeposit }}
                     <BoxCard
                         v-for="box in boxes"
                         :key="box.sandOrder.boxId"
-                        :boxId="box.sandOrder.boxId"
+                        :box-id="box.sandOrder.boxId"
                         :estacion="box.origin"
-                        :selectedBoxesForTrucks="selectedBoxesForTrucks"
-                        :selectedBoxesForDeposit="selectedBoxesForDeposit"
+                        :selected-boxes-for-trucks="selectedBoxesForTrucks"
+                        :selected-boxes-for-deposit="selectedBoxesForDeposit"
                         @deposit="deposit(box)"
                         @truck="truck(box)"
                     />
@@ -39,7 +41,7 @@
                     v-if="activeSection === 'PurchaseOrder'"
                     :company-client-id="clientId"
                     :pit-id="pitId"
-                    :selectedBoxes="selectedBoxesForTrucks"
+                    :selected-boxes="selectedBoxesForTrucks"
                     :confirm-purchase-order="confirmPurchaseOrder"
                     @updateQueueItem="updateQueueItem()"
                 />
@@ -52,7 +54,6 @@
                     :cols="col"
                     :floor="floor"
                     :deposit="warehouse.layout || {}"
-                    :visible-categories="visibleCategories"
                     @select-box="selectBox"
                 />
             </section>
@@ -65,10 +66,6 @@
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
-    import { useRouter, useRoute } from 'vue-router';
     import Layout from '@/layouts/Main.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -79,7 +76,13 @@
     import BoxCard from '@/components/EmptyBox/EmptyBox.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import PurchaseOrderForm from '@/components/purchaseOrder/Form.vue';
-    import { formatDeposit, defaultBox, getInDepoBoxes, searchInDepoBoxes } from '@/helpers/useWarehouse';
+    import {
+        formatDeposit,
+        defaultBox,
+        getInDepoBoxes,
+        searchInDepoBoxes,
+        formatBoxLocation,
+    } from '@/helpers/useWarehouse';
     import {
         getPurchaseOrders,
         getSandOrders,
@@ -88,7 +91,7 @@
         getWorkOrders,
         getSand,
     } from '@/helpers/useGetEntities';
-    import { Warehouse } from '@/interfaces/sandflow';
+    import { QueueItem, Warehouse } from '@/interfaces/sandflow';
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -165,7 +168,6 @@
                         return res.data.data;
                     })
                     .catch((err) => console.error(err));
-                console.log(boxes.value);
             };
 
             const updateQueueItem = () => {
@@ -190,10 +192,12 @@
             const selectedQueueForTrucks = ref([]);
             const selectedQueueForDeposit = ref([]);
 
-            const deposit = (box) => {
-                choosedBox.value = box;
-                let checkFilter =
+            const deposit = (box: QueueItem) => {
+                choosedBox.value = box.sandOrder;
+
+                const checkFilter =
                     selectedBoxesForDeposit.value.filter((check) => check.boxId === box.sandOrder.boxId).length > 0;
+
                 if (checkFilter) {
                     selectedBoxesForDeposit.value = selectedBoxesForDeposit.value.filter(
                         (check) => check.boxId !== box.sandOrder.boxId
@@ -206,6 +210,7 @@
                     selectedQueueForDeposit.value.push(box);
                     // selectedBoxForDeposit.value = selectedBoxesForDeposit.value[0];
                 }
+
                 if (selectedBoxesForDeposit.value.length > 0) {
                     activeSection.value = 'Deposit';
                 } else {
@@ -216,6 +221,7 @@
             const truck = (box) => {
                 let checkFilter =
                     selectedBoxesForTrucks.value.filter((check) => check.boxId === box.sandOrder.boxId).length > 0;
+
                 if (checkFilter) {
                     selectedBoxesForTrucks.value = selectedBoxesForTrucks.value.filter(
                         (check) => check.boxId !== box.sandOrder.boxId
@@ -261,7 +267,7 @@
                 return response;
             };
 
-            const selectBox = (box: Box) => {
+            const selectBox = async (box: Box) => {
                 // Si ya estaba en el deposito o en el cradle no se pisa
                 // Igual no se deberia poder clickear ;D
                 if (choosedBox.value.wasOriginallyOnDeposit || choosedBox.value.wasOriginallyOnCradle) {
@@ -273,9 +279,6 @@
                 if (box.category == 'aisle' || box.category == 'cradle') {
                     return;
                 }
-
-                // Sacamos la caja de cradle si estaba ahi
-                // clearBoxInCradleSlots(choosedBox.value.boxId);
 
                 choosedBox.value.location = {
                     where: 'warehouse',
@@ -291,7 +294,7 @@
                 choosedBox.value.col = box.col;
                 sandOrders.value.push(choosedBox.value);
                 wasWarehouseModificated.value = true;
-                inDepoBoxes.value = searchInDepoBoxes(warehouse.value.id);
+                inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
             };
 
             // :: DEPOSIT
@@ -307,10 +310,6 @@
             const col = ref(0);
 
             const sandOrders = ref([]);
-
-            const getSandOrders = async () => {
-                sandOrders.value = await axios.get(`${apiUrl}/sandOrder`);
-            };
 
             const choosedBox = ref({
                 ...defaultBox,
@@ -334,10 +333,16 @@
 
             watchEffect(async () => {
                 if (clientId.value >= 0 && pitId.value >= 0) {
-                    // await getSandOrders();
+                    sandOrders.value = await getSandOrders();
+                    sandOrders.value = sandOrders.value.filter((box: SandOrder) => box.location).map(formatBoxLocation);
+
                     await getQueueItem();
                     await assingWareHouseValue();
                     await assignDepositLayout();
+
+                    if (warehouse.value) {
+                        inDepoBoxes.value = await searchInDepoBoxes(warehouse.value.id);
+                    }
                 }
 
                 boxes.value = boxes.value.map((box) => {
@@ -345,12 +350,9 @@
                         box.location = JSON.parse(box.location);
                         box.location.been_set = true;
                     }
+
                     return box;
                 });
-
-                if (warehouse.value) {
-                    inDepoBoxes.value = await searchInDepoBoxes(warehouse.value.id);
-                }
             });
 
             onMounted(async () => {

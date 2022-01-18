@@ -76,8 +76,6 @@
         },
     });
 
-    console.log(props);
-
     const emits = defineEmits(['select-box']);
     const { floor, rows, cols, deposit } = toRefs(props);
     const depo = ref(null);
@@ -114,8 +112,6 @@
     const getBoxData = (row: number, col: number, floorNum: number) => {
         return deposit.value[`${floorNum}|${row}|${col}`];
     };
-
-    console.log(props.boxes);
 
     const getCellBox = (row: number, col: number, floorNum: number) => {
         const cellBox = props.boxes.find((box) => {
