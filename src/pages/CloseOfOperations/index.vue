@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <ABMFormTitle title="Cierre de operaciónes" />
+        <ABMFormTitle title="Cierre de operaciones" />
         <FieldGroup class="pt-3 px-4 pb-4 gap-y-3">
             <FieldSelect
                 v-model:data="clientId"
@@ -8,7 +8,8 @@
                 title="Cliente"
                 field-name="client"
                 placeholder="Seleccionar cliente"
-                :endpoint-data="companiesFiltered"
+                endpoint="/company"
+                @change="getSandPlans"
             />
             <FieldSelect
                 v-model:data="operatorId"
@@ -30,12 +31,12 @@
                 is-optional
             />
 
-            <section class="bg-white col-span-full shadow">
+            <section class="bg-white col-span-full shadow max-w-[100%]">
                 <div class="grid grid-cols-4 text-sm rounded-t border p-3">
-                    <span class="ml-12">POZO</span>
-                    <span class="ml-12">ETAPAS</span>
-                    <span class="ml-12">ESTADO</span>
-                    <span class="ml-12">TONELADAS</span>
+                    <span class="ml-4 text-left">POZO</span>
+                    <span class="ml-4 text-left">ETAPAS</span>
+                    <span class="ml-4 text-left">ESTADO</span>
+                    <span class="ml-4 text-left">TONELADAS</span>
                 </div>
                 <div
                     v-if="!pits || pits.length <= 0"
@@ -44,15 +45,35 @@
                     <span>Seleccione un cliente</span>
                 </div>
                 <div v-else class="divide-y rounded-b border-x border-b">
-                    <article v-for="pit in pits" :key="pit.id" class="grid grid-cols-4 px-4 py-2 text-sm">
-                        <div class="m-4 ml-10">
+                    <article
+                        v-for="sandPlan in filteredSandPlans"
+                        :key="sandPlan.id"
+                        class="grid grid-cols-4 px-4 py-2 text-sm"
+                    >
+                        <div class="m-4 text-left">
                             <input
                                 id="checkbox"
                                 v-model="checked"
                                 type="checkbox"
                                 class="outline-none focus:outline-none text-green-500 rounded mr-2"
                             />
-                            <span> {{ pit.name }} </span>
+                            <span> {{ sandPlan.pit.name }} </span>
+                        </div>
+                        <div class="m-4 text-left">
+                            <span> 1 / {{ sandPlan.stages.length }} </span>
+                        </div>
+                        <div class="m-4 text-left">
+                            <span> {{ sandPlan.stages[0].status }} </span>
+                        </div>
+                        <div class="m-4 text-left">
+                            <span>
+                                {{
+                                    sandPlan.stages[0].quantity1 +
+                                    sandPlan.stages[0].quantity2 +
+                                    sandPlan.stages[0].quantity3 +
+                                    sandPlan.stages[0].quantity4
+                                }}
+                            </span>
                         </div>
                         <!-- <div v-for="(value, key) in pit" :key="key">{{ key }}: {{ value }}</div> -->
                     </article>
@@ -72,7 +93,7 @@
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
-    useTitle('Cierre de operaciónes <> Sandflow');
+    useTitle('Cierre de operaciones <> Sandflow');
 
     const clientId = ref(-1);
     const operatorId = ref(-1);
@@ -80,33 +101,38 @@
     const pits = ref([]);
     const checked = ref(false);
     const sandPlans = ref([]);
-    const companiesFiltered = ref([]);
+    const filteredSandPlans = ref([]);
 
-    // const getPits = async () => {
-    //     if (clientId.value > 0) {
-    //         const url = `/pit?companyId=${clientId.value}`;
-    //         const response = await axios.get(`${api}/${url}`).catch((err) => {
-    //             return false;
-    //         });
-    //         console.log(response);
-    //         pits.value = response.data.data;
-    //         console.log(pits.value);
-    //     }
-    // };
+    const getSandPlans = async () => {
+        if (clientId.value > 0) {
+            const url = `/pit?companyId=${clientId.value}`;
+            const response = await axios.get(`${api}/${url}`).catch((err) => {
+                return false;
+            });
 
-    onMounted(async () => {
-        const response = await axios.get(`${api}/sandPlan`).catch((err) => {
-            return false;
-        });
-        console.log(response);
+            const result = await axios.get(`${api}/sandPlan`).catch((err) => {
+                return false;
+            });
 
-        sandPlans.value = response.data.data;
-        console.log(sandPlans.value);
-        getCompanies();
-    });
+            // console.log('pitResult', response);
+            pits.value = response.data.data;
+            console.log('pits', pits.value);
 
-    const getCompanies = () => {
-        sandPlans.value.forEach((sandPlan) => console.log(sandPlan));
+            // console.log('sandplanResult', result);
+            sandPlans.value = result.data.data;
+            console.log('sandplans', sandPlans.value);
+
+            // setTimeout(() => {
+            //     console.log('filteredSandPlans.value', filteredSandPlans.value);
+            // }, 500);
+            getFilteredSandPlans();
+        }
+    };
+
+    const getFilteredSandPlans = () => {
+        filteredSandPlans.value = sandPlans.value.filter((sandPlan) => sandPlan.company.id === clientId.value);
+
+        console.log(filteredSandPlans.value);
     };
 </script>
 
