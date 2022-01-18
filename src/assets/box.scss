@@ -113,12 +113,12 @@
       };
     };
     &.aisle {
-      @apply bg-stone-300;
+      @apply bg-zinc-600;
       &-clickable{
-        @apply border-stone-300 text-stone-600;
+        @apply border-zinc-600 text-zinc-600;
       }
       &.icon{
-        @apply text-stone-200;
+        @apply text-zinc-400;
       };
     };
   };
@@ -129,7 +129,6 @@
     @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
   }
   &.not-shown {
-    @apply bg-zinc-600 cursor-not-allowed;
     
     &-clickable{
       @apply border-zinc-600 text-zinc-600;

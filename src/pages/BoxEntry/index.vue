@@ -54,21 +54,18 @@
                                     <span
                                         v-for="(sand, i) in sandTypes"
                                         :key="i"
-                                        :class="`select-category mesh-type__${sand.id} radio clickable`"
-                                        @click="setVisibleCategories(sand.id)"
+                                        :class="`select-category mesh-type__${sand.id} clickable`"
                                     >
-                                        <EyeIcon v-if="visibleCategories.includes(sand.id)" class="icon" />
-                                        <EyeIconOff v-else class="icon" />
+                                        <div
+                                            :class="`w-[10px] h-[10px] m-[5px] rounded-full mesh-type__${sand.id} boxCard`"
+                                        />
                                         {{ sand.type }}</span
                                     >
                                     <!-- <span class="select-category full">
                                         <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-indigo-900" />
                                         Cradle</span
                                     > -->
-                                    <span class="select-category full">
-                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-[#878787]" />
-                                        Ocupado ocupado
-                                    </span>
+                                    <span class="select-category full"> Ocupado ocupado </span>
                                     <span class="select-category full">
                                         <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-[#CECCCC]" />
                                         Pasillo
