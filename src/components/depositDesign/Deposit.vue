@@ -79,6 +79,8 @@
     const { floor, rows, cols, deposit } = toRefs(props);
     const depo = ref(null);
 
+    console.log(props);
+
     const cssRows = useCssVar('--rows', depo);
     cssRows.value = String(rows.value);
 

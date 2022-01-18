@@ -47,11 +47,13 @@
                     v-if="activeSection === 'Deposit'"
                     class="w-full flex flex-col gap-5"
                     :selected-box="choosedBox"
-                    :boxes="selectedBoxesForDeposit"
+                    :boxes="inDepoBoxes"
                     :rows="row"
                     :cols="col"
                     :floor="floor"
                     :deposit="warehouse.layout || {}"
+                    :visible-categories="visibleCategories"
+                    @select-box="selectBox"
                 />
             </section>
         </div>
@@ -183,6 +185,7 @@
 
             const selectedBoxesForTrucks = ref([]);
             const selectedBoxesForDeposit = ref([]);
+            // const selectedBoxForDeposit = ref({})
 
             const selectedQueueForTrucks = ref([]);
             const selectedQueueForDeposit = ref([]);
@@ -201,6 +204,7 @@
                 } else {
                     selectedBoxesForDeposit.value.push(box.sandOrder);
                     selectedQueueForDeposit.value.push(box);
+                    // selectedBoxForDeposit.value = selectedBoxesForDeposit.value[0];
                 }
                 if (selectedBoxesForDeposit.value.length > 0) {
                     activeSection.value = 'Deposit';
@@ -237,13 +241,22 @@
             const warehouses = ref([]);
             const warehouse = ref({});
 
+            const inDepoBoxes = ref([]);
+
             const floor = ref(0);
             const row = ref(0);
             const col = ref(0);
 
+            const sandOrders = ref([]);
+
             const choosedBox = ref({
                 ...defaultBox,
             });
+
+            const getSandOrders = async () => {
+                // sandOrders.value = axios.get(`${api}/sandOrders?pitId=${pitId.value}`);
+                sandOrders.value = await (await axios.get(`${apiUrl}/sandOrder?pitId=${pitId.value}`))?.data?.data;
+            };
 
             const assingWareHouseValue = async () => {
                 warehouse.value = await warehouses.value.find((singleWarehouse) => {
@@ -263,6 +276,7 @@
 
             watchEffect(async () => {
                 if (clientId.value >= 0 && pitId.value >= 0) {
+                    await getSandOrders();
                     await getQueueItem();
                     await assingWareHouseValue();
                     await assignDepositLayout();
@@ -275,7 +289,17 @@
                     }
                     return box;
                 });
+
+                if (warehouse.value) {
+                    inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
+                }
             });
+
+            // TRAER TODAS LAS SAND ORDERS.map(order)
+            // hacer MAP para convertir location order.location = Json.parse(order.location)
+            // Filter de eso location.where = 'warehouse' && location.whereId = warehouse.value.id
+
+            // esto me da todas las cajas que estan adentro del deposito para completar inDepoBoxes.
 
             onMounted(async () => {
                 warehouses.value = await getWarehouses();
@@ -302,6 +326,7 @@
                 confirmPurchaseOrder,
                 confirm,
                 updateQueueItem,
+                inDepoBoxes,
             };
         },
     };
