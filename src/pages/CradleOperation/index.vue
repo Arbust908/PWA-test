@@ -117,7 +117,6 @@
                 await axios
                     .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
                     .catch((err) => console.error(err));
-                console.log('selectedCradleCheckbox', selectedCradle.value);
 
                 return (cradleSlots.value[slotIndex].status = newStatus);
             };
@@ -216,11 +215,7 @@
 
             watchEffect(async () => {
                 if (cradleId.value !== -1) {
-                    console.log('cradleId', cradleId.value);
-
                     selectedCradle.value = cradles.value.filter((cradle) => {
-                        console.log('cradle', cradle);
-
                         return cradle.id == cradleId.value;
                     })[0];
 
@@ -228,18 +223,13 @@
 
                     cradleSlots.value.forEach((slot) => {
                         const { sandTypeId } = slot;
-                        console.log('sandTypeId', { sandTypeId });
-                        console.log('slot', slot);
                         let sandType = sandTypes.value.find((sandType) => {
-                            console.log('sandType', sandType);
-
                             return sandType.id == sandTypeId;
                         });
 
                         if (sandType) {
                             sandType = sandType.type;
                         }
-                        console.log('sandType', sandType);
 
                         slot.sandType = sandType;
                     });
@@ -278,16 +268,27 @@
                 order: -1,
             };
 
-            const requestEmptyBoxHandle = () => {
+            const requestEmptyBoxHandle = async () => {
                 selectedSlots.value.forEach((selectedSlot) => {
+                    const slotPosition = selectedSlot?.location?.where_slot;
+                    cradleSlots.value[slotPosition] = { boxId: null };
                     const newQI = { ...defaultQueueItem };
                     newQI.status = 10;
                     newQI.origin = selectedSlot?.location?.where_origin;
                     newQI.pitId = pitId.value;
                     newQI.sandOrderId = selectedSlot.id;
-                    console.log('selectedSlot', selectedSlot);
                     createQueueItem(newQI);
                 });
+                const updateCradle = { ...selectedCradle.value };
+                updateCradle.slots = cradleSlots.value;
+                await axios
+                    .put(`${apiUrl}/cradle/${updateCradle.id}`, updateCradle)
+                    .then((res) => {
+                        if (res.request.status == 200) {
+                            confirmModal();
+                        }
+                    })
+                    .catch((err) => console.error(err));
             };
 
             const createQueueItem = async (queueItem: QueueItem) => {
@@ -296,7 +297,6 @@
                     .then((response) => {
                         if (response.request.status == 200) {
                             console.log(queueItem, 'se guardo bien');
-                            confirmModal();
                         }
                     })
                     .catch((err) => console.error(err));
