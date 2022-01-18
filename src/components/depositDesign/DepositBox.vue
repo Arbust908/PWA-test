@@ -114,6 +114,7 @@
     });
 
     let visibleCategories = ref(props.visibleCategories);
+    console.log(visibleCategories);
 
     const isBlocked = () => {
         if (isDesign.value) {

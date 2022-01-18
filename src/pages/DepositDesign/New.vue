@@ -33,9 +33,11 @@
                                     :checked="selectedBox.category == sand.id"
                                     type="radio"
                                     name="boxCat"
-                                    :class="`form-checkbox mesh-type__${sand.id} radio clickable`"
+                                    :class="`form-checkbox mesh-type__${
+                                        sand.id <= 5 ? sand.id : 'extra'
+                                    } radio clickable`"
                                     @click="setCat(sand.id.toString())"
-                                />
+                                />{{ sand.id }}
                                 <span>{{ sand.type }}</span>
                             </label>
                             <label class="type-select" for="empty">
@@ -144,7 +146,8 @@
                     selectedBox.value.category != 'aisle' &&
                     selectedBox.value.category != 'cradle'
                 ) {
-                    return sandTypes.value[parseInt(selectedBox.value.category) - 1].type;
+                    console.log(sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type);
+                    return sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type;
                 }
             });
 

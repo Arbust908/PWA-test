@@ -140,6 +140,12 @@ export const getBoxClasses = (category: string) => {
             return 'mesh-type__taken cradle';
         case null:
             return '';
+        default:
+            if (parseInt(category) > 5) {
+                return 'mesh-type__extra boxCard';
+            } else {
+                return '';
+            }
     }
 
     return '';

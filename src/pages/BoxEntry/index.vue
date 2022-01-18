@@ -55,11 +55,16 @@
                                     <span
                                         v-for="(sand, i) in sandTypes"
                                         :key="i"
-                                        :class="`select-category mesh-type__${sand.id} clickable`"
+                                        :class="`select-category mesh-type__${
+                                            sand.id <= 5 ? sand.id : 'extra'
+                                        } clickable`"
                                         @click="conLog"
                                     >
+                                        {{ sand.id }}
                                         <div
-                                            :class="`w-[10px] h-[10px] m-[5px] rounded-full mesh-type__${sand.id} boxCard`"
+                                            :class="`w-[10px] h-[10px] m-[5px] rounded-full mesh-type__${
+                                                sand.id <= 5 ? sand.id : 'extra'
+                                            } boxCard`"
                                         />
                                         {{ sand.type }}</span
                                     >
@@ -67,9 +72,8 @@
                                         <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-indigo-900" />
                                         Cradle</span
                                     > -->
-                                    <span class="select-category full"> Ocupado ocupado </span>
                                     <span class="select-category full">
-                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-[#CECCCC]" />
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full mesh-type__taken aisle" />
                                         Pasillo
                                     </span>
                                 </div>
@@ -350,8 +354,6 @@
             return box.boxId === id;
         });
 
-        setVisibleCategories(choosedBox.value.sandTypeId);
-
         if (checkIfWasBoxInOriginalDeposit(id)) {
             Object.entries(warehouse.value.layout).forEach((cell) => {
                 if (cell[1].id == id) {
@@ -460,7 +462,7 @@
     };
 
     const showAllCategories = () => {
-        sandTypes.value.forEach((sand) => visibleCategories.value.push(sand.type));
+        sandTypes.value.forEach((sand) => visibleCategories.value.push(sand.id));
         console.log(visibleCategories.value);
     };
 
@@ -629,9 +631,6 @@
             @apply w-5 h-5;
         }
 
-        &:not(.full):not(.aisle) {
-            cursor: pointer;
-        }
         &.blocked {
             @apply text-second-800 border-second-800;
         }
