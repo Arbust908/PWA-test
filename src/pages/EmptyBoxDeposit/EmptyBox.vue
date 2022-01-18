@@ -210,10 +210,12 @@
                     );
                     // Hay que Vaciar la location de la caja
                     // ...
+                    // BoxInDeposit map chequear el que tenga el mimo id y le remplazamos la location
                 } else {
                     // Sino la agregamos a la lista
                     selectedBoxesForDeposit.value.push(box.sandOrder);
                     selectedQueueForDeposit.value.push(box);
+                    // tomar la box.location y guardarla en una variable
                 }
 
                 if (selectedBoxesForDeposit.value.length > 0) {
