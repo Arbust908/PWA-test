@@ -66,6 +66,7 @@
 </template>
 
 <script lang="ts">
+    import { Ref } from 'vue';
     import Layout from '@/layouts/Main.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -114,7 +115,7 @@
         setup() {
             useTitle('Destino de cajas vacias');
 
-            let activeSection = ref(null);
+            let activeSection: Ref<string | null> = ref(null);
 
             const router = useRouter();
             const route = useRoute();
@@ -195,20 +196,24 @@
             const deposit = (box: QueueItem) => {
                 choosedBox.value = box.sandOrder;
 
-                const checkFilter =
-                    selectedBoxesForDeposit.value.filter((check) => check.boxId === box.sandOrder.boxId).length > 0;
+                const boxWasSelected = selectedBoxesForDeposit.value.find(
+                    (check) => check.boxId === box.sandOrder.boxId
+                );
 
-                if (checkFilter) {
+                if (boxWasSelected) {
+                    // Si la caja estaba seleccionad la borramos de la lista
                     selectedBoxesForDeposit.value = selectedBoxesForDeposit.value.filter(
                         (check) => check.boxId !== box.sandOrder.boxId
                     );
                     selectedQueueForDeposit.value = selectedQueueForDeposit.value.filter(
-                        (check) => check.boxId !== box.boxId
+                        (check) => check.id !== box.id
                     );
+                    // Hay que Vaciar la location de la caja
+                    // ...
                 } else {
+                    // Sino la agregamos a la lista
                     selectedBoxesForDeposit.value.push(box.sandOrder);
                     selectedQueueForDeposit.value.push(box);
-                    // selectedBoxForDeposit.value = selectedBoxesForDeposit.value[0];
                 }
 
                 if (selectedBoxesForDeposit.value.length > 0) {
@@ -218,18 +223,19 @@
                 }
             };
 
-            const truck = (box) => {
-                let checkFilter =
-                    selectedBoxesForTrucks.value.filter((check) => check.boxId === box.sandOrder.boxId).length > 0;
+            const truck = (box: QueueItem) => {
+                const boxWasSelected = selectedBoxesForTrucks.value.find(
+                    (check) => check.boxId === box.sandOrder.boxId
+                );
 
-                if (checkFilter) {
+                if (boxWasSelected) {
+                    // Si la caja estaba seleccionad la borramos de la lista
                     selectedBoxesForTrucks.value = selectedBoxesForTrucks.value.filter(
                         (check) => check.boxId !== box.sandOrder.boxId
                     );
-                    selectedBoxesForTrucks.value = selectedBoxesForTrucks.value.filter(
-                        (check) => check.boxId !== box.boxId
-                    );
+                    selectedQueueForTrucks.value = selectedQueueForTrucks.value.filter((check) => check.id !== box.id);
                 } else {
+                    // Sino la agregamos a la lista
                     selectedBoxesForTrucks.value.push(box.sandOrder);
                     selectedQueueForTrucks.value.push(box);
                 }
@@ -239,8 +245,6 @@
                 } else {
                     activeSection.value = null;
                 }
-                console.log(box);
-                console.log(selectedBoxesForTrucks.value);
             };
 
             const checkIfWasBoxInOriginalDeposit = (boxId) => {

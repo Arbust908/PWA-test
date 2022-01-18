@@ -60,7 +60,10 @@
         },
         emits: ['deposit', 'truck'],
         setup(props, { emit }) {
-            const { boxId, estacion } = useVModels(props, emit);
+            const { boxId, estacion, selectedBoxesForTrucks, selectedBoxesForDeposit } = useVModels(props, emit);
+            console.log(boxId.value);
+            console.log(selectedBoxesForTrucks.value);
+            console.log(selectedBoxesForDeposit.value);
 
             const clickedDeposit = ref(false);
             const clickedTruck = ref(false);
@@ -69,6 +72,8 @@
                 id: boxId.value,
                 estacion: estacion.value,
             });
+
+            // const
 
             const deposit = () => {
                 emit('deposit');
