@@ -5,7 +5,11 @@
             <h4>Arena {{ type }}</h4>
             <p class="text-gray-400">{{ amount }} toneladas</p>
         </article>
-        <article ref="progress" class="w-[70px] rounded flex justify-center items-center ml-auto">
+        <article
+            ref="progress"
+            class="w-[70px] rounded flex justify-center items-center ml-auto"
+            :class="stagePorcentageVariable"
+        >
             <div class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center circle-progress">
                 <p class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]">
                     {{ porcentage.toFixed() }}%

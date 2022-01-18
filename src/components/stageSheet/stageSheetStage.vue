@@ -19,6 +19,7 @@
             </i>
         </header>
         <div
+            v-if="isSelectedStage"
             :class="isSelectedStage ? 'opened' : 'scale-y-0 h-0'"
             class="flex gap-5 border-t border-gray-200 transform transition ease-in-out duration-300 overflow-hidden origin-top flex-wrap"
         >
@@ -44,13 +45,17 @@
                     :key="place + 'place'"
                     :class="[
                         isSelectedBox(place) ? 'selected' : null,
-                        box.boxId ? `mesh-type__${box?.sandType?.id} filled boxCard` : 'not-filled',
+                        box?.boxId ? `mesh-type__${box?.sandType?.id} filled boxCard` : 'not-filled',
+                        box?.isDone ? 'done' : null,
                     ]"
                     class="stage--box"
+                    :order="box.order"
                     @click="fillBox(place, $event)"
                 >
-                    <p>{{ box.boxId ? box.boxId : box }}</p>
-                    <p v-if="box.amount" class="text-black">{{ box.amount }} ton</p>
+                    <p>{{ box?.boxId ? box.boxId : box }}</p>
+                    <p v-if="box?.amount" :class="box?.isDone ? '!text-gray-400' : null" class="text-black">
+                        {{ box.amount }} ton
+                    </p>
                     <teleport to="#modal">
                         <OnClickOutside v-if="isSelectedBox(place)" @trigger="selectedBox = null">
                             <div
@@ -113,6 +118,8 @@
     import PlusIcon from './PlusIcon.vue';
     import SheetDepoBox from './sheetDepoBox.vue';
     import StageSheetSandDetail from './stageSheetSandDetail.vue';
+    import { createAllQueueItems, getQueueItems } from '@/helpers/useQueueItem';
+    import { getSandOrders } from '@/helpers/useWarehouse';
     const props = defineProps({
         sandStage: {
             type: Object,
@@ -130,6 +137,10 @@
             type: Boolean,
             default: false,
         },
+        pitId: {
+            type: Number,
+            default: 0,
+        },
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
     const router = useRouter();
@@ -142,17 +153,77 @@
     });
 
     const isLoading = ref(false);
-    const toggleLoading = useToggle(isLoading);
 
     const showProgress = computed(() => {
         return stagePorcentage.value > 0 && stagePorcentage.value < 100;
     });
     const boxQueue: Ref<Array<number | SandOrder>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+
+    boxQueue.value = await getSandOrders();
+    console.log(boxQueue.value);
+    boxQueue.value = boxQueue.value
+        .filter((order) => {
+            return order.location;
+        })
+        .filter((order) => {
+            const { queueItems } = order;
+
+            if (queueItems.length) {
+                const queueItem = queueItems[0];
+                const { pitId } = queueItem;
+
+                return pitId === props.pitId;
+            }
+
+            return;
+        })
+        .map((order) => {
+            const { queueItems, location } = order;
+
+            order.location = JSON.parse(location);
+
+            if (queueItems.length) {
+                const queueItem = queueItems[0];
+                order.isDone = queueItem.status === 99;
+                order.order = queueItem.order;
+
+                return order;
+            }
+
+            return;
+        })
+        .filter((order) => {
+            return order?.order && order?.order > 0;
+        })
+        .sort((a, b) => {
+            const { queueItems: qiA } = a;
+            const { queueItems: qiB } = b;
+            let orderA = 0;
+            let orderB = 0;
+
+            if (qiA.length) {
+                const queueItem = qiA[0];
+                orderA = queueItem.order;
+            }
+
+            if (qiB.length) {
+                const queueItem = qiB[0];
+                orderB = queueItem.order;
+            }
+
+            return orderB - orderA;
+        });
+
+    if (boxQueue.value.length < 14) {
+        const queueNum = boxQueue.value.length;
+        for (let i = queueNum + 1; i <= 14; i++) {
+            boxQueue.value.push(i);
+        }
+    }
+    console.log(boxQueue.value);
+
     const addBoxToQueue = (place: null | number = null, box: any = null) => {
         if (place !== null && box !== null) {
-            console.log(place, box);
-            console.log(typeof box.location === 'string');
-
             if (typeof box.location === 'string') {
                 box.location = JSON.parse(box.location);
             }
@@ -314,17 +385,31 @@
         }
     });
 
-    const generateQueue = () => {
+    const generateQueue = async () => {
         isLoading.value = true;
         console.log(boxQueue.value);
-        const toAddQueue = boxQueue.value.filter((box) => {
-            return typeof box !== 'number';
-        });
+        const toAddQueue: Array<QueueItem> = boxQueue.value
+            .filter((box) => {
+                return typeof box !== 'number';
+            })
+            .map((box) => {
+                return box.queueItems[0];
+            })
+            .filter((item) => {
+                console.log('item: ', item);
+
+                return;
+            })
+            .map((item) => {
+                item.origin = item.destination;
+                item.destination = null;
+            });
         console.log(toAddQueue);
-        setTimeout(() => {
-            console.log('Espero');
-            isLoading.value = false;
-        }, 1500);
+
+        await createAllQueueItems(toAddQueue);
+        console.log('Espero');
+        isLoading.value = false;
+        // Emit que todo esta sumado
     };
 </script>
 
@@ -376,6 +461,9 @@
         }
         &.filled {
             @apply border-solid border  text-sm;
+        }
+        &.done {
+            @apply cursor-not-allowed bg-gray-300 border-gray-400 text-gray-400 hover:shadow-none;
         }
     }
     .circle-progress {
