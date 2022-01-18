@@ -144,3 +144,35 @@ export const createAllQueueItems = async (queue: Array<QueueItem>) => {
 
     return Promise.all(queueItems);
 };
+
+export const itemIsFinished = (queueItem: QueueItem) => {
+    return queueItem.status === 99;
+};
+
+export const itemIsNotDone = (queueItem: QueueItem) => {
+    return queueItem.status !== 99;
+};
+
+export const itemIsNotToEmpty = (queueItem: QueueItem) => {
+    return queueItem.status !== 10;
+};
+
+export const orderItems = (itemA: QueueItem, itemB: QueueItem, direction = 'ASC') => {
+    const orderA = itemA.order === -1 ? 0 : itemA.order;
+    const orderB = itemB.order === -1 ? 0 : itemB.order;
+    console.groupCollapsed(`Ordenando items`);
+    const mod = direction === 'ASC' ? 1 : -1;
+    console.log('Direction', direction);
+    console.log('Mod', mod);
+    console.log('Item A', orderA);
+    console.log('Item B', orderB);
+    console.log(orderA - orderB);
+    console.log((orderA - orderB) * mod);
+    console.groupEnd();
+
+    return (orderA - orderB) * mod;
+};
+
+export const orderDesc = (itemA: QueueItem, itemB: QueueItem) => {
+    return orderItems(itemA, itemB, 'DSC');
+};
