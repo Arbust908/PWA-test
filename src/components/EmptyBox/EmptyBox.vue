@@ -1,6 +1,8 @@
 <template>
     <article class="card" :class="activeChip && 'selected'">
-        <BoxIcon class="icon" />
+        <div class="icon-box">
+            <BoxIcon class="icon" />
+        </div>
         <div class="info">
             <div class="space-y-1 text-sm font-bold">
                 <p>Caja: {{ boxId }}</p>
@@ -84,8 +86,11 @@
         &.selected {
             @apply border-green-500;
         }
+        .icon-box {
+            @apply w-[85px] h-20 bg-[#9CA2B0] flex justify-center items-center rounded-xl;
+        }
         .icon {
-            @apply w-[85px] h-20 text-second-400;
+            @apply w-12 h-12 text-second-400;
         }
         .info {
             @apply flex flex-col justify-between text-gray-500 grow;
