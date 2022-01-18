@@ -129,6 +129,7 @@
     @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
   }
   &.not-shown {
+    @apply bg-zinc-600 cursor-not-allowed;
     
     &-clickable{
       @apply border-zinc-600 text-zinc-600;

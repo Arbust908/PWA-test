@@ -21,6 +21,7 @@
                         :endpoint-data="filteredPurchaseOrders"
                         :data="purchaseOrderId"
                         @update:data="purchaseOrderId = $event"
+                        @change="showAllCategories"
                     />
                 </FieldGroup>
                 <EntryBoxesList
@@ -55,6 +56,7 @@
                                         v-for="(sand, i) in sandTypes"
                                         :key="i"
                                         :class="`select-category mesh-type__${sand.id} clickable`"
+                                        @click="conLog"
                                     >
                                         <div
                                             :class="`w-[10px] h-[10px] m-[5px] rounded-full mesh-type__${sand.id} boxCard`"
@@ -445,11 +447,21 @@
     const visibleCategories = ref([]);
 
     const setVisibleCategories = (category: string) => {
+        console.log(category);
         if (visibleCategories.value.includes(category)) {
             visibleCategories.value.splice(visibleCategories.value.indexOf(category), 1);
         } else {
             visibleCategories.value.push(category);
         }
+    };
+
+    const conLog = () => {
+        console.log(visibleCategories.value);
+    };
+
+    const showAllCategories = () => {
+        sandTypes.value.forEach((sand) => visibleCategories.value.push(sand.type));
+        console.log(visibleCategories.value);
     };
 
     let selectedCradle = ref(0);
