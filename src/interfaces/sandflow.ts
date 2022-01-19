@@ -209,6 +209,32 @@ export interface SandOrder {
     sandProvider?: SandProvider;
 }
 
+interface BoxLocation {
+    where?: string;
+    where_id?: number;
+    floor?: number;
+    row?: number;
+    col?: number;
+    origin?: string;
+    origin_id?: number;
+}
+export interface SandOrderBox {
+    id?: number;
+    sandTypeId: number;
+    amount: number;
+    purchaseOrderId: number;
+    sandProviderId: number;
+    boxId?: string;
+    status: number;
+    location: BoxLocation;
+    sandType?: Sand;
+    floor?: number;
+    row?: number;
+    column?: number;
+    purchaseOrder?: PurchaseOrder;
+    sandProvider?: SandProvider;
+}
+
 export interface TransportProvider {
     id?: number;
     name: string;

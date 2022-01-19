@@ -94,7 +94,7 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import FieldToggle from '@/components/ui/form/FieldToggle.vue';
-    import { getQueueItems, updateQueueItems } from '@/helpers/useQueueItem';
+    import { getQueueItems, updateQueueItem } from '@/helpers/useQueueItem';
     import { wait } from '@/helpers/useWait';
 
     const clientId = ref(-1);
@@ -151,7 +151,7 @@
         // console.log(toDelete);
         // await Promise.all(
         //     toDelete.map((item: QueueItem) => {
-        //         item?.id && deleteQueueItems(item.id);
+        //         item?.id && deleteQueueItem(item.id);
         //     })
         // );
     });
@@ -164,7 +164,7 @@
             updateLists();
             console.log('cambiar estado');
             console.log(item);
-            updateQueueItems(item);
+            updateQueueItem(item);
         }, 1000);
     };
 

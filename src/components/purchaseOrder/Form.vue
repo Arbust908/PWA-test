@@ -1,71 +1,58 @@
 <template>
-    <div class="overflow-y-scroll"></div>
-    <h1>Orden de pedido</h1>
+    <ABMFormTitle title="Orden de pedido" />
     <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" />
-    <section class="bg-white rounded-md shadow-sm overflow-y-auto">
+    <section class="bg-white rounded-md overflow-y-auto">
         <form method="POST" action="/" class="flex-col gap-4">
-            <!-- <FieldGroup class="max-w-2xl border-none">
-                <ClientPitCombo
-                    :client-id="companyClientId"
-                    :pit-id="pitId"
-                    validation-type="empty"
-                    @update:clientId="companyClientId = $event"
-                    @update:pitId="pitId = $event"
-                />
-            </FieldGroup> -->
             <FieldLegend>Arena</FieldLegend>
             <template v-for="(providerId, sandProvidersKey) in sandProvidersIds" :key="sandProvidersKey">
-                <div class="max-w-2xl w-full grid grid-cols-12 gap-6 gap-y-0 mb-4">
-                    <FieldSelect
-                        class="col-span-10 mt-5"
-                        field-name="sandProvider"
-                        title="Centro de carga de arena"
-                        placeholder="Seleccionar centro de carga"
-                        endpoint="/sandProvider"
-                        :data="providerId.id"
-                        :select-class="useFirstSP"
-                        @update:data="providerId.id = $event"
-                        @change="changeProvider"
-                        @click="useFirstSP = true"
-                    />
-                    <div class="col-span-12 m-0 p-0 gap-0">
-                        <InvalidInputLabel v-if="providerId.id === -1 && useFirstSP === true" validation-type="empty" />
-                    </div>
-                </div>
-                <FieldGroup v-for="box in selectedBoxes" :key="box.boxId" class="max-w-3xl relative">
+                <FieldSelect
+                    class="max-w-sm my-4"
+                    field-name="sandProvider"
+                    title="Centro de carga de arena"
+                    placeholder="Seleccionar centro de carga"
+                    endpoint="/sandProvider"
+                    validation-type="empty"
+                    :data="providerId.id"
+                    :select-class="useFirstSP"
+                    @update:data="providerId.id = $event"
+                    @change="changeProvider"
+                    @click="useFirstSP = true"
+                />
+                <FieldGroup v-for="(box, orderKey) in selectedBoxes" :key="box.boxId" class="max-w-3xl relative">
                     <FieldSelect
                         class="col-span-7 sm:col-span-4"
                         :title="orderKey === 0 ? 'Tipo' : ''"
                         field-name="sandType"
                         placeholder="Tipo de Arena"
                         endpoint-key="type"
+                        validation-type="empty"
                         :data="box.sandTypeId"
                         :endpoint-data="filteredSandTypes"
                         :select-class="useFirstST"
                         @update:data="box.sandTypeId = $event"
                         @click="useFirstST = true"
                     />
-                    <InvalidInputLabel
-                        v-if="box.sandTypeId === -1 && useFirstST === true"
-                        validation-type="empty"
-                        class="text-xs"
-                    />
-                    <FieldInput
-                        class="col-span-7 sm:col-span-4"
+                    <FieldWithSides
+                        v-model:data="box.amount"
+                        :title="orderKey === 0 ? 'Cantidad' : ''"
+                        class="col-span-7 sm:col-span-3"
                         field-name="sandQuantity"
-                        placeholder="ID"
-                        :data="box.amount"
-                        @update:data="box.amount = $event"
+                        placeholder="Arena"
+                        type="number"
+                        mask="####"
+                        validation-type="empty"
+                        :number-validation="useFirstSQ"
+                        :post="{ title: '0', value: 't', width: '3rem' }"
                     />
                     <FieldInput
-                        :title="box.index === 0 ? 'ID de caja' : ''"
+                        :title="orderKey === 0 ? 'ID de caja' : ''"
                         class="col-span-7 sm:col-span-4"
                         field-name="sandBoxId"
                         placeholder="ID"
                         :maxlength="10"
                         :data="box.boxId"
-                        @update:data="box.boxId = $event"
                         is-readonly
+                        @update:data="box.boxId = $event"
                     />
                 </FieldGroup>
             </template>
@@ -77,14 +64,10 @@
                         title="Proveedor"
                         placeholder="Selecciona proveedor"
                         endpoint="/transportProvider"
+                        validation-type="empty"
                         :data="transportProviderId"
                         :select-class="useFirstTP"
                         @update:data="transportProviderId = $event"
-                        @click="useFirstTP = true"
-                    />
-                    <InvalidInputLabel
-                        v-if="transportProviderId === -1 && useFirstTP === true"
-                        validation-type="empty"
                     />
                 </div>
 
@@ -94,6 +77,7 @@
                             title="Conductores"
                             field-name="transportProvider2"
                             placeholder="Seleccionar Conductor"
+                            validation-type="empty"
                             :endpoint-data="filteredDrivers"
                             :data="driverId"
                             :select-class="useFirstDriver"
@@ -103,7 +87,6 @@
                             "
                             @click="useFirstDriver = true"
                         />
-                        <InvalidInputLabel v-if="driverId === -1 && useFirstDriver === true" validation-type="empty" />
                     </div>
 
                     <FieldInput
@@ -184,10 +167,6 @@
             </FieldGroup>
         </form>
     </section>
-    <!-- <footer class="mt-8 space-x-3 flex justify-end">
-        <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
-        <PrimaryBtn btn="wide" @click.prevent="confirm()"> Crear Orden </PrimaryBtn>
-    </footer> -->
 
     <OrderModal
         v-if="showModal"
@@ -246,6 +225,7 @@
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
 
     import PDF from '@/components/purchaseOrder/PDF.vue';
+    import ABMFormTitle1 from '../ui/ABMFormTitle.vue';
 
     const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
     const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
@@ -255,9 +235,11 @@
     const props = defineProps({
         companyClientId: {
             type: Number,
+            required: true,
         },
         pitId: {
             type: Number,
+            required: true,
         },
         selectedBoxes: {
             type: Array,
@@ -607,6 +589,8 @@
     });
 
     const save = (): void => {
+        const order = ref(null);
+
         if (true) {
             // _updateQueueItem();
             // Formateamos la orden de pedido
@@ -630,6 +614,7 @@
             watch(pODone, (newVal, _) => {
                 if (newVal && newVal.data) {
                     // Recorremos los proveedores de sand
+                    order.value = newVal.data;
                     const poId = newVal.data.id;
                     purchaseId.value = poId;
                     titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
@@ -641,7 +626,7 @@
                 }
             });
         }
-        emit('updateQueueItem');
+        emit('updateQueueItem', order.value);
     };
     // >> Success y Error Modal
     const openSuccess = ref(false);

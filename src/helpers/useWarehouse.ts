@@ -1,5 +1,5 @@
 import { useClone } from '@/helpers/useClone';
-import { SandOrder } from '@/interfaces/sandflow';
+import { SandOrder, SandOrderBox } from '@/interfaces/sandflow';
 
 import axios from 'axios';
 
@@ -176,9 +176,9 @@ export const getSandOrders = async () => {
         })
         .catch((err) => console.error(err));
 };
-export const formatBoxLocation = (box: SandOrder) => {
+export const formatBoxLocation = (box: SandOrder): SandOrderBox => {
     const { location } = box;
     box.location = JSON.parse(location);
 
-    return box;
+    return box as SandOrderBox;
 };

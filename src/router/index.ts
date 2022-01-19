@@ -272,14 +272,14 @@ const routes: Array<RouteRecordRaw> = [
         path: '/deposito-cajas-vacias',
         name: 'EmptyBoxDeposit',
         component: () => import('@/pages/EmptyBoxDeposit/Index.vue'),
-        beforeEnter: [isLogged],
+        beforeEnter: [isMobileAndLogged],
     },
     {
         // Agregar permiso al Lead Operator
         path: '/destino-cajas-vacias',
         name: 'EmptyBoxDestiny',
         component: () => import('@/pages/EmptyBoxDeposit/EmptyBox.vue'),
-        beforeEnter: [isLogged],
+        beforeEnter: [isMobileAndLogged],
     },
     {
         path: '/usuarios',

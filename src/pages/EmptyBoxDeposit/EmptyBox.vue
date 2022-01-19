@@ -116,7 +116,7 @@
         setup() {
             useTitle('Destino de cajas vacias');
 
-            let activeSection: Ref<string | null> = ref(null);
+            const activeSection: Ref<string | null> = ref(null);
             const instance = axios.create({
                 baseURL: apiUrl,
             });
