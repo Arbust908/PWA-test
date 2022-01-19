@@ -75,6 +75,7 @@
             default: false,
         },
     });
+
     const emits = defineEmits(['select-box']);
     const { floor, rows, cols, deposit } = toRefs(props);
     const depo = ref(null);

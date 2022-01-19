@@ -1,4 +1,3 @@
-!
 <template>
     <article class="available-box">
         <TheAllIcon v-if="isActiveBox" type="outline" icon="CheckCircle" class="w-6 h-6 text-green-600" />
