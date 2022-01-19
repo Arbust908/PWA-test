@@ -50,6 +50,7 @@
                     :selected-boxes="selectedBoxes"
                     :confirm-purchase-order="fireOrder"
                     @updateQueueItem="finalizeOrder($event)"
+                    @orderIsComplete="canSendOrder = true"
                 />
             </section>
         </div>
@@ -69,7 +70,7 @@
                 v-else
                 btn="wide"
                 size="md"
-                :disabled="canCreateOrder"
+                :disabled="!canSendOrder"
                 :is-loading="isLoading"
                 @click="confirmOrder"
             >
@@ -123,7 +124,11 @@
     const pitId = ref(-1);
     const selectionIsDone = computed(() => clientId.value !== -1 && pitId.value !== -1);
 
+    // Esto se usa para la grilla del Deposito
     const warehouse = ref({} as Warehouse);
+    const floor = ref(0);
+    const row = ref(0);
+    const col = ref(0);
 
     watch(pitId, async (newVal) => {
         if (newVal > -1 && clientId.value > -1) {
@@ -135,10 +140,7 @@
                     return response.data.data[0];
                 })
                 .catch((err) => console.error(err));
-            console.log(warehouse.value);
-
             warehouseConfiguration();
-
             activeSection.value = 'Deposit';
         }
     });
@@ -197,10 +199,6 @@
         return;
     };
 
-    const floor = ref(0);
-    const row = ref(0);
-    const col = ref(0);
-
     const choosedBox = ref({
         ...defaultBox,
     });
@@ -216,6 +214,8 @@
             inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
         }
     };
+
+    const canSendOrder = ref(false);
 
     const finalizeOrder = (order: any) => {
         console.log('Finalizando orden');

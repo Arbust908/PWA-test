@@ -260,9 +260,6 @@
     const router = useRouter();
     setTimeout(() => {
         download();
-        setTimeout(() => {
-            emit('close');
-            router.push('/orden-de-pedido');
-        }, 1000);
+        emit('close');
     }, 500);
 </script>

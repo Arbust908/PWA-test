@@ -281,7 +281,8 @@ export interface PurchaseOrder {
 export interface TransportOrder {
     id?: number;
     boxAmount: string;
-    licensePlate: string;
+    driverId?: number;
+    licensePlate?: string;
     observations: string;
     purchaseOrderId: number;
     purchaseOrder?: PurchaseOrder;

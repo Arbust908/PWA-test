@@ -176,13 +176,12 @@
                 </FieldGroup>
                 <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="max-w-3xl relative flex-wrap">
                     <FieldLegend class="mt-2">Observaciones</FieldLegend>
-                    <section class="flex gap-2 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
+                    <section class="flex gap-4 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
                             <DatePicker
                                 v-model="localDate"
                                 validation-type="empty"
-                                class="mr-6 md:mr-8"
                                 @date-object="dateObject = $event"
                             />
                         </label>
@@ -240,6 +239,7 @@
             @main="
                 togglePDF();
                 openSuccess = false;
+                $router.push('/orden-de-pedido');
             "
         />
         <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @main="openError = false" />
