@@ -159,7 +159,7 @@
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
     import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
     import CradleRow from './CradleRow.vue';
-    import { formatDeposit, defaultBox, getInDepoBoxes } from '@/helpers/useWarehouse';
+    import { formatDeposit, defaultBox, getInDepoBoxes, searchInDepoBoxes } from '@/helpers/useWarehouse';
     import {
         getPurchaseOrders,
         getSandOrders,
@@ -349,10 +349,11 @@
         return response;
     };
 
-    const setSelectedBox = async (id: number) => {
+    const setSelectedBox = (id: number) => {
         choosedBox.value = boxes.value.find((box) => {
             return box.boxId === id;
         });
+        console.log('CHOOSEDBOX', choosedBox.value);
 
         if (checkIfWasBoxInOriginalDeposit(id)) {
             Object.entries(warehouse.value.layout).forEach((cell) => {
@@ -427,20 +428,7 @@
 
     watch(selectionsAreDone, async (newVal) => {
         if (newVal) {
-            sandOrders.value = await getSandOrders();
-            const boxes = sandOrders.value
-                .map((box) => {
-                    if (box.location && JSON.parse(box.location)) {
-                        box.location = JSON.parse(box.location);
-                        box.location.been_set = true;
-                    }
-
-                    return box;
-                })
-                .filter((box) => {
-                    return box.location;
-                });
-            inDepoBoxes.value = getInDepoBoxes(boxes, warehouse.value.id);
+            inDepoBoxes.value = await searchInDepoBoxes(warehouse.value.id);
         }
     });
 

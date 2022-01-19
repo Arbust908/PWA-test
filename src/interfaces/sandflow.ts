@@ -127,7 +127,7 @@ export interface Cradle {
     id?: number;
     name: string;
     observations?: string;
-    slots?: string;
+    slots?: any[];
     visible: boolean;
     stageSheets?: StageSheet[];
     backupStageSheets?: StageSheet[];
@@ -209,6 +209,32 @@ export interface SandOrder {
     sandProvider?: SandProvider;
 }
 
+interface BoxLocation {
+    where?: string;
+    where_id?: number;
+    floor?: number;
+    row?: number;
+    col?: number;
+    origin?: string;
+    origin_id?: number;
+}
+export interface SandOrderBox {
+    id?: number;
+    sandTypeId: number;
+    amount: number;
+    purchaseOrderId: number;
+    sandProviderId: number;
+    boxId?: string;
+    status: number;
+    location: BoxLocation;
+    sandType?: Sand;
+    floor?: number;
+    row?: number;
+    column?: number;
+    purchaseOrder?: PurchaseOrder;
+    sandProvider?: SandProvider;
+}
+
 export interface TransportProvider {
     id?: number;
     name: string;
@@ -255,7 +281,8 @@ export interface PurchaseOrder {
 export interface TransportOrder {
     id?: number;
     boxAmount: string;
-    licensePlate: string;
+    driverId?: number;
+    licensePlate?: string;
     observations: string;
     purchaseOrderId: number;
     purchaseOrder?: PurchaseOrder;

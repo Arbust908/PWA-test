@@ -5,10 +5,10 @@
             <ClientPitCombo v-model:client-id="clientId" v-model:pit-id="pitId" validation-type="empty" />
         </FieldGroup>
         <h2>Tareas pendientes</h2>
-        <VTable :columns="columns" :items="toDoQueue" empty-text="No tareas pendientes">
+        <VTable :columns="columns" :pagination="pagination" :items="toDoQueue" empty-text="No tareas pendientes">
             <template #item="{ item }">
                 <!-- Desktop -->
-                <td :class="item?.sandOrder?.boxId ? null : 'empty'">
+                <td :class="item?.sandOrder?.boxId ? null : 'empty'" :order="item?.order">
                     {{ item?.sandOrder?.boxId || 'Sin definir' }}
                 </td>
 
@@ -24,7 +24,7 @@
                     <FieldToggle
                         class="mx-auto"
                         :field-name="`status-${item.id}`"
-                        :data="item.status !== 0"
+                        :data="item.status === 99"
                         @toggle="toggleQueueItemStatus(item)"
                     />
                 </td>
@@ -47,7 +47,7 @@
             </template>
         </VTable>
         <h2>Tareas finalizadas</h2>
-        <VTable :columns="columns" :items="finishedQueue" empty-text="No tareas finalizadas">
+        <VTable :columns="columns" :pagination="pagination" :items="finishedQueue" empty-text="No tareas finalizadas">
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item?.sandOrder.boxId ? null : 'empty'">
@@ -87,101 +87,130 @@
 </template>
 
 <script setup lang="ts">
-    import { QueueItem } from '@/interfaces/sandflow';
+    import { QueueItem, SandOrder } from '@/interfaces/sandflow';
     import Layout from '@/layouts/Main.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import FieldToggle from '@/components/ui/form/FieldToggle.vue';
-    import { getQueueItems, updateQueueItems } from '@/helpers/useQueueItem';
-    import { wait } from '@/helpers/useWait';
+    import {
+        getQueueItems,
+        updateQueueItem,
+        itemIsFinished,
+        itemIsNotDone,
+        itemIsNotToEmpty,
+    } from '@/helpers/useQueueItem';
+    import { getCradle, getWorkOrders } from '@/helpers/useGetEntities';
+    import { Cradle } from '@/interfaces/sandflow';
 
     const clientId = ref(-1);
     const pitId = ref(-1);
+    const currentCradle = ref({} as Cradle);
     const columns = [
-        { title: 'Caja Id', key: 'sandOrder.boxId', sortable: true },
-        { title: 'Origen', key: 'origin', sortable: true },
-        { title: 'Destino', key: 'destination', sortable: true },
+        { title: 'Caja Id', key: 'sandOrder.boxId' },
+        { title: 'Origen', key: 'origin' },
+        { title: 'Destino', key: 'destination' },
         { title: 'Finalizada', key: 'status' },
     ];
-    const status = {
-        0: 'Pendiente',
-        1: 'En proceso',
-        2: 'Finalizada',
+
+    const pagination = ref({
+        sortKey: 'order',
+        sortDir: 'desc',
+    });
+
+    const onPitUpdate = async () => {
+        if (clientId.value === -1 || pitId.value === -1) {
+            return;
+        }
+
+        queue.value = queueBackup.value.filter((item: QueueItem) => item.pitId === pitId.value);
+        const workOrders = await getWorkOrders(`?client=${clientId.value}`);
+        const cradleId = workOrders[0]?.operativeCradle;
+        currentCradle.value = await getCradle(Number(cradleId));
+        updateLists();
     };
 
-    watch(clientId, () => {
-        if (clientId.value === -1 || pitId.value === -1) {
-            return;
-        }
-        console.log(queueBackup.value);
+    watch(clientId, await onPitUpdate);
+    watch(pitId, await onPitUpdate);
 
-        queue.value = queueBackup.value.filter((item: QueueItem) => item.pitId === pitId.value);
-        updateLists();
-    });
-    watch(pitId, () => {
-        if (clientId.value === -1 || pitId.value === -1) {
-            return;
-        }
-        console.log(queueBackup.value);
-
-        queue.value = queueBackup.value.filter((item: QueueItem) => item.pitId === pitId.value);
-        updateLists();
-    });
-
-    const queueBackup: Ref<Array<QueueItem>> = ref([]);
-    const queue: Ref<Array<QueueItem>> = ref([]);
+    const queueBackup = ref([] as QueueItem[]);
+    const queue = ref([] as QueueItem[]);
 
     onMounted(async () => {
         const fullQueue = await getQueueItems();
-        console.log(fullQueue);
-        queueBackup.value = fullQueue
-            .sort((a: QueueItem, b: QueueItem) => a.order - b.order)
-            .filter((item: QueueItem) => item.status !== 10);
-        // SUPER SKRIPT PARA BORRAR UNAS QUE CREE ALOPA
-        // console.log(queueBackup.value);
-        // const toDelete = queueBackup.value.filter((item: QueueItem) => {
-        //     const { origin, destination } = item;
-        //     const array = ['Camion', 'Deposito'];
-        //     console.log(array.includes(origin) && array.includes(destination));
-
-        //     return array.includes(origin) && array.includes(destination);
-        // });
-        // console.log(toDelete);
-        // await Promise.all(
-        //     toDelete.map((item: QueueItem) => {
-        //         item?.id && deleteQueueItems(item.id);
-        //     })
-        // );
+        queueBackup.value = fullQueue.filter((item: QueueItem) => itemIsNotToEmpty(item));
     });
 
     const toggleQueueItemStatus = (item: QueueItem) => {
-        console.log(item.status);
         item.status = item.status === 0 ? 99 : 0;
-        console.log(item.status);
         setTimeout(() => {
             updateLists();
-            console.log('cambiar estado');
-            console.log(item);
-            updateQueueItems(item);
+            commitTransition(item);
+            updateQueueItem(item);
         }, 1000);
     };
 
-    const toDoQueue = ref([]);
-    const finishedQueue = ref([]);
+    const toDoQueue = ref([] as QueueItem[]);
+    const finishedQueue = ref([] as QueueItem[]);
 
     const filterNotDone = () => {
-        toDoQueue.value = queue.value.filter((item) => item.status === 0);
-        // console.log('toDoQueue', toDoQueue.value);
+        toDoQueue.value = queue.value.filter((item: QueueItem) => itemIsNotDone(item));
+        const hasNoDestinations = toDoQueue.value.filter(({ destination }: QueueItem) => !destination);
+
+        if (hasNoDestinations) {
+            console.log('Hay Lugar en Cradle?');
+            const availables = checkCradleSlots();
+            availables && fillItemDestination(hasNoDestinations, availables);
+        }
     };
     const filterFinished = () => {
-        finishedQueue.value = queue.value.filter((item) => item.status === 99);
-        // console.log('finishedQueue', finishedQueue.value);
+        finishedQueue.value = queue.value.filter((item: QueueItem) => itemIsFinished(item));
     };
     const updateLists = () => {
         filterNotDone();
         filterFinished();
+    };
+
+    const checkCradleSlots = () => {
+        const { slots } = currentCradle.value;
+
+        return slots
+            ?.map((slot: SandOrder, index: number) => {
+                slot.station = index;
+
+                return slot;
+            })
+            .filter(({ boxId }: SandOrder) => boxId === null);
+    };
+
+    const fillItemDestination = (items: QueueItem[], availableSlots: any[]) => {
+        console.log(items);
+        console.log(availableSlots);
+        const amountOfSlots = availableSlots.length;
+
+        for (let i = 0; i < amountOfSlots; i++) {
+            const item = items[i];
+            const slot = availableSlots[i];
+            const station = `Estacion ${slot.station + 1}`;
+
+            if (slot) {
+                item.destination = station;
+            }
+        }
+        // Cambiar el destino al Slot libre
+    };
+
+    // Cuando se completa la tarea deberia impactar en el where del SandOrder
+    const commitTransition = async (item: QueueItem) => {
+        const { sandOrder, origin, destination } = item;
+        const { location } = sandOrder;
+
+        console.log(JSON.parse(location));
+
+        if (JSON.parse(location)) {
+            sandOrder.location = JSON.parse(location);
+        }
     };
 
     updateLists();

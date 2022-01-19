@@ -268,6 +268,20 @@ const routes: Array<RouteRecordRaw> = [
         beforeEnter: [isMobileAndLogged, checkPermission],
     },
     {
+        // Agregar permiso al Lead Operator
+        path: '/deposito-cajas-vacias',
+        name: 'EmptyBoxDeposit',
+        component: () => import('@/pages/EmptyBoxDeposit/Index.vue'),
+        beforeEnter: [isMobileAndLogged],
+    },
+    {
+        // Agregar permiso al Lead Operator
+        path: '/destino-cajas-vacias',
+        name: 'EmptyBoxDestiny',
+        component: () => import('@/pages/EmptyBoxDeposit/EmptyBox.vue'),
+        beforeEnter: [isMobileAndLogged],
+    },
+    {
         path: '/usuarios',
         name: 'User',
         component: () => import('@/pages/User/index.vue'),
