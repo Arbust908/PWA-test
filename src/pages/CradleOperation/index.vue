@@ -126,7 +126,6 @@
             onMounted(async () => {
                 const result = await axios.get(`${apiUrl}/sandOrder`);
                 sandOrdersOriginal.value = result.data.data;
-                console.log(sandOrdersOriginal.value);
             });
 
             const getSelectedSandOrder = (slot: any) => {
@@ -137,13 +136,11 @@
                     selectedSandOrders.value.push(
                         sandOrdersOriginal.value.find((sandOrderOriginal) => sandOrderOriginal.id === slot.id)
                     );
-                    console.log(selectedSandOrders.value);
                 } else {
                     const deleteIndex = selectedSandOrders.value.findIndex(
                         (sandOrder) => sandOrder.id === findSandOrderOriginalId
                     );
                     selectedSandOrders.value.splice(deleteIndex, 1);
-                    console.log(selectedSandOrders.value);
                 }
             };
 
