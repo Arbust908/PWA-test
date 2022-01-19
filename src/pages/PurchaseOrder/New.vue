@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <button @click="downloadPDF">Download</button>
+        <!-- <button @click="downloadPDF">Download</button> -->
         <PDF v-show="showPDF" ref="pdf" :info="pdfInfo" @close="redirectIndex" />
 
         <section class="bg-white rounded-md shadow-sm">
@@ -223,7 +223,7 @@
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
-            <PrimaryBtn btn="wide" @click.prevent="confirm()"> Crear Orden </PrimaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull" @click.prevent="isFull && confirm()"> Crear Orden </PrimaryBtn>
         </footer>
 
         <OrderModal
