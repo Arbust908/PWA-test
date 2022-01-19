@@ -239,7 +239,6 @@
             @main="
                 downloadPDF();
                 openSuccess = false;
-                $router.push('/orden-de-pedido');
             "
         />
         <ErrorModal :open="openError" :title="titleErrorGral" :text="textErrorGral" @main="openError = false" />
@@ -248,15 +247,13 @@
 </template>
 
 <script setup lang="ts">
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
-    import { useOnFirst, useIfNotLonly, isFirst, isLast, isNotLastAndNotLonly } from '@/helpers/iteretionHelpers';
+    import { useIfNotLonly, isFirst, isLast } from '@/helpers/iteretionHelpers';
     import {
         Sand,
         SandOrder,
@@ -282,7 +279,6 @@
 
     const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
     const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
-    const GhostBtn = defineAsyncComponent(() => import('@/components/ui/buttons/GhostBtn.vue'));
     const api = import.meta.env.VITE_API_URL || '/api';
 
     const drivers = ref([]);
