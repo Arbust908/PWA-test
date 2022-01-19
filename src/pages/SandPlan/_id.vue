@@ -8,6 +8,7 @@
                         v-model:client-id="currentSandPlan.companyId"
                         v-model:pit-id="currentSandPlan.pitId"
                         :is-disabled="true"
+                        validation-type="empty"
                     />
                 </FieldGroup>
             </form>
