@@ -63,6 +63,13 @@
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/')">Cancelar</SecondaryBtn>
             <PrimaryBtn btn="wide" size="md" @click.prevent="confirm()"> Confirmar </PrimaryBtn>
         </footer>
+
+        <SuccessModal
+            :open="openSuccess"
+            title="¡Perfecto!"
+            text="Enviamos la orden de trabajo correspondiente."
+            @main="closeModalAndReset()"
+        />
     </Layout>
 </template>
 
@@ -94,10 +101,11 @@
         getSand,
     } from '@/helpers/useGetEntities';
     import { QueueItem, Warehouse } from '@/interfaces/sandflow';
-
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
+
+    const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
 
     export default {
         components: {
@@ -111,15 +119,19 @@
             BoxCard,
             Icon,
             PurchaseOrderForm,
+            SuccessModal,
         },
 
         setup() {
             useTitle('Destino de cajas vacias');
 
-            const activeSection: Ref<string | null> = ref(null);
             const instance = axios.create({
                 baseURL: apiUrl,
             });
+            const router = useRouter();
+
+            //MODALS
+            const openSuccess = ref(false);
 
             // :: CLIENT
             const clientId = ref(-1);
@@ -169,19 +181,24 @@
             };
 
             const updateQueueItem = () => {
-                selectedQueueForTrucks.value.forEach((queueItem) => {
-                    queueItem.status = 0;
-                    console.log(queueItem);
-                    useAxios('/queueItem/' + queueItem.id, { method: 'PUT', data: queueItem }, instance);
-                });
+                if (selectedQueueForTrucks.value.length > 0) {
+                    selectedQueueForTrucks.value.forEach((queueItem) => {
+                        queueItem.status = 0;
+                        console.log(queueItem);
+                        useAxios('/queueItem/' + queueItem.id, { method: 'PUT', data: queueItem }, instance);
+                    });
+                }
+                if (selectedQueueForDeposit.value.length > 0) {
+                    selectedQueueForDeposit.value.forEach((queueItem) => {
+                        queueItem.status = 0;
+                        console.log('QueItem a guardar', queueItem);
+                        useAxios('/queueItem/' + queueItem.id, { method: 'PUT', data: queueItem }, instance);
+                    });
+                }
             };
 
             const boxes = ref([]);
             const confirmPurchaseOrder = ref(false);
-
-            const confirm = () => {
-                confirmPurchaseOrder.value = true;
-            };
 
             const selectedBoxesForTrucks = ref([]);
             const selectedBoxesForDeposit = ref([]);
@@ -189,6 +206,16 @@
 
             const selectedQueueForTrucks = ref([]);
             const selectedQueueForDeposit = ref([]);
+
+            const activeSection = computed(() => {
+                if (selectedBoxesForDeposit.value.length > 0) {
+                    return 'Deposit';
+                }
+                if (selectedBoxesForTrucks.value.length > 0) {
+                    return 'PurchaseOrder';
+                }
+                return null;
+            });
 
             const deposit = (box: QueueItem) => {
                 choosedBox.value = box.sandOrder;
@@ -206,6 +233,7 @@
                         (check) => check.id !== box.id
                     );
                     // Hay que Vaciar la location de la caja
+                    choosedBox.value.location = '';
                     // ...
                     // BoxInDeposit map chequear el que tenga el mimo id y le remplazamos la location
                 } else {
@@ -215,11 +243,8 @@
                     // tomar la box.location y guardarla en una variable
                 }
 
-                if (selectedBoxesForDeposit.value.length > 0) {
-                    activeSection.value = 'Deposit';
-                } else {
-                    activeSection.value = null;
-                }
+                console.log('boxDeposit', selectedBoxesForDeposit.value);
+                console.log('queueDeposit', selectedQueueForDeposit.value);
             };
 
             const truck = (box: QueueItem) => {
@@ -237,12 +262,6 @@
                     // Sino la agregamos a la lista
                     selectedBoxesForTrucks.value.push(box.sandOrder);
                     selectedQueueForTrucks.value.push(box);
-                }
-
-                if (selectedBoxesForTrucks.value.length > 0) {
-                    activeSection.value = 'PurchaseOrder';
-                } else {
-                    activeSection.value = null;
                 }
             };
 
@@ -358,6 +377,36 @@
                 });
             });
 
+            const saveDepositBoxes = async () => {
+                const data = selectedBoxesForDeposit.value[0];
+                data.location = JSON.stringify(data.location);
+                console.log(data.location);
+                await axios.put(`${apiUrl}/sandOrder/${data.id}`, data);
+            };
+
+            // SAVE
+            const confirm = () => {
+                // Chequeamos si hay boxes en truck para disparar save correspondiente
+                if (selectedBoxesForTrucks.value.length > 0) {
+                    confirmPurchaseOrder.value = true;
+                }
+                // Chequeamos is hay boxes en deposit para disparar el save correspondiente
+                if (selectedBoxesForDeposit.value.length > 0) {
+                    saveDepositBoxes();
+                    updateQueueItem();
+                    openSuccess.value = true;
+                }
+            };
+
+            const closeModalAndReset = () => {
+                clientId.value = -1;
+                pitId.value = -1;
+                selectedBoxesForDeposit.value = [];
+                selectedBoxesForTrucks.value = [];
+                openSuccess.value = false;
+                router.go(0);
+            };
+
             onMounted(async () => {
                 warehouses.value = await getWarehouses();
             });
@@ -385,6 +434,8 @@
                 updateQueueItem,
                 inDepoBoxes,
                 selectBox,
+                openSuccess,
+                closeModalAndReset,
             };
         },
     };

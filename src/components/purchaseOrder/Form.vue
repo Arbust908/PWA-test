@@ -1,13 +1,6 @@
 <template>
     <ABMFormTitle title="Orden de pedido" />
-    <PDF
-        v-if="showPDF"
-        :info="pdfInfo"
-        @close="
-            togglePDF();
-            $router.go(0);
-        "
-    />
+    <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" />
     <section class="bg-white rounded-md overflow-y-auto">
         <form method="POST" action="/" class="flex-col gap-4">
             <FieldLegend>Arena</FieldLegend>
@@ -31,14 +24,15 @@
                     placeholder="Tipo de Arena"
                     endpoint-key="type"
                     validation-type="empty"
-                    :data="box.sandTypeId"
+                    :data="sandProviderId > 0 ? box.sandTypeId : -1"
                     :endpoint-data="filteredSandTypes"
                     :select-class="useFirstST"
                     @update:data="box.sandTypeId = $event"
                     @click="useFirstST = true"
                 />
                 <FieldWithSides
-                    v-model:data="box.amount"
+                    :data="sandProviderId > 0 ? box.amount : 0"
+                    @update:data="box.amount = $event"
                     :title="orderKey === 0 ? 'Cantidad' : ''"
                     class="col-span-7 sm:col-span-3"
                     field-name="sandQuantity"
@@ -441,7 +435,6 @@
         const order = ref(null);
 
         if (true) {
-            // _updateQueueItem();
             // Formateamos la orden de pedido
             const purchaseOrder = _formatPO();
             // Creamos via API la orden de pedido
