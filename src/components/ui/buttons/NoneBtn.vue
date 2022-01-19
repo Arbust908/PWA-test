@@ -1,5 +1,5 @@
 <template>
-    <BaseBtn btn="none" :type="type" :size="size">
+    <BaseBtn :btn="`none ${btn}`" :type="type" :size="size" :disabled="disabled" :is-loading="isLoading">
         <slot> Nada </slot>
     </BaseBtn>
 </template>

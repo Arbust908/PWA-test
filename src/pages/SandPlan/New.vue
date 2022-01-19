@@ -7,6 +7,7 @@
                     <ClientPitCombo
                         v-model:client-id="currentSandPlan.companyId"
                         v-model:pit-id="currentSandPlan.pitId"
+                        validation-type="empty"
                     />
                 </FieldGroup>
             </form>
