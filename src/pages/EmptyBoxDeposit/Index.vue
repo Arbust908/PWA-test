@@ -221,6 +221,8 @@
         console.log('Finalizando orden');
         console.log(selectedBoxes.value);
         console.log(order);
+        // Aca lo que deberiamos hacer es sacar las cajas del depósito
+        // y crear los QueueItems de los mismos
     };
 
     // Esto queda como ultimo por consejo Experto
