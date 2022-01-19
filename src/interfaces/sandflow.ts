@@ -127,7 +127,7 @@ export interface Cradle {
     id?: number;
     name: string;
     observations?: string;
-    slots?: string;
+    slots?: any[];
     visible: boolean;
     stageSheets?: StageSheet[];
     backupStageSheets?: StageSheet[];
