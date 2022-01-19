@@ -63,6 +63,7 @@
                             <span> 1 / {{ sandPlan.stages.length }} </span>
                         </div>
                         <div class="m-4 text-left">
+                            <Badge />
                             <span> {{ sandPlan.stages[0].status }} </span>
                         </div>
                         <div class="m-4 text-left">
@@ -75,7 +76,6 @@
                                 }}
                             </span>
                         </div>
-                        <!-- <div v-for="(value, key) in pit" :key="key">{{ key }}: {{ value }}</div> -->
                     </article>
                 </div>
             </section>
@@ -90,6 +90,7 @@
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import Badge from '@/components/ui/Badge.vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -132,7 +133,7 @@
     const getFilteredSandPlans = () => {
         filteredSandPlans.value = sandPlans.value.filter((sandPlan) => sandPlan.company.id === clientId.value);
 
-        console.log(filteredSandPlans.value);
+        console.log('filteredSandPlans', filteredSandPlans.value);
     };
 </script>
 
