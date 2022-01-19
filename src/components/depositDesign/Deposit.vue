@@ -23,6 +23,7 @@
                             :visible-categories="visibleCategories"
                             :box-data="getBoxData(row, col, currentFloor)"
                             :sand-info="getCellBox(row, col, currentFloor)"
+                            :is-design="isDesign"
                             @select-box="selectBox"
                         />
                     </template>
@@ -67,6 +68,11 @@
         boxes: {
             type: Array,
             default: () => [],
+        },
+        isDesign: {
+            type: Boolean,
+            required: false,
+            default: false,
         },
     });
     const emits = defineEmits(['select-box']);

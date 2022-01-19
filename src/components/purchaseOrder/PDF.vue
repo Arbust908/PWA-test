@@ -164,7 +164,7 @@
             required: true,
         },
     });
-    const emit = defineEmits(['close']);
+    const emit = defineEmits(['close', 'pdf-html']);
 
     const toPDF = ref(null);
     const sandProviderName = computed(() => {
@@ -249,9 +249,9 @@
     };
     const exportFilename = `orden_de_pedido_${props.info.purchaseOrder.id}.pdf`;
     const download = () => {
+        emit('pdf-html', JSON.stringify(toPDF.value));
         const doc = document.querySelector('#toPDF');
         pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
-        console.log('PDF en HTMl', toPDF.value);
         worker.set(pdfOptions).from(doc).save(exportFilename);
     };
     const trueOrientation = ([width, height]) => {

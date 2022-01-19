@@ -9,6 +9,7 @@
                         :pit-id="pitId"
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
+                        validation-type="empty"
                     />
                     <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de filas</h3>
@@ -81,6 +82,7 @@
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5 overflow-auto"
+                        is-design
                         :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"

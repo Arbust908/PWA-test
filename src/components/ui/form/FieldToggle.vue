@@ -1,7 +1,7 @@
 <template>
     <label :for="fieldName" :class="value ? 'checked' : null" @click="toggleValue()">
         <div class="ball" />
-        <input :id="fieldName" v-model="value" class="input invisible" type="checkbox" :name="fieldName" />
+        <input :id="fieldName" :value="value" class="input invisible" type="checkbox" :name="fieldName" />
     </label>
 </template>
 
@@ -16,11 +16,20 @@
             required: true,
         },
     });
-    const emits = defineEmits(['update:data']);
+    const emits = defineEmits(['toggle']);
     const value = useVModel(props, 'data');
+    const canSendEvent = ref(true);
     const toggleValue = () => {
-        value.value = !value.value;
-        emits('update:data', value.value);
+        if (!canSendEvent.value) {
+            return;
+        }
+        console.log();
+        emits('toggle', value.value);
+        canSendEvent.value = false;
+        setTimeout(() => {
+            canSendEvent.value = true;
+            console.log('can send event');
+        }, 1000);
     };
 </script>
 

@@ -1,7 +1,7 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" />
+        <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" @pdf-html="sendPdf" />
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-3 sm:p-4 flex-col gap-4">
                 <FieldGroup class="max-w-2xl border-none">
@@ -83,10 +83,7 @@
                             :data="order.boxId"
                             @update:data="order.boxId = $event"
                         />
-                        <div
-                            :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'"
-                            class="col-span-1 md:col-span-2 flex flex-row"
-                        >
+                        <div :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'" class="col-span-1 md:col-span-2">
                             <AddDeleteBtn
                                 v-if="useIfNotLonly(providerId.sandOrders)"
                                 purpose="remove"
@@ -298,6 +295,7 @@
 
     const filteredDrivers = computed(() => {
         driverId.value = -1;
+
         if (transportProviderId.value > -1) {
             const driversFiltered = drivers.value.filter(
                 (driver) => driver.transportProviderId === transportProviderId.value
@@ -699,6 +697,10 @@
             observation: packageObservations.value,
         };
     });
+    const sendPdf = (pdfHtml: string) => {
+        // Enviar el PDF al Back
+        console.log(pdfHtml);
+    };
 </script>
 
 <style lang="scss" scoped>

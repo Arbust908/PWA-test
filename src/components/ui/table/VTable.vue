@@ -201,11 +201,23 @@
                         modifier = -1;
                     }
 
-                    const propA = getDescendantProp(a, sortKey).toString().toLowerCase();
-                    const propB = getDescendantProp(b, sortKey).toString().toLowerCase();
+                    let propA = getDescendantProp(a, sortKey);
+                    let propB = getDescendantProp(b, sortKey);
 
-                    if (!isNaN(Number(propA)) && !isNaN(Number(propA))) {
-                        return Number(propA) - Number(propB);
+                    if (propA === null) {
+                        propA = 'zzzzz';
+                    }
+
+                    if (propB === null) {
+                        propB = 'zzzzz';
+                    }
+
+                    if (!isNaN(Number(propA))) {
+                        propA = Number(propA);
+                    }
+
+                    if (!isNaN(Number(propB))) {
+                        propB = Number(propB);
                     }
 
                     if (propA < propB) {
@@ -245,29 +257,29 @@
 
             const desktopActions = computed(() => props.actions.filter((action: any) => !action.onlyMobile));
 
-            const beforeEnter = (el) => {
-                console.log(el);
+            const beforeEnter = (el: any) => {
                 el.style.opacity = 0;
                 el.style.transform = 'translateY(50%)';
             };
-            const enter = (el, done) => {
-                console.log(el);
+            const enter = (el: any, done: any) => {
                 const staggerIndex = el.dataset.staggerIndex;
                 gsap.to(el, {
                     opacity: 1,
                     y: 0,
                     duration: 0.5,
                     delay: 0.15 * staggerIndex,
-                    onComplete: done,
+                    onComplete: () => {
+                        el.style.transform = '';
+                        el.style.opacity = '';
+                        done();
+                    },
                 });
             };
-            const beforeLeave = (el) => {
-                console.log(el);
+            const beforeLeave = (el: any) => {
                 el.style.opacity = 1;
                 el.style.transform = 'translateY(0)';
             };
-            const leave = (el, done) => {
-                console.log(el);
+            const leave = (el: any, done: any) => {
                 const staggerIndex = el.dataset.staggerIndex;
                 gsap.to(el, {
                     opacity: 0,
