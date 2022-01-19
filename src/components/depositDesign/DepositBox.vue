@@ -1,7 +1,6 @@
 <template>
     <button :class="[boxClassess]" class="box" @click.prevent="selectBox">
-        <span class="text-sm">{{ sandInfo?.id }}</span>
-        <!-- {{ sandInfo }} -->
+        <span class="text-sm">{{ sandInfo?.boxId }}</span>
     </button>
 </template>
 
@@ -41,9 +40,14 @@
             required: false,
             default: ref({}),
         },
+        isDesign: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     });
     const emits = defineEmits(['select-box']);
-    let { floor, row, col, selectedBox, boxData } = toRefs(props);
+    let { floor, row, col, selectedBox, boxData, isDesign } = toRefs(props);
 
     const category = computed(() => {
         return boxData && boxData.value ? boxData.value.category : 'empty';
@@ -56,6 +60,14 @@
             bC += getBoxClasses(String(props.sandInfo?.sandTypeId));
         } else {
             bC += getBoxClasses(category.value);
+        }
+
+        if (isDesign.value && bC.length < 2) {
+            bC += ' design';
+        }
+
+        if (!isDesign.value && (category.value == 'aisle' || category.value == 'cradle')) {
+            bC += ' cursor-not-allowed';
         }
 
         if (isBlocked()) {
@@ -78,12 +90,11 @@
     });
 
     const selectBox = () => {
-        if (category.value == 'aisle' || category.value == 'cradle' || isBlocked()) {
+        if ((category.value == 'aisle' || category.value == 'cradle' || isBlocked()) && !isDesign.value) {
             console.log('Bloqueo');
 
             return;
         }
-        console.log('selectBox', selectedBox.value);
         const box: Box = {
             floor: floor.value,
             row: row.value,
@@ -91,7 +102,6 @@
             category: category.value || '',
             id: id.value || '',
         };
-        console.log('selectBox', box);
         emits('select-box', box);
     };
 
@@ -106,6 +116,12 @@
     let visibleCategories = ref(props.visibleCategories);
 
     const isBlocked = () => {
+        if (isDesign.value) {
+            console.log('isDesign');
+
+            return false;
+        }
+
         if (!visibleCategories.value) {
             return false;
         }

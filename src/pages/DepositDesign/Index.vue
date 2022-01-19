@@ -1,11 +1,6 @@
 <template>
     <Layout>
-        <header class="flex justify-between items-center mb-4 px-3">
-            <h2 class="text-2xl font-semibold text-second-900">Depósitos</h2>
-            <router-link to="/diseno-de-deposito/nueva">
-                <PrimaryBtn>Nuevo Depósito</PrimaryBtn>
-            </router-link>
-        </header>
+        <ABMHeader title="Depósitos" link="/diseno-de-deposito/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
                 title="Filtro"
@@ -88,11 +83,7 @@
 </template>
 
 <script>
-    import { ref, watch, computed, onMounted } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
     import { TrashIcon, PencilAltIcon } from '@heroicons/vue/solid';
-    import { useTitle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import GhostBtn from '@/components/ui/buttons/GhostBtn.vue';
@@ -103,6 +94,7 @@
     import Badge from '@/components/ui/Badge.vue';
     import Backdrop from '@/components/modal/Backdrop.vue';
     import DisableModal from '@/components/modal/DisableModal.vue';
+    import ABMHeader from '@/components/ui/ABMHeader.vue';
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -122,6 +114,7 @@
             Backdrop,
             GhostBtn,
             DisableModal,
+            ABMHeader,
         },
         setup() {
             useTitle('Depósitos <> Sandflow');

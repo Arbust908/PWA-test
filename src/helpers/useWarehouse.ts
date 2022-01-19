@@ -1,4 +1,9 @@
 import { useClone } from '@/helpers/useClone';
+import { SandOrder } from '@/interfaces/sandflow';
+
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
 export const defaultBox = {
     floor: 1,
@@ -13,6 +18,13 @@ export const defaultBox = {
 };
 
 export const formatDeposit = (deposit: any) => {
+    const formatedDefault = { floor: 0, row: 0, col: 0, dimensions: '' };
+
+    if (!deposit) {
+        console.error('Deposit es ', deposit);
+
+        return { ...formatedDefault };
+    }
     const { clone: deposito } = useClone(deposit);
     const dimensions = Object.keys(deposito).reduce(
         (dims, currentCell) => {
@@ -24,7 +36,7 @@ export const formatDeposit = (deposit: any) => {
 
             return dims;
         },
-        { floor: 0, row: 0, col: 0, dimensions: '' }
+        { ...formatedDefault }
     );
     dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
 
@@ -58,8 +70,33 @@ export const formatLocation = (location: any) => {
     return dimensions;
 };
 
-export const boxesByFloor = (location: any) => {
-    console.log('boxesByFloor', location);
+export const boxesByFloor = (location: any, queueItemSort = false) => {
+    if (queueItemSort) {
+        const boxes = location.reduce((allFloors: Array<any>, box: any) => {
+            const { location: wheres } = box;
+
+            if (wheres.where !== 'warehouse') {
+                return;
+            }
+            const { floor, col, row } = wheres;
+
+            box.floor = floor;
+            box.col = col;
+            box.row = row;
+
+            const floorIndex = Number(box.floor) - 1;
+
+            if (!allFloors[floorIndex]) {
+                allFloors[floorIndex] = [];
+            }
+            allFloors[floorIndex].push(box);
+
+            return allFloors;
+        }, []);
+
+        return boxes;
+    }
+
     const boxes = Object.keys(location).reduce((bxs: any, currentCell) => {
         const box = location[currentCell];
 
@@ -79,7 +116,6 @@ export const boxesByFloor = (location: any) => {
 
         return bxs;
     }, []);
-    console.log(boxes);
 
     return boxes;
 };
@@ -102,19 +138,40 @@ export const getBoxClasses = (category: string) => {
             return 'mesh-type__taken aisle';
         case 'cradle':
             return 'mesh-type__taken cradle';
+        case null:
+            return '';
     }
 
-    return 'mesh-type__empty boxCard';
+    return '';
 };
 
 export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
     const boxy = boxes.filter((box) => {
         const { location } = box;
 
-        return location && location.where_id === depoId;
+        return location && location.where === 'warehouse' && location.where_id === depoId;
     });
 
-    console.log('boxy', boxy);
-
     return [...new Set(boxy)];
+};
+
+export const searchInDepoBoxes = async (depoId: number) => {
+    let allBoxes = await getSandOrders();
+    allBoxes = allBoxes.filter((box: SandOrder) => box.location).map(formatBoxLocation);
+
+    return getInDepoBoxes(allBoxes, depoId);
+};
+export const getSandOrders = async () => {
+    return await axios
+        .get(`${apiUrl}/sandOrder`)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const formatBoxLocation = (box: SandOrder) => {
+    const { location } = box;
+    box.location = JSON.parse(location);
+
+    return box;
 };

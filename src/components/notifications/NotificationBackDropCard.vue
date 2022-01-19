@@ -74,7 +74,6 @@
             const listSandTypes = (sandOrders) => {
                 let names = '';
                 sandOrders.forEach((sand) => {
-                    console.log(getSTName(sand.sandTypeId));
                     names += getSTName(sand.sandTypeId) + ' ';
                 });
                 return names;

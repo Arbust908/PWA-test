@@ -1,5 +1,8 @@
 import { QueueItem } from '@/interfaces/sandflow';
 import { getLast } from './iteretionHelpers';
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
 export enum QueueTransactions {
     CradleATransporte = 'aTransporte',
@@ -80,4 +83,96 @@ export const separateQueues = (queue: Array<QueueItem>): SteppedQueue => {
         );
 
     return { ...steppedQueue };
+};
+
+export const defaultQueueItem: QueueItem = {
+    sandOrderId: -1,
+    pitId: -1,
+    origin: '',
+    destination: '',
+    status: 0,
+    order: -1,
+};
+
+export const getOrderPro = async (transition: QueueTransactions = QueueTransactions.DepositoACradle) => {
+    const queue = await getQueueItems();
+
+    return getOrder(queue, transition);
+};
+
+export const createQueueItem = async (queueItem: QueueItem) => {
+    return await axios
+        .post(`${apiUrl}/queueItem/`, queueItem)
+        .then((response) => {
+            return response;
+        })
+        .catch((err) => console.error(err));
+};
+export const getQueueItems = async () => {
+    return await axios
+        .get(`${apiUrl}/queueItem/`)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const updateQueueItems = async (queueData: QueueItem) => {
+    const { id } = queueData;
+
+    return await axios
+        .put(`${apiUrl}/queueItem/${id}`, queueData)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const deleteQueueItems = async (queueItemId: number) => {
+    return await axios
+        .delete(`${apiUrl}/queueItem/${queueItemId}`)
+        .then((response) => {
+            return response;
+        })
+        .catch((err) => console.error(err));
+};
+
+export const createAllQueueItems = async (queue: Array<QueueItem>) => {
+    const queueItems = queue.map((queueItem) => {
+        queueItem.status = 0;
+
+        return updateQueueItems(queueItem);
+    });
+
+    return Promise.all(queueItems);
+};
+
+export const itemIsFinished = (queueItem: QueueItem) => {
+    return queueItem.status === 99;
+};
+
+export const itemIsNotDone = (queueItem: QueueItem) => {
+    return queueItem.status !== 99;
+};
+
+export const itemIsNotToEmpty = (queueItem: QueueItem) => {
+    return queueItem.status !== 10;
+};
+
+export const orderItems = (itemA: QueueItem, itemB: QueueItem, direction = 'ASC') => {
+    const orderA = itemA.order === -1 ? 0 : itemA.order;
+    const orderB = itemB.order === -1 ? 0 : itemB.order;
+    console.groupCollapsed(`Ordenando items`);
+    const mod = direction === 'ASC' ? 1 : -1;
+    console.log('Direction', direction);
+    console.log('Mod', mod);
+    console.log('Item A', orderA);
+    console.log('Item B', orderB);
+    console.log(orderA - orderB);
+    console.log((orderA - orderB) * mod);
+    console.groupEnd();
+
+    return (orderA - orderB) * mod;
+};
+
+export const orderDesc = (itemA: QueueItem, itemB: QueueItem) => {
+    return orderItems(itemA, itemB, 'DSC');
 };

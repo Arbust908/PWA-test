@@ -259,8 +259,6 @@
                         { method: 'POST', data: sandProviderIds.value[0].SandOrders[0] },
                         instance
                     );
-                    console.log(sandOrder);
-                    console.log(sandOrder.id);
                     sandOrderId.value = sandOrder.id;
                     pN.value = {
                         textArena: 'Arena',
@@ -295,7 +293,6 @@
                         });
 
                     let order = response.data.data;
-                    console.log(order.id);
                     sandOrderId.value = order.id;
                     pN.value = {
                         textArena: 'Arena',

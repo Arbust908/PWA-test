@@ -127,7 +127,7 @@ export interface Cradle {
     id?: number;
     name: string;
     observations?: string;
-    slots?: string;
+    slots?: any[];
     visible: boolean;
     stageSheets?: StageSheet[];
     backupStageSheets?: StageSheet[];
@@ -347,14 +347,18 @@ export interface QueueItem {
     origin: string;
     destination: string;
     status: number;
+    // 0 - Pendiente
+    // 10 - A retirar
+    // 20 - En Cola ?
+    // 99 - Finalizado
     order: number;
     // 999999 - 900000 aTRansporte
     // 99999 - 90000 Retiro ( cradleAOtro )
     // 9999 - 9000 TRansporte a Otro
     // 999 - 500 Deposito a Cradle
-    createdAt: Date;
-    updatedAt: Date;
-    deletedAt: Date;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
 }
 
 /* 

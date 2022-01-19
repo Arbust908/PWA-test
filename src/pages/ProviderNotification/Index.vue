@@ -3,16 +3,16 @@
         <ABMHeader title="Notificaciones a proveedores" link="/notificaciones-a-proveedores/nueva" />
         <div class="relative grid grid-cols-12 col-span-full gap-4 mt-2">
             <FieldSelect
+                v-model:data="sandProviderId"
                 title="Filtro"
                 class="col-span-full sm:col-span-5 md:col-span-3 lg:col-span-4 xl:col-span-3"
                 placeholder="Seleccionar cliente"
                 field-name="name"
                 endpoint="/sandProvider"
-                v-model:data="sandProviderId"
             />
         </div>
         <VTable
-            class="mt-5"
+            class="mt-5 min-w-full lg:min-w-min"
             :columns="columns"
             :pagination="pagination"
             :items="filteredNotifications"
@@ -20,11 +20,10 @@
             disable-key="id"
         >
             <template #item="{ item }">
-                <!-- Desktop -->
                 <td :class="item?.sandProvider?.name ? null : 'empty'">
                     {{ item?.sandProvider?.name || 'Sin definir' }}
                 </td>
-                <td :class="item?.data ? null : 'empty'">
+                <td :class="item?.data?.sandOrders ? null : 'empty'">
                     {{ listSandTypes(item.data?.sandOrders) || 'Sin definir' }}
                 </td>
 
@@ -32,7 +31,7 @@
                     {{ item?.transportProvider?.name || 'Sin definir' }}
                 </td>
 
-                <td :class="item.data ? null : 'empty'">
+                <td :class="item?.data?.cantidadCamiones ? null : 'empty'">
                     {{ item?.data?.cantidadCamiones || 'Sin definir' }}
                 </td>
 
@@ -42,7 +41,6 @@
                 </td>
             </template>
 
-            <!-- Mobile -->
             <template #mobileTitle="{ item }">
                 <span class="font-bold">Carga: </span> {{ item?.sandProvider?.name }}
             </template>
@@ -162,13 +160,8 @@
             });
 
             const filteredNotifications = computed(() => {
-                console.log(provNotifDB.value);
-                console.log(sandProviderId.value);
-
                 if (sandProviderId.value > -1) {
                     return provNotifDB.value.filter((client) => {
-                        console.log(client);
-
                         return client.sandProviderId == sandProviderId.value;
                     });
                 }

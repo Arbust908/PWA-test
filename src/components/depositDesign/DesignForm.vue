@@ -282,7 +282,6 @@
         id: '',
     });
     const selectBox = (box: Box) => {
-        console.log(box);
         selectedBox.value = box;
     };
 

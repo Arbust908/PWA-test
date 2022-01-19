@@ -30,7 +30,6 @@
         </header>
         <main>
             <section style="margin-bottom: 1.25rem">
-                ="detalle"-->
                 <h3
                     style="
                         font-weight: 700;
@@ -88,7 +87,6 @@
                 </article>
             </section>
             <section style="margin-bottom: 1.25rem">
-                ="detalle"-->
                 <h3
                     style="
                         font-weight: 700;
@@ -117,7 +115,6 @@
             </section>
             <hr style="border-color: rgb(209 213 219); margin-top: 2.5rem; margin-bottom: 2.5rem" />
             <section style="font-size: 0.875rem; line-height: 1.25rem">
-                ="observaciones"-->
                 <h3
                     style="
                         font-size: 0.875rem;
@@ -159,7 +156,6 @@
         </footer>
     </section>
 </template>
-
 <script setup lang="ts">
     import { formatHour, createFromDate } from '@/helpers/useChronos';
     const props = defineProps({
@@ -181,7 +177,6 @@
 
     const sandOrders = computed(() => {
         const so = props.info.purchaseOrder?.sandOrders;
-        console.log('Sand order', so);
         const sand = props.info.purchaseOrder?.sands;
 
         if (!so) {
@@ -252,22 +247,32 @@
             orientation: 'p',
         },
     };
-    const exportFilename = `orden_de_pedido_${props.info.purchaseOrder.id}.pdf`;
-    const download = () => {
+
+    const getFileContent = async () => {
         const doc = document.querySelector('#toPDF');
         pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
-        console.log('PDF en HTMl', toPDF.value);
-        worker.set(pdfOptions).from(doc).save(exportFilename);
+
+        const fileContent = await html2pdf().set(pdfOptions).from(doc).toPdf().output();
+
+        return btoa(fileContent);
     };
+
+    const download = async () => {
+        const exportFilename = `orden_de_pedido_${props.info.purchaseOrder.id}.pdf`;
+        const doc = document.querySelector('#toPDF');
+        pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
+
+        await worker.set(pdfOptions).from(doc).save(exportFilename);
+
+        emit('close');
+    };
+
     const trueOrientation = ([width, height]) => {
         return width > height ? 'l' : 'p';
     };
-    const router = useRouter();
-    setTimeout(() => {
-        download();
-        setTimeout(() => {
-            emit('close');
-            router.push('/orden-de-pedido');
-        }, 1000);
-    }, 500);
+
+    defineExpose({
+        download,
+        getFileContent,
+    });
 </script>

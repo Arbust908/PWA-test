@@ -83,9 +83,7 @@
                 loading.value = true;
                 const sandId = route.params.id;
                 const result = await useStoreLogic(router, store, 'sand', GET, sandId);
-                console.log(result);
                 currentSandType.value = result.res.type;
-                console.log('segundo', currentSandType.value);
 
                 if (result.type == 'success') {
                     currentSand.value = result.res;

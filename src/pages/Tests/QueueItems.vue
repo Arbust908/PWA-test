@@ -106,12 +106,9 @@
     const title = useTitle(`  Queue Item <> Sandflow  `);
     const showBD = ref(false);
     const toggleBD = () => {
-        console.log('show BD', showBD.value);
         showBD.value = !showBD.value;
-        console.log('show BD', showBD.value);
     };
     const setTo = (to: string) => {
-        console.log(to);
         const [deDonde, aDonde] = to.split('A');
         /**
          * Esto es a modo ilustrativo

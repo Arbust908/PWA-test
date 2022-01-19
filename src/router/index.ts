@@ -261,18 +261,6 @@ const routes: Array<RouteRecordRaw> = [
         // component: () => import('@/pages/StageSheet/index.vue'),
         beforeEnter: [isMobileAndLogged, checkPermission],
     },
-    // {
-    //     path: '/stage-sheet/:id',
-    //     name: 'StageSheetById',
-    //     component: () => import('@/pages/StageSheet/_id/index.vue'),
-    //     beforeEnter: [isMobileAndLogged, checkPermission],
-    // },
-    // {
-    //     path: '/stage-sheet/:id/nueva',
-    //     name: 'StageSheetNewStage',
-    //     component: () => import('@/pages/StageSheet/_id/new.vue'),
-    //     beforeEnter: [isMobileAndLogged, checkPermission],
-    // },
     {
         path: '/stage-sheet/nuevo',
         name: 'NewStageSheet',
@@ -309,6 +297,19 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/User/Admin.vue'),
         beforeEnter: isAdmin,
     },
+    {
+        path: '/cierre-de-operaciones',
+        name: 'CloseOfOperation',
+        component: () => import('@/pages/CloseOfOperations/index.vue'),
+        beforeEnter: isLogged,
+    },
+    {
+        path: '/operacion-en-forklift',
+        name: 'ForkliftOperation',
+        component: () => import('@/pages/ForkliftOperation/index.vue'),
+        beforeEnter: isLogged,
+    },
+    // Todas las rutas deberian ir antes de estas 👇
     {
         path: '/no-mobile',
         name: 'NoMobile',

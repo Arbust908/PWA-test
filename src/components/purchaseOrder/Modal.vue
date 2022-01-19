@@ -34,7 +34,9 @@
         </div>
         <div class="w-full flex gap-x-6 justify-end mt-3">
             <SecondaryBtn @click.prevent="$emit('close')"> Volver </SecondaryBtn>
-            <PrimaryBtn @click.prevent="$emit('confirm')" @click="checked && downloadPDF(po)"> Confirmar </PrimaryBtn>
+            <PrimaryBtn @click.prevent="$emit('confirm')" :is-loading="loading" @click="checked && downloadPDF(po)">
+                Confirmar
+            </PrimaryBtn>
         </div>
     </Modal>
 </template>
@@ -73,6 +75,11 @@
                 type: Array,
                 required: true,
             },
+            loading: {
+                type: Boolean,
+                required: false,
+                default: false,
+            },
         },
         setup(props) {
             const getSandType = (sandTypeId: number) => {
@@ -81,33 +88,11 @@
                 return sandType ? sandType.type : 'Sin tipo de arena';
             };
             const content = ref(null);
-            watchEffect(() => {
-                console.log(content.value);
-            });
 
             const checked = ref(true);
 
             const downloadPDF = (po) => {
                 return;
-                // const doc = new jsPDF();
-                // console.log('po', po);
-
-                // const id = 'ID-123';
-                // const spName = po.sandProvider.name;
-                // const sandOrder = JSON.stringify(po.sandOrders);
-
-                // const tpName = po.transportProvider.name;
-                // const transportOrder = JSON.stringify(po.transportOrders);
-
-                // doc.text('Orden de pedido', 10, 10);
-
-                // doc.text('Provedor de Arena: ' + spName, 10, 20);
-                // doc.text(sandOrder, 10, 26);
-
-                // doc.text('Provedoor de Transporte: ' + tpName, 10, 35);
-                // doc.text(transportOrder, 10, 41);
-
-                // doc.save('OrdenDePedido' + id + '.pdf');
             };
 
             return {

@@ -23,6 +23,7 @@
                             :visible-categories="visibleCategories"
                             :box-data="getBoxData(row, col, currentFloor)"
                             :sand-info="getCellBox(row, col, currentFloor)"
+                            :is-design="isDesign"
                             @select-box="selectBox"
                         />
                     </template>
@@ -68,6 +69,11 @@
             type: Array,
             default: () => [],
         },
+        isDesign: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     });
     const emits = defineEmits(['select-box']);
     const { floor, rows, cols, deposit } = toRefs(props);
@@ -112,8 +118,6 @@
 
             return location.floor === floorNum && location.row === row && location.col === col;
         });
-
-        console.log(cellBox);
 
         return cellBox || null;
     };
