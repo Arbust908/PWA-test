@@ -147,6 +147,6 @@
 </style>
 <style lang="scss" scoped>
     .been-set {
-        @apply cursor-not-allowed border;
+        @apply cursor-not-allowed;
     }
 </style>
