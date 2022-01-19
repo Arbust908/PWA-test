@@ -96,7 +96,7 @@
     import FieldToggle from '@/components/ui/form/FieldToggle.vue';
     import {
         getQueueItems,
-        updateQueueItems,
+        updateQueueItem,
         itemIsFinished,
         itemIsNotDone,
         itemIsNotToEmpty,
@@ -147,7 +147,7 @@
         setTimeout(() => {
             updateLists();
             commitTransition(item);
-            updateQueueItems(item);
+            updateQueueItem(item);
         }, 1000);
     };
 

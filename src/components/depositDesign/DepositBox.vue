@@ -53,6 +53,8 @@
         return boxData && boxData.value ? boxData.value.category : 'empty';
     });
 
+    props?.sandInfo?.value && console.log(props?.sandInfo.value);
+
     const boxClassess = computed(() => {
         let bC = '';
 
