@@ -29,10 +29,13 @@
                 </div>
             </section>
 
-            <section class="bg-white rounded-md shadow-sm max-w-4xl p-4">
+            <section class="bg-white rounded-md shadow-sm max-w-4xl p-4 grow">
                 <ABMFormTitle title="Detalle" />
-                <img v-if="clientId < 0 || pitId < 0" src="@/assets/imgs/cajasvacias.png" alt="" />
-                <div v-show="activeSection === null" class="p-6 m-6 rounded-lg border-2 text-center">
+                <img v-if="clientId < 0 || pitId < 0" class="mx-auto" src="@/assets/imgs/cajasvacias.png" alt="" />
+                <div
+                    v-show="clientId >= 0 && pitId >= 0 && activeSection === null"
+                    class="p-6 m-6 rounded-lg border-2 text-center"
+                >
                     <p>Seleccione depósito ó camión para comenzar</p>
                 </div>
                 <PurchaseOrderForm
@@ -56,7 +59,7 @@
                 />
             </section>
         </div>
-        <footer class="mt-8 space-x-3 flex justify-end">
+        <footer class="mt-8 space-x-3 flex justify-end max-w-4xl xl:ml-[328px]">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/')">Cancelar</SecondaryBtn>
             <PrimaryBtn btn="wide" size="md" @click.prevent="confirm()"> Confirmar </PrimaryBtn>
         </footer>
@@ -114,10 +117,6 @@
             useTitle('Destino de cajas vacias');
 
             let activeSection: Ref<string | null> = ref(null);
-
-            const router = useRouter();
-            const route = useRoute();
-            const store = useStore();
             const instance = axios.create({
                 baseURL: apiUrl,
             });

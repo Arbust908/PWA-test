@@ -82,7 +82,7 @@
     .card {
         max-width: 260px;
         box-shadow: 0px 1px 4px rgba(0, 0, 0, 0.25);
-        @apply p-[10px] rounded-[10px] flex gap-3 items-center bg-second-400 border border-transparent bg-white;
+        @apply p-[10px] rounded-[10px] flex gap-3 items-center bg-second-400 border border-transparent bg-white transition duration-300 ease-out;
         &.selected {
             @apply border-green-500;
         }
@@ -98,7 +98,7 @@
     }
 
     .button {
-        @apply text-xs rounded-[10px] py-1 px-1.5 bg-[#94979C] text-white text-center w-full;
+        @apply text-xs rounded-[10px] py-1 px-1.5 bg-[#94979C] text-white text-center w-full transition duration-300 ease-out;
         &.selected {
             @apply bg-[#25AE6C];
         }
