@@ -155,6 +155,7 @@
                         pickupsObj.value = pickups;
                         backupPickups.value = JSON.parse(JSON.stringify(pickupsObj.value));
                         crewObj.value = crew;
+                        backupCrew.value = JSON.parse(JSON.stringify(crewObj.value));
                     }
                 });
             });
@@ -472,6 +473,7 @@
                             }
 
                             for (const crewToDelete of comparedCrews.deleted) {
+                                console.log('delete');
                                 await axios.delete(api + `/crew/${crewToDelete.id}`);
                             }
 
