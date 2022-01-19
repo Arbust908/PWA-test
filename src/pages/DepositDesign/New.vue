@@ -38,7 +38,7 @@
                                         sand.id <= 5 ? sand.id : 'extra'
                                     } radio clickable`"
                                     @click="setCat(sand.id.toString())"
-                                />{{ sand.id }}
+                                />
                                 <span>{{ sand.type }}</span>
                             </label>
                             <label class="type-select" for="empty">

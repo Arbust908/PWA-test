@@ -61,7 +61,6 @@
                                         } clickable`"
                                         @click="conLog"
                                     >
-                                        {{ sand.id }}
                                         <div
                                             :class="`w-[10px] h-[10px] m-[5px] rounded-full mesh-type__${
                                                 sand.id <= 5 ? sand.id : 'extra'
