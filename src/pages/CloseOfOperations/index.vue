@@ -31,7 +31,7 @@
                 is-optional
             />
 
-            <section class="bg-white col-span-full shadow max-w-[100%]">
+            <section class="bg-white col-span-full shadow max-w-[100%] hidden sm:block">
                 <div class="grid grid-cols-4 text-sm rounded-t border py-3">
                     <span class="ml-8 text-left">POZO</span>
                     <span class="text-center">ETAPAS</span>
@@ -86,58 +86,94 @@
                     </article>
                 </div>
             </section>
-            <!-- <section class="xs:block">
-                <CloseOperationTable v-for="sandPlan in filteredSandPlans" :key="sandPlan.id" :sand-plan="sandPlan" />
-            </section> -->
-
-            <section class="bg-white rounded-md shadow-sm block sm:hidden">
-                <form method="POST" action="/" class="flex flex-col rounded border-solid border-black">
-                    <header
-                        class="flex justify-between px-3 pb-3 pt-4 border-2 border-b-0 border-solid bg-gray-100 rounded-t-lg"
-                    >
-                        <section class="flex space-x-4 self-center">
-                            <h2 class="font-bold">
-                                <span class="pl-6">Pozo</span>
-                                <span>{{ selectedPitName }}</span>
-                            </h2>
-                        </section>
-                        <section class="flex space-x-4 pr-3">
-                            <button class="flex items-right" @click.prevent="addStage">
-                                <Icon icon="PlusCircle" class="w-7 h-7 m-auto text-green-500 mr-1" />
-                            </button>
-                            <button
-                                :title="currentOpened ? 'Ocultar Etapas' : 'Mostrar Etapas'"
-                                @click.prevent="toggleCurOp"
-                            >
-                                <Icon
-                                    icon="ChevronDown"
-                                    outline
-                                    :opened="currentOpened"
-                                    :class="currentOpened ? 'rotate-180' : null"
-                                    class="w-8 h-8 text-gray-600 transition transform duration-300 ease-out cursor-pointer mr-1"
+            <!-- mobile -->
+            <section v-if="clientId > -1" class="col-span-full block sm:hidden">
+                <form
+                    v-for="sandPlan in filteredSandPlans"
+                    :key="sandPlan.id"
+                    class="flex flex-col rounded shadow-sm border-solid bg-white border-black mb-6"
+                >
+                    <div>
+                        <header
+                            class="flex justify-between px-3 pb-3 pt-4 border-2 border-b-0 border-solid bg-gray-200 rounded-t-lg"
+                        >
+                            <section class="flex space-x-4 self-center">
+                                <input
+                                    id="checkbox"
+                                    type="checkbox"
+                                    class="outline-none focus:outline-none text-green-500 rounded ml-4 mt-1"
                                 />
-                            </button>
-                        </section>
-                    </header>
-                    <div v-show="currentOpened" class="pr-8 pl-2 border-2 border-solid rounded-b-lg">
-                        <ResponsiveTableSandPlan
-                            v-for="(stage, Key) in inProgressStages"
-                            :key="Key"
-                            :pos="Key"
-                            :stage="stage"
-                            :editing="editingStage"
-                            :sands="sands"
-                            :stages-amount="currentSandPlan.stages.length - 1"
-                            editing-key="innerId"
-                            @editStage="editStage"
-                            @saveStage="saveStage"
-                            @duplicateStage="duplicateStage"
-                            @deleteStage="deleteStage"
-                        />
+                                <h2 class="font-bold">
+                                    <span class="">Pozo {{ sandPlan.pit.name }}</span>
+                                </h2>
+                            </section>
+                            <section class="flex space-x-4 pr-3">
+                                <button @click.prevent="setOpened(sandPlan.id)">
+                                    <Icon
+                                        icon="ChevronDown"
+                                        outline
+                                        :opened="currentOpened.includes(sandPlan.id)"
+                                        :class="currentOpened.includes(sandPlan.id) ? 'rotate-180' : null"
+                                        class="w-8 h-8 text-gray-600 transition transform duration-300 ease-out cursor-pointer mr-1"
+                                    />
+                                </button>
+                            </section>
+                        </header>
+                        <div
+                            v-show="currentOpened.includes(sandPlan.id)"
+                            class="pr-8 pl-2 border-2 border-solid rounded-b-lg"
+                        >
+                            <CloseOperationTable :sand-plan="sandPlan" class="my-4" />
+                        </div>
                     </div>
                 </form>
             </section>
+            <section
+                v-else
+                class="rounded border-2 border-dashed col-span-full p-6 text-center text-gray-500 block sm:hidden"
+            >
+                <span>Seleccione un cliente</span>
+            </section>
         </FieldGroup>
+        <footer class="footerDesktop">
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
+            <PrimaryBtn btn="wide" size="md" @click.prevent="toggleModal()"> Finalizar Operación </PrimaryBtn>
+        </footer>
+
+        <OrderModal
+            v-if="showModal"
+            :show-modal="showModal"
+            :driver="driverName"
+            :po-id="purchaseId"
+            :po="po"
+            :plates="filteredPlates"
+            @close="showModal = false"
+            @confirm="
+                save();
+                openSuccess = true;
+            "
+        />
+
+        <SuccessModal
+            :open="openSuccess"
+            text="El cierre de operación #1234 ha sido generado con éxito"
+            @close="$router.go(0)"
+            @main="$router.go(0)"
+        />
+        <ErrorModal
+            :open="showErrorModal"
+            title="¡Ups! Hubo un problema al intentar guardar el cierre."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleErrorModal()"
+            @main="toggleErrorModal()"
+        />
+        <ErrorModal
+            :open="showApiErrorModal"
+            title="¡Ups! Hubo un problema y no pudimos guardar la planificación."
+            text="Por favor, intentá nuevamente en unos minutos."
+            @close="toggleApiErrorModal()"
+            @main="toggleApiErrorModal()"
+        />
     </Layout>
 </template>
 
@@ -149,7 +185,15 @@
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import Badge from '@/components/ui/Badge.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
+    import OrderModal from '@/components/purchaseOrder/Modal.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+
     import CloseOperationTable from '@/components/closeOfOperation/CloseOperationTable.vue';
+    import { Ref } from 'vue';
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -162,6 +206,25 @@
     const sandPlans = ref([]);
     const filteredSandPlans = ref([]);
     const stagesAmount = ref(0);
+    const currentOpened = ref([]);
+    const openSuccess = ref(false);
+    const showModal = ref(false);
+    const toggleModal = useToggle(showModal);
+    const atLeastOne = ref(false);
+
+    const showErrorModal = ref(false);
+    const toggleErrorModal = useToggle(showErrorModal);
+
+    const showApiErrorModal = ref(false);
+    const toggleApiErrorModal = useToggle(showApiErrorModal);
+
+    const setOpened = (id: number): void => {
+        if (currentOpened.value.includes(id)) {
+            currentOpened.value = currentOpened.value.filter((COid) => COid !== id);
+        } else {
+            currentOpened.value.push(id);
+        }
+    };
 
     const getSandPlans = async () => {
         if (clientId.value > 0) {
@@ -175,10 +238,8 @@
             });
 
             pits.value = response.data.data;
-            console.log('pits', pits.value);
 
             sandPlans.value = result.data.data;
-            console.log('sandplans', sandPlans.value);
 
             getFilteredSandPlans();
         }
@@ -186,8 +247,11 @@
 
     const getFilteredSandPlans = () => {
         filteredSandPlans.value = sandPlans.value.filter((sandPlan) => sandPlan.company.id === clientId.value);
-        console.log('filteredSandPlans', filteredSandPlans.value);
     };
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+    .footerDesktop {
+        @apply mt-4 mr-5 space-x-3 flex justify-end;
+    }
+</style>

@@ -1,40 +1,30 @@
 <template>
     <table>
         <tr>
-            <th class="text-left px-6 py-4 w-3/6">
-                <span>Pozo </span>
-                <span>{{ sandPlan.pit.name }}</span>
-            </th>
-        </tr>
-        <tr>
             <th class="head">Etapas</th>
-            <td class="typeWrap">
+            <td class="text-right text-gray-400">
                 {{ sandPlan.stages.find((currentStage) => currentStage.status === 0).stage }} /
                 {{ sandPlan.stages.length }}
             </td>
         </tr>
         <tr>
             <th class="head">Toneladas</th>
-            <td>
-                <span>
-                    {{
-                        sandPlan.stages[0].quantity1 +
-                        sandPlan.stages[0].quantity2 +
-                        sandPlan.stages[0].quantity3 +
-                        sandPlan.stages[0].quantity4
-                    }}
-                    t
-                </span>
+            <td class="text-right font-bold">
+                {{
+                    sandPlan.stages[0].quantity1 +
+                    sandPlan.stages[0].quantity2 +
+                    sandPlan.stages[0].quantity3 +
+                    sandPlan.stages[0].quantity4
+                }}t
             </td>
         </tr>
         <tr>
             <th class="head">Estado</th>
-            <td>
+            <td class="text-right">
                 <Badge v-if="sandPlan.stages[0].status === 0" class="bg-blue-700 rounded-lg" text="EN PROGRESO" />
                 <Badge v-else text="COMPLETA" />
             </td>
         </tr>
-        <div class="separador-final ml-6 mt-6 mb-6" />
     </table>
 </template>
 
