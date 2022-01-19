@@ -1,8 +1,8 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <button @click="downloadPDF">downloadPDF</button>
-        <PDF ref="pdf" v-show="false" @close="redirectIndex" :info="pdfInfo" @pdf-html="sendPdf" />
+        <button @click="downloadPDF">Download</button>
+        <PDF v-show="showPDF" ref="pdf" :info="pdfInfo" @close="redirectIndex" />
 
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-3 sm:p-4 flex-col gap-4">
@@ -183,13 +183,12 @@
                 </FieldGroup>
                 <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="max-w-3xl relative flex-wrap">
                     <FieldLegend class="mt-2">Observaciones</FieldLegend>
-                    <section class="flex gap-2 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
+                    <section class="flex gap-4 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
                             <DatePicker
                                 v-model="localDate"
                                 validation-type="empty"
-                                class="mr-6 md:mr-8"
                                 @date-object="dateObject = $event"
                             />
                         </label>
@@ -295,9 +294,12 @@
 
     const pdf = ref(null);
     const savingOrder = ref(false);
+    const showPDF = ref(false);
 
     const downloadPDF = async () => {
-        pdf.value?.download();
+        showPDF.value = true;
+        await pdf.value?.download();
+        showPDF.value = false;
     };
 
     const filteredDrivers = computed(() => {
@@ -369,8 +371,8 @@
             sandOrders: [
                 {
                     id: 0,
-                    sandTypeId: 4,
-                    amount: 100,
+                    sandTypeId: -1,
+                    amount: 0,
                     boxId: '',
                 },
             ],
@@ -659,11 +661,11 @@
             savingOrder.value = false;
 
             if (result.status === 200) {
-                showModal.value = false;
-                openSuccess.value = true;
                 const poId = result.data.data.id;
                 purchaseId.value = poId;
                 titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
+                showModal.value = false;
+                openSuccess.value = true;
                 _saveTO(poId);
                 _saveSO(poId);
             }
@@ -680,7 +682,6 @@
     const titleErrorGral = 'Hubo un problema al intentar generar la orden.'; //error Usuario
     const textErrorGral = 'Por favor, verifica los datos ingresados e intenta nuevamente';
 
-    const showPDF = ref(false);
     const pdfInfo = computed(() => {
         const emptyThing = {
             name: 'none',
