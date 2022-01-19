@@ -44,7 +44,7 @@
                     :index="index"
                     :cradle-slots="cradleSlots"
                     :box="slot"
-                    @selected-slots="SelectSlot(slot)"
+                    @selected-slots="SelectSlot(slot), getSelectedSandOrder(slot)"
                     @change-cradle-slot-status="changeCradleSlotStatus($event[0], $event[1])"
                 />
             </section>
@@ -112,6 +112,8 @@
             const openSuccess = ref(false);
             const ModalText = 'La solicitud de retiro de cajas fue enviada con éxito';
             const selectedSlots = ref([]);
+            const sandOrdersOriginal = ref([]);
+            const selectedSandOrders = ref([]);
 
             const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
                 await axios
@@ -119,6 +121,30 @@
                     .catch((err) => console.error(err));
 
                 return (cradleSlots.value[slotIndex].status = newStatus);
+            };
+
+            onMounted(async () => {
+                const result = await axios.get(`${apiUrl}/sandOrder`);
+                sandOrdersOriginal.value = result.data.data;
+                console.log(sandOrdersOriginal.value);
+            });
+
+            const getSelectedSandOrder = (slot: any) => {
+                const findSandOrderOriginalId = sandOrdersOriginal.value.find(
+                    (sandOrderOriginal) => sandOrderOriginal.id === slot.id
+                ).id;
+                if (!selectedSandOrders.value.some((sandOrder) => sandOrder.id === findSandOrderOriginalId)) {
+                    selectedSandOrders.value.push(
+                        sandOrdersOriginal.value.find((sandOrderOriginal) => sandOrderOriginal.id === slot.id)
+                    );
+                    console.log(selectedSandOrders.value);
+                } else {
+                    const deleteIndex = selectedSandOrders.value.findIndex(
+                        (sandOrder) => sandOrder.id === findSandOrderOriginalId
+                    );
+                    selectedSandOrders.value.splice(deleteIndex, 1);
+                    console.log(selectedSandOrders.value);
+                }
             };
 
             const SelectSlot = (slot: any) => {
@@ -279,6 +305,10 @@
                     newQI.sandOrderId = selectedSlot.id;
                     createQueueItem(newQI);
                 });
+                selectedSandOrders.value.forEach((sandOrder) => {
+                    sandOrder.status = 11;
+                    axios.put(`${apiUrl}/sandOrder/${sandOrder.id}`, sandOrder).catch((err) => console.error(err));
+                });
                 const updateCradle = { ...selectedCradle.value };
                 updateCradle.slots = cradleSlots.value;
                 await axios
@@ -340,6 +370,7 @@
                 selectedCradle,
                 SelectSlot,
                 confirmModal,
+                getSelectedSandOrder,
             };
         },
     });
