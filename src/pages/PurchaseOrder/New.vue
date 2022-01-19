@@ -1,7 +1,9 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" @pdf-html="sendPdf" />
+        <!-- <button @click="downloadPDF">Download</button> -->
+        <PDF v-show="showPDF" ref="pdf" :info="pdfInfo" @close="redirectIndex" />
+
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-3 sm:p-4 flex-col gap-4">
                 <FieldGroup class="max-w-2xl border-none">
@@ -181,13 +183,12 @@
                 </FieldGroup>
                 <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="max-w-3xl relative flex-wrap">
                     <FieldLegend class="mt-2">Observaciones</FieldLegend>
-                    <section class="flex gap-2 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
+                    <section class="flex gap-4 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
                             <DatePicker
                                 v-model="localDate"
                                 validation-type="empty"
-                                class="mr-6 md:mr-8"
                                 @date-object="dateObject = $event"
                             />
                         </label>
@@ -232,18 +233,16 @@
             :po-id="purchaseId"
             :po="po"
             :plates="filteredPlates"
+            :loading="savingOrder"
             @close="showModal = false"
-            @confirm="
-                save();
-                showModal = false;
-            "
+            @confirm="save()"
         />
 
         <SuccessModal
             :open="openSuccess"
             :title="titleSuccess"
             @main="
-                togglePDF();
+                downloadPDF();
                 openSuccess = false;
             "
         />
@@ -292,6 +291,16 @@
 
     const drivers = ref([]);
     const driverId = ref(-1);
+
+    const pdf = ref(null);
+    const savingOrder = ref(false);
+    const showPDF = ref(false);
+
+    const downloadPDF = async () => {
+        showPDF.value = true;
+        await pdf.value?.download();
+        showPDF.value = false;
+    };
 
     const filteredDrivers = computed(() => {
         driverId.value = -1;
@@ -363,7 +372,7 @@
                 {
                     id: 0,
                     sandTypeId: -1,
-                    amount: null,
+                    amount: 0,
                     boxId: '',
                 },
             ],
@@ -619,43 +628,47 @@
     });
 
     onMounted(async () => {
-        const result = await axios.get(`${api}/purchaseOrder`);
-        purchaseId.value = result.data.data.at(-1).id + 1;
+        purchaseId.value = await getLastId();
     });
 
-    const save = (): void => {
+    const getLastId = async () => {
+        const result = await axios.get(`${api}/purchaseOrder`);
+
+        return result.data.data.at(-1).id + 1;
+    };
+
+    const save = async () => {
         if (isFull.value) {
+            savingOrder.value = true;
+
             // Formateamos la orden de pedido
             const purchaseOrder = _formatPO();
+            // get last id
+            const lastId = await getLastId();
+            pdfInfo.value = purchaseOrder;
+            pdfInfo.value.purchaseOrder.id = lastId;
+
+            // deberia tener el resultado HTML del pdf
+            const pdfContent = await pdf.value?.getFileContent();
+            purchaseOrder.pdfContent = pdfContent;
+
             // Creamos via API la orden de pedido
-            const { data: pODone, error } = useAxios(
-                '/purchaseOrder',
-                { method: 'POST', data: purchaseOrder },
-                instance
-            );
-            setTimeout(() => {
-                if (error.value != undefined) {
-                    showModal.value = false;
-                    openErrorGral.value = true;
-                } else {
-                    showModal.value = false;
-                    openSuccess.value = true;
-                }
-            }, 1000);
-            const sOisDone = ref([]);
-            watch(pODone, (newVal, _) => {
-                if (newVal && newVal.data) {
-                    // Recorremos los proveedores de sand
-                    const poId = newVal.data.id;
-                    purchaseId.value = poId;
-                    titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
-                    _saveTO(poId);
-                    _saveSO(poId);
-                    /* setTimeout(() => {
-                        router.push('/orden-de-pedido');
-                    }, 2000); */
-                }
+            const result = await axios.post(`${api}/purchaseOrder`, purchaseOrder).catch((err) => {
+                showModal.value = false;
+                openErrorGral.value = true;
             });
+
+            savingOrder.value = false;
+
+            if (result.status === 200) {
+                const poId = result.data.data.id;
+                purchaseId.value = poId;
+                titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
+                showModal.value = false;
+                openSuccess.value = true;
+                _saveTO(poId);
+                _saveSO(poId);
+            }
         }
     };
     // >> Success y Error Modal
@@ -669,8 +682,6 @@
     const titleErrorGral = 'Hubo un problema al intentar generar la orden.'; //error Usuario
     const textErrorGral = 'Por favor, verifica los datos ingresados e intenta nuevamente';
 
-    const showPDF = ref(false);
-    const togglePDF = useToggle(showPDF);
     const pdfInfo = computed(() => {
         const emptyThing = {
             name: 'none',
@@ -697,9 +708,9 @@
             observation: packageObservations.value,
         };
     });
-    const sendPdf = (pdfHtml: string) => {
-        // Enviar el PDF al Back
-        console.log(pdfHtml);
+
+    const redirectIndex = () => {
+        router.push('/orden-de-pedido');
     };
 </script>
 

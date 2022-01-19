@@ -164,7 +164,7 @@
             required: true,
         },
     });
-    const emit = defineEmits(['close', 'pdf-html']);
+    const emit = defineEmits(['close']);
 
     const toPDF = ref(null);
     const sandProviderName = computed(() => {
@@ -247,22 +247,32 @@
             orientation: 'p',
         },
     };
-    const exportFilename = `orden_de_pedido_${props.info.purchaseOrder.id}.pdf`;
-    const download = () => {
-        emit('pdf-html', JSON.stringify(toPDF.value));
+
+    const getFileContent = async () => {
         const doc = document.querySelector('#toPDF');
         pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
-        worker.set(pdfOptions).from(doc).save(exportFilename);
+
+        const fileContent = await html2pdf().set(pdfOptions).from(doc).toPdf().output();
+
+        return btoa(fileContent);
     };
+
+    const download = async () => {
+        const exportFilename = `orden_de_pedido_${props.info.purchaseOrder.id}.pdf`;
+        const doc = document.querySelector('#toPDF');
+        pdfOptions.jsPDF.orientation = trueOrientation(pdfOptions.jsPDF.format);
+
+        await worker.set(pdfOptions).from(doc).save(exportFilename);
+
+        emit('close');
+    };
+
     const trueOrientation = ([width, height]) => {
         return width > height ? 'l' : 'p';
     };
-    const router = useRouter();
-    setTimeout(() => {
-        download();
-        setTimeout(() => {
-            emit('close');
-            router.push('/orden-de-pedido');
-        }, 1000);
-    }, 500);
+
+    defineExpose({
+        download,
+        getFileContent,
+    });
 </script>
