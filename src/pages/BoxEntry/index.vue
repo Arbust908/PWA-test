@@ -8,9 +8,9 @@
                         <ClientPitCombo
                             :client-id="Number(clientId)"
                             :pit-id="Number(pitId)"
+                            validation-type="empty"
                             @update:clientId="clientId = Number($event)"
                             @update:pitId="pitId = Number($event)"
-                            validation-type="empty"
                         />
                     </span>
                     <FieldSelect
@@ -379,6 +379,13 @@
         // Si clickea en un pasillo no hace nada. Sumo Cradle
         // Tampoco deberia poder clickear en un pasillo
         if (box.category == 'aisle' || box.category == 'cradle') {
+            return;
+        }
+
+        const compareBox = JSON.stringify(choosedBox.value);
+        const compareDefaultBox = JSON.stringify(defaultBox);
+
+        if (compareBox === compareDefaultBox) {
             return;
         }
 
