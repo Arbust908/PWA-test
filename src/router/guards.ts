@@ -135,7 +135,7 @@ export const checkPermission = async (to: any, from: any, next: any) => {
     const permissions = JSON.parse(JSON.stringify(storePermissions));
     const actualRoute = to.name;
 
-    // check if has updated permissions
+    // check if has permissions
     if (permissions.view.includes(actualRoute)) {
         next();
     } else {
