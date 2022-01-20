@@ -8,6 +8,7 @@
                         <ClientPitCombo
                             :client-id="Number(clientId)"
                             :pit-id="Number(pitId)"
+                            validation-type="empty"
                             @update:clientId="clientId = Number($event)"
                             @update:pitId="pitId = Number($event)"
                         />
@@ -156,7 +157,7 @@
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
     import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
     import CradleRow from './CradleRow.vue';
-    import { formatDeposit, defaultBox, getInDepoBoxes } from '@/helpers/useWarehouse';
+    import { formatDeposit, defaultBox, getInDepoBoxes, searchInDepoBoxes } from '@/helpers/useWarehouse';
     import {
         getPurchaseOrders,
         getSandOrders,
@@ -258,8 +259,6 @@
     };
 
     watchEffect(async () => {
-        console.log('Watchpokalips');
-
         if (purchaseOrders.value.length > 0) {
             if (clientId.value !== -1 && pitId.value !== -1) {
                 filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
@@ -320,7 +319,6 @@
     const choosedBox = ref({
         ...defaultBox,
     });
-    console.log('Primer caja', choosedBox.value);
 
     const checkIfWasBoxInOriginalDeposit = (boxId) => {
         let response = false;
@@ -346,10 +344,16 @@
         return response;
     };
 
-    const setSelectedBox = async (id: number) => {
-        choosedBox.value = boxes.value.find((box) => {
+    const setSelectedBox = (id: number) => {
+        const toChooseBox = boxes.value.find((box) => {
             return box.boxId === id;
         });
+
+        if (toChooseBox.boxId === choosedBox.value.boxId) {
+            choosedBox.value = { ...defaultBox };
+        } else {
+            choosedBox.value = toChooseBox;
+        }
 
         setVisibleCategories(choosedBox.value.sandTypeId);
 
@@ -377,6 +381,13 @@
         // Si clickea en un pasillo no hace nada. Sumo Cradle
         // Tampoco deberia poder clickear en un pasillo
         if (box.category == 'aisle' || box.category == 'cradle') {
+            return;
+        }
+
+        const compareBox = JSON.stringify(choosedBox.value);
+        const compareDefaultBox = JSON.stringify(defaultBox);
+
+        if (compareBox === compareDefaultBox) {
             return;
         }
 
@@ -426,20 +437,7 @@
 
     watch(selectionsAreDone, async (newVal) => {
         if (newVal) {
-            sandOrders.value = await getSandOrders();
-            const boxes = sandOrders.value
-                .map((box) => {
-                    if (box.location && JSON.parse(box.location)) {
-                        box.location = JSON.parse(box.location);
-                        box.location.been_set = true;
-                    }
-
-                    return box;
-                })
-                .filter((box) => {
-                    return box.location;
-                });
-            inDepoBoxes.value = getInDepoBoxes(boxes, warehouse.value.id);
+            inDepoBoxes.value = await searchInDepoBoxes(warehouse.value.id);
         }
     });
 
@@ -525,7 +523,6 @@
             await axios
                 .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
                 .then((res) => {
-                    console.log('SH axios', res.data.data);
                     warehouseDone.value = !!res.data.data;
                 })
                 .catch((err) => console.error(err));
@@ -535,7 +532,6 @@
             await axios
                 .put(`${apiUrl}/cradle/${cradleId}`, cradleData)
                 .then((res) => {
-                    console.log('Cd axios', res.data.data);
                     cradleDone.value = !!res.data.data;
                 })
                 .catch((err) => console.error(err));
@@ -566,10 +562,10 @@
         toggleLoading(false);
 
         console.info('Depo Guardado', warehouseDone.value);
-        console.info('Crdl Guardado', cradleDone.value);
         console.warn('Se modifico Cradle?', wasCradleModificated.value);
-        console.warn('Se modifico Depo?', wasWarehouseModificated.value);
         console.error(wasCradleModificated.value == false);
+        console.info('Crdl Guardado', cradleDone.value);
+        console.warn('Se modifico Depo?', wasWarehouseModificated.value);
         console.error(wasWarehouseModificated.value == false);
 
         if (warehouseDone.value && cradleDone.value) {

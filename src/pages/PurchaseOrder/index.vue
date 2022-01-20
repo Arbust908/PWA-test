@@ -50,6 +50,7 @@
     import { useApi } from '@/helpers/useApi';
     import ABMHeader from '@/components/ui/ABMHeader.vue';
     import VTable from '@/components/ui/table/VTable.vue';
+    import FieldSelect from '@/components/ui/form/FieldSelect.vue';
 
     useTitle('Ordenes de Pedido <> Sandflow');
 

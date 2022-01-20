@@ -35,15 +35,24 @@ export const getCradles = async () => {
         })
         .catch((err) => console.error(err));
 };
-
-export const getWorkOrders = async () => {
+export const getCradle = async (cradleId: number) => {
     return await axios
-        .get(`${apiUrl}/workOrder`)
+        .get(`${apiUrl}/cradle/${cradleId}`)
         .then((res) => {
             return res.data.data;
         })
         .catch((err) => console.error(err));
 };
+
+export const getWorkOrders = async (queries = '') => {
+    return await axios
+        .get(`${apiUrl}/workOrder${queries}`)
+        .then((res) => {
+            return res.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+
 export const getSand = async () => {
     return await axios
         .get(`${apiUrl}/sand`)

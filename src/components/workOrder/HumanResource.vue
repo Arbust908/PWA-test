@@ -16,7 +16,6 @@
                 </label>
                 <div class="grid col-span-12"></div>
             </section>
-
             <section class="col-span-full">
                 <PeopleGroup
                     v-for="(people, peopleI) in crew.resources"

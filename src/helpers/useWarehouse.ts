@@ -1,4 +1,9 @@
 import { useClone } from '@/helpers/useClone';
+import { SandOrder, SandOrderBox } from '@/interfaces/sandflow';
+
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
 export const defaultBox = {
     floor: 1,
@@ -13,6 +18,13 @@ export const defaultBox = {
 };
 
 export const formatDeposit = (deposit: any) => {
+    const formatedDefault = { floor: 0, row: 0, col: 0, dimensions: '' };
+
+    if (!deposit) {
+        console.error('Deposit es ', deposit);
+
+        return { ...formatedDefault };
+    }
     const { clone: deposito } = useClone(deposit);
     const dimensions = Object.keys(deposito).reduce(
         (dims, currentCell) => {
@@ -24,7 +36,7 @@ export const formatDeposit = (deposit: any) => {
 
             return dims;
         },
-        { floor: 0, row: 0, col: 0, dimensions: '' }
+        { ...formatedDefault }
     );
     dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
 
@@ -62,6 +74,10 @@ export const boxesByFloor = (location: any, queueItemSort = false) => {
     if (queueItemSort) {
         const boxes = location.reduce((allFloors: Array<any>, box: any) => {
             const { location: wheres } = box;
+
+            if (wheres.where !== 'warehouse') {
+                return;
+            }
             const { floor, col, row } = wheres;
 
             box.floor = floor;
@@ -130,11 +146,39 @@ export const getBoxClasses = (category: string) => {
 };
 
 export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
+    // console.groupCollapsed('getInDepoBoxes');
+    // console.log('boxes', boxes);
+    // console.log('boxes', [...boxes]);
+    // console.log('depoId', depoId);
     const boxy = boxes.filter((box) => {
         const { location } = box;
 
-        return location && location.where_id === depoId;
+        return location && location.where === 'warehouse' && location.where_id === depoId;
     });
+    // console.log('boxy', boxy);
+    // console.groupEnd();
 
     return [...new Set(boxy)];
+};
+
+export const searchInDepoBoxes = async (depoId: number) => {
+    let allBoxes = await getSandOrders();
+    allBoxes = allBoxes.filter((box: SandOrder) => box.location).map(formatBoxLocation);
+
+    return getInDepoBoxes(allBoxes, depoId);
+};
+
+export const getSandOrders = async () => {
+    return await axios
+        .get(`${apiUrl}/sandOrder`)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const formatBoxLocation = (box: SandOrder): SandOrderBox => {
+    const { location } = box;
+    box.location = JSON.parse(location);
+
+    return box as SandOrderBox;
 };
