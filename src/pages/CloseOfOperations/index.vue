@@ -102,8 +102,10 @@
                             <section class="flex space-x-4 self-center">
                                 <input
                                     id="checkbox"
+                                    v-model="sandPlan.isSelected"
                                     type="checkbox"
                                     class="outline-none focus:outline-none text-green-500 rounded ml-4 mt-1"
+                                    @change="addCheckedPits(sandPlan, sandPlan.isSelected)"
                                 />
                                 <h2 class="font-bold">
                                     <span class="">Pozo {{ sandPlan.pit.name }}</span>
