@@ -9,7 +9,7 @@
             />
         </FieldGroup>
         <div class="flex gap-x-6">
-            <section class="bg-white rounded-md shadow-sm min-w-[308px]">
+            <section class="bg-white rounded-md shadow-sm min-w-[308px] max-h-[620px] overflow-y-auto">
                 <h2 class="p-6 pb-0 font-bold text-2xl">Cajas Vacias</h2>
                 <div v-if="clientId > 0 && pitId > 0" class="px-6 py-5 space-y-5">
                     <BoxCard
@@ -144,13 +144,6 @@
                     boxes.value = [];
                 }
             });
-
-            const selectedClientName = computed(() => {
-                return clientId.value >= 0 && clients.value.length > 0
-                    ? clients.value.find((client) => client.id === clientId.value)?.name
-                    : '';
-            });
-
             // :: PITS
             const pitId = ref(-1);
             const pits = ref([] as Array<Pit>);
@@ -159,11 +152,6 @@
                 if (pitApi && pitApi.data) {
                     pits.value = pitApi.data;
                 }
-            });
-            const selectedPitName = computed(() => {
-                return pitId.value >= 0 && pits.value.length > 0
-                    ? pits.value.find((pit) => pit.id === pitId.value)?.name
-                    : '';
             });
 
             const showPurchaseOrder = ref(false);
@@ -179,6 +167,7 @@
                         return res.data.data;
                     })
                     .catch((err) => console.error(err));
+                boxes.value = boxes.value.filter((box) => box.sandOrder);
             };
 
             const updateQueueItem = () => {
@@ -189,6 +178,7 @@
                         useAxios('/queueItem/' + queueItem.id, { method: 'PUT', data: queueItem }, instance);
                     });
                 }
+
                 if (selectedQueueForDeposit.value.length > 0) {
                     selectedQueueForDeposit.value.forEach((queueItem) => {
                         queueItem.status = 0;
@@ -212,9 +202,11 @@
                 if (selectedBoxesForDeposit.value.length > 0) {
                     return 'Deposit';
                 }
+
                 if (selectedBoxesForTrucks.value.length > 0) {
                     return 'PurchaseOrder';
                 }
+
                 return null;
             });
 
@@ -391,6 +383,7 @@
                 if (selectedBoxesForTrucks.value.length > 0) {
                     confirmPurchaseOrder.value = true;
                 }
+
                 // Chequeamos is hay boxes en deposit para disparar el save correspondiente
                 if (selectedBoxesForDeposit.value.length > 0) {
                     saveDepositBoxes();

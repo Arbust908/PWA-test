@@ -8,9 +8,9 @@
                         <ClientPitCombo
                             :client-id="Number(clientId)"
                             :pit-id="Number(pitId)"
+                            validation-type="empty"
                             @update:clientId="clientId = Number($event)"
                             @update:pitId="pitId = Number($event)"
-                            validation-type="empty"
                         />
                     </span>
                     <FieldSelect
@@ -267,8 +267,6 @@
     };
 
     watchEffect(async () => {
-        console.log('Watchpokalips');
-
         if (purchaseOrders.value.length > 0) {
             if (clientId.value !== -1 && pitId.value !== -1) {
                 filteredPurchaseOrders.value = purchaseOrders.value.filter((po) => {
@@ -329,7 +327,6 @@
     const choosedBox = ref({
         ...defaultBox,
     });
-    console.log('Primer caja', choosedBox.value);
 
     const checkIfWasBoxInOriginalDeposit = (boxId) => {
         let response = false;
@@ -359,7 +356,6 @@
         choosedBox.value = boxes.value.find((box) => {
             return box.boxId === id;
         });
-        console.log('CHOOSEDBOX', choosedBox.value);
 
         if (checkIfWasBoxInOriginalDeposit(id)) {
             Object.entries(warehouse.value.layout).forEach((cell) => {
@@ -385,6 +381,13 @@
         // Si clickea en un pasillo no hace nada. Sumo Cradle
         // Tampoco deberia poder clickear en un pasillo
         if (box.category == 'aisle' || box.category == 'cradle') {
+            return;
+        }
+
+        const compareBox = JSON.stringify(choosedBox.value);
+        const compareDefaultBox = JSON.stringify(defaultBox);
+
+        if (compareBox === compareDefaultBox) {
             return;
         }
 
@@ -530,7 +533,6 @@
             await axios
                 .put(`${apiUrl}/warehouse/${warehouseId}`, wareData)
                 .then((res) => {
-                    console.log('SH axios', res.data.data);
                     warehouseDone.value = !!res.data.data;
                 })
                 .catch((err) => console.error(err));
@@ -540,7 +542,6 @@
             await axios
                 .put(`${apiUrl}/cradle/${cradleId}`, cradleData)
                 .then((res) => {
-                    console.log('Cd axios', res.data.data);
                     cradleDone.value = !!res.data.data;
                 })
                 .catch((err) => console.error(err));
@@ -571,10 +572,10 @@
         toggleLoading(false);
 
         console.info('Depo Guardado', warehouseDone.value);
-        console.info('Crdl Guardado', cradleDone.value);
         console.warn('Se modifico Cradle?', wasCradleModificated.value);
-        console.warn('Se modifico Depo?', wasWarehouseModificated.value);
         console.error(wasCradleModificated.value == false);
+        console.info('Crdl Guardado', cradleDone.value);
+        console.warn('Se modifico Depo?', wasWarehouseModificated.value);
         console.error(wasWarehouseModificated.value == false);
 
         if (warehouseDone.value && cradleDone.value) {

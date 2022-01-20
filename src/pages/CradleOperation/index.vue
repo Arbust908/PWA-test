@@ -106,7 +106,7 @@
             .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
             .catch((err) => console.error(err));
 
-        return (cradleSlots.value[slotIndex].status = newStatus);
+        cradleSlots.value[slotIndex].status = newStatus;
     };
 
     const getSelectedSandOrder = (slot: any) => {
@@ -181,14 +181,6 @@
             });
     };
 
-    const selectionsAreDone = computed(() => {
-        if (clientId.value >= 0 && pitId.value >= 0) {
-            return true;
-        }
-
-        return false;
-    });
-
     const getFilteredCradles = () => {
         let cradlesToFilter = [];
 
@@ -239,25 +231,6 @@
             await getFilteredCradles();
         }
     });
-    // :: CLIENT
-    const selectedClientName = computed(() => {
-        return clientId.value >= 0 ? clients.value.find((pit) => pit.id === clientId.value).name : '';
-    });
-    // << CLIENT
-    // :: PITS
-    const selectedPitName = computed(() => {
-        return pitId.value >= 0 ? pits.value.find((pit) => pit.id === pitId.value).name : '';
-    });
-    // << PITS
-    const designName = computed(() => {
-        return selectedClientName.value !== '' && selectedPitName.value !== ''
-            ? `${selectedPitName.value} - ${selectedClientName.value}`
-            : selectedClientName.value !== ''
-            ? selectedClientName.value
-            : selectedPitName.value !== ''
-            ? selectedPitName.value
-            : '';
-    });
 
     const defaultQueueItem: QueueItem = {
         sandOrderId: -1,
@@ -284,8 +257,10 @@
             newQI.origin = selectedSlot?.location?.where_origin;
             newQI.pitId = pitId.value;
             newQI.sandOrderId = selectedSlot.id;
+
             createQueueItem(newQI);
         });
+
         selectedSandOrders.value.forEach((sandOrder) => {
             sandOrder.status = 11;
             axios.put(`${apiUrl}/sandOrder/${sandOrder.id}`, sandOrder).catch((err) => console.error(err));
@@ -309,19 +284,6 @@
             .then((response) => {
                 if (response.request.status == 200) {
                     console.log(queueItem, 'se guardo bien');
-                }
-            })
-            .catch((err) => console.error(err));
-    };
-
-    const completeStageHandle = async () => {
-        await axios
-            .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
-            .then((res) => {
-                if (res.request.status == 200) {
-                    modalMessage.value = '¡Etapa finalizada con éxito!';
-                    modalButtonText.value = 'Próximo stage';
-                    toggleModal();
                 }
             })
             .catch((err) => console.error(err));
