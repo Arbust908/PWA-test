@@ -113,17 +113,8 @@ export const isMobileAndLogged = (to: any, from: any, next: any) => {
 };
 
 export const checkPermission = async (to: any, from: any, next: any) => {
-    const userFromApi = ref();
-    userFromApi.value = await (await axios.get(`${api}/user/` + store.state.loggedUser.id)).data.data;
-
-    const role = ref([]);
-    role.value = await (await axios.get(`${api}/role/` + userFromApi.value.roleId)).data.data;
-
-    const { visible } = userFromApi.value;
-    const { permissions: storePermissions } = role.value;
-
-    // Updetear los permisos en el store.
-    // store.dispatch.state.loggedUser.permissions = storePermissions;
+    const userFromApi = await (await axios.get(`${api}/user/` + store.state.loggedUser.id)).data.data;
+    const { visible } = userFromApi;
 
     if (!visible) {
         next({ name: 'Error-403' });
@@ -131,6 +122,8 @@ export const checkPermission = async (to: any, from: any, next: any) => {
         return;
     }
 
+    const role = await (await axios.get(`${api}/role/` + userFromApi.roleId)).data.data;
+    const { permissions: storePermissions } = role;
     //TODO: usar el permissionManager
     const permissions = JSON.parse(JSON.stringify(storePermissions));
     const actualRoute = to.name;
