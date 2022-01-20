@@ -24,7 +24,7 @@
                 </FieldGroup>
 
                 <fieldset class="py-2 col-span-6 flex flex-col gap-x-10 2xl:gap-x-40">
-                    <h2 class="text-xl font-bold mb-4">Estaciones</h2>
+                    <h2 class="text-xl font-bold mb-4">Estaciónes</h2>
                     <FieldSelect
                         v-model:data="cradleId"
                         class="cradle-col"

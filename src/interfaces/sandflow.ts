@@ -209,6 +209,8 @@ export interface SandOrder {
     sandProvider?: SandProvider;
 }
 
+// "{\"where\":\"warehouse\",\"where_id\":1,\"floor\":1,\"row\":2,\"col\":5}"
+// {\"where\":\"cradle\",\"where_id\":4,\"where_slot\":2,\"where_origin\":\"Estación 3\"}"
 interface BoxLocation {
     where?: string;
     where_id?: number;
