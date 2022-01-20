@@ -153,7 +153,7 @@
         setTimeout(() => {
             updateLists();
             commitTransition(item);
-            // updateQueueItem(item);
+            updateQueueItem(item);
         }, 1000);
     };
 
