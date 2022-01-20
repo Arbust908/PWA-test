@@ -319,6 +319,7 @@
                     floor.value = fFloor;
                     row.value = fRow;
                     inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
+                    console.log(inDepoBoxes.value);
                 }
             }
         }

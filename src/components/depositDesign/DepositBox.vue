@@ -6,7 +6,7 @@
                 type="outline"
                 :class="`w-10 h-10 m-auto ${sandInfo?.status === 11 ? 'text-neutral-400' : null}`"
         /></span>
-        <span v-else class="text-sm">{{ designation }}</span>
+        <span v-else :class="`text-sm ${sandInfo?.status === 11 ? 'text-stone-500' : null}`">{{ designation }}</span>
     </button>
 </template>
 
@@ -57,8 +57,12 @@
             required: false,
             default: false,
         },
+        isEmptyDeposit: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     });
-    console.log(props.boxData.category);
     const emits = defineEmits(['select-box']);
     let { floor, row, col, selectedBox, boxData, isDesign } = toRefs(props);
 
@@ -101,7 +105,8 @@
             (category.value == 'aisle' ||
                 category.value == 'cradle' ||
                 (category.value == 'empty' && !props.isDestination) ||
-                (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination))
+                (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination) ||
+                (props.sandInfo?.id && !props.isEmptyDeposit))
         ) {
             bC += ' cursor-not-allowed';
         }
@@ -134,6 +139,7 @@
                 category.value == 'cradle' ||
                 (category.value == 'empty' && !props.isDestination) ||
                 (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination) ||
+                (props.sandInfo?.id && !props.isEmptyDeposit) ||
                 isBlocked()) &&
             !isDesign.value &&
             props.isDestination

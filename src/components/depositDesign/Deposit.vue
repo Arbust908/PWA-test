@@ -25,6 +25,7 @@
                             :sand-info="getCellBox(row, col, currentFloor)"
                             :is-design="isDesign"
                             :is-destination="isDestination"
+                            :is-empty-deposit="isEmptyDeposit"
                             @select-box="selectBox"
                         />
                     </template>
@@ -76,6 +77,11 @@
             default: false,
         },
         isDestination: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        isEmptyDeposit: {
             type: Boolean,
             required: false,
             default: false,

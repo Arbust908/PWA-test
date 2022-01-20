@@ -26,6 +26,7 @@
                     :floor="floor"
                     :deposit="warehouse.layout || {}"
                     :is-destination="true"
+                    :is-empty-deposit="true"
                     @select-box="selectBox"
                 />
             </section>
