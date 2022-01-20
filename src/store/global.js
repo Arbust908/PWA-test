@@ -54,6 +54,13 @@ const Forklift_Operation = {
     title: 'ForkliftOperation',
     keep: true,
 };
+const Close_Of_Operations = {
+    name: 'Cierre de operaciones',
+    to: '/cierre-de-operaciones',
+    icon: 'Briefcase',
+    title: 'CloseOfOperations',
+    keep: true,
+};
 const LINE = {
     name: 'LINE',
 };
@@ -112,6 +119,7 @@ export default {
             Operación_en_Cradle,
             Stage_Sheet,
             Forklift_Operation,
+            Close_Of_Operations,
             LINE,
             {
                 name: 'Proveedores',
