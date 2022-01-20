@@ -354,9 +354,17 @@
     };
 
     const setSelectedBox = (id: number) => {
-        choosedBox.value = boxes.value.find((box) => {
+        const toChooseBox = boxes.value.find((box) => {
             return box.boxId === id;
         });
+
+        if (toChooseBox.boxId === choosedBox.value.boxId) {
+            choosedBox.value = { ...defaultBox };
+        } else {
+            choosedBox.value = toChooseBox;
+        }
+
+        // setVisibleCategories(choosedBox.value.sandTypeId);
 
         if (checkIfWasBoxInOriginalDeposit(id)) {
             Object.entries(warehouse.value.layout).forEach((cell) => {
@@ -448,6 +456,7 @@
 
     const setVisibleCategories = (category: string) => {
         console.log(category);
+
         if (visibleCategories.value.includes(category)) {
             visibleCategories.value.splice(visibleCategories.value.indexOf(category), 1);
         } else {

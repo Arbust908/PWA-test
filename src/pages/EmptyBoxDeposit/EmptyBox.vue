@@ -86,6 +86,7 @@
     import BoxCard from '@/components/EmptyBox/EmptyBox.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import PurchaseOrderForm from '@/components/purchaseOrder/Form.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
     import {
         formatDeposit,
         defaultBox,
@@ -105,8 +106,6 @@
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
-
-    const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
 
     export default {
         components: {
