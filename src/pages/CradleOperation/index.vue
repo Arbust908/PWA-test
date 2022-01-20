@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
+        <header class="flex flex-col md:flex-row items-center md:mb-4">
             <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Operación en cradle</h1>
         </header>
         <section class="bg-second-0 rounded-md shadow-sm">
@@ -24,7 +24,7 @@
                 </FieldGroup>
 
                 <fieldset class="py-2 col-span-6 flex flex-col gap-x-10 2xl:gap-x-40">
-                    <h2 class="text-xl font-bold mb-4">Estaciones</h2>
+                    <h2 class="text-xl font-bold mb-4">Estaciónes</h2>
                     <FieldSelect
                         v-model:data="cradleId"
                         class="cradle-col"
@@ -44,7 +44,7 @@
                     :index="index"
                     :cradle-slots="cradleSlots"
                     :box="slot"
-                    @selected-slots="SelectSlot(slot)"
+                    @selected-slots="SelectSlot(slot), getSelectedSandOrder(slot)"
                     @change-cradle-slot-status="changeCradleSlotStatus($event[0], $event[1])"
                 />
             </section>
@@ -112,14 +112,36 @@
             const openSuccess = ref(false);
             const ModalText = 'La solicitud de retiro de cajas fue enviada con éxito';
             const selectedSlots = ref([]);
+            const sandOrdersOriginal = ref([]);
+            const selectedSandOrders = ref([]);
 
             const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
                 await axios
                     .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
                     .catch((err) => console.error(err));
-                console.log('selectedCradleCheckbox', selectedCradle.value);
 
                 return (cradleSlots.value[slotIndex].status = newStatus);
+            };
+
+            onMounted(async () => {
+                const result = await axios.get(`${apiUrl}/sandOrder`);
+                sandOrdersOriginal.value = result.data.data;
+            });
+
+            const getSelectedSandOrder = (slot: any) => {
+                const findSandOrderOriginalId = sandOrdersOriginal.value.find(
+                    (sandOrderOriginal) => sandOrderOriginal.id === slot.id
+                ).id;
+                if (!selectedSandOrders.value.some((sandOrder) => sandOrder.id === findSandOrderOriginalId)) {
+                    selectedSandOrders.value.push(
+                        sandOrdersOriginal.value.find((sandOrderOriginal) => sandOrderOriginal.id === slot.id)
+                    );
+                } else {
+                    const deleteIndex = selectedSandOrders.value.findIndex(
+                        (sandOrder) => sandOrder.id === findSandOrderOriginalId
+                    );
+                    selectedSandOrders.value.splice(deleteIndex, 1);
+                }
             };
 
             const SelectSlot = (slot: any) => {
@@ -216,11 +238,7 @@
 
             watchEffect(async () => {
                 if (cradleId.value !== -1) {
-                    console.log('cradleId', cradleId.value);
-
                     selectedCradle.value = cradles.value.filter((cradle) => {
-                        console.log('cradle', cradle);
-
                         return cradle.id == cradleId.value;
                     })[0];
 
@@ -228,18 +246,13 @@
 
                     cradleSlots.value.forEach((slot) => {
                         const { sandTypeId } = slot;
-                        console.log('sandTypeId', { sandTypeId });
-                        console.log('slot', slot);
                         let sandType = sandTypes.value.find((sandType) => {
-                            console.log('sandType', sandType);
-
                             return sandType.id == sandTypeId;
                         });
 
                         if (sandType) {
                             sandType = sandType.type;
                         }
-                        console.log('sandType', sandType);
 
                         slot.sandType = sandType;
                     });
@@ -278,16 +291,31 @@
                 order: -1,
             };
 
-            const requestEmptyBoxHandle = () => {
+            const requestEmptyBoxHandle = async () => {
                 selectedSlots.value.forEach((selectedSlot) => {
+                    const slotPosition = selectedSlot?.location?.where_slot;
+                    cradleSlots.value[slotPosition] = { boxId: null };
                     const newQI = { ...defaultQueueItem };
                     newQI.status = 10;
                     newQI.origin = selectedSlot?.location?.where_origin;
                     newQI.pitId = pitId.value;
                     newQI.sandOrderId = selectedSlot.id;
-                    console.log('selectedSlot', selectedSlot);
                     createQueueItem(newQI);
                 });
+                selectedSandOrders.value.forEach((sandOrder) => {
+                    sandOrder.status = 11;
+                    axios.put(`${apiUrl}/sandOrder/${sandOrder.id}`, sandOrder).catch((err) => console.error(err));
+                });
+                const updateCradle = { ...selectedCradle.value };
+                updateCradle.slots = cradleSlots.value;
+                await axios
+                    .put(`${apiUrl}/cradle/${updateCradle.id}`, updateCradle)
+                    .then((res) => {
+                        if (res.request.status == 200) {
+                            confirmModal();
+                        }
+                    })
+                    .catch((err) => console.error(err));
             };
 
             const createQueueItem = async (queueItem: QueueItem) => {
@@ -296,7 +324,6 @@
                     .then((response) => {
                         if (response.request.status == 200) {
                             console.log(queueItem, 'se guardo bien');
-                            confirmModal();
                         }
                     })
                     .catch((err) => console.error(err));
@@ -340,6 +367,7 @@
                 selectedCradle,
                 SelectSlot,
                 confirmModal,
+                getSelectedSandOrder,
             };
         },
     });
@@ -357,7 +385,7 @@
     }
     .cradle-data-wrapper,
     .cradle-status-wrapper {
-        @apply flex flex-col text-left justify-between;
+        @apply flex flex-col text-left;
     }
     .cradle-status-wrapper {
         @apply mb-4;
@@ -429,7 +457,7 @@
         }
     }
     .cradle-slots {
-        @apply pl-12 pr-12 pb-12 grid grid-cols-1 gap-4 justify-between items-center;
+        @apply pl-12 pr-12 pb-12 grid grid-cols-1 gap-4  items-center;
 
         @screen lg {
             @apply grid-cols-4;
@@ -440,7 +468,7 @@
             @apply border-dashed border-2 border-second-300 rounded-lg p-4 cursor-pointer flex flex-col text-center;
 
             &:not(.empty) {
-                @apply justify-between bg-gray-100 border-none;
+                @apply bg-gray-100 border-none;
             }
 
             &.without-box {
