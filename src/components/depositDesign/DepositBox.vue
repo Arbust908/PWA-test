@@ -58,6 +58,7 @@
             default: false,
         },
     });
+    console.log(props.boxData.category);
     const emits = defineEmits(['select-box']);
     let { floor, row, col, selectedBox, boxData, isDesign } = toRefs(props);
 
@@ -66,8 +67,6 @@
     });
 
     const designation = computed(() => {
-        console.log(props.sandInfo?.status);
-        console.log(category.value);
         if (isDesign.value && ['aisle', 'cradle', 'empty'].includes(category.value)) {
             switch (category.value) {
                 case 'aisle':
@@ -97,7 +96,13 @@
             bC += ' design';
         }
 
-        if (!isDesign.value && (category.value == 'aisle' || category.value == 'cradle' || category.value == 'empty')) {
+        if (
+            !isDesign.value &&
+            (category.value == 'aisle' ||
+                category.value == 'cradle' ||
+                (category.value == 'empty' && !props.isDestination) ||
+                (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination))
+        ) {
             bC += ' cursor-not-allowed';
         }
 
@@ -125,8 +130,13 @@
 
     const selectBox = () => {
         if (
-            (category.value == 'aisle' || category.value == 'cradle' || category.value == 'empty' || isBlocked()) &&
-            !isDesign.value
+            (category.value == 'aisle' ||
+                category.value == 'cradle' ||
+                (category.value == 'empty' && !props.isDestination) ||
+                (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination) ||
+                isBlocked()) &&
+            !isDesign.value &&
+            props.isDestination
         ) {
             console.log('Bloqueo');
 
@@ -167,10 +177,9 @@
             return false;
         }
 
-        if (category.value == 'empty')
-            if (!visibleCategories.value.includes(Number(category.value)) && category.value !== undefined) {
-                return true;
-            }
+        if (!visibleCategories.value.includes(Number(category.value)) && category.value !== undefined) {
+            return true;
+        }
 
         return false;
     };
