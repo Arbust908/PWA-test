@@ -77,7 +77,7 @@
         }
 
         if (isTheSelected.value) {
-            bC += ' selected';
+            bC += ' selected ring-2 ring-main-500 ring-offset-2 ring-offset-main-0 shadow-lg';
         }
 
         if (beenSet.value) {
