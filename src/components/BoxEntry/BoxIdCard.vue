@@ -1,9 +1,10 @@
 <template>
     <article class="available-box">
-        <TheAllIcon v-if="isActiveBox" type="outline" icon="CheckCircle" class="w-6 h-6 text-green-600" />
+        <TheAllIcon v-if="isLocated" type="outline" icon="CheckCircle" class="w-6 h-6 text-green-600" />
         <button
             v-else
             class="radio-button"
+            :class="{ selected: isActiveBox }"
             :disabled="box.boxId?.length <= 0"
             type="button"
             @click="$emit('select-box', box.boxId)"
@@ -40,7 +41,11 @@
     });
     const emit = defineEmits(['select-box', 'update:box']);
     const boxy = useVModel(props, 'box', emit);
+    const { isActiveBox } = toRefs(props);
     const hadId = props?.box?.boxId.length > 0;
+    const isLocated = computed(() => {
+        return !!boxy.value.location;
+    });
 </script>
 
 <style lang="scss" scoped>
@@ -48,12 +53,20 @@
         @apply flex items-center;
     }
     .radio-button {
-        @apply border border-gray-800 w-5 h-5 m-1 cursor-pointer rounded-full;
+        @apply border border-gray-800 w-5 h-5 m-1 cursor-pointer rounded-full flex justify-center items-center;
+        &::after {
+            content: '';
+            @apply bg-slate-800 absolute w-0 h-0 rounded-full transition duration-75 ease-[cubic-bezier(0.95,0.05,0.795,0.035)];
+        }
+        &.selected::after {
+            content: '';
+            @apply w-3 h-3;
+        }
         &:disabled {
             @apply opacity-50 flex justify-center items-center cursor-not-allowed;
             &::after {
                 content: '';
-                @apply bg-slate-400 absolute w-3 h-3 rounded-full;
+                @apply w-3 h-3;
             }
         }
     }

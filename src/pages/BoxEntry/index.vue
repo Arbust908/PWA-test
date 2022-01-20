@@ -345,9 +345,15 @@
     };
 
     const setSelectedBox = (id: number) => {
-        choosedBox.value = boxes.value.find((box) => {
+        const toChooseBox = boxes.value.find((box) => {
             return box.boxId === id;
         });
+
+        if (toChooseBox.boxId === choosedBox.value.boxId) {
+            choosedBox.value = { ...defaultBox };
+        } else {
+            choosedBox.value = toChooseBox;
+        }
 
         setVisibleCategories(choosedBox.value.sandTypeId);
 
