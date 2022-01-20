@@ -24,6 +24,7 @@
                             :box-data="getBoxData(row, col, currentFloor)"
                             :sand-info="getCellBox(row, col, currentFloor)"
                             :is-design="isDesign"
+                            :is-destination="isDestination"
                             @select-box="selectBox"
                         />
                     </template>
@@ -70,6 +71,11 @@
             default: () => [],
         },
         isDesign: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        isDestination: {
             type: Boolean,
             required: false,
             default: false,
