@@ -56,9 +56,7 @@
                                     <span
                                         v-for="(sand, i) in sandTypes"
                                         :key="i"
-                                        :class="`select-category mesh-type__${
-                                            sand.id <= 5 ? sand.id : 'extra'
-                                        } clickable`"
+                                        :class="`select-category mesh-type__${sand.id <= 5 ? sand.id : 'extra'} text`"
                                         @click="conLog"
                                     >
                                         <div
@@ -72,6 +70,14 @@
                                         <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-indigo-900" />
                                         Cradle</span
                                     > -->
+                                    <span class="select-category full">
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full mesh-type__empty boxCard" />
+                                        Caja Vacía
+                                    </span>
+                                    <span class="select-category full">
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full mesh-type__taken cradle" />
+                                        Cradle
+                                    </span>
                                     <span class="select-category full">
                                         <div class="w-[10px] h-[10px] m-[5px] rounded-full mesh-type__taken aisle" />
                                         Pasillo

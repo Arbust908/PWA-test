@@ -1,12 +1,16 @@
 <template>
     <button :class="[boxClassess]" class="box" @click.prevent="selectBox">
-        <span class="text-sm">{{ sandInfo?.boxId }}</span>
+        <span v-if="boxClassess.includes('selected')" class="text-sm"
+            ><Icon icon="CheckCircle" type="outline" :class="'w-10 h-10 m-auto'"
+        /></span>
+        <span v-else class="text-sm">{{ designation }}</span>
     </button>
 </template>
 
 <script setup lang="ts">
     import { Box } from '@/interfaces/sandflow';
     import { getBoxClasses } from '@/helpers/useWarehouse';
+    import Icon from '@/components/icon/TheAllIcon.vue';
 
     const props = defineProps({
         selectedBox: {
@@ -53,22 +57,39 @@
         return boxData && boxData.value ? boxData.value.category : 'empty';
     });
 
+    const designation = computed(() => {
+        console.log(props.sandInfo?.status);
+        console.log(category.value);
+        if (isDesign.value && ['aisle', 'cradle', 'empty'].includes(category.value)) {
+            switch (category.value) {
+                case 'aisle':
+                    return 'Pasillo';
+                case 'cradle':
+                    return 'Cradle';
+                case 'empty':
+                    return 'Vacía';
+            }
+        } else {
+            return props.sandInfo?.boxId;
+        }
+    });
+
     props?.sandInfo?.value && console.log(props?.sandInfo.value);
 
     const boxClassess = computed(() => {
         let bC = '';
 
         if (props.sandInfo?.sandTypeId) {
-            bC += getBoxClasses(String(props.sandInfo?.sandTypeId));
+            bC += getBoxClasses(String(props.sandInfo?.sandTypeId), props.sandInfo?.status);
         } else {
-            bC += getBoxClasses(category.value);
+            bC += getBoxClasses(category.value, props.sandInfo?.status);
         }
 
         if (isDesign.value && bC.length < 2) {
             bC += ' design';
         }
 
-        if (!isDesign.value && (category.value == 'aisle' || category.value == 'cradle')) {
+        if (!isDesign.value && (category.value == 'aisle' || category.value == 'cradle' || category.value == 'empty')) {
             bC += ' cursor-not-allowed';
         }
 
@@ -77,11 +98,14 @@
         }
 
         if (isTheSelected.value) {
-            bC += ' selected';
+            bC += ' ring-2 ring-offset-second-0 ring-offset-2 ring-main-500 selected';
         }
 
         if (beenSet.value) {
             bC += ' been-set';
+        }
+        if (category.value === undefined && !isTheSelected.value && !isDesign.value) {
+            bC += ' notDesignated';
         }
 
         return bC;
@@ -128,11 +152,11 @@
             return false;
         }
 
-        if (category.value == 'aisle' || category.value == 'cradle') {
+        if (category.value == 'aisle' || category.value == 'cradle' || category.value == 'empty') {
             return false;
         }
 
-        if (!visibleCategories.value.includes(Number(category.value))) {
+        if (!visibleCategories.value.includes(Number(category.value)) && category.value !== undefined) {
             return true;
         }
 
@@ -146,6 +170,7 @@
 <style lang="scss">
     @import '@/assets/box.scss';
 </style>
+
 <style lang="scss" scoped>
     .been-set {
         @apply cursor-not-allowed;
