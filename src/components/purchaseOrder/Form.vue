@@ -1,6 +1,6 @@
 <template>
     <ABMFormTitle title="Orden de pedido" />
-    <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" />
+    <PDF v-show="showPDF" ref="pdf" :info="pdfInfo" @close="redirectIndex" />
     <section class="bg-white rounded-md overflow-y-auto">
         <form method="POST" action="/" class="flex-col gap-4">
             <FieldLegend>Arena</FieldLegend>
@@ -173,7 +173,7 @@
         :open="openSuccess"
         :title="titleSuccess"
         @main="
-            togglePDF();
+            downloadPDF();
             openSuccess = false;
         "
     />
@@ -431,12 +431,28 @@
         purchaseId.value = apiOrders.data.data?.at(-1)?.id + 1 || 1;
     });
 
+    const getLastId = async () => {
+        const result = await axios.get(`${api}/purchaseOrder`);
+
+        return result.data.data?.at(-1)?.id + 1 || 1;
+    };
+
     const save = async (): Promise<void> => {
         const order = ref(null);
 
         if (true) {
             // Formateamos la orden de pedido
             const purchaseOrder = _formatPO();
+
+            // get last id
+            const lastId = await getLastId();
+            pdfInfo.value = purchaseOrder;
+            pdfInfo.value.purchaseOrder.id = lastId;
+
+            // deberia tener el resultado HTML del pdf
+            const pdfContent = await pdf.value?.getFileContent();
+            purchaseOrder.pdfContent = pdfContent;
+
             // Creamos via API la orden de pedido
             const pODone = ref(null);
             const error = ref(null);
@@ -466,7 +482,7 @@
                 openSuccess.value = true;
             }
         }
-        emit('updateQueueItem', order.value);
+        // emit('updateQueueItem', order.value);
     };
     // >> Success y Error Modal
     const openSuccess = ref(false);
@@ -531,6 +547,18 @@
 
     const orderIsComplete = () => {
         emit('orderIsComplete');
+    };
+
+    const pdf = ref(null);
+    const downloadPDF = async () => {
+        showPDF.value = true;
+        await pdf.value?.download();
+        showPDF.value = false;
+    };
+
+    const router = useRouter();
+    const redirectIndex = () => {
+        router.go(0);
     };
 </script>
 
