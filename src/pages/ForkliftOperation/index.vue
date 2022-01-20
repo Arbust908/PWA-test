@@ -121,7 +121,7 @@
         sortDir: 'desc',
     });
 
-    // La onda con esto es que los que ya estaban terminados se van aa "Borrar" despues d euna session en Finished
+    // La onda con esto es que los que ya estaban terminados se van aa "Borrar" despues de una session en Finished
     const itemToDelete = ref([] as QueueItem[]);
 
     const onPitUpdate = async () => {

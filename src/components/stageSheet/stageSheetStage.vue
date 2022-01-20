@@ -27,7 +27,7 @@
                 class="max-w-[16rem] w-full rounded border border-gray-200 shadow-sm px-5 py-7 self-start space-y-6"
             >
                 <StageSheetSandDetail
-                    v-for="sand in sands"
+                    v-for="(sand, key) in sands"
                     :key="sand.id + sand.type"
                     :type="sand.type"
                     :amount="sand.quantity"
@@ -155,7 +155,7 @@
     const isLoading = ref(false);
 
     const showProgress = computed(() => {
-        return stagePorcentage.value > 0 && stagePorcentage.value < 100;
+        return stagePorcentage.value > 0 /* && stagePorcentage.value <= 100 */;
     });
     const boxQueue: Ref<Array<number | SandOrder>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
 

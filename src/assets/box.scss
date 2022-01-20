@@ -126,7 +126,7 @@
 .box {
   @apply h-[58px] w-[58px] rounded;
   &.selected {
-    @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
+    @apply ring-2 ring-blue-500;
   }
   &.not-shown {
     @apply bg-zinc-600 cursor-not-allowed;

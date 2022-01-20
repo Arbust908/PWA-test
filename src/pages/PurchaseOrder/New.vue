@@ -626,7 +626,7 @@
     const getLastId = async () => {
         const result = await axios.get(`${api}/purchaseOrder`);
 
-        return result.data.data.at(-1).id + 1;
+        return result.data.data?.at(-1)?.id + 1 || 1;
     };
 
     const save = async () => {

@@ -166,8 +166,8 @@
         if (box.category == 'aisle' || box.category == 'cradle') {
             return;
         }
-
-        // Tembien deberiamos impedir que levantes cajas que no sean vacias
+        // ***
+        // TODO Tembien deberiamos impedir que levantes cajas que no sean vacias
         // code...
 
         const foundBox = inDepoBoxes.value.find(({ location }: SandOrderBox) => {
