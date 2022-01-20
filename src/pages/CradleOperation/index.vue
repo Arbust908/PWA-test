@@ -117,7 +117,6 @@
                 await axios
                     .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
                     .catch((err) => console.error(err));
-                console.log('selectedCradleCheckbox', selectedCradle.value);
 
                 return (cradleSlots.value[slotIndex].status = newStatus);
             };

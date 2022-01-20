@@ -21,7 +21,7 @@
         <tr>
             <th class="head">Estado</th>
             <td class="text-right">
-                <Badge v-if="sandPlan.stages[0].status === 0" class="bg-blue-700 rounded-lg" text="EN PROGRESO" />
+                <Badge v-if="sandPlan.stages[0].status === 0" class="bg-blue-600 rounded-lg" text="EN PROGRESO" />
                 <Badge v-else text="COMPLETA" />
             </td>
         </tr>

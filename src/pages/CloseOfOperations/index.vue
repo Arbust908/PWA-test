@@ -53,8 +53,10 @@
                         <div class="my-4 pl-8 text-left">
                             <input
                                 id="checkbox"
+                                v-model="sandPlan.isSelected"
                                 type="checkbox"
                                 class="outline-none focus:outline-none text-green-500 rounded mr-2"
+                                @change="addCheckedPits(sandPlan, sandPlan.isSelected)"
                             />
                             <span> {{ sandPlan.pit.name }} </span>
                         </div>
@@ -67,7 +69,7 @@
                         <div class="my-4 text-center">
                             <Badge
                                 v-if="sandPlan.stages[0].status === 0"
-                                class="bg-blue-700 rounded-lg"
+                                class="bg-blue-600 rounded-lg"
                                 text="EN PROGRESO"
                             />
                             <Badge v-else text="COMPLETA" />
@@ -136,22 +138,16 @@
             </section>
         </FieldGroup>
         <footer class="footerDesktop">
-            <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/home')"> Cancelar </SecondaryBtn>
             <PrimaryBtn btn="wide" size="md" @click.prevent="toggleModal()"> Finalizar Operación </PrimaryBtn>
         </footer>
 
-        <OrderModal
+        <CloseOperationModal
             v-if="showModal"
             :show-modal="showModal"
-            :driver="driverName"
-            :po-id="purchaseId"
-            :po="po"
-            :plates="filteredPlates"
+            :sand-plans="endingSandPlanPits"
             @close="showModal = false"
-            @confirm="
-                save();
-                openSuccess = true;
-            "
+            @confirm="openSuccess = true"
         />
 
         <SuccessModal
@@ -189,7 +185,7 @@
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
-    import OrderModal from '@/components/purchaseOrder/Modal.vue';
+    import CloseOperationModal from '@/components/closeOfOperation/CloseOperationModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
 
     import CloseOperationTable from '@/components/closeOfOperation/CloseOperationTable.vue';
@@ -208,13 +204,24 @@
     const stagesAmount = ref(0);
     const currentOpened = ref([]);
     const openSuccess = ref(false);
+    const atLeastOne = ref(false);
+    const endingSandPlanPits = ref([]);
+
+    const addCheckedPits = (sandPlan, check) => {
+        if (check) {
+            endingSandPlanPits.value.push(sandPlan);
+            console.log('entraInfo', endingSandPlanPits.value);
+        } else {
+            endingSandPlanPits.value = endingSandPlanPits.value.filter((EPSandPlan) => EPSandPlan.id !== sandPlan.id);
+            console.log('saleInfo', endingSandPlanPits.value);
+        }
+    };
+
+    // Modals
     const showModal = ref(false);
     const toggleModal = useToggle(showModal);
-    const atLeastOne = ref(false);
-
     const showErrorModal = ref(false);
     const toggleErrorModal = useToggle(showErrorModal);
-
     const showApiErrorModal = ref(false);
     const toggleApiErrorModal = useToggle(showApiErrorModal);
 
