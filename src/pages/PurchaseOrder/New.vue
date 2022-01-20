@@ -60,7 +60,7 @@
                             :title="orderKey === 0 ? 'Cantidad' : ''"
                             class="col-span-7 sm:col-span-3"
                             field-name="sandQuantity"
-                            placeholder="Arena"
+                            placeholder="0 t"
                             type="number"
                             mask="####"
                             validation-type="empty"
@@ -364,7 +364,7 @@
                 {
                     id: 0,
                     sandTypeId: -1,
-                    amount: 0,
+                    amount: null,
                     boxId: '',
                 },
             ],
