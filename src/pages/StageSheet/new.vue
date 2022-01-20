@@ -280,18 +280,21 @@
     onMounted(async () => {
         queueBoxes.value = await getQueueItems();
         queueBoxes.value = queueBoxes.value
-            ?.map((item) => {
-                const {
-                    sandOrder: { location },
-                } = item;
+            ?.filter((item) => item.sandOrder)
+            .map((item) => {
+                const { sandOrder } = item;
+                let location = {};
+
+                if (sandOrder) {
+                    location = sandOrder.location;
+                } else {
+                    console.log('No tenemos Location');
+                }
                 item.location = JSON.parse(location);
 
                 return item;
             })
             .filter((item) => item.location?.where === 'warehouse');
-
-        // const AllTheBoxes = await searchInDepoBoxes(1);
-        // console.log(AllTheBoxes);
     });
 </script>
 
