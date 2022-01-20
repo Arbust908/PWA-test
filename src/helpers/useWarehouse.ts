@@ -1,5 +1,5 @@
 import { useClone } from '@/helpers/useClone';
-import { SandOrder } from '@/interfaces/sandflow';
+import { SandOrder, SandOrderBox } from '@/interfaces/sandflow';
 
 import axios from 'axios';
 
@@ -146,11 +146,17 @@ export const getBoxClasses = (category: string) => {
 };
 
 export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
+    // console.groupCollapsed('getInDepoBoxes');
+    // console.log('boxes', boxes);
+    // console.log('boxes', [...boxes]);
+    // console.log('depoId', depoId);
     const boxy = boxes.filter((box) => {
         const { location } = box;
 
         return location && location.where === 'warehouse' && location.where_id === depoId;
     });
+    // console.log('boxy', boxy);
+    // console.groupEnd();
 
     return [...new Set(boxy)];
 };
@@ -161,6 +167,7 @@ export const searchInDepoBoxes = async (depoId: number) => {
 
     return getInDepoBoxes(allBoxes, depoId);
 };
+
 export const getSandOrders = async () => {
     return await axios
         .get(`${apiUrl}/sandOrder`)
@@ -169,9 +176,9 @@ export const getSandOrders = async () => {
         })
         .catch((err) => console.error(err));
 };
-export const formatBoxLocation = (box: SandOrder) => {
+export const formatBoxLocation = (box: SandOrder): SandOrderBox => {
     const { location } = box;
     box.location = JSON.parse(location);
 
-    return box;
+    return box as SandOrderBox;
 };

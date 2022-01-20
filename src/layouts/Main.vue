@@ -205,10 +205,11 @@
             const sidebarOpen = ref(false);
             const navigation = computed(() => {
                 const hasCustom = store.state.global.isCustom;
-                //Filtramos los items por permiso
+                // Filtramos los items por permiso
                 const navigationItems = JSON.parse(JSON.stringify(store.state.global.navigation));
-                //TODO: usar el permissionManager
-                const storePermissions = store.state.loggedUser.permissions || [];
+                // TODO: usar el permissionManager
+                // const storePermissions = store.state.loggedUser.permissions || [];
+                const storePermissions = store.getters.getUserPermissions;
                 const permissions = JSON.parse(JSON.stringify(storePermissions));
 
                 const fN = navigationItems.filter((nav) => {

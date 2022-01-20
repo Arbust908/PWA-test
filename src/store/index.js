@@ -29,8 +29,17 @@ const store = createStore({
         isGuest(state) {
             return state.loggedUser.role === 0;
         },
+        getLoggedUser(state) {
+            return state.loggedUser || null;
+        },
         getUserToken(state) {
             return state.loggedUser.token || null;
+        },
+        getUserPermissions(state) {
+            return state.loggedUser.permissions || [];
+        },
+        getUserVisibiliy(state) {
+            return state.loggedUser.visible;
         },
     },
     actions: {
@@ -40,10 +49,16 @@ const store = createStore({
         logOutUser({ commit }) {
             commit('SET_USER', { username: '', role: 0 });
         },
+        setUserPermissions({ commit }, permissions) {
+            commit('SET_USER_PERMISSIONS', permissions);
+        },
     },
     mutations: {
         SET_USER(state, payload) {
             state.loggedUser = payload;
+        },
+        SET_USER_PERMISSIONS(state, permissions) {
+            state.loggedUser.permissions = permissions;
         },
     },
     modules: {
