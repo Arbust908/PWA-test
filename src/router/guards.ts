@@ -111,7 +111,7 @@ export const isMobileAndLogged = (to: any, from: any, next: any) => {
 };
 
 export const checkPermission = (to: any, from: any, next: any) => {
-    const { permissions: storePermissions, visible } = store.state.loggedUser;
+    const { permissions: storePermissions, visible } = store.getters.getLoggedUser;
 
     if (!visible) {
         next({ name: 'Error-403' });
@@ -121,7 +121,6 @@ export const checkPermission = (to: any, from: any, next: any) => {
 
     //TODO: usar el permissionManager
     const permissions = JSON.parse(JSON.stringify(storePermissions));
-
     const actualRoute = to.name;
 
     // check if has permissions
