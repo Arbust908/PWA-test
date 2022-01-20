@@ -143,13 +143,6 @@
                     boxes.value = [];
                 }
             });
-
-            const selectedClientName = computed(() => {
-                return clientId.value >= 0 && clients.value.length > 0
-                    ? clients.value.find((client) => client.id === clientId.value)?.name
-                    : '';
-            });
-
             // :: PITS
             const pitId = ref(-1);
             const pits = ref([] as Array<Pit>);
@@ -158,11 +151,6 @@
                 if (pitApi && pitApi.data) {
                     pits.value = pitApi.data;
                 }
-            });
-            const selectedPitName = computed(() => {
-                return pitId.value >= 0 && pits.value.length > 0
-                    ? pits.value.find((pit) => pit.id === pitId.value)?.name
-                    : '';
             });
 
             const showPurchaseOrder = ref(false);
@@ -178,6 +166,7 @@
                         return res.data.data;
                     })
                     .catch((err) => console.error(err));
+                boxes.value = boxes.value.filter((box) => box.sandOrder);
             };
 
             const updateQueueItem = () => {
