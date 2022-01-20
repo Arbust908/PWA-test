@@ -145,12 +145,22 @@ export const createAllQueueItems = async (queue: Array<QueueItem>) => {
     return Promise.all(queueItems);
 };
 
+export const removeQueueItems = async (queue: Array<QueueItem>) => {
+    const queueItems = queue.map((queueItem) => {
+        queueItem.status = 100;
+
+        return updateQueueItem(queueItem);
+    });
+
+    return Promise.all(queueItems);
+};
+
 export const itemIsFinished = (queueItem: QueueItem) => {
     return queueItem.status === 99;
 };
 
 export const itemIsNotDone = (queueItem: QueueItem) => {
-    return queueItem.status !== 99;
+    return queueItem.status < 99;
 };
 
 export const itemIsNotToEmpty = (queueItem: QueueItem) => {

@@ -32,7 +32,6 @@
                 />
                 <FieldWithSides
                     :data="sandProviderId > 0 ? box.amount : 0"
-                    @update:data="box.amount = $event"
                     :title="orderKey === 0 ? 'Cantidad' : ''"
                     class="col-span-7 sm:col-span-3"
                     field-name="sandQuantity"
@@ -42,6 +41,7 @@
                     validation-type="empty"
                     :number-validation="useFirstSQ"
                     :post="{ title: '0', value: 't', width: '3rem' }"
+                    @update:data="box.amount = $event"
                 />
                 <FieldInput
                     :title="orderKey === 0 ? 'ID de caja' : ''"
@@ -428,7 +428,7 @@
         const apiDrivers = await axios.get(`${api}/driver`);
         drivers.value = apiDrivers.data.data;
         const apiOrders = await axios.get(`${api}/purchaseOrder`);
-        purchaseId.value = apiOrders.data.data.at(-1).id + 1;
+        purchaseId.value = apiOrders.data.data?.at(-1)?.id + 1 || 1;
     });
 
     const save = async (): Promise<void> => {

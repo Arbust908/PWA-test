@@ -112,7 +112,7 @@
         const [deDonde, aDonde] = to.split('A');
         /**
          * Esto es a modo ilustrativo
-         * Si es cradle deberia decir "Estacion {Numero}"
+         * Si es cradle deberia decir "Estación {Numero}"
          * Si es Camion deberia decir "Camion {Patente}"
          * Si es Deposito deberia ser "F{fila} C{Columna} N{Nivel}"
          */

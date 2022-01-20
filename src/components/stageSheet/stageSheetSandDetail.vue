@@ -5,12 +5,14 @@
             <h4>Arena {{ type }}</h4>
             <p class="text-gray-400">{{ amount }} toneladas</p>
         </article>
-        <article
-            ref="progress"
-            class="w-[70px] rounded flex justify-center items-center ml-auto"
-            :class="stagePorcentageVariable"
-        >
-            <div class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center circle-progress">
+        <article class="w-[70px] rounded flex justify-center items-center ml-auto">
+            <div
+                :style="{
+                    color: 'red',
+                    'background-image': `conic-gradient(#00a75d 0%, #00a75d ${porcentage}, #c4c4c4 ${porcentage}, #c4c4c4 100%);`,
+                }"
+                class="w-11 h-11 rounded-full bg-gray-700 flex justify-center items-center progress"
+            >
                 <p class="w-9 h-9 rounded-full bg-white flex justify-center items-center text-[10px]">
                     {{ porcentage.toFixed() }}%
                 </p>
@@ -34,17 +36,13 @@
             required: true,
         },
     });
-    const { porcentage } = toRefs(props);
-    const progress = ref(null);
-    const stagePorcentageVariable = useCssVar('--progress', progress);
-    watch(porcentage, () => {
-        stagePorcentageVariable.value = props.porcentage + '%';
-    });
-    stagePorcentageVariable.value = props.porcentage + '%';
+    const { type, amount, porcentage } = toRefs(props);
+
+    const progrssBar = `conic-gradient(#00a75d 0%, #00a75d ${porcentage}, #c4c4c4 ${porcentage}, #c4c4c4 100%);`;
 </script>
 
-<style scoped lang="scss">
-    .circle-progress {
-        background-image: conic-gradient(#00a75d 0%, #00a75d var(--progress), #c4c4c4 var(--progress), #c4c4c4 100%);
+<style lang="scss" scoped>
+    .progress {
+        background-image: v-bind(progrssBar);
     }
 </style>

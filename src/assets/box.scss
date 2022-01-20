@@ -138,9 +138,9 @@
   };
 };
 .box {
-  @apply h-[58px] w-[58px] rounded;
+  @apply h-[58px] w-[58px] rounded transition duration-150 ease-out;
   &.selected {
-    @apply ring-2 ring-offset-second-0 ring-offset-2 ring-main-500;
+    // Nada auno
   }
   &.not-clickable{
     @apply cursor-not-allowed
