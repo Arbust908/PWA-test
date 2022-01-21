@@ -9,7 +9,9 @@
                         :pit-id="pitId"
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
+                        v-model:wo-id="woId"
                         validation-type="empty"
+                        :pads="true"
                     />
                     <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de filas</h3>
@@ -137,6 +139,7 @@
             const instance = axios.create({
                 baseURL: apiUrl,
             });
+            const woId = ref(-1);
 
             const sandTypes = ref([]);
             const sandName = computed(() => {
@@ -368,6 +371,7 @@
                 save,
                 sandTypes,
                 sandName,
+                woId,
             };
         },
     });

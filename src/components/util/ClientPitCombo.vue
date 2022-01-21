@@ -16,7 +16,8 @@
         <FieldLoading v-else />
         <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" :validation-type="validationType" />
     </div>
-    <div :class="sharedClasses">
+    {{ woId }}
+    <div v-if="!pads" :class="sharedClasses">
         <FieldSelect
             v-if="pits.length > 0"
             field-name="pit"
@@ -32,6 +33,9 @@
         <FieldLoading v-else />
         <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" :validation-type="validationType" />
     </div>
+    <div v-if="pads" :class="sharedClasses">
+        <PadSelector :client-id="clientId" v-model:woId="woId" />
+    </div>
 </template>
 
 <script lang="ts">
@@ -43,6 +47,7 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLoading from '@/components/ui/form/FieldLoading.vue';
     import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
+    import PadSelector from '@/components/util/PadSelector.vue';
 
     export default defineComponent({
         name: 'ClientPitCombo',
@@ -50,6 +55,7 @@
             FieldSelect,
             FieldLoading,
             InvalidInputLabel,
+            PadSelector,
         },
         props: {
             clientId: {
@@ -72,9 +78,17 @@
                 type: String,
                 required: false,
             },
+            pads: {
+                type: Boolean,
+                default: false,
+            },
+            woId: {
+                type: Number,
+                required: false,
+            },
         },
         setup(props, { emit }) {
-            const { clientId, pitId } = useVModels(props, emit);
+            const { clientId, pitId, woId } = useVModels(props, emit);
             const { read: getClients } = useApi('/company');
             const backupClients = getClients();
             const clients = ref([] as Array<Company>);
@@ -163,6 +177,7 @@
                 InvalidInputLabel,
                 useFirstClient,
                 useFirstPit,
+                woId,
             };
         },
     });
