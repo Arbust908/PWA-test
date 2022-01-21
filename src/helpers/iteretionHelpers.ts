@@ -19,9 +19,15 @@ export const useIfNotLonly = (array: any[]): boolean => {
     return notLonly(array);
 };
 
-export const getLast = (array: any[]): any => {
+/**
+ * El último del Array
+ *
+ * @param array El array del que queremos la última posición
+ * @returns La ultima posición
+ */
+export function getLast(array: Array<any>) {
     return array[array.length - 1];
-};
+}
 
 export default {
     useOnFirst,

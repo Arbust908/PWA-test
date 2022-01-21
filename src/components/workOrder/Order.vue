@@ -47,7 +47,6 @@
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
     import PitFields from '@/components/workOrder/woPitField.vue';
 
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
     import { Pit } from '@/interfaces/sandflow';
 
     const props = defineProps({
@@ -70,7 +69,6 @@
     });
     const emits = defineEmits(['update:clientId', 'update:serviceCompanyId', 'update:pad', 'update:pits', 'removePit']);
     const { clientId: cId, serviceCompanyId: scId, pad: pd, pits: pt } = useVModels(props, emits);
-    console.log(pt.value);
     const removePit = (pitId: number) => {
         pt.value = pt.value.filter((pit: Pit) => {
             return pit.innerId !== pitId;

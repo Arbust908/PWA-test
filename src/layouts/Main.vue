@@ -162,7 +162,7 @@
                 </div>
             </div>
 
-            <main class="flex-1 relative overflow-y-auto focus:outline-none p-4 md:p-6 lg:p-8 gutter-stable-both">
+            <main class="flex-1 relative overflow-y-auto focus:outline-none p-2 md:p-4 gutter-stable-both">
                 <div class="max-w-7xl">
                     <slot></slot>
                 </div>
@@ -205,22 +205,19 @@
             const sidebarOpen = ref(false);
             const navigation = computed(() => {
                 const hasCustom = store.state.global.isCustom;
-
-                // if (hasCustom) {
-                //     console.log('has custom');
-
-                //     return store.state.global.navigation;
-                // }
-                //Filtramos los items por permiso
+                // Filtramos los items por permiso
                 const navigationItems = JSON.parse(JSON.stringify(store.state.global.navigation));
-                //TODO: usar el permissionManager
-                const storePermissions = store.state.loggedUser.permissions || [];
+                // TODO: usar el permissionManager
+                const storePermissions = store.getters.getUserPermissions;
                 const permissions = JSON.parse(JSON.stringify(storePermissions));
-                // console.log('permissions', permissions);
 
                 const fN = navigationItems.filter((nav) => {
                     if (nav.name === 'LINE') {
                         return true;
+                    }
+
+                    if (nav.keep) {
+                        return nav.keep;
                     }
 
                     if (nav.subNav) {
@@ -233,10 +230,6 @@
 
                     return permissions.view.includes(nav.title);
                 });
-                // store.commit('SET_NEW_NAVIGATION', fN);
-                // store.commit('SET_CUSTOM');
-
-                // console.log('Custome', fN);
 
                 return fN;
             });

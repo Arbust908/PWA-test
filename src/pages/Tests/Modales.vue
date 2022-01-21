@@ -18,21 +18,18 @@
     const showPO = ref(false);
     const closePOModal = useToggle(showPO);
     const actionPOModal = () => {
-        console.log('actionPOModal');
         closePOModal(false);
     };
 
     const showErrorModal = ref(false);
     const closeErrorModal = useToggle(showErrorModal);
     const actionErrorModal = () => {
-        console.log('actionErrorModal');
         closeErrorModal(false);
     };
 
     const showSuccessModal = ref(false);
     const closeSuccessModal = useToggle(showSuccessModal);
     const actionSuccessModal = () => {
-        console.log('actionSuccessModal');
         closeSuccessModal(false);
     };
 </script>

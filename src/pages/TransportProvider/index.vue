@@ -13,7 +13,7 @@
             />
         </div>
         <VTable
-            class="mt-5"
+            class="mt-5 min-w-full lg:min-w-min"
             :columns="columns"
             :pagination="pagination"
             :items="filteredTransportProviders"

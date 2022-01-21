@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
+        <header class="flex flex-col md:flex-row items-center md:mb-4">
             <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Operación en cradle</h1>
         </header>
         <section class="bg-second-0 rounded-md shadow-sm">
@@ -21,304 +21,279 @@
                         />
                     </span>
                 </FieldGroup>
+
                 <fieldset class="py-2 col-span-6 flex flex-col gap-x-10 2xl:gap-x-40">
-                    <h2 class="text-xl font-bold mb-4">Estaciones</h2>
+                    <h2 class="text-xl font-bold mb-4">Estaciónes</h2>
                     <FieldSelect
+                        v-model:data="cradleId"
                         class="cradle-col"
                         title="Cradle"
                         field-name="cradle"
                         placeholder="Seleccionar cradle"
                         endpoint-key="name"
                         :endpoint-data="filteredCradles"
-                        :data="cradleId"
-                        @update:data="cradleId = $event"
                     />
                 </fieldset>
             </form>
-            <section v-if="cradleId < 0" class="cradle-slots">
-                <div v-for="(slot, index) in cradleSlots" :key="index">
-                    <div class="slot empty">
-                        <span class="station-title">Estación {{ index + 1 }}</span>
-                        <span class="copy">Seleccione cliente, etapa y cradle.</span>
-                    </div>
-                    <!-- <button class="calibrate">Calibrar E{{ index + 1 }}</button> -->
-                </div>
-            </section>
-            <section v-else class="cradle-slots">
-                <div v-for="(slot, index) in cradleSlots" :key="index">
-                    <div v-if="slot.boxId" class="slot">
-                        <span class="station-title">Estación {{ index + 1 }} - {{ slot.boxId }}</span>
-                        <div class="cradle-status-wrapper">
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '1')">
-                                <div class="icon-wrapper check" :class="[slot.status == '1' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '1'" icon="Check" class="icon" />
-                                </div>
-                                En ejecución
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '2')">
-                                <div class="icon-wrapper pause" :class="[slot.status == '2' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '2'" icon="Pause" type="outline" class="icon" />
-                                </div>
-                                Pausa
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '3')">
-                                <div class="icon-wrapper empty" :class="[slot.status == '3' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '3'" icon="Minus" class="icon" />
-                                </div>
-                                Vacía
-                            </span>
-                            <span class="cradle-status" @click.prevent="changeCradleSlotStatus(index, '0')">
-                                <div class="icon-wrapper unavailable" :class="[slot.status == '0' ? 'active' : '']">
-                                    <Icon v-if="slot.status == '0'" icon="X" class="icon" />
-                                </div>
-                                No disponible
-                            </span>
-                        </div>
-                        <hr class="border-gray-300" />
-                        <div class="cradle-data-wrapper">
-                            <span class="cradle-data">
-                                <Icon icon="InformationCircle" class="icon" />
-                                {{ slot.amount }}T peso remito
-                            </span>
-                            <!-- <span class="cradle-data">
-                <Icon icon="InformationCircle" class="icon"/>
-                15T peso actual
-              </span> -->
-                            <span class="cradle-data">
-                                <Icon icon="InformationCircle" class="icon" />
-                                Arena: {{ slot.sandType }}
-                            </span>
-                        </div>
-                    </div>
-                    <div v-else class="slot without-box">
-                        <span class="station-title">Estación {{ index + 1 }} - Sin caja</span>
-                    </div>
-                    <!-- <button class="calibrate">Calibrar E{{ index + 1 }}</button> -->
-                </div>
+            <section class="cradle-slots">
+                <CradleSlot
+                    v-for="(slot, index) in cradleSlots"
+                    :key="index"
+                    :cradles="cradles"
+                    :index="index"
+                    :cradle-slots="cradleSlots"
+                    :box="slot"
+                    @selected-slots="SelectSlot(slot), getSelectedSandOrder(slot)"
+                    @change-cradle-slot-status="changeCradleSlotStatus($event[0], $event[1])"
+                />
             </section>
         </section>
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
-            <SecondaryBtn btn="wide" @click.prevent="requestEmptyBoxHandle">Solicitar retiro vacía</SecondaryBtn>
-            <PrimaryBtn btn="wide" type="submit" @click.prevent="completeStageHandle"> Finalizar </PrimaryBtn>
+            <PrimaryBtn
+                btn="wide"
+                type="submit"
+                :disabled="!canRequest"
+                :is-loading="isLoading"
+                @click.prevent="canRequest && requestEmptyBoxHandle"
+            >
+                Solicitar retiro
+            </PrimaryBtn>
         </footer>
-        <Modal type="off" :open="isModalVisible" class="modal" @close="toggleModal">
-            <template #body>
-                <Icon icon="check" class="mx-auto mb-4 w-16 h-16 text-green-400" />
-                <p class="mb-4 text-lg text-gray-600">{{ modalMessage }}</p>
-                <PrimaryBtn btn="confirm-button" @click.prevent="toggleModal">{{ modalButtonText }}</PrimaryBtn>
-            </template>
-        </Modal>
+        <SuccessModal :open="isModalVisible" :title="ModalText" @main="confirmModal" @close="confirmModal" />
     </Layout>
 </template>
 
-<script lang="ts">
-    import { ref, computed, defineComponent, onMounted, watchEffect } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
+<script setup lang="ts">
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import Modal from '@/components/modal/General.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
+    import SuccessModal from '@/components/modal/SuccessModal.vue';
 
-    import { Company, Pit } from '@/interfaces/sandflow';
+    import { Company, Pit, QueueItem } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import CradleSlot from '@/components/Cradle/cradleSlot.vue';
 
     import axios from 'axios';
+
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-    export default defineComponent({
-        components: {
-            SecondaryBtn,
-            Layout,
-            PrimaryBtn,
-            ClientPitCombo,
-            FieldGroup,
-            FieldSelect,
-            Modal,
-            Icon,
-        },
-        setup() {
-            useTitle('Operación en cradle <> Sandflow');
+    useTitle('Operación en cradle <> Sandflow');
 
-            const workOrders = ref([]);
-            const clients = ref([] as Array<Company>);
-            const pits = ref([] as Array<Pit>);
-            const clientId = ref(-1);
-            const pitId = ref(-1);
-            const cradles = ref([]);
-            const cradleId = ref(-1);
-            const filteredCradles = ref([]);
-            const cradleSlots = ref([{}, {}, {}, {}]);
-            const modalMessage = ref('');
-            const modalButtonText = ref('');
-            const isModalVisible = ref(false);
-            const selectedCradle = ref({});
-            const sandTypes = ref([]);
+    const workOrders = ref([]);
+    const clients = ref([] as Array<Company>);
+    const pits = ref([] as Array<Pit>);
+    const clientId = ref(-1);
+    const pitId = ref(-1);
+    const cradles = ref([]);
+    const cradleId = ref(-1);
+    const filteredCradles = ref([]);
+    const cradleSlots = ref([{}, {}, {}, {}]);
+    const modalMessage = ref('');
+    const modalButtonText = ref('');
+    const isModalVisible = ref(false);
+    const selectedCradle = ref({});
+    const sandTypes = ref([]);
+    const ModalText = 'La solicitud de retiro de cajas fue enviada con éxito';
+    const selectedSlots = ref([]);
+    const sandOrdersOriginal = ref([]);
+    const selectedSandOrders = ref([]);
 
-            const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
-                await axios
-                    .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
-                    .catch((err) => console.error(err));
+    const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
+        await axios
+            .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
+            .catch((err) => console.error(err));
 
-                return (cradleSlots.value[slotIndex].status = newStatus);
-            };
+        cradleSlots.value[slotIndex].status = newStatus;
+    };
 
-            const toggleModal = () => {
-                return (isModalVisible.value = !isModalVisible.value);
-            };
+    const getSelectedSandOrder = (slot: any) => {
+        const findSandOrderOriginalId = sandOrdersOriginal.value.find(
+            (sandOrderOriginal) => sandOrderOriginal.id === slot.id
+        ).id;
 
-            const getWorkOrders = async () => {
-                await axios
-                    .get(`${apiUrl}/workOrder`)
-                    .then((res) => {
-                        workOrders.value = res.data.data;
-                    })
-                    .catch((err) => console.error(err));
-            };
+        if (!selectedSandOrders.value.some((sandOrder) => sandOrder.id === findSandOrderOriginalId)) {
+            selectedSandOrders.value.push(
+                sandOrdersOriginal.value.find((sandOrderOriginal) => sandOrderOriginal.id === slot.id)
+            );
+        } else {
+            const deleteIndex = selectedSandOrders.value.findIndex(
+                (sandOrder) => sandOrder.id === findSandOrderOriginalId
+            );
+            selectedSandOrders.value.splice(deleteIndex, 1);
+        }
+    };
 
-            const getCradles = async () => {
-                await axios
-                    .get(`${apiUrl}/cradle`)
-                    .then((res) => {
-                        cradles.value = res.data.data;
-                    })
-                    .catch((err) => console.error(err));
-            };
+    const SelectSlot = (slot: any) => {
+        let hasSlots = selectedSlots.value.find((insideSlot) => {
+            return insideSlot.id === slot.id;
+        });
 
-            const getSandTypes = async () => {
-                await axios
-                    .get(`${apiUrl}/sand`)
-                    .then((res) => {
-                        sandTypes.value = res.data.data;
-                    })
-                    .catch((err) => {
-                        console.error(err);
-                    });
-            };
-
-            onMounted(async () => {
-                await getWorkOrders();
-                await getCradles();
-                await getSandTypes();
+        if (hasSlots) {
+            selectedSlots.value = selectedSlots.value.filter((insideSlot) => {
+                return insideSlot.id !== slot.id;
             });
+        } else {
+            selectedSlots.value.push(slot);
+        }
+    };
+    const router = useRouter();
+    const routerGo = () => {
+        router.go(0);
+    };
 
-            const selectionsAreDone = computed(() => {
-                if (clientId.value >= 0 && pitId.value >= 0) {
-                    return true;
-                }
+    const confirmModal = () => {
+        return toggleModal() && setTimeout(routerGo, 2000);
+    };
+
+    const toggleModal = () => {
+        return (isModalVisible.value = !isModalVisible.value);
+    };
+
+    const getWorkOrders = async () => {
+        await axios
+            .get(`${apiUrl}/workOrder`)
+            .then((res) => {
+                workOrders.value = res.data.data;
+            })
+            .catch((err) => console.error(err));
+    };
+
+    const getCradles = async () => {
+        await axios
+            .get(`${apiUrl}/cradle`)
+            .then((res) => {
+                cradles.value = res.data.data;
+            })
+            .catch((err) => console.error(err));
+    };
+
+    const getSandTypes = async () => {
+        await axios
+            .get(`${apiUrl}/sand`)
+            .then((res) => {
+                sandTypes.value = res.data.data;
+            })
+            .catch((err) => {
+                console.error(err);
             });
+    };
 
-            const getFilteredCradles = () => {
-                let cradlesToFilter = [];
+    const getFilteredCradles = () => {
+        let cradlesToFilter = [];
 
-                workOrders.value.forEach((workOrder) => {
-                    workOrder.pits.forEach((pit) => {
-                        if (pit.id == pitId.value) {
-                            if (workOrder.operativeCradle !== '-1') {
-                                cradlesToFilter.push(workOrder.operativeCradle);
-                            }
-
-                            if (workOrder.backupCradle !== '-1') {
-                                cradlesToFilter.push(workOrder.backupCradle);
-                            }
-                        }
-                    });
-                });
-
-                filteredCradles.value = cradles.value.filter((cradle) => {
-                    if (cradlesToFilter.includes(cradle.id.toString())) {
-                        return cradle;
+        workOrders.value.forEach((workOrder) => {
+            workOrder.pits.forEach((pit) => {
+                if (pit.id == pitId.value) {
+                    if (workOrder.operativeCradle !== '-1') {
+                        cradlesToFilter.push(workOrder.operativeCradle);
                     }
+
+                    if (workOrder.backupCradle !== '-1') {
+                        cradlesToFilter.push(workOrder.backupCradle);
+                    }
+                }
+            });
+        });
+
+        filteredCradles.value = cradles.value.filter((cradle) => {
+            if (cradlesToFilter.includes(cradle.id.toString())) {
+                return cradle;
+            }
+        });
+    };
+
+    watchEffect(async () => {
+        if (cradleId.value !== -1) {
+            selectedCradle.value = cradles.value.filter((cradle) => {
+                return cradle.id == cradleId.value;
+            })[0];
+
+            cradleSlots.value = selectedCradle.value.slots;
+
+            cradleSlots.value.forEach((slot) => {
+                const { sandTypeId } = slot;
+                let sandType = sandTypes.value.find((sandType) => {
+                    return sandType.id == sandTypeId;
                 });
-            };
 
-            watchEffect(async () => {
-                if (cradleId.value !== -1) {
-                    selectedCradle.value = cradles.value.filter((cradle) => {
-                        return cradle.id == cradleId.value;
-                    })[0];
-                    cradleSlots.value = selectedCradle.value.slots;
-                    cradleSlots.value.forEach((slot) => {
-                        const { sandTypeId } = slot;
-                        let sandType = sandTypes.value.filter((sandType) => {
-                            if (sandType.id == sandTypeId) {
-                                return sandType;
-                            }
-                        })[0].type;
-                        slot.sandType = sandType;
-                    });
+                if (sandType) {
+                    sandType = sandType.type;
                 }
 
-                if (cradles.value.length > 0 && clientId.value >= 0 && pitId.value >= 0) {
-                    await getFilteredCradles();
+                slot.sandType = sandType;
+            });
+        }
+
+        if (cradles.value.length > 0 && clientId.value >= 0 && pitId.value >= 0) {
+            await getFilteredCradles();
+        }
+    });
+
+    const defaultQueueItem: QueueItem = {
+        sandOrderId: -1,
+        pitId: -1,
+        origin: '',
+        destination: '',
+        status: 0,
+        order: -1,
+    };
+
+    const canRequest = computed(() => {
+        return selectedSandOrders.value.length > 0;
+    });
+
+    const isLoading = ref(false);
+
+    const requestEmptyBoxHandle = async () => {
+        isLoading.value = true;
+        selectedSlots.value.forEach((selectedSlot) => {
+            const slotPosition = selectedSlot?.location?.where_slot;
+            cradleSlots.value[slotPosition] = { boxId: null };
+            const newQI = { ...defaultQueueItem };
+            newQI.status = 10;
+            newQI.origin = selectedSlot?.location?.where_origin;
+            newQI.pitId = pitId.value;
+            newQI.sandOrderId = selectedSlot.id;
+
+            createQueueItem(newQI);
+        });
+
+        selectedSandOrders.value.forEach((sandOrder) => {
+            sandOrder.status = 11;
+            axios.put(`${apiUrl}/sandOrder/${sandOrder.id}`, sandOrder).catch((err) => console.error(err));
+        });
+        const updateCradle = { ...selectedCradle.value };
+        updateCradle.slots = cradleSlots.value;
+        await axios
+            .put(`${apiUrl}/cradle/${updateCradle.id}`, updateCradle)
+            .then((res) => {
+                if (res.request.status == 200) {
+                    confirmModal();
                 }
-            });
+            })
+            .catch((err) => console.error(err));
+        isLoading.value = false;
+    };
 
-            // :: CLIENT
-            const selectedClientName = computed(() => {
-                return clientId.value >= 0 ? clients.value.find((pit) => pit.id === clientId.value).name : '';
-            });
-            // << CLIENT
-            // :: PITS
-            const selectedPitName = computed(() => {
-                return pitId.value >= 0 ? pits.value.find((pit) => pit.id === pitId.value).name : '';
-            });
-            // << PITS
-            const designName = computed(() => {
-                return selectedClientName.value !== '' && selectedPitName.value !== ''
-                    ? `${selectedPitName.value} - ${selectedClientName.value}`
-                    : selectedClientName.value !== ''
-                    ? selectedClientName.value
-                    : selectedPitName.value !== ''
-                    ? selectedPitName.value
-                    : '';
-            });
+    const createQueueItem = async (queueItem: QueueItem) => {
+        await axios
+            .post(`${apiUrl}/queueItem/`, queueItem)
+            .then((response) => {
+                if (response.request.status == 200) {
+                    console.log(queueItem, 'se guardo bien');
+                }
+            })
+            .catch((err) => console.error(err));
+    };
 
-            const requestEmptyBoxHandle = () => {
-                modalMessage.value = 'La solicitud de retiro de caja vacía fue enviada con éxito.';
-                modalButtonText.value = 'Continuar';
-                toggleModal();
-            };
-
-            const completeStageHandle = async () => {
-                await axios
-                    .put(`${apiUrl}/cradle/${selectedCradle.value.id}`, selectedCradle.value)
-                    .then((res) => {
-                        if (res.request.status == 200) {
-                            modalMessage.value = '¡Etapa finalizada con éxito!';
-                            modalButtonText.value = 'Próximo stage';
-                            toggleModal();
-                        }
-                    })
-                    .catch((err) => console.error(err));
-            };
-
-            return {
-                clients,
-                pits,
-                clientId,
-                cradleId,
-                pitId,
-                designName,
-                requestEmptyBoxHandle,
-                completeStageHandle,
-                selectionsAreDone,
-                cradles,
-                workOrders,
-                filteredCradles,
-                cradleSlots,
-                modalButtonText,
-                modalMessage,
-                toggleModal,
-                isModalVisible,
-                changeCradleSlotStatus,
-            };
-        },
+    onMounted(async () => {
+        const result = await axios.get(`${apiUrl}/sandOrder`);
+        sandOrdersOriginal.value = result.data.data;
+        await getWorkOrders();
+        await getCradles();
+        await getSandTypes();
     });
 </script>
 
@@ -329,9 +304,12 @@
             max-width: 18rem;
         }
     }
+    .ring {
+        @apply ring-inset ring-green-600;
+    }
     .cradle-data-wrapper,
     .cradle-status-wrapper {
-        @apply flex flex-col text-left justify-between;
+        @apply flex flex-col text-left;
     }
     .cradle-status-wrapper {
         @apply mb-4;
@@ -403,40 +381,8 @@
         }
     }
     .cradle-slots {
-        @apply pl-12 pr-12 pb-12 grid grid-cols-1 gap-4 justify-between items-center;
-
-        @screen lg {
-            @apply grid-cols-4;
-        }
-
-        .slot {
-            min-height: 400px;
-            @apply border-dashed border-2 border-second-300 rounded-lg p-4 cursor-pointer flex flex-col text-center;
-
-            &:not(.empty) {
-                @apply justify-between bg-gray-100 border-none;
-            }
-
-            &.without-box {
-                @apply text-gray-100 bg-white justify-center items-center border-dashed border-2 border-second-300 cursor-default;
-
-                .station-title {
-                    @apply pb-0 pt-0;
-                }
-            }
-
-            .station-title {
-                @apply text-lg font-bold text-gray-400 pb-16 pt-4;
-            }
-
-            .copy {
-                @apply text-lg;
-            }
-        }
-
-        button.calibrate {
-            @apply rounded-md bg-purple-300 text-white mt-4 w-full p-2;
-        }
+        grid-template-columns: repeat(auto-fit, 220px);
+        @apply p-12 pt-0 grid gap-4 items-center lg:gap-6;
     }
     .section-tab {
         @apply py-2 border-b-4 w-full font-bold text-gray-400 flex justify-center items-center gap-2;

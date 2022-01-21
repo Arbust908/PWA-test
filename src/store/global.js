@@ -47,6 +47,34 @@ const Stage_Sheet = {
     icon: 'DocumentReport',
     title: 'StageSheet',
 };
+const Forklift_Operation = {
+    name: 'Operacion en forklift',
+    to: '/operacion-en-forklift',
+    icon: 'SwitchHorizontal',
+    title: 'ForkliftOperation',
+    // keep: true,
+};
+const Close_Of_Operations = {
+    name: 'Cierre de operaciones',
+    to: '/cierre-de-operaciones',
+    icon: 'Briefcase',
+    title: 'CloseOfOperations',
+    keep: true,
+};
+const Deposito_de_cajas_vacias = {
+    name: 'Depósito de cajas vacias',
+    to: '/deposito-cajas-vacias',
+    icon: 'Archive',
+    title: 'EmptyBoxDeposit',
+    // keep: true,
+};
+const Destino_de_cajas_vacias = {
+    name: 'Destino de cajas vacias',
+    to: '/Destino-cajas-vacias',
+    icon: 'Archive',
+    title: 'EmptyBoxDestiny',
+    // keep: true,
+};
 const LINE = {
     name: 'LINE',
 };
@@ -104,6 +132,10 @@ export default {
             Ingreso_de_cajas,
             Operación_en_Cradle,
             Stage_Sheet,
+            Deposito_de_cajas_vacias,
+            Destino_de_cajas_vacias,
+            Forklift_Operation,
+            Close_Of_Operations,
             LINE,
             {
                 name: 'Proveedores',

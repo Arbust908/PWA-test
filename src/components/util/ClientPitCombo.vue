@@ -5,7 +5,6 @@
             field-name="client"
             placeholder="Seleccionar cliente"
             title="Cliente"
-            require-validation
             :endpoint-data="clients"
             :data="clientId"
             :is-disabled="isDisabled"
@@ -14,7 +13,7 @@
             @click="useFirstClient = true"
         />
         <FieldLoading v-else />
-        <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" :validation-type="validationType" />
+        <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" validation-type="empty" />
     </div>
     <div :class="sharedClasses">
         <FieldSelect
@@ -30,7 +29,7 @@
             @click="useFirstPit = true"
         />
         <FieldLoading v-else />
-        <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" :validation-type="validationType" />
+        <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" validation-type="empty" />
     </div>
 </template>
 
@@ -67,10 +66,6 @@
             sharedClasses: {
                 type: String,
                 default: 'col-span-full md:col-span-6',
-            },
-            validationType: {
-                type: String,
-                required: false,
             },
         },
         setup(props, { emit }) {
@@ -117,7 +112,7 @@
                 }, 100);
             };
             const selectClientByPit = (idOfPit: number) => {
-                const curPit = backupPits.value.find((pit: Pit) => {
+                const curPit = backupPits.value?.find((pit: Pit) => {
                     return pit.id == idOfPit;
                 });
 
@@ -150,7 +145,6 @@
             const useFirstClient = ref(false);
             watch(useFirstClient, (newVal) => {
                 useFirstClient.value = newVal;
-                console.log(useFirstClient.value);
             });
             const useFirstPit = ref(false);
 

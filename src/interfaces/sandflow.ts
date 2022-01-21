@@ -29,8 +29,8 @@ export interface Pickup {
 }
 export interface HumanResource {
     id?: number;
-    role: string;
-    name: string;
+    role: string | number;
+    name: string | number;
     crewId: number;
     crew?: Crew;
 }
@@ -127,7 +127,7 @@ export interface Cradle {
     id?: number;
     name: string;
     observations?: string;
-    slots?: string;
+    slots?: any[];
     visible: boolean;
     stageSheets?: StageSheet[];
     backupStageSheets?: StageSheet[];
@@ -172,9 +172,12 @@ export interface SandStage {
     sandB?: Sand;
     sandId3: number;
     sandC?: Sand;
+    sandId4: number;
+    sandD?: Sand;
     quantity1: number;
     quantity2: number;
     quantity3: number;
+    quantity4: number;
     action?: 'create' | 'update' | 'delete';
     sandPlanId: number;
     sandPlan?: SandPlan;
@@ -202,6 +205,34 @@ export interface SandOrder {
     status: number;
     location: string;
     sandType?: Sand;
+    purchaseOrder?: PurchaseOrder;
+    sandProvider?: SandProvider;
+}
+
+// "{\"where\":\"warehouse\",\"where_id\":1,\"floor\":1,\"row\":2,\"col\":5}"
+// {\"where\":\"cradle\",\"where_id\":4,\"where_slot\":2,\"where_origin\":\"Estación 3\"}"
+interface BoxLocation {
+    where?: string;
+    where_id?: number;
+    floor?: number;
+    row?: number;
+    col?: number;
+    origin?: string;
+    origin_id?: number;
+}
+export interface SandOrderBox {
+    id?: number;
+    sandTypeId: number;
+    amount: number;
+    purchaseOrderId: number;
+    sandProviderId: number;
+    boxId?: string;
+    status: number;
+    location: BoxLocation;
+    sandType?: Sand;
+    floor?: number;
+    row?: number;
+    column?: number;
     purchaseOrder?: PurchaseOrder;
     sandProvider?: SandProvider;
 }
@@ -252,7 +283,8 @@ export interface PurchaseOrder {
 export interface TransportOrder {
     id?: number;
     boxAmount: string;
-    licensePlate: string;
+    driverId?: number;
+    licensePlate?: string;
     observations: string;
     purchaseOrderId: number;
     purchaseOrder?: PurchaseOrder;
@@ -316,10 +348,8 @@ export enum Roles {
 }
 
 export enum BoxCategory {
-    empty = 'Vacio',
-    cut = 'Cortada',
-    thick = 'Gruesa',
-    fine = 'Fina',
+    empty = 'Caja Vacía',
+    cradle = 'Cradle',
     aisle = 'Pasillo',
 }
 export enum SandStageStatus {
@@ -337,3 +367,37 @@ export interface Box {
     floor: number;
     row: number;
 }
+export interface QueueItem {
+    id?: number;
+    sandOrderId: number;
+    sandOrder?: SandOrder;
+    pitId: number;
+    pit?: Pit;
+    origin: string;
+    destination: string;
+    status: number;
+    // 0 - Pendiente
+    // 10 - A retirar
+    // 20 - En Cola ?
+    // 99 - Finalizado
+    order: number;
+    // 999999 - 900000 aTRansporte
+    // 99999 - 90000 Retiro ( cradleAOtro )
+    // 9999 - 9000 TRansporte a Otro
+    // 999 - 500 Deposito a Cradle
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
+}
+
+/* 
+C - T 
+D - T
+
+C - D
+
+T - C
+T - D
+
+D - C
+*/
