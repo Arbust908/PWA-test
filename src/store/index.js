@@ -52,6 +52,9 @@ const store = createStore({
         setUserPermissions({ commit }, permissions) {
             commit('SET_USER_PERMISSIONS', permissions);
         },
+        setUserRole({ commit }, roleId) {
+            commit('SET_USER_ROLE', roleId);
+        },
     },
     mutations: {
         SET_USER(state, payload) {
@@ -59,6 +62,9 @@ const store = createStore({
         },
         SET_USER_PERMISSIONS(state, permissions) {
             state.loggedUser.permissions = permissions;
+        },
+        SET_USER_ROLE(state, roleId) {
+            state.loggedUser.role = roleId;
         },
     },
     modules: {

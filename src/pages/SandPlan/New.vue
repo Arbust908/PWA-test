@@ -100,7 +100,7 @@
                     </section>
                 </header>
                 <div v-show="currentOpened" class="pr-8 pl-2 border-2 border-solid rounded-b-lg">
-                    <ResposiveTableSandPlan
+                    <ResponsiveTableSandPlan
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
                         :pos="Key"
@@ -160,13 +160,12 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
+    import ResponsiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
     import SandPlanStage from '@/components/sandPlan/StageRow.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
     import StageHeader from '@/components/sandPlan/StageHeader.vue';
     import { isNotLast } from '@/helpers/iteretionHelpers';
-
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
 
@@ -180,7 +179,7 @@
             Icon,
             Layout,
             PrimaryBtn,
-            ResposiveTableSandPlan,
+            ResponsiveTableSandPlan,
             SandPlanStage,
             SecondaryBtn,
             StageEmptyState,

@@ -21,6 +21,7 @@
                         :endpoint-data="filteredPurchaseOrders"
                         :data="purchaseOrderId"
                         @update:data="purchaseOrderId = $event"
+                        @change="showAllCategories"
                     />
                 </FieldGroup>
                 <EntryBoxesList
@@ -54,11 +55,14 @@
                                     <span
                                         v-for="(sand, i) in sandTypes"
                                         :key="i"
-                                        :class="`select-category mesh-type__${sand.id} radio clickable`"
-                                        @click="setVisibleCategories(sand.id)"
+                                        :class="`select-category mesh-type__${sand.id <= 5 ? sand.id : 'extra'} text`"
+                                        @click="conLog"
                                     >
-                                        <EyeIcon v-if="visibleCategories.includes(sand.id)" class="icon" />
-                                        <EyeIconOff v-else class="icon" />
+                                        <div
+                                            :class="`w-[10px] h-[10px] m-[5px] rounded-full mesh-type__${
+                                                sand.id <= 5 ? sand.id : 'extra'
+                                            } boxCard`"
+                                        />
                                         {{ sand.type }}</span
                                     >
                                     <!-- <span class="select-category full">
@@ -66,11 +70,15 @@
                                         Cradle</span
                                     > -->
                                     <span class="select-category full">
-                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-[#878787]" />
-                                        Ocupado ocupado
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full mesh-type__empty boxCard" />
+                                        Caja Vacía
                                     </span>
                                     <span class="select-category full">
-                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-[#CECCCC]" />
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full mesh-type__taken cradle" />
+                                        Cradle
+                                    </span>
+                                    <span class="select-category full">
+                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full mesh-type__taken aisle" />
                                         Pasillo
                                     </span>
                                 </div>
@@ -310,6 +318,7 @@
                     floor.value = fFloor;
                     row.value = fRow;
                     inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
+                    console.log(inDepoBoxes.value);
                 }
             }
         }
@@ -354,7 +363,7 @@
             choosedBox.value = toChooseBox;
         }
 
-        setVisibleCategories(choosedBox.value.sandTypeId);
+        // setVisibleCategories(choosedBox.value.sandTypeId);
 
         if (checkIfWasBoxInOriginalDeposit(id)) {
             Object.entries(warehouse.value.layout).forEach((cell) => {
@@ -445,11 +454,22 @@
     const visibleCategories = ref([]);
 
     const setVisibleCategories = (category: string) => {
+        console.log(category);
+
         if (visibleCategories.value.includes(category)) {
             visibleCategories.value.splice(visibleCategories.value.indexOf(category), 1);
         } else {
             visibleCategories.value.push(category);
         }
+    };
+
+    const conLog = () => {
+        console.log(visibleCategories.value);
+    };
+
+    const showAllCategories = () => {
+        sandTypes.value.forEach((sand) => visibleCategories.value.push(sand.id));
+        console.log(visibleCategories.value);
     };
 
     let selectedCradle = ref(0);
@@ -615,9 +635,6 @@
             @apply w-5 h-5;
         }
 
-        &:not(.full):not(.aisle) {
-            cursor: pointer;
-        }
         &.blocked {
             @apply text-second-800 border-second-800;
         }

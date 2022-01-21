@@ -7,9 +7,9 @@
                     <ClientPitCombo
                         :client-id="clientId"
                         :pit-id="pitId"
+                        :is-disabled="true"
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
-                        :is-disabled="true"
                     />
                     <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de filas</h3>
@@ -34,7 +34,9 @@
                                     :checked="selectedBox.category == sand.id"
                                     type="radio"
                                     name="boxCat"
-                                    :class="`form-checkbox mesh-type__${sand.id} radio clickable`"
+                                    :class="`form-checkbox mesh-type__${
+                                        sand.id <= 5 ? sand.id : 'extra'
+                                    } radio clickable`"
                                     @click="setCat(sand.id.toString())"
                                 />
                                 <span>{{ sand.type }}</span>
@@ -82,6 +84,7 @@
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5"
+                        is-design
                         :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
@@ -147,7 +150,7 @@
                     selectedBox.value.category != 'aisle' &&
                     selectedBox.value.category != 'cradle'
                 ) {
-                    return sandTypes.value[parseInt(selectedBox.value.category) - 1].type;
+                    return sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type;
                 }
             });
 

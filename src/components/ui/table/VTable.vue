@@ -245,6 +245,12 @@
 
                 return [];
             });
+            const paginatedItemsCount = ref(0);
+            watch(paginatedItems, (val) => {
+                const count = val.length;
+                const lastCount = paginatedItemsCount.value;
+                paginatedItemsCount.value = Math.max(count, lastCount);
+            });
 
             const paginate = (array: Array<any>, length: number, pageNumber: number) => {
                 localPagination.value.from = array.length ? (pageNumber - 1) * length + 1 : ' ';
@@ -263,11 +269,13 @@
             };
             const enter = (el: any, done: any) => {
                 const staggerIndex = el.dataset.staggerIndex;
+                const delay = paginatedItemsCount.value > 10 ? 0.05 : 0.15;
+                const duration = paginatedItemsCount.value > 10 ? 0.25 : 0.5;
                 gsap.to(el, {
                     opacity: 1,
                     y: 0,
-                    duration: 0.5,
-                    delay: 0.15 * staggerIndex,
+                    duration: duration,
+                    delay: delay * staggerIndex,
                     onComplete: () => {
                         el.style.transform = '';
                         el.style.opacity = '';
@@ -281,11 +289,13 @@
             };
             const leave = (el: any, done: any) => {
                 const staggerIndex = el.dataset.staggerIndex;
+                const delay = paginatedItemsCount.value > 10 ? 0.05 : 0.15;
+                const duration = paginatedItemsCount.value > 10 ? 0.25 : 0.5;
                 gsap.to(el, {
                     opacity: 0,
                     y: '-50%',
-                    duration: 0.5,
-                    delay: 0.15 * staggerIndex,
+                    duration: duration,
+                    delay: delay * staggerIndex,
                     onComplete: done,
                 });
             };

@@ -52,6 +52,13 @@ const Forklift_Operation = {
     to: '/operacion-en-forklift',
     icon: 'SwitchHorizontal',
     title: 'ForkliftOperation',
+    // keep: true,
+};
+const Close_Of_Operations = {
+    name: 'Cierre de operaciones',
+    to: '/cierre-de-operaciones',
+    icon: 'Briefcase',
+    title: 'CloseOfOperations',
     keep: true,
 };
 const Deposito_de_cajas_vacias = {
@@ -59,14 +66,14 @@ const Deposito_de_cajas_vacias = {
     to: '/deposito-cajas-vacias',
     icon: 'Archive',
     title: 'EmptyBoxDeposit',
-    keep: true,
+    // keep: true,
 };
 const Destino_de_cajas_vacias = {
     name: 'Destino de cajas vacias',
     to: '/Destino-cajas-vacias',
     icon: 'Archive',
-    title: 'EmptyBox',
-    keep: true,
+    title: 'EmptyBoxDestiny',
+    // keep: true,
 };
 const LINE = {
     name: 'LINE',
@@ -128,6 +135,7 @@ export default {
             Deposito_de_cajas_vacias,
             Destino_de_cajas_vacias,
             Forklift_Operation,
+            Close_Of_Operations,
             LINE,
             {
                 name: 'Proveedores',

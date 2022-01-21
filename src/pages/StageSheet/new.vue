@@ -32,7 +32,7 @@
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
                     :boxes="boxes"
-                    :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
+                    :is-selected-stage="isStageSelected(sheet.id, selectedStage.id)"
                     :is-active="pendingStages[0].id === sheet.id"
                     :pit-id="pitId"
                     @set-stage="setStage($event)"
@@ -49,7 +49,7 @@
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
                     :boxes="boxes"
-                    :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
+                    :is-selected-stage="isStageSelected(sheet.id, selectedStage.id)"
                     :is-active="pendingStages[0].id === sheet.id"
                     :pit-id="pitId"
                     @set-stage="setStage($event)"
@@ -67,10 +67,11 @@
             </div>
             <aside>
                 <h3 class="text-3xl font-bold">Detalle</h3>
-                <article v-if="selectedStage?.id === -1" class="px-4 py-6 border rounded-[10px]">
+                <article v-if="selectedStage === -1" class="px-4 py-6 border rounded-[10px]">
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
                 </article>
                 <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
+                    {{ queueDetail }}
                     <div class="text-semibold space-y-3">
                         <p>
                             <span class="mr-2">Total Arena A:</span>
@@ -222,7 +223,19 @@
     const pendingStages = computed(() => {
         return stages.value?.sort((a, b) => a.stage - b.stage) || [];
     });
-    const isSageSelected = (stage: number, selected: number): boolean => {
+    const activeStage = computed(() => {
+        return (
+            stages.value
+                ?.sort((a, b) => {
+                    return a.stage - b.stage;
+                })
+                .find((_: SandStage, index: number) => {
+                    return index === 0;
+                }) || {}
+        );
+    });
+
+    const isStageSelected = (stage: number, selected: number): boolean => {
         return selected === stage;
     };
     const boxes = computed(() => {
@@ -241,10 +254,18 @@
         selectedQueue.value = queue;
     };
     const queueDetail = computed(() => {
+        console.log('queueDetail', selectedQueue.value);
+
         return selectedQueue.value.reduce((acc, item) => {
-            if (item?.sandType?.id) {
-                const sandId = item?.sandType?.id;
+            console.log('acc', acc);
+            console.log('item', item);
+
+            if (item?.sandTypeId) {
+                console.log('Entramos');
+                const sandId = item?.sandTypeId;
                 const sandIndex = acc.indexOf(sandId);
+
+                console.log(sandId, sandIndex);
 
                 if (sandIndex === -1) {
                     acc.push(item?.amount);
@@ -252,6 +273,7 @@
                     acc[sandIndex] = acc[sandIndex] + item?.amount;
                 }
             }
+            console.log(acc);
 
             return acc;
         }, []);
@@ -289,7 +311,10 @@
                 } else {
                     console.log('No tenemos Location');
                 }
-                item.location = JSON.parse(location);
+
+                if (location && JSON.parse(location)) {
+                    item.location = JSON.parse(location);
+                }
 
                 return item;
             })
@@ -307,7 +332,7 @@
     }
     .panel {
         @apply grid gap-x-6;
-        grid-template-columns: minmax(320px, 1fr) 360px;
+        grid-template-columns: minmax(320px, 760px) 360px;
     }
     .stage {
         &--panel {

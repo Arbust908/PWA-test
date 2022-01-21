@@ -55,7 +55,7 @@
                 type="submit"
                 :disabled="!canRequest"
                 :is-loading="isLoading"
-                @click.prevent="requestEmptyBoxHandle"
+                @click.prevent="canRequest && requestEmptyBoxHandle"
             >
                 Solicitar retiro
             </PrimaryBtn>

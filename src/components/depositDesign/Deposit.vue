@@ -20,10 +20,13 @@
                             :col="col"
                             :floor="currentFloor"
                             :selected-box="selectedBox"
+                            :selected-boxes="selectedBoxes"
                             :visible-categories="visibleCategories"
                             :box-data="getBoxData(row, col, currentFloor)"
                             :sand-info="getCellBox(row, col, currentFloor)"
                             :is-design="isDesign"
+                            :is-destination="isDestination"
+                            :is-empty-deposit="isEmptyDeposit"
                             @select-box="selectBox"
                         />
                     </template>
@@ -42,7 +45,15 @@
     const props = defineProps({
         selectedBox: {
             type: Object,
-            required: true,
+            default: () => {
+                return {};
+            },
+        },
+        selectedBoxes: {
+            type: Array,
+            default: () => {
+                return [];
+            },
         },
         deposit: {
             type: Object,
@@ -70,6 +81,16 @@
             default: () => [],
         },
         isDesign: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        isDestination: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        isEmptyDeposit: {
             type: Boolean,
             required: false,
             default: false,
