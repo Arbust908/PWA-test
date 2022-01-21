@@ -96,11 +96,13 @@
     import FieldToggle from '@/components/ui/form/FieldToggle.vue';
     import {
         getQueueItems,
-        updateQueueItems,
+        updateQueueItem,
         itemIsFinished,
         itemIsNotDone,
         itemIsNotToEmpty,
+        removeQueueItems,
     } from '@/helpers/useQueueItem';
+    import { finishSandOrder, updateSandOrder } from '@/helpers/useSandOrder.service';
     import { getCradle, getWorkOrders } from '@/helpers/useGetEntities';
     import { Cradle } from '@/interfaces/sandflow';
 
@@ -119,6 +121,9 @@
         sortDir: 'desc',
     });
 
+    // La onda con esto es que los que ya estaban terminados se van aa "Borrar" despues de una session en Finished
+    const itemToDelete = ref([] as QueueItem[]);
+
     const onPitUpdate = async () => {
         if (clientId.value === -1 || pitId.value === -1) {
             return;
@@ -129,6 +134,7 @@
         const cradleId = workOrders[0]?.operativeCradle;
         currentCradle.value = await getCradle(Number(cradleId));
         updateLists();
+        itemToDelete.value = finishedQueue.value;
     };
 
     watch(clientId, await onPitUpdate);
@@ -147,7 +153,7 @@
         setTimeout(() => {
             updateLists();
             commitTransition(item);
-            updateQueueItems(item);
+            updateQueueItem(item);
         }, 1000);
     };
 
@@ -158,7 +164,7 @@
         toDoQueue.value = queue.value.filter((item: QueueItem) => itemIsNotDone(item));
         const hasNoDestinations = toDoQueue.value.filter(({ destination }: QueueItem) => !destination);
 
-        if (hasNoDestinations) {
+        if (hasNoDestinations.length) {
             console.log('Hay Lugar en Cradle?');
             const availables = checkCradleSlots();
             availables && fillItemDestination(hasNoDestinations, availables);
@@ -185,6 +191,17 @@
     };
 
     const fillItemDestination = (items: QueueItem[], availableSlots: any[]) => {
+        if (items.length <= 0) {
+            console.log('No hay items');
+
+            return;
+        }
+
+        if (availableSlots.length <= 0) {
+            console.log('No hay lugares disponibles');
+
+            return;
+        }
         console.log(items);
         console.log(availableSlots);
         const amountOfSlots = availableSlots.length;
@@ -192,18 +209,21 @@
         for (let i = 0; i < amountOfSlots; i++) {
             const item = items[i];
             const slot = availableSlots[i];
-            const station = `Estacion ${slot.station + 1}`;
+            const station = `Estación ${slot.station + 1}`;
 
             if (slot) {
                 item.destination = station;
             }
         }
-        // Cambiar el destino al Slot libre
     };
 
     // Cuando se completa la tarea deberia impactar en el where del SandOrder
     const commitTransition = async (item: QueueItem) => {
         const { sandOrder, origin, destination } = item;
+
+        if (sandOrder !== undefined) {
+            return;
+        }
         const { location } = sandOrder;
 
         console.log(JSON.parse(location));
@@ -211,9 +231,101 @@
         if (JSON.parse(location)) {
             sandOrder.location = JSON.parse(location);
         }
+
+        console.groupCollapsed('Commiting transition');
+        console.log(sandOrder);
+        console.log(origin);
+        console.log(destination);
+        console.log(sandOrder.location);
+        console.groupEnd();
+        // Preguntar de donde viene
+        const originType = origin.split(' ')[0];
+        const destinationType = destination.split(' ')[0];
+        console.log('originType ' + originType);
+        console.log('destinationType ' + destinationType);
+        let msg = '';
+        switch (originType) {
+            case 'Camion':
+                msg += 'Soy Camion => ';
+                switch (destinationType) {
+                    case 'Camion':
+                        // No deberia ir nunca de macion a camino
+                        msg += 'Camion';
+                        break;
+                    case 'Estación':
+                        // No pareciera que hacemos nada
+                        msg += 'Estación';
+                        break;
+                    default:
+                        // No parecier que hacemos nada
+                        msg += 'Deposito';
+                        break;
+                }
+                console.log(msg);
+                break;
+            case 'Estación':
+                msg += 'Soy Estación => ';
+                switch (destinationType) {
+                    case 'Camion':
+                        // Matar SO con id = 99
+                        await finishSandOrder(sandOrder);
+                        msg += 'Camion';
+                        break;
+                    case 'Estación':
+                        // Nunca deberia ir de estacion a estacion
+                        msg += 'Estación';
+                        break;
+                    default:
+                        // Pareciera que lo hace Destino de Cajas Vacias
+                        msg += 'Deposito';
+                        break;
+                }
+                console.log(msg);
+                break;
+            default:
+                msg += 'Soy Deposito => ';
+                switch (destinationType) {
+                    case 'Camion':
+                        // Matar SO con id = 99
+                        await finishSandOrder(sandOrder);
+                        msg += 'Camion';
+                        break;
+                    case 'Estación': {
+                        // Mover la SO a la estacion
+                        const { id } = currentCradle.value;
+                        const cradleStation = Number(destination.split(' ')[1]);
+                        const slot = cradleStation - 1;
+
+                        const newLocation = {
+                            where: 'cradle',
+                            where_id: id,
+                            where_slot: slot,
+                            where_origin: destination,
+                        };
+
+                        sandOrder.location = JSON.stringify(newLocation);
+
+                        await updateSandOrder(sandOrder);
+
+                        msg += 'Estación';
+                        break;
+                    }
+                    default:
+                        // Nunca deberia ir de deposito a deposito
+                        msg += 'Deposito';
+                        break;
+                }
+                console.log(msg);
+                break;
+        }
     };
 
     updateLists();
+
+    onUnmounted(async () => {
+        await removeQueueItems(itemToDelete.value);
+        console.log('Unmounted');
+    });
 </script>
 
 <style lang="scss" scoped>

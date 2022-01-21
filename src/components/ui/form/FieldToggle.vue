@@ -23,12 +23,10 @@
         if (!canSendEvent.value) {
             return;
         }
-        console.log();
         emits('toggle', value.value);
         canSendEvent.value = false;
         setTimeout(() => {
             canSendEvent.value = true;
-            console.log('can send event');
         }, 1000);
     };
 </script>

@@ -116,7 +116,7 @@ export const getQueueItems = async () => {
         })
         .catch((err) => console.error(err));
 };
-export const updateQueueItems = async (queueData: QueueItem) => {
+export const updateQueueItem = async (queueData: QueueItem) => {
     const { id } = queueData;
 
     return await axios
@@ -126,7 +126,7 @@ export const updateQueueItems = async (queueData: QueueItem) => {
         })
         .catch((err) => console.error(err));
 };
-export const deleteQueueItems = async (queueItemId: number) => {
+export const deleteQueueItem = async (queueItemId: number) => {
     return await axios
         .delete(`${apiUrl}/queueItem/${queueItemId}`)
         .then((response) => {
@@ -139,7 +139,17 @@ export const createAllQueueItems = async (queue: Array<QueueItem>) => {
     const queueItems = queue.map((queueItem) => {
         queueItem.status = 0;
 
-        return updateQueueItems(queueItem);
+        return updateQueueItem(queueItem);
+    });
+
+    return Promise.all(queueItems);
+};
+
+export const removeQueueItems = async (queue: Array<QueueItem>) => {
+    const queueItems = queue.map((queueItem) => {
+        queueItem.status = 100;
+
+        return updateQueueItem(queueItem);
     });
 
     return Promise.all(queueItems);
@@ -150,7 +160,7 @@ export const itemIsFinished = (queueItem: QueueItem) => {
 };
 
 export const itemIsNotDone = (queueItem: QueueItem) => {
-    return queueItem.status !== 99;
+    return queueItem.status < 99;
 };
 
 export const itemIsNotToEmpty = (queueItem: QueueItem) => {

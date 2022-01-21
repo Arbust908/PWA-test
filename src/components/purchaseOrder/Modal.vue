@@ -23,7 +23,7 @@
                 </li>
             </div>
         </div>
-        <div class="flex items-center">
+        <div class="flex items-center mt-1">
             <input
                 id="checkbox"
                 v-model="checked"
@@ -34,75 +34,49 @@
         </div>
         <div class="w-full flex gap-x-6 justify-end mt-3">
             <SecondaryBtn @click.prevent="$emit('close')"> Volver </SecondaryBtn>
-            <PrimaryBtn @click.prevent="$emit('confirm')" :is-loading="loading" @click="checked && downloadPDF(po)">
-                Confirmar
-            </PrimaryBtn>
+            <PrimaryBtn :is-loading="loading" @click.prevent="$emit('confirm')"> Confirmar </PrimaryBtn>
         </div>
     </Modal>
 </template>
 
-<script lang="ts">
-    import { defineComponent, ref, watchEffect } from 'vue';
+<script setup lang="ts">
     import Modal from '@/components/modal/General.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import { isEven } from '@/helpers/iteretionHelpers';
-    import jsPDF from 'jspdf';
-    export default defineComponent({
-        components: {
-            Modal,
-            PrimaryBtn,
-            SecondaryBtn,
+    const props = defineProps({
+        po: {
+            type: Object,
+            required: true,
         },
-        props: {
-            po: {
-                type: Object,
-                required: true,
-            },
-            showModal: {
-                type: Boolean,
-                required: true,
-            },
-            driver: {
-                type: String,
-                required: true,
-            },
-            poId: {
-                type: Number,
-                required: true,
-            },
-            plates: {
-                type: Array,
-                required: true,
-            },
-            loading: {
-                type: Boolean,
-                required: false,
-                default: false,
-            },
+        showModal: {
+            type: Boolean,
+            required: true,
         },
-        setup(props) {
-            const getSandType = (sandTypeId: number) => {
-                const sandType = props.po.sands.find((st) => st.id === sandTypeId);
-
-                return sandType ? sandType.type : 'Sin tipo de arena';
-            };
-            const content = ref(null);
-
-            const checked = ref(true);
-
-            const downloadPDF = (po) => {
-                return;
-            };
-
-            return {
-                getSandType,
-                isEven,
-                downloadPDF,
-                checked,
-            };
+        driver: {
+            type: String,
+            required: true,
+        },
+        poId: {
+            type: Number,
+            required: true,
+        },
+        plates: {
+            type: Array,
+            required: true,
+        },
+        loading: {
+            type: Boolean,
+            required: false,
+            default: false,
         },
     });
+    defineEmits(['close', 'confirm']);
+    const getSandType = (sandTypeId: number) => {
+        const sandType = props.po.sands.find((st) => st.id === sandTypeId);
+
+        return sandType ? sandType.type : 'Sin tipo de arena';
+    };
+    const checked = ref(true);
 </script>
 
 <style scoped>

@@ -169,13 +169,13 @@
             }
             const sandProviderIds: Ref<Array<sandProviderId>> = ref([]);
 
-            const sandOrder: Ref<Array<SandOrder>> = ref([]);
+            //const sandOrder: Ref<Array<SandOrder>> = ref([]);
+
             const fillSandType = (soId) => {
                 const currSO = sandOrder.value.find((so) => so.id === soId);
                 const currST = sandTypes.value.find((st) => st.id === currSO?.sandTypeId);
                 currSO.sandType = currST;
             };
-
             const transportProviders = ref([]);
             const { data: tPData } = useAxios('/transportProvider', instance);
             watch(tPData, (tPData) => {
@@ -254,12 +254,11 @@
                 const sandOrderId = ref(0);
 
                 if (sandProviderIds.value[0].id > 0 && transportOrder.value[0].transportProviderId < 0) {
-                    const { data: sandOrder } = await useAxios(
-                        `/sandOrder`,
-                        { method: 'POST', data: sandProviderIds.value[0].SandOrders[0] },
-                        instance
+                    const { data: sandOrder } = await axios.post(
+                        `${apiUrl}/sandOrder`,
+                        sandProviderIds.value[0].SandOrders[0]
                     );
-                    sandOrderId.value = sandOrder.id;
+                    sandOrderId.value = sandOrder.data.id;
                     pN.value = {
                         textArena: 'Arena',
                         sandProviderId: Number(sandProviderIds.value[0].id),
@@ -318,7 +317,6 @@
                             amount: order.amount,
                         });
                     });
-
                     return sanitizedSandOrders;
                 };
 
@@ -345,11 +343,13 @@
 
             const confirmNotification = async () => {
                 const response = await axios
-                    .post(`${apiUrl}/ProviderNotification`, pN.value)
+                    .post(`${apiUrl}/providerNotification`, pN.value)
                     .then((res) => {
                         return res;
                     })
-                    .catch((err) => console.error(err));
+                    .catch((err) => {
+                        console.error(err);
+                    });
 
                 if (response?.status == 200) {
                     isNotificationConfirmed.value = true;
