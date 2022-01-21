@@ -23,7 +23,10 @@
                         @truck="truck(box)"
                     />
                 </div>
-                <div v-else class="flex flex-row bg-gray-100 m-4 p-4 rounded text-center text-sm text-black">
+                <div
+                    v-if="boxes.length < 1"
+                    class="flex flex-row bg-gray-100 mx-4 my-auto p-4 rounded text-center text-sm text-black"
+                >
                     <Icon icon="ExclamationCircle" type="outline" class="w-5 h-5" />
                     <p class="ml-2">No hay cajas vacias por retirar</p>
                 </div>
