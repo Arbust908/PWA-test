@@ -338,7 +338,9 @@
         return total;
     });
     const getPorcentage = (total: number, value = 0) => {
-        return (value * 100) / total;
+        const result = (value * 100) / total;
+
+        return result === Infinity ? 0 : (value * 100) / total;
     };
 
     const stagePorcentage = computed(() => {

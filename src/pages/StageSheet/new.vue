@@ -290,7 +290,10 @@
                 } else {
                     console.log('No tenemos Location');
                 }
-                item.location = JSON.parse(location);
+
+                if (location && JSON.parse(location)) {
+                    item.location = JSON.parse(location);
+                }
 
                 return item;
             })
