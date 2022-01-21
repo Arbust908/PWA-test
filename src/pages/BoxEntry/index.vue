@@ -8,7 +8,6 @@
                         <ClientPitCombo
                             :client-id="Number(clientId)"
                             :pit-id="Number(pitId)"
-                            validation-type="empty"
                             @update:clientId="clientId = Number($event)"
                             @update:pitId="pitId = Number($event)"
                         />

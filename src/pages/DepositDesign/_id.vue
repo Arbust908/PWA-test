@@ -3,43 +3,27 @@
         <ABMFormTitle title="Diseño de depósito" />
         <section class="deposit bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
-                <fieldset class="py-2 w-full max-w-2xl grid grid-cols-12 gap-y-4 gap-x-14">
-                    <label class="col-span-5" for="depositClient">
-                        <span>Cliente</span>
-                        <select id="depositClient" v-model="clientId" class="input" name="depositClient">
-                            <option selected disabled value="-1">Seleccionar cliente</option>
-                            <option v-for="client in clients" :key="client.id" :value="client.id">
-                                {{ client.name }}
-                            </option>
-                        </select>
-                    </label>
-                    <label class="col-span-4" for="depositPit">
-                        <span>Pozo</span>
-                        <select id="depositPit" v-model="pitId" class="input" name="depositPit">
-                            <option selected disabled value="-1">Seleccionar pozo</option>
-                            <option v-for="pit in pits" :key="pit.id" :value="pit.id">
-                                {{ pit.name }}
-                            </option>
-                        </select>
-                    </label>
-                    <div class="col-span-2"></div>
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-left gap-4">
+                <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
+                    <ClientPitCombo
+                        :client-id="clientId"
+                        :pit-id="pitId"
+                        :is-disabled="true"
+                        @update:clientId="clientId = $event"
+                        @update:pitId="pitId = $event"
+                    />
+                    <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de filas</h3>
                         <Counter :amount="rows" @update:amount="rows = $event" />
                     </div>
-                    <div class="col-span-6 md:col-span-4 flex flex-col items-center gap-4">
+                    <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de columnas</h3>
                         <Counter :amount="cols" @update:amount="cols = $event" />
                     </div>
-                    <div class="col-span-6 md:col-span-4 flex-col items-end gap-4">
-                        <h3 class="text-sm">Cantidad de pisos</h3>
+                    <div class="col-span-4 flex flex-col items-center gap-4">
+                        <h3 class="text-sm">Cantidad de niveles</h3>
                         <Counter :amount="floors" :max="2" @update:amount="floors = $event" />
                     </div>
-                    <!-- <div class="col-span-3 flex flex-col items-center gap-4">
-            <h3 class="text-xs">Cantidad de ubicación</h3>
-            <Counter />
-          </div> -->
-                </fieldset>
+                </FieldGroup>
                 <fieldset class="py-2 flex gap-x-10 2xl:gap-x-40">
                     <section class="w-full max-w-[220px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
                         <h2 class="col-span-full text-xl font-bold">Asignar categoría</h2>
@@ -126,7 +110,9 @@
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import Counter from '@/components/ui/Counter.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
+    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import BoxCard from '@/components/depositDesign/DepositBoxCard.vue';
+    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import { Company, Pit, Warehouse, Box } from '@/interfaces/sandflow';
 
     import axios from 'axios';
@@ -142,6 +128,8 @@
             PrimaryBtn,
             DepositGrid,
             BoxCard,
+            FieldGroup,
+            ClientPitCombo,
             ABMFormTitle,
         },
         setup() {
