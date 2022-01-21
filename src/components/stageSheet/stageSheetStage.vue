@@ -4,7 +4,14 @@
             <h2>Etapa {{ sandStage.stage }}/20</h2>
             <p>Total: {{ weigth }} Toneladas</p>
             <div class="flex gap-x-1 items-center">
-                <progress v-if="showProgress" max="100" :value="stagePorcentage">{{ stagePorcentage }}%</progress>
+                <progress
+                    v-if="showProgress"
+                    max="100"
+                    :class="stagePorcentage > 100 ? 'over' : null"
+                    :value="stagePorcentage"
+                >
+                    {{ stagePorcentage }}%
+                </progress>
                 <span v-if="showProgress">{{ stagePorcentage.toFixed(2) + '%' }}</span>
                 <span v-else class="italic text-center w-full">{{
                     stagePorcentage === 0 ? 'Pendiente' : 'Finalizada '
@@ -18,17 +25,14 @@
                 <ChevronIcon />
             </i>
         </header>
-        <div
-            v-if="isSelectedStage"
-            :class="isSelectedStage ? 'opened' : 'scale-y-0 h-0'"
-            class="flex gap-5 border-t border-gray-200 transform transition ease-in-out duration-300 overflow-hidden origin-top flex-wrap"
-        >
+        <div v-if="isSelectedStage" :class="isSelectedStage ? 'opened' : 'scale-y-0 h-0'" class="stage--details">
             <section
                 class="max-w-[16rem] w-full rounded border border-gray-200 shadow-sm px-5 py-7 self-start space-y-6"
             >
                 <StageSheetSandDetail
                     v-for="(sand, key) in sands"
                     :key="sand.id + sand.type"
+                    :sand="sand"
                     :type="sand.type"
                     :amount="sand.quantity"
                     :porcentage="getPorcentage(sand.quantity, queueDetail[sand.type])"
@@ -39,7 +43,7 @@
                     Debés completar al menos un 70% de la etapa anterior para continuar con la siguiente
                 </p>
             </section>
-            <section v-else class="grid grid-cols-5 gap-4 max-w-md mx-auto">
+            <section v-else class="stage--queue">
                 <article
                     v-for="(box, place) in boxQueue"
                     :key="place + 'place'"
@@ -97,8 +101,10 @@
                     <PlusIcon />
                 </article>
             </section>
-            <footer class="w-full flex justify-end gap-3">
-                <NoneBtn btn="wide" :is-loading="isLoading"> Cancelar </NoneBtn>
+            <footer class="col-span-full flex justify-end gap-3">
+                <NoneBtn btn="wide" :is-loading="isLoading" @click="$emit('set-stage', sandStage.id)">
+                    Cancelar
+                </NoneBtn>
                 <InverseBtn btn="wide" :is-loading="isLoading" @click="generateQueue()"> Guardar </InverseBtn>
             </footer>
         </div>
@@ -143,6 +149,7 @@
         },
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
+    const { isActive, isSelectedStage } = toRefs(props);
     const router = useRouter();
     const store = useStore();
     const sands = ref([]);
@@ -155,72 +162,90 @@
     const isLoading = ref(false);
 
     const showProgress = computed(() => {
-        return stagePorcentage.value > 0 /* && stagePorcentage.value <= 100 */;
+        return stagePorcentage.value > 0;
     });
     const boxQueue: Ref<Array<number | SandOrder>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
 
-    boxQueue.value = await getSandOrders();
-    console.log(boxQueue.value);
-    boxQueue.value = boxQueue.value
-        .filter((order) => {
-            return order.location;
-        })
-        .filter((order) => {
-            const { queueItems } = order;
+    const fillQueueBoxes = async () => {
+        boxQueue.value = await getSandOrders();
+        console.log(boxQueue.value);
+        boxQueue.value = boxQueue.value
+            .filter((order) => {
+                return order.location;
+            })
+            .filter((order) => {
+                const { queueItems } = order;
 
-            if (queueItems.length) {
-                const queueItem = queueItems[0];
-                const { pitId } = queueItem;
+                if (queueItems.length) {
+                    const queueItem = queueItems[0];
+                    const { pitId } = queueItem;
 
-                return pitId === props.pitId;
+                    return pitId === props.pitId;
+                }
+
+                return;
+            })
+            .map((order) => {
+                const { queueItems, location } = order;
+
+                order.location = JSON.parse(location);
+
+                if (queueItems.length) {
+                    const queueItem = queueItems[0];
+                    order.isDone = queueItem.status === 99;
+                    order.order = queueItem.order;
+
+                    return order;
+                }
+
+                return;
+            })
+            .filter((order) => {
+                return order?.order && order?.order > 0;
+            })
+            .sort((a, b) => {
+                const { queueItems: qiA } = a;
+                const { queueItems: qiB } = b;
+                let orderA = 0;
+                let orderB = 0;
+
+                if (qiA.length) {
+                    const queueItem = qiA[0];
+                    orderA = queueItem.order;
+                }
+
+                if (qiB.length) {
+                    const queueItem = qiB[0];
+                    orderB = queueItem.order;
+                }
+
+                return orderB - orderA;
+            });
+
+        if (boxQueue.value.length < 14) {
+            const queueNum = boxQueue.value.length;
+            for (let i = queueNum + 1; i <= 14; i++) {
+                boxQueue.value.push(i);
             }
-
-            return;
-        })
-        .map((order) => {
-            const { queueItems, location } = order;
-
-            order.location = JSON.parse(location);
-
-            if (queueItems.length) {
-                const queueItem = queueItems[0];
-                order.isDone = queueItem.status === 99;
-                order.order = queueItem.order;
-
-                return order;
-            }
-
-            return;
-        })
-        .filter((order) => {
-            return order?.order && order?.order > 0;
-        })
-        .sort((a, b) => {
-            const { queueItems: qiA } = a;
-            const { queueItems: qiB } = b;
-            let orderA = 0;
-            let orderB = 0;
-
-            if (qiA.length) {
-                const queueItem = qiA[0];
-                orderA = queueItem.order;
-            }
-
-            if (qiB.length) {
-                const queueItem = qiB[0];
-                orderB = queueItem.order;
-            }
-
-            return orderB - orderA;
-        });
-
-    if (boxQueue.value.length < 14) {
-        const queueNum = boxQueue.value.length;
-        for (let i = queueNum + 1; i <= 14; i++) {
-            boxQueue.value.push(i);
         }
-    }
-    console.log(boxQueue.value);
+        console.log(boxQueue.value);
+    };
+
+    watch(isSelectedStage, (val) => {
+        if (val) {
+            emits('update-queue', boxQueue.value);
+        }
+    });
+
+    watch(
+        isActive,
+        (val) => {
+            if (val) {
+                fillQueueBoxes();
+            }
+        },
+        { immediate: true }
+    );
 
     const addBoxToQueue = (place: null | number = null, box: any = null) => {
         if (place !== null && box !== null) {
@@ -238,11 +263,18 @@
     const isActiveStage = computed(() => {
         return props.isActive;
     });
-    watch(isActiveStage, (newValue) => {
-        if (newValue) {
-            emits('update-queue', boxQueue.value);
-        }
-    });
+    watch(
+        isActiveStage,
+        (newValue) => {
+            console.log(newValue);
+
+            if (newValue) {
+                newValue && console.log('Emito');
+                emits('update-queue', boxQueue.value);
+            }
+        },
+        { immediate: true }
+    );
     const selectedBox = ref(null as any);
     const isSelectedBox = (boxId: number) => {
         return selectedBox.value?.id === boxId;
@@ -335,7 +367,9 @@
         return total;
     });
     const getPorcentage = (total: number, value = 0) => {
-        return (value * 100) / total;
+        const result = (value * 100) / total;
+
+        return result === Infinity ? 0 : (value * 100) / total;
     };
 
     const stagePorcentage = computed(() => {
@@ -417,7 +451,7 @@
     @import '@/assets/box.scss';
     .stage {
         &--row {
-            @apply rounded-md border border-gray-200 bg-white;
+            @apply rounded-md border border-gray-200 bg-white max-w-[744px];
             & > header {
                 @apply px-6 py-8;
                 h2,
@@ -433,24 +467,36 @@
                 @apply px-6 py-8 scale-y-100 h-auto;
             }
         }
+        &--details {
+            grid-template-columns: 16rem 1fr;
+            @apply grid gap-5 border-t border-gray-200 transform transition ease-in-out duration-300 overflow-hidden origin-top;
+        }
     }
     progress {
         @apply rounded-full h-2.5;
+        &::-webkit-progress-bar {
+            @apply bg-[#E5E7EB] rounded-full;
+        }
+        &::-webkit-progress-value {
+            @apply bg-main-500 rounded-full;
+        }
+        &::-moz-progress-bar {
+            @apply bg-gray-200 rounded-full;
+        }
     }
-    progress::-webkit-progress-bar {
-        @apply bg-[#E5E7EB] rounded-full;
-    }
-    progress::-webkit-progress-value {
-        @apply bg-main-500 rounded-full;
-    }
-    progress::-moz-progress-bar {
-        @apply bg-gray-200 rounded-full;
+    progress.over {
+        &::-webkit-progress-value {
+            @apply bg-red-500;
+        }
     }
     .expand-btn {
         @apply flex justify-center items-center w-8 cursor-pointer transition-all duration-300 ease-in-out transform;
     }
+    .stage--queue {
+        grid-template-columns: repeat(auto-fit, 70px);
+        @apply grid gap-4;
+    }
     .stage--box {
-        width: 70px;
         height: 70px;
         @apply rounded-lg flex flex-col justify-center items-center hover:shadow-md cursor-pointer transition duration-300 ease-in-out;
         &.not-filled {

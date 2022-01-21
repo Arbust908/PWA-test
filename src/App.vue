@@ -26,9 +26,7 @@
 </template>
 
 <script lang="ts">
-    import { defineComponent } from 'vue';
     import { useActions } from 'vuex-composition-helpers';
-    import { useDark, useToggle, useOnline } from '@vueuse/core';
 
     export default defineComponent({
         setup() {

@@ -6,8 +6,8 @@
     &.boxCard {
       @apply bg-orange-200 text-amber-800;
     };
-    &.arrow {
-      @apply text-amber-800 bg-orange-300;
+    &.text {
+      @apply text-amber-800;
     };
     &.iconBg {
       @apply text-orange-300;
@@ -15,6 +15,9 @@
     &.meshBorder {
       @apply border border-amber-700;
     };
+    &.bubble {
+      @apply border-2 border-orange-800 bg-orange-300;
+    }
   };
   &__2 {
     &.clickable {
@@ -23,9 +26,8 @@
     &.boxCard {
       @apply bg-emerald-200 text-emerald-800;
     };
-    &.arrow {
+    &.text {
       @apply text-emerald-800;
-      background-color: #81C2A3;
     };
     &.iconBg {
       color: #81C2A3;
@@ -33,6 +35,9 @@
     &.meshBorder {
       @apply border border-emerald-700;
     };
+    &.bubble {
+      @apply border-2 border-emerald-800 bg-emerald-300;
+    }
   };
   &__3 {
     &.clickable {
@@ -41,8 +46,8 @@
     &.boxCard {
       @apply bg-sky-200 text-sky-900;
     };
-    &.arrow {
-      @apply text-sky-900 bg-sky-300;
+    &.text {
+      @apply text-sky-900;
     };
     &.iconBg {
       @apply text-sky-300;
@@ -50,6 +55,9 @@
     &.meshBorder {
       @apply border border-sky-700;
     };
+    &.bubble {
+      @apply border-2 border-sky-800 bg-sky-300;
+    }
   };
   &__4 {
     &.clickable {
@@ -58,9 +66,8 @@
     &.boxCard {
       @apply bg-purple-200 text-violet-900;
     };
-    &.arrow {
+    &.text {
       @apply text-violet-900;
-      background-color: #AB78D2;
     };
     &.iconBg {
       color: #AB78D2;
@@ -68,6 +75,9 @@
     &.meshBorder {
       @apply border border-violet-700;
     };
+    &.bubble {
+      @apply border-2 border-violet-800 bg-violet-300;
+    }
   };
   &__5 {
     &.clickable {
@@ -76,15 +86,34 @@
     &.boxCard {
       @apply bg-red-100 text-orange-800;
     };
-    &.arrow {
+    &.text {
       @apply text-orange-800;
-      background-color: #F98764;
     };
     &.iconBg {
       color: #F98764;
     };
     &.meshBorder {
       @apply border border-orange-700;
+    };
+    &.bubble {
+      @apply border-2 border-orange-800 bg-orange-300;
+    }
+  };
+  &__extra {
+    &.clickable {
+      @apply  border-pink-200 text-pink-200;
+    };
+    &.boxCard {
+      @apply bg-pink-200 text-pink-800;
+    };
+    &.text {
+      @apply text-pink-800;
+    };
+    &.iconBg {
+      @apply text-pink-300;
+    };
+    &.meshBorder {
+      @apply border border-amber-700;
     };
   };
   &__empty {
@@ -94,12 +123,15 @@
     &.boxCard {
       @apply bg-stone-300 text-white;
     };
-    &.arrow {
+    &.text {
       @apply text-white bg-neutral-400;
     };
     &.iconBg {
       @apply text-neutral-400;
     };
+    &.bubble {
+      @apply border-2 border-neutral-800 bg-neutral-300;
+    }
   };
   &__taken {
     @apply text-white;
@@ -113,12 +145,12 @@
       };
     };
     &.aisle {
-      @apply bg-stone-300;
+      @apply bg-zinc-600;
       &-clickable{
-        @apply border-stone-300 text-stone-600;
+        @apply border-zinc-600 text-zinc-600;
       }
       &.icon{
-        @apply text-stone-200;
+        @apply text-zinc-400;
       };
     };
   };
@@ -128,9 +160,12 @@
   &.selected {
     // Nada auno
   }
+  &.not-clickable{
+    @apply cursor-not-allowed
+  }
   &.not-shown {
-    @apply bg-zinc-600 cursor-not-allowed;
-    
+    @apply bg-zinc-600 cursor-not-allowed text-zinc-600;
+
     &-clickable{
       @apply border-zinc-600 text-zinc-600;
     }
@@ -140,5 +175,8 @@
   };
   &.design {
     background: #CECCCC;
+  }
+  &.notDesignated{
+    @apply border border-dashed border-gray-400;
   }
 }

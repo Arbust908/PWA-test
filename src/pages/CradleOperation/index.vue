@@ -10,7 +10,6 @@
                         <ClientPitCombo
                             :client-id="Number(clientId)"
                             :pit-id="Number(pitId)"
-                            validation-type="empty"
                             @update:clientId="
                                 clientId = Number($event);
                                 cradleId = -1;
@@ -56,7 +55,7 @@
                 type="submit"
                 :disabled="!canRequest"
                 :is-loading="isLoading"
-                @click.prevent="requestEmptyBoxHandle"
+                @click.prevent="canRequest && requestEmptyBoxHandle"
             >
                 Solicitar retiro
             </PrimaryBtn>

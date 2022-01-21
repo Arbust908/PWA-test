@@ -55,6 +55,7 @@
                     :cols="col"
                     :floor="floor"
                     :deposit="warehouse.layout || {}"
+                    :is-destination="true"
                     @select-box="selectBox"
                 />
             </section>
