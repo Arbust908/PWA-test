@@ -110,12 +110,13 @@
         }
 
         if (
-            !isDesign.value &&
-            (category.value == 'aisle' ||
-                category.value == 'cradle' ||
-                (category.value == 'empty' && !props.isDestination) ||
-                (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination) ||
-                (props.sandInfo?.id && !props.isEmptyDeposit))
+            (!isDesign.value &&
+                (category.value == 'aisle' ||
+                    category.value == 'cradle' ||
+                    (category.value == 'empty' && !props.isDestination) ||
+                    (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination) ||
+                    (props.sandInfo?.id && !props.isEmptyDeposit))) ||
+            isEmptyBoxInEmptyDepo.value
         ) {
             bC += ' cursor-not-allowed';
         }
@@ -143,6 +144,10 @@
         return boxData?.value?.id || '';
     });
 
+    const isEmptyBoxInEmptyDepo = computed(() => {
+        return props.sandInfo?.status !== 11 && props.isEmptyDeposit;
+    });
+
     const selectBox = () => {
         if (
             (category.value == 'aisle' ||
@@ -150,6 +155,7 @@
                 (category.value == 'empty' && !props.isDestination) ||
                 (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination) ||
                 (props.sandInfo?.id && !props.isEmptyDeposit) ||
+                isEmptyBoxInEmptyDepo.value ||
                 isBlocked()) &&
             !isDesign.value &&
             props.isDestination
@@ -170,9 +176,7 @@
 
     const isTheSelected = computed(() => {
         const isInSelectedArray = selectedBoxes.value.some((box) => {
-            selectedBox.value.row === row.value &&
-                selectedBox.value.col === col.value &&
-                selectedBox.value.floor === floor.value;
+            return box.row === row.value && box.col === col.value && box.floor === floor.value;
         });
 
         if (isInSelectedArray) {

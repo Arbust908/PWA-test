@@ -191,6 +191,9 @@ export const getSandOrders = async () => {
 export const formatBoxLocation = (box: SandOrder): SandOrderBox => {
     const { location } = box;
     box.location = JSON.parse(location);
+    box.row = box.location.row;
+    box.col = box.location.col;
+    box.floor = box.location.floor;
 
     return box as SandOrderBox;
 };
