@@ -112,7 +112,7 @@
                 }, 100);
             };
             const selectClientByPit = (idOfPit: number) => {
-                const curPit = backupPits.value.find((pit: Pit) => {
+                const curPit = backupPits.value?.find((pit: Pit) => {
                     return pit.id == idOfPit;
                 });
 
