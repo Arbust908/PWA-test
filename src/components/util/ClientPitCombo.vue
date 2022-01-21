@@ -5,7 +5,6 @@
             field-name="client"
             placeholder="Seleccionar cliente"
             title="Cliente"
-            require-validation
             :endpoint-data="clients"
             :data="clientId"
             :is-disabled="isDisabled"
@@ -14,7 +13,7 @@
             @click="useFirstClient = true"
         />
         <FieldLoading v-else />
-        <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" :validation-type="validationType" />
+        <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" validation-type="empty" />
     </div>
     <div :class="sharedClasses">
         <FieldSelect
@@ -30,7 +29,7 @@
             @click="useFirstPit = true"
         />
         <FieldLoading v-else />
-        <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" :validation-type="validationType" />
+        <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" validation-type="empty" />
     </div>
 </template>
 
@@ -67,10 +66,6 @@
             sharedClasses: {
                 type: String,
                 default: 'col-span-full md:col-span-6',
-            },
-            validationType: {
-                type: String,
-                required: false,
             },
         },
         setup(props, { emit }) {
