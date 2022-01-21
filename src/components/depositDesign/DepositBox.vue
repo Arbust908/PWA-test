@@ -1,17 +1,33 @@
 <template>
     <button :class="[boxClassess]" class="box" @click.prevent="selectBox">
-        <span class="text-sm">{{ sandInfo?.boxId }}</span>
+        <span v-if="boxClassess.includes('selected') && !isDesign" class="text-sm">
+            <Icon
+                icon="CheckCircle"
+                type="outline"
+                :class="`w-10 h-10 m-auto ${sandInfo?.status === 11 ? 'text-neutral-400' : null}`"
+            />
+        </span>
+        <span v-else :class="`text-sm ${sandInfo?.status === 11 ? 'text-stone-500' : null}`">{{ designation }}</span>
     </button>
 </template>
 
 <script setup lang="ts">
     import { Box } from '@/interfaces/sandflow';
     import { getBoxClasses } from '@/helpers/useWarehouse';
+    import Icon from '@/components/icon/TheAllIcon.vue';
 
     const props = defineProps({
         selectedBox: {
             type: Object,
-            required: true,
+            default: () => {
+                return {};
+            },
+        },
+        selectedBoxes: {
+            type: Array,
+            default: () => {
+                return [];
+            },
         },
         floor: {
             type: Number,
@@ -45,12 +61,37 @@
             required: false,
             default: false,
         },
+        isDestination: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
+        isEmptyDeposit: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     });
     const emits = defineEmits(['select-box']);
-    let { floor, row, col, selectedBox, boxData, isDesign } = toRefs(props);
+    let { floor, row, col, selectedBox, selectedBoxes, boxData, isDesign } = toRefs(props);
 
     const category = computed(() => {
         return boxData && boxData.value ? boxData.value.category : 'empty';
+    });
+
+    const designation = computed(() => {
+        if (isDesign.value && ['aisle', 'cradle', 'empty'].includes(category.value)) {
+            switch (category.value) {
+                case 'aisle':
+                    return 'Pasillo';
+                case 'cradle':
+                    return 'Cradle';
+                case 'empty':
+                    return 'Vacía';
+            }
+        } else {
+            return props.sandInfo?.boxId;
+        }
     });
 
     props?.sandInfo?.value && console.log(props?.sandInfo.value);
@@ -59,16 +100,24 @@
         let bC = '';
 
         if (props.sandInfo?.sandTypeId) {
-            bC += getBoxClasses(String(props.sandInfo?.sandTypeId));
+            bC += getBoxClasses(String(props.sandInfo?.sandTypeId), props.sandInfo?.status);
         } else {
-            bC += getBoxClasses(category.value);
+            bC += getBoxClasses(category.value, props.sandInfo?.status);
         }
 
         if (isDesign.value && bC.length < 2) {
             bC += ' design';
         }
 
-        if (!isDesign.value && (category.value == 'aisle' || category.value == 'cradle')) {
+        if (
+            !isDesign.value &&
+            (isAisle.value ||
+                isCradle.value ||
+                isEmptyBoxNotInDestination.value ||
+                isNotUndesignatedBoxInDestination.value ||
+                isFullBoxNotInEmptyDepo.value ||
+                isEmptyBoxInEmptyDepo.value)
+        ) {
             bC += ' cursor-not-allowed';
         }
 
@@ -84,6 +133,10 @@
             bC += ' been-set';
         }
 
+        if (category.value === undefined && !isTheSelected.value && !isDesign.value) {
+            bC += ' notDesignated';
+        }
+
         return bC;
     });
 
@@ -91,8 +144,43 @@
         return boxData?.value?.id || '';
     });
 
+    const isEmptyBoxInEmptyDepo = computed(() => {
+        return (
+            props.sandInfo?.status !== 11 &&
+            props.isEmptyDeposit &&
+            category.value !== 'empty' &&
+            props.boxData.category === undefined &&
+            props.sandInfo?.id
+        );
+    });
+    const isFullBoxNotInEmptyDepo = computed(() => {
+        return props.sandInfo?.id && !props.isEmptyDeposit;
+    });
+    const isNotUndesignatedBoxInDestination = computed(() => {
+        return props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination;
+    });
+    const isAisle = computed(() => {
+        return category.value == 'aisle';
+    });
+    const isCradle = computed(() => {
+        return category.value == 'cradle';
+    });
+    const isEmptyBoxNotInDestination = computed(() => {
+        return category.value == 'empty' && !props.isDestination;
+    });
+
     const selectBox = () => {
-        if ((category.value == 'aisle' || category.value == 'cradle' || isBlocked()) && !isDesign.value) {
+        if (
+            (isAisle.value ||
+                isCradle.value ||
+                isEmptyBoxNotInDestination.value ||
+                isNotUndesignatedBoxInDestination.value ||
+                isFullBoxNotInEmptyDepo.value ||
+                isEmptyBoxInEmptyDepo.value ||
+                isBlocked()) &&
+            !isDesign.value &&
+            props.isDestination
+        ) {
             console.log('Bloqueo');
 
             return;
@@ -108,6 +196,18 @@
     };
 
     const isTheSelected = computed(() => {
+        const isInSelectedArray = selectedBoxes.value.some((box) => {
+            return box.row === row.value && box.col === col.value && box.floor === floor.value;
+        });
+
+        if (isInSelectedArray) {
+            return true;
+        }
+
+        if (!selectedBox.value) {
+            return false;
+        }
+
         return (
             selectedBox.value.row === row.value &&
             selectedBox.value.col === col.value &&
@@ -128,11 +228,11 @@
             return false;
         }
 
-        if (category.value == 'aisle' || category.value == 'cradle') {
+        if (category.value == 'aisle' || category.value == 'cradle' || category.value == 'empty') {
             return false;
         }
 
-        if (!visibleCategories.value.includes(Number(category.value))) {
+        if (!visibleCategories.value.includes(Number(category.value)) && category.value !== undefined) {
             return true;
         }
 
@@ -146,8 +246,9 @@
 <style lang="scss">
     @import '@/assets/box.scss';
 </style>
+
 <style lang="scss" scoped>
     .been-set {
-        @apply cursor-not-allowed border;
+        @apply cursor-not-allowed;
     }
 </style>

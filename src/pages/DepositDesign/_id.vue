@@ -1,6 +1,6 @@
 <template>
     <Layout>
-        <ABMHeader title="Diseño de depósito" />
+        <ABMFormTitle title="Diseño de depósito" />
         <section class="deposit bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
                 <fieldset class="py-2 w-full max-w-2xl grid grid-cols-12 gap-y-4 gap-x-14">
@@ -50,7 +50,9 @@
                                     :checked="selectedBox.category == sand.id"
                                     type="radio"
                                     name="boxCat"
-                                    :class="`form-checkbox mesh-type__${sand.id} radio clickable`"
+                                    :class="`form-checkbox mesh-type__${
+                                        sand.id <= 5 ? sand.id : 'extra'
+                                    } radio clickable`"
                                     @click="setCat(sand.id.toString())"
                                 />
                                 <span>{{ sand.type }}</span>
@@ -98,6 +100,7 @@
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5"
+                        is-design
                         :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
@@ -128,7 +131,7 @@
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
-    import ABMHeader from '@/components/ui/ABMHeader.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
@@ -139,7 +142,7 @@
             PrimaryBtn,
             DepositGrid,
             BoxCard,
-            ABMHeader,
+            ABMFormTitle,
         },
         setup() {
             const router = useRouter();
@@ -159,7 +162,7 @@
                     selectedBox.value.category != 'aisle' &&
                     selectedBox.value.category != 'cradle'
                 ) {
-                    return sandTypes.value[parseInt(selectedBox.value.category) - 1].type;
+                    return sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type;
                 }
             });
 

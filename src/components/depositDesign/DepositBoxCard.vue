@@ -92,6 +92,14 @@
                         return 'mesh-type__taken aisle';
                     case 'cradle':
                         return 'mesh-type__taken cradle';
+                    case null:
+                        return '';
+                    default:
+                        if (parseInt(category.value) > 5) {
+                            return 'mesh-type__extra boxCard';
+                        } else {
+                            return '';
+                        }
                 }
             });
 

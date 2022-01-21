@@ -20,11 +20,14 @@
                     v-if="activeSection === 'Deposit'"
                     class="w-full pl-14 pt-10"
                     :selected-box="choosedBox"
+                    :selected-boxes="selectedBoxes"
                     :boxes="inDepoBoxes"
                     :rows="row"
                     :cols="col"
                     :floor="floor"
                     :deposit="warehouse.layout || {}"
+                    :is-destination="true"
+                    :is-empty-deposit="true"
                     @select-box="selectBox"
                 />
             </section>
