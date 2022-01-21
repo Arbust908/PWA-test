@@ -72,7 +72,7 @@
         },
         maxNumberAmount: {
             type: Number,
-            default: 1,
+            required: false,
         },
     });
 
@@ -84,7 +84,7 @@
 
     watch(value, (data, oldData) => {
         if (Number(data) < 1 && props.maxNumberAmount) {
-            value.value = 1;
+            value.value = 0;
         } else if (Number(data) > props.maxNumberAmount) {
             value.value = props.maxNumberAmount;
         } else {
