@@ -98,6 +98,9 @@
         },
         setup(props, { emit }) {
             const value = useVModel(props, 'data', emit);
+            if (value.value == null) {
+                value.value = -1;
+            }
             const endpointData = useVModel(props, 'endpointData', emit);
             const getApiVal = () => {
                 const endpoint = addVisibleFilter(props.endpoint);

@@ -268,6 +268,7 @@
                         currentSandPlan.stages = formatedStages;
                         buckupStages.value = sp.stages;
                     }
+                    console.log('uno', currentSandPlan.value);
                 });
             } else {
                 const sp = { ...currentSandPlan, ...vuexSP };
@@ -426,20 +427,24 @@
             const { updateSandPlan } = useActions(['updateSandPlan']);
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
-                    if (stage.sandId1 === -1) {
+                    if (stage.sandId1 === -1 || stage.quantity1 > 1 || stage.quantity1 == null) {
                         stage.sandId1 = null;
+                        stage.quantity1 = null;
                     }
 
-                    if (stage.sandId2 === -1) {
+                    if (stage.sandId2 === -1 || stage.quantity2 > 1 || stage.quantity2 == null) {
                         stage.sandId2 = null;
+                        stage.quantity2 = null;
                     }
 
-                    if (stage.sandId3 === -1) {
+                    if (stage.sandId3 === -1 || stage.quantity3 > 1 || stage.quantity3 == null) {
                         stage.sandId3 = null;
+                        stage.quantity3 = null;
                     }
 
-                    if (stage.sandId4 === -1) {
+                    if (stage.sandId4 === -1 || stage.quantity4 > 1 || stage.quantity4 == null) {
                         stage.sandId4 = null;
+                        stage.quantity4 = null;
                     }
 
                     return stage;
