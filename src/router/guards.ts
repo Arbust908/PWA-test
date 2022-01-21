@@ -113,8 +113,35 @@ export const isMobileAndLogged = (to: any, from: any, next: any) => {
 };
 
 export const checkPermission = async (to: any, from: any, next: any) => {
-    const userFromApi = await (await axios.get(`${api}/user/` + store.state.loggedUser.id)).data.data;
-    const { visible } = userFromApi;
+    const loggedUser = store.state.loggedUser;
+    const userFromApi = await (await axios.get(`${api}/user/${loggedUser.id}`)).data.data;
+    const { visible, roleId } = userFromApi;
+
+    let storePermissions = loggedUser.permissions;
+    let userChanged = false;
+
+    if (loggedUser.role !== roleId) {
+        const role = await (await axios.get(`${api}/role/${roleId}`)).data.data;
+        storePermissions = role.permissions;
+        store.dispatch('setUserRole', roleId);
+        loggedUser.role = roleId;
+        userChanged = true;
+    }
+
+    if (loggedUser.visible !== visible) {
+        loggedUser.visible = visible;
+        userChanged = true;
+    }
+
+    if (JSON.stringify(storePermissions) !== JSON.stringify(loggedUser.permissions)) {
+        store.dispatch('setUserPermissions', storePermissions);
+        loggedUser.permissions = storePermissions;
+        userChanged = true;
+    }
+
+    if (userChanged) {
+        localStorage.setItem('user', JSON.stringify(loggedUser));
+    }
 
     if (!visible) {
         next({ name: 'Error-403' });
@@ -122,8 +149,6 @@ export const checkPermission = async (to: any, from: any, next: any) => {
         return;
     }
 
-    const role = await (await axios.get(`${api}/role/` + userFromApi.roleId)).data.data;
-    const { permissions: storePermissions } = role;
     //TODO: usar el permissionManager
     const permissions = JSON.parse(JSON.stringify(storePermissions));
     const actualRoute = to.name;

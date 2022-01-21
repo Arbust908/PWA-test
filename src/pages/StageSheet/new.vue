@@ -33,7 +33,7 @@
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
                     :boxes="boxes"
-                    :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
+                    :is-selected-stage="isStageSelected(sheet.id, selectedStage.id)"
                     :is-active="pendingStages[0].id === sheet.id"
                     :pit-id="pitId"
                     @set-stage="setStage($event)"
@@ -50,7 +50,7 @@
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
                     :boxes="boxes"
-                    :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
+                    :is-selected-stage="isStageSelected(sheet.id, selectedStage.id)"
                     :is-active="pendingStages[0].id === sheet.id"
                     :pit-id="pitId"
                     @set-stage="setStage($event)"
@@ -223,7 +223,7 @@
     const pendingStages = computed(() => {
         return stages.value?.sort((a, b) => a.stage - b.stage) || [];
     });
-    const isSageSelected = (stage: number, selected: number): boolean => {
+    const isStageSelected = (stage: number, selected: number): boolean => {
         return selected === stage;
     };
     const boxes = computed(() => {

@@ -29,6 +29,7 @@
                 <StageSheetSandDetail
                     v-for="(sand, key) in sands"
                     :key="sand.id + sand.type"
+                    :sand="sand"
                     :type="sand.type"
                     :amount="sand.quantity"
                     :porcentage="getPorcentage(sand.quantity, queueDetail[sand.type])"
@@ -98,7 +99,9 @@
                 </article>
             </section>
             <footer class="w-full flex justify-end gap-3">
-                <NoneBtn btn="wide" :is-loading="isLoading"> Cancelar </NoneBtn>
+                <NoneBtn btn="wide" :is-loading="isLoading" @click="$emit('set-stage', sandStage.id)">
+                    Cancelar
+                </NoneBtn>
                 <InverseBtn btn="wide" :is-loading="isLoading" @click="generateQueue()"> Guardar </InverseBtn>
             </footer>
         </div>

@@ -15,6 +15,9 @@
     &.meshBorder {
       @apply border border-amber-700;
     };
+    &.bubble {
+      @apply border-2 border-orange-800 bg-orange-300;
+    }
   };
   &__2 {
     &.clickable {
@@ -33,6 +36,9 @@
     &.meshBorder {
       @apply border border-emerald-700;
     };
+    &.bubble {
+      @apply border-2 border-emerald-800 bg-emerald-300;
+    }
   };
   &__3 {
     &.clickable {
@@ -50,6 +56,9 @@
     &.meshBorder {
       @apply border border-sky-700;
     };
+    &.bubble {
+      @apply border-2 border-sky-800 bg-sky-300;
+    }
   };
   &__4 {
     &.clickable {
@@ -68,6 +77,9 @@
     &.meshBorder {
       @apply border border-violet-700;
     };
+    &.bubble {
+      @apply border-2 border-violet-800 bg-violet-300;
+    }
   };
   &__5 {
     &.clickable {
@@ -86,6 +98,9 @@
     &.meshBorder {
       @apply border border-orange-700;
     };
+    &.bubble {
+      @apply border-2 border-orange-800 bg-orange-300;
+    }
   };
   &__empty {
     &.clickable {
@@ -100,6 +115,9 @@
     &.iconBg {
       @apply text-neutral-400;
     };
+    &.bubble {
+      @apply border-2 border-neutral-800 bg-neutral-300;
+    }
   };
   &__taken {
     @apply text-white;

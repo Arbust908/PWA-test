@@ -208,7 +208,6 @@
                 // Filtramos los items por permiso
                 const navigationItems = JSON.parse(JSON.stringify(store.state.global.navigation));
                 // TODO: usar el permissionManager
-                // const storePermissions = store.state.loggedUser.permissions || [];
                 const storePermissions = store.getters.getUserPermissions;
                 const permissions = JSON.parse(JSON.stringify(storePermissions));
 
