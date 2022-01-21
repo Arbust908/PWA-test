@@ -24,27 +24,68 @@
 </template>
 
 <script>
-    import { defineComponent, watch } from 'vue';
-    import { useRoute } from 'vue-router';
-    import { useVModel, useCssVar } from '@vueuse/core';
-    import { maska } from 'maska';
-    import FieldTitle from '@/components/ui/form/FieldTitle.vue';
-    import InvalidInputLabel from '../InvalidInputLabel.vue';
-    export default defineComponent({
-        name: 'FieldInput',
-        directives: { maska },
-        components: {
-            FieldTitle,
-            InvalidInputLabel,
-        },
-        props: {
-            data: {
-                default: '',
+        import { defineComponent, watch } from 'vue';
+        import { useRoute } from 'vue-router';
+        import { useVModel, useCssVar } from '@vueuse/core';
+        import { maska } from 'maska';
+        import FieldTitle from '@/components/ui/form/FieldTitle.vue';
+        import InvalidInputLabel from '../InvalidInputLabel.vue';
+        export default defineComponent({
+            name: 'FieldInput',
+            directives: { maska },
+            components: {
+                FieldTitle,
+                InvalidInputLabel,
             },
-            type: {
-                type: String,
-                default: 'text',
+            props: {
+                data: {
+                    default: '',
+                },
+                type: {
+                    type: String,
+                    default: 'text',
+                },
+                fieldName: {
+                    type: String,
+                    default: 'input',
+                },
+                placeholder: {
+                    type: String,
+                    default: 'Input',
+                },
+                title: {
+                    type: [String, null],
+                    default: null,
+                },
+                mask: {
+                    type: [String, Array],
+                    default: '',
+                },
+                isOptional: {
+                    type: Boolean,
+                    default: false,
+                },
+                pre: {
+                    type: Object,
+                    default: null,
+                },
+                post: {
+                    type: Object,
+                    default: null,
+                },
+                validationType: {
+                    type: String,
+                    required: true,
+                },
+                numberValidation: {
+                    type: Boolean,
+                },
+                maxNumberAmount: {
+                    type: Number,
+                },
             },
+    <<<<<<< Updated upstream
+    =======
             fieldName: {
                 type: String,
                 default: 'input',
@@ -54,7 +95,7 @@
                 default: 'Input',
             },
             title: {
-                type: [String, null],
+                type: String,
                 default: null,
             },
             mask: {
@@ -79,59 +120,74 @@
             },
             numberValidation: {
                 type: Boolean,
+                default: false,
             },
             maxNumberAmount: {
                 type: Number,
+                required: false,
             },
-        },
+        });
+    >>>>>>> Stashed changes
 
-        setup(props, { emit }) {
-            const route = useRoute();
-            const value = useVModel(props, 'data', emit);
-            const cssPre = useCssVar('--pre', 0);
-            const cssPost = useCssVar('--post', 0);
+            setup(props, { emit }) {
+                const route = useRoute();
+                const value = useVModel(props, 'data', emit);
+                const cssPre = useCssVar('--pre', 0);
+                const cssPost = useCssVar('--post', 0);
 
-            watch(value, (data, oldData) => {
-                if (data < 1 && props.maxNumberAmount) {
-                    props.data = 1;
-                } else if (data > props.maxNumberAmount) {
-                    value.value = props.maxNumberAmount;
-                } else {
-                    value.value = data;
+                watch(value, (data, oldData) => {
+                    if (data < 1 && props.maxNumberAmount) {
+                        props.data = 1;
+                    } else if (data > props.maxNumberAmount) {
+                        value.value = props.maxNumberAmount;
+                    } else {
+                        value.value = data;
+                    }
+                });
+
+    <<<<<<< Updated upstream
+                if (props.pre) {
+                    cssPre.value = props.pre.width ?? '20%';
                 }
-            });
-
-            if (props.pre) {
-                cssPre.value = props.pre.width ?? '20%';
+    =======
+        watch(value, (data, oldData) => {
+            if (Number(data) < 1 && props.maxNumberAmount) {
+                value.value = 0;
+            } else if (Number(data) > props.maxNumberAmount) {
+                value.value = props.maxNumberAmount;
+            } else {
+                value.value = Number(data);
             }
+        });
+    >>>>>>> Stashed changes
 
-            if (props.post) {
-                cssPost.value = props.post.width ?? '20%';
-            }
+                if (props.post) {
+                    cssPost.value = props.post.width ?? '20%';
+                }
 
-            const used = ref(false);
-            const usedInput = () => {
-                used.value = true;
-            };
+                const used = ref(false);
+                const usedInput = () => {
+                    used.value = true;
+                };
 
-            const numberValidation = computed(() => {
-                return props.numberValidation && value.value <= 0 ? true : null;
-            });
+                const numberValidation = computed(() => {
+                    return props.numberValidation && value.value <= 0 ? true : null;
+                });
 
-            function print() {
-                console.log(props.numberValidation);
-            }
+                function print() {
+                    console.log(props.numberValidation);
+                }
 
-            return {
-                value,
-                ...props,
-                numberValidation,
-                usedInput,
-                used,
-                print,
-            };
-        },
-    });
+                return {
+                    value,
+                    ...props,
+                    numberValidation,
+                    usedInput,
+                    used,
+                    print,
+                };
+            },
+        });
 </script>
 
 <style lang="scss" scoped>
