@@ -110,13 +110,13 @@
         }
 
         if (
-            (!isDesign.value &&
-                (category.value == 'aisle' ||
-                    category.value == 'cradle' ||
-                    (category.value == 'empty' && !props.isDestination) ||
-                    (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination) ||
-                    (props.sandInfo?.id && !props.isEmptyDeposit))) ||
-            isEmptyBoxInEmptyDepo.value
+            !isDesign.value &&
+            (isAisle.value ||
+                isCradle.value ||
+                isEmptyBoxNotInDestination.value ||
+                isNotUndesignatedBoxInDestination.value ||
+                isFullBoxNotInEmptyDepo.value ||
+                isEmptyBoxInEmptyDepo.value)
         ) {
             bC += ' cursor-not-allowed';
         }
@@ -145,16 +145,37 @@
     });
 
     const isEmptyBoxInEmptyDepo = computed(() => {
-        return props.sandInfo?.status !== 11 && props.isEmptyDeposit;
+        return (
+            props.sandInfo?.status !== 11 &&
+            props.isEmptyDeposit &&
+            category.value !== 'empty' &&
+            props.boxData.category === undefined &&
+            props.sandInfo?.id
+        );
+    });
+    const isFullBoxNotInEmptyDepo = computed(() => {
+        return props.sandInfo?.id && !props.isEmptyDeposit;
+    });
+    const isNotUndesignatedBoxInDestination = computed(() => {
+        return props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination;
+    });
+    const isAisle = computed(() => {
+        return category.value == 'aisle';
+    });
+    const isCradle = computed(() => {
+        return category.value == 'cradle';
+    });
+    const isEmptyBoxNotInDestination = computed(() => {
+        return category.value == 'empty' && !props.isDestination;
     });
 
     const selectBox = () => {
         if (
-            (category.value == 'aisle' ||
-                category.value == 'cradle' ||
-                (category.value == 'empty' && !props.isDestination) ||
-                (props.boxData.category != 'empty' && props.boxData.category != undefined && props.isDestination) ||
-                (props.sandInfo?.id && !props.isEmptyDeposit) ||
+            (isAisle.value ||
+                isCradle.value ||
+                isEmptyBoxNotInDestination.value ||
+                isNotUndesignatedBoxInDestination.value ||
+                isFullBoxNotInEmptyDepo.value ||
                 isEmptyBoxInEmptyDepo.value ||
                 isBlocked()) &&
             !isDesign.value &&
