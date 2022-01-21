@@ -119,10 +119,10 @@ export const checkPermission = async (to: any, from: any, next: any) => {
 
     let storePermissions = loggedUser.permissions;
     let userChanged = false;
+    const role = await (await axios.get(`${api}/role/${roleId}`)).data.data;
+    storePermissions = role.permissions;
 
     if (loggedUser.role !== roleId) {
-        const role = await (await axios.get(`${api}/role/${roleId}`)).data.data;
-        storePermissions = role.permissions;
         store.dispatch('setUserRole', roleId);
         loggedUser.role = roleId;
         userChanged = true;

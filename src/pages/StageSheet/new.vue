@@ -223,6 +223,15 @@
     const pendingStages = computed(() => {
         return stages.value?.sort((a, b) => a.stage - b.stage) || [];
     });
+    const activeStage = computed(() => {
+        return (
+            stages.value
+                ?.sort((a, b) => {
+                    return a.stage - b.stage;
+                })
+                .find() || {}
+        );
+    });
     const isStageSelected = (stage: number, selected: number): boolean => {
         return selected === stage;
     };
