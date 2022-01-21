@@ -1,11 +1,12 @@
 <template>
     <button :class="[boxClassess]" class="box" @click.prevent="selectBox">
-        <span v-if="boxClassess.includes('selected') && !isDesign" class="text-sm"
-            ><Icon
+        <span v-if="boxClassess.includes('selected') && !isDesign" class="text-sm">
+            <Icon
                 icon="CheckCircle"
                 type="outline"
                 :class="`w-10 h-10 m-auto ${sandInfo?.status === 11 ? 'text-neutral-400' : null}`"
-        /></span>
+            />
+        </span>
         <span v-else :class="`text-sm ${sandInfo?.status === 11 ? 'text-stone-500' : null}`">{{ designation }}</span>
     </button>
 </template>
@@ -18,7 +19,15 @@
     const props = defineProps({
         selectedBox: {
             type: Object,
-            required: true,
+            default: () => {
+                return {};
+            },
+        },
+        selectedBoxes: {
+            type: Array,
+            default: () => {
+                return [];
+            },
         },
         floor: {
             type: Number,
@@ -64,7 +73,7 @@
         },
     });
     const emits = defineEmits(['select-box']);
-    let { floor, row, col, selectedBox, boxData, isDesign } = toRefs(props);
+    let { floor, row, col, selectedBox, selectedBoxes, boxData, isDesign } = toRefs(props);
 
     const category = computed(() => {
         return boxData && boxData.value ? boxData.value.category : 'empty';
@@ -122,6 +131,7 @@
         if (beenSet.value) {
             bC += ' been-set';
         }
+
         if (category.value === undefined && !isTheSelected.value && !isDesign.value) {
             bC += ' notDesignated';
         }
@@ -159,6 +169,20 @@
     };
 
     const isTheSelected = computed(() => {
+        const isInSelectedArray = selectedBoxes.value.some((box) => {
+            selectedBox.value.row === row.value &&
+                selectedBox.value.col === col.value &&
+                selectedBox.value.floor === floor.value;
+        });
+
+        if (isInSelectedArray) {
+            return true;
+        }
+
+        if (!selectedBox.value) {
+            return false;
+        }
+
         return (
             selectedBox.value.row === row.value &&
             selectedBox.value.col === col.value &&

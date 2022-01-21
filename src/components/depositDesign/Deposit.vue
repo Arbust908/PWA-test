@@ -20,6 +20,7 @@
                             :col="col"
                             :floor="currentFloor"
                             :selected-box="selectedBox"
+                            :selected-boxes="selectedBoxes"
                             :visible-categories="visibleCategories"
                             :box-data="getBoxData(row, col, currentFloor)"
                             :sand-info="getCellBox(row, col, currentFloor)"
@@ -44,7 +45,15 @@
     const props = defineProps({
         selectedBox: {
             type: Object,
-            required: true,
+            default: () => {
+                return {};
+            },
+        },
+        selectedBoxes: {
+            type: Array,
+            default: () => {
+                return [];
+            },
         },
         deposit: {
             type: Object,
