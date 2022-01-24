@@ -34,7 +34,7 @@
         </div>
         <div class="w-full flex gap-x-6 justify-end mt-3">
             <SecondaryBtn @click.prevent="$emit('close')"> Volver </SecondaryBtn>
-            <PrimaryBtn :is-loading="loading" @click.prevent="$emit('confirm')"> Confirmar </PrimaryBtn>
+            <PrimaryBtn :is-loading="loading" @click.prevent="$emit('confirm', checked)"> Confirmar </PrimaryBtn>
         </div>
     </Modal>
 </template>
