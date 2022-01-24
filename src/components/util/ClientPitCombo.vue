@@ -15,7 +15,6 @@
         <FieldLoading v-else />
         <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" validation-type="empty" />
     </div>
-    {{ woId }}
     <div v-if="!pads" :class="sharedClasses">
         <FieldSelect
             v-if="pits.length > 0"
@@ -33,7 +32,13 @@
         <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" validation-type="empty" />
     </div>
     <div v-if="pads" :class="sharedClasses">
-        <PadSelector :client-id="clientId" v-model:woId="woId" />
+        <PadSelector
+            :client-id="clientId"
+            v-model:woId="woId"
+            v-model:work-orders="workOrders"
+            v-model:first-filter="firstFilter"
+            :is-disabled="isDisabled"
+        />
     </div>
 </template>
 
@@ -84,6 +89,18 @@
             woId: {
                 type: Number,
                 required: false,
+            },
+            workOrders: {
+                type: Array,
+                default: [],
+            },
+            firstFilter: {
+                type: Boolean,
+                default: false,
+            },
+            fromId: {
+                type: Boolean,
+                default: false,
             },
         },
         setup(props, { emit }) {
@@ -159,6 +176,23 @@
                     filterPitsByClient(newVal);
                 }
             });
+            const workOrders = ref([]);
+            const firstFilter = ref(false);
+            watch(woId, (newVal) => {
+                if (newVal !== -1) {
+                    const filterClientByPad = workOrders.value.filter((workOrder) => workOrder.id === newVal);
+                    clientId.value = Number(filterClientByPad[0].client);
+                    if (props.fromId) {
+                        firstFilter.value = true;
+                    }
+                }
+            });
+
+            onMounted(() => {
+                if (props.fromId === true) {
+                    firstFilter.value = true;
+                }
+            });
 
             const useFirstClient = ref(false);
             watch(useFirstClient, (newVal) => {
@@ -177,6 +211,8 @@
                 useFirstClient,
                 useFirstPit,
                 woId,
+                workOrders,
+                firstFilter,
             };
         },
     });

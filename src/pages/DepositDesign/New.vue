@@ -335,17 +335,17 @@
             };
 
             const isFull = computed(() => {
-                const hasClientAndPit: boolean = clientId.value >= 0 && pitId.value >= 0;
+                const hasClientAndPad: boolean = clientId.value >= 0 && woId.value >= 0;
                 const hasDeposit: boolean = rows.value > 0 && cols.value > 0 && floors.value > 0;
 
-                return hasClientAndPit && hasDeposit;
+                return hasClientAndPad && hasDeposit;
             });
 
             const save = () => {
                 purgeOffCells();
                 const wH: Warehouse = {
                     clientCompanyId: clientId.value,
-                    pitId: pitId.value,
+                    pitId: woId.value,
                     layout: deposit.value,
                 };
                 const { data } = useAxios('/warehouse', { method: 'POST', data: wH }, instance);

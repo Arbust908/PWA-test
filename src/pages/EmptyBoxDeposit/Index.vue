@@ -129,14 +129,23 @@
 
     // Esto se usa para la grilla del Deposito
     const warehouse = ref({} as Warehouse);
+    const workOrders = ref([]);
     const floor = ref(0);
     const row = ref(0);
     const col = ref(0);
 
+    onMounted(async () => {
+        const result = await axios.get(`${apiUrl}/workOrder`);
+        workOrders.value = result.data.data;
+        console.log(workOrders.value);
+    });
+
     watch(pitId, async (newVal) => {
+        const pad = workOrders.value.find((workOrder) => workOrder.pits.find((pit) => pit.id === newVal))?.id;
+
         if (newVal > -1 && clientId.value > -1) {
             // Buscamos el deposito
-            const warehouseUrl = `${apiUrl}/warehouse?pitId=${pitId.value}&clientCompanyId=${clientId.value}`;
+            const warehouseUrl = `${apiUrl}/warehouse?pitId=${pad}&clientCompanyId=${clientId.value}`;
             warehouse.value = await axios
                 .get(warehouseUrl)
                 .then((response) => {
