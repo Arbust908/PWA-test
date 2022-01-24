@@ -54,6 +54,13 @@ const Forklift_Operation = {
     title: 'ForkliftOperation',
     // keep: true,
 };
+const Close_Of_Operations = {
+    name: 'Cierre de operaciones',
+    to: '/cierre-de-operaciones',
+    icon: 'Briefcase',
+    title: 'CloseOfOperations',
+    keep: true,
+};
 const Deposito_de_cajas_vacias = {
     name: 'Depósito de cajas vacias',
     to: '/deposito-cajas-vacias',
@@ -128,6 +135,7 @@ export default {
             Deposito_de_cajas_vacias,
             Destino_de_cajas_vacias,
             Forklift_Operation,
+            Close_Of_Operations,
             LINE,
             {
                 name: 'Proveedores',

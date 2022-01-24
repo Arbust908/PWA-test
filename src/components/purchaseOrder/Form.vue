@@ -482,7 +482,7 @@
                 openSuccess.value = true;
             }
         }
-        // emit('updateQueueItem', order.value);
+        emit('updateQueueItem', order.value);
     };
     // >> Success y Error Modal
     const openSuccess = ref(false);

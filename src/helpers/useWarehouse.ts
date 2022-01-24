@@ -120,26 +120,38 @@ export const boxesByFloor = (location: any, queueItemSort = false) => {
     return boxes;
 };
 
-export const getBoxClasses = (category: string) => {
-    switch (category) {
-        case '1':
-            return 'mesh-type__1 boxCard';
-        case '2':
-            return 'mesh-type__2 boxCard';
-        case '3':
-            return 'mesh-type__3 boxCard';
-        case '4':
-            return 'mesh-type__4 boxCard';
-        case '5':
-            return 'mesh-type__5 boxCard';
-        case 'empty':
-            return 'mesh-type__empty boxCard';
-        case 'aisle':
-            return 'mesh-type__taken aisle';
-        case 'cradle':
-            return 'mesh-type__taken cradle';
-        case null:
-            return '';
+export const getBoxClasses = (category: string, status: number) => {
+    if (status === 11) {
+        return 'mesh-type__empty boxCard';
+    } else if (status === null) {
+        return 'notDesignated';
+    } else {
+        switch (category) {
+            case '1':
+                return 'mesh-type__1 boxCard';
+            case '2':
+                return 'mesh-type__2 boxCard';
+            case '3':
+                return 'mesh-type__3 boxCard';
+            case '4':
+                return 'mesh-type__4 boxCard';
+            case '5':
+                return 'mesh-type__5 boxCard';
+            case 'empty':
+                return 'mesh-type__empty boxCard';
+            case 'aisle':
+                return 'mesh-type__taken aisle';
+            case 'cradle':
+                return 'mesh-type__taken cradle';
+            case null:
+                return '';
+            default:
+                if (parseInt(category) > 5) {
+                    return 'mesh-type__extra boxCard';
+                } else {
+                    return '';
+                }
+        }
     }
 
     return '';
@@ -179,6 +191,9 @@ export const getSandOrders = async () => {
 export const formatBoxLocation = (box: SandOrder): SandOrderBox => {
     const { location } = box;
     box.location = JSON.parse(location);
+    box.row = box.location.row;
+    box.col = box.location.col;
+    box.floor = box.location.floor;
 
     return box as SandOrderBox;
 };

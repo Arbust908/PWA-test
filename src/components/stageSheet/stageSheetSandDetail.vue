@@ -44,17 +44,10 @@
         return sand.value.id;
     });
     // TODO animacion de fill
-
     const input = ref(0);
-    console.log(input.value);
-    console.log(porcentage.value);
-
     input.value = porcentage.value;
-    console.log(input.value);
 
     watch(porcentage, (newValue) => {
-        console.log(newValue);
-
         input.value = newValue;
     });
 

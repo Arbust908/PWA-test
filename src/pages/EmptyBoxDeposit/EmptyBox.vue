@@ -11,7 +11,7 @@
         <div class="flex gap-x-6">
             <section class="bg-white rounded-md shadow-sm min-w-[308px] max-h-[620px] overflow-y-auto">
                 <h2 class="p-6 pb-0 font-bold text-2xl">Cajas Vacias</h2>
-                <div v-if="clientId > 0 && pitId > 0" class="px-6 py-5 space-y-5">
+                <div v-if="boxes.length > 0" class="px-6 py-5 space-y-5">
                     <BoxCard
                         v-for="box in boxes"
                         :key="box.sandOrder.boxId"
@@ -23,7 +23,7 @@
                         @truck="truck(box)"
                     />
                 </div>
-                <div v-else class="flex flex-row bg-gray-100 m-4 p-4 rounded text-center text-sm text-black">
+                <div v-else class="flex flex-row bg-gray-100 mx-4 my-6 p-4 rounded text-center text-sm text-black">
                     <Icon icon="ExclamationCircle" type="outline" class="w-5 h-5" />
                     <p class="ml-2">No hay cajas vacias por retirar</p>
                 </div>
@@ -55,6 +55,7 @@
                     :cols="col"
                     :floor="floor"
                     :deposit="warehouse.layout || {}"
+                    :is-destination="true"
                     @select-box="selectBox"
                 />
             </section>

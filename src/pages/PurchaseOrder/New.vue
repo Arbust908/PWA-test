@@ -10,7 +10,6 @@
                     <ClientPitCombo
                         :client-id="companyClientId"
                         :pit-id="pitId"
-                        validation-type="empty"
                         @update:clientId="companyClientId = $event"
                         @update:pitId="pitId = $event"
                     />

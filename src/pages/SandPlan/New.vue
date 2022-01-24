@@ -7,7 +7,6 @@
                     <ClientPitCombo
                         v-model:client-id="currentSandPlan.companyId"
                         v-model:pit-id="currentSandPlan.pitId"
-                        validation-type="empty"
                     />
                 </FieldGroup>
             </form>
@@ -101,7 +100,7 @@
                     </section>
                 </header>
                 <div v-show="currentOpened" class="pr-8 pl-2 border-2 border-solid rounded-b-lg">
-                    <ResposiveTableSandPlan
+                    <ResponsiveTableSandPlan
                         v-for="(stage, Key) in inProgressStages"
                         :key="Key"
                         :pos="Key"
@@ -161,13 +160,12 @@
     import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import ResposiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
+    import ResponsiveTableSandPlan from '@/components/sandPlan/ResponsiveTableSandPlan.vue';
     import SandPlanStage from '@/components/sandPlan/StageRow.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import StageEmptyState from '@/components/sandPlan/StageEmptyState.vue';
     import StageHeader from '@/components/sandPlan/StageHeader.vue';
     import { isNotLast } from '@/helpers/iteretionHelpers';
-
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
 
@@ -181,7 +179,7 @@
             Icon,
             Layout,
             PrimaryBtn,
-            ResposiveTableSandPlan,
+            ResponsiveTableSandPlan,
             SandPlanStage,
             SecondaryBtn,
             StageEmptyState,
@@ -380,20 +378,24 @@
 
             const save = (): void => {
                 currentSandPlan.stages.map((stage) => {
-                    if (stage.sandId1 === -1) {
+                    if (stage.sandId1 === -1 || stage.quantity1 > 1 || stage.quantity1 == null) {
                         stage.sandId1 = null;
+                        stage.quantity1 = null;
                     }
 
-                    if (stage.sandId2 === -1) {
+                    if (stage.sandId2 === -1 || stage.quantity2 > 1 || stage.quantity2 == null) {
                         stage.sandId2 = null;
+                        stage.quantity2 = null;
                     }
 
-                    if (stage.sandId3 === -1) {
+                    if (stage.sandId3 === -1 || stage.quantity3 > 1 || stage.quantity3 == null) {
                         stage.sandId3 = null;
+                        stage.quantity3 = null;
                     }
 
-                    if (stage.sandId4 === -1) {
+                    if (stage.sandId4 === -1 || stage.quantity4 > 1 || stage.quantity4 == null) {
                         stage.sandId4 = null;
+                        stage.quantity4 = null;
                     }
 
                     return stage;
@@ -408,6 +410,7 @@
 
                     return noSandTypeNull;
                 });
+
                 const { data } = useAxios('/sandPlan', { method: 'POST', data: currentSandPlan }, instance);
                 watch(data, (apiData) => {
                     if (apiData && apiData.data) {
