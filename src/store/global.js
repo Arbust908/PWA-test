@@ -52,7 +52,7 @@ const Forklift_Operation = {
     icon: 'SwitchHorizontal',
     title: 'ForkliftOperation',
 };
-const Close_Of_Operations = {
+const Close_Of_Operation = {
     name: 'Cierre de operaciones',
     to: '/cierre-de-operaciones',
     icon: 'Briefcase',
@@ -130,7 +130,7 @@ export default {
             Deposito_de_cajas_vacias,
             Destino_de_cajas_vacias,
             Forklift_Operation,
-            Close_Of_Operations,
+            Close_Of_Operation,
             LINE,
             {
                 name: 'Proveedores',
