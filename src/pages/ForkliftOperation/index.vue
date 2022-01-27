@@ -9,7 +9,7 @@
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item?.sandOrder?.boxId ? null : 'empty'" :order="item?.order">
-                    {{ item?.sandOrder?.boxId || 'Sin definir' }}
+                    {{ item?.sandOrder?.boxId || 'Sin definir' }} ({{ item?.order }})
                 </td>
 
                 <td :class="item.origin ? null : 'empty'">
@@ -51,7 +51,7 @@
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item?.sandOrder.boxId ? null : 'empty'">
-                    {{ item?.sandOrder.boxId || 'Sin definir' }}
+                    {{ item?.sandOrder.boxId || 'Sin definir' }} - {{ item?.order }}
                 </td>
 
                 <td :class="item.origin ? null : 'empty'">
@@ -145,7 +145,9 @@
 
     onMounted(async () => {
         const fullQueue = await getQueueItems();
-        queueBackup.value = fullQueue.filter((item: QueueItem) => itemIsNotToEmpty(item));
+        queueBackup.value = fullQueue
+            .filter((item: QueueItem) => itemIsNotToEmpty(item))
+            .filter((item: QueueItem) => item.order >= 0);
     });
 
     const toggleQueueItemStatus = (item: QueueItem) => {
