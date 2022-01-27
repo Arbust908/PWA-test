@@ -36,9 +36,16 @@
                 </td>
 
                 <td class="text-center" :class="item ? null : 'empty'">
-                    <Badge v-if="item.isOperator" text="Enviada" classes="bg-[#1AA532] text-white px-5" />
+                    <Badge
+                        class="text-white px-5"
+                        :class="getNotificationInfo(item).color"
+                        :text="getNotificationInfo(item).text"
+                    />
+
+                    <!-- <Badge v-if="item.isOperator" text="Enviada" classes="bg-[#1AA532] text-white px-5" />
                     <Badge v-else text="En proceso" classes="bg-[#616161] text-white" />
                     <Badge v-if="false" text="Rechazada" classes="bg-[#BE1A3B] text-white px-5" />
+                    -->
                 </td>
             </template>
 
@@ -82,6 +89,7 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
+    const api = import.meta.env.VITE_API_URL || '/api';
     import axios from 'axios';
 
     import NotificationBackDropCard from '@/components/notifications/NotificationBackDropCard.vue';
@@ -127,8 +135,16 @@
         },
         {
             label: 'Reenviar',
-            callback: () => {
-                toggleModal();
+            callback: async (item) => {
+                // toggleModal();
+                const result = await axios.post(`${api}/providerNotification/${item.id}/resend`).catch((err) => {
+                    console.log(err);
+                    alert('ERROR' + err);
+                });
+
+                if (result.status === 200) {
+                    alert('OK');
+                }
             },
         },
     ];
@@ -194,11 +210,38 @@
     // MODALS
     const showModal = ref(false);
     const toggleModal = useToggle(showModal);
+
+    const STATUS_NOTIFICATION_PENDING = 0;
+    const STATUS_NOTIFICATION_DELIVERED = 1;
+    const STATUS_NOTIFICATION_FAILED = 2;
+
+    const getNotificationInfo = (value) => {
+        switch (value.notificationStatus) {
+            case STATUS_NOTIFICATION_PENDING:
+                return {
+                    color: 'bg-[#616161]',
+                    text: 'En proceso',
+                };
+            case STATUS_NOTIFICATION_DELIVERED:
+                return {
+                    color: 'bg-[#1AA532]',
+                    text: 'Enviada',
+                };
+
+            case STATUS_NOTIFICATION_FAILED:
+                return {
+                    color: 'bg-[#BE1A3B]',
+                    text: 'Fallida',
+                };
+            default:
+                return {
+                    color: 'bg-[#616161]',
+                    text: 'En proceso',
+                };
+        }
+    };
 </script>
 
 <style lang="scss" scoped>
     @import '@/assets/table.scss';
-    .badge {
-        background-color: #616161;
-    }
 </style>

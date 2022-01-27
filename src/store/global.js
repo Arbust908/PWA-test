@@ -1,4 +1,3 @@
-import { useRouter } from 'vue-router';
 const OrdenDeTrabajo = {
     name: 'Orden de trabajo',
     to: '/orden-de-trabajo',
@@ -59,7 +58,7 @@ const Close_Of_Operations = {
     to: '/cierre-de-operaciones',
     icon: 'Briefcase',
     title: 'CloseOfOperations',
-    keep: true,
+    // keep: true,
 };
 const Deposito_de_cajas_vacias = {
     name: 'Depósito de cajas vacias',

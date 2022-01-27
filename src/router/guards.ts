@@ -123,23 +123,27 @@ export const checkPermission = async (to: any, from: any, next: any) => {
     storePermissions = role.permissions;
 
     if (loggedUser.role !== roleId) {
+        // console.log('Cambio el Role o su Id');
         store.dispatch('setUserRole', roleId);
         loggedUser.role = roleId;
         userChanged = true;
     }
 
     if (loggedUser.visible !== visible) {
+        // console.log('Cambio la Visibilidad');
         loggedUser.visible = visible;
         userChanged = true;
     }
 
     if (JSON.stringify(storePermissions) !== JSON.stringify(loggedUser.permissions)) {
+        // console.log('Los permisos en local Cambiaron');
         store.dispatch('setUserPermissions', storePermissions);
         loggedUser.permissions = storePermissions;
         userChanged = true;
     }
 
     if (userChanged) {
+        // console.log('Cambio el Usuario');
         localStorage.setItem('user', JSON.stringify(loggedUser));
     }
 
