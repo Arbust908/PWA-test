@@ -144,6 +144,7 @@
                 }
             });
             // :: PITS
+            const workOrders = ref([]);
             const pitId = ref(-1);
             const pits = ref([] as Array<Pit>);
             const { data: pitsData } = useAxios('/pit', instance);
@@ -333,7 +334,10 @@
                 warehouse.value = await warehouses.value.find((singleWarehouse) => {
                     return (
                         parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
-                        parseInt(singleWarehouse.pitId) == pitId.value
+                        parseInt(singleWarehouse.pitId) ==
+                            workOrders.value.find((workOrder) => workOrder.pits.find((pit) => pit.id === pitId.value))
+                                ?.id
+                        //parseInt(singleWarehouse.pitId) == pitId.value
                     );
                 });
             };
@@ -401,7 +405,9 @@
             };
 
             onMounted(async () => {
+                workOrders.value = await getWorkOrders();
                 warehouses.value = await getWarehouses();
+                console.log(warehouses.value);
             });
 
             return {

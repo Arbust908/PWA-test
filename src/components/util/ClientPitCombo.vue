@@ -47,6 +47,7 @@
     import { useVModels } from '@vueuse/core';
     import { Pit, Company } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
+    import { getWorkOrders } from '@/helpers/useGetEntities';
 
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLoading from '@/components/ui/form/FieldLoading.vue';
@@ -178,17 +179,28 @@
             });
             const workOrders = ref([]);
             const firstFilter = ref(false);
-            watch(woId, (newVal) => {
-                if (newVal !== -1) {
-                    const filterClientByPad = workOrders.value.filter((workOrder) => workOrder.id === newVal);
+
+            const padFilter = async (filterValue: number) => {
+                workOrders.value = await getWorkOrders();
+
+                if (filterValue !== -1) {
+                    const filterClientByPad = workOrders.value.filter((workOrder) => workOrder.id === filterValue);
+                    console.log(workOrders.value);
                     clientId.value = Number(filterClientByPad[0].client);
+
                     if (props.fromId) {
                         firstFilter.value = true;
                     }
                 }
+            };
+
+            watch(woId, async (newVal) => {
+                await padFilter(newVal);
             });
 
-            onMounted(() => {
+            onMounted(async () => {
+                await padFilter(woId.value);
+
                 if (props.fromId === true) {
                     firstFilter.value = true;
                 }

@@ -5,13 +5,13 @@
             <form method="POST" action="/" class="p-8 md:p-12 flex flex-col gap-4">
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
                     <ClientPitCombo
+                        v-model:wo-id="woId"
                         :client-id="clientId"
                         :pit-id="pitId"
-                        @update:clientId="clientId = $event"
-                        @update:pitId="pitId = $event"
-                        v-model:wo-id="woId"
                         validation-type="empty"
                         :pads="true"
+                        @update:clientId="clientId = $event"
+                        @update:pitId="pitId = $event"
                     />
                     <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de filas</h3>

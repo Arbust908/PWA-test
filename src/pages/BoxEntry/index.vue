@@ -10,7 +10,7 @@
                             :pit-id="Number(pitId)"
                             @update:clientId="clientId = Number($event)"
                             @update:pitId="pitId = Number($event)"
-                        />{{ clientId }}
+                        />
                     </span>
                     <FieldSelect
                         class="col-span-4"

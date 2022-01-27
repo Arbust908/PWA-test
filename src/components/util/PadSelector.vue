@@ -85,11 +85,10 @@
                     );
                     console.log('holi');
                     padPopulation.value = filteredWorkOrders;
-                    woId.value = -1;
                 } else {
                     padPopulation.value = workOrders.value;
                     console.log(workOrders.value);
-                    if (!firstFilter.value) {
+                    if (firstFilter.value) {
                         woId.value = -1;
                     }
                 }
