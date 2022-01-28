@@ -38,7 +38,7 @@
                     :porcentage="getPorcentage(sand.quantity, queueDetail[sand.type])"
                 />
             </section>
-            <section v-if="!isActiveStage" class="flex justify-center items-center max-w-md">
+            <section v-if="!isActive" class="flex justify-center items-center max-w-md">
                 <p class="leading-wider leading-loose text-center max-w-sm mx-auto">
                     Debés completar al menos un 70% de la etapa anterior para continuar con la siguiente
                 </p>
@@ -85,9 +85,9 @@
                                     </nav>
                                     <section class="overflow-y-auto gutter-stable-both max-h-[220px] pb-6 space-y-2">
                                         <SheetDepoBox
-                                            v-for="(box, index) in boxesByFloorAndFiltered"
+                                            v-for="(floorBox, index) in boxesByFloorAndFiltered"
                                             :key="index"
-                                            :box="box"
+                                            :box="floorBox"
                                             @set-box="addBoxToQueue(place, $event)"
                                         />
                                         <p v-if="boxesByFloorAndFiltered.length <= 0">Sin Cajas</p>
@@ -125,7 +125,11 @@
     import SheetDepoBox from './sheetDepoBox.vue';
     import StageSheetSandDetail from './stageSheetSandDetail.vue';
     import { createAllQueueItems, getQueueItems } from '@/helpers/useQueueItem';
+    import { filterEmptyQueueBox, getPorcentage } from '@/helpers/useSheetHelpers';
     import { getSandOrders } from '@/helpers/useWarehouse';
+    import { getLast } from '@/helpers/iteretionHelpers';
+    import { useSheetStore } from '@/store/stageSheet.pinia';
+    import { storeToRefs } from 'pinia';
     const props = defineProps({
         sandStage: {
             type: Object,
@@ -143,12 +147,12 @@
             type: Boolean,
             default: false,
         },
-        pitId: {
-            type: Number,
-            default: 0,
-        },
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
+    const sheetStore = useSheetStore();
+    const { clientId, pitId, currentWarehouse, queueBoxes, workOrder, currentCradle, getPitBoxes, getPitBoxesByFloor } =
+        storeToRefs(sheetStore);
+    // const { setTab, isTabSelected, setCradle, setWorkOrder } = sheetStore;
     const { isActive, isSelectedStage } = toRefs(props);
     const router = useRouter();
     const store = useStore();
@@ -164,26 +168,32 @@
     const showProgress = computed(() => {
         return stagePorcentage.value > 0;
     });
+    // Cola de cajas del Stage
+    /**
+     * @type {Ref<Array<number | QueueItem>>}
+     * @description Referencia a la cola de cajas del stage
+     */
     const boxQueue: Ref<Array<number | SandOrder>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
-
     const fillQueueBoxes = async () => {
         boxQueue.value = await getSandOrders();
-        console.log(boxQueue.value);
+        console.log('Cola de Cajas', boxQueue.value);
         boxQueue.value = boxQueue.value
             .filter((order) => {
                 return order.location;
             })
-            .filter((order) => {
+            .filter((order: SandOrder) => {
                 const { queueItems } = order;
 
-                if (queueItems.length) {
-                    const queueItem = queueItems[0];
-                    const { pitId } = queueItem;
+                if (queueItems !== undefined) {
+                    if (queueItems.length) {
+                        const queueItem = queueItems[0];
+                        const { pitId: itemPitId } = queueItem;
 
-                    return pitId === props.pitId;
+                        return itemPitId === pitId.value;
+                    }
                 }
 
-                return;
+                return false;
             })
             .map((order) => {
                 const { queueItems, location } = order;
@@ -222,13 +232,15 @@
                 return orderB - orderA;
             });
 
+        console.log('Cajas de Cola final', boxQueue.value);
+
         if (boxQueue.value.length < 14) {
             const queueNum = boxQueue.value.length;
             for (let i = queueNum + 1; i <= 14; i++) {
                 boxQueue.value.push(i);
             }
         }
-        console.log(boxQueue.value);
+        console.log('Cajas de Cola relleno', boxQueue.value);
     };
 
     watch(isSelectedStage, (val) => {
@@ -236,16 +248,19 @@
             emits('update-queue', boxQueue.value);
         }
     });
-
     watch(
         isActive,
         (val) => {
             if (val) {
+                console.log('isActive');
+                val && console.log('Emito');
+                emits('update-queue', boxQueue.value);
                 fillQueueBoxes();
             }
         },
         { immediate: true }
     );
+    // Quizas se puede unificar los watchs de arriba
 
     const addBoxToQueue = (place: null | number = null, box: any = null) => {
         if (place !== null && box !== null) {
@@ -260,21 +275,6 @@
             boxQueue.value.push(boxQueue.value.length + 1);
         }
     };
-    const isActiveStage = computed(() => {
-        return props.isActive;
-    });
-    watch(
-        isActiveStage,
-        (newValue) => {
-            console.log(newValue);
-
-            if (newValue) {
-                newValue && console.log('Emito');
-                emits('update-queue', boxQueue.value);
-            }
-        },
-        { immediate: true }
-    );
     const selectedBox = ref(null as any);
     const isSelectedBox = (boxId: number) => {
         return selectedBox.value?.id === boxId;
@@ -283,7 +283,7 @@
         x: 0,
         y: 0,
     });
-    const fillBox = (boxId: number, event) => {
+    const fillBox = (boxId: number, event: any) => {
         selectedBox.value = { id: boxId };
         popUpCords.x = event.clientX;
         popUpCords.y = event.clientY;
@@ -296,20 +296,14 @@
     const selectFloor = (floor: number) => {
         selectedFloor.value = floor;
     };
-    const boxesByFloorAndFiltered = computed(() => {
-        const filteredBoxes = [];
-        props.boxes[selectedFloor.value - 1].map((box) => {
-            console.groupCollapsed(`${box.id}`);
-            console.log('Box Id: ', box.id);
-            console.log('Box where: ', box?.location?.where);
-            console.log('Box BoxId: ', box?.sandOrder?.boxId);
-            console.log('Box: ', box);
-            console.groupEnd();
 
+    /* CAJAS POR PISO */
+    const boxesByFloorAndFiltered = computed(() => {
+        const filteredBoxes = [] as any[];
+        getPitBoxesByFloor.value[selectedFloor.value - 1].map((box: any) => {
             const compareQueue = boxQueue.value.filter((queuedBox) => {
                 return queuedBox.id;
             });
-
             console.log('Compare Queue: ', compareQueue);
 
             if (compareQueue.length <= 0) {
@@ -320,13 +314,6 @@
 
             if (box?.id) {
                 const isOnQueue = compareQueue.some((queuedBox) => {
-                    console.groupCollapsed(`isOnQueue ${queuedBox.id}`);
-                    console.log('Box: ', queuedBox);
-                    console.log('Box Id: ', queuedBox.id);
-                    console.log('Box where: ', queuedBox?.location?.where);
-                    console.log('Box BoxId: ', queuedBox?.boxId);
-                    console.groupEnd();
-
                     return queuedBox.boxId === box?.sandOrder?.boxId;
                 });
 
@@ -339,6 +326,9 @@
 
             return box;
         });
+
+        console.log(filteredBoxes);
+        console.log([...new Set(filteredBoxes)]);
 
         return filteredBoxes;
     });
@@ -366,21 +356,9 @@
 
         return total;
     });
-    const getPorcentage = (total: number, value = 0) => {
-        const result = (value * 100) / total;
-
-        return result === Infinity ? 0 : (value * 100) / total;
-    };
-
     const stagePorcentage = computed(() => {
         return getPorcentage(weigth.value, queueDetailTotal.value);
     });
-    watch(stagePorcentage, () => {
-        if (stagePorcentage.value >= 100) {
-            emits('set-stage-full');
-        }
-    });
-
     const getSandLogic = async (sandId: number) => {
         const { GET } = StoreLogicMethods;
         const result = await useStoreLogic(router, store, 'sand', GET, sandId);
@@ -391,11 +369,48 @@
 
         return {};
     };
-
     const updateSand = (sand: Sand, sandQuantity: number) => {
         const { clone: sandInfo } = useClone(sand);
         sandInfo.quantity = sandQuantity;
         sands.value.push(sandInfo);
+    };
+    const generateQueue = async () => {
+        isLoading.value = true;
+        console.log(boxQueue.value);
+        const toAddQueue: Array<QueueItem> = boxQueue.value
+            .filter(filterEmptyQueueBox)
+            .map((box) => {
+                console.log('Box: ', box);
+
+                const items = box?.queueItems.filter((item: QueueItem) => {
+                    console.log('Item: ', item);
+
+                    return item.status !== 99;
+                });
+                console.log('Items: ', items);
+                console.log('Items: ', getLast(items));
+
+                return getLast(items);
+            })
+            .filter((item) => {
+                console.log('QueueItem: ', item);
+
+                return item?.destination;
+            })
+            .map((item) => {
+                console.log('item: ', item);
+                item.origin = item.destination;
+                item.destination = null;
+
+                return item;
+            });
+        console.log('toAddQueue', toAddQueue);
+        console.log('CRADLE', currentCradle.value);
+
+        // await createAllQueueItems(toAddQueue);
+        console.log('Espero');
+        isLoading.value = false;
+        // Emit que todo esta sumado
     };
 
     onMounted(async () => {
@@ -418,33 +433,6 @@
             updateSand(await getSandLogic(sandId4), quantity4);
         }
     });
-
-    const generateQueue = async () => {
-        isLoading.value = true;
-        console.log(boxQueue.value);
-        const toAddQueue: Array<QueueItem> = boxQueue.value
-            .filter((box) => {
-                return typeof box !== 'number';
-            })
-            .map((box) => {
-                return box.queueItems[0];
-            })
-            .filter((item) => {
-                console.log('item: ', item);
-
-                return;
-            })
-            .map((item) => {
-                item.origin = item.destination;
-                item.destination = null;
-            });
-        console.log(toAddQueue);
-
-        await createAllQueueItems(toAddQueue);
-        console.log('Espero');
-        isLoading.value = false;
-        // Emit que todo esta sumado
-    };
 </script>
 
 <style scoped lang="scss">
