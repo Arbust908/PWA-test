@@ -180,7 +180,7 @@ export const searchInDepoBoxes = async (depoId: number) => {
     return getInDepoBoxes(allBoxes, depoId);
 };
 
-export const getSandOrders = async () => {
+export const getSandOrders = async (): Promise<SandOrder[]> => {
     return await axios
         .get(`${apiUrl}/sandOrder`)
         .then((response) => {
