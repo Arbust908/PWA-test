@@ -5,6 +5,7 @@
             field-name="client"
             placeholder="Seleccionar cliente"
             title="Cliente"
+            require-validation
             :endpoint-data="clients"
             :data="clientId"
             :is-disabled="isDisabled"
@@ -21,6 +22,7 @@
             field-name="pit"
             placeholder="Seleccionar pozo"
             title="Pozo"
+            require-validation
             :endpoint-data="pits"
             :data="pitId"
             :is-disabled="isDisabled"
@@ -34,6 +36,7 @@
     <div v-if="pads" :class="sharedClasses">
         <PadSelector
             :client-id="clientId"
+            require-validation
             v-model:woId="woId"
             v-model:work-orders="workOrders"
             v-model:first-filter="firstFilter"
@@ -125,6 +128,10 @@
             });
 
             const filterPitsByClient = (idOfClient: number) => {
+                if (firstFilter.value) {
+                    pitId.value = -1;
+                }
+                firstFilter.value = true;
                 pits.value = [];
                 setTimeout(() => {
                     const proxyPitId = pitId.value ? pitId.value : 0;

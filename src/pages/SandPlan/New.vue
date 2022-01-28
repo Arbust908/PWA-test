@@ -53,8 +53,8 @@
                                     <tbody v-show="currentOpened" class="divide-y">
                                         <SandPlanStage
                                             v-for="(stage, Key) in inProgressStages"
-                                            :class="isNotLast(Key, inProgressStages) && 'border-b border-gray-200'"
                                             :key="Key"
+                                            :class="isNotLast(Key, inProgressStages) && 'border-b border-gray-200'"
                                             :pos="Key"
                                             :stage="stage"
                                             :editing="editingStage"
@@ -220,6 +220,7 @@
                     },
                 ],
             });
+            console.log(currentSandPlan);
 
             const addStage = () => {
                 if (currentSandPlan.stages?.length >= 40) {
@@ -358,7 +359,6 @@
             // << SAND
             const isFull = computed(() => {
                 const minSands = minSandsAmount(currentSandPlan.stages);
-
                 const noZeroSandTypeNull =
                     (currentSandPlan.stages[0].sandId1 !== null && currentSandPlan.stages[0].sandId1 !== -1) ||
                     (currentSandPlan.stages[0].sandId2 !== null && currentSandPlan.stages[0].sandId2 !== -1) ||
@@ -424,6 +424,7 @@
                         (stage.sandId2 !== null && stage.quantity2 > 0) ||
                         (stage.sandId3 !== null && stage.quantity3 > 0) ||
                         (stage.sandId4 !== null && stage.quantity4 > 0);
+
                     return noSandTypeNull;
                 });
 

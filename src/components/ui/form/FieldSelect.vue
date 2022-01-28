@@ -121,7 +121,7 @@
             const noOptionSelected = computed(() => value.value === -1);
 
             const selectClasses = computed(() => {
-                return props.selectClass && value.value === -1 ? 'error' : null;
+                return props.selectClass && props.requireValidation && value.value === -1 ? 'error' : null;
             });
 
             return {

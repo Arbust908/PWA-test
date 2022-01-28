@@ -4,9 +4,10 @@
         field-name="pad"
         placeholder="Seleccionar PAD"
         title="PAD"
-        require-validation
         :endpoint-data="padPopulation"
         endpoint-key="pad"
+        :require-validation="requireValidation"
+        :is-optional="isOptional"
         :is-disabled="isDisabled"
         v-model:data="woId"
         v-model:work-orders="workOrders"
@@ -15,7 +16,7 @@
         @click="useFirstPad = true"
     />
     <FieldLoading v-else />
-    <InvalidInputLabel v-if="woId == -1 && useFirstPad === true" validation-type="empty" />
+    <InvalidInputLabel v-if="woId == -1 && useFirstPad === true && requireValidation" validation-type="empty" />
 </template>
 
 <script lang="ts">
@@ -40,6 +41,10 @@
                 type: Number,
                 required: true,
             },
+            requireValidation: {
+                type: Boolean,
+                default: false,
+            },
             isDisabled: {
                 type: Boolean,
                 default: false,
@@ -60,6 +65,10 @@
                 type: Boolean,
                 default: false,
             },
+            isOptional: {
+                type: Boolean,
+                default: false,
+            },
         },
         setup(props, { emit }) {
             const { clientId, woId, workOrders, firstFilter } = useVModels(props, emit);
@@ -70,24 +79,21 @@
             onMounted(async () => {
                 const result = await axios.get(`${api}/workOrder`);
                 workOrders.value = result.data.data;
-                console.log(clientId.value);
             });
 
-            watch(workOrders, (newVal) => {
+            watch(workOrders, (newVal: any) => {
                 padPopulation.value = newVal;
-                console.log(padPopulation.value);
             });
 
-            const filteringPads = (newClientId) => {
+            const filteringPads = (newClientId: number) => {
                 if (newClientId !== -1 && !firstFilter.value) {
                     const filteredWorkOrders = workOrders.value.filter(
                         (workOrder) => Number(workOrder.client) === newClientId
                     );
-                    console.log('holi');
                     padPopulation.value = filteredWorkOrders;
                 } else {
                     padPopulation.value = workOrders.value;
-                    console.log(workOrders.value);
+
                     if (firstFilter.value) {
                         woId.value = -1;
                     }
@@ -96,7 +102,6 @@
             };
 
             watch(clientId, (newVal) => {
-                console.log(firstFilter.value);
                 filteringPads(newVal);
             });
 
@@ -104,6 +109,7 @@
             watch(useFirstPad, (newVal) => {
                 useFirstPad.value = newVal;
             });
+
             return {
                 clientId,
                 InvalidInputLabel,

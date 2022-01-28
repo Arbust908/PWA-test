@@ -34,7 +34,6 @@
                     :boxes="boxes"
                     :is-selected-stage="isStageSelected(sheet.id, selectedStage.id)"
                     :is-active="pendingStages[0].id === sheet.id"
-                    :pit-id="pitId"
                     @set-stage="setStage($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
@@ -51,7 +50,6 @@
                     :boxes="boxes"
                     :is-selected-stage="isStageSelected(sheet.id, selectedStage.id)"
                     :is-active="pendingStages[0].id === sheet.id"
-                    :pit-id="pitId"
                     @set-stage="setStage($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
@@ -71,23 +69,10 @@
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
                 </article>
                 <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
-                    {{ queueDetail }}
                     <div class="text-semibold space-y-3">
-                        <p>
-                            <span class="mr-2">Total Arena A:</span>
-                            <span>{{ queueDetailFormated(queueDetail && queueDetail[0]) }}</span>
-                        </p>
-                        <p>
-                            <span class="mr-2">Total Arena B:</span>
-                            <span>{{ queueDetailFormated(queueDetail && queueDetail[1]) }}</span>
-                        </p>
-                        <p>
-                            <span class="mr-2">Total Arena C:</span>
-                            <span>{{ queueDetailFormated(queueDetail && queueDetail[2]) }}</span>
-                        </p>
-                        <p>
-                            <span class="mr-2">Total Arena D:</span>
-                            <span>{{ queueDetailFormated(queueDetail && queueDetail[3]) }}</span>
+                        <p v-for="(detail, index) in queueDetail" :key="index">
+                            <span class="mr-2">{{ detailTitle(index) }}:</span>
+                            <span>{{ queueDetailFormated(detail) }}</span>
                         </p>
                     </div>
                     <hr class="border-white border mt-1" />
@@ -118,7 +103,8 @@
 
 <script setup lang="ts">
     import axios from 'axios';
-    import { StageSheet, SandStage, Warehouse, QueueItem } from '@/interfaces/sandflow';
+    import { Ref } from 'vue';
+    import { StageSheet, SandStage, Warehouse, QueueItem, SandOrder, WorkOrder, Pit } from '@/interfaces/sandflow';
     import { boxesByFloor, formatLocation, searchInDepoBoxes } from '@/helpers/useWarehouse';
     import { useAxios } from '@vueuse/integrations/useAxios';
 
@@ -130,23 +116,19 @@
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import StageSheetStageBox from '@/components/stageSheet/stageSheetStageBox.vue';
     import { getQueueItems } from '@/helpers/useQueueItem';
+    import { useSheetStore } from '@/store/stageSheet.pinia';
+    import { storeToRefs } from 'pinia';
+    import { detailTitle, queueDetailFormated, isStageSelected } from '@/helpers/useSheetHelpers';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
     const instance = axios.create({
         baseURL: apiUrl,
     });
-
-    const clientId = ref(-1);
-    const pitId = ref(-1);
-
     const _TABS = { PENDING: 0, COMPLETED: 1 };
-    const selectedTab = ref(0);
-    const setTab = (tab: number) => {
-        selectedTab.value = tab;
-    };
-    const isTabSelected = (tab: number) => {
-        return selectedTab.value === tab;
-    };
+
+    const store = useSheetStore();
+    const { clientId, pitId, currentWarehouse, queueBoxes, workOrder } = storeToRefs(store);
+    const { setTab, isTabSelected, setCradle, setWorkOrder } = store;
 
     const actualSheet: StageSheet = reactive({
         companyId: -1,
@@ -157,13 +139,13 @@
         stages: [],
     });
 
-    let warehouse: Ref<Warehouse> = ref({});
-    const queueBoxes = ref([]);
-
     const fillSheet = async (currentSheet: any) => {
         if (currentSheet.companyId !== -1 && currentSheet.pitId !== -1) {
-            getSandPlan(currentSheet);
-            getDeposit(currentSheet);
+            await getSandPlan(currentSheet);
+            await getDeposit(currentSheet);
+            await getWorkorder(currentSheet);
+            const cradleId = workOrder.value.operativeCradle;
+            await getCradle(Number(cradleId));
         }
     };
 
@@ -176,39 +158,38 @@
         fillSheet(actualSheet);
     });
 
-    const getSandPlan = async ({ pitId: pozoId, companyId }: StageSheet) => {
+    const getSandPlan = async ({ pitId: pozoId }: StageSheet) => {
         const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
         watch(data, (newVal) => {
-            console.log(newVal);
+            console.log('Sand Plan', newVal);
             stages.value = newVal.data[0]?.stages;
         });
     };
 
-    const getDeposit = async ({ pitId: pozoId, companyId }: StageSheet) => {
+    const getDeposit = async ({ pitId: pozoId }: StageSheet) => {
         const { data } = useAxios(`/warehouse?pitId=${pozoId}`, instance);
         watch(data, (newVal) => {
-            warehouse.value = newVal?.data[0];
+            currentWarehouse.value = newVal?.data[0];
+        });
+    };
+
+    const getWorkorder = async ({ pitId: pozoId, companyId }: StageSheet) => {
+        const response = await axios.get(`${apiUrl}/workOrder?client=${companyId}`);
+        const workOrderFromApi = response.data.data;
+        console.log('Work Order', workOrderFromApi);
+        const currentWO = workOrderFromApi.find((wo: WorkOrder) => wo.pits.some((pozo: Pit) => pozo.id === pozoId));
+        setWorkOrder(currentWO);
+    };
+
+    const getCradle = async (cradleId: number) => {
+        const { data } = useAxios(`/cradle/${cradleId}`, instance);
+        watch(data, (newVal) => {
+            setCradle(newVal.data);
         });
     };
 
     const selectedStage = ref(-1);
     let stages: Ref<Array<SandStage>> = ref([]);
-
-    const setWareHouseBoxes = ({ layout }: Warehouse) => {
-        const whBoxes = [];
-        for (const key in layout) {
-            if (Object.prototype.hasOwnProperty.call(layout, key)) {
-                const element = layout[key];
-                const location = formatLocation(key);
-                whBoxes.push({
-                    ...element,
-                    ...location,
-                });
-            }
-        }
-
-        return whBoxes.filter((box) => box.id);
-    };
 
     const setStage = (stage: number) => {
         if (selectedStage.value.id === stage) {
@@ -223,21 +204,7 @@
     const pendingStages = computed(() => {
         return stages.value?.sort((a, b) => a.stage - b.stage) || [];
     });
-    const activeStage = computed(() => {
-        return (
-            stages.value
-                ?.sort((a, b) => {
-                    return a.stage - b.stage;
-                })
-                .find((_: SandStage, index: number) => {
-                    return index === 0;
-                }) || {}
-        );
-    });
 
-    const isStageSelected = (stage: number, selected: number): boolean => {
-        return selected === stage;
-    };
     const boxes = computed(() => {
         if (pitId.value !== -1 && clientId.value !== -1) {
             return boxesByFloor(
@@ -246,7 +213,7 @@
             );
         }
 
-        return boxesByFloor(warehouse.value.layout || {});
+        return boxesByFloor(currentWarehouse.value.layout || {});
     });
 
     const selectedQueue = ref([]);
@@ -255,41 +222,34 @@
     };
     const queueDetail = computed(() => {
         console.log('queueDetail', selectedQueue.value);
+        const filteredSelectQueue = selectedQueue.value.filter((item: SandOrder | number | any) => item?.sandTypeId);
 
-        return selectedQueue.value.reduce((acc, item) => {
-            console.log('acc', acc);
-            console.log('item', item);
-
-            if (item?.sandTypeId) {
+        return Object.values(
+            filteredSelectQueue.reduce((acc, item: SandOrder) => {
+                console.groupCollapsed('Filter queueDetail');
                 console.log('Entramos');
                 const sandId = item?.sandTypeId;
-                const sandIndex = acc.indexOf(sandId);
+                console.log('sandId: ' + sandId);
+                console.log('Antes', acc);
 
-                console.log(sandId, sandIndex);
-
-                if (sandIndex === -1) {
-                    acc.push(item?.amount);
+                if (acc[sandId]) {
+                    acc[sandId] += item.amount;
                 } else {
-                    acc[sandIndex] = acc[sandIndex] + item?.amount;
+                    acc[sandId] = item.amount;
                 }
-            }
-            console.log(acc);
+                console.log('Despues', acc);
+                console.groupEnd();
 
-            return acc;
-        }, []);
+                return acc;
+            }, {} as { [key: string]: number })
+        );
     });
     const sumQueueDetail = computed(() => {
         return queueDetail.value.reduce((acc, item) => {
             return acc + item;
         }, 0);
     });
-    const queueDetailFormated = (info: any) => {
-        if (info) {
-            return info + ' toneladas';
-        }
-
-        return '-';
-    };
+    // Dirty
     const setStageFull = (sheetId: number) => {
         const stage = stages.value.find((stage) => stage.stageSheetId === sheetId);
 
@@ -298,28 +258,26 @@
         }
     };
 
-    onMounted(async () => {
-        queueBoxes.value = await getQueueItems();
-        queueBoxes.value = queueBoxes.value
-            ?.filter((item) => item.sandOrder)
-            .map((item) => {
-                const { sandOrder } = item;
-                let location = {};
+    queueBoxes.value = await getQueueItems();
+    queueBoxes.value = queueBoxes.value
+        ?.filter((item) => item.sandOrder)
+        .map((item) => {
+            const { sandOrder } = item;
+            let location = '';
 
-                if (sandOrder) {
-                    location = sandOrder.location;
-                } else {
-                    console.log('No tenemos Location');
-                }
+            if (sandOrder) {
+                location = sandOrder.location;
+            } else {
+                console.log('No tenemos Location');
+            }
 
-                if (location && JSON.parse(location)) {
-                    item.location = JSON.parse(location);
-                }
+            if (location && JSON.parse(location)) {
+                item.location = JSON.parse(location);
+            }
 
-                return item;
-            })
-            .filter((item) => item.location?.where === 'warehouse');
-    });
+            return item;
+        })
+        .filter((item) => item.location?.where === 'warehouse');
 </script>
 
 <style scoped lang="scss">

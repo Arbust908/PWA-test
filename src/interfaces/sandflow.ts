@@ -204,6 +204,8 @@ export interface SandOrder {
     boxId?: string;
     status: number;
     location: string;
+    providerNotifications?: ProviderNotification[];
+    queueItems?: QueueItem[];
     sandType?: Sand;
     purchaseOrder?: PurchaseOrder;
     sandProvider?: SandProvider;
@@ -211,7 +213,7 @@ export interface SandOrder {
 
 // "{\"where\":\"warehouse\",\"where_id\":1,\"floor\":1,\"row\":2,\"col\":5}"
 // {\"where\":\"cradle\",\"where_id\":4,\"where_slot\":2,\"where_origin\":\"Estación 3\"}"
-interface BoxLocation {
+export interface BoxLocation {
     where?: string;
     where_id?: number;
     floor?: number;
