@@ -84,7 +84,7 @@
 
     watch(value, (data, oldData) => {
         if (Number(data) < 1 && props.maxNumberAmount) {
-            value.value = 0;
+            value.value = null;
         } else if (Number(data) > props.maxNumberAmount) {
             value.value = props.maxNumberAmount;
         } else {
