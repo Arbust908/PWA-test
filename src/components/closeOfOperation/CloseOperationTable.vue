@@ -2,26 +2,16 @@
     <table>
         <tr>
             <th class="head">Etapas</th>
-            <td class="text-right text-gray-400">
-                {{ sandPlan.stages.find((currentStage) => currentStage.status === 0).stage }} /
-                {{ sandPlan.stages.length }}
-            </td>
+            <td class="text-right text-gray-400">{{ currentStage }} / {{ stageTotal }}</td>
         </tr>
         <tr>
             <th class="head">Toneladas</th>
-            <td class="text-right font-bold">
-                {{
-                    sandPlan.stages[0].quantity1 +
-                    sandPlan.stages[0].quantity2 +
-                    sandPlan.stages[0].quantity3 +
-                    sandPlan.stages[0].quantity4
-                }}t
-            </td>
+            <td class="text-right font-bold">{{ stageSandAmmount }}t</td>
         </tr>
         <tr>
             <th class="head">Estado</th>
             <td class="text-right">
-                <Badge v-if="sandPlan.stages[0].status === 0" class="bg-blue-600 rounded-lg" text="EN PROGRESO" />
+                <Badge v-if="sandPlan.stages[0]?.status === 0" class="bg-blue-600 rounded-lg" text="EN PROGRESO" />
                 <Badge v-else text="COMPLETA" />
             </td>
         </tr>
@@ -87,6 +77,34 @@
 
     const totalWheight = computed(() => {
         return Number(stage.value.quantity1) + Number(stage.value.quantity2) + Number(stage.value.quantity3) || 0;
+    });
+
+    const currentStage = ref(0);
+    const stageTotal = ref(0);
+    const stageSandAmmount = ref(0);
+
+    onMounted(() => {
+        currentStage.value = 0;
+        stageTotal.value = 0;
+        stageSandAmmount.value = 0;
+        const stageQuantities = [];
+
+        if (sandPlan.value.stages.length > 0) {
+            const currentStageFull = sandPlan.value.stages.find((stage: any) => stage.status === 0);
+            currentStage.value = currentStageFull.stage;
+            stageTotal.value = sandPlan.value.stages.length;
+            stageQuantities.push(
+                currentStageFull.quantity1,
+                currentStageFull.quantity2,
+                currentStageFull.quantity3,
+                currentStageFull.quantity4
+            );
+            stageQuantities.map((quantity) => {
+                if (quantity >= 0) {
+                    stageSandAmmount.value += quantity;
+                }
+            });
+        }
     });
 </script>
 
