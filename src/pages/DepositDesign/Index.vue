@@ -27,8 +27,8 @@
                     {{ item.clientCompany.name || 'Sin definir' }}
                 </td>
 
-                <td :class="[item.pit ? null : 'empty', item.visible ? null : 'notavailable']">
-                    {{ item.pit.name || 'Sin definir' }}
+                <td :class="[item.workOrder?.pad ? null : 'empty', item.visible ? null : 'notavailable']">
+                    {{ item.workOrder?.pad || 'Sin definir' }}
                 </td>
 
                 <td :class="[formatDeposit(item.layout).col ? null : 'empty', item.visible ? null : 'notavailable']">
@@ -98,6 +98,7 @@
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
+    import { getWorkOrders } from '@/helpers/useGetEntities';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default {
@@ -135,8 +136,15 @@
                 });
             };
 
+            const workOrders = ref([]);
+
             onMounted(async () => {
                 await getDeposits();
+                workOrders.value = await getWorkOrders();
+                deposits.value = deposits.value.map((deposit) => {
+                    deposit.workOrder = workOrders.value.find((workOrder) => workOrder.id === deposit.pitId) || {};
+                    return deposit;
+                });
             });
 
             const pagination = ref({
@@ -146,7 +154,7 @@
 
             const columns = [
                 { title: 'Cliente', key: 'clientCompany.name', sortable: true },
-                { title: 'Pozos', key: 'pit.name', sortable: true },
+                { title: 'PAD', key: 'workOrder.pad', sortable: true },
                 { title: 'Columnas', key: 'col' },
                 { title: 'Filas', key: 'row' },
                 { title: 'Niveles', key: 'floor' },
