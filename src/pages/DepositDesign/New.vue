@@ -5,8 +5,11 @@
             <form method="POST" action="/" class="p-8 md:p-12 flex flex-col gap-4">
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
                     <ClientPitCombo
+                        v-model:wo-id="woId"
                         :client-id="clientId"
                         :pit-id="pitId"
+                        validation-type="empty"
+                        :pads="true"
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
                     />
@@ -138,6 +141,7 @@
             const instance = axios.create({
                 baseURL: apiUrl,
             });
+            const woId = ref(-1);
 
             const sandTypes = ref([]);
             const sandName = computed(() => {
@@ -331,17 +335,17 @@
             };
 
             const isFull = computed(() => {
-                const hasClientAndPit: boolean = clientId.value >= 0 && pitId.value >= 0;
+                const hasClientAndPad: boolean = clientId.value >= 0 && woId.value >= 0;
                 const hasDeposit: boolean = rows.value > 0 && cols.value > 0 && floors.value > 0;
 
-                return hasClientAndPit && hasDeposit;
+                return hasClientAndPad && hasDeposit;
             });
 
             const save = () => {
                 purgeOffCells();
                 const wH: Warehouse = {
                     clientCompanyId: clientId.value,
-                    pitId: pitId.value,
+                    pitId: woId.value,
                     layout: deposit.value,
                 };
                 const { data } = useAxios('/warehouse', { method: 'POST', data: wH }, instance);
@@ -370,6 +374,7 @@
                 save,
                 sandTypes,
                 sandName,
+                woId,
             };
         },
     });

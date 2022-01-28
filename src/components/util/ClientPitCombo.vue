@@ -15,7 +15,7 @@
         <FieldLoading v-else />
         <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" validation-type="empty" />
     </div>
-    <div :class="sharedClasses">
+    <div v-if="!pads" :class="sharedClasses">
         <FieldSelect
             v-if="pits.length > 0"
             field-name="pit"
@@ -31,6 +31,15 @@
         <FieldLoading v-else />
         <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" validation-type="empty" />
     </div>
+    <div v-if="pads" :class="sharedClasses">
+        <PadSelector
+            :client-id="clientId"
+            v-model:woId="woId"
+            v-model:work-orders="workOrders"
+            v-model:first-filter="firstFilter"
+            :is-disabled="isDisabled"
+        />
+    </div>
 </template>
 
 <script lang="ts">
@@ -38,10 +47,12 @@
     import { useVModels } from '@vueuse/core';
     import { Pit, Company } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
+    import { getWorkOrders } from '@/helpers/useGetEntities';
 
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLoading from '@/components/ui/form/FieldLoading.vue';
     import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
+    import PadSelector from '@/components/util/PadSelector.vue';
 
     export default defineComponent({
         name: 'ClientPitCombo',
@@ -49,6 +60,7 @@
             FieldSelect,
             FieldLoading,
             InvalidInputLabel,
+            PadSelector,
         },
         props: {
             clientId: {
@@ -67,9 +79,33 @@
                 type: String,
                 default: 'col-span-full md:col-span-6',
             },
+            validationType: {
+                type: String,
+                required: false,
+            },
+            pads: {
+                type: Boolean,
+                default: false,
+            },
+            woId: {
+                type: Number,
+                required: false,
+            },
+            workOrders: {
+                type: Array,
+                default: [],
+            },
+            firstFilter: {
+                type: Boolean,
+                default: false,
+            },
+            fromId: {
+                type: Boolean,
+                default: false,
+            },
         },
         setup(props, { emit }) {
-            const { clientId, pitId } = useVModels(props, emit);
+            const { clientId, pitId, woId } = useVModels(props, emit);
             const { read: getClients } = useApi('/company');
             const backupClients = getClients();
             const clients = ref([] as Array<Company>);
@@ -141,6 +177,34 @@
                     filterPitsByClient(newVal);
                 }
             });
+            const workOrders = ref([]);
+            const firstFilter = ref(false);
+
+            const padFilter = async (filterValue: number) => {
+                workOrders.value = await getWorkOrders();
+
+                if (filterValue !== -1) {
+                    const filterClientByPad = workOrders.value.filter((workOrder) => workOrder.id === filterValue);
+                    console.log(workOrders.value);
+                    clientId.value = Number(filterClientByPad[0].client);
+
+                    if (props.fromId) {
+                        firstFilter.value = true;
+                    }
+                }
+            };
+
+            watch(woId, async (newVal) => {
+                await padFilter(newVal);
+            });
+
+            onMounted(async () => {
+                await padFilter(woId.value);
+
+                if (props.fromId === true) {
+                    firstFilter.value = true;
+                }
+            });
 
             const useFirstClient = ref(false);
             watch(useFirstClient, (newVal) => {
@@ -158,6 +222,9 @@
                 InvalidInputLabel,
                 useFirstClient,
                 useFirstPit,
+                woId,
+                workOrders,
+                firstFilter,
             };
         },
     });

@@ -20,6 +20,13 @@
                 endpoint="/company?isOperator=1"
                 is-optional
             />
+            <!-- <PadSelector
+                :client-id="clientId"
+                v-model:woId="woId"
+                v-model:work-orders="workOrders"
+                v-model:first-filter="firstFilter"
+                :is-disabled="isDisabled"
+            /> -->
             <FieldSelect
                 v-model:data="workOrderId"
                 class="col-span-12 md:col-span-5 xl:col-span-4"
@@ -62,13 +69,13 @@
                         </div>
                         <div class="my-4 text-center">
                             <span>
-                                {{ sandPlan.stages.find((currentStage) => currentStage.status === 0).stage }} /
-                                {{ sandPlan.stages.length }}
+                                {{ sandPlan.stages?.find((currentStage) => currentStage.status === 0)?.stage }} /
+                                {{ sandPlan.stages?.length }}
                             </span>
                         </div>
                         <div class="my-4 text-center">
                             <Badge
-                                v-if="sandPlan.stages[0].status === 0"
+                                v-if="sandPlan.stages[0]?.status === 0"
                                 class="bg-blue-600 rounded-lg"
                                 text="EN PROGRESO"
                             />
@@ -77,10 +84,10 @@
                         <div class="my-4 pl-4 text-left font-bold">
                             <span>
                                 {{
-                                    sandPlan.stages[0].quantity1 +
-                                    sandPlan.stages[0].quantity2 +
-                                    sandPlan.stages[0].quantity3 +
-                                    sandPlan.stages[0].quantity4
+                                    sandPlan.stages[0]?.quantity1 +
+                                    sandPlan.stages[0]?.quantity2 +
+                                    sandPlan.stages[0]?.quantity3 +
+                                    sandPlan.stages[0]?.quantity4
                                 }}
                                 t
                             </span>
@@ -182,6 +189,7 @@
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import PadSelector from '@/components/util/PadSelector.vue';
     import Badge from '@/components/ui/Badge.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -250,13 +258,22 @@
 
             sandPlans.value = result.data.data;
 
-            getFilteredSandPlans();
+            await getFilteredSandPlans();
         }
     };
 
     const getFilteredSandPlans = () => {
-        filteredSandPlans.value = sandPlans.value.filter((sandPlan) => sandPlan.company.id === clientId.value);
+        filteredSandPlans.value = JSON.parse(
+            JSON.stringify(sandPlans.value.filter((sandPlan) => sandPlan.company.id === clientId.value))
+        );
     };
+
+    watch(filteredSandPlans, (newVal) => {
+        console.log(newVal);
+    });
+    watch(pits, (newVal) => {
+        console.log(newVal);
+    });
 </script>
 
 <style lang="scss" scoped>

@@ -56,7 +56,6 @@
                                         v-for="(sand, i) in sandTypes"
                                         :key="i"
                                         :class="`select-category mesh-type__${sand.id <= 5 ? sand.id : 'extra'} text`"
-                                        @click="conLog"
                                     >
                                         <div
                                             :class="`w-[10px] h-[10px] m-[5px] rounded-full mesh-type__${
@@ -185,6 +184,7 @@
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
 
     import axios from 'axios';
+    import workOrders from '@/store/workOrders';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     useTitle('Ingreso de Cajas <> Sandflow');
@@ -265,6 +265,12 @@
         // });
     };
 
+    const workOrdersPad = ref([]);
+    onMounted(async () => {
+        const result = await axios.get(`${apiUrl}/workOrder`);
+        workOrdersPad.value = result.data.data;
+    });
+
     watchEffect(async () => {
         if (purchaseOrders.value.length > 0) {
             if (clientId.value !== -1 && pitId.value !== -1) {
@@ -303,7 +309,8 @@
                 warehouse.value = await warehouses.value.filter((singleWarehouse) => {
                     if (
                         parseInt(singleWarehouse.clientCompanyId) == clientId.value &&
-                        parseInt(singleWarehouse.pitId) == pitId.value
+                        parseInt(singleWarehouse.pitId) ==
+                            workOrdersPad.value.find((workOrder) => workOrder.id === singleWarehouse.pitId)?.id
                     ) {
                         return singleWarehouse;
                     }
@@ -454,8 +461,6 @@
     const visibleCategories = ref([]);
 
     const setVisibleCategories = (category: string) => {
-        console.log(category);
-
         if (visibleCategories.value.includes(category)) {
             visibleCategories.value.splice(visibleCategories.value.indexOf(category), 1);
         } else {
@@ -463,13 +468,8 @@
         }
     };
 
-    const conLog = () => {
-        console.log(visibleCategories.value);
-    };
-
     const showAllCategories = () => {
         sandTypes.value.forEach((sand) => visibleCategories.value.push(sand.id));
-        console.log(visibleCategories.value);
     };
 
     let selectedCradle = ref(0);
