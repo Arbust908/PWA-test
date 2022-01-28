@@ -123,7 +123,7 @@
         </section>
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end">
-            <SecondaryBtn btn="wide" @click.prevent="check()"> Cancelar </SecondaryBtn>
+            <SecondaryBtn btn="wide" @click.prevent="$router.push('/planificacion-de-arena')"> Cancelar </SecondaryBtn>
             <PrimaryBtn btn="wide" size="md" :disabled="!isFull" @click.prevent="isFull ? save() : toggleErrorModal()">
                 Guardar
             </PrimaryBtn>
@@ -252,7 +252,6 @@
 
             const editStage = (stage) => {
                 editingStage.value = stage.id;
-                console.log(editingStage.value);
             };
 
             const saveStage = (stage) => {
@@ -304,12 +303,6 @@
                 }
             });
             const selectedPitName = computed(() => {
-                console.groupCollapsed('selectedPitName');
-                console.log(currentSandPlan.pitId);
-                console.log(pits.value);
-                console.log(pits.value.find((pit) => pit.id == currentSandPlan.pitId));
-                console.groupEnd();
-
                 return currentSandPlan.pitId >= 0 ? pits.value.find((pit) => pit.id == currentSandPlan.pitId).name : '';
             });
 
@@ -343,14 +336,10 @@
                 return check;
             };
 
-            const check = () => {
-                console.log(currentSandPlan.stages[0].sandId1);
-            };
-
             // << SAND
             const isFull = computed(() => {
                 const minSands = minSandsAmount(currentSandPlan.stages);
-                console.log(currentSandPlan.stages[0].sandId1);
+
                 const noZeroSandTypeNull =
                     (currentSandPlan.stages[0].sandId1 !== null && currentSandPlan.stages[0].sandId1 !== -1) ||
                     (currentSandPlan.stages[0].sandId2 !== null && currentSandPlan.stages[0].sandId2 !== -1) ||
@@ -386,8 +375,6 @@
             const { saveSandPlan } = useActions(['saveSandPlan']);
 
             const save = (): void => {
-                console.log('currentSandPlan', currentSandPlan);
-
                 currentSandPlan.stages.map((stage) => {
                     if (stage.sandId1 === -1 || stage.quantity1 < 1 || stage.quantity1 == null) {
                         stage.sandId1 = null;
@@ -412,8 +399,6 @@
                     return stage;
                 });
 
-                console.log('currentSandPlan2', currentSandPlan);
-
                 currentSandPlan.stages = currentSandPlan.stages.filter((stage) => {
                     const noSandTypeNull =
                         (stage.sandId1 !== null && stage.quantity1 > 0) ||
@@ -423,8 +408,6 @@
                     return noSandTypeNull;
                 });
 
-                console.log('currentSandPlan3', currentSandPlan);
-
                 const { data } = useAxios('/sandPlan', { method: 'POST', data: currentSandPlan }, instance);
                 watch(data, (apiData) => {
                     if (apiData && apiData.data) {
@@ -432,7 +415,6 @@
                         currentSandPlan.id = sandPlanId;
 
                         currentSandPlan.stages.forEach((stage) => {
-                            console.log(stage);
                             const { data } = useAxios(
                                 '/sandStage',
                                 {
@@ -487,7 +469,6 @@
                 toggleErrorModal,
                 toggleApiErrorModal,
                 isNotLast,
-                check,
             };
         },
     };
