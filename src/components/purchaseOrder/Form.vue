@@ -451,7 +451,7 @@
 
             // deberia tener el resultado HTML del pdf
             const pdfContent = await pdf.value?.getFileContent();
-            purchaseOrder.pdfContent = pdfContent;
+            purchaseOrder.pdfContent = 'pdfContent';
 
             // Creamos via API la orden de pedido
             const pODone = ref(null);

@@ -137,9 +137,7 @@ export const deleteQueueItem = async (queueItemId: number) => {
 
 export const createAllQueueItems = async (queue: Array<QueueItem>) => {
     const queueItems = queue.map((queueItem) => {
-        queueItem.status = 0;
-
-        return updateQueueItem(queueItem);
+        return createQueueItem(queueItem);
     });
 
     return Promise.all(queueItems);
@@ -185,4 +183,30 @@ export const orderItems = (itemA: QueueItem, itemB: QueueItem, direction = 'ASC'
 
 export const orderDesc = (itemA: QueueItem, itemB: QueueItem) => {
     return orderItems(itemA, itemB, 'DSC');
+};
+
+export const sheetGridItems = (queueBoxes: Array<QueueItem>) => {
+    console.log('queueBoxes', queueBoxes);
+    const { deTransporte, aCradle } = separateQueues(queueBoxes);
+    console.log('deTransporte', deTransporte);
+    console.log('aCradle', aCradle);
+    const newItemList = [...deTransporte, ...aCradle];
+
+    return newItemList.filter((item) => {
+        const { origin, destination } = item;
+        const baseOrigin = origin.split(' ')[0];
+        console.log('baseOrigin', baseOrigin);
+
+        if (baseOrigin === 'Camion') {
+            const destinationArray = destination.split(' ');
+
+            if (destinationArray.length === 3) {
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
+    });
 };

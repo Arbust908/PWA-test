@@ -49,7 +49,7 @@
                     :key="place + 'place'"
                     :class="[
                         isSelectedBox(place) ? 'selected' : null,
-                        box?.boxId ? `mesh-type__${box?.sandType?.id} filled boxCard` : 'not-filled',
+                        box?.boxId ? `mesh-type__${box?.sandTypeId} filled boxCard` : 'not-filled',
                         box?.isDone ? 'done' : null,
                     ]"
                     class="stage--box"
@@ -124,8 +124,21 @@
     import PlusIcon from './PlusIcon.vue';
     import SheetDepoBox from './sheetDepoBox.vue';
     import StageSheetSandDetail from './stageSheetSandDetail.vue';
-    import { createAllQueueItems, getQueueItems } from '@/helpers/useQueueItem';
-    import { filterEmptyQueueBox, getPorcentage } from '@/helpers/useSheetHelpers';
+    import {
+        createAllQueueItems,
+        getOrderPro,
+        getQueueItems,
+        QueueTransactions,
+        separateQueues,
+        sheetGridItems,
+    } from '@/helpers/useQueueItem';
+    import {
+        extractOrderInfo,
+        filterEmptyQueueBox,
+        filterJustToAddBox,
+        filterJustToAddBoxes,
+        getPorcentage,
+    } from '@/helpers/useSheetHelpers';
     import { getSandOrders } from '@/helpers/useWarehouse';
     import { getLast } from '@/helpers/iteretionHelpers';
     import { useSheetStore } from '@/store/stageSheet.pinia';
@@ -173,66 +186,20 @@
      * @type {Ref<Array<number | QueueItem>>}
      * @description Referencia a la cola de cajas del stage
      */
-    const boxQueue: Ref<Array<number | SandOrder>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    const boxQueue: Ref<Array<number | QueueItem>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+
+    /**
+     * Tomamos los QueueItems de este Pozo y los filtramos por los que van al Cradle
+     * y los mutamos para que tengan la info de la caja (boxId, peso y tipo de arena)
+     */
     const fillQueueBoxes = async () => {
-        boxQueue.value = await getSandOrders();
-        console.log('Cola de Cajas', boxQueue.value);
-        boxQueue.value = boxQueue.value
-            .filter((order) => {
-                return order.location;
-            })
-            .filter((order: SandOrder) => {
-                const { queueItems } = order;
-
-                if (queueItems !== undefined) {
-                    if (queueItems.length) {
-                        const queueItem = queueItems[0];
-                        const { pitId: itemPitId } = queueItem;
-
-                        return itemPitId === pitId.value;
-                    }
-                }
-
-                return false;
-            })
-            .map((order) => {
-                const { queueItems, location } = order;
-
-                order.location = JSON.parse(location);
-
-                if (queueItems.length) {
-                    const queueItem = queueItems[0];
-                    order.isDone = queueItem.status === 99;
-                    order.order = queueItem.order;
-
-                    return order;
-                }
-
-                return;
-            })
-            .filter((order) => {
-                return order?.order && order?.order > 0;
-            })
-            .sort((a, b) => {
-                const { queueItems: qiA } = a;
-                const { queueItems: qiB } = b;
-                let orderA = 0;
-                let orderB = 0;
-
-                if (qiA.length) {
-                    const queueItem = qiA[0];
-                    orderA = queueItem.order;
-                }
-
-                if (qiB.length) {
-                    const queueItem = qiB[0];
-                    orderB = queueItem.order;
-                }
-
-                return orderB - orderA;
-            });
-
-        console.log('Cajas de Cola final', boxQueue.value);
+        console.log('getPitBoxes', getPitBoxes.value);
+        const sheetItems = sheetGridItems(getPitBoxes.value as Array<QueueItem>);
+        console.log('sheetItems', sheetItems);
+        boxQueue.value = sheetItems.map(extractOrderInfo).sort((a: any, b: any) => {
+            return a.order - b.order;
+        }) as Array<any>;
+        console.log(boxQueue.value);
 
         if (boxQueue.value.length < 14) {
             const queueNum = boxQueue.value.length;
@@ -240,11 +207,11 @@
                 boxQueue.value.push(i);
             }
         }
-        console.log('Cajas de Cola relleno', boxQueue.value);
     };
 
     watch(isSelectedStage, (val) => {
         if (val) {
+            console.log('Seleccionado');
             emits('update-queue', boxQueue.value);
         }
     });
@@ -253,21 +220,16 @@
         (val) => {
             if (val) {
                 console.log('isActive');
-                val && console.log('Emito');
-                emits('update-queue', boxQueue.value);
+                // emits('update-queue', boxQueue.value);
                 fillQueueBoxes();
             }
         },
         { immediate: true }
     );
-    // Quizas se puede unificar los watchs de arriba
 
     const addBoxToQueue = (place: null | number = null, box: any = null) => {
         if (place !== null && box !== null) {
-            if (typeof box.location === 'string') {
-                box.location = JSON.parse(box.location);
-            }
-            box.location.where = 'sheet';
+            box.toAdd = true; // *** Con esto puedo saber si la agregue recien ;D
             boxQueue.value[place] = box;
             selectedBox.value = null;
             emits('update-queue', boxQueue.value);
@@ -299,38 +261,25 @@
 
     /* CAJAS POR PISO */
     const boxesByFloorAndFiltered = computed(() => {
-        const filteredBoxes = [] as any[];
-        getPitBoxesByFloor.value[selectedFloor.value - 1].map((box: any) => {
-            const compareQueue = boxQueue.value.filter((queuedBox) => {
-                return queuedBox.id;
-            });
-            console.log('Compare Queue: ', compareQueue);
+        const filteredBoxes = getPitBoxesByFloor.value[selectedFloor.value - 1].map(extractOrderInfo).filter((box) => {
+            console.log(box, 'Box');
+            const { origin, destination, status } = box;
+            const originParts = origin.split(' ');
+            const destinationParts = destination.split(' ');
 
-            if (compareQueue.length <= 0) {
-                filteredBoxes.push(box);
-
-                return true;
-            }
-
-            if (box?.id) {
-                const isOnQueue = compareQueue.some((queuedBox) => {
-                    return queuedBox.boxId === box?.sandOrder?.boxId;
-                });
-
-                if (!isOnQueue) {
-                    filteredBoxes.push(box);
-                }
-
-                return !compareQueue.some((queuedBox) => queuedBox.boxId === box.boxId);
-            }
-
-            return box;
+            return originParts[0] === 'Camion' && destinationParts.length === 3 && status < 99;
         });
 
-        console.log(filteredBoxes);
-        console.log([...new Set(filteredBoxes)]);
+        const queueNoNumbers = boxQueue.value.filter((item) => {
+            return typeof item !== 'number';
+        });
+        const usedQueueIds = queueNoNumbers.map((box) => {
+            const { id } = box as QueueItem;
 
-        return filteredBoxes;
+            return id;
+        });
+
+        return filteredBoxes.filter((box: QueueItem) => !usedQueueIds.includes(box.sandOrder?.id));
     });
 
     const queueDetail = computed(() => {
@@ -379,35 +328,44 @@
         console.log(boxQueue.value);
         const toAddQueue: Array<QueueItem> = boxQueue.value
             .filter(filterEmptyQueueBox)
-            .map((box) => {
-                console.log('Box: ', box);
+            .filter(filterJustToAddBox) as QueueItem[];
 
-                const items = box?.queueItems.filter((item: QueueItem) => {
-                    console.log('Item: ', item);
-
-                    return item.status !== 99;
-                });
-                console.log('Items: ', items);
-                console.log('Items: ', getLast(items));
-
-                return getLast(items);
-            })
-            .filter((item) => {
-                console.log('QueueItem: ', item);
-
-                return item?.destination;
-            })
-            .map((item) => {
-                console.log('item: ', item);
-                item.origin = item.destination;
-                item.destination = null;
-
-                return item;
-            });
+        /**
+         * Aca lo que voy a tener son QueueItems y cajas que estan en el depo
+         * Hay que crear los QueueItems que van al Cradle
+         */
         console.log('toAddQueue', toAddQueue);
-        console.log('CRADLE', currentCradle.value);
+        /*
+        amount: 50
+        boxId: "S-OP00"
+        destination: "F1 C1 N1"
+        order: 9979
+        origin: "Camion ABA123"
+        pitId: 11
+        sandOrderId: 36
+        sandTypeId: 1
+        status: 0
+        */
+        const newQueueItems = await JSON.parse(JSON.stringify(toAddQueue)).map(async (item: QueueItem) => {
+            const { sandOrderId, pitId: itemPitId, destination } = item as QueueItem;
+            const { DepositoACradle } = QueueTransactions;
 
-        // await createAllQueueItems(toAddQueue);
+            const newOrder = await getOrderPro(DepositoACradle);
+
+            const newItem = {
+                status: 0,
+                order: newOrder,
+                sandOrderId,
+                pitId: itemPitId,
+                origin: destination,
+                destination: '',
+            };
+
+            return newItem as QueueItem;
+        });
+        console.log('newQueueItems', await Promise.all(newQueueItems));
+
+        await createAllQueueItems(await Promise.all(newQueueItems));
         console.log('Espero');
         isLoading.value = false;
         // Emit que todo esta sumado

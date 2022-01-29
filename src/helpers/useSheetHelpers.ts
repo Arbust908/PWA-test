@@ -1,3 +1,5 @@
+import { QueueItem, SandOrder } from '@/interfaces/sandflow';
+
 export const detailTitle = (index: number) => {
     const titleChar = String.fromCharCode(index + 65);
 
@@ -24,4 +26,18 @@ export const getPorcentage = (total: number, value = 0) => {
 
 export const filterEmptyQueueBox = (queueBox: any) => {
     return typeof queueBox !== 'number';
+};
+
+export const filterJustToAddBox = (queueBox: any) => {
+    console.log('queueBox', queueBox);
+    console.log('queueBox', queueBox.toAdd);
+
+    return queueBox.toAdd;
+};
+
+export const extractOrderInfo = (item: QueueItem) => {
+    const { sandOrder } = item;
+    const { boxId, amount, sandTypeId } = sandOrder as SandOrder;
+
+    return { ...item, boxId, amount, sandTypeId };
 };
