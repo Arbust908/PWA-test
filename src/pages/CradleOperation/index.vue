@@ -55,7 +55,7 @@
                 type="submit"
                 :disabled="!canRequest"
                 :is-loading="isLoading"
-                @click.prevent="canRequest && requestEmptyBoxHandle"
+                @click.prevent="canRequest && requestEmptyBoxHandle()"
             >
                 Solicitar retiro
             </PrimaryBtn>
@@ -264,6 +264,7 @@
             sandOrder.status = 11;
             axios.put(`${apiUrl}/sandOrder/${sandOrder.id}`, sandOrder).catch((err) => console.error(err));
         });
+
         const updateCradle = { ...selectedCradle.value };
         updateCradle.slots = cradleSlots.value;
         await axios

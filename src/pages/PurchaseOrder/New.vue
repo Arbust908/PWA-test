@@ -1,7 +1,6 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <!-- <button @click="downloadPDF">Download</button> -->
         <PDF v-show="showPDF" ref="pdf" :info="pdfInfo" @close="redirectIndex" />
 
         <section class="bg-white rounded-md shadow-sm">
@@ -229,7 +228,7 @@
             :plates="filteredPlates"
             :loading="savingOrder"
             @close="showModal = false"
-            @confirm="save()"
+            @confirm="save"
         />
 
         <SuccessModal
@@ -628,7 +627,7 @@
         return result.data.data?.at(-1)?.id + 1 || 1;
     };
 
-    const save = async () => {
+    const save = async (sendEmails = false) => {
         if (isFull.value) {
             savingOrder.value = true;
 
@@ -639,9 +638,13 @@
             pdfInfo.value = purchaseOrder;
             pdfInfo.value.purchaseOrder.id = lastId;
 
-            // deberia tener el resultado HTML del pdf
-            const pdfContent = await pdf.value?.getFileContent();
-            purchaseOrder.pdfContent = pdfContent;
+            purchaseOrder.sendEmails = sendEmails;
+
+            if (sendEmails) {
+                // solo si se envian mails se envia el content del pdf
+                const pdfContent = await pdf.value?.getFileContent();
+                purchaseOrder.pdfContent = 'pdfContent';
+            }
 
             // Creamos via API la orden de pedido
             const result = await axios.post(`${api}/purchaseOrder`, purchaseOrder).catch((err) => {

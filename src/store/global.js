@@ -1,4 +1,3 @@
-import { useRouter } from 'vue-router';
 const OrdenDeTrabajo = {
     name: 'Orden de trabajo',
     to: '/orden-de-trabajo',
@@ -52,28 +51,24 @@ const Forklift_Operation = {
     to: '/operacion-en-forklift',
     icon: 'SwitchHorizontal',
     title: 'ForkliftOperation',
-    // keep: true,
 };
-const Close_Of_Operations = {
+const Close_Of_Operation = {
     name: 'Cierre de operaciones',
     to: '/cierre-de-operaciones',
     icon: 'Briefcase',
-    title: 'CloseOfOperations',
-    keep: true,
+    title: 'CloseOfOperation',
 };
 const Deposito_de_cajas_vacias = {
     name: 'Depósito de cajas vacias',
     to: '/deposito-cajas-vacias',
     icon: 'Archive',
     title: 'EmptyBoxDeposit',
-    // keep: true,
 };
 const Destino_de_cajas_vacias = {
     name: 'Destino de cajas vacias',
     to: '/Destino-cajas-vacias',
     icon: 'Archive',
     title: 'EmptyBoxDestiny',
-    // keep: true,
 };
 const LINE = {
     name: 'LINE',
@@ -135,7 +130,7 @@ export default {
             Deposito_de_cajas_vacias,
             Destino_de_cajas_vacias,
             Forklift_Operation,
-            Close_Of_Operations,
+            Close_Of_Operation,
             LINE,
             {
                 name: 'Proveedores',

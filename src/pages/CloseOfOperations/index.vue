@@ -12,6 +12,7 @@
                 @change="getSandPlans"
             />
             <FieldSelect
+                v-if="disabledOperator"
                 v-model:data="operatorId"
                 class="col-span-12 md:col-span-5 xl:col-span-4"
                 title="Operadora / Empresa de Servicios"
@@ -19,17 +20,38 @@
                 placeholder="Seleccionar operadora"
                 endpoint="/company?isOperator=1"
                 is-optional
-            />
-            <FieldSelect
-                v-model:data="workOrderId"
+                @change="filterByOperator"
+            /><FieldSelect
+                v-else
+                v-model:data="operatorId"
                 class="col-span-12 md:col-span-5 xl:col-span-4"
-                title="Orden de trabajo"
-                field-name="workOrder"
-                placeholder="Seleccionar pozos"
-                endpoint="/workOrder"
-                endpoint-key="pad"
+                title="Operadora / Empresa de Servicios"
+                field-name="operator"
+                placeholder="Seleccionar operadora"
+                endpoint="/company?isOperator=1"
                 is-optional
+                is-disabled
+                @change="filterByOperator"
             />
+            <div class="col-span-12 md:col-span-5 xl:col-span-4">
+                <PadSelector
+                    v-if="disabledPad"
+                    class="col-span-12"
+                    is-optional
+                    :client-id="clientId"
+                    v-model:woId="woId"
+                    v-model:work-orders="workOrders"
+                />
+                <PadSelector
+                    v-else
+                    class="col-span-12"
+                    is-optional
+                    is-disabled
+                    :client-id="clientId"
+                    v-model:woId="woId"
+                    v-model:work-orders="workOrders"
+                />
+            </div>
 
             <section class="bg-white col-span-full shadow max-w-[100%] hidden sm:block">
                 <div class="grid grid-cols-4 text-sm rounded-t border py-3">
@@ -61,29 +83,18 @@
                             <span> {{ sandPlan.pit.name }} </span>
                         </div>
                         <div class="my-4 text-center">
-                            <span>
-                                {{ sandPlan.stages.find((currentStage) => currentStage.status === 0).stage }} /
-                                {{ sandPlan.stages.length }}
-                            </span>
+                            <span>{{ checkSandStages(sandPlan) }} {{ currentStage }} / {{ stageTotal }}</span>
                         </div>
                         <div class="my-4 text-center">
                             <Badge
-                                v-if="sandPlan.stages[0].status === 0"
+                                v-if="sandPlan.stages[0]?.status === 0"
                                 class="bg-blue-600 rounded-lg"
                                 text="EN PROGRESO"
                             />
                             <Badge v-else text="COMPLETA" />
                         </div>
                         <div class="my-4 pl-4 text-left font-bold">
-                            <span>
-                                {{
-                                    sandPlan.stages[0].quantity1 +
-                                    sandPlan.stages[0].quantity2 +
-                                    sandPlan.stages[0].quantity3 +
-                                    sandPlan.stages[0].quantity4
-                                }}
-                                t
-                            </span>
+                            <span>{{ stageSandAmmount }}t</span>
                         </div>
                     </article>
                 </div>
@@ -182,6 +193,7 @@
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
+    import PadSelector from '@/components/util/PadSelector.vue';
     import Badge from '@/components/ui/Badge.vue';
     import Icon from '@/components/icon/TheAllIcon.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -189,6 +201,7 @@
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import CloseOperationModal from '@/components/closeOfOperation/CloseOperationModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import { SandPlan } from '@/interfaces/sandflow';
 
     import CloseOperationTable from '@/components/closeOfOperation/CloseOperationTable.vue';
     import { Ref } from 'vue';
@@ -197,18 +210,37 @@
 
     useTitle('Cierre de operaciones <> Sandflow');
 
+    defineProps({
+        woId: {
+            type: Number,
+            default: -1,
+        },
+        workOrders: {
+            type: Array,
+            default: [],
+        },
+    });
+
     const clientId = ref(-1);
     const operatorId = ref(-1);
+    const woId = ref(-1);
+    const workOrders = ref([]);
     const workOrderId = ref(-1);
     const pits = ref([]);
     const sandPlans = ref([]);
     const filteredSandPlans = ref([]);
+    const filteredSandPlansByClient = ref([]);
+    const filteredSandPlansByOperator = ref([]);
+    const filteredSandPlansByPad = ref([]);
     const stagesAmount = ref(0);
     const currentOpened = ref([]);
     const openSuccess = ref(false);
     const atLeastOne = ref(false);
     const endingSandPlanPits = ref([]);
 
+    watch(workOrders, (newVal) => {
+        console.log(newVal);
+    });
     const addCheckedPits = (sandPlan, check) => {
         if (check) {
             endingSandPlanPits.value.push(sandPlan);
@@ -235,7 +267,19 @@
         }
     };
 
+    const test = ref(true);
+    const disabledOperator = ref(false);
+
     const getSandPlans = async () => {
+        console.log(test.value);
+        test.value = false;
+        console.log(test.value);
+        disabledOperator.value = false;
+        disabledPad.value = false;
+        filteredSandPlans.value = [];
+        operatorId.value = -1;
+        woId.value = -1;
+
         if (clientId.value > 0) {
             const url = `/pit?companyId=${clientId.value}`;
             const response = await axios.get(`${api}/${url}`).catch((err) => {
@@ -250,12 +294,92 @@
 
             sandPlans.value = result.data.data;
 
-            getFilteredSandPlans();
+            filteredSandPlans.value = sandPlans.value.filter(
+                (sandPlan: SandPlan) => sandPlan.company.id === clientId.value
+            );
+            filteredSandPlansByClient.value = filteredSandPlans.value;
+
+            disabledOperator.value = true;
         }
     };
 
-    const getFilteredSandPlans = () => {
-        filteredSandPlans.value = sandPlans.value.filter((sandPlan) => sandPlan.company.id === clientId.value);
+    const workOrderByClient = ref([]);
+    const workOrderByOperator = ref([]);
+    const workOrderByPad = ref([]);
+    const disabledPad = ref(false);
+
+    const filterByOperator = () => {
+        if (operatorId.value !== -1) {
+            disabledPad.value = true;
+            console.log(disabledOperator.value);
+            let filterFinished: any = [];
+            workOrderByClient.value = workOrders.value.filter(
+                (workOrder) => Number(workOrder.client) === clientId.value
+            );
+            workOrderByOperator.value = workOrderByClient.value.filter(
+                (workOrder) => Number(workOrder.serviceCompany) === operatorId.value
+            );
+            const filter = workOrderByOperator.value.forEach((workOrder) =>
+                filteredSandPlansByClient.value.forEach((sandPlan) => {
+                    if (sandPlan.pit.workOrderId === workOrder.id) {
+                        filterFinished.push(sandPlan);
+                    }
+                })
+            );
+            filteredSandPlansByOperator.value = filterFinished;
+            filteredSandPlans.value = filteredSandPlansByOperator.value;
+        } else {
+            disabledPad.value = false;
+            filteredSandPlans.value = filteredSandPlansByClient.value;
+        }
+    };
+
+    watch(woId, (newVal) => {
+        if (newVal !== -1) {
+            if (filteredSandPlansByOperator.value.length > 0) {
+                let filterFinished: any = [];
+                workOrderByPad.value = workOrderByOperator.value.filter((workOrder) => Number(workOrder.id) === newVal);
+                const filter = workOrderByPad.value.forEach((workOrder) =>
+                    filteredSandPlansByOperator.value.forEach((sandPlan) => {
+                        if (sandPlan.pit.workOrderId === workOrder.id) {
+                            filterFinished.push(sandPlan);
+                        }
+                    })
+                );
+                filteredSandPlansByPad.value = filterFinished;
+                filteredSandPlans.value = filteredSandPlansByPad.value;
+            }
+        } else {
+            filteredSandPlans.value = filteredSandPlansByOperator.value;
+        }
+    });
+
+    const currentStage = ref(0);
+    const stageTotal = ref(0);
+    const stageSandAmmount = ref(0);
+
+    const checkSandStages = (sandPlan: any) => {
+        currentStage.value = 0;
+        stageTotal.value = 0;
+        stageSandAmmount.value = 0;
+        const stageQuantities = [];
+
+        if (sandPlan.stages.length > 0) {
+            const currentStageFull = sandPlan.stages.find((stage: any) => stage.status === 0);
+            currentStage.value = currentStageFull.stage;
+            stageTotal.value = sandPlan.stages.length;
+            stageQuantities.push(
+                currentStageFull.quantity1,
+                currentStageFull.quantity2,
+                currentStageFull.quantity3,
+                currentStageFull.quantity4
+            );
+            stageQuantities.map((quantity) => {
+                if (quantity >= 0) {
+                    stageSandAmmount.value += quantity;
+                }
+            });
+        }
     };
 </script>
 

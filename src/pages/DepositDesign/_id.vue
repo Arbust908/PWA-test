@@ -5,9 +5,13 @@
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
                     <ClientPitCombo
+                        v-model:wo-id="woId"
                         :client-id="clientId"
                         :pit-id="pitId"
+                        validation-type="empty"
+                        :pads="true"
                         :is-disabled="true"
+                        :from-id="true"
                         @update:clientId="clientId = $event"
                         @update:pitId="pitId = $event"
                     />
@@ -139,6 +143,7 @@
             const instance = axios.create({
                 baseURL: apiUrl,
             });
+            const woId = ref(-1);
             const id = route.params.id;
             useTitle(`Depósito ${id} <> Sandflow`);
             const warehouse = ref([]);
@@ -352,8 +357,10 @@
             };
 
             const updateData = (newData: Warehouse | null) => {
+                console.log(newData);
+
                 if (newData) {
-                    pitId.value = newData.pitId;
+                    woId.value = newData.pitId;
                     clientId.value = newData.clientCompanyId;
                     deposit.value = newData.layout;
                     const formatedDeposit = formatDeposit(newData.layout);
@@ -388,7 +395,7 @@
             });
 
             const isFull = computed(() => {
-                const hasClientAndPit: boolean = clientId.value >= 0 && pitId.value >= 0;
+                const hasClientAndPit: boolean = clientId.value >= 0 && woId.value >= 0;
                 const hasDeposit: boolean = rows.value > 0 && cols.value > 0 && floors.value > 0;
 
                 return hasClientAndPit && hasDeposit;
@@ -398,7 +405,7 @@
                 const wH: Warehouse = {
                     id: Number(id),
                     clientCompanyId: clientId.value,
-                    pitId: pitId.value,
+                    pitId: woId.value,
                     layout: deposit.value,
                 };
                 const { data } = useAxios(`/warehouse/${id}`, { method: 'PUT', data: wH }, instance);
@@ -427,6 +434,7 @@
                 save,
                 sandTypes,
                 sandName,
+                woId,
             };
         },
     });

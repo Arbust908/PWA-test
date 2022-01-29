@@ -268,18 +268,16 @@ const routes: Array<RouteRecordRaw> = [
         beforeEnter: [isMobileAndLogged, checkPermission],
     },
     {
-        // Agregar permiso al Lead Operator
         path: '/deposito-cajas-vacias',
         name: 'EmptyBoxDeposit',
         component: () => import('@/pages/EmptyBoxDeposit/Index.vue'),
-        beforeEnter: [isMobileAndLogged],
+        beforeEnter: [isMobileAndLogged, checkPermission],
     },
     {
-        // Agregar permiso al Lead Operator
         path: '/destino-cajas-vacias',
         name: 'EmptyBoxDestiny',
         component: () => import('@/pages/EmptyBoxDeposit/EmptyBox.vue'),
-        beforeEnter: [isMobileAndLogged],
+        beforeEnter: [isMobileAndLogged, checkPermission],
     },
     {
         path: '/usuarios',
@@ -315,13 +313,13 @@ const routes: Array<RouteRecordRaw> = [
         path: '/cierre-de-operaciones',
         name: 'CloseOfOperation',
         component: () => import('@/pages/CloseOfOperations/index.vue'),
-        beforeEnter: isLogged,
+        beforeEnter: [isLogged, checkPermission],
     },
     {
         path: '/operacion-en-forklift',
         name: 'ForkliftOperation',
         component: () => import('@/pages/ForkliftOperation/index.vue'),
-        beforeEnter: isLogged,
+        beforeEnter: [isLogged, checkPermission],
     },
     // Todas las rutas deberian ir antes de estas 👇
     {

@@ -5,6 +5,7 @@
             field-name="client"
             placeholder="Seleccionar cliente"
             title="Cliente"
+            require-validation
             :endpoint-data="clients"
             :data="clientId"
             :is-disabled="isDisabled"
@@ -15,12 +16,13 @@
         <FieldLoading v-else />
         <InvalidInputLabel v-if="clientId == -1 && useFirstClient === true" validation-type="empty" />
     </div>
-    <div :class="sharedClasses">
+    <div v-if="!pads" :class="sharedClasses">
         <FieldSelect
             v-if="pits.length > 0"
             field-name="pit"
             placeholder="Seleccionar pozo"
             title="Pozo"
+            require-validation
             :endpoint-data="pits"
             :data="pitId"
             :is-disabled="isDisabled"
@@ -31,17 +33,28 @@
         <FieldLoading v-else />
         <InvalidInputLabel v-if="pitId == -1 && useFirstPit === true" validation-type="empty" />
     </div>
+    <div v-if="pads" :class="sharedClasses">
+        <PadSelector
+            v-model:woId="woId"
+            v-model:work-orders="workOrders"
+            v-model:first-filter="firstFilter"
+            :client-id="clientId"
+            require-validation
+            :is-disabled="isDisabled"
+        />
+    </div>
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref, watch } from 'vue';
-    import { useVModels } from '@vueuse/core';
+    import { Ref } from 'vue';
     import { Pit, Company } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
+    import { getWorkOrders } from '@/helpers/useGetEntities';
 
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLoading from '@/components/ui/form/FieldLoading.vue';
     import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
+    import PadSelector from '@/components/util/PadSelector.vue';
 
     export default defineComponent({
         name: 'ClientPitCombo',
@@ -49,6 +62,7 @@
             FieldSelect,
             FieldLoading,
             InvalidInputLabel,
+            PadSelector,
         },
         props: {
             clientId: {
@@ -67,11 +81,35 @@
                 type: String,
                 default: 'col-span-full md:col-span-6',
             },
+            validationType: {
+                type: String,
+                default: null,
+            },
+            pads: {
+                type: Boolean,
+                default: false,
+            },
+            woId: {
+                type: Number,
+                default: -1,
+            },
+            workOrders: {
+                type: Array,
+                default: () => [],
+            },
+            firstFilter: {
+                type: Boolean,
+                default: false,
+            },
+            fromId: {
+                type: Boolean,
+                default: false,
+            },
         },
         setup(props, { emit }) {
-            const { clientId, pitId } = useVModels(props, emit);
+            const { clientId, pitId, woId } = useVModels(props, emit);
             const { read: getClients } = useApi('/company');
-            const backupClients = getClients();
+            const backupClients = getClients() as Ref<Array<Company>>;
             const clients = ref([] as Array<Company>);
             watch(backupClients, (newVal) => {
                 if (newVal) {
@@ -80,7 +118,7 @@
             });
 
             const { read: getPits } = useApi('/pit');
-            const backupPits = getPits();
+            const backupPits = getPits() as Ref<Array<Pit>>;
             const pits = ref([] as Array<Pit>);
             watch(backupPits, (newVal) => {
                 if (newVal) {
@@ -89,6 +127,10 @@
             });
 
             const filterPitsByClient = (idOfClient: number) => {
+                if (firstFilter.value) {
+                    pitId.value = -1;
+                }
+                firstFilter.value = true;
                 pits.value = [];
                 setTimeout(() => {
                     const proxyPitId = pitId.value ? pitId.value : 0;
@@ -119,7 +161,7 @@
                 if (curPit) {
                     setTimeout(() => {
                         const selectedClientId =
-                            backupClients.value.find((client: Company) => {
+                            backupClients.value?.find((client: Company) => {
                                 return client.id == curPit.companyId;
                             }).id || -1;
 
@@ -141,6 +183,34 @@
                     filterPitsByClient(newVal);
                 }
             });
+            const workOrders = ref([]);
+            const firstFilter = ref(false);
+
+            const padFilter = async (filterValue: number) => {
+                workOrders.value = await getWorkOrders();
+
+                if (filterValue !== -1) {
+                    const filterClientByPad = workOrders.value.filter((workOrder) => workOrder.id === filterValue);
+                    console.log(workOrders.value);
+                    clientId.value = Number(filterClientByPad[0].client);
+
+                    if (props.fromId) {
+                        firstFilter.value = true;
+                    }
+                }
+            };
+
+            watch(woId, async (newVal) => {
+                props.pads && (await padFilter(newVal));
+            });
+
+            onMounted(async () => {
+                props.pads && (await padFilter(woId.value));
+
+                if (props.fromId === true) {
+                    firstFilter.value = true;
+                }
+            });
 
             const useFirstClient = ref(false);
             watch(useFirstClient, (newVal) => {
@@ -158,6 +228,9 @@
                 InvalidInputLabel,
                 useFirstClient,
                 useFirstPit,
+                woId,
+                workOrders,
+                firstFilter,
             };
         },
     });

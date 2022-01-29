@@ -69,8 +69,6 @@ export default {
                 });
         },
         user_get: async ({ commit }, payload) => {
-            console.log('payload', payload);
-
             return await axios
                 .get(`${api}/user/${payload}`)
                 .then((res) => {
