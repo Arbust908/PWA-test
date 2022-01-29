@@ -35,19 +35,18 @@
     </div>
     <div v-if="pads" :class="sharedClasses">
         <PadSelector
-            :client-id="clientId"
-            require-validation
             v-model:woId="woId"
             v-model:work-orders="workOrders"
             v-model:first-filter="firstFilter"
+            :client-id="clientId"
+            require-validation
             :is-disabled="isDisabled"
         />
     </div>
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref, watch } from 'vue';
-    import { useVModels } from '@vueuse/core';
+    import { Ref } from 'vue';
     import { Pit, Company } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
     import { getWorkOrders } from '@/helpers/useGetEntities';
@@ -84,7 +83,7 @@
             },
             validationType: {
                 type: String,
-                required: false,
+                default: null,
             },
             pads: {
                 type: Boolean,
@@ -92,11 +91,11 @@
             },
             woId: {
                 type: Number,
-                required: false,
+                default: -1,
             },
             workOrders: {
                 type: Array,
-                default: [],
+                default: () => [],
             },
             firstFilter: {
                 type: Boolean,
@@ -110,7 +109,7 @@
         setup(props, { emit }) {
             const { clientId, pitId, woId } = useVModels(props, emit);
             const { read: getClients } = useApi('/company');
-            const backupClients = getClients();
+            const backupClients = getClients() as Ref<Array<Company>>;
             const clients = ref([] as Array<Company>);
             watch(backupClients, (newVal) => {
                 if (newVal) {
@@ -119,7 +118,7 @@
             });
 
             const { read: getPits } = useApi('/pit');
-            const backupPits = getPits();
+            const backupPits = getPits() as Ref<Array<Pit>>;
             const pits = ref([] as Array<Pit>);
             watch(backupPits, (newVal) => {
                 if (newVal) {
@@ -162,7 +161,7 @@
                 if (curPit) {
                     setTimeout(() => {
                         const selectedClientId =
-                            backupClients.value.find((client: Company) => {
+                            backupClients.value?.find((client: Company) => {
                                 return client.id == curPit.companyId;
                             }).id || -1;
 
@@ -202,11 +201,11 @@
             };
 
             watch(woId, async (newVal) => {
-                await padFilter(newVal);
+                props.pads && (await padFilter(newVal));
             });
 
             onMounted(async () => {
-                await padFilter(woId.value);
+                props.pads && (await padFilter(woId.value));
 
                 if (props.fromId === true) {
                     firstFilter.value = true;

@@ -51,7 +51,7 @@
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item?.sandOrder.boxId ? null : 'empty'">
-                    {{ item?.sandOrder.boxId || 'Sin definir' }} - {{ item?.order }}
+                    {{ item?.sandOrder.boxId || 'Sin definir' }}
                 </td>
 
                 <td :class="item.origin ? null : 'empty'">
@@ -324,10 +324,17 @@
 
     updateLists();
 
-    onUnmounted(async () => {
-        await removeQueueItems(itemToDelete.value);
-        console.log('Unmounted');
+    watch(finishedQueue, (newVal) => {
+        console.log(newVal);
+
+        if (newVal && newVal.length > 10) {
+            console.log(itemToDelete.value);
+        }
     });
+    // onUnmounted(async () => {
+    //     await removeQueueItems(itemToDelete.value);
+    //     console.log('Unmounted');
+    // });
 </script>
 
 <style lang="scss" scoped>
