@@ -61,3 +61,11 @@ export const getSand = async () => {
         })
         .catch((err) => console.error(err));
 };
+export const getSandPlan = async () => {
+    return await axios
+        .get(`${apiUrl}/sandPlan`)
+        .then((res) => {
+            return res.data.data;
+        })
+        .catch((err) => console.error(err));
+};

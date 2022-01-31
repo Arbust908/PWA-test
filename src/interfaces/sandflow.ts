@@ -280,6 +280,7 @@ export interface PurchaseOrder {
     transportProvider?: TransportProvider;
     sandProvider?: SandProvider;
     pit?: Pit;
+    notificationStatus?: number;
 }
 
 export interface TransportOrder {

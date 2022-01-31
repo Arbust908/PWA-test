@@ -1,27 +1,25 @@
 <template>
     <FieldSelect
-        v-if="workOrders.length > 0"
+        v-if="allWorkOrders.length > 0"
+        v-model:data="workOrderId"
+        v-model:work-orders="allWorkOrders"
+        v-model:first-filter="isFirstTime"
         field-name="pad"
         placeholder="Seleccionar PAD"
         title="PAD"
-        :endpoint-data="padPopulation"
         endpoint-key="pad"
+        :endpoint-data="padPopulation"
         :require-validation="requireValidation"
         :is-optional="isOptional"
         :is-disabled="isDisabled"
-        v-model:data="woId"
-        v-model:work-orders="workOrders"
-        v-model:first-filter="firstFilter"
         :select-class="useFirstPad"
         @click="useFirstPad = true"
     />
     <FieldLoading v-else />
-    <InvalidInputLabel v-if="woId == -1 && useFirstPad === true && requireValidation" validation-type="empty" />
+    <InvalidInputLabel v-if="workOrderId == -1 && useFirstPad === true && requireValidation" validation-type="empty" />
 </template>
 
 <script lang="ts">
-    import { defineComponent, ref, watch } from 'vue';
-    import { useVModels } from '@vueuse/core';
     import axios from 'axios';
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -59,7 +57,7 @@
             },
             workOrders: {
                 type: Array,
-                default: [],
+                default: () => [],
             },
             firstFilter: {
                 type: Boolean,
@@ -71,34 +69,39 @@
             },
         },
         setup(props, { emit }) {
-            const { clientId, woId, workOrders, firstFilter } = useVModels(props, emit);
+            const {
+                clientId,
+                woId: workOrderId,
+                workOrders: allWorkOrders,
+                firstFilter: isFirstTime,
+            } = useVModels(props, emit);
 
             const padPopulation = ref([]);
             const pads = ref([]);
 
             onMounted(async () => {
                 const result = await axios.get(`${api}/workOrder`);
-                workOrders.value = result.data.data;
+                allWorkOrders.value = result.data.data;
             });
 
-            watch(workOrders, (newVal: any) => {
+            watch(allWorkOrders, (newVal: any) => {
                 padPopulation.value = newVal;
             });
 
             const filteringPads = (newClientId: number) => {
-                if (newClientId !== -1 && !firstFilter.value) {
-                    const filteredWorkOrders = workOrders.value.filter(
+                if (newClientId !== -1 && !isFirstTime.value) {
+                    const filteredWorkOrders = allWorkOrders.value.filter(
                         (workOrder) => Number(workOrder.client) === newClientId
                     );
                     padPopulation.value = filteredWorkOrders;
                 } else {
-                    padPopulation.value = workOrders.value;
+                    padPopulation.value = allWorkOrders.value;
 
-                    if (firstFilter.value) {
-                        woId.value = -1;
+                    if (isFirstTime.value) {
+                        workOrderId.value = -1;
                     }
                 }
-                firstFilter.value = false;
+                isFirstTime.value = false;
             };
 
             watch(clientId, (newVal) => {
@@ -111,13 +114,13 @@
             });
 
             return {
-                clientId,
                 InvalidInputLabel,
                 useFirstPad,
-                workOrders,
+                allWorkOrders,
                 padPopulation,
                 pads,
-                woId,
+                workOrderId,
+                isFirstTime,
             };
         },
     });
