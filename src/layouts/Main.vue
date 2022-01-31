@@ -158,6 +158,7 @@
                                 </MenuItems>
                             </transition>
                         </Menu>
+                        <!-- {{ user }} -->
                     </div>
                 </div>
             </div>

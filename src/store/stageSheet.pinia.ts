@@ -1,5 +1,5 @@
 import { boxesByFloor } from '@/helpers/useWarehouse';
-import { BoxLocation, Cradle, QueueItem, Warehouse, WorkOrder } from '@/interfaces/sandflow';
+import { BoxLocation, Cradle, QueueItem, Sand, SandStage, Warehouse, WorkOrder } from '@/interfaces/sandflow';
 import { defineStore } from 'pinia';
 
 interface QueueBox extends QueueItem {
@@ -12,12 +12,16 @@ interface QueueBox extends QueueItem {
 export const useSheetStore = defineStore('stageSheet', () => {
     // State
     const clientId = ref(-1);
-    const pitId = ref(-1);
-    const selectedTab = ref(0);
-    const currentWarehouse = ref({} as Warehouse);
-    const queueBoxes = ref([] as QueueBox[]);
-    const workOrder = ref({} as WorkOrder);
     const currentCradle = ref({} as Cradle);
+    const currentWarehouse = ref({} as Warehouse);
+    const pitId = ref(-1);
+    const queueBoxes = ref([] as QueueBox[]);
+    const sands = ref([] as Sand[]);
+    const selectedSandStage = ref({} as SandStage);
+    const selectedStageId = ref(-1);
+    const selectedTab = ref(0);
+    const stages = ref([] as SandStage[]);
+    const workOrder = ref({} as WorkOrder);
 
     // Getters
     const getPitBoxes = computed(() => {
@@ -28,6 +32,23 @@ export const useSheetStore = defineStore('stageSheet', () => {
 
         return boxesByFloor(getPitBoxes.value, true);
     });
+    const getSelectStage = computed(() => {
+        return stages.value.find((stage) => stage.id === selectedStageId.value) || ({} as SandStage);
+    });
+    const finalizedStages = computed(() => {
+        return stages.value?.filter((s: SandStage) => s.status === 2) || [];
+    });
+    const pendingStages = computed(() => {
+        return (
+            stages.value
+                ?.filter((s: SandStage) => s.status !== 2)
+                ?.sort((a: SandStage, b: SandStage) => a.stage - b.stage) || []
+        );
+    });
+
+    const getSandById = (id: number) => {
+        return sands.value.find((sand) => sand.id === id);
+    };
 
     // Actions
     const setTab = (tabToSet: number) => {
@@ -39,6 +60,19 @@ export const useSheetStore = defineStore('stageSheet', () => {
     const setWorkOrder = (workOrderToSet: WorkOrder) => {
         workOrder.value = workOrderToSet;
     };
+    const setSelectedStageId = (stageId: number) => {
+        if (stageId === selectedStageId.value) {
+            selectedStageId.value = -1;
+            selectedSandStage.value = {} as SandStage;
+        } else {
+            selectedStageId.value = stageId;
+            selectedSandStage.value = stages.value.find((stage) => stage.id === stageId) || ({} as SandStage);
+        }
+    };
+    const setSands = (sandsToSet: Sand[]) => {
+        sands.value = sandsToSet;
+    };
+
     // Helpers
     const isTabSelected = (tab: number) => {
         return selectedTab.value === tab;
@@ -46,18 +80,28 @@ export const useSheetStore = defineStore('stageSheet', () => {
 
     return {
         clientId,
-        pitId,
-        selectedTab,
-        currentWarehouse,
-        queueBoxes,
-        workOrder,
         currentCradle,
+        currentWarehouse,
+        finalizedStages,
         getPitBoxes,
         getPitBoxesByFloor,
+        getSelectStage,
+        pendingStages,
+        pitId,
+        queueBoxes,
+        sands,
+        selectedSandStage,
+        selectedStageId,
+        selectedTab,
+        stages,
+        workOrder,
         // Methods
-        setTab,
+        getSandById,
         isTabSelected,
         setCradle,
+        setSelectedStageId,
+        setTab,
         setWorkOrder,
+        setSands,
     };
 });

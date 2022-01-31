@@ -13,9 +13,7 @@
                     {{ stagePorcentage }}%
                 </progress>
                 <span v-if="showProgress">{{ stagePorcentage.toFixed(2) + '%' }}</span>
-                <span v-else class="italic text-center w-full">{{
-                    stagePorcentage === 0 ? 'Pendiente' : 'Finalizada '
-                }}</span>
+                <span v-else class="italic text-center w-full">{{ stageStatus[sandStage.status] }}</span>
             </div>
             <i
                 :class="isSelectedStage ? 'rotate-180' : 'rotate-0'"
@@ -136,7 +134,6 @@
         extractOrderInfo,
         filterEmptyQueueBox,
         filterJustToAddBox,
-        filterJustToAddBoxes,
         getPorcentage,
     } from '@/helpers/useSheetHelpers';
     import { getSandOrders } from '@/helpers/useWarehouse';
@@ -163,9 +160,23 @@
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
     const sheetStore = useSheetStore();
-    const { clientId, pitId, currentWarehouse, queueBoxes, workOrder, currentCradle, getPitBoxes, getPitBoxesByFloor } =
-        storeToRefs(sheetStore);
+    const {
+        clientId,
+        pitId,
+        currentWarehouse,
+        queueBoxes,
+        workOrder,
+        currentCradle,
+        sands: allSands,
+        getPitBoxes,
+        getPitBoxesByFloor,
+        selectedSandStage,
+    } = storeToRefs(sheetStore);
     // const { setTab, isTabSelected, setCradle, setWorkOrder } = sheetStore;
+    /**
+     * isActive Marca si es un stage que esta "activo" y por ende muestra el porsentaje
+     * isSelectedStage Marca si el stage esta seleccionado y por ende el que muestra los detalles
+     */
     const { isActive, isSelectedStage } = toRefs(props);
     const router = useRouter();
     const store = useStore();
@@ -175,8 +186,12 @@
             return acc + sand.quantity;
         }, 0);
     });
-
     const isLoading = ref(false);
+    const stageStatus = {
+        0: 'Pendiente',
+        1: 'En Proceso',
+        2: 'Finalizado',
+    };
 
     const showProgress = computed(() => {
         return stagePorcentage.value > 0;
@@ -220,7 +235,7 @@
         (val) => {
             if (val) {
                 console.log('isActive');
-                // emits('update-queue', boxQueue.value);
+                emits('update-queue', boxQueue.value);
                 fillQueueBoxes();
             }
         },
@@ -284,15 +299,24 @@
 
     const queueDetail = computed(() => {
         return boxQueue.value.reduce((acc, item) => {
-            if (item?.sandType?.id) {
-                const sandId = item?.sandType?.id;
-                const sandType = item?.sandType?.type;
-
-                acc[sandType] = acc[sandType] ? acc[sandType] + item?.amount : item?.amount;
+            if (typeof item === 'number') {
+                return acc;
             }
 
+            if (item?.sandOrder?.sandTypeId) {
+                const sandId = item?.sandOrder?.sandTypeId;
+                console.log(sandId, 'sandId');
+                const sandType = allSands.value.find((sand) => sand.id === sandId)?.type || 'Desconocido';
+                console.log('sands', allSands.value);
+                console.log(sandType, 'sandType');
+                const sandAmount = item?.sandOrder?.amount || 0;
+
+                acc[sandType] = acc[sandType] ? acc[sandType] + sandAmount : sandAmount;
+            }
+            console.log(acc);
+
             return acc;
-        }, {});
+        }, {} as { [key: string]: number });
     });
     const queueDetailTotal = computed(() => {
         let total = 0;
@@ -335,17 +359,6 @@
          * Hay que crear los QueueItems que van al Cradle
          */
         console.log('toAddQueue', toAddQueue);
-        /*
-        amount: 50
-        boxId: "S-OP00"
-        destination: "F1 C1 N1"
-        order: 9979
-        origin: "Camion ABA123"
-        pitId: 11
-        sandOrderId: 36
-        sandTypeId: 1
-        status: 0
-        */
         const newQueueItems = await JSON.parse(JSON.stringify(toAddQueue)).map(async (item: QueueItem) => {
             const { sandOrderId, pitId: itemPitId, destination } = item as QueueItem;
             const { DepositoACradle } = QueueTransactions;
@@ -373,22 +386,27 @@
 
     onMounted(async () => {
         emits('update-queue', boxQueue.value);
-        const { sandId1, sandId2, sandId3, sandId4, quantity1, quantity2, quantity3, quantity4 } = props.sandStage;
+        const { sandId1, sandId2, sandId3, sandId4, quantity1, quantity2, quantity3, quantity4 } =
+            selectedSandStage.value;
 
         if (sandId1) {
-            updateSand(await getSandLogic(sandId1), quantity1);
+            const sand1 = allSands.value.find((sand) => sand.id === sandId1) || (await getSandLogic(sandId1));
+            updateSand(sand1, quantity1);
         }
 
         if (sandId2) {
-            updateSand(await getSandLogic(sandId2), quantity2);
+            const sand2 = allSands.value.find((sand) => sand.id === sandId2) || (await getSandLogic(sandId2));
+            updateSand(sand2, quantity2);
         }
 
         if (sandId3) {
-            updateSand(await getSandLogic(sandId3), quantity3);
+            const sand3 = allSands.value.find((sand) => sand.id === sandId3) || (await getSandLogic(sandId3));
+            updateSand(sand3, quantity3);
         }
 
         if (sandId4) {
-            updateSand(await getSandLogic(sandId4), quantity4);
+            const sand4 = allSands.value.find((sand) => sand.id === sandId4) || (await getSandLogic(sandId4));
+            updateSand(sand4, quantity4);
         }
     });
 </script>

@@ -14,7 +14,7 @@ export const queueDetailFormated = (info: any) => {
     return '-';
 };
 
-export const isStageSelected = (stage: number, selected: number): boolean => {
+export const isStageSelected = (stage: number | null, selected: number): boolean => {
     return selected === stage;
 };
 

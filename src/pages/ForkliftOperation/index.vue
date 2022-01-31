@@ -167,7 +167,6 @@
         const hasNoDestinations = toDoQueue.value.filter(({ destination }: QueueItem) => !destination);
 
         if (hasNoDestinations.length) {
-            console.log('Hay Lugar en Cradle?');
             const availables = checkCradleSlots();
             availables && fillItemDestination(hasNoDestinations, availables);
         }
@@ -204,8 +203,6 @@
 
             return;
         }
-        console.log(items);
-        console.log(availableSlots);
         const amountOfSlots = availableSlots.length;
 
         for (let i = 0; i < amountOfSlots; i++) {

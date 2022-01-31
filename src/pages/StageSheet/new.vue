@@ -25,6 +25,8 @@
                 Etapas finalizadas
             </button>
         </nav>
+        {{ selectedSandStage }}
+        {{ selectedStageId }}
         <section class="mt-4 panel">
             <div v-if="isTabSelected(_TABS.PENDING)" class="stage--panel">
                 <StageSheetStage
@@ -32,9 +34,9 @@
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
                     :boxes="boxes"
-                    :is-selected-stage="isStageSelected(sheet.id, selectedStage.id)"
+                    :is-selected-stage="isStageSelected(sheet.id, selectedStageId)"
                     :is-active="pendingStages[0].id === sheet.id"
-                    @set-stage="setStage($event)"
+                    @set-stage="setSelectedStageId($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
                 />
@@ -48,9 +50,9 @@
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
                     :boxes="boxes"
-                    :is-selected-stage="isStageSelected(sheet.id, selectedStage.id)"
+                    :is-selected-stage="isStageSelected(sheet.id, selectedStageId)"
                     :is-active="pendingStages[0].id === sheet.id"
-                    @set-stage="setStage($event)"
+                    @set-stage="setSelectedStageId($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
                 />
@@ -127,8 +129,19 @@
     const _TABS = { PENDING: 0, COMPLETED: 1 };
 
     const store = useSheetStore();
-    const { clientId, pitId, currentWarehouse, queueBoxes, workOrder } = storeToRefs(store);
-    const { setTab, isTabSelected, setCradle, setWorkOrder } = store;
+    const {
+        clientId,
+        pitId,
+        currentWarehouse,
+        queueBoxes,
+        workOrder,
+        stages,
+        finalizedStages,
+        pendingStages,
+        selectedStageId,
+        selectedSandStage,
+    } = storeToRefs(store);
+    const { setTab, isTabSelected, setCradle, setWorkOrder, setSelectedStageId, setSands } = store;
 
     const actualSheet: StageSheet = reactive({
         companyId: -1,
@@ -158,6 +171,13 @@
         fillSheet(actualSheet);
     });
 
+    const getSand = async () => {
+        const { data } = useAxios(`/sand`, instance);
+        watch(data, (newVal) => {
+            console.log('Sand', newVal);
+            setSands(newVal);
+        });
+    };
     const getSandPlan = async ({ pitId: pozoId }: StageSheet) => {
         const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
         watch(data, (newVal) => {
@@ -189,21 +209,6 @@
     };
 
     const selectedStage = ref(-1);
-    let stages: Ref<Array<SandStage>> = ref([]);
-
-    const setStage = (stage: number) => {
-        if (selectedStage.value.id === stage) {
-            selectedStage.value = -1;
-        } else {
-            selectedStage.value = stages.value.find((s) => s.id === stage);
-        }
-    };
-    const finalizedStages = computed(() => {
-        return stages.value?.filter((s) => s.status === 'finalized') || [];
-    });
-    const pendingStages = computed(() => {
-        return stages.value?.sort((a, b) => a.stage - b.stage) || [];
-    });
 
     const boxes = computed(() => {
         if (pitId.value !== -1 && clientId.value !== -1) {
