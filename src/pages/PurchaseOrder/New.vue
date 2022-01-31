@@ -643,7 +643,7 @@
             if (sendEmails) {
                 // solo si se envian mails se envia el content del pdf
                 const pdfContent = await pdf.value?.getFileContent();
-                purchaseOrder.pdfContent = 'pdfContent';
+                purchaseOrder.pdfContent = pdfContent;
             }
 
             // Creamos via API la orden de pedido
