@@ -89,7 +89,7 @@
             type: Boolean,
         },
     });
-    const emit = defineEmits(['is-blured', 'change', 'click']);
+    const emit = defineEmits(['is-blured', 'change', 'click', 'update:data']);
     const value = useVModel(props, 'data', emit);
 
     if (value.value == null) {

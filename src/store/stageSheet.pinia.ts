@@ -1,5 +1,14 @@
 import { boxesByFloor } from '@/helpers/useWarehouse';
-import { BoxLocation, Cradle, QueueItem, Sand, SandStage, Warehouse, WorkOrder } from '@/interfaces/sandflow';
+import {
+    BoxLocation,
+    Cradle,
+    QueueItem,
+    Sand,
+    SandOrder,
+    SandStage,
+    Warehouse,
+    WorkOrder,
+} from '@/interfaces/sandflow';
 import { defineStore } from 'pinia';
 
 interface QueueBox extends QueueItem {
@@ -22,15 +31,19 @@ export const useSheetStore = defineStore('stageSheet', () => {
     const selectedTab = ref(0);
     const stages = ref([] as SandStage[]);
     const workOrder = ref({} as WorkOrder);
+    const ultimateBoxes = ref([] as SandOrder[]);
 
     // Getters
     const getPitBoxes = computed(() => {
+        console.log('🍍Pinia', queueBoxes.value);
+
         return queueBoxes.value.filter((box) => box.pitId === pitId.value);
     });
     const getPitBoxesByFloor = computed(() => {
-        console.log('Pinia', getPitBoxes.value);
+        console.log('🍍Pinia', ultimateBoxes.value);
+        console.log('🍍Pinia', boxesByFloor(ultimateBoxes.value, true));
 
-        return boxesByFloor(getPitBoxes.value, true);
+        return boxesByFloor(ultimateBoxes.value, true);
     });
     const getSelectStage = computed(() => {
         return stages.value.find((stage) => stage.id === selectedStageId.value) || ({} as SandStage);
@@ -95,6 +108,7 @@ export const useSheetStore = defineStore('stageSheet', () => {
         selectedTab,
         stages,
         workOrder,
+        ultimateBoxes,
         // Methods
         getSandById,
         isTabSelected,

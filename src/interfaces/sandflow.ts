@@ -221,6 +221,7 @@ export interface BoxLocation {
     col?: number;
     origin?: string;
     origin_id?: number;
+    where_origin?: string;
 }
 export interface SandOrderBox {
     id?: number;

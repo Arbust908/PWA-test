@@ -25,8 +25,6 @@
                 Etapas finalizadas
             </button>
         </nav>
-        {{ selectedSandStage }}
-        {{ selectedStageId }}
         <section class="mt-4 panel">
             <div v-if="isTabSelected(_TABS.PENDING)" class="stage--panel">
                 <StageSheetStage
@@ -49,7 +47,6 @@
                     v-for="sheet in finalizedStages"
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
-                    :boxes="boxes"
                     :is-selected-stage="isStageSelected(sheet.id, selectedStageId)"
                     :is-active="pendingStages[0].id === sheet.id"
                     @set-stage="setSelectedStageId($event)"
@@ -106,7 +103,16 @@
 <script setup lang="ts">
     import axios from 'axios';
     import { Ref } from 'vue';
-    import { StageSheet, SandStage, Warehouse, QueueItem, SandOrder, WorkOrder, Pit } from '@/interfaces/sandflow';
+    import {
+        StageSheet,
+        SandStage,
+        Warehouse,
+        QueueItem,
+        SandOrder,
+        WorkOrder,
+        Pit,
+        SandOrderBox,
+    } from '@/interfaces/sandflow';
     import { boxesByFloor, formatLocation, searchInDepoBoxes } from '@/helpers/useWarehouse';
     import { useAxios } from '@vueuse/integrations/useAxios';
 
@@ -121,6 +127,7 @@
     import { useSheetStore } from '@/store/stageSheet.pinia';
     import { storeToRefs } from 'pinia';
     import { detailTitle, queueDetailFormated, isStageSelected } from '@/helpers/useSheetHelpers';
+    import { getSandOrders } from '@/helpers/useGetEntities';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
     const instance = axios.create({
@@ -140,6 +147,7 @@
         pendingStages,
         selectedStageId,
         selectedSandStage,
+        ultimateBoxes,
     } = storeToRefs(store);
     const { setTab, isTabSelected, setCradle, setWorkOrder, setSelectedStageId, setSands } = store;
 
@@ -155,10 +163,11 @@
     const fillSheet = async (currentSheet: any) => {
         if (currentSheet.companyId !== -1 && currentSheet.pitId !== -1) {
             await getSandPlan(currentSheet);
-            await getDeposit(currentSheet);
             await getWorkorder(currentSheet);
+            await getDeposit(currentSheet);
             const cradleId = workOrder.value.operativeCradle;
             await getCradle(Number(cradleId));
+            fillBoxes();
         }
     };
 
@@ -174,20 +183,19 @@
     const getSand = async () => {
         const { data } = useAxios(`/sand`, instance);
         watch(data, (newVal) => {
-            console.log('Sand', newVal);
-            setSands(newVal);
+            setSands(newVal.data);
         });
     };
     const getSandPlan = async ({ pitId: pozoId }: StageSheet) => {
         const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
         watch(data, (newVal) => {
-            console.log('Sand Plan', newVal);
             stages.value = newVal.data[0]?.stages;
         });
     };
 
-    const getDeposit = async ({ pitId: pozoId }: StageSheet) => {
-        const { data } = useAxios(`/warehouse?pitId=${pozoId}`, instance);
+    const getDeposit = async () => {
+        const workOrdeId = workOrder.value.id;
+        const { data } = useAxios(`/warehouse?pitId=${workOrdeId}`, instance);
         watch(data, (newVal) => {
             currentWarehouse.value = newVal?.data[0];
         });
@@ -196,7 +204,6 @@
     const getWorkorder = async ({ pitId: pozoId, companyId }: StageSheet) => {
         const response = await axios.get(`${apiUrl}/workOrder?client=${companyId}`);
         const workOrderFromApi = response.data.data;
-        console.log('Work Order', workOrderFromApi);
         const currentWO = workOrderFromApi.find((wo: WorkOrder) => wo.pits.some((pozo: Pit) => pozo.id === pozoId));
         setWorkOrder(currentWO);
     };
@@ -212,10 +219,9 @@
 
     const boxes = computed(() => {
         if (pitId.value !== -1 && clientId.value !== -1) {
-            return boxesByFloor(
-                queueBoxes.value.filter((box) => box.pitId === pitId.value),
-                true
-            );
+            ultimateBoxes.value = newPowerBoxes?.value;
+
+            return boxesByFloor(newPowerBoxes.value, true);
         }
 
         return boxesByFloor(currentWarehouse.value.layout || {});
@@ -226,24 +232,17 @@
         selectedQueue.value = queue;
     };
     const queueDetail = computed(() => {
-        console.log('queueDetail', selectedQueue.value);
         const filteredSelectQueue = selectedQueue.value.filter((item: SandOrder | number | any) => item?.sandTypeId);
 
         return Object.values(
             filteredSelectQueue.reduce((acc, item: SandOrder) => {
-                console.groupCollapsed('Filter queueDetail');
-                console.log('Entramos');
                 const sandId = item?.sandTypeId;
-                console.log('sandId: ' + sandId);
-                console.log('Antes', acc);
 
                 if (acc[sandId]) {
                     acc[sandId] += item.amount;
                 } else {
                     acc[sandId] = item.amount;
                 }
-                console.log('Despues', acc);
-                console.groupEnd();
 
                 return acc;
             }, {} as { [key: string]: number })
@@ -263,6 +262,30 @@
         }
     };
 
+    const boxesInWarehouse = await getSandOrders();
+    const fillBoxes = () => {
+        return boxesInWarehouse
+            .filter((boxy: SandOrder) => boxy.location)
+            .map((boxy: SandOrder) => {
+                const { location } = boxy;
+
+                if (typeof location === 'string') {
+                    boxy.location = JSON.parse(location);
+                }
+
+                return boxy as SandOrderBox;
+            })
+            .filter((boxy: SandOrderBox) => boxy.location?.where === 'warehouse')
+            .filter((boxy: SandOrderBox) => boxy.location?.where_id === currentWarehouse.value?.id);
+    };
+    const newPowerBoxes = computed(() => {
+        if (currentWarehouse.value?.id) {
+            return fillBoxes();
+        }
+
+        return [];
+    });
+
     queueBoxes.value = await getQueueItems();
     queueBoxes.value = queueBoxes.value
         ?.filter((item) => item.sandOrder)
@@ -273,7 +296,7 @@
             if (sandOrder) {
                 location = sandOrder.location;
             } else {
-                console.log('No tenemos Location');
+                // console.log('No tenemos Location');
             }
 
             if (location && JSON.parse(location)) {
@@ -283,6 +306,10 @@
             return item;
         })
         .filter((item) => item.location?.where === 'warehouse');
+
+    onMounted(async () => {
+        await getSand();
+    });
 </script>
 
 <style scoped lang="scss">

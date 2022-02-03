@@ -1,7 +1,7 @@
 <template>
     <button
         type="button"
-        :class="`mesh-type__${box?.sandOrder?.sandTypeId} boxCard meshBorder`"
+        :class="`mesh-type__${box?.sandTypeId} boxCard meshBorder`"
         :disabled="!sandInfo?.id"
         class="depo-box bubble"
         @click="$emit('set-box', box)"
@@ -33,9 +33,6 @@
 
     const sandTypeId = computed(() => {
         return box.value?.sandTypeId;
-    });
-    const boxInfo = computed(() => {
-        return box.value?.sandOrder;
     });
 
     const { read } = useApi<Sand>(`/sand/${sandTypeId.value}`);
