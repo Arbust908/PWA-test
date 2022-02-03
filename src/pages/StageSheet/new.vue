@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
     import axios from 'axios';
-    import { Ref } from 'vue';
+    import { ComputedRef, Ref } from 'vue';
     import {
         StageSheet,
         SandStage,
@@ -227,14 +227,9 @@
 
     const selectedQueue = ref([] as any[]);
     const updateQueue = (queue: Array<any>) => {
-        console.log(queue);
-
         selectedQueue.value = queue;
     };
-    const queueDetail = computed(() => {
-        console.log('DETALLES'); //
-        console.log(selectedQueue.value); //
-
+    const queueDetail: ComputedRef<Array<number>> = computed(() => {
         const filteredSelectQueue = selectedQueue.value.filter((item: SandOrder | number | any) => item?.sandTypeId);
 
         return Object.values(
@@ -252,7 +247,7 @@
         );
     });
     const sumQueueDetail = computed(() => {
-        return queueDetail.value.reduce((acc, item) => {
+        return queueDetail.value.reduce((acc: number, item: number) => {
             return acc + item;
         }, 0);
     });

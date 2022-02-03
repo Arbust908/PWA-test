@@ -317,25 +317,24 @@
 
     /* CAJAS POR PISO */
     const boxesByFloorAndFiltered = computed(() => {
-        const filteredBoxes = getPitBoxesByFloor.value[selectedFloor.value - 1]
-            // .map(extractBoxInfo)
-            .filter((box: any) => {
-                const { location, status } = box;
-                const { where } = location;
+        const filteredBoxes = getPitBoxesByFloor.value[selectedFloor.value - 1].filter((box: any) => {
+            const { location, status } = box;
+            const { where } = location;
 
-                return where === 'warehouse' && status <= 99;
-            });
+            return where === 'warehouse' && status <= 99;
+        });
 
         const queueNoNumbers = boxQueue.value.filter((item) => {
             return typeof item !== 'number';
         });
         const usedQueueIds = queueNoNumbers.map((box) => {
-            const { id } = box as SandOrderBox;
+            console.log('Cajas en lista', box);
+            const { boxId } = box as SandOrderBox;
 
-            return id;
+            return boxId;
         });
 
-        return filteredBoxes.filter((box: SandOrderBox) => !usedQueueIds.includes(box?.id));
+        return filteredBoxes.filter((box: SandOrderBox) => !usedQueueIds.includes(box?.boxId));
     });
 
     interface QueueDetail {
