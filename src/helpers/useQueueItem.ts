@@ -168,15 +168,7 @@ export const itemIsNotToEmpty = (queueItem: QueueItem) => {
 export const orderItems = (itemA: QueueItem, itemB: QueueItem, direction = 'ASC') => {
     const orderA = itemA.order === -1 ? 0 : itemA.order;
     const orderB = itemB.order === -1 ? 0 : itemB.order;
-    console.groupCollapsed(`Ordenando items`);
     const mod = direction === 'ASC' ? 1 : -1;
-    console.log('Direction', direction);
-    console.log('Mod', mod);
-    console.log('Item A', orderA);
-    console.log('Item B', orderB);
-    console.log(orderA - orderB);
-    console.log((orderA - orderB) * mod);
-    console.groupEnd();
 
     return (orderA - orderB) * mod;
 };
@@ -186,16 +178,12 @@ export const orderDesc = (itemA: QueueItem, itemB: QueueItem) => {
 };
 
 export const sheetGridItems = (queueBoxes: Array<QueueItem>) => {
-    console.log('queueBoxes', queueBoxes);
     const { deTransporte, aCradle } = separateQueues(queueBoxes);
-    console.log('deTransporte', deTransporte);
-    console.log('aCradle', aCradle);
     const newItemList = [...deTransporte, ...aCradle];
 
     return newItemList.filter((item) => {
         const { origin, destination } = item;
         const baseOrigin = origin.split(' ')[0];
-        console.log('baseOrigin', baseOrigin);
 
         if (baseOrigin === 'Camion') {
             const destinationArray = destination.split(' ');

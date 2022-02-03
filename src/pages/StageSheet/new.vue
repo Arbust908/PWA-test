@@ -64,7 +64,7 @@
             </div>
             <aside>
                 <h3 class="text-3xl font-bold">Detalle</h3>
-                <article v-if="selectedStage === -1" class="px-4 py-6 border rounded-[10px]">
+                <article v-if="selectedStageId === -1" class="px-4 py-6 border rounded-[10px]">
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
                 </article>
                 <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
@@ -102,7 +102,7 @@
 
 <script setup lang="ts">
     import axios from 'axios';
-    import { Ref } from 'vue';
+    import { ComputedRef, Ref } from 'vue';
     import {
         StageSheet,
         SandStage,
@@ -215,8 +215,6 @@
         });
     };
 
-    const selectedStage = ref(-1);
-
     const boxes = computed(() => {
         if (pitId.value !== -1 && clientId.value !== -1) {
             ultimateBoxes.value = newPowerBoxes?.value;
@@ -227,11 +225,11 @@
         return boxesByFloor(currentWarehouse.value.layout || {});
     });
 
-    const selectedQueue = ref([]);
+    const selectedQueue = ref([] as any[]);
     const updateQueue = (queue: Array<any>) => {
         selectedQueue.value = queue;
     };
-    const queueDetail = computed(() => {
+    const queueDetail: ComputedRef<Array<number>> = computed(() => {
         const filteredSelectQueue = selectedQueue.value.filter((item: SandOrder | number | any) => item?.sandTypeId);
 
         return Object.values(
@@ -249,7 +247,7 @@
         );
     });
     const sumQueueDetail = computed(() => {
-        return queueDetail.value.reduce((acc, item) => {
+        return queueDetail.value.reduce((acc: number, item: number) => {
             return acc + item;
         }, 0);
     });
