@@ -35,14 +35,9 @@ export const useSheetStore = defineStore('stageSheet', () => {
 
     // Getters
     const getPitBoxes = computed(() => {
-        console.log('🍍Pinia', queueBoxes.value);
-
         return queueBoxes.value.filter((box) => box.pitId === pitId.value);
     });
     const getPitBoxesByFloor = computed(() => {
-        console.log('🍍Pinia', ultimateBoxes.value);
-        console.log('🍍Pinia', boxesByFloor(ultimateBoxes.value, true));
-
         return boxesByFloor(ultimateBoxes.value, true);
     });
     const getSelectStage = computed(() => {

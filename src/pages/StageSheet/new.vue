@@ -64,7 +64,7 @@
             </div>
             <aside>
                 <h3 class="text-3xl font-bold">Detalle</h3>
-                <article v-if="selectedStage === -1" class="px-4 py-6 border rounded-[10px]">
+                <article v-if="selectedStageId === -1" class="px-4 py-6 border rounded-[10px]">
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
                 </article>
                 <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
@@ -215,8 +215,6 @@
         });
     };
 
-    const selectedStage = ref(-1);
-
     const boxes = computed(() => {
         if (pitId.value !== -1 && clientId.value !== -1) {
             ultimateBoxes.value = newPowerBoxes?.value;
@@ -227,11 +225,16 @@
         return boxesByFloor(currentWarehouse.value.layout || {});
     });
 
-    const selectedQueue = ref([]);
+    const selectedQueue = ref([] as any[]);
     const updateQueue = (queue: Array<any>) => {
+        console.log(queue);
+
         selectedQueue.value = queue;
     };
     const queueDetail = computed(() => {
+        console.log('DETALLES'); //
+        console.log(selectedQueue.value); //
+
         const filteredSelectQueue = selectedQueue.value.filter((item: SandOrder | number | any) => item?.sandTypeId);
 
         return Object.values(

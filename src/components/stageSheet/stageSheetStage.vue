@@ -223,13 +223,10 @@
      * y los mutamos para que tengan la info de la caja (boxId, peso y tipo de arena)
      */
     const fillQueueBoxes = async () => {
-        console.log('getPitBoxes', getPitBoxes.value);
         const sheetItems = sheetGridItems(getPitBoxes.value as Array<QueueItem>);
-        console.log('sheetItems', sheetItems);
         boxQueue.value = sheetItems.map(extractOrderInfo).sort((a: any, b: any) => {
             return a.order - b.order;
         }) as Array<any>;
-        console.log(boxQueue.value);
 
         if (boxQueue.value.length < 14) {
             const queueNum = boxQueue.value.length;
@@ -242,7 +239,6 @@
     const { sandId1, sandId2, sandId3, sandId4, quantity1, quantity2, quantity3, quantity4 } = toRefs(props.sandStage);
     const updateSand = (sand: Sand, sandQuantity: number) => {
         const sandInfo = JSON.parse(JSON.stringify(sand));
-        console.log('sandInfo', sandInfo);
         sandInfo.quantity = sandQuantity;
         sands.value.push(sandInfo);
     };
@@ -269,7 +265,6 @@
 
     watch(isSelectedStage, (val) => {
         if (val) {
-            console.log('Seleccionado');
             emits('update-queue', boxQueue.value);
         }
     });
@@ -277,7 +272,6 @@
         isActive,
         (val) => {
             if (val) {
-                console.log('isActive');
                 emits('update-queue', boxQueue.value);
                 fillQueueBoxes();
             }
@@ -309,7 +303,6 @@
         popUpCords.y = event.clientY;
     };
     const activeDelete = async (place: any) => {
-        console.log('activeDelete', place.id);
         await deleteQueueItem(place.id);
         await fillQueueBoxes();
     };
@@ -327,7 +320,6 @@
         const filteredBoxes = getPitBoxesByFloor.value[selectedFloor.value - 1]
             // .map(extractBoxInfo)
             .filter((box: any) => {
-                console.log(box, 'Box');
                 const { location, status } = box;
                 const { where } = location;
 
@@ -360,11 +352,8 @@
 
             if (item?.sandTypeId) {
                 const sandId = item?.sandTypeId;
-                console.log(sandId, 'sandId');
                 const selectedSand = allSands.value.find((sand) => sand.id === sandId) as Sand;
                 const sandType = selectedSand?.type || 'Desconocido';
-                console.log('sands', allSands.value);
-                console.log(sandType, 'sandType');
                 const sandAmount = item?.amount || 0;
 
                 if (acc[sandType]) {
@@ -373,7 +362,6 @@
                     acc[sandType] = { name: sandType, amount: sandAmount, id: sandId, sand: selectedSand };
                 }
             }
-            console.log(acc);
 
             return acc;
         }, {} as { [key: string]: QueueDetail });
@@ -389,7 +377,6 @@
 
     const generateQueue = async () => {
         isLoading.value = true;
-        console.log(boxQueue.value);
         const toAddQueue: Array<SandOrderBox> = boxQueue.value
             .filter(filterEmptyQueueBox)
             .filter(filterJustToAddBox) as SandOrderBox[];
@@ -398,7 +385,6 @@
          * Aca lo que voy a tener son QueueItems y cajas que estan en el depo
          * Hay que crear los QueueItems que van al Cradle
          */
-        console.log('toAddQueue', toAddQueue);
         const SandOrdersToMove = [] as Array<SandOrderBox>;
         const newQueueItems = await JSON.parse(JSON.stringify(toAddQueue)).map(async (item: SandOrderBox) => {
             const { id, purchaseOrder, location } = item;
@@ -418,13 +404,10 @@
                 origin: destination,
                 destination: '',
             };
-            console.log('newItem', newItem);
             SandOrdersToMove.push(item);
 
             return newItem as QueueItem;
         });
-        // console.log('🔽 newQueueItems', await Promise.all(newQueueItems));
-        // console.log('🔜 SandOrdersToMove', SandOrdersToMove);
 
         await moveBoxes(SandOrdersToMove);
         await createAllQueueItems(await Promise.all(newQueueItems));
@@ -432,7 +415,6 @@
     };
 
     onMounted(() => {
-        console.log('>>> onMounted');
         emits('update-queue', boxQueue.value);
     });
 </script>
