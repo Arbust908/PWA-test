@@ -9,7 +9,7 @@
             <template #item="{ item }">
                 <!-- Desktop -->
                 <td :class="item?.sandOrder?.boxId ? null : 'empty'" :order="item?.order">
-                    {{ item?.sandOrder?.boxId || 'Sin definir' }} ({{ item?.order }})
+                    {{ item?.sandOrder?.boxId || 'Sin definir' }}
                 </td>
 
                 <td :class="item.origin ? null : 'empty'">

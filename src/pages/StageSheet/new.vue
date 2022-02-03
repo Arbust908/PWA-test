@@ -7,7 +7,13 @@
                 v-model:pit-id="pitId"
                 shared-classes="col-span-full md:col-span-4"
             />
-            <PrimaryBtn class="col-span-6 md:col-span-3 max-h-12 mt-7">Finalizar Stage</PrimaryBtn>
+            {{ selectedStageId }}
+            <PrimaryBtn
+                class="col-span-6 md:col-span-3 max-h-12 mt-7"
+                :disabled="selectedStageId < 0"
+                @click="finishCurrent"
+                >Finalizar Stage</PrimaryBtn
+            >
         </FieldGroup>
         <nav class="flex gap-8 mt-10">
             <button
@@ -169,6 +175,10 @@
             await getCradle(Number(cradleId));
             fillBoxes();
         }
+    };
+
+    const finishCurrent = () => {
+        console.log(selectedSandStage.value);
     };
 
     watch(clientId, (newVal) => {

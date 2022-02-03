@@ -303,6 +303,7 @@
         popUpCords.y = event.clientY;
     };
     const activeDelete = async (place: any) => {
+        console.log('activeDelete', place);
         await deleteQueueItem(place.id);
         await fillQueueBoxes();
     };
