@@ -250,7 +250,7 @@
         },
 
         {
-            label: 'Imprimir PDF',
+            label: 'Imprimir',
             callback: async (item: PurchaseOrder) => {
                 selectedPurchaseOrder.value = item;
                 //wait one second
