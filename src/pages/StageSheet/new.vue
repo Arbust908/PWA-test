@@ -7,7 +7,6 @@
                 v-model:pit-id="pitId"
                 shared-classes="col-span-full md:col-span-4"
             />
-            {{ selectedStageId }}
             <PrimaryBtn
                 class="col-span-6 md:col-span-3 max-h-12 mt-7"
                 :disabled="selectedStageId < 0"
@@ -178,6 +177,9 @@
     };
 
     const finishCurrent = () => {
+        if (selectedStageId.value < 0) {
+            return;
+        }
         console.log(selectedSandStage.value);
     };
 

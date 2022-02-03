@@ -64,10 +64,6 @@
                                         />
                                         {{ sand.type }}</span
                                     >
-                                    <!-- <span class="select-category full">
-                                        <div class="w-[10px] h-[10px] m-[5px] rounded-full bg-indigo-900" />
-                                        Cradle</span
-                                    > -->
                                     <span class="select-category full">
                                         <div class="w-[10px] h-[10px] m-[5px] rounded-full mesh-type__empty boxCard" />
                                         Caja Vacía
@@ -90,6 +86,7 @@
                                     :choosed-box="choosedBox"
                                 />
                             </section>
+                            {{ choosedBox }}
                             <DepositGrid
                                 v-if="warehouse"
                                 class="w-full flex flex-col gap-5"
@@ -156,8 +153,6 @@
 </template>
 
 <script setup lang="ts">
-    import { EyeIcon } from '@heroicons/vue/solid';
-    import EyeIconOff from './EyeIconOff.vue';
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import DepositGrid from '@/components/depositDesign/Deposit.vue';
@@ -175,7 +170,7 @@
     import { asyncForEach } from '@/helpers/useAsyncFor';
     import { defaultQueueItem, createQueueItem, QueueTransactions, getOrderPro } from '@/helpers/useQueueItem';
 
-    import { Box } from '@/interfaces/sandflow';
+    import { Box, SandOrderBox, PurchaseOrder, Sand } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -192,8 +187,8 @@
     const activeSection = ref('deposit');
     const boxes = ref([]);
 
-    const purchaseOrders = ref([]);
-    const sandOrders = ref([]);
+    const purchaseOrders = ref([] as PurchaseOrder[]);
+    const sandOrders = ref([] as SandOrderBox[]);
     const inDepoBoxes = ref([]);
     const filteredPurchaseOrders = ref([]);
 
@@ -209,7 +204,7 @@
     const cleanCradles = ref([]);
     const selectedPurchaseOrder = ref({});
 
-    const sandTypes = ref([]);
+    const sandTypes = ref([] as Sand[]);
 
     const isLoading = ref(false);
     const toggleLoading = useToggle(isLoading);
@@ -242,7 +237,8 @@
     };
 
     const clearBoxInDeposit = (boxId: number) => {
-        // Look for box AKA sandOrder and emtpy location
+        // Le borramos la info de Depo a la Caja
+        console.log('clearBoxInDeposit', boxId);
         // Object.entries(warehouse.value.layout).forEach((cell) => {
         //     if (cell[1].id == id) {
         //         (cell[1].category = 'empty'), delete cell[1][id];
@@ -266,10 +262,6 @@
     };
 
     const workOrdersPad = ref([]);
-    onMounted(async () => {
-        const result = await axios.get(`${apiUrl}/workOrder`);
-        workOrdersPad.value = result.data.data;
-    });
 
     watchEffect(async () => {
         if (purchaseOrders.value.length > 0) {
@@ -278,6 +270,9 @@
                     if (po.companyId == clientId.value && po.pitId == pitId.value && po.isFullyAllocated == 0) {
                         return po;
                     }
+                });
+                sandOrders.value = sandOrders.value.filter((so) => {
+                    return so?.purchaseOrder && so?.purchaseOrder?.pitId == pitId.value;
                 });
             }
 
@@ -324,6 +319,8 @@
                     col.value = fCol;
                     floor.value = fFloor;
                     row.value = fRow;
+                    console.log(sandOrders.value, warehouse.value.id);
+                    console.log(getInDepoBoxes(sandOrders.value, warehouse.value.id));
                     inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
                     console.log(inDepoBoxes.value);
                 }
@@ -423,23 +420,6 @@
         sandOrders.value.push(choosedBox.value);
         wasWarehouseModificated.value = true;
         inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
-
-        // if (box.category == 'empty' || box.category !== 'aisle') {
-        //     // if (visibleCategories.value.includes(box.category)) {
-        //     const hasPos = [choosedBox.value.floor, choosedBox.value.row, choosedBox.value.col].some(Boolean);
-
-        //     if (hasPos) {
-        //         let prevBoxPosition = `${choosedBox.value.floor}|${choosedBox.value.row}|${choosedBox.value.col}`;
-        //         warehouse.value.layout[`${prevBoxPosition}`].category = 'empty';
-        //         warehouse.value.layout[`${prevBoxPosition}`].id = '';
-        //     }
-        //     const newBPos = `${box.floor}|${box.row}|${box.col}`;
-        //     choosedBox.value.floor = box.floor;
-        //     choosedBox.value.col = box.col;
-        //     choosedBox.value.row = box.row;
-        //     warehouse.value.layout[`${newBPos}`].category = choosedBox.value.category;
-        //     warehouse.value.layout[`${newBPos}`].id = choosedBox.value.boxId;
-        // }
     };
 
     const changeSection = (option: string) => {
@@ -480,7 +460,7 @@
         selectedCradle.value = id;
     };
 
-    const handleSlotClick = (slot: Slot) => {
+    const handleSlotClick = (slot) => {
         console.log(slot);
     };
 
@@ -607,6 +587,8 @@
     });
 
     onMounted(async () => {
+        const result = await axios.get(`${apiUrl}/workOrder`);
+        workOrdersPad.value = result.data.data;
         sandTypes.value = await getSand();
         sandTypes.value = sandTypes.value.filter((type) => {
             return type.visible;
@@ -616,6 +598,16 @@
         warehouses.value = await getWarehouses();
         cradles.value = await getCradles();
         cleanCradles.value = [...cradles.value];
+        sandOrders.value = await (
+            await getSandOrders()
+        )
+            .filter((order) => order.location)
+            .map((order) => {
+                return {
+                    ...order,
+                    location: JSON.parse(order.location),
+                };
+            });
     });
 </script>
 

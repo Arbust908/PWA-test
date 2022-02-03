@@ -11,6 +11,7 @@ export interface Pit {
     stageSheets?: StageSheet[];
     sandPlans?: SandPlan[];
     warehouses?: Warehouse[];
+    visible?: boolean;
 }
 export interface Traktor {
     id?: number;
@@ -19,6 +20,7 @@ export interface Traktor {
     description: string;
     workOrderId: number;
     workOrder?: WorkOrder[];
+    visible?: boolean;
 }
 export interface Pickup {
     id?: number;
@@ -26,6 +28,7 @@ export interface Pickup {
     description: string;
     workOrderId: number;
     workOrder?: WorkOrder[];
+    visible?: boolean;
 }
 export interface HumanResource {
     id?: number;
@@ -33,6 +36,7 @@ export interface HumanResource {
     name: string | number;
     crewId: number;
     crew?: Crew;
+    visible?: boolean;
 }
 export interface Crew {
     id?: number;
@@ -42,6 +46,7 @@ export interface Crew {
     workOrderId: number;
     resources?: HumanResource[];
     workOrder?: WorkOrder[];
+    visible?: boolean;
 }
 
 export interface WorkOrder {
@@ -74,6 +79,7 @@ export interface CompanyRepresentative {
     sandProviders?: SandProvider[];
     company?: Company[];
     transportProviders?: TransportProvider[];
+    visible?: boolean;
 }
 
 export interface SandProvider {
@@ -111,6 +117,7 @@ export interface Vehicle {
     transportId: string;
     driverId: number;
     Driver?: Driver;
+    visible?: boolean;
 }
 
 export interface Sand {
@@ -182,6 +189,7 @@ export interface SandStage {
     sandPlanId: number;
     sandPlan?: SandPlan;
     status: null | 0 | 1 | 2;
+    visible?: boolean;
 }
 
 export interface SandPlan {
@@ -209,6 +217,7 @@ export interface SandOrder {
     sandType?: Sand;
     purchaseOrder?: PurchaseOrder;
     sandProvider?: SandProvider;
+    visible?: boolean;
 }
 
 // "{\"where\":\"warehouse\",\"where_id\":1,\"floor\":1,\"row\":2,\"col\":5}"
@@ -238,6 +247,7 @@ export interface SandOrderBox {
     column?: number;
     purchaseOrder?: PurchaseOrder;
     sandProvider?: SandProvider;
+    visible?: boolean;
 }
 
 export interface TransportProvider {
@@ -264,6 +274,7 @@ export interface ProviderNotification {
     sandProvider?: SandProvider;
     sandOrder?: SandOrder;
     transportProvider?: TransportProvider;
+    visible?: boolean;
 }
 
 export interface PurchaseOrder {
@@ -282,6 +293,7 @@ export interface PurchaseOrder {
     sandProvider?: SandProvider;
     pit?: Pit;
     notificationStatus?: number;
+    visible?: boolean;
 }
 
 export interface TransportOrder {
@@ -292,6 +304,7 @@ export interface TransportOrder {
     observations: string;
     purchaseOrderId: number;
     purchaseOrder?: PurchaseOrder;
+    visible?: boolean;
 }
 
 export interface Warehouse {
@@ -324,6 +337,7 @@ export interface StageSheet {
     stages?: SandStage[];
     operativeCradle?: Cradle;
     backupCradle?: Cradle;
+    visible?: boolean;
 }
 
 export interface User {
@@ -336,6 +350,7 @@ export interface User {
     roleId: number;
     active: boolean;
     Role?: Role;
+    visible?: boolean;
 }
 
 export interface Role {
@@ -370,6 +385,7 @@ export interface Box {
     col: number;
     floor: number;
     row: number;
+    visible?: boolean;
 }
 export interface QueueItem {
     id?: number;

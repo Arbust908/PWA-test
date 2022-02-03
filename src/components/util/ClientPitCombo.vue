@@ -115,7 +115,7 @@
     const clients = ref([] as Array<Company>);
     watch(backupClients, (newVal) => {
         if (newVal) {
-            clients.value = newVal;
+            clients.value = newVal.filter((v) => v.visible);
         }
     });
 

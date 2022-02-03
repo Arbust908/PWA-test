@@ -50,8 +50,9 @@
         <VTable :columns="columns" :pagination="pagination" :items="finishedQueue" empty-text="No tareas finalizadas">
             <template #item="{ item }">
                 <!-- Desktop -->
-                <td :class="item?.sandOrder.boxId ? null : 'empty'">
-                    {{ item?.sandOrder.boxId || 'Sin definir' }}
+                {{ item }}
+                <td :class="item?.sandOrder?.boxId ? null : 'empty'">
+                    {{ item?.sandOrder?.boxId || 'Sin definir' }}
                 </td>
 
                 <td :class="item.origin ? null : 'empty'">
@@ -69,7 +70,7 @@
 
             <!-- Mobile -->
             <template #mobileTitle="{ item }">
-                {{ item?.sandOrder.boxId }}
+                {{ item?.sandOrder?.boxId }}
             </template>
 
             <template #mobileSubtitle="{ item }">

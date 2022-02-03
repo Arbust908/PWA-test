@@ -55,6 +55,7 @@
                     @click="box?.boxId ? activeDelete(box) : fillBox(place, $event)"
                 >
                     <button
+                        v-if="box?.boxId"
                         class="w-6 h-6 absolute top-0 right-0 -mt-2 -mr-2 bg-white rounded-full shadow-sm group-hover:bg-red-400 group-hover:text-red-50 transition duration-150 ease-out"
                     >
                         <TheAllIcon icon="XCircle" type="outline" />
