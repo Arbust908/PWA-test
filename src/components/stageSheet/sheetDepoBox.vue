@@ -1,10 +1,10 @@
 <template>
     <button
         type="button"
-        :class="`mesh-type__${box?.sandOrder?.sandTypeId} boxCard meshBorder`"
-        :disabled="!boxInfo?.id"
+        :class="`mesh-type__${box?.sandTypeId} boxCard meshBorder`"
+        :disabled="!sandInfo?.id"
         class="depo-box bubble"
-        @click="$emit('set-box', boxInfo)"
+        @click="$emit('set-box', box)"
     >
         {{ boxId }} :: {{ box?.sandType?.type }} - {{ amountInT }}
     </button>
@@ -12,6 +12,8 @@
 
 <script setup lang="ts">
     import { useApi } from '@/helpers/useApi';
+    import { Sand } from '@/interfaces/sandflow';
+    import { Ref } from 'vue';
 
     const props = defineProps({
         box: {
@@ -20,24 +22,24 @@
         },
     });
     defineEmits(['set-box']);
+    const { box } = toRefs(props);
 
-    const myBox = ref(props.box);
-
-    const sOId = computed(() => {
-        return myBox.value?.sandOrder?.id;
-    });
     const boxId = computed(() => {
-        return myBox.value?.sandOrder?.boxId;
+        return box.value?.boxId;
     });
     const amountInT = computed(() => {
-        return myBox.value?.sandOrder?.amount + ' toneladas';
+        return box.value?.amount + ' toneladas';
     });
 
-    const { read } = useApi(`/sandOrder/${sOId.value}`);
-    const boxInfo = read();
-    watch(boxInfo, () => {
-        if (boxInfo.value) {
-            myBox.value.sandType = boxInfo.value?.sandType;
+    const sandTypeId = computed(() => {
+        return box.value?.sandTypeId;
+    });
+
+    const { read } = useApi<Sand>(`/sand/${sandTypeId.value}`);
+    const sandInfo = read() as Ref<Sand>;
+    watch(sandInfo, (newVal) => {
+        if (newVal) {
+            box.value.sandType = newVal;
         }
     });
 </script>

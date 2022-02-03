@@ -221,6 +221,7 @@ export interface BoxLocation {
     col?: number;
     origin?: string;
     origin_id?: number;
+    where_origin?: string;
 }
 export interface SandOrderBox {
     id?: number;
@@ -280,6 +281,7 @@ export interface PurchaseOrder {
     transportProvider?: TransportProvider;
     sandProvider?: SandProvider;
     pit?: Pit;
+    notificationStatus?: number;
 }
 
 export interface TransportOrder {
@@ -399,7 +401,7 @@ D - T
 C - D
 
 T - C
-T - D
+T - D /
 
 D - C
 */

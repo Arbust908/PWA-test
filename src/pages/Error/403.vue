@@ -8,32 +8,18 @@
                 Para poder ingresar comunicate con un administrador.
             </p>
             <div class="flex justify-center mt-6">
-                <PrimaryBtn @click="goBack()">Volver a donde estaba</PrimaryBtn>
+                <PrimaryBtn @click="goSafe()">Volver</PrimaryBtn>
             </div>
         </section>
     </Layout>
 </template>
 
-<script lang="ts">
-    import { useRouter } from 'vue-router';
+<script setup lang="ts">
     import Layout from '@/layouts/Main.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    const router = useRouter();
 
-    export default {
-        components: {
-            Layout,
-            PrimaryBtn,
-        },
-        setup() {
-            const router = useRouter();
-
-            const goBack = () => {
-                router.go(-1);
-            };
-
-            return {
-                goBack,
-            };
-        },
+    const goSafe = () => {
+        router.push('/');
     };
 </script>

@@ -12,58 +12,35 @@
                 @change="getSandPlans"
             />
             <FieldSelect
-                v-if="disabledOperator"
                 v-model:data="operatorId"
                 class="col-span-12 md:col-span-5 xl:col-span-4"
                 title="Operadora / Empresa de Servicios"
                 field-name="operator"
                 placeholder="Seleccionar operadora"
                 endpoint="/company?isOperator=1"
+                :is-disabled="disabledOperator"
                 is-optional
-                @change="filterByOperator"
-            /><FieldSelect
-                v-else
-                v-model:data="operatorId"
-                class="col-span-12 md:col-span-5 xl:col-span-4"
-                title="Operadora / Empresa de Servicios"
-                field-name="operator"
-                placeholder="Seleccionar operadora"
-                endpoint="/company?isOperator=1"
-                is-optional
-                is-disabled
                 @change="filterByOperator"
             />
             <div class="col-span-12 md:col-span-5 xl:col-span-4">
                 <PadSelector
-                    v-if="disabledPad"
-                    class="col-span-12"
-                    is-optional
-                    :client-id="clientId"
                     v-model:woId="woId"
                     v-model:work-orders="workOrders"
-                />
-                <PadSelector
-                    v-else
-                    class="col-span-12"
+                    shared-classes="col-span-12"
                     is-optional
-                    is-disabled
+                    :is-disabled="disabledPad"
                     :client-id="clientId"
-                    v-model:woId="woId"
-                    v-model:work-orders="workOrders"
                 />
             </div>
 
             <section class="bg-white col-span-full shadow max-w-[100%] hidden sm:block">
-                <div class="grid grid-cols-4 text-sm rounded-t border py-3">
-                    <span class="ml-8 text-left">POZO</span>
+                <header class="grid grid-cols-4 text-sm rounded-t border-b py-3">
+                    <span class="pl-8 text-left">POZO</span>
                     <span class="text-center">ETAPAS</span>
                     <span class="text-center">ESTADO</span>
-                    <span class="ml-4 text-left">TONELADAS</span>
-                </div>
-                <div
-                    v-if="!pits || pits.length <= 0"
-                    class="rounded-b border-x border-b border-dashed w-full p-6 text-center text-gray-400 italic"
-                >
+                    <span class="pl-4 text-left">TONELADAS</span>
+                </header>
+                <div v-if="!pits || pits.length <= 0" class="rounded-b w-full p-6 text-center text-gray-400 italic">
                     <span>Seleccione un cliente</span>
                 </div>
                 <div v-else class="divide-y rounded-b border-x border-b">
@@ -72,7 +49,7 @@
                         :key="sandPlan.id"
                         class="grid grid-cols-4 py-2 text-sm"
                     >
-                        <div class="my-4 pl-8 text-left">
+                        <div class="my-4 text-left pl-8">
                             <input
                                 id="checkbox"
                                 v-model="sandPlan.isSelected"
@@ -83,7 +60,7 @@
                             <span> {{ sandPlan.pit.name }} </span>
                         </div>
                         <div class="my-4 text-center">
-                            <span>{{ checkSandStages(sandPlan) }} {{ currentStage }} / {{ stageTotal }}</span>
+                            <span>{{ getPlanCurrentStage(sandPlan) }} / {{ getPlanTotalStages(sandPlan) }}</span>
                         </div>
                         <div class="my-4 text-center">
                             <Badge
@@ -93,9 +70,15 @@
                             />
                             <Badge v-else text="COMPLETA" />
                         </div>
-                        <div class="my-4 pl-4 text-left font-bold">
-                            <span>{{ stageSandAmmount }}t</span>
+                        <div class="my-4 text-left pl-4 font-bold">
+                            <span>{{ checkSandStages(sandPlan) }}t</span>
                         </div>
+                    </article>
+                    <article
+                        v-if="filteredSandPlans.length <= 0"
+                        class="rounded-b w-full p-6 text-center text-gray-400 italic"
+                    >
+                        <span>No hay planificaciones</span>
                     </article>
                 </div>
             </section>
@@ -104,12 +87,10 @@
                 <form
                     v-for="sandPlan in filteredSandPlans"
                     :key="sandPlan.id"
-                    class="flex flex-col rounded shadow-sm border-solid bg-white border-black mb-6"
+                    class="flex flex-col shadow-sm overflow-hidden rounded-lg bg-white mb-6"
                 >
                     <div>
-                        <header
-                            class="flex justify-between px-3 pb-3 pt-4 border-2 border-b-0 border-solid bg-gray-200 rounded-t-lg"
-                        >
+                        <header class="flex justify-between px-3 pb-3 pt-4 bg-gray-200">
                             <section class="flex space-x-4 self-center">
                                 <input
                                     id="checkbox"
@@ -138,10 +119,16 @@
                             v-show="currentOpened.includes(sandPlan.id)"
                             class="pr-8 pl-2 border-2 border-solid rounded-b-lg"
                         >
-                            <CloseOperationTable :sand-plan="sandPlan" class="my-4" />
+                            <CloseOperationTable :sand-plan="sandPlan" class="my-4 w-full" />
                         </div>
                     </div>
                 </form>
+                <article
+                    v-if="filteredSandPlans.length <= 0"
+                    class="rounded border-2 border-dashed col-span-full p-6 text-center text-gray-500 block sm:hidden"
+                >
+                    <span>No hay planificaciones</span>
+                </article>
             </section>
             <section
                 v-else
@@ -162,7 +149,7 @@
             @close="showModal = false"
             @confirm="openSuccess = true"
         />
-
+        <!-- QUe hacemos con estos modales? -->
         <SuccessModal
             :open="openSuccess"
             text="El cierre de operación #1234 ha sido generado con éxito"
@@ -201,53 +188,68 @@
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import CloseOperationModal from '@/components/closeOfOperation/CloseOperationModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
-    import { SandPlan } from '@/interfaces/sandflow';
+    import { Pit, SandPlan, WorkOrder } from '@/interfaces/sandflow';
 
     import CloseOperationTable from '@/components/closeOfOperation/CloseOperationTable.vue';
-    import { Ref } from 'vue';
+    import { getSandPlan } from '@/helpers/useGetEntities';
 
     const api = import.meta.env.VITE_API_URL || '/api';
-
     useTitle('Cierre de operaciones <> Sandflow');
-
-    defineProps({
-        woId: {
-            type: Number,
-            default: -1,
-        },
-        workOrders: {
-            type: Array,
-            default: [],
-        },
-    });
 
     const clientId = ref(-1);
     const operatorId = ref(-1);
     const woId = ref(-1);
-    const workOrders = ref([]);
-    const workOrderId = ref(-1);
-    const pits = ref([]);
-    const sandPlans = ref([]);
-    const filteredSandPlans = ref([]);
-    const filteredSandPlansByClient = ref([]);
-    const filteredSandPlansByOperator = ref([]);
-    const filteredSandPlansByPad = ref([]);
-    const stagesAmount = ref(0);
-    const currentOpened = ref([]);
+    const workOrders = ref([] as WorkOrder[]);
+    const pits = ref([] as Pit[]);
+    const sandPlans = ref([] as SandPlan[]);
+    const currentOpened = ref([] as number[]);
     const openSuccess = ref(false);
-    const atLeastOne = ref(false);
-    const endingSandPlanPits = ref([]);
+    const endingSandPlanPits = ref([] as SandPlan[]);
+    const disabledOperator = ref(true);
+    const disabledPad = ref(true);
 
-    watch(workOrders, (newVal) => {
-        console.log(newVal);
+    const filteredWorkOrders = computed(() => {
+        return workOrders.value.filter((wo) => {
+            // TODO si client pasa a ser Id en algun momento el Number es redundante pero hay que cambiarlo.
+            return Number(wo.client) === clientId.value;
+        });
     });
-    const addCheckedPits = (sandPlan, check) => {
+
+    const filteredSandPlans = computed(() => {
+        const sandPlansToShow = ref(sandPlans.value);
+
+        if (clientId.value !== -1) {
+            sandPlansToShow.value = sandPlansToShow.value.filter(
+                (sandPlan: SandPlan) => sandPlan.company?.id === clientId.value
+            );
+        }
+
+        if (operatorId.value !== -1) {
+            sandPlansToShow.value = sandPlansToShow.value.filter((sandPlan: SandPlan) => {
+                const workOrderByOperatorIds = filteredWorkOrders.value
+                    .filter((wo: WorkOrder) => Number(wo.serviceCompany) === operatorId.value)
+                    .map((wo: WorkOrder) => wo.id);
+
+                return workOrderByOperatorIds.includes(sandPlan?.pit?.workOrderId);
+            });
+        }
+
+        if (woId.value !== -1) {
+            sandPlansToShow.value = sandPlansToShow.value.filter((sandPlan: SandPlan) => {
+                return sandPlan?.pit?.workOrderId === woId.value;
+            });
+        }
+
+        return sandPlansToShow.value;
+    });
+
+    const addCheckedPits = (sandPlan: SandPlan, check: boolean) => {
         if (check) {
             endingSandPlanPits.value.push(sandPlan);
-            console.log('entraInfo', endingSandPlanPits.value);
         } else {
-            endingSandPlanPits.value = endingSandPlanPits.value.filter((EPSandPlan) => EPSandPlan.id !== sandPlan.id);
-            console.log('saleInfo', endingSandPlanPits.value);
+            endingSandPlanPits.value = endingSandPlanPits.value.filter(
+                (EPSandPlan: SandPlan) => EPSandPlan.id !== sandPlan.id
+            );
         }
     };
 
@@ -267,120 +269,74 @@
         }
     };
 
-    const test = ref(true);
-    const disabledOperator = ref(false);
-
-    const getSandPlans = async () => {
-        console.log(test.value);
-        test.value = false;
-        console.log(test.value);
-        disabledOperator.value = false;
-        disabledPad.value = false;
-        filteredSandPlans.value = [];
+    const resetOperator = () => {
         operatorId.value = -1;
+        disabledPad.value = true;
+    };
+    const resetPad = () => {
         woId.value = -1;
-
-        if (clientId.value > 0) {
-            const url = `/pit?companyId=${clientId.value}`;
-            const response = await axios.get(`${api}/${url}`).catch((err) => {
-                return false;
-            });
-
-            const result = await axios.get(`${api}/sandPlan`).catch((err) => {
-                return false;
-            });
-
-            pits.value = response.data.data;
-
-            sandPlans.value = result.data.data;
-
-            filteredSandPlans.value = sandPlans.value.filter(
-                (sandPlan: SandPlan) => sandPlan.company.id === clientId.value
-            );
-            filteredSandPlansByClient.value = filteredSandPlans.value;
-
-            disabledOperator.value = true;
-        }
+        disabledOperator.value = true;
     };
 
-    const workOrderByClient = ref([]);
-    const workOrderByOperator = ref([]);
-    const workOrderByPad = ref([]);
-    const disabledPad = ref(false);
-
-    const filterByOperator = () => {
-        if (operatorId.value !== -1) {
-            disabledPad.value = true;
-            console.log(disabledOperator.value);
-            let filterFinished: any = [];
-            workOrderByClient.value = workOrders.value.filter(
-                (workOrder) => Number(workOrder.client) === clientId.value
-            );
-            workOrderByOperator.value = workOrderByClient.value.filter(
-                (workOrder) => Number(workOrder.serviceCompany) === operatorId.value
-            );
-            const filter = workOrderByOperator.value.forEach((workOrder) =>
-                filteredSandPlansByClient.value.forEach((sandPlan) => {
-                    if (sandPlan.pit.workOrderId === workOrder.id) {
-                        filterFinished.push(sandPlan);
-                    }
-                })
-            );
-            filteredSandPlansByOperator.value = filterFinished;
-            filteredSandPlans.value = filteredSandPlansByOperator.value;
-        } else {
+    watch(clientId, (newValue) => {
+        if (newValue !== -1) {
+            disabledOperator.value = false;
             disabledPad.value = false;
-            filteredSandPlans.value = filteredSandPlansByClient.value;
-        }
-    };
-
-    watch(woId, (newVal) => {
-        if (newVal !== -1) {
-            if (filteredSandPlansByOperator.value.length > 0) {
-                let filterFinished: any = [];
-                workOrderByPad.value = workOrderByOperator.value.filter((workOrder) => Number(workOrder.id) === newVal);
-                const filter = workOrderByPad.value.forEach((workOrder) =>
-                    filteredSandPlansByOperator.value.forEach((sandPlan) => {
-                        if (sandPlan.pit.workOrderId === workOrder.id) {
-                            filterFinished.push(sandPlan);
-                        }
-                    })
-                );
-                filteredSandPlansByPad.value = filterFinished;
-                filteredSandPlans.value = filteredSandPlansByPad.value;
-            }
         } else {
-            filteredSandPlans.value = filteredSandPlansByOperator.value;
+            resetOperator();
+            resetPad();
         }
     });
 
-    const currentStage = ref(0);
-    const stageTotal = ref(0);
-    const stageSandAmmount = ref(0);
-
-    const checkSandStages = (sandPlan: any) => {
-        currentStage.value = 0;
-        stageTotal.value = 0;
-        stageSandAmmount.value = 0;
-        const stageQuantities = [];
-
-        if (sandPlan.stages.length > 0) {
-            const currentStageFull = sandPlan.stages.find((stage: any) => stage.status === 0);
-            currentStage.value = currentStageFull.stage;
-            stageTotal.value = sandPlan.stages.length;
-            stageQuantities.push(
-                currentStageFull.quantity1,
-                currentStageFull.quantity2,
-                currentStageFull.quantity3,
-                currentStageFull.quantity4
-            );
-            stageQuantities.map((quantity) => {
-                if (quantity >= 0) {
-                    stageSandAmmount.value += quantity;
-                }
+    const getSandPlans = async () => {
+        if (clientId.value > 0) {
+            const url = `/pit?companyId=${clientId.value}`;
+            const response = await axios.get<Pit[]>(`${api}/${url}`).catch((err) => {
+                return false;
             });
+
+            pits.value = response?.data?.data;
         }
     };
+
+    const getPlanCurrentStage = (plan: SandPlan) => {
+        if (plan?.stages) {
+            const currentStageFull = plan.stages.find((stage: any) => stage.status === 0);
+
+            return currentStageFull?.stage || 0;
+        }
+
+        return 0;
+    };
+
+    const getPlanTotalStages = (plan: SandPlan) => {
+        if (plan?.stages) {
+            const totalStages = plan.stages.length;
+
+            return totalStages;
+        }
+
+        return 0;
+    };
+
+    const checkSandStages = (sandPlan: any) => {
+        if (sandPlan.stages.length > 0) {
+            const currentStageFull = sandPlan.stages.find((stage: any) => stage.status === 0);
+
+            return (
+                currentStageFull.quantity1 +
+                currentStageFull.quantity2 +
+                currentStageFull.quantity3 +
+                currentStageFull.quantity4
+            );
+        }
+
+        return 0;
+    };
+
+    onMounted(async () => {
+        sandPlans.value = await getSandPlan();
+    });
 </script>
 
 <style lang="scss" scoped>

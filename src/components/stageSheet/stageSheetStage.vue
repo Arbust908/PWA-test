@@ -13,9 +13,7 @@
                     {{ stagePorcentage }}%
                 </progress>
                 <span v-if="showProgress">{{ stagePorcentage.toFixed(2) + '%' }}</span>
-                <span v-else class="italic text-center w-full">{{
-                    stagePorcentage === 0 ? 'Pendiente' : 'Finalizada '
-                }}</span>
+                <span v-else class="italic text-center w-full">{{ stageStatus[sandStage.status] }}</span>
             </div>
             <i
                 :class="isSelectedStage ? 'rotate-180' : 'rotate-0'"
@@ -30,12 +28,12 @@
                 class="max-w-[16rem] w-full rounded border border-gray-200 shadow-sm px-5 py-7 self-start space-y-6"
             >
                 <StageSheetSandDetail
-                    v-for="(sand, key) in sands"
+                    v-for="sand in sands"
                     :key="sand.id + sand.type"
                     :sand="sand"
                     :type="sand.type"
                     :amount="sand.quantity"
-                    :porcentage="getPorcentage(sand.quantity, queueDetail[sand.type])"
+                    :porcentage="getPorcentage(sand?.quantity, queueDetail[sand.type]?.amount)"
                 />
             </section>
             <section v-if="!isActive" class="flex justify-center items-center max-w-md">
@@ -49,13 +47,18 @@
                     :key="place + 'place'"
                     :class="[
                         isSelectedBox(place) ? 'selected' : null,
-                        box?.boxId ? `mesh-type__${box?.sandType?.id} filled boxCard` : 'not-filled',
+                        box?.boxId ? `mesh-type__${box?.sandTypeId} filled boxCard relative group` : 'not-filled',
                         box?.isDone ? 'done' : null,
                     ]"
                     class="stage--box"
                     :order="box.order"
-                    @click="fillBox(place, $event)"
+                    @click="box?.boxId ? activeDelete(box) : fillBox(place, $event)"
                 >
+                    <button
+                        class="w-6 h-6 absolute top-0 right-0 -mt-2 -mr-2 bg-white rounded-full shadow-sm group-hover:bg-red-400 group-hover:text-red-50 transition duration-150 ease-out"
+                    >
+                        <TheAllIcon icon="XCircle" type="outline" />
+                    </button>
                     <p>{{ box?.boxId ? box.boxId : box }}</p>
                     <p v-if="box?.amount" :class="box?.isDone ? '!text-gray-400' : null" class="text-black">
                         {{ box.amount }} ton
@@ -112,7 +115,15 @@
 </template>
 
 <script setup lang="ts">
-    import { SandStage, Sand, QueueItem, SandOrder } from '@/interfaces/sandflow';
+    import {
+        SandStage,
+        Sand,
+        QueueItem,
+        SandOrder,
+        SandOrderBox,
+        PurchaseOrder,
+        BoxLocation,
+    } from '@/interfaces/sandflow';
     import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
     import { useClone } from '@/helpers/useClone';
     import { Ref } from 'vue';
@@ -124,12 +135,28 @@
     import PlusIcon from './PlusIcon.vue';
     import SheetDepoBox from './sheetDepoBox.vue';
     import StageSheetSandDetail from './stageSheetSandDetail.vue';
-    import { createAllQueueItems, getQueueItems } from '@/helpers/useQueueItem';
-    import { filterEmptyQueueBox, getPorcentage } from '@/helpers/useSheetHelpers';
+    import {
+        createAllQueueItems,
+        deleteQueueItem,
+        getOrderPro,
+        getQueueItems,
+        QueueTransactions,
+        separateQueues,
+        sheetGridItems,
+    } from '@/helpers/useQueueItem';
+    import {
+        extractBoxInfo,
+        extractOrderInfo,
+        filterEmptyQueueBox,
+        filterJustToAddBox,
+        getPorcentage,
+        moveBoxes,
+    } from '@/helpers/useSheetHelpers';
     import { getSandOrders } from '@/helpers/useWarehouse';
     import { getLast } from '@/helpers/iteretionHelpers';
     import { useSheetStore } from '@/store/stageSheet.pinia';
     import { storeToRefs } from 'pinia';
+    import TheAllIcon from '../icon/TheAllIcon.vue';
     const props = defineProps({
         sandStage: {
             type: Object,
@@ -150,20 +177,36 @@
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
     const sheetStore = useSheetStore();
-    const { clientId, pitId, currentWarehouse, queueBoxes, workOrder, currentCradle, getPitBoxes, getPitBoxesByFloor } =
-        storeToRefs(sheetStore);
+    const {
+        clientId,
+        pitId,
+        currentWarehouse,
+        queueBoxes,
+        workOrder,
+        currentCradle,
+        sands: allSands,
+        getPitBoxes,
+        getPitBoxesByFloor,
+        selectedSandStage,
+    } = storeToRefs(sheetStore);
     // const { setTab, isTabSelected, setCradle, setWorkOrder } = sheetStore;
+    /**
+     * isActive Marca si es un stage que esta "activo" y por ende muestra el porsentaje
+     * isSelectedStage Marca si el stage esta seleccionado y por ende el que muestra los detalles
+     */
     const { isActive, isSelectedStage } = toRefs(props);
-    const router = useRouter();
-    const store = useStore();
-    const sands = ref([]);
+    const sands = ref([] as Sand[]);
     const weigth = computed(() => {
-        return sands.value.reduce((acc, sand) => {
+        return sands.value.reduce((acc, sand: any) => {
             return acc + sand.quantity;
         }, 0);
     });
-
     const isLoading = ref(false);
+    const stageStatus = {
+        0: 'Pendiente',
+        1: 'En Proceso',
+        2: 'Finalizado',
+    };
 
     const showProgress = computed(() => {
         return stagePorcentage.value > 0;
@@ -173,66 +216,20 @@
      * @type {Ref<Array<number | QueueItem>>}
      * @description Referencia a la cola de cajas del stage
      */
-    const boxQueue: Ref<Array<number | SandOrder>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    const boxQueue: Ref<Array<number | SandOrderBox>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+
+    /**
+     * Tomamos los QueueItems de este Pozo y los filtramos por los que van al Cradle
+     * y los mutamos para que tengan la info de la caja (boxId, peso y tipo de arena)
+     */
     const fillQueueBoxes = async () => {
-        boxQueue.value = await getSandOrders();
-        console.log('Cola de Cajas', boxQueue.value);
-        boxQueue.value = boxQueue.value
-            .filter((order) => {
-                return order.location;
-            })
-            .filter((order: SandOrder) => {
-                const { queueItems } = order;
-
-                if (queueItems !== undefined) {
-                    if (queueItems.length) {
-                        const queueItem = queueItems[0];
-                        const { pitId: itemPitId } = queueItem;
-
-                        return itemPitId === pitId.value;
-                    }
-                }
-
-                return false;
-            })
-            .map((order) => {
-                const { queueItems, location } = order;
-
-                order.location = JSON.parse(location);
-
-                if (queueItems.length) {
-                    const queueItem = queueItems[0];
-                    order.isDone = queueItem.status === 99;
-                    order.order = queueItem.order;
-
-                    return order;
-                }
-
-                return;
-            })
-            .filter((order) => {
-                return order?.order && order?.order > 0;
-            })
-            .sort((a, b) => {
-                const { queueItems: qiA } = a;
-                const { queueItems: qiB } = b;
-                let orderA = 0;
-                let orderB = 0;
-
-                if (qiA.length) {
-                    const queueItem = qiA[0];
-                    orderA = queueItem.order;
-                }
-
-                if (qiB.length) {
-                    const queueItem = qiB[0];
-                    orderB = queueItem.order;
-                }
-
-                return orderB - orderA;
-            });
-
-        console.log('Cajas de Cola final', boxQueue.value);
+        console.log('getPitBoxes', getPitBoxes.value);
+        const sheetItems = sheetGridItems(getPitBoxes.value as Array<QueueItem>);
+        console.log('sheetItems', sheetItems);
+        boxQueue.value = sheetItems.map(extractOrderInfo).sort((a: any, b: any) => {
+            return a.order - b.order;
+        }) as Array<any>;
+        console.log(boxQueue.value);
 
         if (boxQueue.value.length < 14) {
             const queueNum = boxQueue.value.length;
@@ -240,11 +237,39 @@
                 boxQueue.value.push(i);
             }
         }
-        console.log('Cajas de Cola relleno', boxQueue.value);
     };
+
+    const { sandId1, sandId2, sandId3, sandId4, quantity1, quantity2, quantity3, quantity4 } = toRefs(props.sandStage);
+    const updateSand = (sand: Sand, sandQuantity: number) => {
+        const sandInfo = JSON.parse(JSON.stringify(sand));
+        console.log('sandInfo', sandInfo);
+        sandInfo.quantity = sandQuantity;
+        sands.value.push(sandInfo);
+    };
+
+    if (sandId1.value) {
+        const sand1 = allSands.value.find((sand) => sand.id === sandId1.value) || ({} as Sand);
+        updateSand(sand1, quantity1);
+    }
+
+    if (sandId2.value) {
+        const sand2 = allSands.value.find((sand) => sand.id === sandId2.value) || ({} as Sand);
+        updateSand(sand2, quantity2);
+    }
+
+    if (sandId3.value) {
+        const sand3 = allSands.value.find((sand) => sand.id === sandId3.value) || ({} as Sand);
+        updateSand(sand3, quantity3);
+    }
+
+    if (sandId4.value) {
+        const sand4 = allSands.value.find((sand) => sand.id === sandId4.value) || ({} as Sand);
+        updateSand(sand4, quantity4);
+    }
 
     watch(isSelectedStage, (val) => {
         if (val) {
+            console.log('Seleccionado');
             emits('update-queue', boxQueue.value);
         }
     });
@@ -253,21 +278,16 @@
         (val) => {
             if (val) {
                 console.log('isActive');
-                val && console.log('Emito');
                 emits('update-queue', boxQueue.value);
                 fillQueueBoxes();
             }
         },
         { immediate: true }
     );
-    // Quizas se puede unificar los watchs de arriba
 
     const addBoxToQueue = (place: null | number = null, box: any = null) => {
         if (place !== null && box !== null) {
-            if (typeof box.location === 'string') {
-                box.location = JSON.parse(box.location);
-            }
-            box.location.where = 'sheet';
+            box.toAdd = true; // *** Con esto puedo saber si la agregue recien ;D
             boxQueue.value[place] = box;
             selectedBox.value = null;
             emits('update-queue', boxQueue.value);
@@ -288,6 +308,11 @@
         popUpCords.x = event.clientX;
         popUpCords.y = event.clientY;
     };
+    const activeDelete = async (place: any) => {
+        console.log('activeDelete', place.id);
+        await deleteQueueItem(place.id);
+        await fillQueueBoxes();
+    };
 
     const selectedFloor = ref(1);
     const floors = computed(() => {
@@ -299,139 +324,116 @@
 
     /* CAJAS POR PISO */
     const boxesByFloorAndFiltered = computed(() => {
-        const filteredBoxes = [] as any[];
-        getPitBoxesByFloor.value[selectedFloor.value - 1].map((box: any) => {
-            const compareQueue = boxQueue.value.filter((queuedBox) => {
-                return queuedBox.id;
+        const filteredBoxes = getPitBoxesByFloor.value[selectedFloor.value - 1]
+            // .map(extractBoxInfo)
+            .filter((box: any) => {
+                console.log(box, 'Box');
+                const { location, status } = box;
+                const { where } = location;
+
+                return where === 'warehouse' && status <= 99;
             });
-            console.log('Compare Queue: ', compareQueue);
 
-            if (compareQueue.length <= 0) {
-                filteredBoxes.push(box);
+        const queueNoNumbers = boxQueue.value.filter((item) => {
+            return typeof item !== 'number';
+        });
+        const usedQueueIds = queueNoNumbers.map((box) => {
+            const { id } = box as SandOrderBox;
 
-                return true;
-            }
-
-            if (box?.id) {
-                const isOnQueue = compareQueue.some((queuedBox) => {
-                    return queuedBox.boxId === box?.sandOrder?.boxId;
-                });
-
-                if (!isOnQueue) {
-                    filteredBoxes.push(box);
-                }
-
-                return !compareQueue.some((queuedBox) => queuedBox.boxId === box.boxId);
-            }
-
-            return box;
+            return id;
         });
 
-        console.log(filteredBoxes);
-        console.log([...new Set(filteredBoxes)]);
-
-        return filteredBoxes;
+        return filteredBoxes.filter((box: SandOrderBox) => !usedQueueIds.includes(box?.id));
     });
 
+    interface QueueDetail {
+        name: string;
+        amount: number;
+        sand: Sand;
+        id: number;
+    }
     const queueDetail = computed(() => {
         return boxQueue.value.reduce((acc, item) => {
-            if (item?.sandType?.id) {
-                const sandId = item?.sandType?.id;
-                const sandType = item?.sandType?.type;
-
-                acc[sandType] = acc[sandType] ? acc[sandType] + item?.amount : item?.amount;
+            if (typeof item === 'number') {
+                return acc;
             }
+
+            if (item?.sandTypeId) {
+                const sandId = item?.sandTypeId;
+                console.log(sandId, 'sandId');
+                const selectedSand = allSands.value.find((sand) => sand.id === sandId) as Sand;
+                const sandType = selectedSand?.type || 'Desconocido';
+                console.log('sands', allSands.value);
+                console.log(sandType, 'sandType');
+                const sandAmount = item?.amount || 0;
+
+                if (acc[sandType]) {
+                    acc[sandType].amount + sandAmount;
+                } else {
+                    acc[sandType] = { name: sandType, amount: sandAmount, id: sandId, sand: selectedSand };
+                }
+            }
+            console.log(acc);
 
             return acc;
-        }, {});
+        }, {} as { [key: string]: QueueDetail });
     });
     const queueDetailTotal = computed(() => {
-        let total = 0;
-        for (const key in queueDetail.value) {
-            if (Object.prototype.hasOwnProperty.call(queueDetail.value, key)) {
-                const element = queueDetail.value[key];
-                total += element;
-            }
-        }
-
-        return total;
+        return Object.values(queueDetail.value).reduce((acc, item) => {
+            return acc + item.amount;
+        }, 0);
     });
     const stagePorcentage = computed(() => {
         return getPorcentage(weigth.value, queueDetailTotal.value);
     });
-    const getSandLogic = async (sandId: number) => {
-        const { GET } = StoreLogicMethods;
-        const result = await useStoreLogic(router, store, 'sand', GET, sandId);
 
-        if (result?.res) {
-            return result.res;
-        }
-
-        return {};
-    };
-    const updateSand = (sand: Sand, sandQuantity: number) => {
-        const { clone: sandInfo } = useClone(sand);
-        sandInfo.quantity = sandQuantity;
-        sands.value.push(sandInfo);
-    };
     const generateQueue = async () => {
         isLoading.value = true;
         console.log(boxQueue.value);
-        const toAddQueue: Array<QueueItem> = boxQueue.value
+        const toAddQueue: Array<SandOrderBox> = boxQueue.value
             .filter(filterEmptyQueueBox)
-            .map((box) => {
-                console.log('Box: ', box);
+            .filter(filterJustToAddBox) as SandOrderBox[];
 
-                const items = box?.queueItems.filter((item: QueueItem) => {
-                    console.log('Item: ', item);
-
-                    return item.status !== 99;
-                });
-                console.log('Items: ', items);
-                console.log('Items: ', getLast(items));
-
-                return getLast(items);
-            })
-            .filter((item) => {
-                console.log('QueueItem: ', item);
-
-                return item?.destination;
-            })
-            .map((item) => {
-                console.log('item: ', item);
-                item.origin = item.destination;
-                item.destination = null;
-
-                return item;
-            });
+        /**
+         * Aca lo que voy a tener son QueueItems y cajas que estan en el depo
+         * Hay que crear los QueueItems que van al Cradle
+         */
         console.log('toAddQueue', toAddQueue);
-        console.log('CRADLE', currentCradle.value);
+        const SandOrdersToMove = [] as Array<SandOrderBox>;
+        const newQueueItems = await JSON.parse(JSON.stringify(toAddQueue)).map(async (item: SandOrderBox) => {
+            const { id, purchaseOrder, location } = item;
+            const { pitId: itemPitId } = purchaseOrder as PurchaseOrder;
+            const { where, where_origin } = location as BoxLocation;
+            const { DepositoACradle } = QueueTransactions;
 
-        // await createAllQueueItems(toAddQueue);
-        console.log('Espero');
+            const destination = where === 'warehouse' ? where_origin : '';
+
+            const newOrder = await getOrderPro(DepositoACradle);
+
+            const newItem = {
+                status: 0,
+                order: newOrder,
+                sandOrderId: id,
+                pitId: itemPitId,
+                origin: destination,
+                destination: '',
+            };
+            console.log('newItem', newItem);
+            SandOrdersToMove.push(item);
+
+            return newItem as QueueItem;
+        });
+        // console.log('🔽 newQueueItems', await Promise.all(newQueueItems));
+        // console.log('🔜 SandOrdersToMove', SandOrdersToMove);
+
+        await moveBoxes(SandOrdersToMove);
+        await createAllQueueItems(await Promise.all(newQueueItems));
         isLoading.value = false;
-        // Emit que todo esta sumado
     };
 
-    onMounted(async () => {
+    onMounted(() => {
+        console.log('>>> onMounted');
         emits('update-queue', boxQueue.value);
-        const { sandId1, sandId2, sandId3, sandId4, quantity1, quantity2, quantity3, quantity4 } = props.sandStage;
-
-        if (sandId1) {
-            updateSand(await getSandLogic(sandId1), quantity1);
-        }
-
-        if (sandId2) {
-            updateSand(await getSandLogic(sandId2), quantity2);
-        }
-
-        if (sandId3) {
-            updateSand(await getSandLogic(sandId3), quantity3);
-        }
-
-        if (sandId4) {
-            updateSand(await getSandLogic(sandId4), quantity4);
-        }
     });
 </script>
 

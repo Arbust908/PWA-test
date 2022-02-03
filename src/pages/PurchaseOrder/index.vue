@@ -39,15 +39,10 @@
                 </td>
                 <td class="text-center" :class="item ? null : 'empty'">
                     <Badge
-                        class="text-white px-5"
+                        class="text-white px-5 w-full inline-block"
                         :class="getNotificationInfo(item).color"
                         :text="getNotificationInfo(item).text"
                     />
-
-                    <!-- <Badge v-if="item.isOperator" text="Enviada" classes="bg-[#1AA532] text-white px-5" />
-                    <Badge v-else text="En proceso" classes="bg-[#616161] text-white" />
-                    <Badge v-if="false" text="Rechazada" classes="bg-[#BE1A3B] text-white px-5" />
-                    <p v-if="false" class="italics">Cancelada</p> -->
                 </td>
             </template>
 
@@ -63,18 +58,12 @@
 </template>
 
 <script setup lang="ts">
-    const STATUS_NOTIFICATION_PENDING = 0;
-    const STATUS_NOTIFICATION_DELIVERED = 1;
-    const STATUS_NOTIFICATION_FAILED = 2;
-    const STATUS_NOTIFICATION_CANCELLED = 3;
-
     import { useActions } from 'vuex-composition-helpers';
     import dayjs from 'dayjs';
     import axios from 'axios';
     import Layout from '@/layouts/Main.vue';
-    const api = import.meta.env.VITE_API_URL || '/api';
 
-    import { PurchaseOrder } from '@/interfaces/sandflow';
+    import { PurchaseOrder, Sand } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
     import ABMHeader from '@/components/ui/ABMHeader.vue';
     import VTable from '@/components/ui/table/VTable.vue';
@@ -82,12 +71,22 @@
     import Badge from '@/components/ui/Badge.vue';
     import PDF from '@/components/purchaseOrder/PDF.vue';
     import { useAxios } from '@vueuse/integrations/useAxios';
+    import { useModalState } from '@/store/modals.pinia';
+
+    const STATUS_NOTIFICATION_PENDING = 0;
+    const STATUS_NOTIFICATION_DELIVERED = 1;
+    const STATUS_NOTIFICATION_FAILED = 2;
+    const STATUS_NOTIFICATION_CANCELLED = 3;
+    const api = import.meta.env.VITE_API_URL || '/api';
 
     const instance = axios.create({
         baseURL: api,
     });
 
     useTitle('Ordenes de Pedido <> Sandflow');
+
+    const store = useModalState();
+    const { openModal } = store;
 
     const sandProviderId = ref(-1);
 
@@ -101,7 +100,7 @@
 
     const drivers = ref([]);
 
-    const getNotificationInfo = (value) => {
+    const getNotificationInfo = (value: PurchaseOrder) => {
         switch (value.notificationStatus) {
             case STATUS_NOTIFICATION_PENDING:
                 return {
@@ -131,7 +130,7 @@
         }
     };
 
-    const pdf = ref(null);
+    const pdf = ref(null as any);
 
     const pdfInfo = computed(() => {
         const emptyThing = {
@@ -173,7 +172,7 @@
     });
 
     const { deletePurchaseOrder, savePurchaseOrder } = useActions(['deletePurchaseOrder', 'savePurchaseOrder']);
-    const { read, destroy } = useApi('/purchaseOrder');
+    const { read, destroy } = useApi<PurchaseOrder>('/purchaseOrder');
     const PurchaseOrders: Array<PurchaseOrder> = read();
     watch(PurchaseOrders, (newValue, _) => {
         if (newValue) {
@@ -184,13 +183,6 @@
         return pOs.map((pO) => {
             savePurchaseOrder(pO);
         });
-    };
-    const deletePO = async (poId: number) => {
-        PurchaseOrders.value = PurchaseOrders.value.filter((pO: PurchaseOrder) => {
-            return pO.id !== poId;
-        });
-        destroy(poId);
-        deletePurchaseOrder(poId);
     };
 
     const pagination = ref({
@@ -208,14 +200,14 @@
         { title: '', key: 'actions' },
     ];
 
-    const selectedPurchaseOrder = ref(null);
+    const selectedPurchaseOrder = ref({} as PurchaseOrder);
 
     const actions = [
         {
             label: 'Reenviar',
-            // hide: (item: PurchaseOrder) => {
-            //     retornar solo cuando la notificacion esta en estado ??
-            // },
+            hide: (item: PurchaseOrder) => {
+                return item.notificationStatus !== STATUS_NOTIFICATION_CANCELLED;
+            },
             callback: async (item: PurchaseOrder) => {
                 selectedPurchaseOrder.value = item;
 
@@ -229,30 +221,30 @@
                     })
                     .catch((err) => {
                         console.log(err);
-                        alert('ERROR' + err);
+                        openModal('error', 'Error', 'Hubo un error al reenviar la orden');
                     });
 
                 if (result.status === 200) {
-                    alert('OK');
+                    openModal('success', 'Orden Reenviada', 'La orden fue reenviada con exito!');
                 }
             },
         },
 
         {
             label: 'Cancelar',
-            // hide: (item: PurchaseOrder) => {
-            //     retornar solo cuando la notificacion esta en estado ??
-            // },
+            hide: (item: PurchaseOrder) => {
+                return item.notificationStatus !== STATUS_NOTIFICATION_CANCELLED;
+            },
             callback: async (item: PurchaseOrder) => {
                 selectedPurchaseOrder.value = item;
 
                 const result = await axios.post(`${api}/purchaseOrder/${item.id}/cancel`).catch((err) => {
                     console.log(err);
-                    alert('ERROR' + err);
+                    openModal('error', 'Error', 'Hubo un error al canelar la orden');
                 });
 
                 if (result.status === 200) {
-                    alert('OK');
+                    openModal('success', 'Orden Cancelada', 'La orden fue cancelada con exito!');
                 }
             },
         },

@@ -1,3 +1,4 @@
+import { SandOrder } from '@/interfaces/sandflow';
 import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
@@ -9,7 +10,7 @@ export const getPurchaseOrders = async () => {
         })
         .catch((err) => console.error(err));
 };
-export const getSandOrders = async () => {
+export const getSandOrders = async (): Promise<SandOrder[]> => {
     return await axios
         .get(`${apiUrl}/sandOrder`)
         .then((res) => {
@@ -56,6 +57,14 @@ export const getWorkOrders = async (queries = '') => {
 export const getSand = async () => {
     return await axios
         .get(`${apiUrl}/sand`)
+        .then((res) => {
+            return res.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const getSandPlan = async () => {
+    return await axios
+        .get(`${apiUrl}/sandPlan`)
         .then((res) => {
             return res.data.data;
         })

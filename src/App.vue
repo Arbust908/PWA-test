@@ -23,34 +23,49 @@
             <router-view class="w-full"></router-view>
         </Suspense>
     </div>
+    <SuccessModal
+        :open="isSuccessOpened"
+        :title="title"
+        :text="content"
+        @close="closeAndRefresh"
+        @main="closeAndRefresh"
+    />
+    <ErrorModal :open="isErrorOpened" :title="title" :text="content" @close="closeAndRefresh" @main="closeAndRefresh" />
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
+    import { storeToRefs } from 'pinia';
     import { useActions } from 'vuex-composition-helpers';
+    import { useModalState } from './store/modals.pinia';
+    import SuccessModal from './components/modal/SuccessModal.vue';
+    import ErrorModal from './components/modal/ErrorModal.vue';
 
-    export default defineComponent({
-        setup() {
-            const isDark = useDark();
-            const toggleDark = useToggle(isDark);
+    const isDark = useDark();
+    const toggleDark = useToggle(isDark);
 
-            if (isDark.value) {
-                toggleDark();
-            }
+    if (isDark.value) {
+        toggleDark();
+    }
 
-            const isOnline = useOnline();
+    const router = useRouter();
+    const store = useModalState();
+    const { isOpened, modalType, title, content } = storeToRefs(store);
+    const { closeModal } = store;
 
-            if (localStorage.getItem('user')) {
-                const user = JSON.parse(localStorage.getItem('user'));
+    const isErrorOpened = computed(() => modalType.value === 'error' && isOpened.value);
+    const isSuccessOpened = computed(() => modalType.value === 'success' && isOpened.value);
 
-                const { setUser } = useActions(['setUser']);
-                setUser(user);
-            }
+    const closeAndRefresh = () => {
+        closeModal();
+        router.go(0);
+    };
 
-            return {
-                isDark,
-                isOnline,
-                toggleDark,
-            };
-        },
-    });
+    const isOnline = useOnline();
+
+    if (localStorage.getItem('user')) {
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        const { setUser } = useActions(['setUser']);
+        setUser(user);
+    }
 </script>
