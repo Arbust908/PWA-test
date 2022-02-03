@@ -124,11 +124,11 @@
     const meshTypes = ref([]);
 
     const filteredMeshTypes = computed(() => {
-        const selectedMeshTypes = sandProvider.value.meshType
-            ?.filter((mesh: Sand) => mesh.visible)
-            ?.map((mesh: Sand) => mesh.id);
+        const selectedMeshTypes = sandProvider.value.meshType?.map((mesh: Sand) => mesh.id);
 
-        return meshTypes.value.filter((m: any) => !selectedMeshTypes.includes(m.id));
+        return meshTypes.value
+            .filter((mesh: Sand) => mesh.visible)
+            .filter((m: any) => !selectedMeshTypes.includes(m.id));
     });
 
     const addMeshType = (newMeshType: string) => {
@@ -172,12 +172,7 @@
         const result = await useStoreLogic(router, store, 'sand', 'getAll');
 
         if (result.type == 'success') {
-            meshTypes.value = result.res.map((sand: Sand) => {
-                return {
-                    id: sand.id,
-                    type: sand.type,
-                };
-            });
+            meshTypes.value = result.res;
         }
     });
 </script>
