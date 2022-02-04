@@ -480,6 +480,8 @@
         pODone.value = await axios
             .post(`${api}/purchaseOrder`, orderToCreate)
             .then((response) => {
+                console.log(response);
+
                 return response.data.data;
             })
             .catch((err) => {

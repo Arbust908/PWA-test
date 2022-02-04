@@ -14,7 +14,7 @@
                 <div v-if="boxes.length > 0" class="px-6 py-5 space-y-5">
                     <BoxCard
                         v-for="box in boxes"
-                        :key="box.sandOrder.boxId"
+                        :key="box.id"
                         :box-id="box.sandOrder.boxId"
                         :estacion="box.origin"
                         :selected-boxes-for-trucks="selectedBoxesForTrucks"
@@ -45,7 +45,7 @@
                     :selected-boxes="selectedBoxesForTrucks"
                     :confirm-purchase-order="confirmPurchaseOrder"
                     @order-is-complete="confirmedPurchaseOrder = true"
-                    @update-queue-item="updateQueueItem(selectedBoxesForTrucks, 'truck', $event)"
+                    @update-queue-item="updateQueueItem(selectedQueueForTrucks, 'truck', $event)"
                 />
                 <DepositGrid
                     v-if="activeSection === 'Deposit'"
@@ -166,7 +166,11 @@
             })
             .catch((err) => console.error(err));
         console.log(boxes.value);
-        boxes.value = boxes.value.filter((box) => box.sandOrder).filter((box) => box.origin);
+        boxes.value = boxes.value
+            .filter((box) => box.sandOrder)
+            .filter((box) => box.origin)
+            .filter((box) => box.sandOrder)
+            .filter((box) => box.sandOrder?.boxId);
     };
 
     /**
@@ -176,9 +180,10 @@
      * @param {Array<QueueItem>} queueItems
      * @param {string} origin puede ser o 'truck' o 'deposit'
      */
-    const updateQueueItem = async (queueItemList: QueueItem[], origin: 'truck' | 'deposit', orderData = null) => {
+    const updateQueueItem = async (queueItemList: QueueItem[], origin: 'truck' | 'deposit', orderData: any = null) => {
         const { CradleADeposito, CradleATransporte } = QueueTransactions;
-        await queueItemList.forEach(async (queueItem) => {
+
+        await queueItemList.forEach(async (queueItem: QueueItem) => {
             queueItem.status = 0;
 
             if (origin === 'truck') {
@@ -194,7 +199,7 @@
         });
     };
 
-    const boxes = ref([]);
+    const boxes = ref([] as QueueItem[]);
     const confirmPurchaseOrder = ref(false);
 
     const selectedBoxesForTrucks = ref([] as Array<SandOrderBox>);
@@ -217,7 +222,7 @@
 
     const deposit = (box: QueueItem) => {
         confirmedPurchaseOrder.value = false;
-        choosedBox.value = box.sandOrder;
+        choosedBox.value = box.sandOrder as SandOrder;
 
         const boxWasSelected = selectedBoxesForDeposit.value.find((check) => check.boxId === box.sandOrder.boxId);
 
@@ -234,13 +239,14 @@
         } else {
             // Sino la agregamos a la lista
             selectedBoxesForDeposit.value.push(box.sandOrder);
-            selectedQueueForDeposit.value.push(box);
+            selectedQueueForDeposit.value.push({ ...box });
             // tomar la box.location y guardarla en una variable
         }
     };
 
     const truck = (box: QueueItem) => {
         const boxWasSelected = selectedBoxesForTrucks.value.find((check) => check.boxId === box.sandOrder.boxId);
+        console.log('El nuevo que item', box);
 
         if (boxWasSelected) {
             // Si la caja estaba seleccionad la borramos de la lista
@@ -251,7 +257,7 @@
         } else {
             // Sino la agregamos a la lista
             selectedBoxesForTrucks.value.push(box.sandOrder);
-            selectedQueueForTrucks.value.push(box);
+            selectedQueueForTrucks.value.push({ ...box });
         }
     };
 
