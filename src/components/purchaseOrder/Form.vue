@@ -237,7 +237,6 @@
         }
     });
 
-    useTitle('Nueva orden de pedido <> Sandflow');
     const instance = axios.create({
         baseURL: api,
     });
@@ -380,7 +379,6 @@
             oldBox.status = 100;
 
             if (oldBox && oldBox.location && typeof oldBox.location !== 'string') {
-                oldBox.location = { where: 'transport' };
                 oldBox.location = JSON.stringify(oldBox.location);
             }
             useAxios(`/sandOrder/${oldBox.id}`, { method: 'PUT', data: oldBox }, instance);

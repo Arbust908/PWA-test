@@ -69,13 +69,14 @@
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
 
-    import { Company, Pit, QueueItem } from '@/interfaces/sandflow';
+    import { Company, Pit, QueueItem, SandOrder } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import CradleSlot from '@/components/Cradle/cradleSlot.vue';
 
     import axios from 'axios';
+    import ControlCardVue from '@/components/panel/ControlCard.vue';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
@@ -248,25 +249,35 @@
 
     const requestEmptyBoxHandle = async () => {
         isLoading.value = true;
+        console.log(selectedSlots.value);
         selectedSlots.value.forEach((selectedSlot) => {
-            const slotPosition = selectedSlot?.location?.where_slot;
+            let { location } = selectedSlot;
+
+            if (typeof location === 'string') {
+                location = JSON.parse(location);
+            }
+
+            const slotPosition = location?.where_slot;
             cradleSlots.value[slotPosition] = { boxId: null };
             const newQI = { ...defaultQueueItem };
             newQI.status = 10;
-            newQI.origin = selectedSlot?.location?.where_origin;
+            newQI.origin = location?.where_origin;
             newQI.pitId = pitId.value;
             newQI.sandOrderId = selectedSlot.id;
 
             createQueueItem(newQI);
         });
 
-        selectedSandOrders.value.forEach((sandOrder) => {
-            sandOrder.status = 11;
+        selectedSandOrders.value.forEach((sandOrder: SandOrder) => {
+            sandOrder.status = 11; // Esto es que esta vacia (?)
             axios.put(`${apiUrl}/sandOrder/${sandOrder.id}`, sandOrder).catch((err) => console.error(err));
         });
 
         const updateCradle = { ...selectedCradle.value };
+        console.log(updateCradle);
+        console.log(cradleSlots.value);
         updateCradle.slots = cradleSlots.value;
+
         await axios
             .put(`${apiUrl}/cradle/${updateCradle.id}`, updateCradle)
             .then((res) => {

@@ -24,7 +24,6 @@
                         @change="showAllCategories"
                     />
                 </FieldGroup>
-                {{ boxes }}
                 <EntryBoxesList
                     v-if="selectionsAreDone"
                     :boxes="boxes"
@@ -87,7 +86,6 @@
                                     :choosed-box="choosedBox"
                                 />
                             </section>
-                            {{ choosedBox }}
                             <DepositGrid
                                 v-if="warehouse"
                                 class="w-full flex flex-col gap-5"
@@ -177,7 +175,7 @@
         createAllQueueItems,
     } from '@/helpers/useQueueItem';
 
-    import { Box, SandOrderBox, PurchaseOrder, Sand, Cradle } from '@/interfaces/sandflow';
+    import { Box, SandOrderBox, PurchaseOrder, Sand, Cradle, QueueItem } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -486,7 +484,8 @@
         const driver = await (await axios.get(`${apiUrl}/driver/${transportDriverId}`))?.data?.data;
         const transportId = driver?.transportId;
 
-        const queueItemsToMake = toFilterBoxes.map(async (box: SandOrderBox) => {
+        const queueItemsToMake = [] as QueueItem[];
+        await asyncForEach(toFilterBoxes, async (box: SandOrderBox) => {
             const { TransporteACradle, TransporteADeposito } = QueueTransactions;
             const {
                 location: { where },
@@ -504,8 +503,12 @@
             newQI.pitId = pitId.value;
             newQI.sandOrderId = box?.id as number;
             newQI.order = orderQI;
+            console.log(newQI);
+
+            queueItemsToMake.push(newQI);
         });
         console.log('ToMake', queueItemsToMake);
+
         await createAllQueueItems(queueItemsToMake);
 
         if (cradleId !== 0) {

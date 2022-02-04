@@ -165,7 +165,8 @@
                 return res.data.data;
             })
             .catch((err) => console.error(err));
-        boxes.value = boxes.value.filter((box) => box.sandOrder);
+        console.log(boxes.value);
+        boxes.value = boxes.value.filter((box) => box.sandOrder).filter((box) => box.origin);
     };
 
     /**
@@ -285,6 +286,8 @@
         const selectedQueueItem = selectedQueueForDeposit.value.find((queueItem: QueueItem) => {
             return queueItem?.sandOrder?.id === sandOrderId && queueItem?.sandOrder.boxId === boxId;
         }) as QueueItem;
+        console.log('selectedQueueItem', selectedQueueItem);
+        // selectedQueueItem.origin = `F${box.row} C${box.col} N${box.floor}`;
         selectedQueueItem.destination = `F${box.row} C${box.col} N${box.floor}`;
 
         choosedBox.value.floor = box.floor;
@@ -292,7 +295,10 @@
         choosedBox.value.col = box.col;
         sandOrders.value.push(choosedBox.value);
         wasWarehouseModificated.value = true;
-        inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
+        inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id).filter(
+            (boxy) => boxy.location && boxy.status < 99
+        );
+        console.log('inDepoBoxes', inDepoBoxes.value);
     };
 
     // :: DEPOSIT
@@ -344,6 +350,8 @@
 
             if (warehouse.value) {
                 inDepoBoxes.value = await searchInDepoBoxes(warehouse?.value?.id || 0);
+                console.log('inDepoBoxes', inDepoBoxes.value);
+                inDepoBoxes.value = inDepoBoxes.value.filter((boxy) => boxy.location && boxy.status < 99);
             }
         }
 

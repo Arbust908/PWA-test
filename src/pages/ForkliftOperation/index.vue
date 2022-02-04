@@ -106,6 +106,7 @@
     import { getCradle, getWorkOrders, updateCradle } from '@/helpers/useGetEntities';
     import { Cradle } from '@/interfaces/sandflow';
 
+    useTitle('Operacion en forklift <> Sandflow');
     const clientId = ref(-1);
     const pitId = ref(-1);
     const currentCradle = ref({} as Cradle);
