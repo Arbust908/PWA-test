@@ -249,7 +249,7 @@
             return boxesByFloor(newPowerBoxes.value, true);
         }
 
-        return boxesByFloor(currentWarehouse.value.layout || {});
+        return [];
     });
 
     const selectedQueue = ref([] as any[]);
@@ -289,6 +289,8 @@
 
     const boxesInWarehouse = await getSandOrders();
     const fillBoxes = () => {
+        console.log(boxesInWarehouse);
+
         return boxesInWarehouse
             .filter((boxy: SandOrder) => boxy.location)
             .map((boxy: SandOrder) => {

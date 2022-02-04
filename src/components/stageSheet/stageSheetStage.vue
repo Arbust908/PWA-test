@@ -227,7 +227,7 @@
      * y los mutamos para que tengan la info de la caja (boxId, peso y tipo de arena)
      */
     const fillQueueBoxes = async () => {
-        const sheetItems = sheetGridItems(getPitBoxes.value as Array<QueueItem>);
+        const sheetItems = sheetGridItems(queueBoxes.value as Array<QueueItem>);
         boxQueue.value = sheetItems.map(extractOrderInfo).sort((a: any, b: any) => {
             return a.order - b.order;
         }) as Array<any>;
@@ -320,7 +320,7 @@
         selectedFloor.value = floor;
     };
 
-    /* CAJAS POR PISO */
+    /* CAJAS POR PISO para el dropdown que agrega */
     const boxesByFloorAndFiltered = computed(() => {
         const filteredBoxes = getPitBoxesByFloor.value[selectedFloor.value - 1].filter((box: any) => {
             const { location, status } = box;
@@ -361,7 +361,7 @@
                 const sandAmount = item?.amount || 0;
 
                 if (acc[sandType]) {
-                    acc[sandType].amount + sandAmount;
+                    acc[sandType].amount = acc[sandType].amount + sandAmount;
                 } else {
                     acc[sandType] = { name: sandType, amount: sandAmount, id: sandId, sand: selectedSand };
                 }
