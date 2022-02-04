@@ -228,9 +228,12 @@
      */
     const fillQueueBoxes = async () => {
         const sheetItems = sheetGridItems(queueBoxes.value as Array<QueueItem>);
-        boxQueue.value = sheetItems.map(extractOrderInfo).sort((a: any, b: any) => {
-            return a.order - b.order;
-        }) as Array<any>;
+        boxQueue.value = sheetItems
+            .map(extractOrderInfo)
+            .sort((a: any, b: any) => {
+                return a.order - b.order;
+            })
+            .filter((item) => item.pitId === pitId.value) as Array<any>;
 
         if (boxQueue.value.length < 14) {
             const queueNum = boxQueue.value.length;
@@ -322,12 +325,16 @@
 
     /* CAJAS POR PISO para el dropdown que agrega */
     const boxesByFloorAndFiltered = computed(() => {
-        const filteredBoxes = getPitBoxesByFloor.value[selectedFloor.value - 1].filter((box: any) => {
-            const { location, status } = box;
-            const { where } = location;
+        console.log('boxesByFloorAndFiltered', getPitBoxesByFloor.value);
+        let filteredBoxes = getPitBoxesByFloor.value[selectedFloor.value - 1] || [];
+        console.log('filteredBoxes', filteredBoxes);
+        filteredBoxes =
+            filteredBoxes.filter((box: any) => {
+                const { location, status } = box;
+                const { where } = location;
 
-            return where === 'warehouse' && status <= 99;
-        });
+                return where === 'warehouse' && status <= 99;
+            }) || [];
 
         const queueNoNumbers = boxQueue.value.filter((item) => {
             return typeof item !== 'number';

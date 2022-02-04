@@ -244,6 +244,7 @@
 
     const boxes = computed(() => {
         if (pitId.value !== -1 && clientId.value !== -1) {
+            console.log('power box', newPowerBoxes.value);
             ultimateBoxes.value = newPowerBoxes?.value;
 
             return boxesByFloor(newPowerBoxes.value, true);

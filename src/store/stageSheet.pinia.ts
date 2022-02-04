@@ -38,6 +38,11 @@ export const useSheetStore = defineStore('stageSheet', () => {
         return queueBoxes.value.filter((box) => box.pitId === pitId.value);
     });
     const getPitBoxesByFloor = computed(() => {
+        console.log('🍍');
+        console.log('getPitBoxesByFloor');
+        console.log(ultimateBoxes.value);
+        console.log(boxesByFloor(ultimateBoxes.value, true));
+
         return boxesByFloor(ultimateBoxes.value, true);
     });
     const getSelectStage = computed(() => {
