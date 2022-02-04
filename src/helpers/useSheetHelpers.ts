@@ -1,4 +1,4 @@
-import { BoxLocation, QueueItem, SandOrder, SandOrderBox } from '@/interfaces/sandflow';
+import { BoxLocation, QueueItem, SandOrder, SandOrderBox, SandStage } from '@/interfaces/sandflow';
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -97,4 +97,26 @@ export const updateAllItems = async (orders: Array<SandOrder | SandOrderBox>) =>
     });
 
     return Promise.all(orderList);
+};
+
+export const updateSandStage = async (stage: SandStage) => {
+    const { id } = stage;
+
+    return await axios
+        .put(`${apiUrl}/sandStage/${id}`, stage)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const finishSandStage = async (stage: SandStage) => {
+    const { id } = stage;
+    stage.status = 2;
+
+    return await axios
+        .put(`${apiUrl}/sandStage/${id}`, stage)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
 };

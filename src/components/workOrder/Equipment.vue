@@ -101,6 +101,7 @@
     import TracktoField from '@/components/workOrder/woTraktorField.vue';
     import PickupField from '@/components/workOrder/woPickupField.vue';
     import axios from 'axios';
+    import { Cradle, Forklift } from '@/interfaces/sandflow';
 
     const api = import.meta.env.VITE_API_URL || '/api';
 
@@ -186,7 +187,6 @@
     onMounted(async () => {
         const WOsData = await axios.get(`${api}/workOrder`);
         WOs.value = WOsData.data.data;
-        console.log(WOs.value);
 
         if (WOs.value.length > 0) {
             const inUseArray = WOs.value.reduce(
@@ -227,27 +227,31 @@
     const Cs = ref([]);
     const Fs = ref([]);
 
-    const inUseCradles = ref([]);
-    const inUseForklifts = ref([]);
+    const inUseCradles = ref([] as number[]);
+    const inUseForklifts = ref([] as number[]);
 
     const opCradle = computed(() => {
-        return Cs.value.map((cradle) => {
-            if (inUseCradles.value.includes(cradle.id)) {
-                cradle.name = cradle.name + ' (en uso)';
-            }
+        return Cs.value
+            .filter((cradle: Cradle) => cradle.visible)
+            .map((cradle: Cradle) => {
+                if (inUseCradles.value.includes(cradle?.id)) {
+                    cradle.name = cradle.name + ' (en uso)';
+                }
 
-            return cradle;
-        });
+                return cradle;
+            }) as Cradle[];
     });
 
     const opForklift = computed(() => {
-        return Fs.value.map((forklift) => {
-            if (inUseForklifts.value.includes(forklift.id)) {
-                forklift.name = forklift.name + ' (en uso)';
-            }
+        return Fs.value
+            .filter((forklift: Forklift) => forklift.visible)
+            .map((forklift: Forklift) => {
+                if (inUseForklifts.value.includes(forklift?.id)) {
+                    forklift.name = forklift.name + ' (en uso)';
+                }
 
-            return forklift;
-        });
+                return forklift;
+            }) as Forklift[];
     });
 
     const bpCradle = computed(() => {

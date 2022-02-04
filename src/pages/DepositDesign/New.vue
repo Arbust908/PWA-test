@@ -6,12 +6,11 @@
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
                     <ClientPitCombo
                         v-model:wo-id="woId"
-                        :client-id="clientId"
-                        :pit-id="pitId"
+                        v-model:client-id="clientId"
+                        v-model:pit-id="pitId"
+                        v-model:work-orders="workOrders"
                         validation-type="empty"
                         :pads="true"
-                        @update:clientId="clientId = $event"
-                        @update:pitId="pitId = $event"
                     />
                     <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de filas</h3>
@@ -142,6 +141,7 @@
                 baseURL: apiUrl,
             });
             const woId = ref(-1);
+            const workOrders = ref([]);
 
             const sandTypes = ref([]);
             const sandName = computed(() => {
@@ -151,6 +151,7 @@
                     selectedBox.value.category != 'cradle'
                 ) {
                     console.log(sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type);
+
                     return sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type;
                 }
             });

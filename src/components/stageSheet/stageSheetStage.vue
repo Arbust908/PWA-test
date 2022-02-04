@@ -55,6 +55,7 @@
                     @click="box?.boxId ? activeDelete(box) : fillBox(place, $event)"
                 >
                     <button
+                        v-if="box?.boxId"
                         class="w-6 h-6 absolute top-0 right-0 -mt-2 -mr-2 bg-white rounded-full shadow-sm group-hover:bg-red-400 group-hover:text-red-50 transition duration-150 ease-out"
                     >
                         <TheAllIcon icon="XCircle" type="outline" />
@@ -108,7 +109,10 @@
                 <NoneBtn btn="wide" :is-loading="isLoading" @click="$emit('set-stage', sandStage.id)">
                     Cancelar
                 </NoneBtn>
-                <InverseBtn btn="wide" :is-loading="isLoading" @click="generateQueue()"> Guardar </InverseBtn>
+                <InverseBtn v-if="stagePorcentage < 100" btn="wide" :is-loading="isLoading" @click="generateQueue()">
+                    Guardar
+                </InverseBtn>
+                <InverseBtn v-else btn="wide" :is-loading="isLoading" @click="generateQueue()"> Finalizar </InverseBtn>
             </footer>
         </div>
     </article>
@@ -175,7 +179,7 @@
             default: false,
         },
     });
-    const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
+    const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full', 'saved-queue']);
     const sheetStore = useSheetStore();
     const {
         clientId,
@@ -303,6 +307,7 @@
         popUpCords.y = event.clientY;
     };
     const activeDelete = async (place: any) => {
+        console.log('activeDelete', place);
         await deleteQueueItem(place.id);
         await fillQueueBoxes();
     };
@@ -411,6 +416,12 @@
         await moveBoxes(SandOrdersToMove);
         await createAllQueueItems(await Promise.all(newQueueItems));
         isLoading.value = false;
+
+        if (stagePorcentage.value >= 100) {
+            emits('saved-queue', true);
+        } else {
+            emits('saved-queue', false);
+        }
     };
 
     onMounted(() => {

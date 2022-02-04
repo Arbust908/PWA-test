@@ -52,8 +52,8 @@
                     :pit-id="pitId"
                     :selected-boxes="selectedBoxes"
                     :confirm-purchase-order="fireOrder"
-                    @updateQueueItem="finalizeOrder($event)"
-                    @orderIsComplete="canSendOrder = true"
+                    @update-queue-item="finalizeOrder($event)"
+                    @order-is-complete="canSendOrder = true"
                 />
             </section>
         </div>
@@ -110,13 +110,21 @@
         getWorkOrders,
         getSand,
     } from '@/helpers/useGetEntities';
-    import { getQueueItems } from '@/helpers/useQueueItem';
-    import { QueueItem, SandOrder, Warehouse, SandOrderBox } from '@/interfaces/sandflow';
+    import {
+        createAllQueueItems,
+        deleteAllQueueItems,
+        getOrderPro,
+        getQueueItems,
+        QueueTransactions,
+        updateAllQueueItems,
+    } from '@/helpers/useQueueItem';
+    import { QueueItem, SandOrder, Warehouse, SandOrderBox, BoxLocation } from '@/interfaces/sandflow';
 
     import axios from 'axios';
+    import { updateAllSandOrders } from '@/helpers/useSandOrder.service';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
-    useTitle('Depósito de cajas vacias');
+    useTitle('Depósito de cajas vacias <> Sandflow');
 
     // La seccion activa
     const activeSection: Ref<string | null> = ref(null);
@@ -224,17 +232,70 @@
         if (warehouse.value.id) {
             // Chequeamos que el deposito tenga ID para filtrar las cajas al depo
             inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
+            // Filtramos los de status 11 que son los que van necesitan destino cuando salen del cradle
+            // y Filtramos los que esten terminados con 100
+            const boxesToRemove = inDepoBoxes.value
+                .filter((box) => box.status !== 100)
+                .map((box) => {
+                    let { location } = box;
+
+                    if (typeof location === 'string') {
+                        location = JSON.parse(location);
+                    }
+                    location = { where: '' };
+
+                    location = JSON.stringify(location);
+
+                    return { ...box, location };
+                });
+            updateAllSandOrders(boxesToRemove);
+            inDepoBoxes.value = inDepoBoxes.value.filter((box) => box.status !== 100);
         }
     };
 
     const canSendOrder = ref(false);
 
-    const finalizeOrder = (order: any) => {
-        console.log('Finalizando orden');
-        console.log(selectedBoxes.value);
-        console.log(order);
+    const finalizeOrder = async (order: any) => {
+        const newQueueItems = [] as QueueItem[];
+        const { DepositoATransporte } = QueueTransactions;
+        const itemOrder = await getOrderPro(DepositoATransporte);
+        selectedBoxes.value.forEach((box) => {
+            const founrOrder = order.sandOrders.find((sandOrder: SandOrder) => sandOrder.boxId === box.boxId);
+            const orderId = founrOrder?.id;
+            console.log(order);
+            console.log(box);
+            let { location } = box;
+
+            if (typeof location === 'string') {
+                location = JSON.parse(location);
+            }
+            const { where_origin } = location as BoxLocation;
+            const destinationTransport = `Camion ${order.plates}`;
+            console.log('🛑🛑🛑', where_origin);
+            newQueueItems.push({
+                boxId: box.boxId,
+                sandOrderId: orderId,
+                pitId: pitId.value,
+                order: itemOrder,
+                origin: where_origin,
+                destination: destinationTransport,
+                status: 0,
+            } as QueueItem);
+        });
+        const finishingBoxes = selectedBoxes.value.map((box) => {
+            box.status = 100;
+            box.location = { where: 'transport' };
+
+            return box;
+        });
+        console.log('Cajas que cerramos', finishingBoxes);
+        console.log('Nuevos a la lista', newQueueItems);
         // Aca lo que deberiamos hacer es sacar las cajas del depósito
         // y crear los QueueItems de los mismos
+        await createAllQueueItems(newQueueItems);
+        await updateAllSandOrders(finishingBoxes);
+
+        // createAllQueueItems
     };
 
     // Esto queda como ultimo por consejo Experto

@@ -37,15 +37,10 @@
 
                 <td class="text-center" :class="item ? null : 'empty'">
                     <Badge
-                        class="text-white px-5"
+                        class="text-white px-5 w-full inline-block"
                         :class="getNotificationInfo(item).color"
                         :text="getNotificationInfo(item).text"
                     />
-
-                    <!-- <Badge v-if="item.isOperator" text="Enviada" classes="bg-[#1AA532] text-white px-5" />
-                    <Badge v-else text="En proceso" classes="bg-[#616161] text-white" />
-                    <Badge v-if="false" text="Rechazada" classes="bg-[#BE1A3B] text-white px-5" />
-                    -->
                 </td>
             </template>
 
@@ -89,11 +84,15 @@
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import VTable from '@/components/ui/table/VTable.vue';
     import Badge from '@/components/ui/Badge.vue';
-    const api = import.meta.env.VITE_API_URL || '/api';
     import axios from 'axios';
 
     import NotificationBackDropCard from '@/components/notifications/NotificationBackDropCard.vue';
     import ABMHeader from '@/components/ui/ABMHeader.vue';
+    import { useModalState } from '@/store/modals.pinia';
+
+    const api = import.meta.env.VITE_API_URL || '/api';
+    const store = useModalState();
+    const { openModal } = store;
 
     const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     const Backdrop = defineAsyncComponent(() => import('@/components/modal/Backdrop.vue'));
@@ -138,12 +137,12 @@
             callback: async (item) => {
                 // toggleModal();
                 const result = await axios.post(`${api}/providerNotification/${item.id}/resend`).catch((err) => {
-                    console.log(err);
-                    alert('ERROR' + err);
+                    console.error(err);
+                    openModal('error', 'Error', 'Hubo un error al reenviar la notificacions');
                 });
 
-                if (result.status === 200) {
-                    alert('OK');
+                if (result?.status === 200) {
+                    openModal('success', 'Notificacion Reenviada', 'La notificacion fue reenviada con exito!');
                 }
             },
         },
@@ -158,12 +157,11 @@
 
         return provNotifDB.value;
     });
-    console.log(filteredNotifications.value);
     const getProviderNotifications = async () => {
         loading.value = true;
 
         const res = await axios.get(`${apiUrl}/providerNotification`).catch((err) => {
-            console.log(err);
+            console.error(err);
         });
 
         if (res.status === 200) {
@@ -177,7 +175,7 @@
 
     const getSands = async () => {
         const res = await axios.get(`${apiUrl}/sand`).catch((err) => {
-            console.log(err);
+            console.error(err);
         });
         sandTypesFromId.value = res.data.data;
     };

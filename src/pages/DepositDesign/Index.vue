@@ -49,7 +49,9 @@
                 {{ item.clientCompany.name }}
             </template>
 
-            <template #mobileSubtitle="{ item }"> <span class="font-bold">Pozo: </span>{{ item.pit.name }} </template>
+            <template #mobileSubtitle="{ item }">
+                <span class="font-bold">Pozo: </span>{{ item.workOrder?.pad }}
+            </template>
         </VTable>
 
         <DisableModal
@@ -143,6 +145,7 @@
                 workOrders.value = await getWorkOrders();
                 deposits.value = deposits.value.map((deposit) => {
                     deposit.workOrder = workOrders.value.find((workOrder) => workOrder.id === deposit.pitId) || {};
+
                     return deposit;
                 });
             });

@@ -158,17 +158,11 @@ export const getBoxClasses = (category: string, status: number) => {
 };
 
 export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
-    // console.groupCollapsed('getInDepoBoxes');
-    // console.log('boxes', boxes);
-    // console.log('boxes', [...boxes]);
-    // console.log('depoId', depoId);
     const boxy = boxes.filter((box) => {
         const { location } = box;
 
         return location && location.where === 'warehouse' && location.where_id === depoId;
     });
-    // console.log('boxy', boxy);
-    // console.groupEnd();
 
     return [...new Set(boxy)];
 };

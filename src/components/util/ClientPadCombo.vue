@@ -15,51 +15,40 @@
         <FieldLoading v-else />
         <InvalidInputLabel v-if="idOfClient == -1 && useFirstClient === true" validation-type="empty" />
     </div>
-    <div v-if="!pads" :class="sharedClasses">
+    <div :class="sharedClasses">
         <FieldSelect
-            v-if="pits.length > 0"
+            v-if="pads@apply ;.length > 0"
             v-model:data="idOfPit"
-            field-name="pit"
-            placeholder="Seleccionar pozo"
-            title="Pozo"
+            field-name="pad"
+            placeholder="Seleccionar PAD"
+            title="PAD"
             require-validation
-            :endpoint-data="pits"
+            :endpoint-data="pads"
             :is-disabled="isDisabled"
-            :select-class="useFirstPit"
-            @click="useFirstPit = true"
+            :select-class="useFirstPad"
+            @click="useFirstPad = true"
         />
         <FieldLoading v-else />
-        <InvalidInputLabel v-if="idOfPit == -1 && useFirstPit === true" validation-type="empty" />
-    </div>
-    <div v-if="pads" :class="sharedClasses">
-        <PadSelector
-            v-model:woId="idOfWorkOrder"
-            v-model:work-orders="allWorkOrders"
-            v-model:first-filter="isFirstTime"
-            :client-id="clientId"
-            require-validation
-            :is-disabled="isDisabled"
-        />
+        <InvalidInputLabel v-if="idOfPad == -1 && useFirstPad === true" validation-type="empty" />
     </div>
 </template>
 
 <script setup lang="ts">
     import { Ref } from 'vue';
-    import { Pit, Company } from '@/interfaces/sandflow';
+    import { Pit, Company, WorkOrder } from '@/interfaces/sandflow';
     import { useApi } from '@/helpers/useApi';
     import { getWorkOrders } from '@/helpers/useGetEntities';
 
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldLoading from '@/components/ui/form/FieldLoading.vue';
     import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
-    import PadSelector from '@/components/util/PadSelector.vue';
 
     const props = defineProps({
         clientId: {
             type: Number,
             required: true,
         },
-        pitId: {
+        padId: {
             type: Number,
             required: true,
         },
@@ -74,18 +63,6 @@
         validationType: {
             type: String,
             default: null,
-        },
-        pads: {
-            type: Boolean,
-            default: false,
-        },
-        woId: {
-            type: Number,
-            default: -1,
-        },
-        workOrders: {
-            type: Array,
-            default: () => [],
         },
         firstFilter: {
             type: Boolean,
@@ -103,32 +80,26 @@
         'update:firstFilter',
         'update:clientId',
     ]);
-    const {
-        clientId: idOfClient,
-        pitId: idOfPit,
-        woId: idOfWorkOrder,
-        workOrders: allWorkOrders,
-        firstFilter: isFirstTime,
-    } = useVModels(props, emit);
+    const { clientId: idOfClient, padId: idOfPad, firstFilter: isFirstTime } = useVModels(props, emit);
     const { read: getClients } = useApi('/company');
     const backupClients = getClients() as Ref<Array<Company>>;
     const clients = ref([] as Array<Company>);
     watch(backupClients, (newVal) => {
         if (newVal) {
-            clients.value = newVal.filter((v) => v.visible);
+            clients.value = newVal;
         }
     });
 
-    const { read: getPits } = useApi('/pit');
-    const backupPits = getPits() as Ref<Array<Pit>>;
-    const pits = ref([] as Array<Pit>);
-    watch(backupPits, (newVal) => {
+    const { read: getWorkorder } = useApi('/workOrder');
+    const backupWorkorder = getWorkorder() as Ref<Array<WorkOrder>>;
+    const workOrders = ref([] as Array<WorkOrder>);
+    watch(backupWorkorder, (newVal) => {
         if (newVal) {
             pits.value = newVal;
         }
     });
 
-    const filterPitsByClient = (theClientId: number) => {
+    const filterWorkordersByClient = (theClientId: number) => {
         if (firstFilter.value) {
             idOfPit.value = -1;
         }
@@ -185,7 +156,6 @@
             filterPitsByClient(newVal);
         }
     });
-    const workOrders = ref([]);
     const firstFilter = ref(false);
 
     const padFilter = async (filterValue: number) => {
