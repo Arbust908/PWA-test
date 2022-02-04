@@ -6,7 +6,7 @@ const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
 export enum QueueTransactions {
     CradleATransporte = 'aTransporte',
-    DepositoATransporte = 'aTranporte',
+    DepositoATransporte = 'aTransporte',
     CradleADeposito = 'Retiro',
     TransporteACradle = 'deTransporte',
     TransporteADeposito = 'deTransporte',
@@ -35,11 +35,12 @@ const steppedQueueLimits: { [key: string]: { min: number; max: number } } = {
 
 export const getOrder = (
     queue: Array<QueueItem>,
-    transition: QueueTransactions | string = QueueTransactions.DepositoACradle
+    transition: QueueTransactions = QueueTransactions.DepositoACradle
 ): number => {
     let newOrder = 0;
     const queues = separateQueues(queue);
-    const transitionQueueOrders = queues[transition].map(({ order }: QueueItem) => order);
+    const transitionQueue = queues[transition] as Array<QueueItem>;
+    const transitionQueueOrders = transitionQueue.map(({ order }: QueueItem) => order) || ([] as Array<number>);
     const limits = steppedQueueLimits[transition];
 
     newOrder = getOrderNumber(transitionQueueOrders, limits);
@@ -126,6 +127,13 @@ export const updateQueueItem = async (queueData: QueueItem) => {
         })
         .catch((err) => console.error(err));
 };
+export const updateAllQueueItems = async (queue: QueueItem[]) => {
+    const queueItems = queue.map((queueItem) => {
+        return updateQueueItem(queueItem);
+    });
+
+    return Promise.all(queueItems);
+};
 export const deleteQueueItem = async (queueItemId: number) => {
     return await axios
         .delete(`${apiUrl}/queueItem/${queueItemId}`)
@@ -133,6 +141,13 @@ export const deleteQueueItem = async (queueItemId: number) => {
             return response;
         })
         .catch((err) => console.error(err));
+};
+export const deleteAllQueueItems = async (queue: QueueItem[]) => {
+    const queueItems = queue.map((queueItem) => {
+        return deleteQueueItem(queueItem.id as number);
+    });
+
+    return Promise.all(queueItems);
 };
 
 export const createAllQueueItems = async (queue: Array<QueueItem>) => {

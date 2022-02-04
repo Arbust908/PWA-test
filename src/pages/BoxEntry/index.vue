@@ -24,6 +24,7 @@
                         @change="showAllCategories"
                     />
                 </FieldGroup>
+                {{ boxes }}
                 <EntryBoxesList
                     v-if="selectionsAreDone"
                     :boxes="boxes"
@@ -168,9 +169,15 @@
         getSand,
     } from '@/helpers/useGetEntities';
     import { asyncForEach } from '@/helpers/useAsyncFor';
-    import { defaultQueueItem, createQueueItem, QueueTransactions, getOrderPro } from '@/helpers/useQueueItem';
+    import {
+        defaultQueueItem,
+        createQueueItem,
+        QueueTransactions,
+        getOrderPro,
+        createAllQueueItems,
+    } from '@/helpers/useQueueItem';
 
-    import { Box, SandOrderBox, PurchaseOrder, Sand } from '@/interfaces/sandflow';
+    import { Box, SandOrderBox, PurchaseOrder, Sand, Cradle } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -236,29 +243,25 @@
         cradles.value = newCradles;
     };
 
-    const clearBoxInDeposit = (boxId: number) => {
+    const clearBoxInDeposit = (boxToClear: any) => {
         // Le borramos la info de Depo a la Caja
-        console.log('clearBoxInDeposit', boxId);
-        // Object.entries(warehouse.value.layout).forEach((cell) => {
-        //     if (cell[1].id == id) {
-        //         (cell[1].category = 'empty'), delete cell[1][id];
-        //     }
-        // });
+        console.log('clearBoxInDeposit', boxToClear);
+        boxToClear.row = null;
+        boxToClear.col = null;
+        boxToClear.floor = null;
     };
 
     const clearBoxInCradleSlots = (boxId: number) => {
         // Look for box AKA sandOrder and emtpy location
-        // let id = 0;
-        // cradles.value.forEach((cradle) => {
-        //     cradle.slots = cradle.slots.map((slot) => {
-        //         if (slot.boxId == id) {
-        //             slot = {
-        //                 boxId: null,
-        //             };
-        //         }
-        //         return slot;
-        //     });
-        // });
+        cradles.value.forEach((cradle: Cradle) => {
+            cradle.slots = cradle?.slots?.map((slot: any) => {
+                if (slot.boxId === boxId) {
+                    return { boxId: null };
+                }
+
+                return slot;
+            });
+        });
     };
 
     const workOrdersPad = ref([]);
@@ -319,10 +322,7 @@
                     col.value = fCol;
                     floor.value = fFloor;
                     row.value = fRow;
-                    console.log(sandOrders.value, warehouse.value.id);
-                    console.log(getInDepoBoxes(sandOrders.value, warehouse.value.id));
                     inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
-                    console.log(inDepoBoxes.value);
                 }
             }
         }
@@ -440,14 +440,6 @@
     const originalWarehouseLayout = ref({});
     const visibleCategories = ref([]);
 
-    const setVisibleCategories = (category: string) => {
-        if (visibleCategories.value.includes(category)) {
-            visibleCategories.value.splice(visibleCategories.value.indexOf(category), 1);
-        } else {
-            visibleCategories.value.push(category);
-        }
-    };
-
     const showAllCategories = () => {
         sandTypes.value.forEach((sand) => visibleCategories.value.push(sand.id));
     };
@@ -460,6 +452,7 @@
         selectedCradle.value = id;
     };
 
+    // A deprecar
     const handleSlotClick = (slot) => {
         console.log(slot);
     };
@@ -493,7 +486,7 @@
         const driver = await (await axios.get(`${apiUrl}/driver/${transportDriverId}`))?.data?.data;
         const transportId = driver?.transportId;
 
-        toFilterBoxes.map(async (box) => {
+        const queueItemsToMake = toFilterBoxes.map(async (box: SandOrderBox) => {
             const { TransporteACradle, TransporteADeposito } = QueueTransactions;
             const {
                 location: { where },
@@ -507,12 +500,13 @@
             }
             const newQI = { ...defaultQueueItem };
             newQI.origin = `Camion ${transportId}`;
-            newQI.destination = box?.location?.where_origin;
+            newQI.destination = box?.location?.where_origin as string;
             newQI.pitId = pitId.value;
-            newQI.sandOrderId = box?.id;
+            newQI.sandOrderId = box?.id as number;
             newQI.order = orderQI;
-            const res = await createQueueItem(newQI);
         });
+        console.log('ToMake', queueItemsToMake);
+        await createAllQueueItems(queueItemsToMake);
 
         if (cradleId !== 0) {
             wasCradleModificated.value = true;

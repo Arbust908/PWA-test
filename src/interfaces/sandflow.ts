@@ -202,7 +202,12 @@ export interface SandPlan {
     company?: Company;
     stages?: SandStage[];
 }
-
+/**
+ * Status
+ * 0: No iniciado
+ * - otros?
+ * 100: Finalizado
+ */
 export interface SandOrder {
     id?: number;
     sandTypeId: number;

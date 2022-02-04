@@ -1,7 +1,7 @@
 <template>
     <ABMFormTitle title="Orden de pedido" />
     <PDF v-show="showPDF" ref="pdf" :info="pdfInfo" @close="redirectIndex" />
-    <section class="bg-white rounded-md overflow-y-auto">
+    <section class="bg-white rounded-md overflow-y-auto pl-px">
         <form method="POST" action="/" class="flex-col gap-4">
             <FieldLegend>Arena</FieldLegend>
             <FieldSelect
@@ -338,19 +338,20 @@
     const useFirstSQ = ref(false);
 
     // :: TransportProvider
-    const transportProviders = ref([]);
+    const transportProviders = ref([] as TransportProvider[]);
     const { data: tPData } = useAxios('/transportProvider', instance);
-    watch(tPData, (tPData) => {
-        if (tPData && tPData.data) {
-            transportProviders.value = tPData.data;
+    watch(tPData, (newData) => {
+        if (newData && newData.data) {
+            transportProviders.value = newData.data;
         }
     });
     const transportProviderId: Ref<number> = ref(-1);
     const useFirstTP = ref(false);
     const useFirstDriver = ref(false);
 
-    const po = ref(null);
+    const po = ref(null as any);
 
+    /** Setea la data de la orden y levanta el modal */
     const confirm = () => {
         const sp = sandProviders.value.find((sandP) => {
             return sandP.id === sandProviderId.value;
@@ -373,16 +374,35 @@
         useAxios('/transportOrder', { method: 'POST', data: transportOrder.value }, instance);
     };
     const _saveSO = (poId: number) => {
-        props.selectedBoxes.map((box: any) => {
+        const sandOrderToDo = props.selectedBoxes.map((box: any) => {
+            // Finalizamos la orden de pedido
+            const oldBox = box;
+            oldBox.status = 100;
+
+            if (oldBox && oldBox.location && typeof oldBox.location !== 'string') {
+                oldBox.location = { where: 'transport' };
+                oldBox.location = JSON.stringify(oldBox.location);
+            }
+            useAxios(`/sandOrder/${oldBox.id}`, { method: 'PUT', data: oldBox }, instance);
             const { id, ...newSO } = box;
             newSO.purchaseOrderId = poId;
             newSO.sandProviderId = box.sandProviderId;
 
+            // Creamos la nueva
             if (newSO && newSO.location && typeof newSO.location !== 'string') {
                 newSO.location = JSON.stringify(newSO.location);
             }
-            useAxios('/sandOrder', { method: 'POST', data: newSO }, instance);
+
+            return axios
+                .post(`${api}/sandOrder/`, newSO)
+                .then((response) => {
+                    return response.data.data;
+                })
+                .catch((err) => console.error(err));
+            // useAxios('/sandOrder', { method: 'POST', data: newSO }, instance);
         });
+
+        return Promise.all(sandOrderToDo);
     };
 
     const _formatPO = () => {
@@ -437,52 +457,58 @@
         return result.data.data?.at(-1)?.id + 1 || 1;
     };
 
+    /**
+     *
+     */
     const save = async (): Promise<void> => {
         const order = ref(null);
+        // Formateamos la orden de pedido
+        const purchaseOrder = _formatPO();
 
-        if (true) {
-            // Formateamos la orden de pedido
-            const purchaseOrder = _formatPO();
+        // get last id
+        const lastId = await getLastId();
+        purchaseId.value = lastId;
+        // pdfInfo.value = purchaseOrder;
+        // pdfInfo.value.purchaseOrder.id = lastId;
 
-            // get last id
-            const lastId = await getLastId();
-            pdfInfo.value = purchaseOrder;
-            pdfInfo.value.purchaseOrder.id = lastId;
+        // deberia tener el resultado HTML del pdf
+        const pdfContent = await pdf.value?.getFileContent();
+        const orderToCreate = purchaseOrder as any;
+        orderToCreate.pdfContent = pdfContent;
 
-            // deberia tener el resultado HTML del pdf
-            const pdfContent = await pdf.value?.getFileContent();
-            purchaseOrder.pdfContent = pdfContent;
+        // Creamos via API la orden de pedido
+        const pODone = ref(null);
+        const error = ref(null);
+        pODone.value = await axios
+            .post(`${api}/purchaseOrder`, orderToCreate)
+            .then((response) => {
+                return response.data.data;
+            })
+            .catch((err) => {
+                error.value = err;
+                console.error(err);
 
-            // Creamos via API la orden de pedido
-            const pODone = ref(null);
-            const error = ref(null);
-            pODone.value = await axios
-                .post(`${api}/purchaseOrder`, purchaseOrder)
-                .then((response) => {
-                    return response.data.data;
-                })
-                .catch((err) => {
-                    error.value = err;
-                    console.error(err);
+                return err;
+            });
 
-                    return err;
-                });
+        order.value = pODone.value;
+        const poId = pODone.value?.id;
+        titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
+        _saveTO(poId);
+        const newSO = await _saveSO(poId);
 
-            order.value = pODone.value;
-            const poId = pODone.value?.id;
-            titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
-            _saveTO(poId);
-            _saveSO(poId);
-
-            if (error?.value != undefined) {
-                showModal.value = false;
-                openErrorGral.value = true;
-            } else {
-                showModal.value = false;
-                openSuccess.value = true;
-            }
+        if (error?.value != undefined) {
+            showModal.value = false;
+            openErrorGral.value = true;
+        } else {
+            showModal.value = false;
+            openSuccess.value = true;
         }
-        emit('updateQueueItem', order.value);
+
+        orderToCreate.purchaseOrderId = poId;
+        orderToCreate.plates = filteredPlates.value[0];
+        orderToCreate.sandOrders = newSO;
+        emit('updateQueueItem', orderToCreate);
     };
     // >> Success y Error Modal
     const openSuccess = ref(false);
@@ -496,7 +522,6 @@
     const textErrorGral = 'Por favor, verifica los datos ingresados e intenta nuevamente';
 
     const showPDF = ref(false);
-    const togglePDF = useToggle(showPDF);
     const pdfInfo = computed(() => {
         const emptyThing = {
             name: 'none',
@@ -541,15 +566,11 @@
             transportOrder.value.driverId !== -1;
 
         if (hasTransportProvider && hasSandProvider && sandOrdersAreFull && hasTimeAndDate && transportOrderIsFull) {
-            orderIsComplete();
+            emit('orderIsComplete');
         }
     });
 
-    const orderIsComplete = () => {
-        emit('orderIsComplete');
-    };
-
-    const pdf = ref(null);
+    const pdf = ref(null as any);
     const downloadPDF = async () => {
         showPDF.value = true;
         await pdf.value?.download();

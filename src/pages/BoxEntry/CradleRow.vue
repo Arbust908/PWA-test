@@ -54,6 +54,8 @@
             const handleSelectedCradle = () => {
                 emit('handle-selected-cradle');
             };
+
+            // A deprecar
             const handleSlotClick = (e) => {
                 emit('handle-slot-click', e);
             };

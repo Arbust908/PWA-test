@@ -109,7 +109,10 @@
                 <NoneBtn btn="wide" :is-loading="isLoading" @click="$emit('set-stage', sandStage.id)">
                     Cancelar
                 </NoneBtn>
-                <InverseBtn btn="wide" :is-loading="isLoading" @click="generateQueue()"> Guardar </InverseBtn>
+                <InverseBtn v-if="stagePorcentage < 100" btn="wide" :is-loading="isLoading" @click="generateQueue()">
+                    Guardar
+                </InverseBtn>
+                <InverseBtn v-else btn="wide" :is-loading="isLoading" @click="generateQueue()"> Finalizar </InverseBtn>
             </footer>
         </div>
     </article>
@@ -176,7 +179,7 @@
             default: false,
         },
     });
-    const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full']);
+    const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full', 'saved-queue']);
     const sheetStore = useSheetStore();
     const {
         clientId,
@@ -413,6 +416,12 @@
         await moveBoxes(SandOrdersToMove);
         await createAllQueueItems(await Promise.all(newQueueItems));
         isLoading.value = false;
+
+        if (stagePorcentage.value >= 100) {
+            emits('saved-queue', true);
+        } else {
+            emits('saved-queue', false);
+        }
     };
 
     onMounted(() => {

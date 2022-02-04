@@ -72,11 +72,11 @@
         },
         maxNumberAmount: {
             type: Number,
-            required: false,
+            default: 9999,
         },
     });
 
-    const emits = defineEmits([]);
+    const emits = defineEmits(['update:data']);
 
     const value = useVModel(props, 'data', emits);
     const cssPre = useCssVar('--pre', 0);
@@ -84,7 +84,7 @@
 
     watch(value, (data, oldData) => {
         if (Number(data) < 1 && props.maxNumberAmount) {
-            value.value = null;
+            value.value = '';
         } else if (Number(data) > props.maxNumberAmount) {
             value.value = props.maxNumberAmount;
         } else {

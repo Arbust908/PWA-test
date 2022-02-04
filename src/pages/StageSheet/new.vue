@@ -42,6 +42,7 @@
                     @set-stage="setSelectedStageId($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
+                    @saved-queue="saveQueue"
                 />
                 <StageSheetStageBox v-if="pendingStages?.length <= 0">
                     <p class="text-center p-6">No hay etapas pendientes</p>
@@ -128,16 +129,17 @@
     import StageSheetStage from '@/components/stageSheet/stageSheetStage.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import StageSheetStageBox from '@/components/stageSheet/stageSheetStageBox.vue';
-    import { getQueueItems } from '@/helpers/useQueueItem';
+    import { deleteAllQueueItems, getQueueItems, updateAllQueueItems } from '@/helpers/useQueueItem';
     import { useSheetStore } from '@/store/stageSheet.pinia';
     import { storeToRefs } from 'pinia';
-    import { detailTitle, queueDetailFormated, isStageSelected } from '@/helpers/useSheetHelpers';
+    import { detailTitle, queueDetailFormated, isStageSelected, finishSandStage } from '@/helpers/useSheetHelpers';
     import { getSandOrders } from '@/helpers/useGetEntities';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
     const instance = axios.create({
         baseURL: apiUrl,
     });
+    useTitle('Stage Sheet <> SandFlow');
     const _TABS = { PENDING: 0, COMPLETED: 1 };
 
     const store = useSheetStore();
@@ -169,18 +171,31 @@
         if (currentSheet.companyId !== -1 && currentSheet.pitId !== -1) {
             await getSandPlan(currentSheet);
             await getWorkorder(currentSheet);
-            await getDeposit(currentSheet);
+            await getDeposit();
             const cradleId = workOrder.value.operativeCradle;
             await getCradle(Number(cradleId));
             fillBoxes();
         }
     };
 
-    const finishCurrent = () => {
+    const finishCurrent = async () => {
         if (selectedStageId.value < 0) {
             return;
         }
-        console.log(selectedSandStage.value);
+        console.log(selectedQueue.value);
+        const toFreeBoxes = selectedQueue.value.filter((item: QueueItem) => item.status < 99);
+        const toFinishBoxes = selectedQueue.value
+            .filter((item: QueueItem) => item.status >= 99)
+            .map((item: QueueItem) => {
+                return {
+                    ...item,
+                    status: 100,
+                };
+            });
+        await updateAllQueueItems(toFinishBoxes);
+        await deleteAllQueueItems(toFreeBoxes);
+        await finishSandStage(selectedSandStage.value);
+        router.go(0);
     };
 
     watch(clientId, (newVal) => {
@@ -316,6 +331,19 @@
             return item;
         })
         .filter((item) => item.location?.where === 'warehouse');
+
+    const router = useRouter();
+    const saveQueue = (isFinished: boolean) => {
+        if (isFinished) {
+            // tomo el stage de sageID
+            // le pongo 2 para que este finalizado
+            // Modificamos el Stage para que este finalizado
+            finishCurrent();
+        }
+        // En cualquier caso cierro el acordeaon y recargo
+        selectedStageId.value = -1;
+        router.go(0);
+    };
 
     onMounted(async () => {
         await getSand();

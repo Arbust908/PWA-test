@@ -50,7 +50,6 @@
         <VTable :columns="columns" :pagination="pagination" :items="finishedQueue" empty-text="No tareas finalizadas">
             <template #item="{ item }">
                 <!-- Desktop -->
-                {{ item }}
                 <td :class="item?.sandOrder?.boxId ? null : 'empty'">
                     {{ item?.sandOrder?.boxId || 'Sin definir' }}
                 </td>
@@ -88,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-    import { QueueItem, SandOrder } from '@/interfaces/sandflow';
+    import { QueueItem, SandOrder, SandOrderBox } from '@/interfaces/sandflow';
     import Layout from '@/layouts/Main.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -104,7 +103,7 @@
         removeQueueItems,
     } from '@/helpers/useQueueItem';
     import { finishSandOrder, updateSandOrder } from '@/helpers/useSandOrder.service';
-    import { getCradle, getWorkOrders } from '@/helpers/useGetEntities';
+    import { getCradle, getWorkOrders, updateCradle } from '@/helpers/useGetEntities';
     import { Cradle } from '@/interfaces/sandflow';
 
     const clientId = ref(-1);
@@ -164,7 +163,9 @@
     const finishedQueue = ref([] as QueueItem[]);
 
     const filterNotDone = () => {
-        toDoQueue.value = queue.value.filter((item: QueueItem) => itemIsNotDone(item));
+        toDoQueue.value = queue.value
+            .filter((item: QueueItem) => itemIsNotDone(item))
+            .filter((item: QueueItem) => item.sandOrder);
         const hasNoDestinations = toDoQueue.value.filter(({ destination }: QueueItem) => !destination);
 
         if (hasNoDestinations.length) {
@@ -173,7 +174,9 @@
         }
     };
     const filterFinished = () => {
-        finishedQueue.value = queue.value.filter((item: QueueItem) => itemIsFinished(item));
+        finishedQueue.value = queue.value
+            .filter((item: QueueItem) => itemIsFinished(item))
+            .filter((item: QueueItem) => item.sandOrder);
     };
     const updateLists = () => {
         filterNotDone();
@@ -211,7 +214,7 @@
             const slot = availableSlots[i];
             const station = `Estación ${slot.station + 1}`;
 
-            if (slot) {
+            if (slot && item) {
                 item.destination = station;
             }
         }
@@ -221,14 +224,12 @@
     const commitTransition = async (item: QueueItem) => {
         const { sandOrder, origin, destination } = item;
 
-        if (sandOrder !== undefined) {
+        if (sandOrder === undefined) {
             return;
         }
-        const { location } = sandOrder;
+        const { location } = sandOrder as SandOrderBox;
 
-        console.log(JSON.parse(location));
-
-        if (JSON.parse(location)) {
+        if (typeof location === 'string') {
             sandOrder.location = JSON.parse(location);
         }
 
@@ -304,8 +305,10 @@
                         };
 
                         sandOrder.location = JSON.stringify(newLocation);
+                        currentCradle.value.slots[slot] = sandOrder as SandOrderBox;
 
                         await updateSandOrder(sandOrder);
+                        await updateCradle(currentCradle.value);
 
                         msg += 'Estación';
                         break;
