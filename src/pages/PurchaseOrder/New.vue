@@ -259,6 +259,8 @@
         PurchaseOrder,
         TransportProvider,
         TransportOrder,
+        Company,
+        Pit,
     } from '@/interfaces/sandflow';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
@@ -395,83 +397,36 @@
             ...defaultTransportOrder,
         },
     ]);
-
-    const removeTransportOrder = (id: number) => {
-        TransportOrders.value = TransportOrders.value.filter((order) => order.innerId !== id);
-    };
-
-    const addTransportOrder = () => {
-        const last = TransportOrders.value[TransportOrders.value.length - 1];
-        TransportOrders.value.push({ ...defaultTransportOrder, innerId: last.innerId + 1 });
-    };
-
-    const addSandProvider = () => {
-        const lastSPIndex = sandProvidersIds.value.length - 1;
-        const lastSP = sandProvidersIds.value[lastSPIndex];
-        const lastIndex = lastSP.innerId;
-        const newInnerId = lastIndex >= 0 ? lastIndex + 1 : 0;
-        sandProvidersIds.value.push({
-            innerId: newInnerId,
-            id: -1,
-            sandOrders: [
-                {
-                    id: 0,
-                    sandTypeId: -1,
-                    amount: null,
-                    boxId: '',
-                },
-            ],
-        });
-    };
-
-    const removeSandProvider = (providerId: number) => {
-        sandProvidersIds.value = sandProvidersIds.value.filter((sandProvider: SandProvider) => {
-            return sandProvider.innerId !== providerId;
-        });
-    };
-
     const sandProviders = ref([] as Array<SandProvider>);
     const { data: sandProvidersData } = useAxios('/sandProvider', instance);
-    watch(sandProvidersData, (sPData, prevCount) => {
+    watch(sandProvidersData, (sPData) => {
         if (sPData && sPData.data) {
             sandProviders.value = sPData.data;
         }
     });
-    const companyClientId: Ref<number> = ref(-1);
-    const pitId: Ref<number> = ref(-1);
-    // >> Proveedores de Sand
-    // :: Ordenes de Sand
-    const sandOrder: Ref<Array<any>> = ref([
-        {
-            id: 0,
-            sandTypeId: -1,
-            amount: null,
-            boxId: '',
-        },
-    ]);
-    // :: Ordenes de Sand
-    const sandOrders = ref([] as Array<SandOrder>);
+    const companyClientId = ref(-1);
+    const pitId = ref(-1);
 
     const sandTypes = ref([] as Array<Sand>);
     const { data: sandTypesData } = useAxios('/sand', instance);
     const useFirstST = ref(false);
 
-    watch(sandTypesData, (sOData, prevCount) => {
+    watch(sandTypesData, (sOData) => {
         if (sOData && sOData.data) {
             sandTypes.value = sOData.data;
         }
     });
     const soLength = ref(0);
 
-    const removeOrder = (id: number, providerOrderId): void => {
-        const currentSPI = sandProvidersIds.value.find((spi) => spi.innerId === providerOrderId);
+    const removeOrder = (id: number, providerOrderId: number): void => {
+        const currentSPI = sandProvidersIds.value.find((spi: any) => spi.innerId === providerOrderId);
         currentSPI.sandOrders = currentSPI.sandOrders.filter((order) => order.id !== id);
         soLength.value -= 1;
         TransportOrders.value[0].boxAmount = soLength.value;
     };
 
     const addOrder = (providerOrderId: number): void => {
-        const currentSPI = sandProvidersIds.value.find((spi) => spi.innerId === providerOrderId);
+        const currentSPI = sandProvidersIds.value.find((spi: any) => spi.innerId === providerOrderId);
         const sandOrder = currentSPI.sandOrders;
         const lastSandOrder = sandOrder[sandOrder.length - 1];
         const newId = lastSandOrder.id + 1;
@@ -488,27 +443,19 @@
     const useFirstSQ = ref(false);
 
     // :: TransportProvider
-    const transportProviders = ref([]);
+    const transportProviders = ref([] as TransportProvider[]);
     const { data: tPData } = useAxios('/transportProvider', instance);
-    watch(tPData, (tPData, prevCount) => {
-        if (tPData && tPData.data) {
-            transportProviders.value = tPData.data;
+    watch(tPData, (newData) => {
+        if (newData && newData.data) {
+            transportProviders.value = newData.data;
         }
     });
-    const transportProviderId: Ref<number> = ref(-1);
-    const transportProvider: TransportProvider = reactive({
-        id: 1,
-        name: '',
-        transportId: '',
-        boxQuantity: null,
-        observation: '',
-        amount: null,
-    });
+    const transportProviderId = ref(-1);
     // >> TransportProvider
     const useFirstTP = ref(false);
     const useFirstDriver = ref(false);
 
-    const isFull: ComputedRef<boolean> = computed(() => {
+    const isFull = computed(() => {
         const hasPit = pitId.value >= 0;
         const hasClient = companyClientId.value >= 0;
         const validSandProviderIds =
@@ -536,7 +483,7 @@
 
         return !!(hasPit && hasClient && validSandProviderIds && validSandOrders && hasTransport && hasTransportOrders);
     });
-    const po = ref(null);
+    const po = ref({} as PurchaseOrder);
     const confirm = () => {
         const sp = sandProviders.value.find((sandP) => {
             return sandP.id === sandProvidersIds.value[0].id;
@@ -602,14 +549,14 @@
     };
 
     const purchaseId = ref(0);
-    const companies = ref([]);
+    const companies = ref([] as Company[]);
     const { data: companiesData } = useAxios('/company', instance);
     watch(companiesData, (companiesIfno) => {
         if (companiesIfno && companiesIfno.data) {
             companies.value = companiesIfno.data;
         }
     });
-    const pits = ref([]);
+    const pits = ref([] as Pit[]);
     const { data: pitsData } = useAxios('/pit', instance);
     watch(pitsData, (pitsInfo) => {
         if (pitsInfo && pitsInfo.data) {
@@ -630,13 +577,15 @@
     const save = async (sendEmails = false) => {
         if (isFull.value) {
             savingOrder.value = true;
-
             // Formateamos la orden de pedido
-            const purchaseOrder = _formatPO();
+            const purchaseOrder: any = _formatPO();
+            console.log(purchaseOrder);
             // get last id
             const lastId = await getLastId();
-            pdfInfo.value = purchaseOrder;
-            pdfInfo.value.purchaseOrder.id = lastId;
+            let newPdfInfo: any = pdfInfo.value;
+            newPdfInfo = purchaseOrder;
+            console.log(newPdfInfo);
+            // newPdfInfo.purchaseOrder.id = lastId;
 
             purchaseOrder.sendEmails = sendEmails;
 
@@ -654,7 +603,7 @@
 
             savingOrder.value = false;
 
-            if (result.status === 200) {
+            if (result?.status === 200) {
                 const poId = result.data.data.id;
                 purchaseId.value = poId;
                 titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;

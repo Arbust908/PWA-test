@@ -18,7 +18,7 @@
                     :name="`boxId-${box.id}`"
                     :readonly="hadId"
                     type="text"
-                    placeholder="Ej: S-0908"
+                    placeholder="Ej: 08"
                     class="input"
                     @blur="boxy.boxId = $event.target.value"
                 />

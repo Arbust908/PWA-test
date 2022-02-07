@@ -32,9 +32,6 @@ export const filterEmptyQueueBox = (queueBox: any) => {
 };
 
 export const filterJustToAddBox = (queueBox: any) => {
-    console.log('queueBox', queueBox);
-    console.log('queueBox', queueBox.toAdd);
-
     return queueBox.toAdd;
 };
 

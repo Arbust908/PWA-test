@@ -290,14 +290,12 @@
 
     const boxesInWarehouse = await getSandOrders();
     const fillBoxes = () => {
-        console.log(boxesInWarehouse);
-
         return boxesInWarehouse
             .filter((boxy: SandOrder) => boxy.location)
             .map((boxy: SandOrder) => {
                 const { location } = boxy;
 
-                if (typeof location === 'string') {
+                if (location && typeof location === 'string') {
                     boxy.location = JSON.parse(location);
                 }
 
@@ -314,7 +312,11 @@
         return [];
     });
 
+    /**
+     * EStas son las Queue Items que queremos mostrar en la listita
+     */
     queueBoxes.value = await getQueueItems();
+    console.log('queueBoxes', queueBoxes.value);
     queueBoxes.value = queueBoxes.value
         ?.filter((item) => item.sandOrder)
         .map((item) => {
@@ -323,8 +325,6 @@
 
             if (sandOrder) {
                 location = sandOrder.location;
-            } else {
-                // console.log('No tenemos Location');
             }
 
             if (location && JSON.parse(location)) {
@@ -332,8 +332,11 @@
             }
 
             return item;
-        })
-        .filter((item) => item.location?.where === 'warehouse');
+        });
+    // .filter((item) => item.location?.where === 'warehouse');
+    console.log('queueBoxes', queueBoxes.value);
+    queueBoxes.value = queueBoxes.value.filter((item) => item.status <= 100);
+    console.log('queueBoxes', queueBoxes.value);
 
     const router = useRouter();
     const saveQueue = (isFinished: boolean) => {
@@ -350,6 +353,17 @@
 
     onMounted(async () => {
         await getSand();
+    });
+    onUnmounted(() => {
+        clientId.value = -1;
+        pitId.value = -1;
+        currentWarehouse.value = {} as Warehouse;
+        queueBoxes.value = [];
+        selectedSandStage.value = {} as SandStage;
+        selectedStageId.value = -1;
+        stages.value = [];
+        workOrder.value = {} as WorkOrder;
+        ultimateBoxes.value = [];
     });
 </script>
 

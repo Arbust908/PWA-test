@@ -22,7 +22,7 @@ export const updateSandOrder = async (order: SandOrder | SandOrderBox) => {
 };
 
 export const finishSandOrder = async (order: SandOrder | SandOrderBox) => {
-    order.status = 99;
+    order.status = 100;
 
     return updateSandOrder(order);
 };

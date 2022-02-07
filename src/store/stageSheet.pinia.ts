@@ -39,9 +39,6 @@ export const useSheetStore = defineStore('stageSheet', () => {
     });
     const getPitBoxesByFloor = computed(() => {
         console.log('🍍');
-        console.log('getPitBoxesByFloor');
-        console.log(ultimateBoxes.value);
-        console.log(boxesByFloor(ultimateBoxes.value, true));
 
         return boxesByFloor(ultimateBoxes.value, true);
     });

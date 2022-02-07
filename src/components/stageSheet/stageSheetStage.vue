@@ -48,14 +48,14 @@
                     :class="[
                         isSelectedBox(place) ? 'selected' : null,
                         box?.boxId ? `mesh-type__${box?.sandTypeId} filled boxCard relative group` : 'not-filled',
-                        box?.isDone ? 'done' : null,
+                        box?.status === 99 ? 'done' : null,
                     ]"
                     class="stage--box"
                     :order="box.order"
                     @click="box?.boxId ? activeDelete(box) : fillBox(place, $event)"
                 >
                     <button
-                        v-if="box?.boxId"
+                        v-if="box?.boxId && box?.status !== 99"
                         class="w-6 h-6 absolute top-0 right-0 -mt-2 -mr-2 bg-white rounded-full shadow-sm group-hover:bg-red-400 group-hover:text-red-50 transition duration-150 ease-out"
                     >
                         <TheAllIcon icon="XCircle" type="outline" />
@@ -181,19 +181,7 @@
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full', 'saved-queue']);
     const sheetStore = useSheetStore();
-    const {
-        clientId,
-        pitId,
-        currentWarehouse,
-        queueBoxes,
-        workOrder,
-        currentCradle,
-        sands: allSands,
-        getPitBoxes,
-        getPitBoxesByFloor,
-        selectedSandStage,
-    } = storeToRefs(sheetStore);
-    // const { setTab, isTabSelected, setCradle, setWorkOrder } = sheetStore;
+    const { pitId, queueBoxes, sands: allSands, getPitBoxes, getPitBoxesByFloor } = storeToRefs(sheetStore);
     /**
      * isActive Marca si es un stage que esta "activo" y por ende muestra el porsentaje
      * isSelectedStage Marca si el stage esta seleccionado y por ende el que muestra los detalles
@@ -227,13 +215,57 @@
      * y los mutamos para que tengan la info de la caja (boxId, peso y tipo de arena)
      */
     const fillQueueBoxes = async () => {
-        const sheetItems = sheetGridItems(queueBoxes.value as Array<QueueItem>);
-        boxQueue.value = sheetItems
-            .map(extractOrderInfo)
-            .sort((a: any, b: any) => {
-                return a.order - b.order;
-            })
-            .filter((item) => item.pitId === pitId.value) as Array<any>;
+        const sheetItems = getPitBoxes.value;
+        console.log('sheetItems', sheetItems);
+        const { deTransporte, aCradle } = separateQueues(sheetItems);
+        const newItemList = [...deTransporte, ...aCradle];
+        /**
+         * Lo que quiero son las tareas que mueven Cajas
+         *  1 - Del depo al Cradle
+         *  2 - Del Transporte al Cradle
+         * quiero filtar para que solo me queden las que cumplen con eso
+         * sacando las que van del tranporte al deposito
+         */
+        console.log('newItemList', newItemList);
+        boxQueue.value = newItemList.filter((item) => {
+            const { origin, destination } = item;
+            console.groupCollapsed(`${origin} => ${destination}`);
+            const baseOrigin = origin.split(' ')[0];
+            const baseDestination = destination.split(' ')[0];
+            console.log(baseOrigin);
+            console.log(baseDestination);
+
+            // Si viene del camion
+            if (baseOrigin === 'Camion') {
+                console.log('Vengo del camion');
+                const destinationArray = destination.split(' ');
+
+                // Si tiene 3 de length va al depo por enden no las quiero
+                if (destinationArray.length === 3) {
+                    console.log('voy al depo');
+                    console.groupEnd();
+
+                    return false;
+                }
+                console.log('voy al cradle');
+                console.groupEnd();
+
+                return true;
+            } else if (baseDestination === 'Estación') {
+                console.log('voy al cradle');
+                console.groupEnd();
+
+                return true;
+            } else {
+                console.log('No entro');
+                console.groupEnd();
+
+                return false;
+            }
+        });
+
+        boxQueue.value = boxQueue.value.map(extractOrderInfo);
+        console.log(boxQueue.value);
 
         if (boxQueue.value.length < 14) {
             const queueNum = boxQueue.value.length;
@@ -309,10 +341,26 @@
         popUpCords.x = event.clientX;
         popUpCords.y = event.clientY;
     };
-    const activeDelete = async (place: any) => {
+    const activeDelete = async (place: QueueItem | SandOrder | number) => {
         console.log('activeDelete', place);
-        await deleteQueueItem(place.id);
-        await fillQueueBoxes();
+
+        if (typeof place === 'number') {
+            return;
+        } else if ('queueItems' in place) {
+            // Soy SandOrder
+            // Simplemente lo elimino de la cola
+            boxQueue.value = boxQueue.value.filter((item: any) => {
+                return (item?.queueItems && item.id !== place.id) || typeof item === 'number';
+            });
+        } else {
+            // Soy QueueItem
+            // Lo elimino de la cola
+            place.id && (await deleteQueueItem(place.id));
+            boxQueue.value = boxQueue.value.filter((item: any) => {
+                return (!item?.queueItems && item.id !== place.id) || typeof item === 'number';
+            });
+        }
+        // await fillQueueBoxes();
     };
 
     const selectedFloor = ref(1);
@@ -340,7 +388,6 @@
             return typeof item !== 'number';
         });
         const usedQueueIds = queueNoNumbers.map((box) => {
-            console.log('Cajas en lista', box);
             const { boxId } = box as SandOrderBox;
 
             return boxId;
@@ -356,6 +403,8 @@
         id: number;
     }
     const queueDetail = computed(() => {
+        console.log('Las cajas en la cola 🍑', boxQueue.value);
+
         return boxQueue.value.reduce((acc, item) => {
             if (typeof item === 'number') {
                 return acc;

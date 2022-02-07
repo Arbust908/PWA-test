@@ -162,11 +162,9 @@
         :po-id="purchaseId"
         :po="po"
         :plates="filteredPlates"
+        :loading="savingOrder"
         @close="showModal = false"
-        @confirm="
-            save();
-            showModal = false;
-        "
+        @confirm="save"
     />
 
     <SuccessModal
@@ -257,6 +255,7 @@
 
     const drivers = ref([]);
     const driverId = ref(-1);
+    const savingOrder = ref(false);
 
     const filteredPlates = computed(() => {
         if (driverId.value > -1) {
@@ -375,21 +374,24 @@
     const _saveSO = (poId: number) => {
         const sandOrderToDo = props.selectedBoxes.map((box: any) => {
             // Finalizamos la orden de pedido
-            const oldBox = box;
+            const oldBox = { ...box };
             oldBox.status = 100;
 
             if (oldBox && oldBox.location && typeof oldBox.location !== 'string') {
                 oldBox.location = JSON.stringify(oldBox.location);
             }
             useAxios(`/sandOrder/${oldBox.id}`, { method: 'PUT', data: oldBox }, instance);
-            const { id, ...newSO } = box;
+            const { id, location, ...newSO } = box;
             newSO.purchaseOrderId = poId;
             newSO.sandProviderId = box.sandProviderId;
+            newSO.status = 0;
+
+            console.log(newSO);
 
             // Creamos la nueva
-            if (newSO && newSO.location && typeof newSO.location !== 'string') {
-                newSO.location = JSON.stringify(newSO.location);
-            }
+            // if (newSO && newSO.location && typeof newSO.location !== 'string') {
+            //     newSO.location = JSON.stringify({});
+            // }
 
             return axios
                 .post(`${api}/sandOrder/`, newSO)
@@ -458,17 +460,47 @@
     /**
      *
      */
-    const save = async (): Promise<void> => {
+    const save = async (sendEmails = false): Promise<void> => {
+        savingOrder.value = true;
         const order = ref(null);
         // Formateamos la orden de pedido
-        const purchaseOrder = _formatPO();
-
+        const purchaseOrder: any = _formatPO();
         // get last id
         const lastId = await getLastId();
-        purchaseId.value = lastId;
-        // pdfInfo.value = purchaseOrder;
-        // pdfInfo.value.purchaseOrder.id = lastId;
+        let newPdfInfo: any = pdfInfo.value;
+        newPdfInfo = purchaseOrder;
+        // newPdfInfo.purchaseOrder.id = lastId;
 
+        purchaseOrder.sendEmails = sendEmails;
+
+        if (sendEmails) {
+            // solo si se envian mails se envia el content del pdf
+            const pdfContent = await pdf.value?.getFileContent();
+            purchaseOrder.pdfContent = pdfContent;
+        }
+        // Creamos via API la orden de pedido
+        const result = await axios.post(`${api}/purchaseOrder`, purchaseOrder).catch((err) => {
+            showModal.value = false;
+            // openErrorGral.value = true;
+        });
+        savingOrder.value = false;
+
+        if (result?.status === 200) {
+            const poId = result.data.data.id;
+            purchaseId.value = poId;
+            titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
+            showModal.value = false;
+            openSuccess.value = true;
+            _saveTO(poId);
+            const newSO = await _saveSO(poId);
+            //
+            purchaseOrder.purchaseOrderId = poId;
+            purchaseOrder.plates = filteredPlates.value[0];
+            purchaseOrder.sandOrders = newSO;
+            emit('updateQueueItem', purchaseOrder);
+        }
+
+        /*
         // deberia tener el resultado HTML del pdf
         const pdfContent = await pdf.value?.getFileContent();
         const orderToCreate = purchaseOrder as any;
@@ -504,11 +536,12 @@
             showModal.value = false;
             openSuccess.value = true;
         }
+        */
 
-        orderToCreate.purchaseOrderId = poId;
-        orderToCreate.plates = filteredPlates.value[0];
-        orderToCreate.sandOrders = newSO;
-        emit('updateQueueItem', orderToCreate);
+        // orderToCreate.purchaseOrderId = poId;
+        // orderToCreate.plates = filteredPlates.value[0];
+        // orderToCreate.sandOrders = newSO;
+        // emit('updateQueueItem', orderToCreate);
     };
     // >> Success y Error Modal
     const openSuccess = ref(false);

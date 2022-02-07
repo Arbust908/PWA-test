@@ -71,7 +71,7 @@
         <SuccessModal
             :open="openSuccess"
             title="¡Perfecto!"
-            text="Enviamos la orden de trabajo correspondiente."
+            text="Las cajas ya tienen destino y estan listas para mover."
             @main="closeModalAndReset()"
         />
     </Layout>

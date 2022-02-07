@@ -142,12 +142,6 @@
     const row = ref(0);
     const col = ref(0);
 
-    onMounted(async () => {
-        const result = await axios.get(`${apiUrl}/workOrder`);
-        workOrders.value = result.data.data;
-        console.log(workOrders.value);
-    });
-
     watch(pitId, async (newVal) => {
         const pad = workOrders.value.find((workOrder) => workOrder.pits.find((pit) => pit.id === newVal))?.id;
 
@@ -300,6 +294,9 @@
 
     // Esto queda como ultimo por consejo Experto
     onMounted(async () => {
+        const result = await axios.get(`${apiUrl}/workOrder`);
+        workOrders.value = result.data.data;
+        console.log(workOrders.value);
         // Cuando monta buscamos las Cajas y les formateamos el location
         sandOrders.value = await getSandOrders();
         sandOrders.value = sandOrders.value.filter((box: SandOrder) => box.location).map(formatBoxLocation);
