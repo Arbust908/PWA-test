@@ -25,7 +25,6 @@
             <div class="col-span-12 md:col-span-5 xl:col-span-4">
                 <PadSelector
                     v-model:woId="woId"
-                    v-model:work-orders="workOrders"
                     shared-classes="col-span-12"
                     is-optional
                     :is-disabled="disabledPad"
@@ -147,7 +146,7 @@
             :show-modal="showModal"
             :sand-plans="endingSandPlanPits"
             @close="showModal = false"
-            @confirm="openSuccess = true"
+            @confirm="closeTheOperation"
         />
         <!-- QUe hacemos con estos modales? -->
         <SuccessModal
@@ -188,10 +187,10 @@
     import SuccessModal from '@/components/modal/SuccessModal.vue';
     import CloseOperationModal from '@/components/closeOfOperation/CloseOperationModal.vue';
     import ErrorModal from '@/components/modal/ErrorModal.vue';
-    import { Pit, SandPlan, WorkOrder } from '@/interfaces/sandflow';
+    import { Pit, SandPlan, SandStage, WorkOrder } from '@/interfaces/sandflow';
 
     import CloseOperationTable from '@/components/closeOfOperation/CloseOperationTable.vue';
-    import { getSandPlan } from '@/helpers/useGetEntities';
+    import { getSandPlan, getWorkOrders, updateStage, updateWorkOrder } from '@/helpers/useGetEntities';
 
     const api = import.meta.env.VITE_API_URL || '/api';
     useTitle('Cierre de operaciones <> Sandflow');
@@ -217,6 +216,9 @@
 
     const filteredSandPlans = computed(() => {
         const sandPlansToShow = ref(sandPlans.value);
+        sandPlansToShow.value = sandPlansToShow.value.filter((sandPlan) => {
+            return sandPlan.stages?.every((stage: SandStage) => stage && stage?.status < 2);
+        });
 
         if (clientId.value !== -1) {
             sandPlansToShow.value = sandPlansToShow.value.filter(
@@ -323,6 +325,11 @@
         if (sandPlan.stages.length > 0) {
             const currentStageFull = sandPlan.stages.find((stage: any) => stage.status === 0);
 
+            if (!currentStageFull) {
+                return 0;
+            }
+            console.log(currentStageFull);
+
             return (
                 currentStageFull.quantity1 +
                 currentStageFull.quantity2 +
@@ -334,8 +341,59 @@
         return 0;
     };
 
+    const closeTheOperation = async () => {
+        console.log('----------------');
+        console.log(endingSandPlanPits.value);
+        console.log(workOrders.value);
+        // Hay que recorrer todos e ir finalizarlos
+        // Finalizarlo significa...
+        // Cerrar las etapas. Status 100
+        // Buscar la orden de trabajo
+        // inhabilitar la workOrder y ponerle status 100
+        // tambien de la workOrder "liberar" los cradle y forklifts que seian ponerlos como strings vacios
+        const operationsToClose = endingSandPlanPits.value.map((sandPlan: SandPlan) => {
+            const stagesToEnd = sandPlan?.stages?.map((stage: SandStage) => {
+                console.log(stage);
+                stage.status = 2;
+                stage.visible = false;
+                console.log(stage);
+
+                return updateStage(stage);
+            });
+            const getWorkOrderId = sandPlan?.pit?.workOrderId;
+            const thisWorkOrder = workOrders.value.find((wo: WorkOrder) => wo.id === getWorkOrderId);
+
+            if (thisWorkOrder) {
+                thisWorkOrder.visible = false;
+                thisWorkOrder.operativeCradle = '';
+                thisWorkOrder.operativeForklift = '';
+                thisWorkOrder.backupCradle = '';
+                thisWorkOrder.backupForklift = '';
+            }
+            console.log(thisWorkOrder);
+            console.log(stagesToEnd);
+            console.log(getWorkOrderId);
+            const woProcess = updateWorkOrder(thisWorkOrder as WorkOrder);
+
+            if (stagesToEnd) {
+                return Promise.all(stagesToEnd).then(() => {
+                    console.log('Termino');
+                });
+            }
+            Promise.all([woProcess]).then(() => {
+                console.log('Termino');
+            });
+
+            return;
+        });
+        console.log('----------------');
+
+        openSuccess.value = true;
+    };
+
     onMounted(async () => {
-        sandPlans.value = await getSandPlan();
+        sandPlans.value = (await getSandPlan()) as SandPlan[];
+        workOrders.value = (await getWorkOrders()) as WorkOrder[];
     });
 </script>
 

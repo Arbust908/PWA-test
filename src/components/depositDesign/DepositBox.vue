@@ -219,8 +219,6 @@
 
     const isBlocked = () => {
         if (isDesign.value) {
-            console.log('isDesign');
-
             return false;
         }
 

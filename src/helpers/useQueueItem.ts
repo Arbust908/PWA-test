@@ -58,7 +58,7 @@ const getOrderNumber = (queueNumbers: Array<number>, { min, max }: any) => {
 
 export const separateQueues = (queue: Array<QueueItem>): SteppedQueue => {
     const steppedQueue = queue
-        .filter(({ status }) => status !== 99)
+        // .filter(({ status }) => status !== 99)
         .sort((a, b) => b.order - a.order)
         .reduce(
             (acc, queueItem) => {
@@ -193,8 +193,12 @@ export const orderDesc = (itemA: QueueItem, itemB: QueueItem) => {
 };
 
 export const sheetGridItems = (queueBoxes: Array<QueueItem>) => {
+    console.log('🍄', queueBoxes);
     const { deTransporte, aCradle } = separateQueues(queueBoxes);
+    console.log('🍄', deTransporte, aCradle);
+
     const newItemList = [...deTransporte, ...aCradle];
+    console.log('🍄', newItemList);
 
     return newItemList.filter((item) => {
         const { origin, destination } = item;

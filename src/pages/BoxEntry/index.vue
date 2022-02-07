@@ -293,6 +293,7 @@
                     selectedPurchaseOrder.value = filteredPurchaseOrders.value[purchaseOrderIndex];
 
                     boxes.value = filteredPurchaseOrders.value[purchaseOrderIndex].sandOrders;
+                    console.log('boxes', boxes.value);
                 } else {
                     boxes.value = [];
                 }
@@ -301,6 +302,7 @@
                     let sandType = sandTypes.find((type) => parseInt(type.id) == parseInt(box.sandTypeId));
                     box.category = sandType.type.toLowerCase();
                 });
+                console.log('boxes', boxes.value);
 
                 warehouse.value = await warehouses.value.filter((singleWarehouse) => {
                     if (
@@ -321,6 +323,7 @@
                     floor.value = fFloor;
                     row.value = fRow;
                     inDepoBoxes.value = getInDepoBoxes(sandOrders.value, warehouse.value.id);
+                    console.log('inDepoBoxes', inDepoBoxes.value);
                 }
             }
         }
@@ -390,9 +393,44 @@
 
         // Si clickea en un pasillo no hace nada. Sumo Cradle
         // Tampoco deberia poder clickear en un pasillo
-        if (box.category == 'aisle' || box.category == 'cradle') {
+        const notAllowedCats = ['aisle', 'cradle', 'empty'];
+
+        if (notAllowedCats.includes(box.category)) {
+            console.log('notAllowedCats', notAllowedCats);
+
             return;
         }
+
+        const coordsOverlap = boxes.value.some((boxInOrder: any) => {
+            const isTheSameBox = boxInOrder.id === box.id;
+            const boxInOrderHasCoords = !!(boxInOrder?.floor && boxInOrder?.row && boxInOrder?.col);
+            const choosedBoxHasCoords = !!(box.floor && box.row && box.col);
+            const isTheSameFloor = boxInOrder?.floor === box.floor;
+            const isTheSameRow = boxInOrder?.row === box.row;
+            const isTheSameCol = boxInOrder?.col === box.col;
+            /**
+             * Si la caja que clickee (box) coincide con alguna coordenada de una caja en la orden (boxInOrder)
+             * no deberia pasar
+             */
+
+            return (
+                !isTheSameBox &&
+                boxInOrderHasCoords &&
+                choosedBoxHasCoords &&
+                isTheSameFloor &&
+                isTheSameRow &&
+                isTheSameCol
+            );
+        });
+
+        if (coordsOverlap) {
+            console.log('Se pisan');
+
+            return;
+        }
+        console.log('selectBox', box);
+        console.log('All the boxes', boxes.value);
+        console.log('choosedBox', choosedBox.value);
 
         const compareBox = JSON.stringify(choosedBox.value);
         const compareDefaultBox = JSON.stringify(defaultBox);
@@ -503,13 +541,22 @@
             newQI.pitId = pitId.value;
             newQI.sandOrderId = box?.id as number;
             newQI.order = orderQI;
-            console.log(newQI);
-
             queueItemsToMake.push(newQI);
         });
-        console.log('ToMake', queueItemsToMake);
+        console.log('queueItemsToMake', queueItemsToMake);
+        const createItems = queueItemsToMake
+            .filter((item) => item.origin)
+            .filter((item) => item.destination)
+            .filter((item, key, allItems) => {
+                const { sandOrderId } = item;
+                const isTheSame = allItems.findIndex((otherItem) => otherItem.sandOrderId === sandOrderId) === key;
 
-        await createAllQueueItems(queueItemsToMake);
+                return isTheSame;
+            });
+
+        console.log('createItems', createItems);
+
+        await createAllQueueItems(createItems);
 
         if (cradleId !== 0) {
             wasCradleModificated.value = true;
@@ -557,11 +604,7 @@
 
         toggleLoading(false);
 
-        console.info('Depo Guardado', warehouseDone.value);
-        console.warn('Se modifico Cradle?', wasCradleModificated.value);
         console.error(wasCradleModificated.value == false);
-        console.info('Crdl Guardado', cradleDone.value);
-        console.warn('Se modifico Depo?', wasWarehouseModificated.value);
         console.error(wasWarehouseModificated.value == false);
 
         if (warehouseDone.value && cradleDone.value) {

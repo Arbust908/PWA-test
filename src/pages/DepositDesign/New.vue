@@ -141,7 +141,6 @@
                 baseURL: apiUrl,
             });
             const woId = ref(-1);
-            const workOrders = ref([]);
 
             const sandTypes = ref([]);
             const sandName = computed(() => {
@@ -150,8 +149,6 @@
                     selectedBox.value.category != 'aisle' &&
                     selectedBox.value.category != 'cradle'
                 ) {
-                    console.log(sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type);
-
                     return sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type;
                 }
             });
@@ -322,7 +319,6 @@
                 id: '',
             });
             const selectBox = (box: Box) => {
-                console.log(box);
                 selectedBox.value = box;
             };
 

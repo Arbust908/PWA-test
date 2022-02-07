@@ -93,11 +93,11 @@
         return props.selectedBox.boxId === boxId;
     };
 
-    const beforeEnter = (el) => {
-        el.style.opacity = 0;
+    const beforeEnter = (el: HTMLElement) => {
+        el.style.opacity = '0';
         el.style.transform = 'scaleY(50%)';
     };
-    const enter = (el, done) => {
+    const enter = (el: HTMLElement, done) => {
         const staggerIndex = el.dataset.staggerIndex;
         gsap.to(el, {
             opacity: 1,

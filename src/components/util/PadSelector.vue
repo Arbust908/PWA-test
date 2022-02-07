@@ -94,11 +94,9 @@
 
     onMounted(async () => {
         const result = await axios.get(`${api}/workOrder`);
-        console.log(result.data.data);
         setTimeout(() => {
             allWorkOrders.value = result.data.data;
         }, 1000);
-        console.log(allWorkOrders.value);
     });
 </script>
 

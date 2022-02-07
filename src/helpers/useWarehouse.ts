@@ -169,7 +169,10 @@ export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
 
 export const searchInDepoBoxes = async (depoId: number) => {
     let allBoxes = await getSandOrders();
-    allBoxes = allBoxes.filter((box: SandOrder) => box.location).map(formatBoxLocation);
+    allBoxes = allBoxes
+        .filter((box: SandOrder) => box.status <= 99)
+        .filter((box: SandOrder) => box.location && box.location !== null)
+        .map(formatBoxLocation);
 
     return getInDepoBoxes(allBoxes, depoId);
 };
@@ -183,7 +186,11 @@ export const getSandOrders = async (): Promise<SandOrder[]> => {
         .catch((err) => console.error(err));
 };
 export const formatBoxLocation = (box: SandOrder): SandOrderBox => {
+    console.log('formatBoxLocation', box);
     const { location } = box;
+
+    console.log('location :I', location);
+
     box.location = JSON.parse(location);
     box.row = box.location.row;
     box.col = box.location.col;

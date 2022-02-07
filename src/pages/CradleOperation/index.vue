@@ -1,8 +1,6 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row items-center md:mb-4">
-            <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Operación en cradle</h1>
-        </header>
+        <ABMFormTitle title="Operación en cradle" />
         <section class="bg-second-0 rounded-md shadow-sm">
             <form method="POST" action="/" class="p-12 flex flex-col gap-4">
                 <FieldGroup class="grid grid-cols-12 gap-4 max-w-4xl">
@@ -69,37 +67,35 @@
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
 
-    import { Company, Pit, QueueItem, SandOrder } from '@/interfaces/sandflow';
+    import { Company, Cradle, Pit, QueueItem, Sand, SandOrder, WorkOrder } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import CradleSlot from '@/components/Cradle/cradleSlot.vue';
 
     import axios from 'axios';
-    import ControlCardVue from '@/components/panel/ControlCard.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import { getCradle, getCradles, getSand, getSandOrders, getWorkOrders } from '@/helpers/useGetEntities';
+    import { createQueueItem } from '@/helpers/useQueueItem';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     useTitle('Operación en cradle <> Sandflow');
 
-    const workOrders = ref([]);
-    const clients = ref([] as Array<Company>);
-    const pits = ref([] as Array<Pit>);
-    const clientId = ref(-1);
-    const pitId = ref(-1);
-    const cradles = ref([]);
-    const cradleId = ref(-1);
-    const filteredCradles = ref([]);
-    const cradleSlots = ref([{}, {}, {}, {}]);
-    const modalMessage = ref('');
-    const modalButtonText = ref('');
-    const isModalVisible = ref(false);
-    const selectedCradle = ref({});
-    const sandTypes = ref([]);
     const ModalText = 'La solicitud de retiro de cajas fue enviada con éxito';
-    const selectedSlots = ref([]);
-    const sandOrdersOriginal = ref([]);
-    const selectedSandOrders = ref([]);
+    const clientId = ref(-1);
+    const cradleId = ref(-1);
+    const cradleSlots = ref([{}, {}, {}, {}] as any[]);
+    const cradles = ref([] as Cradle[]);
+    const filteredCradles = ref([] as Cradle[]);
+    const isModalVisible = ref(false);
+    const pitId = ref(-1);
+    const sandOrdersOriginal = ref([] as SandOrder[]);
+    const sandTypes = ref([] as Sand[]);
+    const selectedCradle = ref({} as Cradle);
+    const selectedSandOrders = ref([] as SandOrder[]);
+    const selectedSlots = ref([] as any[]);
+    const workOrders = ref([] as WorkOrder[]);
 
     const changeCradleSlotStatus = async (slotIndex: number, newStatus: string) => {
         await axios
@@ -112,7 +108,7 @@
     const getSelectedSandOrder = (slot: any) => {
         const findSandOrderOriginalId = sandOrdersOriginal.value.find(
             (sandOrderOriginal) => sandOrderOriginal.id === slot.id
-        ).id;
+        )?.id;
 
         if (!selectedSandOrders.value.some((sandOrder) => sandOrder.id === findSandOrderOriginalId)) {
             selectedSandOrders.value.push(
@@ -152,40 +148,15 @@
         return (isModalVisible.value = !isModalVisible.value);
     };
 
-    const getWorkOrders = async () => {
-        await axios
-            .get(`${apiUrl}/workOrder`)
-            .then((res) => {
-                workOrders.value = res.data.data;
-            })
-            .catch((err) => console.error(err));
-    };
-
-    const getCradles = async () => {
-        await axios
-            .get(`${apiUrl}/cradle`)
-            .then((res) => {
-                cradles.value = res.data.data;
-            })
-            .catch((err) => console.error(err));
-    };
-
-    const getSandTypes = async () => {
-        await axios
-            .get(`${apiUrl}/sand`)
-            .then((res) => {
-                sandTypes.value = res.data.data;
-            })
-            .catch((err) => {
-                console.error(err);
-            });
-    };
-
     const getFilteredCradles = () => {
-        let cradlesToFilter = [];
+        let cradlesToFilter = [] as string[];
 
-        workOrders.value.forEach((workOrder) => {
+        workOrders.value.forEach((workOrder: WorkOrder) => {
             workOrder.pits.forEach((pit) => {
+                if (typeof pit === 'number') {
+                    return;
+                }
+
                 if (pit.id == pitId.value) {
                     if (workOrder.operativeCradle !== '-1') {
                         cradlesToFilter.push(workOrder.operativeCradle);
@@ -289,23 +260,11 @@
         isLoading.value = false;
     };
 
-    const createQueueItem = async (queueItem: QueueItem) => {
-        await axios
-            .post(`${apiUrl}/queueItem/`, queueItem)
-            .then((response) => {
-                if (response.request.status == 200) {
-                    console.log(queueItem, 'se guardo bien');
-                }
-            })
-            .catch((err) => console.error(err));
-    };
-
     onMounted(async () => {
-        const result = await axios.get(`${apiUrl}/sandOrder`);
-        sandOrdersOriginal.value = result.data.data;
-        await getWorkOrders();
-        await getCradles();
-        await getSandTypes();
+        sandOrdersOriginal.value = (await getSandOrders()) || ([] as SandOrder[]);
+        workOrders.value = (await getWorkOrders()) || ([] as WorkOrder[]);
+        cradles.value = (await getCradles()) || ([] as Cradle[]);
+        sandTypes.value = (await getSand()) || ([] as Sand[]);
     });
 </script>
 

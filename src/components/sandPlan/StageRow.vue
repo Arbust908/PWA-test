@@ -189,7 +189,7 @@
     const { stage, editing, sands, pos, editingKey, stagesAmount } = toRefs(props);
     stage.value.stage = pos.value;
 
-    const { read: getSands } = useApi('/sand');
+    const { read: getSands } = useApi('/sand?visible=1');
 
     const backupSandTypes = getSands();
 
