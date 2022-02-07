@@ -1,4 +1,13 @@
-import { Cradle, PurchaseOrder, Sand, SandOrder, SandPlan, Warehouse, WorkOrder } from '@/interfaces/sandflow';
+import {
+    Cradle,
+    PurchaseOrder,
+    Sand,
+    SandOrder,
+    SandPlan,
+    SandStage,
+    Warehouse,
+    WorkOrder,
+} from '@/interfaces/sandflow';
 import axios from 'axios';
 const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
@@ -75,6 +84,26 @@ export const updateCradle = async (cradleData: Cradle) => {
 
     return await axios
         .put(`${apiUrl}/cradle/${id}`, cradleData)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const updateStage = async (stageData: SandStage) => {
+    const { id } = stageData;
+
+    return await axios
+        .put(`${apiUrl}/sandStage/${id}`, stageData)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const updateWorkOrder = async (workOrderData: WorkOrder) => {
+    const { id } = workOrderData;
+
+    return await axios
+        .put(`${apiUrl}/workOrder/${id}`, workOrderData)
         .then((response) => {
             return response.data.data;
         })

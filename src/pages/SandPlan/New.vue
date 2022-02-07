@@ -434,8 +434,8 @@
                         const sandPlanId = apiData.data.id;
                         currentSandPlan.id = sandPlanId;
 
-                        currentSandPlan.stages.forEach((stage) => {
-                            const { data } = useAxios(
+                        currentSandPlan.stages?.forEach((stage) => {
+                            useAxios(
                                 '/sandStage',
                                 {
                                     method: 'POST',

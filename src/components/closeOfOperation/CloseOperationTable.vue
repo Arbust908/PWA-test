@@ -91,19 +91,22 @@
 
         if (sandPlan.value.stages.length > 0) {
             const currentStageFull = sandPlan.value.stages.find((stage: any) => stage.status === 0);
-            currentStage.value = currentStageFull.stage;
-            stageTotal.value = sandPlan.value.stages.length;
-            stageQuantities.push(
-                currentStageFull.quantity1,
-                currentStageFull.quantity2,
-                currentStageFull.quantity3,
-                currentStageFull.quantity4
-            );
-            stageQuantities.map((quantity) => {
-                if (quantity >= 0) {
-                    stageSandAmmount.value += quantity;
-                }
-            });
+
+            if (currentStageFull) {
+                currentStage.value = currentStageFull?.stage;
+                stageTotal.value = sandPlan.value.stages.length;
+                stageQuantities.push(
+                    currentStageFull.quantity1,
+                    currentStageFull.quantity2,
+                    currentStageFull.quantity3,
+                    currentStageFull.quantity4
+                );
+                stageQuantities.map((quantity) => {
+                    if (quantity >= 0) {
+                        stageSandAmmount.value += quantity;
+                    }
+                });
+            }
         }
     });
 </script>

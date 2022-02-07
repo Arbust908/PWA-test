@@ -190,7 +190,7 @@
     import { Pit, SandPlan, SandStage, WorkOrder } from '@/interfaces/sandflow';
 
     import CloseOperationTable from '@/components/closeOfOperation/CloseOperationTable.vue';
-    import { getSandPlan, getWorkOrders } from '@/helpers/useGetEntities';
+    import { getSandPlan, getWorkOrders, updateStage, updateWorkOrder } from '@/helpers/useGetEntities';
 
     const api = import.meta.env.VITE_API_URL || '/api';
     useTitle('Cierre de operaciones <> Sandflow');
@@ -216,6 +216,9 @@
 
     const filteredSandPlans = computed(() => {
         const sandPlansToShow = ref(sandPlans.value);
+        sandPlansToShow.value = sandPlansToShow.value.filter((sandPlan) => {
+            return sandPlan.stages?.every((stage: SandStage) => stage && stage?.status < 2);
+        });
 
         if (clientId.value !== -1) {
             sandPlansToShow.value = sandPlansToShow.value.filter(
@@ -353,8 +356,9 @@
                 console.log(stage);
                 stage.status = 2;
                 stage.visible = false;
+                console.log(stage);
 
-                return stage;
+                return updateStage(stage);
             });
             const getWorkOrderId = sandPlan?.pit?.workOrderId;
             const thisWorkOrder = workOrders.value.find((wo: WorkOrder) => wo.id === getWorkOrderId);
@@ -367,13 +371,24 @@
                 thisWorkOrder.backupForklift = '';
             }
             console.log(thisWorkOrder);
-
             console.log(stagesToEnd);
             console.log(getWorkOrderId);
+            const woProcess = updateWorkOrder(thisWorkOrder as WorkOrder);
+
+            if (stagesToEnd) {
+                return Promise.all(stagesToEnd).then(() => {
+                    console.log('Termino');
+                });
+            }
+            Promise.all([woProcess]).then(() => {
+                console.log('Termino');
+            });
+
+            return;
         });
         console.log('----------------');
 
-        // openSuccess = true
+        openSuccess.value = true;
     };
 
     onMounted(async () => {
