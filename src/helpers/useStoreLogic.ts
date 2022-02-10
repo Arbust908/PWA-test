@@ -3,6 +3,10 @@ declare global {
         capitalize(): string;
     }
 }
+const online = useOnline();
+import Localbase from 'localbase';
+
+const db = new Localbase('db');
 export enum StoreLogicMethods {
     CREATE = 'create',
     GET = 'get',
@@ -18,71 +22,57 @@ export async function useStoreLogic(
     method: StoreLogicMethods | string,
     payload?: any
 ) {
+    console.log(online ? '🟢 Tamos Redy' : '🔴 No redy');
+    const localDB = await db.collection(entity).get();
+    console.log(localDB);
+
+    if (!online) {
+        console.log('Vamos por el LocalDB');
+    }
+
     return await store.dispatch(`${entity}DataHandler`, { method, payload }).then((res: any) => {
+        const { CREATE, GET, GET_ALL, DELETE, UPDATE } = StoreLogicMethods;
         String.prototype.capitalize = function () {
             return this.charAt(0).toUpperCase() + this.slice(1);
         };
         const routeName = entity.capitalize();
+        console.log(`${routeName} ${method}`, res);
 
-        // const redirectHandler = (responseNumber: any) => {
-        //     if (responseNumber == 200) {
-        //         router.push({ name: routeName });
-        //     } else if (responseNumber == 500) {
-        //         router.push({ name: 'Error-500' });
-        //     } else if (responseNumber == 503) {
-        //         router.push({ name: 'Error-503' });
-        //     } else if (responseNumber == 504) {
-        //         router.push({ name: 'Error-504' });
-        //     }
-        // };
-
-        if (res && method === StoreLogicMethods.CREATE) {
-            // redirectHandler(res.status);
-
+        if (res && method === CREATE) {
             return { type: 'success', res };
         }
 
-        if (!res.createdAt && method === StoreLogicMethods.CREATE) {
+        if (!res.createdAt && method === CREATE) {
             const message = store.getters[`${entity}Message`](method);
-            // redirectHandler(res.status);
 
             return { type: 'failed', message };
         }
 
-        if (method === StoreLogicMethods.GET || method === StoreLogicMethods.GET_ALL) {
+        if (method === GET || method === GET_ALL) {
             if (res.status !== 'failed') {
-                // redirectHandler(res.status);
-
                 return { type: 'success', res };
             } else {
                 const message = store.getters[`${entity}Message`](method);
-                // redirectHandler(res.status);
 
                 return { type: 'failed', message };
             }
         }
 
-        if (method === StoreLogicMethods.DELETE) {
+        if (method === DELETE) {
             if (res.status !== 'failed') {
-                // redirectHandler(res.status);
-
                 return { type: 'success', res };
             } else {
                 const message = store.getters[`${entity}Message`](method);
-                // redirectHandler(res.status);
 
                 return { type: 'failed', message };
             }
         }
 
-        if (method === StoreLogicMethods.UPDATE) {
+        if (method === UPDATE) {
             if (res.status !== 'failed') {
-                // redirectHandler(res.status);
-
                 return { type: 'success', res };
             } else {
                 const message = store.getters[`${entity}Message`](method);
-                // redirectHandler(res.status);
 
                 return { type: 'failed', message };
             }
