@@ -345,10 +345,9 @@
      * EStas son las Queue Items que queremos mostrar en la listita
      */
     queueBoxes.value = await getQueueItems();
-    console.log('queueBoxes', queueBoxes.value);
     queueBoxes.value = queueBoxes.value
         ?.filter((item) => item.sandOrder)
-        .map((item) => {
+        ?.map((item) => {
             // Agrego el location del sandOrder para que sea mas facil de manejar
             const { sandOrder } = item;
             let location = '';
@@ -364,8 +363,7 @@
             return item;
         });
     // .filter((item) => item.location?.where === 'warehouse');
-    console.log('queueBoxes', queueBoxes.value);
-    queueBoxes.value = queueBoxes.value.map((item: QueueBox) => {
+    queueBoxes.value = queueBoxes.value?.map((item: QueueBox) => {
         // Convierto el QueueItem a un QueueBox
         // AKA convierto el nuevo Origin sucio en Origin y sandStageId + sandPlanId
         const { origin } = item as QueueBox;
@@ -381,8 +379,6 @@
 
         return item as QueueBox;
     });
-    // queueBoxes.value = queueBoxes.value.filter((item) => item.status <= 100);
-    console.log('queueBoxes', queueBoxes.value);
 
     const router = useRouter();
     const saveQueue = (isFinished: boolean) => {

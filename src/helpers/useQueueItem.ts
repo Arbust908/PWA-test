@@ -196,12 +196,9 @@ export const orderDesc = (itemA: QueueItem, itemB: QueueItem) => {
 };
 
 export const sheetGridItems = (queueBoxes: Array<QueueItem>) => {
-    console.log('🍄', queueBoxes);
     const { deTransporte, aCradle } = separateQueues(queueBoxes);
-    console.log('🍄', deTransporte, aCradle);
 
     const newItemList = [...deTransporte, ...aCradle];
-    console.log('🍄', newItemList);
 
     return newItemList.filter((item) => {
         const { origin, destination } = item;
