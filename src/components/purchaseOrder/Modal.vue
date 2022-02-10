@@ -23,7 +23,7 @@
                 </li>
             </div>
         </div>
-        <div class="flex items-center">
+        <div class="flex items-center mt-1">
             <input
                 id="checkbox"
                 v-model="checked"
@@ -34,90 +34,49 @@
         </div>
         <div class="w-full flex gap-x-6 justify-end mt-3">
             <SecondaryBtn @click.prevent="$emit('close')"> Volver </SecondaryBtn>
-            <PrimaryBtn @click.prevent="$emit('confirm')" @click="checked && downloadPDF(po)"> Confirmar </PrimaryBtn>
+            <PrimaryBtn :is-loading="loading" @click.prevent="$emit('confirm', checked)"> Confirmar </PrimaryBtn>
         </div>
     </Modal>
 </template>
 
-<script lang="ts">
-    import { defineComponent, ref, watchEffect } from 'vue';
+<script setup lang="ts">
     import Modal from '@/components/modal/General.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import { isEven } from '@/helpers/iteretionHelpers';
-    import jsPDF from 'jspdf';
-    export default defineComponent({
-        components: {
-            Modal,
-            PrimaryBtn,
-            SecondaryBtn,
+    const props = defineProps({
+        po: {
+            type: Object,
+            required: true,
         },
-        props: {
-            po: {
-                type: Object,
-                required: true,
-            },
-            showModal: {
-                type: Boolean,
-                required: true,
-            },
-            driver: {
-                type: String,
-                required: true,
-            },
-            poId: {
-                type: Number,
-                required: true,
-            },
-            plates: {
-                type: Array,
-                required: true,
-            },
+        showModal: {
+            type: Boolean,
+            required: true,
         },
-        setup(props) {
-            const getSandType = (sandTypeId: number) => {
-                const sandType = props.po.sands.find((st) => st.id === sandTypeId);
-
-                return sandType ? sandType.type : 'Sin tipo de arena';
-            };
-            const content = ref(null);
-            watchEffect(() => {
-                console.log(content.value);
-            });
-
-            const checked = ref(true);
-
-            const downloadPDF = (po) => {
-                return;
-                // const doc = new jsPDF();
-                // console.log('po', po);
-
-                // const id = 'ID-123';
-                // const spName = po.sandProvider.name;
-                // const sandOrder = JSON.stringify(po.sandOrders);
-
-                // const tpName = po.transportProvider.name;
-                // const transportOrder = JSON.stringify(po.transportOrders);
-
-                // doc.text('Orden de pedido', 10, 10);
-
-                // doc.text('Provedor de Arena: ' + spName, 10, 20);
-                // doc.text(sandOrder, 10, 26);
-
-                // doc.text('Provedoor de Transporte: ' + tpName, 10, 35);
-                // doc.text(transportOrder, 10, 41);
-
-                // doc.save('OrdenDePedido' + id + '.pdf');
-            };
-
-            return {
-                getSandType,
-                isEven,
-                downloadPDF,
-                checked,
-            };
+        driver: {
+            type: String,
+            required: true,
+        },
+        poId: {
+            type: Number,
+            required: true,
+        },
+        plates: {
+            type: Array,
+            required: true,
+        },
+        loading: {
+            type: Boolean,
+            required: false,
+            default: false,
         },
     });
+    defineEmits(['close', 'confirm']);
+    const getSandType = (sandTypeId: number) => {
+        const sandType = props.po.sands.find((st) => st.id === sandTypeId);
+
+        return sandType ? sandType.type : 'Sin tipo de arena';
+    };
+    const checked = ref(true);
 </script>
 
 <style scoped>

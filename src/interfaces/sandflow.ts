@@ -11,6 +11,7 @@ export interface Pit {
     stageSheets?: StageSheet[];
     sandPlans?: SandPlan[];
     warehouses?: Warehouse[];
+    visible?: boolean;
 }
 export interface Traktor {
     id?: number;
@@ -19,6 +20,7 @@ export interface Traktor {
     description: string;
     workOrderId: number;
     workOrder?: WorkOrder[];
+    visible?: boolean;
 }
 export interface Pickup {
     id?: number;
@@ -26,13 +28,15 @@ export interface Pickup {
     description: string;
     workOrderId: number;
     workOrder?: WorkOrder[];
+    visible?: boolean;
 }
 export interface HumanResource {
     id?: number;
-    role: string;
-    name: string;
+    role: string | number;
+    name: string | number;
     crewId: number;
     crew?: Crew;
+    visible?: boolean;
 }
 export interface Crew {
     id?: number;
@@ -42,6 +46,7 @@ export interface Crew {
     workOrderId: number;
     resources?: HumanResource[];
     workOrder?: WorkOrder[];
+    visible?: boolean;
 }
 
 export interface WorkOrder {
@@ -74,6 +79,7 @@ export interface CompanyRepresentative {
     sandProviders?: SandProvider[];
     company?: Company[];
     transportProviders?: TransportProvider[];
+    visible?: boolean;
 }
 
 export interface SandProvider {
@@ -111,6 +117,7 @@ export interface Vehicle {
     transportId: string;
     driverId: number;
     Driver?: Driver;
+    visible?: boolean;
 }
 
 export interface Sand {
@@ -127,7 +134,7 @@ export interface Cradle {
     id?: number;
     name: string;
     observations?: string;
-    slots?: string;
+    slots?: any[];
     visible: boolean;
     stageSheets?: StageSheet[];
     backupStageSheets?: StageSheet[];
@@ -172,13 +179,17 @@ export interface SandStage {
     sandB?: Sand;
     sandId3: number;
     sandC?: Sand;
+    sandId4: number;
+    sandD?: Sand;
     quantity1: number;
     quantity2: number;
     quantity3: number;
+    quantity4: number;
     action?: 'create' | 'update' | 'delete';
     sandPlanId: number;
     sandPlan?: SandPlan;
     status: null | 0 | 1 | 2;
+    visible?: boolean;
 }
 
 export interface SandPlan {
@@ -191,7 +202,12 @@ export interface SandPlan {
     company?: Company;
     stages?: SandStage[];
 }
-
+/**
+ * Status
+ * 0: No iniciado
+ * - otros?
+ * 100: Finalizado
+ */
 export interface SandOrder {
     id?: number;
     sandTypeId: number;
@@ -201,9 +217,42 @@ export interface SandOrder {
     boxId?: string;
     status: number;
     location: string;
+    providerNotifications?: ProviderNotification[];
+    queueItems?: QueueItem[];
     sandType?: Sand;
     purchaseOrder?: PurchaseOrder;
     sandProvider?: SandProvider;
+    visible?: boolean;
+}
+
+// "{\"where\":\"warehouse\",\"where_id\":1,\"floor\":1,\"row\":2,\"col\":5}"
+// {\"where\":\"cradle\",\"where_id\":4,\"where_slot\":2,\"where_origin\":\"Estación 3\"}"
+export interface BoxLocation {
+    where?: string;
+    where_id?: number;
+    floor?: number;
+    row?: number;
+    col?: number;
+    origin?: string;
+    origin_id?: number;
+    where_origin?: string;
+}
+export interface SandOrderBox {
+    id?: number;
+    sandTypeId: number;
+    amount: number;
+    purchaseOrderId: number;
+    sandProviderId: number;
+    boxId?: string;
+    status: number;
+    location: BoxLocation;
+    sandType?: Sand;
+    floor?: number;
+    row?: number;
+    column?: number;
+    purchaseOrder?: PurchaseOrder;
+    sandProvider?: SandProvider;
+    visible?: boolean;
 }
 
 export interface TransportProvider {
@@ -230,6 +279,7 @@ export interface ProviderNotification {
     sandProvider?: SandProvider;
     sandOrder?: SandOrder;
     transportProvider?: TransportProvider;
+    visible?: boolean;
 }
 
 export interface PurchaseOrder {
@@ -247,15 +297,19 @@ export interface PurchaseOrder {
     transportProvider?: TransportProvider;
     sandProvider?: SandProvider;
     pit?: Pit;
+    notificationStatus?: number;
+    visible?: boolean;
 }
 
 export interface TransportOrder {
     id?: number;
     boxAmount: string;
-    licensePlate: string;
+    driverId?: number;
+    licensePlate?: string;
     observations: string;
     purchaseOrderId: number;
     purchaseOrder?: PurchaseOrder;
+    visible?: boolean;
 }
 
 export interface Warehouse {
@@ -288,6 +342,7 @@ export interface StageSheet {
     stages?: SandStage[];
     operativeCradle?: Cradle;
     backupCradle?: Cradle;
+    visible?: boolean;
 }
 
 export interface User {
@@ -300,6 +355,7 @@ export interface User {
     roleId: number;
     active: boolean;
     Role?: Role;
+    visible?: boolean;
 }
 
 export interface Role {
@@ -316,10 +372,8 @@ export enum Roles {
 }
 
 export enum BoxCategory {
-    empty = 'Vacio',
-    cut = 'Cortada',
-    thick = 'Gruesa',
-    fine = 'Fina',
+    empty = 'Caja Vacía',
+    cradle = 'Cradle',
     aisle = 'Pasillo',
 }
 export enum SandStageStatus {
@@ -336,4 +390,67 @@ export interface Box {
     col: number;
     floor: number;
     row: number;
+    visible?: boolean;
 }
+export interface QueueItem {
+    id?: number;
+    sandOrderId: number;
+    sandOrder?: SandOrder;
+    pitId: number;
+    pit?: Pit;
+    origin: string; // vamos a poner el id del SandPlan aca tambien
+    destination: string;
+    status: number;
+    // 0 - Pendiente
+    // 10 - A retirar
+    // 20 - En Cola ?
+    // 99 - Finalizado
+    order: number;
+    // 999999 - 900000 aTRansporte
+    // 99999 - 90000 Retiro ( cradleAOtro )
+    // 9999 - 9000 TRansporte a Otro
+    // 999 - 500 Deposito a Cradle
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
+}
+
+export enum QueueBoxStatus {
+    FRESH = 0,
+    WITH_NO_DESTINATION = 10,
+    MOVED = 99,
+    DONE = 100,
+}
+export interface QueueBox {
+    id?: number;
+    sandOrderId: number;
+    sandOrder?: SandOrder;
+    pitId: number;
+    pit?: Pit;
+    origin: string;
+    destination: string;
+    sandStageId: number;
+    sandPlanId: number;
+    status: QueueBoxStatus;
+    // 0 - Pendiente
+    // 10 - A retirar
+    // 20 - En Cola ?
+    // 99 - Finalizado
+    // 100 - Borrado
+    order: number;
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
+}
+
+/* 
+C - T 
+D - T
+
+C - D
+
+T - C
+T - D /
+
+D - C
+*/

@@ -1,17 +1,16 @@
 <template>
     <Layout>
-        <header class="flex flex-col md:flex-row md:justify-between items-center md:mb-4">
-            <h1 class="font-bold text-second-900 text-2xl self-start mb-3 md:mb-0">Diseño de depósito</h1>
-        </header>
+        <ABMFormTitle title="Diseño de depósito" />
         <section class="deposit bg-second-0 rounded-md shadow-sm overflow-hidden">
             <form method="POST" action="/" class="p-8 md:p-12 flex flex-col gap-4">
                 <FieldGroup class="col-span-full gap-x-6 py-0 max-w-xl">
-                    <h2 class="col-span-full text-[24px] font-bold">Pozo {{ designName }}</h2>
                     <ClientPitCombo
-                        :client-id="clientId"
-                        :pit-id="pitId"
-                        @update:clientId="clientId = $event"
-                        @update:pitId="pitId = $event"
+                        v-model:wo-id="woId"
+                        v-model:client-id="clientId"
+                        v-model:pit-id="pitId"
+                        v-model:work-orders="workOrders"
+                        validation-type="empty"
+                        :pads="true"
                     />
                     <div class="col-span-4 flex flex-col items-center gap-4">
                         <h3 class="text-sm">Cantidad de filas</h3>
@@ -30,49 +29,18 @@
                     <section class="w-full max-w-[220px] lg:max-w-[260px] flex flex-col gap-6 md:gap-8">
                         <h2 class="col-span-full text-xl font-bold">Asignar categoría</h2>
                         <div class="flex flex-col gap-5 ml-4">
-                            <label class="type-select" for="aisle">
+                            <label v-for="(sand, i) in sandTypes" :key="i" class="type-select" :for="sand.type">
                                 <input
-                                    id="aisle"
-                                    :checked="selectedBox.category === 'aisle'"
+                                    :id="sand.type"
+                                    :checked="selectedBox.category == sand.id"
                                     type="radio"
                                     name="boxCat"
-                                    class="form-checkbox aisle"
-                                    @click="setCat('aisle')"
+                                    :class="`form-checkbox mesh-type__${
+                                        sand.id <= 5 ? sand.id : 'extra'
+                                    } radio clickable`"
+                                    @click="setCat(sand.id.toString())"
                                 />
-                                <span>Pasillo</span>
-                            </label>
-                            <label class="type-select" for="fina">
-                                <input
-                                    id="fina"
-                                    :checked="selectedBox.category === 'fina'"
-                                    type="radio"
-                                    name="boxCat"
-                                    class="form-checkbox fina"
-                                    @click="setCat('fina')"
-                                />
-                                <span>Arena fina</span>
-                            </label>
-                            <label class="type-select" for="gruesa">
-                                <input
-                                    id="gruesa"
-                                    :checked="selectedBox.category === 'gruesa'"
-                                    type="radio"
-                                    name="boxCat"
-                                    class="form-checkbox gruesa"
-                                    @click="setCat('gruesa')"
-                                />
-                                <span>Arena gruesa</span>
-                            </label>
-                            <label class="type-select" for="cortada">
-                                <input
-                                    id="cortada"
-                                    :checked="selectedBox.category === 'cortada'"
-                                    type="radio"
-                                    name="boxCat"
-                                    class="form-checkbox cortada"
-                                    @click="setCat('cortada')"
-                                />
-                                <span>Caja cortada</span>
+                                <span>{{ sand.type }}</span>
                             </label>
                             <label class="type-select" for="empty">
                                 <input
@@ -80,16 +48,44 @@
                                     :checked="selectedBox.category === 'empty'"
                                     type="radio"
                                     name="boxCat"
-                                    class="form-checkbox empty"
+                                    class="form-checkbox mesh-type__empty clickable"
                                     @click="setCat('empty')"
                                 />
-                                <span>Vacio</span>
+                                <span>Caja Vacía</span>
+                            </label>
+                            <label class="type-select" for="cradle">
+                                <input
+                                    id="cradle"
+                                    :checked="selectedBox.category === 'cradle'"
+                                    type="radio"
+                                    name="boxCat"
+                                    class="form-checkbox mesh-type__taken cradle-clickable"
+                                    @click="setCat('cradle')"
+                                />
+                                <span>Cradle</span>
+                            </label>
+                            <label class="type-select" for="aisle">
+                                <input
+                                    id="aisle"
+                                    :checked="selectedBox.category === 'aisle'"
+                                    type="radio"
+                                    name="boxCat"
+                                    class="form-checkbox mesh-type__taken aisle-clickable"
+                                    @click="setCat('aisle')"
+                                />
+                                <span>Pasillo</span>
                             </label>
                         </div>
-                        <BoxCard v-if="selectedBox.category !== ''" v-bind="selectedBox" />
+                        <BoxCard
+                            v-if="selectedBox.category !== ''"
+                            v-bind="selectedBox"
+                            :deposit-render="true"
+                            :sand-name="sandName"
+                        />
                     </section>
                     <DepositGrid
                         class="w-full flex flex-col gap-5 overflow-auto"
+                        is-design
                         :selected-box="selectedBox"
                         :rows="rows"
                         :cols="cols"
@@ -104,19 +100,12 @@
         <!-- *** -->
         <footer class="mt-8 space-x-3 flex justify-end items-center">
             <SecondaryBtn btn="wide" @click.prevent="$router.push('/diseno-de-deposito')">Cancelar</SecondaryBtn>
-            <PrimaryBtn btn="wide" :disabled="!isFull ? 'yes' : null" @click.prevent="isFull && save()">
-                Guardar
-            </PrimaryBtn>
+            <PrimaryBtn btn="wide" :disabled="!isFull" @click.prevent="isFull && save()"> Guardar </PrimaryBtn>
         </footer>
     </Layout>
 </template>
 
 <script lang="ts">
-    import { ref, Ref, computed, defineComponent, watch } from 'vue';
-    import { useStore } from 'vuex';
-    import { useRouter } from 'vue-router';
-    import { useTitle } from '@vueuse/core';
-
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
@@ -129,6 +118,7 @@
 
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
 
     export default defineComponent({
@@ -141,6 +131,7 @@
             BoxCard,
             FieldGroup,
             ClientPitCombo,
+            ABMFormTitle,
         },
         setup() {
             useTitle('Nuevo Depósito <> Sandflow');
@@ -148,6 +139,26 @@
             const store = useStore();
             const instance = axios.create({
                 baseURL: apiUrl,
+            });
+            const woId = ref(-1);
+
+            const sandTypes = ref([]);
+            const sandName = computed(() => {
+                if (
+                    selectedBox.value.category != 'empty' &&
+                    selectedBox.value.category != 'aisle' &&
+                    selectedBox.value.category != 'cradle'
+                ) {
+                    return sandTypes.value.find((type) => type.id === parseInt(selectedBox.value.category)).type;
+                }
+            });
+
+            onMounted(async () => {
+                const result = await axios.get(`${apiUrl}/sand`);
+                sandTypes.value = result.data.data;
+                sandTypes.value = sandTypes.value.filter((type) => {
+                    return type.visible;
+                });
             });
 
             let deposit = ref({});
@@ -315,21 +326,23 @@
                 selectedBox.value.category = cat;
 
                 const { floor, row, col } = selectedBox.value;
-                deposit.value[`${floor}|${row}|${col}`].category = cat;
+                const key = `${floor}|${row}|${col}`;
+
+                deposit.value[key].category = cat;
             };
 
             const isFull = computed(() => {
-                const hasClientAndPit: boolean = clientId.value >= 0 && pitId.value >= 0;
+                const hasClientAndPad: boolean = clientId.value >= 0 && woId.value >= 0;
                 const hasDeposit: boolean = rows.value > 0 && cols.value > 0 && floors.value > 0;
 
-                return hasClientAndPit && hasDeposit;
+                return hasClientAndPad && hasDeposit;
             });
 
             const save = () => {
                 purgeOffCells();
                 const wH: Warehouse = {
                     clientCompanyId: clientId.value,
-                    pitId: pitId.value,
+                    pitId: woId.value,
                     layout: deposit.value,
                 };
                 const { data } = useAxios('/warehouse', { method: 'POST', data: wH }, instance);
@@ -356,39 +369,22 @@
                 deposit,
                 isFull,
                 save,
+                sandTypes,
+                sandName,
+                woId,
             };
         },
     });
 </script>
 
 <style lang="scss" scoped>
+    @import '@/assets/box.scss';
     .input {
         @apply w-full px-3 py-2 rounded focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-second-300 mt-1 flex shadow-sm;
     }
     input[type='radio'] {
         @apply w-5 h-5 border border-second-400 text-second-400;
-        &.aisle {
-            @apply border-second-300 text-second-300;
-        }
-        &.fina {
-            @apply border-orange-600 text-orange-600;
-        }
-        &.gruesa {
-            @apply border-green-600 text-green-600;
-        }
-        &.cortada {
-            @apply border-blue-600 text-blue-600;
-        }
-        &.blocked {
-            @apply border-second-800 text-second-800;
-        }
-        &.empty {
-            @apply border-second-200 text-second-200;
-        }
     }
-    // input:read-only {
-    //   @apply bg-second-200 border cursor-not-allowed;
-    // }
     fieldset:not(:last-of-type) {
         @apply border-b pb-6;
     }

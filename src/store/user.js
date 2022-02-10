@@ -39,6 +39,9 @@ export default {
         userUpdateValidation: async ({ commit }, payload) => {
             await commit('UPDATE_USER_VALIDATION', payload);
         },
+        updateUserPerrmisions: async ({ commit }, payload) => {
+            await commit('UPDATE_USER_PERMISSIONS', payload);
+        },
         userDataHandler: async ({ dispatch, getters }, methodAndPayload) => {
             let { method, payload } = methodAndPayload;
             method = `user_${method}`;
@@ -66,8 +69,6 @@ export default {
                 });
         },
         user_get: async ({ commit }, payload) => {
-            console.log('payload', payload);
-
             return await axios
                 .get(`${api}/user/${payload}`)
                 .then((res) => {

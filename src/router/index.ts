@@ -261,22 +261,22 @@ const routes: Array<RouteRecordRaw> = [
         // component: () => import('@/pages/StageSheet/index.vue'),
         beforeEnter: [isMobileAndLogged, checkPermission],
     },
-    // {
-    //     path: '/stage-sheet/:id',
-    //     name: 'StageSheetById',
-    //     component: () => import('@/pages/StageSheet/_id/index.vue'),
-    //     beforeEnter: [isMobileAndLogged, checkPermission],
-    // },
-    // {
-    //     path: '/stage-sheet/:id/nueva',
-    //     name: 'StageSheetNewStage',
-    //     component: () => import('@/pages/StageSheet/_id/new.vue'),
-    //     beforeEnter: [isMobileAndLogged, checkPermission],
-    // },
     {
         path: '/stage-sheet/nuevo',
         name: 'NewStageSheet',
         component: () => import('@/pages/StageSheet/new.vue'),
+        beforeEnter: [isMobileAndLogged, checkPermission],
+    },
+    {
+        path: '/deposito-cajas-vacias',
+        name: 'EmptyBoxDeposit',
+        component: () => import('@/pages/EmptyBoxDeposit/Index.vue'),
+        beforeEnter: [isMobileAndLogged, checkPermission],
+    },
+    {
+        path: '/destino-cajas-vacias',
+        name: 'EmptyBoxDestiny',
+        component: () => import('@/pages/EmptyBoxDeposit/EmptyBox.vue'),
         beforeEnter: [isMobileAndLogged, checkPermission],
     },
     {
@@ -309,6 +309,19 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/User/Admin.vue'),
         beforeEnter: isAdmin,
     },
+    {
+        path: '/cierre-de-operaciones',
+        name: 'CloseOfOperation',
+        component: () => import('@/pages/CloseOfOperations/index.vue'),
+        beforeEnter: [isLogged, checkPermission],
+    },
+    {
+        path: '/operacion-en-forklift',
+        name: 'ForkliftOperation',
+        component: () => import('@/pages/ForkliftOperation/index.vue'),
+        beforeEnter: [isLogged, checkPermission],
+    },
+    // Todas las rutas deberian ir antes de estas 👇
     {
         path: '/no-mobile',
         name: 'NoMobile',
@@ -364,6 +377,11 @@ const routes: Array<RouteRecordRaw> = [
         path: '/tests/pdf',
         name: 'TestPDF',
         component: () => import('@/pages/Tests/PDF.vue'),
+    },
+    {
+        path: '/tests/queue',
+        name: 'TestQueue',
+        component: () => import('@/pages/Tests/QueueItems.vue'),
     },
     {
         path: '/:catchAll(.*)',

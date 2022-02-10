@@ -1,155 +1,3 @@
-<script setup lang="ts">
-    import axios from 'axios';
-    import { StageSheet, SandStage, Warehouse } from '@/interfaces/sandflow';
-    import { boxesByFloor, formatLocation } from '@/helpers/useWarehouse';
-    import { useAxios } from '@vueuse/integrations/useAxios';
-
-    import Layout from '@/layouts/Main.vue';
-    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
-    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
-    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
-    import StageSheetStage from '@/components/stageSheet/stageSheetStage.vue';
-    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
-    import StageSheetStageBox from '@/components/stageSheet/stageSheetStageBox.vue';
-
-    const apiUrl = import.meta.env.VITE_API_URL || '/api';
-    const instance = axios.create({
-        baseURL: apiUrl,
-    });
-
-    const clientId = ref(-1);
-    const pitId = ref(-1);
-
-    const _TABS = { PENDING: 0, COMPLETED: 1 };
-    const selectedTab = ref(0);
-    const setTab = (tab: number) => {
-        selectedTab.value = tab;
-    };
-    const isTabSelected = (tab: number) => {
-        return selectedTab.value === tab;
-    };
-
-    const actualSheet: StageSheet = reactive({
-        companyId: -1,
-        pitId: -1,
-        warehouseId: -1,
-        operativeCradleId: -1,
-        backupCradleId: -1,
-        stages: [],
-    });
-
-    let warehouse: Ref<Warehouse> = ref({});
-
-    const fillSheet = async (currentSheet: any) => {
-        if (currentSheet.companyId !== -1 && currentSheet.pitId !== -1) {
-            getSandPlan(currentSheet);
-            getDeposit(currentSheet);
-        }
-    };
-
-    watch(clientId, (newVal) => {
-        actualSheet.companyId = newVal;
-        fillSheet(actualSheet);
-    });
-    watch(pitId, (newVal) => {
-        actualSheet.pitId = newVal;
-        fillSheet(actualSheet);
-    });
-
-    const getSandPlan = async ({ pitId: pozoId, companyId }: StageSheet) => {
-        const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
-        watch(data, (newVal) => {
-            stages.value = newVal.data[0].stages;
-        });
-    };
-
-    const getDeposit = async ({ pitId: pozoId, companyId }: StageSheet) => {
-        const { data } = useAxios(`/warehouse?pitId=${pozoId}`, instance);
-        watch(data, (newVal) => {
-            warehouse.value = newVal.data[0];
-        });
-    };
-
-    const selectedStage = ref(-1);
-    let stages: Ref<Array<SandStage>> = ref([]);
-
-    const setWareHouseBoxes = ({ layout }: Warehouse) => {
-        const whBoxes = [];
-        for (const key in layout) {
-            if (Object.prototype.hasOwnProperty.call(layout, key)) {
-                const element = layout[key];
-                const location = formatLocation(key);
-                whBoxes.push({
-                    ...element,
-                    ...location,
-                });
-            }
-        }
-
-        return whBoxes.filter((box) => box.id);
-    };
-
-    const setStage = (stage: number) => {
-        if (selectedStage.value.id === stage) {
-            selectedStage.value = -1;
-        } else {
-            selectedStage.value = stages.value.find((s) => s.id === stage);
-        }
-    };
-    const finalizedStages = computed(() => {
-        return stages.value?.filter((s) => s.status === 'finalized');
-    });
-    const pendingStages = computed(() => {
-        return stages.value?.sort((a, b) => a.stage - b.stage);
-    });
-    const isSageSelected = (stage: number, selected: number): boolean => {
-        return selected === stage;
-    };
-    const boxes = computed(() => {
-        return boxesByFloor(warehouse.value.layout || {});
-    });
-
-    const selectedQueue = ref([]);
-    const updateQueue = (queue: Array<any>) => {
-        selectedQueue.value = queue;
-    };
-    const queueDetail = computed(() => {
-        return selectedQueue.value.reduce((acc, item) => {
-            if (item?.sandType?.id) {
-                const sandId = item?.sandType?.id;
-                const sandIndex = acc.indexOf(sandId);
-
-                if (sandIndex === -1) {
-                    acc.push(item?.amount);
-                } else {
-                    acc[sandIndex] = acc[sandIndex] + item?.amount;
-                }
-            }
-
-            return acc;
-        }, []);
-    });
-    const sumQueueDetail = computed(() => {
-        return queueDetail.value.reduce((acc, item) => {
-            return acc + item;
-        }, 0);
-    });
-    const queueDetailFormated = (info: any) => {
-        if (info) {
-            return info + ' toneladas';
-        }
-
-        return '-';
-    };
-    const setStageFull = (sheetId: number) => {
-        const stage = stages.value.find((stage) => stage.stageSheetId === sheetId);
-
-        if (stage) {
-            stage.done = stage.weight;
-        }
-    };
-</script>
-
 <template>
     <Layout>
         <ABMFormTitle title="Stage sheet" />
@@ -159,9 +7,14 @@
                 v-model:pit-id="pitId"
                 shared-classes="col-span-full md:col-span-4"
             />
-            <PrimaryBtn class="col-span-6 md:col-span-3 max-h-12 mt-7">Finalizar Stage</PrimaryBtn>
+            <PrimaryBtn
+                class="col-span-6 md:col-span-3 max-h-12 mt-7"
+                :disabled="disableFinishBtn"
+                @click="finishCurrent"
+            >
+                Finalizar Stage
+            </PrimaryBtn>
         </FieldGroup>
-        {{}}
         <nav class="flex gap-8 mt-10">
             <button
                 :class="isTabSelected(_TABS.PENDING) ? 'selected' : null"
@@ -185,11 +38,12 @@
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
                     :boxes="boxes"
-                    :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
+                    :is-selected-stage="isStageSelected(sheet.id, selectedStageId)"
                     :is-active="pendingStages[0].id === sheet.id"
-                    @set-stage="setStage($event)"
+                    @set-stage="setSelectedStageId($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
+                    @saved-queue="saveQueue"
                 />
                 <StageSheetStageBox v-if="pendingStages?.length <= 0">
                     <p class="text-center p-6">No hay etapas pendientes</p>
@@ -201,40 +55,38 @@
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
                     :boxes="boxes"
-                    :is-selected-stage="isSageSelected(sheet.id, selectedStage.id)"
-                    :is-active="pendingStages[0].id === sheet.id"
-                    @set-stage="setStage($event)"
+                    :is-selected-stage="isStageSelected(sheet.id, selectedStageId)"
+                    :is-active="finalizedStages[0].id === sheet.id"
+                    @set-stage="setSelectedStageId($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
+                    @saved-queue="saveQueue"
                 />
                 <StageSheetStageBox v-if="finalizedStages.length <= 0">
                     <p class="text-center p-6">No hay etapas finalizadas</p>
                 </StageSheetStageBox>
             </div>
+            <div v-else>
+                <StageSheetStageBox v-if="finalizedStages.length <= 0">
+                    <p class="text-center p-6">No hay etapas</p>
+                </StageSheetStageBox>
+            </div>
             <aside>
                 <h3 class="text-3xl font-bold">Detalle</h3>
-                <article v-if="selectedStage?.id === -1" class="px-4 py-6 border rounded-[10px]">
+                <article v-if="selectedStageId === -1" class="px-4 py-6 border rounded-[10px]">
                     <span class="text-center">Desplegá una etapa para ver el detalle de la misma</span>
                 </article>
                 <article v-else class="px-4 py-6 rounded-[10px] bg-blue-100">
                     <div class="text-semibold space-y-3">
-                        <p>
-                            <span class="mr-2">Total Arena A:</span>
-                            <span>{{ queueDetailFormated(queueDetail && queueDetail[0]) }}</span>
-                        </p>
-                        <p>
-                            <span class="mr-2">Total Arena B:</span>
-                            <span>{{ queueDetailFormated(queueDetail && queueDetail[1]) }}</span>
-                        </p>
-                        <p>
-                            <span class="mr-2">Total Arena C:</span>
-                            <span>{{ queueDetailFormated(queueDetail && queueDetail[2]) }}</span>
+                        <p v-for="(detail, index) in queueDetail" :key="index">
+                            <span class="mr-2">{{ detailTitle(index) }}:</span>
+                            <span>{{ queueDetailFormated(detail) }}</span>
                         </p>
                     </div>
                     <hr class="border-white border mt-1" />
-                    <p class="text-bold text-lg mt-4">
+                    <p class="font-bold text-lg mt-4">
                         <span class="mr-2">Total General:</span>
-                        <span>{{ sumQueueDetail || '-' }}</span>
+                        <span>{{ queueDetailFormated(sumQueueDetail) }}</span>
                     </p>
                 </article>
                 <article v-if="false" class="px-3 py-4 rounded-[10px] bg-gray-100 border border-gray-400 shadow">
@@ -257,6 +109,315 @@
     </Layout>
 </template>
 
+<script setup lang="ts">
+    import axios from 'axios';
+    import { ComputedRef, Ref } from 'vue';
+    import {
+        StageSheet,
+        SandStage,
+        Warehouse,
+        QueueItem,
+        SandOrder,
+        WorkOrder,
+        Pit,
+        SandOrderBox,
+        QueueBox,
+    } from '@/interfaces/sandflow';
+    import { boxesByFloor, formatLocation, searchInDepoBoxes } from '@/helpers/useWarehouse';
+    import { useAxios } from '@vueuse/integrations/useAxios';
+
+    import Layout from '@/layouts/Main.vue';
+    import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
+    import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
+    import FieldGroup from '@/components/ui/form/FieldGroup.vue';
+    import StageSheetStage from '@/components/stageSheet/stageSheetStage.vue';
+    import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import StageSheetStageBox from '@/components/stageSheet/stageSheetStageBox.vue';
+    import { deleteAllQueueItems, getQueueItems, updateAllQueueItems } from '@/helpers/useQueueItem';
+    import { useSheetStore } from '@/store/stageSheet.pinia';
+    import { storeToRefs } from 'pinia';
+    import {
+        detailTitle,
+        queueDetailFormated,
+        isStageSelected,
+        finishSandStage,
+        decodeNewOrigin,
+    } from '@/helpers/useSheetHelpers';
+    import { getSandOrders } from '@/helpers/useGetEntities';
+
+    const apiUrl = import.meta.env.VITE_API_URL || '/api';
+    const instance = axios.create({
+        baseURL: apiUrl,
+    });
+    useTitle('Stage Sheet <> SandFlow');
+    const _TABS = { PENDING: 0, COMPLETED: 1 };
+
+    const store = useSheetStore();
+    const {
+        clientId,
+        pitId,
+        currentWarehouse,
+        queueBoxes,
+        workOrder,
+        stages,
+        finalizedStages,
+        pendingStages,
+        selectedStageId,
+        selectedSandStage,
+        ultimateBoxes,
+    } = storeToRefs(store);
+    const { setTab, isTabSelected, setCradle, setWorkOrder, setSelectedStageId, setSands } = store;
+
+    const actualSheet: StageSheet = reactive({
+        companyId: -1,
+        pitId: -1,
+        warehouseId: -1,
+        operativeCradleId: -1,
+        backupCradleId: -1,
+        stages: [],
+    });
+
+    const fillSheet = async (currentSheet: any) => {
+        if (currentSheet.companyId !== -1 && currentSheet.pitId !== -1) {
+            await getSandPlan(currentSheet);
+            await getWorkorder(currentSheet);
+            await getDeposit();
+            const cradleId = workOrder.value.operativeCradle;
+            await getCradle(Number(cradleId));
+            fillBoxes();
+        }
+    };
+    const disableFinishBtn = computed(() => {
+        return (
+            selectedStageId.value < 0 ||
+            selectedSandStage.value?.status === null ||
+            selectedSandStage.value?.status >= 2
+        );
+    });
+
+    const finishCurrent = async () => {
+        console.log(selectedStageId.value);
+
+        if (selectedStageId.value < 0) {
+            return;
+        }
+        const toFreeBoxes = selectedQueue.value.filter((item: QueueItem) => item.status < 99);
+        const toFinishBoxes = selectedQueue.value
+            .filter((item: QueueItem) => item.status >= 99)
+            .map((item: QueueItem) => {
+                if ('sandPlanId' in item && 'sandStageId' in item) {
+                    console.log('Tengo data extra');
+                    const { origin, sandPlanId, sandStageId } = item;
+                    const newOrigin = { origin, sandPlanId, sandStageId };
+                    console.log(newOrigin);
+                    item.origin = JSON.stringify(newOrigin);
+                }
+
+                return {
+                    ...item,
+                    status: 100,
+                };
+            });
+        console.log('🔒', toFinishBoxes);
+        console.log('🔓', toFreeBoxes);
+        console.log('📦', selectedSandStage.value);
+        await updateAllQueueItems(toFinishBoxes);
+        await deleteAllQueueItems(toFreeBoxes);
+        await finishSandStage(selectedSandStage.value);
+        router.go(0);
+    };
+
+    watch(clientId, (newVal) => {
+        actualSheet.companyId = newVal;
+        fillSheet(actualSheet);
+    });
+    watch(pitId, (newVal) => {
+        actualSheet.pitId = newVal;
+        fillSheet(actualSheet);
+    });
+
+    const getSand = async () => {
+        const { data } = useAxios(`/sand`, instance);
+        watch(data, (newVal) => {
+            setSands(newVal.data);
+        });
+    };
+    const getSandPlan = async ({ pitId: pozoId }: StageSheet) => {
+        const { data } = useAxios(`/sandPlan?pitId=${pozoId}`, instance);
+        watch(data, (newVal) => {
+            stages.value = newVal.data[0]?.stages;
+        });
+    };
+
+    const getDeposit = async () => {
+        const workOrdeId = workOrder.value.id;
+        const { data } = useAxios(`/warehouse?pitId=${workOrdeId}`, instance);
+        watch(data, (newVal) => {
+            currentWarehouse.value = newVal?.data[0];
+        });
+    };
+
+    const getWorkorder = async ({ pitId: pozoId, companyId }: StageSheet) => {
+        const response = await axios.get(`${apiUrl}/workOrder?client=${companyId}`);
+        const workOrderFromApi = response.data.data;
+        const currentWO = workOrderFromApi.find((wo: WorkOrder) => wo.pits.some((pozo: Pit) => pozo.id === pozoId));
+        setWorkOrder(currentWO);
+    };
+
+    const getCradle = async (cradleId: number) => {
+        const { data } = useAxios(`/cradle/${cradleId}`, instance);
+        watch(data, (newVal) => {
+            setCradle(newVal.data);
+        });
+    };
+
+    const boxes = computed(() => {
+        if (pitId.value !== -1 && clientId.value !== -1) {
+            console.log('power box', newPowerBoxes.value);
+            ultimateBoxes.value = newPowerBoxes?.value;
+
+            return boxesByFloor(newPowerBoxes.value, true);
+        }
+
+        return [];
+    });
+
+    const selectedQueue = ref([] as any[]);
+    const updateQueue = (queue: Array<any>) => {
+        selectedQueue.value = queue;
+    };
+    const queueDetail: ComputedRef<Array<number>> = computed(() => {
+        const filteredSelectQueue = selectedQueue.value.filter((item: SandOrder | number | any) => item?.sandTypeId);
+
+        return Object.values(
+            filteredSelectQueue.reduce((acc, item: SandOrder) => {
+                const sandId = item?.sandTypeId;
+
+                if (acc[sandId]) {
+                    acc[sandId] += item.amount;
+                } else {
+                    acc[sandId] = item.amount;
+                }
+
+                return acc;
+            }, {} as { [key: string]: number })
+        );
+    });
+    const sumQueueDetail = computed(() => {
+        return queueDetail.value.reduce((acc: number, item: number) => {
+            return acc + item;
+        }, 0);
+    });
+    // Dirty
+    const setStageFull = (sheetId: number) => {
+        const stage = stages.value.find((stage) => stage.stageSheetId === sheetId);
+
+        if (stage) {
+            stage.done = stage.weight;
+        }
+    };
+
+    const boxesInWarehouse = await getSandOrders();
+    const fillBoxes = () => {
+        return boxesInWarehouse
+            .filter((boxy: SandOrder) => boxy.location)
+            .map((boxy: SandOrder) => {
+                const { location } = boxy;
+
+                if (location && typeof location === 'string') {
+                    boxy.location = JSON.parse(location);
+                }
+
+                return boxy as SandOrderBox;
+            })
+            .filter((boxy: SandOrderBox) => boxy.location?.where === 'warehouse')
+            .filter((boxy: SandOrderBox) => boxy.location?.where_id === currentWarehouse.value?.id);
+    };
+    const newPowerBoxes = computed(() => {
+        if (currentWarehouse.value?.id) {
+            return fillBoxes();
+        }
+
+        return [];
+    });
+
+    /**
+     * EStas son las Queue Items que queremos mostrar en la listita
+     */
+    queueBoxes.value = await getQueueItems();
+    console.log('queueBoxes', queueBoxes.value);
+    queueBoxes.value = queueBoxes.value
+        ?.filter((item) => item.sandOrder)
+        .map((item) => {
+            // Agrego el location del sandOrder para que sea mas facil de manejar
+            const { sandOrder } = item;
+            let location = '';
+
+            if (sandOrder) {
+                location = sandOrder.location;
+            }
+
+            if (location && JSON.parse(location)) {
+                item.location = JSON.parse(location);
+            }
+
+            return item;
+        });
+    // .filter((item) => item.location?.where === 'warehouse');
+    console.log('queueBoxes', queueBoxes.value);
+    queueBoxes.value = queueBoxes.value.map((item: QueueBox) => {
+        // Convierto el QueueItem a un QueueBox
+        // AKA convierto el nuevo Origin sucio en Origin y sandStageId + sandPlanId
+        const { origin } = item as QueueBox;
+        console.log('Origen', origin);
+
+        if (origin.includes('sandPlanId') && origin.includes('sandStageId')) {
+            const originData = decodeNewOrigin(origin);
+            console.log('originData', originData);
+            item.origin = originData.origin;
+            item.sandStageId = originData.sandStageId;
+            item.sandPlanId = originData.sandPlanId;
+        }
+
+        return item as QueueBox;
+    });
+    // queueBoxes.value = queueBoxes.value.filter((item) => item.status <= 100);
+    console.log('queueBoxes', queueBoxes.value);
+
+    const router = useRouter();
+    const saveQueue = (isFinished: boolean) => {
+        console.log('👎? ' + isFinished);
+
+        if (isFinished) {
+            // tomo el stage de sageID
+            // le pongo 2 para que este finalizado
+            // Modificamos el Stage para que este finalizado
+            console.log('Finalizo 😺');
+            finishCurrent();
+
+            return;
+        }
+        // En cualquier caso cierro el acordeaon y recargo
+        // selectedStageId.value = -1;
+        router.go(0);
+    };
+
+    onMounted(async () => {
+        await getSand();
+    });
+    onUnmounted(() => {
+        clientId.value = -1;
+        pitId.value = -1;
+        currentWarehouse.value = {} as Warehouse;
+        queueBoxes.value = [];
+        selectedSandStage.value = {} as SandStage;
+        selectedStageId.value = -1;
+        stages.value = [];
+        workOrder.value = {} as WorkOrder;
+        ultimateBoxes.value = [];
+    });
+</script>
+
 <style scoped lang="scss">
     @import '@/assets/box.scss';
     .tab {
@@ -267,7 +428,7 @@
     }
     .panel {
         @apply grid gap-x-6;
-        grid-template-columns: minmax(320px, 1fr) 360px;
+        grid-template-columns: minmax(320px, 760px) 360px;
     }
     .stage {
         &--panel {

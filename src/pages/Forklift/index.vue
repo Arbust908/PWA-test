@@ -14,7 +14,7 @@
         </div>
 
         <VTable
-            class="mt-5 max-w-fit"
+            class="mt-5 min-w-full lg:min-w-min"
             :columns="columns"
             :pagination="pagination"
             :items="filteredForklifts"
@@ -53,7 +53,7 @@
         <DisableModal
             :open="showModal"
             title="¿Desea inhabilitar este forklift?"
-            text="Una vez inhabilitado, no podrá utilizar este forklift en ninguna otra sección de la aplicación"
+            text="Una vez inhabilitado, no podrá utilizarlo en ninguna otra sección de la aplicación"
             @close="showModal = false"
             @main="confirmModal"
         />

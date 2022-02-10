@@ -10,7 +10,7 @@ export const validateEquipment = (
         cradleId > -1 &&
         forkliftId > -1 &&
         traktors.length > 0 &&
-        traktors.every((traktor) => traktor.chassis !== '' && traktor.supplier !== '') &&
+        traktors.every((traktor) => traktor.chassis !== -1 && traktor.supplier !== -1) &&
         pickups.length > 0 &&
         pickups.every((pickup) => pickup.pickupId !== '')
     );
@@ -28,7 +28,7 @@ export const validateHumanResourses = (crews: Array<any>) => {
             const resourcesFull =
                 group.resources.length > 0 &&
                 group.resources.every((resource: HumanResource) => {
-                    return resource.rol !== '' && resource.name !== '';
+                    return resource.role != -1 && resource.name != -1;
                 });
 
             return group.timeStart && group.timeEnd && resourcesFull;

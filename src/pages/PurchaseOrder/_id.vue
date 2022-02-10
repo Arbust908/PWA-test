@@ -83,22 +83,17 @@
                             />
                         </template>
                         <div class="flex items-center col-span-12">
-                            <div
+                            <AddDeleteBtn
                                 v-if="sandProvidersIds.length > 1"
-                                class="icon-button"
+                                purpose="remove"
                                 @click.prevent="removeSandProvider(providerId.innerId)"
-                            >
-                                <Icon icon="Trash" type="outline" class="w-5 h-5 items-center" />
-                                Borrar proveedor
-                            </div>
-                            <div
+                            />
+                            <!-- Arena Section -->
+                            <AddDeleteBtn
                                 v-if="sandProvidersIds.length - 1 == sandProvidersKey"
-                                :class="['icon-button', sandProvidersIds.length - 1 !== sandProvidersKey ? '' : 'ml-3']"
+                                purpose="add"
                                 @click.prevent="addSandProvider"
-                            >
-                                <Icon icon="Plus" type="outline" class="icon w-5 h-5 items-center" />
-                                Agregar proveedor
-                            </div>
+                            />
                         </div>
                     </FieldGroup>
                 </div>
@@ -117,13 +112,7 @@
             </form>
             <footer class="p-4 space-x-8 flex justify-end">
                 <SecondaryBtn @click.prevent="$router.push('/orden-de-pedido')"> Cancelar </SecondaryBtn>
-                <PrimaryBtn
-                    type="submit"
-                    size="sm"
-                    class="p-4"
-                    :disabled="!isFull ? 'yes' : null"
-                    @click.prevent="isFull && save()"
-                >
+                <PrimaryBtn type="submit" size="sm" class="p-4" :disabled="!isFull" @click.prevent="isFull && save()">
                     Guardar Orden
                 </PrimaryBtn>
             </footer>
@@ -188,33 +177,7 @@
             const sandOrder = ref(currentPurchaseOrder?.value?.sandOrders ?? 0);
             const companyClientId: Ref<number> = ref(currentPurchaseOrder?.value?.companyId ?? 0);
             const pitId: Ref<number> = ref(currentPurchaseOrder?.value?.pitId ?? 0);
-            const sandProvidersIds = ref(
-                // currentPurchaseOrder.value.sandOrders.reduce((sPIs, so, i) => {
-                //   const currentSPI = sPIs.find((spi) => {
-                //     return spi.id == so.sandProviderId;
-                //   });
-                //   const newSO = {
-                //     id: i,
-                //     sandTypeId: so.sandTypeId,
-                //     amount: so.amount,
-                //     boxId: so.boxId,
-                //   };
-                //   if (currentSPI) {
-                //     currentSPI.sandOrders.push(newSO);
-                //   } else {
-                //     const newSPI = {
-                //       innerID: i,
-                //       id: so.sandProviderId,
-                //       sandOrders: [],
-                //     };
-                //     newSPI.sandOrders.push(newSO);
-                //     sPIs.push(newSPI);
-                //   }
-                //   return sPIs;
-                // }, [])
-                []
-            );
-            console.log('SPI', sandProvidersIds);
+            const sandProvidersIds = ref([]);
             // >> Init
             // :: Proveedores de Sand
             const sandProviders = ref([] as Array<SandProvider>);
@@ -282,7 +245,6 @@
                         sandProviderId: sandProvidersIds.value[0].id,
                         transportProviderId: transportProviderId.value,
                     };
-                    console.log(purchaseOrder);
                     // Creamos via API la orden de pedido
                     const { data: pODone } = useAxios(
                         `/purchaseOrder/${id}`,
@@ -292,14 +254,10 @@
                     const sOisDone = ref([]);
                     watch(pODone, (newVal, _) => {
                         if (newVal && newVal.data) {
-                            console.log('PO data', newVal.data);
-                            console.log('SPIs', sandProvidersIds.value);
                             // Recorremos los proveedores de sand
                             sandProvidersIds.value.map((spI) => {
-                                console.log('SPI', spI.sandOrders);
                                 // Guradamos via api las ordenes de sand
                                 spI.sandOrders.map((sO: SandOrder) => {
-                                    console.log('SO', sO);
                                     sO.purchaseOrderId = newVal.data.id;
                                     sO.sandProviderId = spI.id;
                                     const { data: sODone } = useAxios(

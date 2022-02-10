@@ -1,14 +1,14 @@
 <template>
     <Layout>
         <ABMFormTitle title="Orden de pedido" />
-        <PDF v-if="showPDF" :info="pdfInfo" @close="togglePDF()" />
+        <PDF v-show="showPDF" ref="pdf" :info="pdfInfo" @close="redirectIndex" />
+
         <section class="bg-white rounded-md shadow-sm">
             <form method="POST" action="/" class="p-3 sm:p-4 flex-col gap-4">
                 <FieldGroup class="max-w-2xl border-none">
                     <ClientPitCombo
                         :client-id="companyClientId"
                         :pit-id="pitId"
-                        validation-type="empty"
                         @update:clientId="companyClientId = $event"
                         @update:pitId="pitId = $event"
                     />
@@ -53,17 +53,12 @@
                                 @update:data="order.sandTypeId = $event"
                                 @click="useFirstST = true"
                             />
-                            <InvalidInputLabel
-                                v-if="order.sandTypeId === -1 && useFirstST === true"
-                                validation-type="empty"
-                                class="text-xs"
-                            />
                         </div>
                         <FieldWithSides
                             :title="orderKey === 0 ? 'Cantidad' : ''"
                             class="col-span-7 sm:col-span-3"
                             field-name="sandQuantity"
-                            placeholder="Arena"
+                            placeholder="0 t"
                             type="number"
                             mask="####"
                             validation-type="empty"
@@ -83,28 +78,21 @@
                             :data="order.boxId"
                             @update:data="order.boxId = $event"
                         />
-                        <div
-                            :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'"
-                            class="col-span-1 md:col-span-2 flex flex-row"
-                        >
-                            <CircularBtn
+                        <div :class="isFirst(orderKey) ? 'mt-7' : 'mt-3'" class="col-span-1 md:col-span-2">
+                            <AddDeleteBtn
                                 v-if="useIfNotLonly(providerId.sandOrders)"
-                                class="flex self-start"
-                                size="sm"
-                                @click="removeOrder(order.id, providerId.innerId)"
-                            >
-                                <Icon icon="Trash" type="outline" class="w-7 h-7" />
-                            </CircularBtn>
+                                purpose="remove"
+                                @click.prevent="removeOrder(order.id, providerId.innerId)"
+                            />
                             <!-- Arena Section -->
-                            <CircularBtn
+                            <AddDeleteBtn
                                 v-if="isLast(orderKey, providerId.sandOrders) && soLength < 2"
-                                class="flex self-start"
-                                size="sm"
-                                btn="bg-green-500"
-                                @click.prevent="addOrder(providerId.innerId)"
-                            >
-                                <Icon icon="Plus" class="w-7 h-7 text-white" />
-                            </CircularBtn>
+                                purpose="add"
+                                @click.prevent="
+                                    addOrder(providerId.innerId);
+                                    useFirstST = false;
+                                "
+                            />
                         </div>
                     </FieldGroup>
                 </template>
@@ -188,13 +176,12 @@
                 </FieldGroup>
                 <FieldGroup v-for="(to, toKey) in TransportOrders" :key="toKey" class="max-w-3xl relative flex-wrap">
                     <FieldLegend class="mt-2">Observaciones</FieldLegend>
-                    <section class="flex gap-2 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
+                    <section class="flex gap-4 xl:gap-8 sm:flex-row items-start col-span-12 flex-wrap">
                         <label class="col-span-3">
                             <p class="text-sm mb-2">Fecha de entrega</p>
                             <DatePicker
                                 v-model="localDate"
                                 validation-type="empty"
-                                class="mr-6 md:mr-8"
                                 @date-object="dateObject = $event"
                             />
                         </label>
@@ -239,18 +226,16 @@
             :po-id="purchaseId"
             :po="po"
             :plates="filteredPlates"
+            :loading="savingOrder"
             @close="showModal = false"
-            @confirm="
-                save();
-                showModal = false;
-            "
+            @confirm="save"
         />
 
         <SuccessModal
             :open="openSuccess"
             :title="titleSuccess"
             @main="
-                togglePDF();
+                downloadPDF();
                 openSuccess = false;
             "
         />
@@ -260,14 +245,13 @@
 </template>
 
 <script setup lang="ts">
-    import Icon from '@/components/icon/TheAllIcon.vue';
     import Layout from '@/layouts/Main.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
-    import CircularBtn from '@/components/ui/buttons/CircularBtn.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
     import axios from 'axios';
     import { useAxios } from '@vueuse/integrations/useAxios';
-    import { useOnFirst, useIfNotLonly, isFirst, isLast, isNotLastAndNotLonly } from '@/helpers/iteretionHelpers';
+    import { useIfNotLonly, isFirst, isLast } from '@/helpers/iteretionHelpers';
     import {
         Sand,
         SandOrder,
@@ -275,6 +259,8 @@
         PurchaseOrder,
         TransportProvider,
         TransportOrder,
+        Company,
+        Pit,
     } from '@/interfaces/sandflow';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldLegend from '@/components/ui/form/FieldLegend.vue';
@@ -293,10 +279,24 @@
 
     const SuccessModal = defineAsyncComponent(() => import('@/components/modal/SuccessModal.vue'));
     const ErrorModal = defineAsyncComponent(() => import('@/components/modal/ErrorModal.vue'));
-    const GhostBtn = defineAsyncComponent(() => import('@/components/ui/buttons/GhostBtn.vue'));
     const api = import.meta.env.VITE_API_URL || '/api';
 
+    const drivers = ref([]);
+    const driverId = ref(-1);
+
+    const pdf = ref(null);
+    const savingOrder = ref(false);
+    const showPDF = ref(false);
+
+    const downloadPDF = async () => {
+        showPDF.value = true;
+        await pdf.value?.download();
+        showPDF.value = false;
+    };
+
     const filteredDrivers = computed(() => {
+        driverId.value = -1;
+
         if (transportProviderId.value > -1) {
             const driversFiltered = drivers.value.filter(
                 (driver) => driver.transportProviderId === transportProviderId.value
@@ -307,9 +307,6 @@
 
         return [];
     });
-
-    const drivers = ref([]);
-    const driverId = ref(-1);
 
     const filteredPlates = computed(() => {
         if (driverId.value > -1) {
@@ -336,6 +333,7 @@
         // TODO: StoreLogic
         const result = await axios.get(`${api}/driver`);
         drivers.value = result.data.data;
+        const result2 = await axios.get(`${api}/sandProvider`);
     });
 
     useTitle('Nueva orden de pedido <> Sandflow');
@@ -381,7 +379,6 @@
                 return sandProvider;
             }
         });
-
         filteredSandTypes.value = provider.meshType;
     };
 
@@ -400,83 +397,36 @@
             ...defaultTransportOrder,
         },
     ]);
-
-    const removeTransportOrder = (id: number) => {
-        TransportOrders.value = TransportOrders.value.filter((order) => order.innerId !== id);
-    };
-
-    const addTransportOrder = () => {
-        const last = TransportOrders.value[TransportOrders.value.length - 1];
-        TransportOrders.value.push({ ...defaultTransportOrder, innerId: last.innerId + 1 });
-    };
-
-    const addSandProvider = () => {
-        const lastSPIndex = sandProvidersIds.value.length - 1;
-        const lastSP = sandProvidersIds.value[lastSPIndex];
-        const lastIndex = lastSP.innerId;
-        const newInnerId = lastIndex >= 0 ? lastIndex + 1 : 0;
-        sandProvidersIds.value.push({
-            innerId: newInnerId,
-            id: -1,
-            sandOrders: [
-                {
-                    id: 0,
-                    sandTypeId: -1,
-                    amount: null,
-                    boxId: '',
-                },
-            ],
-        });
-    };
-
-    const removeSandProvider = (providerId: number) => {
-        sandProvidersIds.value = sandProvidersIds.value.filter((sandProvider: SandProvider) => {
-            return sandProvider.innerId !== providerId;
-        });
-    };
-
     const sandProviders = ref([] as Array<SandProvider>);
     const { data: sandProvidersData } = useAxios('/sandProvider', instance);
-    watch(sandProvidersData, (sPData, prevCount) => {
+    watch(sandProvidersData, (sPData) => {
         if (sPData && sPData.data) {
             sandProviders.value = sPData.data;
         }
     });
-    const companyClientId: Ref<number> = ref(-1);
-    const pitId: Ref<number> = ref(-1);
-    // >> Proveedores de Sand
-    // :: Ordenes de Sand
-    const sandOrder: Ref<Array<any>> = ref([
-        {
-            id: 0,
-            sandTypeId: -1,
-            amount: null,
-            boxId: '',
-        },
-    ]);
-    // :: Ordenes de Sand
-    const sandOrders = ref([] as Array<SandOrder>);
+    const companyClientId = ref(-1);
+    const pitId = ref(-1);
 
     const sandTypes = ref([] as Array<Sand>);
     const { data: sandTypesData } = useAxios('/sand', instance);
     const useFirstST = ref(false);
 
-    watch(sandTypesData, (sOData, prevCount) => {
+    watch(sandTypesData, (sOData) => {
         if (sOData && sOData.data) {
             sandTypes.value = sOData.data;
         }
     });
     const soLength = ref(0);
 
-    const removeOrder = (id: number, providerOrderId): void => {
-        const currentSPI = sandProvidersIds.value.find((spi) => spi.innerId === providerOrderId);
+    const removeOrder = (id: number, providerOrderId: number): void => {
+        const currentSPI = sandProvidersIds.value.find((spi: any) => spi.innerId === providerOrderId);
         currentSPI.sandOrders = currentSPI.sandOrders.filter((order) => order.id !== id);
         soLength.value -= 1;
         TransportOrders.value[0].boxAmount = soLength.value;
     };
 
     const addOrder = (providerOrderId: number): void => {
-        const currentSPI = sandProvidersIds.value.find((spi) => spi.innerId === providerOrderId);
+        const currentSPI = sandProvidersIds.value.find((spi: any) => spi.innerId === providerOrderId);
         const sandOrder = currentSPI.sandOrders;
         const lastSandOrder = sandOrder[sandOrder.length - 1];
         const newId = lastSandOrder.id + 1;
@@ -493,27 +443,19 @@
     const useFirstSQ = ref(false);
 
     // :: TransportProvider
-    const transportProviders = ref([]);
+    const transportProviders = ref([] as TransportProvider[]);
     const { data: tPData } = useAxios('/transportProvider', instance);
-    watch(tPData, (tPData, prevCount) => {
-        if (tPData && tPData.data) {
-            transportProviders.value = tPData.data;
+    watch(tPData, (newData) => {
+        if (newData && newData.data) {
+            transportProviders.value = newData.data;
         }
     });
-    const transportProviderId: Ref<number> = ref(-1);
-    const transportProvider: TransportProvider = reactive({
-        id: 1,
-        name: '',
-        transportId: '',
-        boxQuantity: null,
-        observation: '',
-        amount: null,
-    });
+    const transportProviderId = ref(-1);
     // >> TransportProvider
     const useFirstTP = ref(false);
     const useFirstDriver = ref(false);
 
-    const isFull: ComputedRef<boolean> = computed(() => {
+    const isFull = computed(() => {
         const hasPit = pitId.value >= 0;
         const hasClient = companyClientId.value >= 0;
         const validSandProviderIds =
@@ -541,7 +483,7 @@
 
         return !!(hasPit && hasClient && validSandProviderIds && validSandOrders && hasTransport && hasTransportOrders);
     });
-    const po = ref(null);
+    const po = ref({} as PurchaseOrder);
     const confirm = () => {
         const sp = sandProviders.value.find((sandP) => {
             return sandP.id === sandProvidersIds.value[0].id;
@@ -607,14 +549,14 @@
     };
 
     const purchaseId = ref(0);
-    const companies = ref([]);
+    const companies = ref([] as Company[]);
     const { data: companiesData } = useAxios('/company', instance);
     watch(companiesData, (companiesIfno) => {
         if (companiesIfno && companiesIfno.data) {
             companies.value = companiesIfno.data;
         }
     });
-    const pits = ref([]);
+    const pits = ref([] as Pit[]);
     const { data: pitsData } = useAxios('/pit', instance);
     watch(pitsData, (pitsInfo) => {
         if (pitsInfo && pitsInfo.data) {
@@ -623,43 +565,53 @@
     });
 
     onMounted(async () => {
-        const result = await axios.get(`${api}/purchaseOrder`);
-        purchaseId.value = result.data.data.at(-1).id + 1;
+        purchaseId.value = await getLastId();
     });
 
-    const save = (): void => {
+    const getLastId = async () => {
+        const result = await axios.get(`${api}/purchaseOrder`);
+
+        return result.data.data?.at(-1)?.id + 1 || 1;
+    };
+
+    const save = async (sendEmails = false) => {
         if (isFull.value) {
+            savingOrder.value = true;
             // Formateamos la orden de pedido
-            const purchaseOrder = _formatPO();
+            const purchaseOrder: any = _formatPO();
+            console.log(purchaseOrder);
+            // get last id
+            const lastId = await getLastId();
+            let newPdfInfo: any = pdfInfo.value;
+            newPdfInfo = purchaseOrder;
+            console.log(newPdfInfo);
+            // newPdfInfo.purchaseOrder.id = lastId;
+
+            purchaseOrder.sendEmails = sendEmails;
+
+            if (sendEmails) {
+                // solo si se envian mails se envia el content del pdf
+                const pdfContent = await pdf.value?.getFileContent();
+                purchaseOrder.pdfContent = pdfContent;
+            }
+
             // Creamos via API la orden de pedido
-            const { data: pODone, error } = useAxios(
-                '/purchaseOrder',
-                { method: 'POST', data: purchaseOrder },
-                instance
-            );
-            setTimeout(() => {
-                if (error.value != undefined) {
-                    showModal.value = false;
-                    openErrorGral.value = true;
-                } else {
-                    showModal.value = false;
-                    openSuccess.value = true;
-                }
-            }, 1000);
-            const sOisDone = ref([]);
-            watch(pODone, (newVal, _) => {
-                if (newVal && newVal.data) {
-                    // Recorremos los proveedores de sand
-                    const poId = newVal.data.id;
-                    purchaseId.value = poId;
-                    titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
-                    _saveTO(poId);
-                    _saveSO(poId);
-                    /* setTimeout(() => {
-                        router.push('/orden-de-pedido');
-                    }, 2000); */
-                }
+            const result = await axios.post(`${api}/purchaseOrder`, purchaseOrder).catch((err) => {
+                showModal.value = false;
+                openErrorGral.value = true;
             });
+
+            savingOrder.value = false;
+
+            if (result?.status === 200) {
+                const poId = result.data.data.id;
+                purchaseId.value = poId;
+                titleSuccess.value = `La orden de pedido #${poId} ha sido generada con éxito`;
+                showModal.value = false;
+                openSuccess.value = true;
+                _saveTO(poId);
+                _saveSO(poId);
+            }
         }
     };
     // >> Success y Error Modal
@@ -673,8 +625,6 @@
     const titleErrorGral = 'Hubo un problema al intentar generar la orden.'; //error Usuario
     const textErrorGral = 'Por favor, verifica los datos ingresados e intenta nuevamente';
 
-    const showPDF = ref(false);
-    const togglePDF = useToggle(showPDF);
     const pdfInfo = computed(() => {
         const emptyThing = {
             name: 'none',
@@ -701,6 +651,10 @@
             observation: packageObservations.value,
         };
     });
+
+    const redirectIndex = () => {
+        router.push('/orden-de-pedido');
+    };
 </script>
 
 <style lang="scss" scoped>

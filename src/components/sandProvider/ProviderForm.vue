@@ -49,13 +49,7 @@
                         require-validation
                         entity="sandProvider"
                     />
-                    <Icon
-                        icon="Trash"
-                        type="outline"
-                        size="lg"
-                        class="ml-3 w-5 h-5 cursor-pointer"
-                        @click="deleteMeshType(i)"
-                    />
+                    <AddDeleteBtn class="mt-2" purpose="remove" @click.prevent="deleteMeshType(i)" />
                 </div>
             </div>
             <div v-else class="mb-6 hidden">
@@ -79,7 +73,7 @@
                     require-validation
                     entity="sandProvider"
                     @is-blured="checkMeshValidation"
-                    @change="addMeshType($event.target.value)"
+                    @update:data="addMeshType(String($event))"
                 />
             </div>
             <InvalidInputLabel v-if="!isMeshValid && wasMeshSelectBlured" validation-type="empty" />
@@ -99,113 +93,86 @@
     </FieldGroup>
 </template>
 
-<script lang="ts">
+<script setup lang="ts">
     import { computed, defineComponent, ref, onMounted } from 'vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldInput from '@/components/ui/form/FieldInput.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
     import FieldTextArea from '@/components/ui/form/FieldTextArea.vue';
-    import Icon from '@/components/icon/TheAllIcon.vue';
+    import AddDeleteBtn from '@/components/ui/buttons/AddDeleteBtn.vue';
     import InvalidInputLabel from '@/components/ui/InvalidInputLabel.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useStore } from 'vuex';
     import { useRouter } from 'vue-router';
+    import { Sand } from '@/interfaces/sandflow';
 
-    export default defineComponent({
-        components: {
-            FieldGroup,
-            FieldInput,
-            FieldSelect,
-            FieldTextArea,
-            Icon,
-            InvalidInputLabel,
+    const props = defineProps({
+        modelValue: {
+            type: Object,
+            required: true,
         },
-        props: {
-            modelValue: {
-                type: Object,
-                required: true,
-            },
-        },
-        setup(props, { emit }) {
-            const store = useStore();
-            const router = useRouter();
-            const sandProvider = computed({
-                get: () => props.modelValue,
-                set: (value) => emit('update:modelValue', value),
-            });
+    });
+    const emits = defineEmits(['update:modelValue']);
+    const store = useStore();
+    const router = useRouter();
+    const sandProvider = computed({
+        get: () => props.modelValue,
+        set: (value) => emits('update:modelValue', value),
+    });
 
-            const selectedMesh = ref(-1);
-            const meshTypes = ref([]);
+    const selectedMesh = ref(-1);
+    const meshTypes = ref([]);
 
-            const filteredMeshTypes = computed(() => {
-                console.log('Mesh Types', sandProvider.value.meshType);
-                const selectedMeshTypes = sandProvider.value.meshType?.map((mesh) => mesh.id);
+    const filteredMeshTypes = computed(() => {
+        const selectedMeshTypes = sandProvider.value.meshType?.map((mesh: Sand) => mesh.id);
 
-                // *** Problemas. Asyncronismo
-                return meshTypes.value.filter((m: any) => !selectedMeshTypes.includes(m.id));
-            });
+        return meshTypes.value
+            .filter((mesh: Sand) => mesh.visible)
+            .filter((m: any) => !selectedMeshTypes.includes(m.id));
+    });
 
-            const addMeshType = (newMeshType: string) => {
-                // check duplicates
-                const exists = sandProvider.value.meshType.map((mesh) => mesh.id).includes(newMeshType);
+    const addMeshType = (newMeshType: string) => {
+        // check duplicates
+        const exists = sandProvider.value.meshType.map((mesh: Sand) => mesh.id).includes(newMeshType);
 
-                if (exists) {
-                    return;
-                }
+        if (exists) {
+            return;
+        }
 
-                let mesh = meshTypes.value.filter((mesh) => {
-                    if (mesh.id == newMeshType) {
-                        return mesh;
-                    }
-                })[0];
+        const newMesh = meshTypes.value.find((mesh: Sand) => {
+            if (mesh.id === Number(newMeshType)) {
+                return mesh;
+            }
+        });
 
-                sandProvider.value.meshType.push(mesh);
-            };
+        sandProvider.value.meshType.push(newMesh);
+    };
 
-            const deleteMeshType = (index: Object) => {
-                sandProvider.value.meshType.splice(index, 1);
-            };
+    const deleteMeshType = (index: any) => {
+        sandProvider.value.meshType.splice(index, 1);
+    };
 
-            const wasMeshSelectBlured = ref(false);
+    const wasMeshSelectBlured = ref(false);
 
-            const isMeshValid = computed(() => {
-                if (sandProvider.value.meshType?.length > 0) {
-                    return true;
-                }
+    const isMeshValid = computed(() => {
+        if (sandProvider.value.meshType?.length > 0) {
+            return true;
+        }
 
-                return false;
-            });
+        return false;
+    });
 
-            const checkMeshValidation = () => {
-                if (!wasMeshSelectBlured.value) {
-                    wasMeshSelectBlured.value = true;
-                }
-            };
+    const checkMeshValidation = () => {
+        if (!wasMeshSelectBlured.value) {
+            wasMeshSelectBlured.value = true;
+        }
+    };
 
-            onMounted(async () => {
-                const result = await useStoreLogic(router, store, 'sand', 'getAll');
+    onMounted(async () => {
+        const result = await useStoreLogic(router, store, 'sand', 'getAll');
 
-                if (result.type == 'success') {
-                    meshTypes.value = result.res.map((sand) => {
-                        return {
-                            id: sand.id,
-                            type: sand.type,
-                        };
-                    });
-                }
-            });
-
-            return {
-                deleteMeshType,
-                checkMeshValidation,
-                wasMeshSelectBlured,
-                addMeshType,
-                filteredMeshTypes,
-                sandProvider,
-                selectedMesh,
-                isMeshValid,
-                meshTypes,
-            };
-        },
+        if (result.type == 'success') {
+            meshTypes.value = result.res;
+        }
     });
 </script>

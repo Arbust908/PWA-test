@@ -1,18 +1,42 @@
 import { useClone } from '@/helpers/useClone';
+import { SandOrder, SandOrderBox } from '@/interfaces/sandflow';
+
+import axios from 'axios';
+
+const apiUrl = import.meta.env.VITE_API_URL || '/api';
+
+export const defaultBox = {
+    floor: 1,
+    col: 0,
+    row: 0,
+    category: '',
+    id: '',
+    boxId: '',
+    location: '',
+    wasOriginallyOnDeposit: false,
+    wasOriginallyOnCradle: false,
+};
 
 export const formatDeposit = (deposit: any) => {
-    const deposito = useClone(deposit);
+    const formatedDefault = { floor: 0, row: 0, col: 0, dimensions: '' };
+
+    if (!deposit) {
+        console.error('Deposit es ', deposit);
+
+        return { ...formatedDefault };
+    }
+    const { clone: deposito } = useClone(deposit);
     const dimensions = Object.keys(deposito).reduce(
         (dims, currentCell) => {
-            const proxy = currentCell.split('|');
-            const [floor, row, col] = proxy;
+            const cellNameArray = currentCell.split('|');
+            const [floor, row, col] = cellNameArray;
             dims.floor = Math.max(dims.floor, Number(floor));
             dims.row = Math.max(dims.row, Number(row));
             dims.col = Math.max(dims.col, Number(col));
 
             return dims;
         },
-        { floor: 0, row: 0, col: 0, dimensions: '' }
+        { ...formatedDefault }
     );
     dimensions.dimensions = `${dimensions.row} x ${dimensions.col}`;
 
@@ -46,56 +70,33 @@ export const formatLocation = (location: any) => {
     return dimensions;
 };
 
-// {
-//     "1|1|1": {
-//         "id": "SDG85",
-//         "category": "fina"
-//     },
-//     "1|1|2": {
-//         "category": "empty"
-//     },
-//     "1|1|3": {
-//         "category": "gruesa"
-//     },
-//     "1|1|4": {
-//         "category": "empty"
-//     },
-//     "1|1|5": {
-//         "category": "cortada"
-//     },
-//     "1|2|1": {
-//         "category": "fina"
-//     },
-//     "1|2|2": {
-//         "category": "empty"
-//     },
-//     "1|2|3": {
-//         "category": "gruesa"
-//     },
-//     "1|2|4": {
-//         "category": "empty"
-//     },
-//     "1|2|5": {
-//         "category": "cortada"
-//     },
-//     "1|3|1": {
-//         "category": "fina"
-//     },
-//     "1|3|2": {
-//         "category": "empty"
-//     },
-//     "1|3|3": {
-//         "category": "gruesa"
-//     },
-//     "1|3|4": {
-//         "category": "empty"
-//     },
-//     "1|3|5": {
-//         "category": "cortada"
-//     }
-// }
-export const boxesByFloor = (location: any) => {
-    console.log('boxesByFloor', location);
+export const boxesByFloor = (location: any, queueItemSort = false) => {
+    if (queueItemSort) {
+        const boxes = location.reduce((allFloors: Array<any>, box: any) => {
+            const { location: wheres } = box;
+
+            if (wheres.where !== 'warehouse') {
+                return;
+            }
+            const { floor, col, row } = wheres;
+
+            box.floor = floor;
+            box.col = col;
+            box.row = row;
+
+            const floorIndex = Number(box.floor) - 1;
+
+            if (!allFloors[floorIndex]) {
+                allFloors[floorIndex] = [];
+            }
+            allFloors[floorIndex].push(box);
+
+            return allFloors;
+        }, []);
+
+        return boxes;
+    }
+
     const boxes = Object.keys(location).reduce((bxs: any, currentCell) => {
         const box = location[currentCell];
 
@@ -115,7 +116,85 @@ export const boxesByFloor = (location: any) => {
 
         return bxs;
     }, []);
-    console.log(boxes);
 
     return boxes;
+};
+
+export const getBoxClasses = (category: string, status: number) => {
+    if (status === 11) {
+        return 'mesh-type__empty boxCard';
+    } else if (status === null) {
+        return 'notDesignated';
+    } else {
+        switch (category) {
+            case '1':
+                return 'mesh-type__1 boxCard';
+            case '2':
+                return 'mesh-type__2 boxCard';
+            case '3':
+                return 'mesh-type__3 boxCard';
+            case '4':
+                return 'mesh-type__4 boxCard';
+            case '5':
+                return 'mesh-type__5 boxCard';
+            case 'empty':
+                return 'mesh-type__empty boxCard';
+            case 'aisle':
+                return 'mesh-type__taken aisle';
+            case 'cradle':
+                return 'mesh-type__taken cradle';
+            case null:
+                return '';
+            default:
+                if (parseInt(category) > 5) {
+                    return 'mesh-type__extra boxCard';
+                } else {
+                    return '';
+                }
+        }
+    }
+
+    return '';
+};
+
+export const getInDepoBoxes = (boxes: Array<any>, depoId: number) => {
+    const boxy = boxes.filter((box) => {
+        const { location } = box;
+
+        return location && location.where === 'warehouse' && location.where_id === depoId;
+    });
+
+    return [...new Set(boxy)];
+};
+
+export const searchInDepoBoxes = async (depoId: number) => {
+    let allBoxes = await getSandOrders();
+    allBoxes = allBoxes
+        .filter((box: SandOrder) => box.status <= 99)
+        .filter((box: SandOrder) => box.location && box.location !== null)
+        .map(formatBoxLocation);
+
+    return getInDepoBoxes(allBoxes, depoId);
+};
+
+export const getSandOrders = async (): Promise<SandOrder[]> => {
+    return await axios
+        .get(`${apiUrl}/sandOrder`)
+        .then((response) => {
+            return response.data.data;
+        })
+        .catch((err) => console.error(err));
+};
+export const formatBoxLocation = (box: SandOrder): SandOrderBox => {
+    console.log('formatBoxLocation', box);
+    const { location } = box;
+
+    console.log('location :I', location);
+
+    box.location = JSON.parse(location);
+    box.row = box.location.row;
+    box.col = box.location.col;
+    box.floor = box.location.floor;
+
+    return box as SandOrderBox;
 };

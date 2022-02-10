@@ -11,7 +11,13 @@ export enum StoreLogicMethods {
     UPDATE = 'update',
 }
 
-export async function useStoreLogic(router: any, store: any, entity: string, method: StoreLogicMethods, payload?: any) {
+export async function useStoreLogic(
+    router: any,
+    store: any,
+    entity: string,
+    method: StoreLogicMethods | string,
+    payload?: any
+) {
     return await store.dispatch(`${entity}DataHandler`, { method, payload }).then((res: any) => {
         String.prototype.capitalize = function () {
             return this.charAt(0).toUpperCase() + this.slice(1);

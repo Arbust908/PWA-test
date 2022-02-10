@@ -1,15 +1,25 @@
 <template>
     <div class="flex flex-wrap">
-        <CradleCard :id="id" class="max-w-[260px]" :selected="selected" @click="handleSelectedCradle" />
-        <CradleSlots v-if="selected" :cradle="cradle" :box="choosedBox" @clear-box-in-deposit="clearBoxInDeposit" />
+        <CradleCard
+            :id="id"
+            class="max-w-[260px]"
+            :cradle="cradle"
+            :selected="selected"
+            @click="handleSelectedCradle"
+        />
+        <CradleSlots
+            v-if="selected"
+            :cradle="cradle"
+            :box="choosedBox"
+            @clear-box-in-deposit="clearBoxInDeposit"
+            @handle-slot-click="handleSlotClick($event)"
+        />
     </div>
 </template>
 
 <script lang="ts">
     import CradleCard from '@/components/depositDesign/CradleCard.vue';
     import CradleSlots from '@/components/depositDesign/CradleSlots.vue';
-
-    import { ref, watchEffect } from 'vue';
 
     export default {
         components: {
@@ -34,7 +44,8 @@
                 required: true,
             },
         },
-        setup(props, { emit }) {
+        emits: ['clear-box-in-deposit', 'handle-selected-cradle', 'handle-slot-click'],
+        setup(props: any, { emit }: any) {
             const cradle = ref(props.cradle);
             const choosedBox = ref(props.choosedBox);
             const selected = ref(props.selected);
@@ -42,6 +53,11 @@
 
             const handleSelectedCradle = () => {
                 emit('handle-selected-cradle');
+            };
+
+            // A deprecar
+            const handleSlotClick = (e) => {
+                emit('handle-slot-click', e);
             };
 
             const clearBoxInDeposit = (id) => {
@@ -60,6 +76,7 @@
                 id,
                 handleSelectedCradle,
                 clearBoxInDeposit,
+                handleSlotClick,
             };
         },
     };

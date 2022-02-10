@@ -1,4 +1,4 @@
-import { ref, watch } from 'vue';
+import { ref, watch, Ref } from 'vue';
 import axios from 'axios';
 import { useAxios } from '@vueuse/integrations/useAxios';
 const api = import.meta.env.VITE_API_URL || '/api';
@@ -9,13 +9,13 @@ const instance = axios.create({ baseURL: api });
  * @param endpoint toma un string con la ruta de la api
  * @returns objeto con las funciones del CRUD
  */
-export function useApi(endpoint: string) {
+export function useApi<T>(endpoint: string) {
     /**
      *
      * @param entity toma un objeto con la entidad a crear
      * @returns objeto con la entidad creada y el estado de la petición
      */
-    const create = (entity: any) => {
+    const create = (entity: T) => {
         const { data, isFinished } = useAxios(`${endpoint}`, { method: 'POST', data: entity }, instance);
 
         return { data, isFinished };
@@ -24,8 +24,8 @@ export function useApi(endpoint: string) {
      * TODO: Implementar que si le paso un Id lo traiga. hoy se puede hacer si le paso un ID al endpoint
      * @returns objeto con la entidad
      */
-    const read = () => {
-        const entity = ref(null);
+    const read = (): Ref<T> => {
+        const entity = ref(null) as Ref<T | null>;
         const { data } = useAxios(endpoint, instance);
         watch(data, (newValue) => {
             if (newValue && newValue.data) {
@@ -33,7 +33,7 @@ export function useApi(endpoint: string) {
             }
         });
 
-        return entity;
+        return entity as Ref<T>;
     };
     /**
      *

@@ -7,29 +7,24 @@
     </Layout>
 </template>
 
-<script lang="ts">
-    import { computed, defineComponent } from 'vue';
-    import { useStore } from 'vuex';
-    import { useTitle } from '@vueuse/core';
+<script setup lang="ts">
     import Layout from '@/layouts/Main.vue';
     import PanelControlCard from '@/components/panel/ControlCard.vue';
-    export default defineComponent({
-        components: {
-            Layout,
-            PanelControlCard,
-        },
-        setup() {
-            useTitle('Home <> Sandflow');
-            const store = useStore();
-            const navigation = computed(() => {
-                return store.state.global.navigation.filter((nav) => {
-                    return nav.name !== 'LINE' && nav.to !== undefined;
-                });
-            });
 
-            return {
-                navigation,
-            };
-        },
+    useTitle('Home <> Sandflow');
+    const store = useStore();
+    const navigation = computed(() => {
+        const navigationItems = JSON.parse(JSON.stringify(store.state.global.navigation));
+        const storePermissions = store.getters.getUserPermissions;
+        const permissions = JSON.parse(JSON.stringify(storePermissions));
+
+        return navigationItems.filter((nav) => {
+            const isLine = nav.name === 'LINE';
+            const hasDestination = nav.to !== undefined;
+            const permitedRoutes = permissions.view;
+            const hasPermission = permitedRoutes.includes(nav.title);
+
+            return !isLine && hasDestination && hasPermission;
+        });
     });
 </script>

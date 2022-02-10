@@ -1,72 +1,3 @@
-<script setup lang="ts">
-    import BoxIdCard from './BoxIdCard.vue';
-    import ErrorModal from '@/components/modal/ErrorModal.vue';
-    import gsap from 'gsap';
-
-    const props = defineProps({
-        boxes: {
-            type: Array,
-            required: true,
-        },
-        selectedBox: {
-            type: Object,
-            required: true,
-        },
-    });
-    defineEmits(['select-box']);
-
-    const definedBoxes = computed(() => {
-        return props.boxes.filter((box) => {
-            return box.boxId && box.boxId.length > 0;
-        });
-    });
-    const undefinedBoxes = computed(() => {
-        return props.boxes.filter((box) => {
-            return !box.boxId || box.boxId.length === 0;
-        });
-    });
-
-    const noIdModal = ref(false);
-    const toggleNIM = useToggle(noIdModal);
-
-    const isActiveBox = (boxId: string) => {
-        console.log(props.selectedBox.boxId);
-        console.log(boxId);
-        console.log(props.selectedBox.boxId === boxId);
-
-        return props.selectedBox.boxId === boxId;
-    };
-
-    const beforeEnter = (el) => {
-        el.style.opacity = 0;
-        el.style.transform = 'scaleY(50%)';
-    };
-    const enter = (el, done) => {
-        const staggerIndex = el.dataset.staggerIndex;
-        gsap.to(el, {
-            opacity: 1,
-            scaleY: 1,
-            duration: 0.5,
-            delay: 0.1 * staggerIndex,
-            onComplete: done,
-        });
-    };
-    const beforeLeave = (el) => {
-        el.style.opacity = 1;
-        el.style.transform = 'scaleY(100%)';
-    };
-    const leave = (el, done) => {
-        const staggerIndex = el.dataset.staggerIndex;
-        gsap.to(el, {
-            opacity: 0,
-            scaleY: 0.5,
-            duration: 0.5,
-            delay: 0.1 * staggerIndex,
-            onComplete: done,
-        });
-    };
-</script>
-
 <template>
     <fieldset class="w-full pt-1 pb-5 px-2">
         <section v-if="boxes.length > 0" class="space-y-4">
@@ -126,3 +57,68 @@
         @main="toggleNIM"
     />
 </template>
+
+<script setup lang="ts">
+    import BoxIdCard from './BoxIdCard.vue';
+    import ErrorModal from '@/components/modal/ErrorModal.vue';
+    import gsap from 'gsap';
+
+    const props = defineProps({
+        boxes: {
+            type: Array,
+            required: true,
+        },
+        selectedBox: {
+            type: Object,
+            required: true,
+        },
+    });
+    defineEmits(['select-box']);
+
+    const definedBoxes = computed(() => {
+        return props.boxes.filter((box) => {
+            return box.boxId && box.boxId.length > 0;
+        });
+    });
+    const undefinedBoxes = computed(() => {
+        return props.boxes.filter((box) => {
+            return !box.boxId || box.boxId.length === 0;
+        });
+    });
+
+    const noIdModal = ref(false);
+    const toggleNIM = useToggle(noIdModal);
+
+    const isActiveBox = (boxId: string) => {
+        return props.selectedBox.boxId === boxId;
+    };
+
+    const beforeEnter = (el: HTMLElement) => {
+        el.style.opacity = '0';
+        el.style.transform = 'scaleY(50%)';
+    };
+    const enter = (el: HTMLElement, done) => {
+        const staggerIndex = el.dataset.staggerIndex;
+        gsap.to(el, {
+            opacity: 1,
+            scaleY: 1,
+            duration: 0.5,
+            delay: 0.1 * staggerIndex,
+            onComplete: done,
+        });
+    };
+    const beforeLeave = (el) => {
+        el.style.opacity = 1;
+        el.style.transform = 'scaleY(100%)';
+    };
+    const leave = (el, done) => {
+        const staggerIndex = el.dataset.staggerIndex;
+        gsap.to(el, {
+            opacity: 0,
+            scaleY: 0.5,
+            duration: 0.5,
+            delay: 0.1 * staggerIndex,
+            onComplete: done,
+        });
+    };
+</script>

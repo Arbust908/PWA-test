@@ -3,8 +3,13 @@
         <div
             v-for="(slot, index) in cradle.slots"
             :key="index"
-            :class="['single-slot', slot.category, !slot.category ? 'border-dashed border-2 border-second-500' : '']"
-            @click="handleSlotClick(index)"
+            :class="[
+                'single-slot',
+                slot.sandTypeId,
+                slotClasses(slot.sandTypeId),
+                !slot.category ? 'border-dashed border-2 border-second-500' : '',
+            ]"
+            @click="handleSlotClick(slot, index)"
         >
             <div v-if="slot.boxId == null" class="index-wrapper">
                 <span class="index">{{ index + 1 }}</span>
@@ -16,73 +21,80 @@
     </div>
 </template>
 
-<script lang="ts">
-    import { onMounted, ref, watchEffect } from 'vue';
-
-    export default {
-        props: {
-            cradle: {
-                type: Object,
-                required: true,
-            },
-            box: {
-                type: Object,
-                required: true,
-            },
+<script setup lang="ts">
+    import { getBoxClasses } from '@/helpers/useWarehouse';
+    import { BoxLocation, SandOrderBox } from '@/interfaces/sandflow';
+    const props = defineProps({
+        cradle: {
+            type: Object,
+            required: true,
         },
-        setup(props, { emit }) {
-            const cradle = ref(props.cradle);
-            const box = ref(props.box);
-            const wasBoxInCradle = ref(false);
-
-            const handleSlotClick = (index) => {
-                if (box.value.wasOriginallyOnDeposit) {
-                    return;
-                }
-
-                if (box.value.wasOriginallyOnCradle) {
-                    return;
-                }
-
-                if (wasBoxInCradle.value) {
-                    // toast.error("La caja ya est� ingresada")
-                    return;
-                }
-
-                box.value.location = {
-                    where: 'cradle',
-                    where_id: cradle.value.id,
-                };
-
-                const id = box.value.boxId;
-                cradle.value.slots = cradle.value.slots.map((slot) => {
-                    if (slot.boxId == id) {
-                        slot = {
-                            boxId: null,
-                        };
-                    }
-
-                    return slot;
-                });
-                emit('clear-box-in-deposit', id);
-                cradle.value.slots[index] = box.value;
-            };
-
-            watchEffect(() => {
-                box.value = props.box;
-                cradle.value = props.cradle;
-            });
-
-            return {
-                cradle,
-                box,
-                handleSlotClick,
-            };
+        box: {
+            type: Object,
+            required: true,
         },
+    });
+    const emits = defineEmits(['clear-box-in-deposit', 'handle-slot-click']);
+    const { cradle, box } = toRefs(props);
+    const wasBoxInCradle = ref(false);
+
+    const slotClasses = (sandId: number) => {
+        if (typeof sandId === 'number') {
+            return getBoxClasses(String(sandId), -1);
+        }
+
+        return getBoxClasses(sandId, -1);
+    };
+
+    const handleSlotClick = (slot: SandOrderBox, index: number) => {
+        // Si ya estaba en el deposito o en el cradle (antes del ingreso) no se mueve
+        if (box.value.wasOriginallyOnDeposit || box.value.wasOriginallyOnCradle) {
+            return;
+        }
+
+        // Si ya estaba en el cradle no se mueve
+        if (wasBoxInCradle.value) {
+            // toast.error("La caja ya est� ingresada")
+            return;
+        }
+
+        // si la caja no tiene id no se mueve
+        if (box.value.id === '') {
+            return;
+        }
+
+        // Si paso empezamos a retocar la info de la caja
+
+        if (box.value.location && box.value.location.where === 'warehouse') {
+            // Si la caja estaba en deposito lo sacamos
+            emits('clear-box-in-deposit', box.value);
+        }
+        // Ponemos los valores de la locacion en el objeto location
+        box.value.location = {
+            where: 'cradle',
+            where_id: cradle.value.id,
+            where_slot: index,
+            where_origin: 'Estación ' + (index + 1),
+        } as BoxLocation;
+
+        // Sacamos de los Slots la caja que se mueve
+        const movingBoxid = box.value.boxId;
+        cradle.value.slots = cradle.value.slots.map((cradleSlot: SandOrderBox) => {
+            if (cradleSlot.boxId == movingBoxid) {
+                return { boxId: null };
+            }
+
+            return cradleSlot;
+        });
+
+        // Movemos la caja al Slot seleccionado
+        cradle.value.slots[index] = box.value;
+        emits('handle-slot-click', slot);
     };
 </script>
 
 <style lang="scss" scoped>
+    @import '@/assets/box.scss';
     .slots-wrapper {
         @apply ml-4 flex flex-row justify-between items-center;
     }
