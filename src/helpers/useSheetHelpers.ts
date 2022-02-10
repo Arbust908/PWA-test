@@ -1,4 +1,4 @@
-import { BoxLocation, QueueItem, SandOrder, SandOrderBox, SandStage } from '@/interfaces/sandflow';
+import { BoxLocation, QueueBox, QueueItem, SandOrder, SandOrderBox, SandStage } from '@/interfaces/sandflow';
 import axios from 'axios';
 
 const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -35,7 +35,7 @@ export const filterJustToAddBox = (queueBox: any) => {
     return queueBox.toAdd;
 };
 
-export const extractOrderInfo = (item: QueueItem) => {
+export const extractOrderInfo = (item: QueueItem | QueueBox) => {
     const { sandOrder } = item;
     const { boxId, amount, sandTypeId } = sandOrder as SandOrder;
 
@@ -77,6 +77,20 @@ export const moveBoxes = (boxes: SandOrderBox[], to: any = null) => {
     return updateAllItems(movedBoxes);
 };
 
+export const encodeNewOrigin = (origin: string, selectedSandStage: SandStage) => {
+    const sandStageId = selectedSandStage.id;
+    const sandPlanId = selectedSandStage.sandPlanId;
+    const newOrigin = { origin, sandStageId, sandPlanId };
+
+    return JSON.stringify(newOrigin);
+};
+
+export const decodeNewOrigin = (newOrigin: string) => {
+    const { origin, sandStageId, sandPlanId } = JSON.parse(newOrigin);
+
+    return { origin, sandStageId, sandPlanId };
+};
+
 export const updateSandOrder = async (order: SandOrder | SandOrderBox) => {
     const { id } = order;
 
@@ -109,6 +123,7 @@ export const updateSandStage = async (stage: SandStage) => {
 export const finishSandStage = async (stage: SandStage) => {
     const { id } = stage;
     stage.status = 2;
+    console.log('-->>>', stage);
 
     return await axios
         .put(`${apiUrl}/sandStage/${id}`, stage)

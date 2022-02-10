@@ -3,7 +3,11 @@
         <header class="flex justify-between">
             <h2>Etapa {{ sandStage.stage }}/20</h2>
             <p>Total: {{ weigth }} Toneladas</p>
-            <div class="flex gap-x-1 items-center">
+            <!-- <p>{{ sandStage.id }}</p> -->
+            <div v-if="sandStage.status === 2" class="flex gap-x-1 items-center">
+                <span class="italic text-center w-full">Finalizado</span>
+            </div>
+            <div v-else class="flex gap-x-1 items-center">
                 <progress
                     v-if="showProgress"
                     max="100"
@@ -36,7 +40,7 @@
                     :porcentage="getPorcentage(sand?.quantity, queueDetail[sand.type]?.amount)"
                 />
             </section>
-            <section v-if="!isActive" class="flex justify-center items-center max-w-md">
+            <section v-if="sandStage.status === 0 && !isActive" class="flex justify-center items-center max-w-md">
                 <p class="leading-wider leading-loose text-center max-w-sm mx-auto">
                     Debés completar al menos un 70% de la etapa anterior para continuar con la siguiente
                 </p>
@@ -49,21 +53,21 @@
                         isSelectedBox(place) ? 'selected' : null,
                         box?.boxId ? `mesh-type__${box?.sandTypeId} filled boxCard relative group` : 'not-filled',
                         box?.status === 99 ? 'done' : null,
+                        box?.status === 100 ? 'completed' : null,
                     ]"
                     class="stage--box"
                     :order="box.order"
                     @click="box?.boxId ? activeDelete(box) : fillBox(place, $event)"
                 >
                     <button
-                        v-if="box?.boxId && box?.status !== 99"
+                        v-if="box?.boxId && box?.status < 99"
                         class="w-6 h-6 absolute top-0 right-0 -mt-2 -mr-2 bg-white rounded-full shadow-sm group-hover:bg-red-400 group-hover:text-red-50 transition duration-150 ease-out"
                     >
                         <TheAllIcon icon="XCircle" type="outline" />
                     </button>
                     <p>{{ box?.boxId ? box.boxId : box }}</p>
-                    <p v-if="box?.amount" :class="box?.isDone ? '!text-gray-400' : null" class="text-black">
-                        {{ box.amount }} ton
-                    </p>
+                    <p v-if="box?.amount" :class="box?.status < 99 ? 'text-black' : null">{{ box.amount }} ton</p>
+                    <!-- <p v-if="box?.sandStageId">{{ box?.sandStageId }}</p> -->
                     <teleport to="#modal">
                         <OnClickOutside v-if="isSelectedBox(place)" @trigger="selectedBox = null">
                             <div
@@ -109,10 +113,9 @@
                 <NoneBtn btn="wide" :is-loading="isLoading" @click="$emit('set-stage', sandStage.id)">
                     Cancelar
                 </NoneBtn>
-                <InverseBtn v-if="stagePorcentage < 100" btn="wide" :is-loading="isLoading" @click="generateQueue()">
-                    Guardar
+                <InverseBtn btn="wide" :is-loading="isLoading" @click="generateQueue()">
+                    {{ stagePorcentage < 100 ? 'Guardar' : 'Finalizar' }}
                 </InverseBtn>
-                <InverseBtn v-else btn="wide" :is-loading="isLoading" @click="generateQueue()"> Finalizar </InverseBtn>
             </footer>
         </div>
     </article>
@@ -127,6 +130,7 @@
         SandOrderBox,
         PurchaseOrder,
         BoxLocation,
+        QueueBox,
     } from '@/interfaces/sandflow';
     import { useStoreLogic, StoreLogicMethods } from '@/helpers/useStoreLogic';
     import { useClone } from '@/helpers/useClone';
@@ -149,6 +153,7 @@
         sheetGridItems,
     } from '@/helpers/useQueueItem';
     import {
+        encodeNewOrigin,
         extractBoxInfo,
         extractOrderInfo,
         filterEmptyQueueBox,
@@ -181,7 +186,7 @@
     });
     const emits = defineEmits(['set-stage', 'update-queue', 'set-stage-full', 'saved-queue']);
     const sheetStore = useSheetStore();
-    const { pitId, queueBoxes, sands: allSands, getPitBoxes, getPitBoxesByFloor } = storeToRefs(sheetStore);
+    const { sands: allSands, getPitBoxes, getPitBoxesByFloor } = storeToRefs(sheetStore);
     /**
      * isActive Marca si es un stage que esta "activo" y por ende muestra el porsentaje
      * isSelectedStage Marca si el stage esta seleccionado y por ende el que muestra los detalles
@@ -189,6 +194,8 @@
     const { isActive, isSelectedStage } = toRefs(props);
     const sands = ref([] as Sand[]);
     const weigth = computed(() => {
+        console.log('SANDS', sands.value);
+
         return sands.value.reduce((acc, sand: any) => {
             return acc + sand.quantity;
         }, 0);
@@ -208,7 +215,7 @@
      * @type {Ref<Array<number | QueueItem>>}
      * @description Referencia a la cola de cajas del stage
      */
-    const boxQueue: Ref<Array<number | SandOrderBox>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
+    const boxQueue: Ref<Array<number | SandOrderBox | QueueBox>> = ref([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14]);
 
     /**
      * Tomamos los QueueItems de este Pozo y los filtramos por los que van al Cradle
@@ -216,6 +223,7 @@
      */
     const fillQueueBoxes = async () => {
         const sheetItems = getPitBoxes.value;
+        console.log('---------->>fillQueueBoxes<<----------');
         console.log('sheetItems', sheetItems);
         const { deTransporte, aCradle } = separateQueues(sheetItems);
         const newItemList = [...deTransporte, ...aCradle];
@@ -227,7 +235,8 @@
          * sacando las que van del tranporte al deposito
          */
         console.log('newItemList', newItemList);
-        boxQueue.value = newItemList.filter((item) => {
+        const queueIds = [] as number[];
+        let boxList = newItemList.filter((item) => {
             const { origin, destination } = item;
             console.groupCollapsed(`${origin} => ${destination}`);
             const baseOrigin = origin.split(' ')[0];
@@ -251,7 +260,7 @@
                 console.groupEnd();
 
                 return true;
-            } else if (baseDestination === 'Estación') {
+            } else if (baseDestination === 'Estación' || baseDestination === '') {
                 console.log('voy al cradle');
                 console.groupEnd();
 
@@ -264,8 +273,31 @@
             }
         });
 
-        boxQueue.value = boxQueue.value.map(extractOrderInfo);
-        console.log(boxQueue.value);
+        boxList = boxList.filter((item) => {
+            const currentStageId = props.sandStage.id;
+            const { sandStageId } = item as QueueBox;
+            console.groupCollapsed('QueueBox');
+            console.log('item', item);
+            console.log('sandStage', props.sandStage.id);
+            console.log('Es de este Stage?', currentStageId === sandStageId);
+            console.groupEnd();
+
+            return currentStageId === sandStageId;
+        });
+        boxList = boxList.map(extractOrderInfo);
+        boxList = boxList.filter((item) => {
+            const itemId = item.id as number;
+            console.log('itemId', item);
+            const isDuplicate = queueIds.includes(itemId);
+
+            if (!isDuplicate) {
+                queueIds.push(itemId);
+
+                return true;
+            }
+        });
+        console.log(boxList);
+        boxQueue.value = boxList as QueueBox[];
 
         if (boxQueue.value.length < 14) {
             const queueNum = boxQueue.value.length;
@@ -284,22 +316,24 @@
 
     if (sandId1.value) {
         const sand1 = allSands.value.find((sand) => sand.id === sandId1.value) || ({} as Sand);
-        updateSand(sand1, quantity1);
+        console.log('sand1', sand1);
+        console.log('QUANTITY 1', quantity1.value);
+        updateSand(sand1, quantity1.value);
     }
 
     if (sandId2.value) {
         const sand2 = allSands.value.find((sand) => sand.id === sandId2.value) || ({} as Sand);
-        updateSand(sand2, quantity2);
+        updateSand(sand2, quantity2.value);
     }
 
     if (sandId3.value) {
         const sand3 = allSands.value.find((sand) => sand.id === sandId3.value) || ({} as Sand);
-        updateSand(sand3, quantity3);
+        updateSand(sand3, quantity3.value);
     }
 
     if (sandId4.value) {
         const sand4 = allSands.value.find((sand) => sand.id === sandId4.value) || ({} as Sand);
-        updateSand(sand4, quantity4);
+        updateSand(sand4, quantity4.value);
     }
 
     watch(isSelectedStage, (val) => {
@@ -402,6 +436,8 @@
         sand: Sand;
         id: number;
     }
+
+    // Suma de los mismos tipos de arena
     const queueDetail = computed(() => {
         console.log('Las cajas en la cola 🍑', boxQueue.value);
 
@@ -426,12 +462,16 @@
             return acc;
         }, {} as { [key: string]: QueueDetail });
     });
+
+    // Suma del total de arena
     const queueDetailTotal = computed(() => {
         return Object.values(queueDetail.value).reduce((acc, item) => {
             return acc + item.amount;
         }, 0);
     });
     const stagePorcentage = computed(() => {
+        console.log(weigth.value, queueDetailTotal.value);
+
         return getPorcentage(weigth.value, queueDetailTotal.value);
     });
 
@@ -452,7 +492,7 @@
             const { where, where_origin } = location as BoxLocation;
             const { DepositoACradle } = QueueTransactions;
 
-            const destination = where === 'warehouse' ? where_origin : '';
+            const destination = (where === 'warehouse' ? where_origin : '') as string;
 
             const newOrder = await getOrderPro(DepositoACradle);
 
@@ -464,6 +504,11 @@
                 origin: destination,
                 destination: '',
             };
+            const { sandStage } = toRefs(props);
+            console.log('SandPlan & SandStage', sandStage.value, sandStage.value.sandPlanId);
+            console.log('newItem, newOrigin', 'encodeNewOrigin');
+            const newOrigin = encodeNewOrigin(newItem.origin, sandStage.value as SandStage);
+            newItem.origin = newOrigin;
             SandOrdersToMove.push(item);
 
             return newItem as QueueItem;
@@ -473,14 +518,19 @@
         await createAllQueueItems(await Promise.all(newQueueItems));
         isLoading.value = false;
 
+        console.log(stagePorcentage.value, '👌');
+
         if (stagePorcentage.value >= 100) {
+            console.log('👍');
             emits('saved-queue', true);
         } else {
+            console.log('👎');
             emits('saved-queue', false);
         }
     };
 
     onMounted(() => {
+        fillQueueBoxes();
         emits('update-queue', boxQueue.value);
     });
 </script>
@@ -548,6 +598,9 @@
         }
         &.done {
             @apply cursor-not-allowed bg-gray-300 border-gray-400 text-gray-400 hover:shadow-none;
+        }
+        &.completed {
+            @apply cursor-not-allowed bg-gray-400 border-gray-200 text-gray-200 hover:shadow-none;
         }
     }
     .circle-progress {

@@ -9,10 +9,11 @@
             />
             <PrimaryBtn
                 class="col-span-6 md:col-span-3 max-h-12 mt-7"
-                :disabled="selectedStageId < 0"
+                :disabled="disableFinishBtn"
                 @click="finishCurrent"
-                >Finalizar Stage</PrimaryBtn
             >
+                Finalizar Stage
+            </PrimaryBtn>
         </FieldGroup>
         <nav class="flex gap-8 mt-10">
             <button
@@ -53,11 +54,13 @@
                     v-for="sheet in finalizedStages"
                     :key="`stage-${sheet.id}`"
                     :sand-stage="sheet"
+                    :boxes="boxes"
                     :is-selected-stage="isStageSelected(sheet.id, selectedStageId)"
-                    :is-active="pendingStages[0].id === sheet.id"
+                    :is-active="finalizedStages[0].id === sheet.id"
                     @set-stage="setSelectedStageId($event)"
                     @update-queue="updateQueue($event)"
                     @set-stage-full="setStageFull(sheet.id)"
+                    @saved-queue="saveQueue"
                 />
                 <StageSheetStageBox v-if="finalizedStages.length <= 0">
                     <p class="text-center p-6">No hay etapas finalizadas</p>
@@ -118,6 +121,7 @@
         WorkOrder,
         Pit,
         SandOrderBox,
+        QueueBox,
     } from '@/interfaces/sandflow';
     import { boxesByFloor, formatLocation, searchInDepoBoxes } from '@/helpers/useWarehouse';
     import { useAxios } from '@vueuse/integrations/useAxios';
@@ -132,7 +136,13 @@
     import { deleteAllQueueItems, getQueueItems, updateAllQueueItems } from '@/helpers/useQueueItem';
     import { useSheetStore } from '@/store/stageSheet.pinia';
     import { storeToRefs } from 'pinia';
-    import { detailTitle, queueDetailFormated, isStageSelected, finishSandStage } from '@/helpers/useSheetHelpers';
+    import {
+        detailTitle,
+        queueDetailFormated,
+        isStageSelected,
+        finishSandStage,
+        decodeNewOrigin,
+    } from '@/helpers/useSheetHelpers';
     import { getSandOrders } from '@/helpers/useGetEntities';
 
     const apiUrl = import.meta.env.VITE_API_URL || '/api';
@@ -177,21 +187,40 @@
             fillBoxes();
         }
     };
+    const disableFinishBtn = computed(() => {
+        return (
+            selectedStageId.value < 0 ||
+            selectedSandStage.value?.status === null ||
+            selectedSandStage.value?.status >= 2
+        );
+    });
 
     const finishCurrent = async () => {
+        console.log(selectedStageId.value);
+
         if (selectedStageId.value < 0) {
             return;
         }
-        console.log(selectedQueue.value);
         const toFreeBoxes = selectedQueue.value.filter((item: QueueItem) => item.status < 99);
         const toFinishBoxes = selectedQueue.value
             .filter((item: QueueItem) => item.status >= 99)
             .map((item: QueueItem) => {
+                if ('sandPlanId' in item && 'sandStageId' in item) {
+                    console.log('Tengo data extra');
+                    const { origin, sandPlanId, sandStageId } = item;
+                    const newOrigin = { origin, sandPlanId, sandStageId };
+                    console.log(newOrigin);
+                    item.origin = JSON.stringify(newOrigin);
+                }
+
                 return {
                     ...item,
                     status: 100,
                 };
             });
+        console.log('🔒', toFinishBoxes);
+        console.log('🔓', toFreeBoxes);
+        console.log('📦', selectedSandStage.value);
         await updateAllQueueItems(toFinishBoxes);
         await deleteAllQueueItems(toFreeBoxes);
         await finishSandStage(selectedSandStage.value);
@@ -320,6 +349,7 @@
     queueBoxes.value = queueBoxes.value
         ?.filter((item) => item.sandOrder)
         .map((item) => {
+            // Agrego el location del sandOrder para que sea mas facil de manejar
             const { sandOrder } = item;
             let location = '';
 
@@ -335,19 +365,40 @@
         });
     // .filter((item) => item.location?.where === 'warehouse');
     console.log('queueBoxes', queueBoxes.value);
-    queueBoxes.value = queueBoxes.value.filter((item) => item.status <= 100);
+    queueBoxes.value = queueBoxes.value.map((item: QueueBox) => {
+        // Convierto el QueueItem a un QueueBox
+        // AKA convierto el nuevo Origin sucio en Origin y sandStageId + sandPlanId
+        const { origin } = item as QueueBox;
+        console.log('Origen', origin);
+
+        if (origin.includes('sandPlanId') && origin.includes('sandStageId')) {
+            const originData = decodeNewOrigin(origin);
+            console.log('originData', originData);
+            item.origin = originData.origin;
+            item.sandStageId = originData.sandStageId;
+            item.sandPlanId = originData.sandPlanId;
+        }
+
+        return item as QueueBox;
+    });
+    // queueBoxes.value = queueBoxes.value.filter((item) => item.status <= 100);
     console.log('queueBoxes', queueBoxes.value);
 
     const router = useRouter();
     const saveQueue = (isFinished: boolean) => {
+        console.log('👎? ' + isFinished);
+
         if (isFinished) {
             // tomo el stage de sageID
             // le pongo 2 para que este finalizado
             // Modificamos el Stage para que este finalizado
+            console.log('Finalizo 😺');
             finishCurrent();
+
+            return;
         }
         // En cualquier caso cierro el acordeaon y recargo
-        selectedStageId.value = -1;
+        // selectedStageId.value = -1;
         router.go(0);
     };
 

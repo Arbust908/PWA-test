@@ -165,6 +165,7 @@
         getCradles,
         getWorkOrders,
         getSand,
+        getSandStage,
     } from '@/helpers/useGetEntities';
     import { asyncForEach } from '@/helpers/useAsyncFor';
     import {
@@ -175,7 +176,16 @@
         createAllQueueItems,
     } from '@/helpers/useQueueItem';
 
-    import { Box, SandOrderBox, PurchaseOrder, Sand, Cradle, QueueItem } from '@/interfaces/sandflow';
+    import {
+        Box,
+        SandOrderBox,
+        PurchaseOrder,
+        Sand,
+        Cradle,
+        QueueItem,
+        Warehouse,
+        SandStage,
+    } from '@/interfaces/sandflow';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
     import FieldGroup from '@/components/ui/form/FieldGroup.vue';
     import FieldSelect from '@/components/ui/form/FieldSelect.vue';
@@ -523,6 +533,24 @@
         const transportId = driver?.transportId;
 
         const queueItemsToMake = [] as QueueItem[];
+        const allStages = (await getSandStage()) as SandStage[];
+        // Levantar SandPlan y el SandPlan actual
+        console.log(clientId.value, pitId.value);
+        const filterStages = allStages.filter((stage: SandStage) => {
+            console.log(stage);
+
+            return stage?.status !== null && stage?.status < 2;
+        });
+        const currentPlan =
+            filterStages.find((stage: SandStage) => {
+                console.log(stage, '::STAGE::');
+
+                return stage?.sandPlan?.companyId === clientId.value && stage?.sandPlan?.pitId === pitId.value;
+            }) || ({} as SandStage);
+        console.log('Found >>>', currentPlan);
+        const sandStageId = currentPlan?.id;
+        const sandPlanId = currentPlan?.sandPlan?.id;
+
         await asyncForEach(toFilterBoxes, async (box: SandOrderBox) => {
             const { TransporteACradle, TransporteADeposito } = QueueTransactions;
             const {
@@ -541,8 +569,16 @@
             newQI.pitId = pitId.value;
             newQI.sandOrderId = box?.id as number;
             newQI.order = orderQI;
+            // Despues encodeamos eso en el origin y lo mandamos
+            console.log(origin);
+            console.log(sandStageId, sandPlanId);
+            const newOrigin = JSON.stringify({ sandPlanId, sandStageId, origin: newQI.origin });
+            console.log(newOrigin);
+            newQI.origin = newOrigin;
+            console.log(newQI);
             queueItemsToMake.push(newQI);
         });
+
         console.log('queueItemsToMake', queueItemsToMake);
         const createItems = queueItemsToMake
             .filter((item) => item.origin)
@@ -629,14 +665,14 @@
     onMounted(async () => {
         const result = await axios.get(`${apiUrl}/workOrder`);
         workOrdersPad.value = result.data.data;
-        sandTypes.value = await getSand();
+        sandTypes.value = (await getSand()) as Sand[];
         sandTypes.value = sandTypes.value.filter((type) => {
             return type.visible;
         });
 
-        purchaseOrders.value = await getPurchaseOrders();
-        warehouses.value = await getWarehouses();
-        cradles.value = await getCradles();
+        purchaseOrders.value = (await getPurchaseOrders()) as PurchaseOrder[];
+        warehouses.value = (await getWarehouses()) as Warehouse[];
+        cradles.value = (await getCradles()) as Cradle[];
         cleanCradles.value = [...cradles.value];
         sandOrders.value = await (
             await getSandOrders()

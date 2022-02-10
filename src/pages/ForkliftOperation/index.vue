@@ -87,7 +87,7 @@
 </template>
 
 <script setup lang="ts">
-    import { QueueItem, SandOrder, SandOrderBox } from '@/interfaces/sandflow';
+    import { QueueItem, SandOrder, SandOrderBox, WorkOrder } from '@/interfaces/sandflow';
     import Layout from '@/layouts/Main.vue';
     import ABMFormTitle from '@/components/ui/ABMFormTitle.vue';
     import ClientPitCombo from '@/components/util/ClientPitCombo.vue';
@@ -105,6 +105,7 @@
     import { finishSandOrder, updateSandOrder } from '@/helpers/useSandOrder.service';
     import { getCradle, getWorkOrders, updateCradle } from '@/helpers/useGetEntities';
     import { Cradle } from '@/interfaces/sandflow';
+    import { decodeNewOrigin } from '@/helpers/useSheetHelpers';
 
     useTitle('Operacion en forklift <> Sandflow');
     const clientId = ref(-1);
@@ -130,10 +131,24 @@
             return;
         }
 
-        queue.value = queueBackup.value.filter((item: QueueItem) => item.pitId === pitId.value);
-        const workOrders = await getWorkOrders(`?client=${clientId.value}`);
+        queue.value = queueBackup.value
+            .filter((item: QueueItem) => item.pitId === pitId.value)
+            .map((item: QueueItem) => {
+                const { origin } = item;
+
+                if (origin.includes('sandPlanId') && origin.includes('sandStageId')) {
+                    const originData = decodeNewOrigin(origin);
+                    console.log('originData', originData);
+                    item.origin = originData.origin;
+                    item.sandStageId = originData.sandStageId;
+                    item.sandPlanId = originData.sandPlanId;
+                }
+
+                return item;
+            });
+        const workOrders = (await getWorkOrders(`?client=${clientId.value}`)) as WorkOrder[];
         const cradleId = workOrders[0]?.operativeCradle;
-        currentCradle.value = await getCradle(Number(cradleId));
+        currentCradle.value = (await getCradle(Number(cradleId))) as Cradle;
         updateLists();
         itemToDelete.value = finishedQueue.value;
     };
@@ -156,7 +171,25 @@
         setTimeout(() => {
             updateLists();
             commitTransition(item);
+
+            if ('sandPlanId' in item && 'sandStageId' in item) {
+                console.log('Tengo data extra');
+                const { origin, sandPlanId, sandStageId } = item;
+                const newOrigin = { origin, sandPlanId, sandStageId };
+                console.log(newOrigin);
+                item.origin = JSON.stringify(newOrigin);
+            }
+
             updateQueueItem(item);
+            const { origin } = item;
+
+            if (origin.includes('sandPlanId') && origin.includes('sandStageId')) {
+                const originData = decodeNewOrigin(origin);
+                console.log('originData', originData);
+                item.origin = originData.origin;
+                item.sandStageId = originData.sandStageId;
+                item.sandPlanId = originData.sandPlanId;
+            }
         }, 1000);
     };
 
@@ -166,7 +199,8 @@
     const filterNotDone = () => {
         toDoQueue.value = queue.value
             .filter((item: QueueItem) => itemIsNotDone(item))
-            .filter((item: QueueItem) => item.sandOrder);
+            .filter((item: QueueItem) => item.sandOrder)
+            .filter((item: QueueItem) => item.pitId === pitId.value);
         const hasNoDestinations = toDoQueue.value.filter(({ destination }: QueueItem) => !destination);
 
         if (hasNoDestinations.length) {
@@ -177,7 +211,8 @@
     const filterFinished = () => {
         finishedQueue.value = queue.value
             .filter((item: QueueItem) => itemIsFinished(item))
-            .filter((item: QueueItem) => item.sandOrder);
+            .filter((item: QueueItem) => item.sandOrder)
+            .filter((item: QueueItem) => item.pitId === pitId.value);
     };
     const updateLists = () => {
         filterNotDone();

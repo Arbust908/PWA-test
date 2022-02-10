@@ -89,6 +89,14 @@ export const updateCradle = async (cradleData: Cradle) => {
         })
         .catch((err) => console.error(err));
 };
+export const getSandStage = async () => {
+    return await axios
+        .get(`${apiUrl}/sandStage`)
+        .then((res) => {
+            return res.data.data as SandStage[];
+        })
+        .catch((err) => console.error(err));
+};
 export const updateStage = async (stageData: SandStage) => {
     const { id } = stageData;
 

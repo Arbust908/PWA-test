@@ -24,7 +24,7 @@ export const useSheetStore = defineStore('stageSheet', () => {
     const currentCradle = ref({} as Cradle);
     const currentWarehouse = ref({} as Warehouse);
     const pitId = ref(-1);
-    const queueBoxes = ref([] as QueueBox[]);
+    const queueBoxes = ref([] as QueueBox[] | QueueBox[]);
     const sands = ref([] as Sand[]);
     const selectedSandStage = ref({} as SandStage);
     const selectedStageId = ref(-1);
