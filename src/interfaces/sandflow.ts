@@ -398,7 +398,7 @@ export interface QueueItem {
     sandOrder?: SandOrder;
     pitId: number;
     pit?: Pit;
-    origin: string;
+    origin: string; // vamos a poner el id del SandPlan aca tambien
     destination: string;
     status: number;
     // 0 - Pendiente
@@ -410,6 +410,34 @@ export interface QueueItem {
     // 99999 - 90000 Retiro ( cradleAOtro )
     // 9999 - 9000 TRansporte a Otro
     // 999 - 500 Deposito a Cradle
+    createdAt?: Date;
+    updatedAt?: Date;
+    deletedAt?: Date;
+}
+
+export enum QueueBoxStatus {
+    FRESH = 0,
+    WITH_NO_DESTINATION = 10,
+    MOVED = 99,
+    DONE = 100,
+}
+export interface QueueBox {
+    id?: number;
+    sandOrderId: number;
+    sandOrder?: SandOrder;
+    pitId: number;
+    pit?: Pit;
+    origin: string;
+    destination: string;
+    sandStageId: number;
+    sandPlanId: number;
+    status: QueueBoxStatus;
+    // 0 - Pendiente
+    // 10 - A retirar
+    // 20 - En Cola ?
+    // 99 - Finalizado
+    // 100 - Borrado
+    order: number;
     createdAt?: Date;
     updatedAt?: Date;
     deletedAt?: Date;

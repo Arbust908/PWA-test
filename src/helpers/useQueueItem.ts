@@ -58,22 +58,25 @@ const getOrderNumber = (queueNumbers: Array<number>, { min, max }: any) => {
 
 export const separateQueues = (queue: Array<QueueItem>): SteppedQueue => {
     const steppedQueue = queue
-        // .filter(({ status }) => status !== 99)
         .sort((a, b) => b.order - a.order)
         .reduce(
             (acc, queueItem) => {
                 const { order } = queueItem;
 
                 if (order <= 999999 && order >= 900000) {
+                    console.log('aTransporte', queueItem.id);
                     acc.aTransporte.push(queueItem);
                     acc.aTransporte = [...new Set(acc.aTransporte)];
                 } else if (order <= 99999 && order >= 90000) {
+                    console.log('Retiro', queueItem.id);
                     acc.Retiro.push(queueItem);
                     acc.Retiro = [...new Set(acc.Retiro)];
                 } else if (order <= 9999 && order >= 9000) {
+                    console.log('deTransporte', queueItem.id);
                     acc.deTransporte.push(queueItem);
                     acc.deTransporte = [...new Set(acc.deTransporte)];
                 } else if (order <= 999 && order >= 500) {
+                    console.log('aCradle', queueItem.id);
                     acc.aCradle.push(queueItem);
                     acc.aCradle = [...new Set(acc.aCradle)];
                 }
