@@ -4,9 +4,9 @@ declare global {
     }
 }
 const online = useOnline();
-import Localbase from 'localbase';
+// import Localbase from 'localbase';
 
-const db = new Localbase('db');
+// const db = new Localbase('db');
 export enum StoreLogicMethods {
     CREATE = 'create',
     GET = 'get',
@@ -23,8 +23,8 @@ export async function useStoreLogic(
     payload?: any
 ) {
     console.log(online ? '🟢 Tamos Redy' : '🔴 No redy');
-    const localDB = await db.collection(entity).get();
-    console.log(localDB);
+    // const localDB = await db.collection(entity).get();
+    // console.log(localDB);
 
     if (!online) {
         console.log('Vamos por el LocalDB');
