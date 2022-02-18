@@ -149,6 +149,10 @@
             ];
 
             const filteredUsers = computed(() => {
+                users.value = users.value.filter((user) => {
+                    return user.roleId !== 6;
+                });
+
                 if (userId.value > -1) {
                     return users.value.filter((user) => user.id == userId.value);
                 }

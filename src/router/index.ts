@@ -6,34 +6,40 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: 'Main',
+        isGeneric: true,
         component: Home,
         beforeEnter: goToLogin,
     },
     {
         path: '/home',
         name: 'Home',
+        isGeneric: true,
         component: Home,
         beforeEnter: isLogged,
     },
     {
         path: '/register',
         name: 'LoginValidation',
+        isGeneric: true,
         component: () => import('@/pages/LoginValidation.vue'),
     },
     {
         path: '/register-new-password',
         name: 'Register',
+        isGeneric: true,
         component: () => import('@/pages/Register.vue'),
     },
     {
         path: '/login',
         name: 'Login',
+        isGeneric: true,
         component: () => import('@/pages/Login.vue'),
         beforeEnter: isGuest,
     },
     {
         path: '/denied',
         name: 'BeforeLogin',
+        isGeneric: true,
         component: () => import('@/pages/Error/401.vue'),
         beforeEnter: isGuest,
     },
@@ -41,7 +47,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/about',
         name: 'About',
         component: () => import('@/pages/About.vue'),
-        beforeEnter: isLogged,
+        beforeEnter: [isLogged, checkPermission],
     },
     {
         path: '/orden-de-trabajo',
@@ -103,7 +109,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/BoxEntry/index.vue'),
         beforeEnter: [isMobileAndLogged, checkPermission],
     },
-    // < ::
     {
         path: '/tipos-de-arena',
         name: 'Sand',
@@ -300,6 +305,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/usuario/salir',
         name: 'UserLogout',
+        isGeneric: true,
         component: () => import('@/pages/User/Logout.vue'),
         beforeEnter: isLogged,
     },
@@ -321,71 +327,102 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('@/pages/ForkliftOperation/index.vue'),
         beforeEnter: [isLogged, checkPermission],
     },
+    {
+        path: '/rol',
+        name: 'Role',
+        component: () => import('@/pages/Role/index.vue'),
+        beforeEnter: [isLogged, checkPermission],
+    },
+    {
+        path: '/rol/:id',
+        name: 'RoleById',
+        component: () => import('@/pages/Role/_id.vue'),
+        beforeEnter: [isLogged, checkPermission],
+    },
+    {
+        path: '/rol/nuevo',
+        name: 'NewRole',
+        component: () => import('@/pages/Role/new.vue'),
+        beforeEnter: [isLogged, checkPermission],
+    },
     // Todas las rutas deberian ir antes de estas 👇
     {
         path: '/no-mobile',
         name: 'NoMobile',
+        isGeneric: true,
         component: () => import('@/pages/Error/NoMobile.vue'),
     },
     {
         path: '/notLogged',
         name: 'NotLogged',
+        isGeneric: true,
         component: () => import('@/pages/Error/401.vue'),
     },
     {
         path: '/error401',
         name: 'Error-401',
+        isGeneric: true,
         component: () => import('@/pages/Error/401.vue'),
     },
     {
         path: '/error403',
         name: 'Error-403',
+        isGeneric: true,
         component: () => import('@/pages/Error/403.vue'),
         beforeEnter: [isLogged],
     },
     {
         path: '/error404',
         name: 'Error-404',
+        isGeneric: true,
         component: () => import('@/pages/Error/404.vue'),
     },
     {
         path: '/error500',
         name: 'Error-500',
+        isGeneric: true,
         component: () => import('@/pages/Error/500.vue'),
     },
     {
         path: '/error503',
         name: 'Error-503',
+        isGeneric: true,
         component: () => import('@/pages/Error/503.vue'),
     },
     {
         path: '/error504',
         name: 'Error-504',
+        isGeneric: true,
         component: () => import('@/pages/Error/504.vue'),
     },
     {
         path: '/tests',
         name: 'TestIndex',
+        isGeneric: true,
         component: () => import('@/pages/Tests/Modales.vue'),
     },
     {
         path: '/tests/eventos',
         name: 'TestEventos',
+        beforeEnter: [isLogged, checkPermission],
         component: () => import('@/pages/Tests/Eventos.vue'),
     },
     {
         path: '/tests/pdf',
         name: 'TestPDF',
+        beforeEnter: [isLogged, checkPermission],
         component: () => import('@/pages/Tests/PDF.vue'),
     },
     {
         path: '/tests/queue',
         name: 'TestQueue',
+        beforeEnter: [isLogged, checkPermission],
         component: () => import('@/pages/Tests/QueueItems.vue'),
     },
     {
         path: '/:catchAll(.*)',
         name: 'PageNotFound',
+        isGeneric: true,
         component: () => import('@/pages/Error/404.vue'),
     },
 ];

@@ -358,10 +358,16 @@ export interface User {
     visible?: boolean;
 }
 
+interface Permissions {
+    view: Array<string>;
+}
 export interface Role {
     id?: number;
     name: string;
-    permissions: any;
+    permissions: Permissions;
+    createdAt?: string;
+    updatedAt?: string;
+    deletedAt?: string;
 }
 
 export enum Roles {

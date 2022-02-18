@@ -43,77 +43,110 @@
     </Layout>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+    import { watchEffect, reactive, defineAsyncComponent, ref } from 'vue';
+    import { useStore } from 'vuex';
+    import { useRouter } from 'vue-router';
+    import { useTitle, useToggle } from '@vueuse/core';
     import Layout from '@/layouts/Main.vue';
+    import Icon from '@/components/icon/TheAllIcon.vue';
     import ForkliftForm from '@/components/forklift/Form.vue';
     import SecondaryBtn from '@/components/ui/buttons/SecondaryBtn.vue';
     import PrimaryBtn from '@/components/ui/buttons/PrimaryBtn.vue';
+    import WarningBtn from '@/components/ui/buttons/WarningBtn.vue';
     import { useStoreLogic } from '@/helpers/useStoreLogic';
     import { useValidator } from '@/helpers/useValidator';
     import axios from 'axios';
+    const api = import.meta.env.VITE_API_URL || '/api';
+    const Modal = defineAsyncComponent(() => import('@/components/modal/General.vue'));
     import ErrorModal from '@/components/modal/ErrorModal.vue';
     import SuccessModal from '@/components/modal/SuccessModal.vue';
-    import { FUNES } from '@/helpers/funes';
 
-    const api = import.meta.env.VITE_API_URL || '/api';
+    export default {
+        components: {
+            Layout,
+            SecondaryBtn,
+            PrimaryBtn,
+            ForkliftForm,
+            Modal,
+            Icon,
+            WarningBtn,
+            ErrorModal,
+            SuccessModal,
+        },
+        setup() {
+            useTitle('Nuevo Forklift <> Sandflow');
+            const store = useStore();
+            const router = useRouter();
 
-    useTitle('Nuevo Forklift <> Sandflow');
-    const store = useStore();
-    const router = useRouter();
+            const createdForklifts = ref([]);
+            const forklift = reactive({
+                name: '',
+                observations: '',
+            });
 
-    const createdForklifts = ref([]);
-    const forklift = reactive({
-        name: '',
-        observations: '',
-    });
+            const goToIndex = (): void => {
+                router.push('/forklift');
+            };
 
-    const goToIndex = (): void => {
-        router.push('/forklift');
-    };
+            const isValidated = ref(false);
 
-    const isValidated = ref(false);
+            watchEffect(async () => {
+                isValidated.value = (await useValidator(store, 'forklift')) ? true : false;
+            });
 
-    watchEffect(async () => {
-        isValidated.value = (await useValidator(store, 'forklift')) ? true : false;
-    });
+            // MODALS
+            const showModal = ref(false);
+            const toggleModal = useToggle(showModal);
 
-    // MODALS
-    const showModal = ref(false);
-    const toggleModal = useToggle(showModal);
+            const showErrorModal = ref(false);
+            const toggleErrorModal = useToggle(showErrorModal);
 
-    const showErrorModal = ref(false);
-    const toggleErrorModal = useToggle(showErrorModal);
+            const showApiErrorModal = ref(false);
+            const toggleApiErrorModal = useToggle(showApiErrorModal);
 
-    const showApiErrorModal = ref(false);
-    const toggleApiErrorModal = useToggle(showApiErrorModal);
+            const save = async () => {
+                await useStoreLogic(router, store, 'forklift', 'create', forklift).then((res) => {
+                    if (res.type == 'failed') {
+                        toggleApiErrorModal();
+                    } else {
+                        toggleModal();
+                    }
+                });
+            };
 
-    await FUNES.remember('forklifts');
-    const save = async () => {
-        await useStoreLogic(router, store, 'forklift', 'create', forklift).then((res) => {
-            if (res.type == 'failed') {
-                toggleApiErrorModal();
-            } else {
-                toggleModal();
-            }
-        });
-    };
+            const getForkliftsAndCheckIfNameExists = async () => {
+                try {
+                    const forkliftsFromApi = await axios.get(`${api}/forklift`);
 
-    const getForkliftsAndCheckIfNameExists = async () => {
-        try {
-            const forkliftsFromApi = await axios.get(`${api}/forklift`);
+                    createdForklifts.value = forkliftsFromApi.data.data;
 
-            createdForklifts.value = forkliftsFromApi.data.data;
+                    let types = createdForklifts.value.map((forklift) => forklift.name.toLowerCase());
 
-            let types = createdForklifts.value.map((forklift) => forklift.name.toLowerCase());
+                    if (types.includes(forklift.name.toLowerCase())) {
+                        toggleErrorModal();
+                    } else {
+                        save();
+                    }
+                } catch (error) {
+                    console.log(error);
+                }
+            };
 
-            if (types.includes(forklift.name.toLowerCase())) {
-                toggleErrorModal();
-            } else {
-                save();
-            }
-        } catch (error) {
-            console.log(error);
-        }
+            return {
+                forklift,
+                goToIndex,
+                save,
+                isValidated,
+                showModal,
+                showErrorModal,
+                showApiErrorModal,
+                toggleModal,
+                toggleErrorModal,
+                toggleApiErrorModal,
+                getForkliftsAndCheckIfNameExists,
+            };
+        },
     };
 </script>
 
